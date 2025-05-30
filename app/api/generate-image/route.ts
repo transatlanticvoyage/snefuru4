@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import OpenAI from 'openai';
+import fetch from 'node-fetch';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -41,14 +42,46 @@ export async function POST(request: Request) {
       throw new Error('No image URL returned from OpenAI');
     }
 
-    const imageUrl = response.data[0].url;
-    console.log('Generated image URL:', imageUrl);
+    const openaiImageUrl = response.data[0].url;
+    console.log('Generated image URL:', openaiImageUrl);
+
+    // Download the image from OpenAI
+    const imageResponse = await fetch(openaiImageUrl);
+    if (!imageResponse.ok) {
+      throw new Error('Failed to download image from OpenAI');
+    }
+    const imageBuffer = await imageResponse.buffer();
+
+    // Generate a unique filename
+    const timestamp = new Date().getTime();
+    const filename = `${imageId}-${timestamp}.png`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('images')
+      .upload(filename, imageBuffer, {
+        contentType: 'image/png',
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Storage upload error:', uploadError);
+      throw new Error(`Failed to upload image to storage: ${uploadError.message}`);
+    }
+
+    // Get the public URL for the uploaded image
+    const { data: { publicUrl } } = supabase
+      .storage
+      .from('images')
+      .getPublicUrl(filename);
 
     // Update the image record in the database
     const { error: updateError } = await supabase
       .from('images')
       .update({
-        img_file_url1: imageUrl,
+        img_file_url1: publicUrl,
         prompt1: prompt,
         status: 'completed'
       })
@@ -59,7 +92,7 @@ export async function POST(request: Request) {
       throw new Error(`Failed to update image record: ${updateError.message}`);
     }
 
-    return NextResponse.json({ success: true, imageUrl });
+    return NextResponse.json({ success: true, imageUrl: publicUrl });
   } catch (error) {
     console.error('Error generating image:', error);
     
