@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
 interface ApiKey {
@@ -18,20 +17,15 @@ export default function ApiKeysPage2() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const router = useRouter();
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) {
-      router.replace('/login');
-      return;
+    if (user) {
+      fetchApiKeys();
     }
-    fetchApiKeys();
-  }, [user, router]);
+  }, [user]);
 
   const fetchApiKeys = async () => {
-    if (!user) return;
-
     try {
       setLoading(true);
       setError(null);
@@ -67,6 +61,7 @@ export default function ApiKeysPage2() {
           keyType: 'openai',
           keyValue: newKey,
         }),
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -97,6 +92,7 @@ export default function ApiKeysPage2() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ keyType }),
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -111,10 +107,6 @@ export default function ApiKeysPage2() {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
-
-  if (!user) {
-    return null;
-  }
 
   if (loading) {
     return <div className="p-4">Loading API keys...</div>;
