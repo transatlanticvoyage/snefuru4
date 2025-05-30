@@ -14,10 +14,18 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith('/papikeys') ||
     req.nextUrl.pathname.startsWith('/gambar1')
   )) {
-    const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = '/login';
+    // Create a new URL for the login page
+    const redirectUrl = new URL('/login', req.url);
     redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
+  }
+
+  // If there is a session and the user is trying to access login/register pages
+  if (session && (
+    req.nextUrl.pathname.startsWith('/login') ||
+    req.nextUrl.pathname.startsWith('/signup')
+  )) {
+    return NextResponse.redirect(new URL('/home', req.url));
   }
 
   return res;
@@ -28,5 +36,7 @@ export const config = {
   matcher: [
     '/papikeys/:path*',
     '/gambar1/:path*',
+    '/login',
+    '/signup'
   ],
 }; 
