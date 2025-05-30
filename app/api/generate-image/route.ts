@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import OpenAI from 'openai';
 import fetch from 'node-fetch';
 
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     const filename = `${imageId}-${timestamp}.png`;
 
     // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase
+    const { data: uploadData, error: uploadError } = await supabaseAdmin
       .storage
       .from('bucket-images-b1')
       .upload(filename, imageBuffer, {
@@ -72,13 +72,13 @@ export async function POST(request: Request) {
     }
 
     // Get the public URL for the uploaded image
-    const { data: { publicUrl } } = supabase
+    const { data: { publicUrl } } = supabaseAdmin
       .storage
       .from('bucket-images-b1')
       .getPublicUrl(filename);
 
     // Update the image record in the database
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('images')
       .update({
         img_file_url1: publicUrl,
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
     // Update the image record to mark it as failed
     if (error instanceof Error && imageId) {
       try {
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseAdmin
           .from('images')
           .update({
             status: 'failed',
