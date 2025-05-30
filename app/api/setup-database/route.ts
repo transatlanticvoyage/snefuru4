@@ -10,7 +10,8 @@ export async function POST() {
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
           created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
           email TEXT UNIQUE,
-          auth_id UUID UNIQUE
+          auth_id UUID UNIQUE,
+          api_key TEXT
         );
 
         -- Create images_plans_batches table

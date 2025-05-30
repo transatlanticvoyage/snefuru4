@@ -35,10 +35,21 @@ export default function ApiKeysPage() {
       try {
         if (!user) return;
 
+        // First get the user's ID from the users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (userError) throw userError;
+        if (!userData) throw new Error('User record not found');
+
+        // Then fetch the API keys
         const { data, error } = await supabase
           .from('api_keys')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', userData.id)
           .single();
 
         if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
@@ -62,10 +73,20 @@ export default function ApiKeysPage() {
     setError(null);
 
     try {
+      // First get the user's ID from the users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError) throw userError;
+      if (!userData) throw new Error('User record not found');
+
       const { error } = await supabase
         .from('api_keys')
         .upsert({
-          user_id: user.id,
+          user_id: userData.id,
           dropbox_key: dropboxKey,
           updated_at: new Date().toISOString(),
         });
@@ -87,10 +108,20 @@ export default function ApiKeysPage() {
     setError(null);
 
     try {
+      // First get the user's ID from the users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError) throw userError;
+      if (!userData) throw new Error('User record not found');
+
       const { error } = await supabase
         .from('api_keys')
         .upsert({
-          user_id: user.id,
+          user_id: userData.id,
           openai_key: openaiKey,
           updated_at: new Date().toISOString(),
         });

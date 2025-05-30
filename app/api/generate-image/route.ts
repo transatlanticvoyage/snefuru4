@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const { error: updateError } = await supabase
       .from('images')
       .update({
-        image_url: imageUrl,
+        img_file_url1: imageUrl,
         prompt1: prompt,
         status: 'completed'
       })
