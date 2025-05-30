@@ -36,10 +36,8 @@ export async function POST(request: Request) {
     // Get the user's API key
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('api_keys')
-      .select('key_value')
+      .select('openai_key')
       .eq('user_id', userId)
-      .eq('key_type', 'openai')
-      .eq('is_active', true)
       .single();
 
     if (apiKeyError || !apiKeyData) {
@@ -51,7 +49,7 @@ export async function POST(request: Request) {
     }
 
     const openai = new OpenAI({
-      apiKey: apiKeyData.key_value,
+      apiKey: apiKeyData.openai_key,
     });
 
     // Generate the image
@@ -98,9 +96,8 @@ export async function POST(request: Request) {
     const { error: updateError } = await supabase
       .from('images')
       .update({
-        image_url: publicUrl,
-        status: 'completed',
-        updated_at: new Date().toISOString()
+        img_file_url1: publicUrl,
+        status: 'completed'
       })
       .eq('id', id);
 
