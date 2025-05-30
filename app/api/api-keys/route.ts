@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { Database } from '@/types/supabase';
 
 // GET: Fetch user's API keys
 export async function GET() {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies });
+    const supabase = createRouteHandlerClient({ cookies });
     
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     if (sessionError || !session) {
@@ -36,7 +35,7 @@ export async function GET() {
 // POST: Add or update an API key
 export async function POST(request: Request) {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies });
+    const supabase = createRouteHandlerClient({ cookies });
     
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     if (sessionError || !session) {
@@ -83,7 +82,7 @@ export async function POST(request: Request) {
 // DELETE: Deactivate an API key
 export async function DELETE(request: Request) {
   try {
-    const supabase = createRouteHandlerClient<Database>({ cookies });
+    const supabase = createRouteHandlerClient({ cookies });
     
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     if (sessionError || !session) {
