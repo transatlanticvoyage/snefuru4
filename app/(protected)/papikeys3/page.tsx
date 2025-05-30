@@ -35,8 +35,7 @@ export default function ApiKeysPage3() {
       const { data: apiKeys, error } = await supabase
         .from('api_keys')
         .select('*')
-        .eq('user_id', user?.id)
-        .eq('is_active', true);
+        .eq('user_id', user?.id);
 
       if (error) {
         throw error;
@@ -61,16 +60,16 @@ export default function ApiKeysPage3() {
     setSuccess(null);
 
     try {
-      // First, deactivate any existing keys of the same type
-      const { error: deactivateError } = await supabase
+      // First, delete any existing keys of the same type
+      const { error: deleteError } = await supabase
         .from('api_keys')
-        .update({ is_active: false })
+        .delete()
         .eq('user_id', user.id)
         .eq('key_type', 'openai');
 
-      if (deactivateError) {
-        console.error('Deactivate error:', deactivateError);
-        throw new Error(`Failed to deactivate existing key: ${deactivateError.message}`);
+      if (deleteError) {
+        console.error('Delete error:', deleteError);
+        throw new Error(`Failed to delete existing key: ${deleteError.message}`);
       }
 
       // Then create the new key
@@ -79,8 +78,7 @@ export default function ApiKeysPage3() {
         .insert({
           user_id: user.id,
           key_type: 'openai',
-          key_value: newKey,
-          is_active: true
+          key_value: newKey
         });
 
       if (insertError) {
@@ -107,7 +105,7 @@ export default function ApiKeysPage3() {
     try {
       const { error } = await supabase
         .from('api_keys')
-        .update({ is_active: false })
+        .delete()
         .eq('user_id', user.id)
         .eq('key_type', keyType);
 
