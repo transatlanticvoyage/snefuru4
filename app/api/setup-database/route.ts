@@ -11,7 +11,9 @@ export async function POST() {
           created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
           email TEXT UNIQUE,
           auth_id UUID UNIQUE,
-          api_key TEXT
+          api_key TEXT,
+          openai_api_key TEXT,
+          CONSTRAINT fk_auth_id FOREIGN KEY (auth_id) REFERENCES auth.users(id) ON DELETE CASCADE
         );
 
         -- Create images_plans_batches table
