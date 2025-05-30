@@ -45,11 +45,29 @@ export default function Header() {
               <Link href="/home" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
                 Home
               </Link>
+              <Link href="/papikeys" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Papikeys
+              </Link>
+              <Link href="/papikeys2" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Papikeys2
+              </Link>
+              <Link href="/papikeys3" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Papikeys3
+              </Link>
               <Link href="/gambar1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
                 Gambar1
               </Link>
-              <Link href="/stuff1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Stuff1
+              <Link href="/gambar2" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Gambar2
+              </Link>
+              <Link href="/belt1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Belt1
+              </Link>
+              <Link href="/fbin2/panjar1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Panjar1
+              </Link>
+              <Link href="/fbin2/fapikeys1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                FApikeys1
               </Link>
             </nav>
           </div>
