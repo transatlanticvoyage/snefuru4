@@ -23,36 +23,55 @@ export default function FApikeys1Page() {
     setMessage({ type: '', text: '' });
 
     try {
-      if (!user?.email) {
+      if (!user?.email || !user?.id) {
         throw new Error('User not authenticated');
       }
 
       console.log('Current user email:', user.email);
+      console.log('Current user ID:', user.id);
 
-      // First, get the user's auth_id from the users table using email
-      const { data: userData, error: userError } = await supabase
+      // First, check if user exists in the users table
+      const { data: existingUser, error: userError } = await supabase
         .from('users')
         .select('auth_id')
         .eq('email', user.email)
         .single();
 
+      let authId;
+
       if (userError) {
-        console.error('Error fetching user:', userError);
-        throw userError;
-      }
+        if (userError.code === 'PGRST116') {
+          // User doesn't exist, create them
+          console.log('User not found, creating new user record...');
+          const { data: newUser, error: createError } = await supabase
+            .from('users')
+            .insert({
+              email: user.email,
+              auth_id: user.id
+            })
+            .select('auth_id')
+            .single();
 
-      if (!userData?.auth_id) {
-        console.error('No user found with email:', user.email);
-        throw new Error('User not found in database');
-      }
+          if (createError) {
+            console.error('Error creating user:', createError);
+            throw createError;
+          }
 
-      console.log('Found auth_id:', userData.auth_id);
+          authId = newUser.auth_id;
+          console.log('Created new user with auth_id:', authId);
+        } else {
+          throw userError;
+        }
+      } else {
+        authId = existingUser.auth_id;
+        console.log('Found existing user with auth_id:', authId);
+      }
 
       // Now insert the API key using the auth_id
       const { error: insertError } = await supabase
         .from('tapikeys2')
         .insert({
-          fk_users_id: userData.auth_id,
+          fk_users_id: authId,
           key_type: 'openai',
           key_value: apiKey,
           key_name: keyName || 'OpenAI Key',
