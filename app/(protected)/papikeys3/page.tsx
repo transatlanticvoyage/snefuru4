@@ -6,10 +6,9 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface ApiKey {
   id: string;
-  key_type: string;
+  user_id: string;
+  openai_key: string;
   created_at: string;
-  updated_at: string;
-  is_active: boolean;
 }
 
 export default function ApiKeysPage3() {
