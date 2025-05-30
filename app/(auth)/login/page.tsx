@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
 
 export default function Login() {
@@ -18,7 +18,7 @@ export default function Login() {
   useEffect(() => {
     // Redirect if user is already logged in
     if (user) {
-      router.push('/');
+      router.push('/home');
     }
     // Show message from URL if present
     const message = searchParams.get('message');
@@ -33,7 +33,7 @@ export default function Login() {
       setError(null);
       setLoading(true);
       await signIn(email, password);
-      router.push('/');
+      router.push('/home');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during sign in');
     } finally {
