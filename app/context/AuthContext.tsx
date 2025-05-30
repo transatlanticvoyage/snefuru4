@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -53,6 +53,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
     });
     if (error) throw error;
+
+    // Create a record in the users table
+    if (data.user) {
+      const { error: userError } = await supabase
+        .from('users')
+        .insert({
+          auth_id: data.user.id,
+          email: data.user.email,
+          created_at: new Date().toISOString(),
+        });
+      
+      if (userError) {
+        console.error('Error creating user record:', userError);
+        throw new Error('Failed to create user record');
+      }
+    }
   };
 
   const signIn = async (email: string, password: string) => {
