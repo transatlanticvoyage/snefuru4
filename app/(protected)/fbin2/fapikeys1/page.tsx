@@ -19,6 +19,7 @@ export default function FApikeys1Page() {
   const [isEditing, setIsEditing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [hasActiveKey, setHasActiveKey] = useState(false);
+  const [currentKeyName, setCurrentKeyName] = useState('');
 
   // Check for active API key on component mount
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function FApikeys1Page() {
         if (existingUser) {
           const { data: activeKey } = await supabase
             .from('tapikeys2')
-            .select('key_value')
+            .select('key_value, key_name')
             .eq('fk_users_id', existingUser.id)
             .eq('key_type', 'openai')
             .eq('is_active', true)
@@ -44,6 +45,7 @@ export default function FApikeys1Page() {
           setHasActiveKey(!!activeKey);
           if (activeKey) {
             setApiKey(activeKey.key_value);
+            setCurrentKeyName(activeKey.key_name);
           }
         }
       } catch (error) {
@@ -133,6 +135,7 @@ export default function FApikeys1Page() {
 
       setMessage({ type: 'success', text: 'API key saved successfully!' });
       setHasActiveKey(true);
+      setCurrentKeyName(keyName || 'OpenAI Key');
       setIsEditing(false);
       setKeyName('');
     } catch (error: any) {
@@ -178,6 +181,11 @@ export default function FApikeys1Page() {
                 <label htmlFor="keyName" className="block text-sm font-medium text-gray-700">
                   Key Name (Optional)
                 </label>
+                {hasActiveKey && !isEditing && (
+                  <div className="mt-1 text-sm text-gray-600">
+                    Current key name: {currentKeyName}
+                  </div>
+                )}
                 <input
                   type="text"
                   id="keyName"
