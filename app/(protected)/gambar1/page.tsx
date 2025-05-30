@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 
 type Image = {
   id: number;
@@ -23,31 +23,33 @@ export default function Gambar1Page() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('images')
-          .select('*')
-          .order('created_at', { ascending: false });
+    if (user) {
+      fetchImages();
+    }
+  }, [user]);
 
-        if (error) throw error;
-        setImages(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchImages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('images')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    fetchImages();
-  }, []);
+      if (error) throw error;
+      setImages(data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGenerateImage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !prompt.trim()) return;
 
     setIsGenerating(true);
-    setError(null); // Clear any previous errors
+    setError(null);
     
     try {
       // First, get the user's ID from the users table
@@ -199,8 +201,8 @@ export default function Gambar1Page() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prompt</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -211,8 +213,9 @@ export default function Gambar1Page() {
                       {new Date(image.created_at).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{image.rel_users_id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{image.prompt1}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{image.prompt1}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{image.status}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {image.img_file_url1 && (
                         <img
                           src={image.img_file_url1}
@@ -221,7 +224,6 @@ export default function Gambar1Page() {
                         />
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{image.status}</td>
                   </tr>
                 ))}
               </tbody>

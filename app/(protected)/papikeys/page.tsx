@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
 interface ApiKey {
@@ -18,27 +17,13 @@ export default function ApiKeysPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
-    const initializePage = async () => {
-      if (authLoading) {
-        return; // Wait for auth to initialize
-      }
-
-      if (!user) {
-        const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
-        router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
-        return;
-      }
-
-      await fetchApiKeys();
-    };
-
-    initializePage();
-  }, [user, authLoading, router, searchParams]);
+    if (user) {
+      fetchApiKeys();
+    }
+  }, [user]);
 
   const fetchApiKeys = async () => {
     try {
@@ -48,11 +33,6 @@ export default function ApiKeysPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 401) {
-          const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
-          router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
-          return;
-        }
         throw new Error(data.error || 'Failed to fetch API keys');
       }
 
@@ -66,14 +46,10 @@ export default function ApiKeysPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+
     setError(null);
     setSuccess(null);
-
-    if (!user) {
-      const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
-      router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
-      return;
-    }
 
     try {
       const response = await fetch('/api/api-keys', {
@@ -90,11 +66,6 @@ export default function ApiKeysPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 401) {
-          const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
-          router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
-          return;
-        }
         throw new Error(data.error || 'Failed to save API key');
       }
 
@@ -107,11 +78,7 @@ export default function ApiKeysPage() {
   };
 
   const handleDelete = async (keyType: string) => {
-    if (!user) {
-      const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
-      router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
-      return;
-    }
+    if (!user) return;
 
     if (!confirm('Are you sure you want to delete this API key?')) {
       return;
@@ -129,11 +96,6 @@ export default function ApiKeysPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 401) {
-          const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
-          router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
-          return;
-        }
         throw new Error(data.error || 'Failed to delete API key');
       }
 
@@ -143,14 +105,6 @@ export default function ApiKeysPage() {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
-
-  if (authLoading) {
-    return <div className="p-4">Loading authentication...</div>;
-  }
-
-  if (!user) {
-    return null; // Will redirect in useEffect
-  }
 
   if (loading) {
     return <div className="p-4">Loading API keys...</div>;
