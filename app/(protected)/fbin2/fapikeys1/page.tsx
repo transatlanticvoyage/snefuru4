@@ -165,14 +165,6 @@ export default function FApikeys1Page() {
                     {hasActiveKey ? 'Active API key is stored' : 'No active API key stored'}
                   </span>
                 </div>
-                {!isEditing && (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Change API Key
-                  </button>
-                )}
               </div>
             </div>
 
@@ -192,7 +184,10 @@ export default function FApikeys1Page() {
                   value={keyName}
                   onChange={(e) => setKeyName(e.target.value)}
                   placeholder="e.g., Production OpenAI Key"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                    !isEditing ? 'bg-gray-100' : ''
+                  }`}
+                  disabled={!isEditing}
                 />
               </div>
 
@@ -240,29 +235,26 @@ export default function FApikeys1Page() {
                 </div>
               )}
 
-              {isEditing && (
-                <div className="flex space-x-3">
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                      isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {isLoading ? 'Saving...' : 'Save API Key'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setIsVisible(false);
-                    }}
-                    className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(!isEditing)}
+                  className={`inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                    isEditing ? 'bg-gray-100' : ''
+                  }`}
+                >
+                  {isEditing ? 'Cancel Editing' : 'Edit Fields'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading || !isEditing}
+                  className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                    (isLoading || !isEditing) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {isLoading ? 'Saving...' : 'Save Using func_save_api_keys_2'}
+                </button>
+              </div>
             </form>
           </div>
         </div>
