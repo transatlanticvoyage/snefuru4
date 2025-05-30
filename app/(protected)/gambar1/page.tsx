@@ -87,7 +87,7 @@ export default function Gambar1Page() {
       }
 
       // Call the API to generate the image
-      const response = await fetch('/api/generate-image', {
+      const response = await fetch(`${window.location.origin}/api/generate-image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
