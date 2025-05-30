@@ -17,16 +17,31 @@ export async function POST(request: Request) {
       .eq('id', id)
       .single();
 
-    if (imageError || !imageData) {
-      console.error('Error fetching image record:', imageError);
+    if (imageError) {
+      console.error('Error fetching image record:', {
+        error: imageError,
+        code: imageError.code,
+        message: imageError.message,
+        details: imageError.details,
+        hint: imageError.hint
+      });
       return NextResponse.json(
-        { error: 'Failed to fetch image record' },
+        { error: `Failed to fetch image record: ${imageError.message}` },
         { status: 500 }
+      );
+    }
+
+    if (!imageData) {
+      console.error('No image record found for id:', id);
+      return NextResponse.json(
+        { error: 'No image record found with the provided ID' },
+        { status: 404 }
       );
     }
 
     const userId = imageData.rel_users_id;
     if (!userId) {
+      console.error('No user ID found in image record:', imageData);
       return NextResponse.json(
         { error: 'No user ID associated with this image' },
         { status: 400 }
@@ -40,8 +55,22 @@ export async function POST(request: Request) {
       .eq('user_id', userId)
       .single();
 
-    if (apiKeyError || !apiKeyData) {
-      console.error('Error fetching API key:', apiKeyError);
+    if (apiKeyError) {
+      console.error('Error fetching API key:', {
+        error: apiKeyError,
+        code: apiKeyError.code,
+        message: apiKeyError.message,
+        details: apiKeyError.details,
+        hint: apiKeyError.hint
+      });
+      return NextResponse.json(
+        { error: `Failed to fetch API key: ${apiKeyError.message}` },
+        { status: 500 }
+      );
+    }
+
+    if (!apiKeyData) {
+      console.error('No API key found for user:', userId);
       return NextResponse.json(
         { error: 'Please add your OpenAI API key in the API Keys page before generating images.' },
         { status: 400 }
@@ -80,9 +109,12 @@ export async function POST(request: Request) {
       });
 
     if (uploadError) {
-      console.error('Error uploading to storage:', uploadError);
+      console.error('Error uploading to storage:', {
+        error: uploadError,
+        message: uploadError.message
+      });
       return NextResponse.json(
-        { error: 'Failed to upload image to storage' },
+        { error: `Failed to upload image to storage: ${uploadError.message}` },
         { status: 500 }
       );
     }
@@ -102,9 +134,15 @@ export async function POST(request: Request) {
       .eq('id', id);
 
     if (updateError) {
-      console.error('Error updating image record:', updateError);
+      console.error('Error updating image record:', {
+        error: updateError,
+        code: updateError.code,
+        message: updateError.message,
+        details: updateError.details,
+        hint: updateError.hint
+      });
       return NextResponse.json(
-        { error: 'Failed to update image record' },
+        { error: `Failed to update image record: ${updateError.message}` },
         { status: 500 }
       );
     }
