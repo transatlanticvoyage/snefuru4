@@ -17,9 +17,18 @@ export default function ApiKeysPage() {
   const [apiKeys, setApiKeys] = useState<ApiKeys | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // State for each API key
   const [dropboxKey, setDropboxKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  
+  // State for edit mode
+  const [isEditingDropbox, setIsEditingDropbox] = useState(false);
+  const [isEditingOpenai, setIsEditingOpenai] = useState(false);
+  
+  // State for saving
+  const [isSavingDropbox, setIsSavingDropbox] = useState(false);
+  const [isSavingOpenai, setIsSavingOpenai] = useState(false);
 
   useEffect(() => {
     const fetchApiKeys = async () => {
@@ -47,28 +56,53 @@ export default function ApiKeysPage() {
     fetchApiKeys();
   }, [user]);
 
-  const handleSaveApiKeys = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveDropboxKey = async () => {
     if (!user) return;
+    setIsSavingDropbox(true);
+    setError(null);
 
-    setIsSaving(true);
     try {
       const { error } = await supabase
         .from('api_keys')
         .upsert({
           user_id: user.id,
           dropbox_key: dropboxKey,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
+      
+      setApiKeys(prev => prev ? { ...prev, dropbox_key: dropboxKey } : null);
+      setIsEditingDropbox(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSavingDropbox(false);
+    }
+  };
+
+  const handleSaveOpenaiKey = async () => {
+    if (!user) return;
+    setIsSavingOpenai(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase
+        .from('api_keys')
+        .upsert({
+          user_id: user.id,
           openai_key: openaiKey,
           updated_at: new Date().toISOString(),
         });
 
       if (error) throw error;
       
-      setApiKeys(prev => prev ? { ...prev, dropbox_key: dropboxKey, openai_key: openaiKey } : null);
+      setApiKeys(prev => prev ? { ...prev, openai_key: openaiKey } : null);
+      setIsEditingOpenai(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setIsSaving(false);
+      setIsSavingOpenai(false);
     }
   };
 
@@ -89,59 +123,119 @@ export default function ApiKeysPage() {
         
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <form onSubmit={handleSaveApiKeys}>
-              {error && (
-                <div className="mb-4 rounded-md bg-red-50 p-4">
-                  <div className="text-sm text-red-700">{error}</div>
-                </div>
-              )}
-              
-              <div className="space-y-6">
-                <div>
+            {error && (
+              <div className="mb-4 rounded-md bg-red-50 p-4">
+                <div className="text-sm text-red-700">{error}</div>
+              </div>
+            )}
+            
+            <div className="space-y-6">
+              {/* Dropbox API Key */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
                   <label htmlFor="dropboxKey" className="block text-sm font-medium text-gray-700">
                     Dropbox API Key
                   </label>
-                  <div className="mt-1">
-                    <input
-                      type="password"
-                      name="dropboxKey"
-                      id="dropboxKey"
-                      value={dropboxKey}
-                      onChange={(e) => setDropboxKey(e.target.value)}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="Enter your Dropbox API key"
-                    />
+                  <div className="flex items-center space-x-2">
+                    <span className={`text-sm ${apiKeys?.dropbox_key ? 'text-green-600' : 'text-gray-500'}`}>
+                      {apiKeys?.dropbox_key ? 'Active' : 'Not Set'}
+                    </span>
+                    {!isEditingDropbox ? (
+                      <button
+                        onClick={() => setIsEditingDropbox(true)}
+                        className="text-sm text-indigo-600 hover:text-indigo-500"
+                      >
+                        Edit
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setIsEditingDropbox(false);
+                          setDropboxKey(apiKeys?.dropbox_key || '');
+                        }}
+                        className="text-sm text-gray-600 hover:text-gray-500"
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </div>
                 </div>
+                <div className="mt-1 flex space-x-2">
+                  <input
+                    type="password"
+                    name="dropboxKey"
+                    id="dropboxKey"
+                    value={dropboxKey}
+                    onChange={(e) => setDropboxKey(e.target.value)}
+                    disabled={!isEditingDropbox}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                    placeholder={isEditingDropbox ? "Enter your Dropbox API key" : "••••••••••••••••"}
+                  />
+                  {isEditingDropbox && (
+                    <button
+                      onClick={handleSaveDropboxKey}
+                      disabled={isSavingDropbox}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    >
+                      {isSavingDropbox ? 'Saving...' : 'Save'}
+                    </button>
+                  )}
+                </div>
+              </div>
 
-                <div>
+              {/* OpenAI API Key */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
                   <label htmlFor="openaiKey" className="block text-sm font-medium text-gray-700">
                     OpenAI API Key
                   </label>
-                  <div className="mt-1">
-                    <input
-                      type="password"
-                      name="openaiKey"
-                      id="openaiKey"
-                      value={openaiKey}
-                      onChange={(e) => setOpenaiKey(e.target.value)}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="Enter your OpenAI API key"
-                    />
+                  <div className="flex items-center space-x-2">
+                    <span className={`text-sm ${apiKeys?.openai_key ? 'text-green-600' : 'text-gray-500'}`}>
+                      {apiKeys?.openai_key ? 'Active' : 'Not Set'}
+                    </span>
+                    {!isEditingOpenai ? (
+                      <button
+                        onClick={() => setIsEditingOpenai(true)}
+                        className="text-sm text-indigo-600 hover:text-indigo-500"
+                      >
+                        Edit
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setIsEditingOpenai(false);
+                          setOpenaiKey(apiKeys?.openai_key || '');
+                        }}
+                        className="text-sm text-gray-600 hover:text-gray-500"
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </div>
                 </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={isSaving}
-                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  >
-                    {isSaving ? 'Saving...' : 'Save API Keys'}
-                  </button>
+                <div className="mt-1 flex space-x-2">
+                  <input
+                    type="password"
+                    name="openaiKey"
+                    id="openaiKey"
+                    value={openaiKey}
+                    onChange={(e) => setOpenaiKey(e.target.value)}
+                    disabled={!isEditingOpenai}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                    placeholder={isEditingOpenai ? "Enter your OpenAI API key" : "••••••••••••••••"}
+                  />
+                  {isEditingOpenai && (
+                    <button
+                      onClick={handleSaveOpenaiKey}
+                      disabled={isSavingOpenai}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    >
+                      {isSavingOpenai ? 'Saving...' : 'Save'}
+                    </button>
+                  )}
                 </div>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>

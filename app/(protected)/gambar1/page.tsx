@@ -47,6 +47,8 @@ export default function Gambar1Page() {
     if (!user || !prompt.trim()) return;
 
     setIsGenerating(true);
+    setError(null); // Clear any previous errors
+    
     try {
       // First, create a record in the database
       const { data: imageData, error: insertError } = await supabase
@@ -59,7 +61,14 @@ export default function Gambar1Page() {
         .select()
         .single();
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Database insert error:', insertError);
+        throw new Error(`Failed to create image record: ${insertError.message}`);
+      }
+
+      if (!imageData) {
+        throw new Error('No image data returned from database');
+      }
 
       // Call the API to generate the image
       const response = await fetch('/api/generate-image', {
@@ -73,8 +82,10 @@ export default function Gambar1Page() {
         }),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to generate image');
+        throw new Error(responseData.error || 'Failed to generate image');
       }
 
       // Refresh the images list
@@ -83,11 +94,16 @@ export default function Gambar1Page() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error('Database fetch error:', fetchError);
+        throw new Error(`Failed to fetch updated images: ${fetchError.message}`);
+      }
+
       setImages(updatedImages || []);
       setPrompt(''); // Clear the prompt input
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error in handleGenerateImage:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsGenerating(false);
     }
