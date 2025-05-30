@@ -23,41 +23,36 @@ export default function FApikeys1Page() {
     setMessage({ type: '', text: '' });
 
     try {
-      if (!user?.id) {
+      if (!user?.email) {
         throw new Error('User not authenticated');
       }
 
-      console.log('Current user ID:', user.id);
+      console.log('Current user email:', user.email);
 
-      // First, get the user's auth_id from the users table
+      // First, get the user's auth_id from the users table using email
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('auth_id')
-        .eq('id', user.id);
+        .eq('email', user.email)
+        .single();
 
       if (userError) {
         console.error('Error fetching user:', userError);
         throw userError;
       }
 
-      if (!userData || userData.length === 0) {
-        console.error('No user found with ID:', user.id);
+      if (!userData?.auth_id) {
+        console.error('No user found with email:', user.email);
         throw new Error('User not found in database');
       }
 
-      if (userData.length > 1) {
-        console.error('Multiple users found with ID:', user.id);
-        throw new Error('Multiple users found with the same ID');
-      }
-
-      const authId = userData[0].auth_id;
-      console.log('Found auth_id:', authId);
+      console.log('Found auth_id:', userData.auth_id);
 
       // Now insert the API key using the auth_id
       const { error: insertError } = await supabase
         .from('tapikeys2')
         .insert({
-          fk_users_id: authId,
+          fk_users_id: userData.auth_id,
           key_type: 'openai',
           key_value: apiKey,
           key_name: keyName || 'OpenAI Key',
