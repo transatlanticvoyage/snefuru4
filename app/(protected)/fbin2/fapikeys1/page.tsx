@@ -27,10 +27,21 @@ export default function FApikeys1Page() {
         throw new Error('User not authenticated');
       }
 
+      // First, get the user's auth_id from the users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('auth_id')
+        .eq('id', user.id)
+        .single();
+
+      if (userError) throw userError;
+      if (!userData?.auth_id) throw new Error('User not found');
+
+      // Now insert the API key using the auth_id
       const { error } = await supabase
         .from('tapikeys2')
         .insert({
-          fk_users_id: user.id,
+          fk_users_id: userData.auth_id,
           key_type: 'openai',
           key_value: apiKey,
           key_name: keyName || 'OpenAI Key',
