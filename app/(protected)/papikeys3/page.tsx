@@ -76,7 +76,7 @@ export default function ApiKeysPage3() {
         .from('api_keys')
         .insert({
           user_id: user.id,
-          api_key: newKey
+          openai_key: newKey
         });
 
       if (insertError) {
