@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       .from('images')
       .update({
         image_url: imageUrl,
+        prompt1: prompt,
         status: 'completed'
       })
       .eq('id', imageId);

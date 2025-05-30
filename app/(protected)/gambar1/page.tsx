@@ -8,7 +8,7 @@ type Image = {
   id: number;
   created_at: string;
   user_id: string;
-  prompt: string;
+  prompt1: string;
   image_url: string;
   status: string;
   // Add any other fields from your images table
@@ -55,7 +55,7 @@ export default function Gambar1Page() {
         .from('images')
         .insert({
           user_id: user.id,
-          prompt: prompt.trim(),
+          prompt1: prompt.trim(),
           status: 'generating'
         })
         .select()
@@ -195,12 +195,12 @@ export default function Gambar1Page() {
                       {new Date(image.created_at).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{image.user_id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{image.prompt}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{image.prompt1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {image.image_url && (
                         <img
                           src={image.image_url}
-                          alt={image.prompt}
+                          alt={image.prompt1}
                           className="h-20 w-20 object-cover rounded"
                         />
                       )}
