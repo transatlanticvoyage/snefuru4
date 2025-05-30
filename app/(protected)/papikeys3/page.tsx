@@ -7,8 +7,9 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 interface ApiKey {
   id: string;
   user_id: string;
-  openai_key: string;
+  key_value: string;
   created_at: string;
+  key_type: string;
 }
 
 export default function ApiKeysPage3() {
@@ -34,7 +35,8 @@ export default function ApiKeysPage3() {
       const { data: apiKeys, error } = await supabase
         .from('api_keys')
         .select('*')
-        .eq('user_id', user?.id);
+        .eq('user_id', user?.id)
+        .eq('key_type', 'openai');
 
       if (error) {
         throw error;
@@ -63,7 +65,8 @@ export default function ApiKeysPage3() {
       const { error: deleteError } = await supabase
         .from('api_keys')
         .delete()
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('key_type', 'openai');
 
       if (deleteError) {
         console.error('Delete error:', deleteError);
@@ -75,7 +78,8 @@ export default function ApiKeysPage3() {
         .from('api_keys')
         .insert({
           user_id: user.id,
-          openai_key: newKey
+          key_type: 'openai',
+          key_value: newKey
         });
 
       if (insertError) {
@@ -103,7 +107,8 @@ export default function ApiKeysPage3() {
       const { error } = await supabase
         .from('api_keys')
         .delete()
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('key_type', 'openai');
 
       if (error) {
         throw error;
