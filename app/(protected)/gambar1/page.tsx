@@ -9,7 +9,7 @@ type Image = {
   created_at: string;
   rel_users_id: string;
   prompt1: string;
-  image_url: string;
+  img_file_url1: string;
   status: string;
   // Add any other fields from your images table
 };
@@ -213,9 +213,9 @@ export default function Gambar1Page() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{image.rel_users_id}</td>
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{image.prompt1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {image.image_url && (
+                      {image.img_file_url1 && (
                         <img
-                          src={image.image_url}
+                          src={image.img_file_url1}
                           alt={image.prompt1}
                           className="h-20 w-20 object-cover rounded"
                         />
