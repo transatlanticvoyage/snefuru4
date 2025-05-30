@@ -7,7 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 type Image = {
   id: number;
   created_at: string;
-  user_id: string;
+  rel_users_id: string;
   prompt1: string;
   image_url: string;
   status: string;
@@ -54,7 +54,7 @@ export default function Gambar1Page() {
       const { data: imageData, error: insertError } = await supabase
         .from('images')
         .insert({
-          user_id: user.id,
+          rel_users_id: user.id,
           prompt1: prompt.trim(),
           status: 'generating'
         })
@@ -194,7 +194,7 @@ export default function Gambar1Page() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(image.created_at).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{image.user_id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{image.rel_users_id}</td>
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{image.prompt1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {image.image_url && (
