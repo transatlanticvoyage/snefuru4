@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 
 interface ApiKey {
   id: string;
@@ -18,18 +19,28 @@ export default function ApiKeysPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
     fetchApiKeys();
-  }, []);
+  }, [user, router]);
 
   const fetchApiKeys = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await fetch('/api/api-keys');
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/login');
+          return;
+        }
         throw new Error(data.error || 'Failed to fetch API keys');
       }
 
@@ -46,6 +57,11 @@ export default function ApiKeysPage() {
     setError(null);
     setSuccess(null);
 
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
     try {
       const response = await fetch('/api/api-keys', {
         method: 'POST',
@@ -61,6 +77,10 @@ export default function ApiKeysPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/login');
+          return;
+        }
         throw new Error(data.error || 'Failed to save API key');
       }
 
@@ -73,6 +93,11 @@ export default function ApiKeysPage() {
   };
 
   const handleDelete = async (keyType: string) => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
     if (!confirm('Are you sure you want to delete this API key?')) {
       return;
     }
@@ -89,6 +114,10 @@ export default function ApiKeysPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/login');
+          return;
+        }
         throw new Error(data.error || 'Failed to delete API key');
       }
 
@@ -98,6 +127,10 @@ export default function ApiKeysPage() {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
+
+  if (!user) {
+    return null; // Will redirect in useEffect
+  }
 
   if (loading) {
     return <div className="p-4">Loading...</div>;
