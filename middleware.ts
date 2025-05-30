@@ -10,7 +10,10 @@ export async function middleware(req: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession();
 
   // If there's no session and the user is trying to access a protected route
-  if (!session && req.nextUrl.pathname.startsWith('/(protected)')) {
+  if (!session && (
+    req.nextUrl.pathname.startsWith('/papikeys') ||
+    req.nextUrl.pathname.startsWith('/gambar1')
+  )) {
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = '/login';
     redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname);
@@ -23,7 +26,6 @@ export async function middleware(req: NextRequest) {
 // Specify which routes this middleware should run on
 export const config = {
   matcher: [
-    '/(protected)/:path*',
     '/papikeys/:path*',
     '/gambar1/:path*',
   ],

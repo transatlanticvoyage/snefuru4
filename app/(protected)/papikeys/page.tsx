@@ -23,17 +23,21 @@ export default function ApiKeysPage() {
   const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (authLoading) {
-      return; // Wait for auth to initialize
-    }
+    const initializePage = async () => {
+      if (authLoading) {
+        return; // Wait for auth to initialize
+      }
 
-    if (!user) {
-      const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
-      router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
-      return;
-    }
+      if (!user) {
+        const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
+        router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
+        return;
+      }
 
-    fetchApiKeys();
+      await fetchApiKeys();
+    };
+
+    initializePage();
   }, [user, authLoading, router, searchParams]);
 
   const fetchApiKeys = async () => {
@@ -45,7 +49,8 @@ export default function ApiKeysPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          router.push('/login');
+          const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
+          router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
           return;
         }
         throw new Error(data.error || 'Failed to fetch API keys');
@@ -65,7 +70,8 @@ export default function ApiKeysPage() {
     setSuccess(null);
 
     if (!user) {
-      router.push('/login');
+      const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
+      router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
       return;
     }
 
@@ -85,7 +91,8 @@ export default function ApiKeysPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          router.push('/login');
+          const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
+          router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
           return;
         }
         throw new Error(data.error || 'Failed to save API key');
@@ -101,7 +108,8 @@ export default function ApiKeysPage() {
 
   const handleDelete = async (keyType: string) => {
     if (!user) {
-      router.push('/login');
+      const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
+      router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
       return;
     }
 
@@ -122,7 +130,8 @@ export default function ApiKeysPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          router.push('/login');
+          const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
+          router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
           return;
         }
         throw new Error(data.error || 'Failed to delete API key');
