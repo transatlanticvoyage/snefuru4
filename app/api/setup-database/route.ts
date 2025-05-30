@@ -47,7 +47,9 @@ export async function POST() {
           img_file_extension TEXT,
           img_file_size INTEGER,
           width INTEGER,
-          height INTEGER
+          height INTEGER,
+          prompt1 TEXT,
+          status TEXT
         );
 
         -- Create indexes for better query performance

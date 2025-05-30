@@ -50,11 +50,27 @@ export default function Gambar1Page() {
     setError(null); // Clear any previous errors
     
     try {
-      // First, create a record in the database
+      // First, get the user's ID from the users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError) {
+        console.error('Error fetching user:', userError);
+        throw new Error('Failed to fetch user record');
+      }
+
+      if (!userData) {
+        throw new Error('User record not found');
+      }
+
+      // Create a record in the database
       const { data: imageData, error: insertError } = await supabase
         .from('images')
         .insert({
-          rel_users_id: user.id,
+          rel_users_id: userData.id,
           prompt1: prompt.trim(),
           status: 'generating'
         })
