@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { getUserApiKey } from '@/lib/api-keys';
 import OpenAI from 'openai';
 import fetch from 'node-fetch';
 
 export async function POST(request: Request) {
   try {
+    const supabase = createRouteHandlerClient({ cookies });
     const { prompt, imageId: id } = await request.json();
     console.log('Received request with imageId:', id);
 
     // Get the image record to find the user
-    const { data: imageData, error: imageError } = await supabaseAdmin
+    const { data: imageData, error: imageError } = await supabase
       .from('images')
       .select('rel_users_id')
       .eq('id', id)
@@ -55,7 +57,7 @@ export async function POST(request: Request) {
 
     // Upload to Supabase Storage
     const fileName = `${id}-${Date.now()}.png`;
-    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from('bucket-images-b1')
       .upload(fileName, imageBuffer, {
         contentType: 'image/png',
@@ -67,12 +69,12 @@ export async function POST(request: Request) {
     }
 
     // Get the public URL
-    const { data: { publicUrl } } = supabaseAdmin.storage
+    const { data: { publicUrl } } = supabase.storage
       .from('bucket-images-b1')
       .getPublicUrl(fileName);
 
     // Update the database record
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await supabase
       .from('images')
       .update({
         img_file_url1: publicUrl,

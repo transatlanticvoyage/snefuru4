@@ -1,34 +1,33 @@
 import { NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { Database } from '@/types/supabase';
 
 // GET: Fetch user's API keys
 export async function GET() {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createRouteHandlerClient<Database>({ cookies });
     
-    // Get the current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's API keys
-    const { data: apiKeys, error: apiKeysError } = await supabase
+    const { data: apiKeys, error } = await supabase
       .from('api_keys')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .eq('is_active', true);
 
-    if (apiKeysError) {
-      throw new Error(`Failed to fetch API keys: ${apiKeysError.message}`);
+    if (error) {
+      throw error;
     }
 
     return NextResponse.json({ apiKeys });
   } catch (error) {
     console.error('Error fetching API keys:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'An error occurred' },
+      { error: 'Failed to fetch API keys' },
       { status: 500 }
     );
   }
@@ -37,48 +36,45 @@ export async function GET() {
 // POST: Add or update an API key
 export async function POST(request: Request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createRouteHandlerClient<Database>({ cookies });
     
-    // Get the current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { keyType, keyValue } = await request.json();
 
-    if (!keyType || !keyValue) {
-      return NextResponse.json(
-        { error: 'Key type and value are required' },
-        { status: 400 }
-      );
+    // First, deactivate any existing keys of the same type
+    const { error: deactivateError } = await supabase
+      .from('api_keys')
+      .update({ is_active: false })
+      .eq('user_id', session.user.id)
+      .eq('key_type', keyType);
+
+    if (deactivateError) {
+      throw deactivateError;
     }
 
-    // Upsert the API key
-    const { data, error } = await supabase
+    // Then create the new key
+    const { error: insertError } = await supabase
       .from('api_keys')
-      .upsert({
-        user_id: user.id,
+      .insert({
+        user_id: session.user.id,
         key_type: keyType,
         key_value: keyValue,
-        is_active: true,
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single();
+        is_active: true
+      });
 
-    if (error) {
-      throw new Error(`Failed to save API key: ${error.message}`);
+    if (insertError) {
+      throw insertError;
     }
 
-    return NextResponse.json({ 
-      message: 'API key saved successfully',
-      apiKey: data
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error saving API key:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'An error occurred' },
+      { error: 'Failed to save API key' },
       { status: 500 }
     );
   }
@@ -87,44 +83,30 @@ export async function POST(request: Request) {
 // DELETE: Deactivate an API key
 export async function DELETE(request: Request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createRouteHandlerClient<Database>({ cookies });
     
-    // Get the current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { keyType } = await request.json();
 
-    if (!keyType) {
-      return NextResponse.json(
-        { error: 'Key type is required' },
-        { status: 400 }
-      );
-    }
-
-    // Soft delete by setting is_active to false
     const { error } = await supabase
       .from('api_keys')
-      .update({ 
-        is_active: false,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', user.id)
+      .update({ is_active: false })
+      .eq('user_id', session.user.id)
       .eq('key_type', keyType);
 
     if (error) {
-      throw new Error(`Failed to delete API key: ${error.message}`);
+      throw error;
     }
 
-    return NextResponse.json({ 
-      message: 'API key deleted successfully'
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting API key:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'An error occurred' },
+      { error: 'Failed to delete API key' },
       { status: 500 }
     );
   }
