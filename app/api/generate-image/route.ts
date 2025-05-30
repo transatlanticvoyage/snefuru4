@@ -62,10 +62,11 @@ export async function POST(request: Request) {
       size: "1024x1024",
     });
 
-    const imageUrl = response.data[0].url;
-    if (!imageUrl) {
+    if (!response?.data?.[0]?.url) {
       throw new Error('No image URL in response');
     }
+
+    const imageUrl = response.data[0].url;
 
     // Download the image
     const imageResponse = await fetch(imageUrl);
