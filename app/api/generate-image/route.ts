@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getUserApiKey } from '@/lib/api-keys';
 import OpenAI from 'openai';
 import fetch from 'node-fetch';
 
@@ -8,55 +9,30 @@ export async function POST(request: Request) {
     const { prompt, imageId: id } = await request.json();
     console.log('Received request with imageId:', id);
 
-    // Get the user's API key
+    // Get the image record to find the user
     const { data: imageData, error: imageError } = await supabaseAdmin
       .from('images')
       .select('rel_users_id')
       .eq('id', id)
       .single();
 
-    console.log('Image data:', imageData);
-    console.log('Image error:', imageError);
-
     if (imageError) {
-      console.error('Image fetch error details:', {
-        code: imageError.code,
-        message: imageError.message,
-        details: imageError.details
-      });
       throw new Error(`Failed to fetch image data: ${imageError.message}`);
     }
 
     if (!imageData?.rel_users_id) {
-      console.error('No rel_users_id found in image data:', imageData);
       throw new Error('Image record is missing user ID');
     }
 
-    const { data: userData, error: userError } = await supabaseAdmin
-      .from('users')
-      .select('openai_api_key')
-      .eq('id', imageData.rel_users_id)
-      .single();
-
-    console.log('User data:', userData);
-    console.log('User error:', userError);
-
-    if (userError) {
-      console.error('User fetch error details:', {
-        code: userError.code,
-        message: userError.message,
-        details: userError.details
-      });
-      throw new Error(`Failed to fetch user data: ${userError.message}`);
-    }
-
-    if (!userData?.openai_api_key) {
+    // Get the user's OpenAI API key
+    const apiKey = await getUserApiKey(imageData.rel_users_id, 'openai');
+    if (!apiKey) {
       throw new Error('OpenAI API key not configured. Please add your API key in the API Keys page.');
     }
 
     // Initialize OpenAI with user's API key
     const openai = new OpenAI({
-      apiKey: userData.openai_api_key,
+      apiKey: apiKey,
     });
 
     // Generate image using OpenAI

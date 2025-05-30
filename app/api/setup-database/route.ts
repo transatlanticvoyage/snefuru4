@@ -16,6 +16,19 @@ export async function POST() {
           CONSTRAINT fk_auth_id FOREIGN KEY (auth_id) REFERENCES auth.users(id) ON DELETE CASCADE
         );
 
+        -- Create api_keys table
+        CREATE TABLE IF NOT EXISTS api_keys (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+          key_type TEXT NOT NULL,
+          key_value TEXT NOT NULL,
+          is_active BOOLEAN DEFAULT true,
+          last_used_at TIMESTAMP WITH TIME ZONE,
+          UNIQUE(user_id, key_type)
+        );
+
         -- Create images_plans_batches table
         CREATE TABLE IF NOT EXISTS images_plans_batches (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -61,6 +74,8 @@ export async function POST() {
         CREATE INDEX IF NOT EXISTS idx_images_plans_batch_id ON images_plans(rel_images_plans_batches_id);
         CREATE INDEX IF NOT EXISTS idx_images_user_id ON images(rel_users_id);
         CREATE INDEX IF NOT EXISTS idx_images_plan_id ON images(rel_images_plans_id);
+        CREATE INDEX IF NOT EXISTS idx_api_keys_user_id ON api_keys(user_id);
+        CREATE INDEX IF NOT EXISTS idx_api_keys_key_type ON api_keys(key_type);
       `
     })
 
