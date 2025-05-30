@@ -1,22 +1,112 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function FApikeys1Page() {
   const { user } = useAuth();
+  const [apiKey, setApiKey] = useState('');
+  const [keyName, setKeyName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  const func_save_api_keys_2 = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      const { error } = await supabase
+        .from('tapikeys2')
+        .insert({
+          fk_users_id: user.id,
+          key_type: 'openai',
+          key_value: apiKey,
+          key_name: keyName || 'OpenAI Key',
+          is_active: true
+        });
+
+      if (error) throw error;
+
+      setMessage({ type: 'success', text: 'API key saved successfully!' });
+      setApiKey('');
+      setKeyName('');
+    } catch (error: any) {
+      setMessage({ 
+        type: 'error', 
+        text: error.message || 'Failed to save API key' 
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-semibold text-gray-900">FApikeys1</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">API Keys Management</h1>
+        
         <div className="mt-6">
           <div className="bg-white shadow rounded-lg p-6">
-            <p className="text-gray-600">
-              Welcome to FApikeys1! This is a protected page that can only be accessed when logged in.
-            </p>
-            <p className="mt-4 text-gray-600">
-              You are currently logged in as: {user?.email}
-            </p>
+            <form onSubmit={func_save_api_keys_2} className="space-y-4">
+              <div>
+                <label htmlFor="keyName" className="block text-sm font-medium text-gray-700">
+                  Key Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  id="keyName"
+                  value={keyName}
+                  onChange={(e) => setKeyName(e.target.value)}
+                  placeholder="e.g., Production OpenAI Key"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700">
+                  OpenAI API Key
+                </label>
+                <input
+                  type="password"
+                  id="apiKey"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk-..."
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+
+              {message.text && (
+                <div className={`rounded-md p-4 ${
+                  message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                }`}>
+                  {message.text}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {isLoading ? 'Saving...' : 'Save API Key'}
+              </button>
+            </form>
           </div>
         </div>
       </div>
