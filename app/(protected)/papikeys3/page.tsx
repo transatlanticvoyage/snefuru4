@@ -60,12 +60,11 @@ export default function ApiKeysPage3() {
     setSuccess(null);
 
     try {
-      // First, delete any existing keys of the same type
+      // First, delete any existing keys
       const { error: deleteError } = await supabase
         .from('api_keys')
         .delete()
-        .eq('user_id', user.id)
-        .eq('key_type', 'openai');
+        .eq('user_id', user.id);
 
       if (deleteError) {
         console.error('Delete error:', deleteError);
@@ -77,8 +76,7 @@ export default function ApiKeysPage3() {
         .from('api_keys')
         .insert({
           user_id: user.id,
-          key_type: 'openai',
-          key_value: newKey
+          api_key: newKey
         });
 
       if (insertError) {
@@ -95,7 +93,7 @@ export default function ApiKeysPage3() {
     }
   };
 
-  const handleDelete = async (keyType: string) => {
+  const handleDelete = async () => {
     if (!user) return;
 
     if (!confirm('Are you sure you want to delete this API key?')) {
@@ -106,8 +104,7 @@ export default function ApiKeysPage3() {
       const { error } = await supabase
         .from('api_keys')
         .delete()
-        .eq('user_id', user.id)
-        .eq('key_type', keyType);
+        .eq('user_id', user.id);
 
       if (error) {
         throw error;
@@ -179,13 +176,13 @@ export default function ApiKeysPage3() {
                 className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
               >
                 <div>
-                  <p className="font-medium">{key.key_type}</p>
+                  <p className="font-medium">OpenAI API Key</p>
                   <p className="text-sm text-gray-500">
-                    Last updated: {new Date(key.updated_at).toLocaleString()}
+                    Last updated: {new Date(key.created_at).toLocaleString()}
                   </p>
                 </div>
                 <button
-                  onClick={() => handleDelete(key.key_type)}
+                  onClick={handleDelete}
                   className="text-red-600 hover:text-red-800"
                 >
                   Delete
