@@ -29,7 +29,12 @@ export default function ApiKeysPage2() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/api-keys');
+      const response = await fetch('/api/api-keys', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       const data = await response.json();
 
       if (!response.ok) {
