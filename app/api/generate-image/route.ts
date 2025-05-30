@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     // Get the user's OpenAI API key
     const apiKey = await getUserApiKey(imageData.rel_users_id, 'openai');
     if (!apiKey) {
-      throw new Error('OpenAI API key not configured. Please add your API key in the API Keys page.');
+      throw new Error('Please add your OpenAI API key in the API Keys page before generating images.');
     }
 
     // Initialize OpenAI with user's API key
