@@ -19,7 +19,17 @@ export async function POST(request: Request) {
     console.log('Image error:', imageError);
 
     if (imageError) {
-      throw new Error('Failed to fetch image data');
+      console.error('Image fetch error details:', {
+        code: imageError.code,
+        message: imageError.message,
+        details: imageError.details
+      });
+      throw new Error(`Failed to fetch image data: ${imageError.message}`);
+    }
+
+    if (!imageData?.rel_users_id) {
+      console.error('No rel_users_id found in image data:', imageData);
+      throw new Error('Image record is missing user ID');
     }
 
     const { data: userData, error: userError } = await supabaseAdmin
@@ -32,7 +42,12 @@ export async function POST(request: Request) {
     console.log('User error:', userError);
 
     if (userError) {
-      throw new Error('Failed to fetch user data');
+      console.error('User fetch error details:', {
+        code: userError.code,
+        message: userError.message,
+        details: userError.details
+      });
+      throw new Error(`Failed to fetch user data: ${userError.message}`);
     }
 
     if (!userData?.openai_api_key) {
