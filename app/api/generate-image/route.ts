@@ -14,8 +14,7 @@ export async function POST(request: Request) {
     const { data: imageData, error: imageError } = await supabase
       .from('images')
       .select('rel_users_id')
-      .eq('id', id)
-      .single();
+      .eq('id', id);
 
     if (imageError) {
       console.error('Error fetching image record:', {
@@ -31,7 +30,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!imageData) {
+    if (!imageData || imageData.length === 0) {
       console.error('No image record found for id:', id);
       return NextResponse.json(
         { error: 'No image record found with the provided ID' },
@@ -39,9 +38,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const userId = imageData.rel_users_id;
+    if (imageData.length > 1) {
+      console.error('Multiple image records found for id:', id, 'records:', imageData);
+      return NextResponse.json(
+        { error: 'Multiple image records found with the same ID' },
+        { status: 500 }
+      );
+    }
+
+    const userId = imageData[0].rel_users_id;
     if (!userId) {
-      console.error('No user ID found in image record:', imageData);
+      console.error('No user ID found in image record:', imageData[0]);
       return NextResponse.json(
         { error: 'No user ID associated with this image' },
         { status: 400 }
