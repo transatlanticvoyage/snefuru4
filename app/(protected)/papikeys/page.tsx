@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
 interface ApiKey {
@@ -19,15 +19,22 @@ export default function ApiKeysPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
-  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
+    if (authLoading) {
+      return; // Wait for auth to initialize
+    }
+
     if (!user) {
-      router.push('/login');
+      const redirectTo = searchParams.get('redirectedFrom') || '/papikeys';
+      router.push(`/login?redirectedFrom=${encodeURIComponent(redirectTo)}`);
       return;
     }
+
     fetchApiKeys();
-  }, [user, router]);
+  }, [user, authLoading, router, searchParams]);
 
   const fetchApiKeys = async () => {
     try {
@@ -128,12 +135,16 @@ export default function ApiKeysPage() {
     }
   };
 
+  if (authLoading) {
+    return <div className="p-4">Loading authentication...</div>;
+  }
+
   if (!user) {
     return null; // Will redirect in useEffect
   }
 
   if (loading) {
-    return <div className="p-4">Loading...</div>;
+    return <div className="p-4">Loading API keys...</div>;
   }
 
   return (
