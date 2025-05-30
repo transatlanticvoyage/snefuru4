@@ -43,13 +43,13 @@ export default function Header() {
             </div>
             <nav className="ml-6 flex space-x-8">
               <Link href="/home" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Priority 1
+                Home
               </Link>
-              <Link href="/home" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Priority 2
+              <Link href="/gambar1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Gambar1
               </Link>
-              <Link href="/home" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Priority 3
+              <Link href="/stuff1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Stuff1
               </Link>
             </nav>
           </div>
@@ -68,6 +68,18 @@ export default function Header() {
                   <div className="px-4 py-2 text-sm text-gray-700 border-b">
                     {user?.email}
                   </div>
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Profile Settings
+                  </Link>
+                  <Link
+                    href="/papikeys"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    API Keys
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
