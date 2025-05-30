@@ -11,13 +11,14 @@ export default function RootPage() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        router.push('/home');
+        router.replace('/home');
       } else {
-        router.push('/login');
+        router.replace('/login');
       }
     }
   }, [user, loading, router]);
 
+  // Show loading spinner while checking auth state
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
