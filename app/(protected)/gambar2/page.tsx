@@ -77,7 +77,7 @@ export default function Gambar2Page() {
       if (!imageData) throw new Error('No image data returned from database');
 
       // Generate image
-      const response = await fetch('/api/generate-image', {
+      const response = await fetch(`${window.location.origin}/api/generate-image`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
