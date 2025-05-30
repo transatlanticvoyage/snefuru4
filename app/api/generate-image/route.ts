@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase
       .storage
-      .from('images')
+      .from('bucket-images-b1')
       .upload(filename, imageBuffer, {
         contentType: 'image/png',
         cacheControl: '3600',
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     // Get the public URL for the uploaded image
     const { data: { publicUrl } } = supabase
       .storage
-      .from('images')
+      .from('bucket-images-b1')
       .getPublicUrl(filename);
 
     // Update the image record in the database
