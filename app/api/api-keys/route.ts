@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
@@ -15,7 +14,7 @@ export async function GET() {
     }
 
     // Get user's API keys
-    const { data: apiKeys, error: apiKeysError } = await supabaseAdmin
+    const { data: apiKeys, error: apiKeysError } = await supabase
       .from('api_keys')
       .select('*')
       .eq('user_id', user.id)
@@ -56,7 +55,7 @@ export async function POST(request: Request) {
     }
 
     // Upsert the API key
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('api_keys')
       .upsert({
         user_id: user.id,
@@ -106,7 +105,7 @@ export async function DELETE(request: Request) {
     }
 
     // Soft delete by setting is_active to false
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('api_keys')
       .update({ 
         is_active: false,
