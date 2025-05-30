@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { getUserApiKey } from '@/lib/api-keys';
 import OpenAI from 'openai';
 import fetch from 'node-fetch';
 
@@ -18,26 +17,44 @@ export async function POST(request: Request) {
       .eq('id', id)
       .single();
 
-    if (imageError) {
-      throw new Error(`Failed to fetch image data: ${imageError.message}`);
+    if (imageError || !imageData) {
+      console.error('Error fetching image record:', imageError);
+      return NextResponse.json(
+        { error: 'Failed to fetch image record' },
+        { status: 500 }
+      );
     }
 
-    if (!imageData?.rel_users_id) {
-      throw new Error('Image record is missing user ID');
+    const userId = imageData.rel_users_id;
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'No user ID associated with this image' },
+        { status: 400 }
+      );
     }
 
-    // Get the user's OpenAI API key
-    const apiKey = await getUserApiKey(imageData.rel_users_id, 'openai');
-    if (!apiKey) {
-      throw new Error('Please add your OpenAI API key in the API Keys page before generating images.');
+    // Get the user's API key
+    const { data: apiKeyData, error: apiKeyError } = await supabase
+      .from('api_keys')
+      .select('key_value')
+      .eq('user_id', userId)
+      .eq('key_type', 'openai')
+      .eq('is_active', true)
+      .single();
+
+    if (apiKeyError || !apiKeyData) {
+      console.error('Error fetching API key:', apiKeyError);
+      return NextResponse.json(
+        { error: 'Please add your OpenAI API key in the API Keys page before generating images.' },
+        { status: 400 }
+      );
     }
 
-    // Initialize OpenAI with user's API key
     const openai = new OpenAI({
-      apiKey: apiKey,
+      apiKey: apiKeyData.key_value,
     });
 
-    // Generate image using OpenAI
+    // Generate the image
     const response = await openai.images.generate({
       model: "dall-e-3",
       prompt: prompt,
@@ -45,11 +62,10 @@ export async function POST(request: Request) {
       size: "1024x1024",
     });
 
-    if (!response.data?.[0]?.url) {
+    const imageUrl = response.data[0].url;
+    if (!imageUrl) {
       throw new Error('No image URL in response');
     }
-
-    const imageUrl = response.data[0].url;
 
     // Download the image
     const imageResponse = await fetch(imageUrl);
@@ -65,7 +81,11 @@ export async function POST(request: Request) {
       });
 
     if (uploadError) {
-      throw new Error(`Failed to upload image to storage: ${uploadError.message}`);
+      console.error('Error uploading to storage:', uploadError);
+      return NextResponse.json(
+        { error: 'Failed to upload image to storage' },
+        { status: 500 }
+      );
     }
 
     // Get the public URL
@@ -77,20 +97,25 @@ export async function POST(request: Request) {
     const { error: updateError } = await supabase
       .from('images')
       .update({
-        img_file_url1: publicUrl,
-        status: 'completed'
+        image_url: publicUrl,
+        status: 'completed',
+        updated_at: new Date().toISOString()
       })
       .eq('id', id);
 
     if (updateError) {
-      throw new Error(`Failed to update image record: ${updateError.message}`);
+      console.error('Error updating image record:', updateError);
+      return NextResponse.json(
+        { error: 'Failed to update image record' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true, imageUrl: publicUrl });
   } catch (error) {
     console.error('Error generating image:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'An error occurred' },
+      { error: error instanceof Error ? error.message : 'An error occurred while generating the image' },
       { status: 500 }
     );
   }

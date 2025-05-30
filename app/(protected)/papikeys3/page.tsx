@@ -52,7 +52,10 @@ export default function ApiKeysPage3() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      setError('User not authenticated');
+      return;
+    }
 
     setError(null);
     setSuccess(null);
@@ -66,7 +69,8 @@ export default function ApiKeysPage3() {
         .eq('key_type', 'openai');
 
       if (deactivateError) {
-        throw deactivateError;
+        console.error('Deactivate error:', deactivateError);
+        throw new Error(`Failed to deactivate existing key: ${deactivateError.message}`);
       }
 
       // Then create the new key
@@ -80,14 +84,16 @@ export default function ApiKeysPage3() {
         });
 
       if (insertError) {
-        throw insertError;
+        console.error('Insert error:', insertError);
+        throw new Error(`Failed to save API key: ${insertError.message}`);
       }
 
       setSuccess('API key saved successfully');
       setNewKey('');
       fetchApiKeys();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Full error:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred while saving the API key');
     }
   };
 
