@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/app/context/AuthContext';
 
 type Image = {
-  id: number;
+  id: string;
   created_at: string;
   rel_users_id: string;
   prompt1: string;

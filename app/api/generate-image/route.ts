@@ -58,8 +58,9 @@ export async function POST(request: Request) {
     // Get the user's API key
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('api_keys')
-      .select('openai_key')
+      .select('key_value')
       .eq('user_id', userId)
+      .eq('key_type', 'openai')
       .single();
 
     if (apiKeyError) {
@@ -85,7 +86,7 @@ export async function POST(request: Request) {
     }
 
     const openai = new OpenAI({
-      apiKey: apiKeyData.openai_key,
+      apiKey: apiKeyData.key_value,
     });
 
     // Generate the image
