@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 export async function POST(request: Request) {
   try {
     const { prompt, imageId: id } = await request.json();
+    console.log('Received request with imageId:', id);
 
     // Get the user's API key
     const { data: imageData, error: imageError } = await supabaseAdmin
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
       .select('rel_users_id')
       .eq('id', id)
       .single();
+
+    console.log('Image data:', imageData);
+    console.log('Image error:', imageError);
 
     if (imageError) {
       throw new Error('Failed to fetch image data');
@@ -23,6 +27,9 @@ export async function POST(request: Request) {
       .select('openai_api_key')
       .eq('id', imageData.rel_users_id)
       .single();
+
+    console.log('User data:', userData);
+    console.log('User error:', userError);
 
     if (userError) {
       throw new Error('Failed to fetch user data');
