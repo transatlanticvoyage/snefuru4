@@ -27,33 +27,53 @@ export default function FApikeys1Page() {
         throw new Error('User not authenticated');
       }
 
+      console.log('Current user ID:', user.id);
+
       // First, get the user's auth_id from the users table
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('auth_id')
-        .eq('id', user.id)
-        .single();
+        .eq('id', user.id);
 
-      if (userError) throw userError;
-      if (!userData?.auth_id) throw new Error('User not found');
+      if (userError) {
+        console.error('Error fetching user:', userError);
+        throw userError;
+      }
+
+      if (!userData || userData.length === 0) {
+        console.error('No user found with ID:', user.id);
+        throw new Error('User not found in database');
+      }
+
+      if (userData.length > 1) {
+        console.error('Multiple users found with ID:', user.id);
+        throw new Error('Multiple users found with the same ID');
+      }
+
+      const authId = userData[0].auth_id;
+      console.log('Found auth_id:', authId);
 
       // Now insert the API key using the auth_id
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from('tapikeys2')
         .insert({
-          fk_users_id: userData.auth_id,
+          fk_users_id: authId,
           key_type: 'openai',
           key_value: apiKey,
           key_name: keyName || 'OpenAI Key',
           is_active: true
         });
 
-      if (error) throw error;
+      if (insertError) {
+        console.error('Error inserting API key:', insertError);
+        throw insertError;
+      }
 
       setMessage({ type: 'success', text: 'API key saved successfully!' });
       setApiKey('');
       setKeyName('');
     } catch (error: any) {
+      console.error('Full error:', error);
       setMessage({ 
         type: 'error', 
         text: error.message || 'Failed to save API key' 
