@@ -23,21 +23,20 @@ export default function FApikeys1Page() {
     setMessage({ type: '', text: '' });
 
     try {
-      if (!user?.email || !user?.id) {
+      if (!user?.id) {
         throw new Error('User not authenticated');
       }
 
-      console.log('Current user email:', user.email);
-      console.log('Current user ID:', user.id);
+      console.log('Current user auth_id:', user.id);
 
-      // First, check if user exists in the users table
+      // First, check if user exists in the users table and get their id
       const { data: existingUser, error: userError } = await supabase
         .from('users')
-        .select('auth_id')
-        .eq('email', user.email)
+        .select('id')
+        .eq('auth_id', user.id)
         .single();
 
-      let authId;
+      let userId;
 
       if (userError) {
         if (userError.code === 'PGRST116') {
@@ -46,10 +45,10 @@ export default function FApikeys1Page() {
           const { data: newUser, error: createError } = await supabase
             .from('users')
             .insert({
-              email: user.email,
-              auth_id: user.id
+              auth_id: user.id,
+              email: user.email
             })
-            .select('auth_id')
+            .select('id')
             .single();
 
           if (createError) {
@@ -57,21 +56,33 @@ export default function FApikeys1Page() {
             throw createError;
           }
 
-          authId = newUser.auth_id;
-          console.log('Created new user with auth_id:', authId);
+          userId = newUser.id;
+          console.log('Created new user with ID:', userId);
         } else {
           throw userError;
         }
       } else {
-        authId = existingUser.auth_id;
-        console.log('Found existing user with auth_id:', authId);
+        userId = existingUser.id;
+        console.log('Found existing user with ID:', userId);
       }
 
-      // Now insert the API key using the auth_id
+      // First, deactivate any existing keys of the same type
+      const { error: deactivateError } = await supabase
+        .from('tapikeys2')
+        .update({ is_active: false })
+        .eq('fk_users_id', userId)
+        .eq('key_type', 'openai');
+
+      if (deactivateError) {
+        console.error('Error deactivating existing keys:', deactivateError);
+        throw deactivateError;
+      }
+
+      // Now insert the API key
       const { error: insertError } = await supabase
         .from('tapikeys2')
         .insert({
-          fk_users_id: authId,
+          fk_users_id: userId,
           key_type: 'openai',
           key_value: apiKey,
           key_name: keyName || 'OpenAI Key',
