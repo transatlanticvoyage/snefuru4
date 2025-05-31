@@ -147,7 +147,7 @@ export async function POST(request: Request) {
     const fileName = `image_${timestamp}.png`;
     const { data: uploadData, error: uploadError } = await supabase
       .storage
-      .from('images')
+      .from('bucket-images-b1')
       .upload(fileName, imageBlob, {
         contentType: 'image/png',
         upsert: false
@@ -163,7 +163,7 @@ export async function POST(request: Request) {
 
     const { data: { publicUrl } } = supabase
       .storage
-      .from('images')
+      .from('bucket-images-b1')
       .getPublicUrl(fileName);
 
     const { data: newImage, error: dbError } = await supabase
