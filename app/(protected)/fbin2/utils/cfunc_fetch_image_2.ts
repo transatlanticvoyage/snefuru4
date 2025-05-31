@@ -19,14 +19,27 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
 
     // 2. Check authentication
     const supabase = createClientComponentClient();
+    console.log('Checking authentication...');
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    console.log('Session check result:', { session: !!session, error: sessionError });
 
-    if (sessionError || !session) {
+    if (sessionError) {
+      console.error('Session error:', sessionError);
+      return {
+        success: false,
+        error: `Authentication error: ${sessionError.message}`
+      };
+    }
+
+    if (!session) {
+      console.log('No session found');
       return {
         success: false,
         error: 'User not authenticated'
       };
     }
+
+    console.log('User authenticated:', session.user.id);
 
     // 3. Call our server-side API endpoint
     const response = await fetch('/fbin2/api/sfunc_fetch_image_2', {
@@ -39,6 +52,7 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     });
 
     const data = await response.json();
+    console.log('Server response:', data);
 
     if (!response.ok) {
       return {

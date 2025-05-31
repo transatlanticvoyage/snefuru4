@@ -13,11 +13,28 @@ export default function Panjar2Page() {
   const { user } = useAuth();
   const supabase = createClientComponentClient();
 
+  useEffect(() => {
+    // Debug: Check auth state
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('Page auth state:', { 
+        userFromContext: !!user, 
+        userFromSession: !!session,
+        userId: user?.id,
+        sessionUserId: session?.user?.id
+      });
+    };
+    checkAuth();
+  }, [user, supabase]);
+
   const fetchImages = async () => {
     try {
       if (!user?.id) {
+        console.log('No user ID in context');
         throw new Error('User not authenticated');
       }
+
+      console.log('Fetching user data for auth_id:', user.id);
 
       // Get user's ID from the users table
       const { data: userData, error: userError } = await supabase
@@ -27,12 +44,16 @@ export default function Panjar2Page() {
         .single();
 
       if (userError) {
+        console.error('User lookup error:', userError);
         throw new Error('Failed to fetch user record');
       }
 
       if (!userData) {
+        console.log('No user data found for auth_id:', user.id);
         throw new Error('User record not found');
       }
+
+      console.log('Found user data:', userData);
 
       // Fetch images for this specific user
       const { data, error } = await supabase
@@ -44,6 +65,7 @@ export default function Panjar2Page() {
       if (error) throw error;
       setImages(data || []);
     } catch (err) {
+      console.error('Error in fetchImages:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch images');
     } finally {
       setIsLoading(false);
@@ -54,6 +76,7 @@ export default function Panjar2Page() {
     if (user) {
       fetchImages();
     } else {
+      console.log('No user in context, skipping fetch');
       setIsLoading(false);
     }
   }, [user]);
