@@ -53,14 +53,18 @@ export default function Panjar2UI({ images }: Panjar2UIProps) {
                 <td className="px-4 py-2 border">{new Date(image.created_at).toLocaleString()}</td>
                 <td className="px-4 py-2 border">{image.rel_images_plans_id}</td>
                 <td className="px-4 py-2 border">
-                  <a 
-                    href={image.img_file_url1} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline truncate block max-w-xs"
-                  >
-                    {image.img_file_url1}
-                  </a>
+                  {image.img_file_url1 ? (
+                    <a 
+                      href={image.img_file_url1}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline truncate block max-w-xs"
+                    >
+                      {image.img_file_url1}
+                    </a>
+                  ) : (
+                    <span className="text-gray-400">No URL</span>
+                  )}
                 </td>
                 <td className="px-4 py-2 border">{image.img_file_extension}</td>
                 <td className="px-4 py-2 border">{image.img_file_size}</td>
