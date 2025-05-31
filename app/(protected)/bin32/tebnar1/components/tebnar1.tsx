@@ -23,10 +23,14 @@ const gridCols = 9; // A-I
 const gridRows = 11;
 const colHeaders = Array.from({ length: gridCols }, (_, i) => String.fromCharCode(65 + i)); // ['A',...,'I']
 
-function ExcelPasteGrid() {
+function ExcelPasteGrid({ onGridDataChange }: { onGridDataChange?: (grid: string[][]) => void }) {
   const [grid, setGrid] = useState<string[][]>(Array.from({ length: gridRows }, () => Array(gridCols).fill('')));
   const [selected, setSelected] = useState<{ row: number; col: number }>({ row: 0, col: 0 });
   const gridRef = useRef<HTMLTableElement>(null);
+
+  useEffect(() => {
+    if (onGridDataChange) onGridDataChange(grid);
+  }, [grid, onGridDataChange]);
 
   // Handle cell click
   const handleCellClick = (row: number, col: number) => {
@@ -114,6 +118,9 @@ export default function Tebnar1() {
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [gridData, setGridData] = useState<string[][]>([]);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitResult, setSubmitResult] = useState<string | null>(null);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -156,19 +163,49 @@ export default function Tebnar1() {
     fetchPlans();
   }, [user, supabase]);
 
+  const handleSubmit = async () => {
+    setSubmitLoading(true);
+    setSubmitResult(null);
+    try {
+      if (!user?.id) throw new Error('User not authenticated');
+      if (!gridData || gridData.length < 2) throw new Error('No data to submit');
+      const fieldNames = gridData[0].map(f => f.trim()).filter(Boolean);
+      const rows = gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+      if (fieldNames.length === 0 || rows.length === 0) throw new Error('Grid is empty or missing headers');
+      // Map each row to an object
+      const records = rows.map(row => {
+        const obj: Record<string, string> = {};
+        fieldNames.forEach((field, idx) => {
+          if (field) obj[field] = row[idx] ?? '';
+        });
+        return obj;
+      });
+      // Import client function
+      const { func_create_plans_from_xls_1 } = await import('../utils/cfunc_create_plans_from_xls_1');
+      const result = await func_create_plans_from_xls_1(records);
+      setSubmitResult(result?.message || (result?.success ? 'Success' : 'Failed'));
+    } catch (err) {
+      setSubmitResult(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <div>
-      <ExcelPasteGrid />
+      <ExcelPasteGrid onGridDataChange={setGridData} />
       <div className="my-4">
         <button
           className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-          // onClick will be added later
+          onClick={handleSubmit}
+          disabled={submitLoading}
         >
-          Submit func_create_plans_from_xls_1
+          {submitLoading ? 'Submitting...' : 'Submit func_create_plans_from_xls_1'}
         </button>
+        {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
