@@ -18,16 +18,46 @@ export async function POST(request: Request) {
     // Initialize Supabase with auth context
     const supabase = createRouteHandlerClient({ cookies });
 
-    // Get API key from tapikeys2 table
+    // Get the current user's session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { success: false, error: 'User not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    // First, get the user's ID from the users table
+    const { data: existingUser, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', session.user.id)
+      .single();
+
+    if (userError) {
+      console.error('User lookup error:', userError);
+      return NextResponse.json(
+        { success: false, error: 'Failed to find user record' },
+        { status: 500 }
+      );
+    }
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { success: false, error: 'User record not found' },
+        { status: 404 }
+      );
+    }
+
+    // Get API key from tapikeys2 table for this specific user
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('tapikeys2')
       .select('key_value')
+      .eq('fk_users_id', existingUser.id)
       .eq('key_type', 'openai')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(1);
-
-    console.log('API Key Query Result:', { apiKeyData, apiKeyError });
 
     if (apiKeyError) {
       console.error('Supabase error:', apiKeyError);
@@ -40,6 +70,7 @@ export async function POST(request: Request) {
             query: {
               table: 'tapikeys2',
               filters: {
+                fk_users_id: existingUser.id,
                 key_type: 'openai',
                 is_active: true
               }
@@ -59,6 +90,7 @@ export async function POST(request: Request) {
             query: {
               table: 'tapikeys2',
               filters: {
+                fk_users_id: existingUser.id,
                 key_type: 'openai',
                 is_active: true
               }
@@ -71,7 +103,6 @@ export async function POST(request: Request) {
     }
 
     const apiKey = apiKeyData[0].key_value;
-    console.log('API Key found:', apiKey ? 'Yes' : 'No');
     if (!apiKey) {
       return NextResponse.json(
         { 
@@ -81,6 +112,7 @@ export async function POST(request: Request) {
             query: {
               table: 'tapikeys2',
               filters: {
+                fk_users_id: existingUser.id,
                 key_type: 'openai',
                 is_active: true
               }
