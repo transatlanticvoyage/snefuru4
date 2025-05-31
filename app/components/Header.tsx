@@ -2,19 +2,21 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function Header() {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+        setActiveDropdown(null);
       }
     }
 
@@ -31,47 +33,137 @@ export default function Header() {
     }
   };
 
+  const toggleDropdown = (dropdown: string) => {
+    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
+  };
+
   return (
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/home" className="text-2xl font-bold text-indigo-600">
-                Snefuru
+              <Link href="/" className="text-xl font-bold text-indigo-600">
+                Snefuru4
               </Link>
             </div>
             <nav className="ml-6 flex space-x-8">
-              <Link href="/home" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Home
-              </Link>
-              <Link href="/papikeys" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Papikeys
-              </Link>
-              <Link href="/papikeys2" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Papikeys2
-              </Link>
-              <Link href="/papikeys3" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Papikeys3
-              </Link>
-              <Link href="/gambar1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Gambar1
-              </Link>
-              <Link href="/gambar2" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Gambar2
-              </Link>
-              <Link href="/belt1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Belt1
-              </Link>
-              <Link href="/fbin2/panjar1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Panjar1
-              </Link>
-              <Link href="/fbin2/panjar2" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                Panjar2
-              </Link>
-              <Link href="/fbin2/fapikeys1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
-                FApikeys1
-              </Link>
+              {/* Pages 1 Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => toggleDropdown('pages1')}
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Pages 1
+                  <svg className="ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {activeDropdown === 'pages1' && (
+                  <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1">
+                      <Link href="/stuff1" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Stuff1
+                      </Link>
+                      <Link href="/stuff2" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Stuff2
+                      </Link>
+                      <Link href="/stuff3" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Stuff3
+                      </Link>
+                      <Link href="/stuff4" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Stuff4
+                      </Link>
+                      <Link href="/stuff5" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Stuff5
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Pages 2 Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => toggleDropdown('pages2')}
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Pages 2
+                  <svg className="ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {activeDropdown === 'pages2' && (
+                  <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1">
+                      <Link href="/panjar2" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Panjar2
+                      </Link>
+                      <Link href="/fapikeys1" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        FApikeys1
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Empty Dropdowns */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => toggleDropdown('pages3')}
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Pages 3
+                  <svg className="ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {activeDropdown === 'pages3' && (
+                  <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1">
+                      {/* Empty for now */}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => toggleDropdown('pages4')}
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Pages 4
+                  <svg className="ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {activeDropdown === 'pages4' && (
+                  <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1">
+                      {/* Empty for now */}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => toggleDropdown('pages5')}
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Pages 5
+                  <svg className="ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {activeDropdown === 'pages5' && (
+                  <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1">
+                      {/* Empty for now */}
+                    </div>
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
           <div className="flex items-center">
