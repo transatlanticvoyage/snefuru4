@@ -1,166 +1,71 @@
 import { readdir, stat } from 'fs/promises';
-import { join } from 'path';
+import { join, relative, sep } from 'path';
 
 interface NavItem {
   name: string;
-  path: string;
+  path?: string;
   children?: NavItem[];
 }
 
-async function findPages(dir: string, basePath: string = ''): Promise<NavItem[]> {
-  try {
-    console.log('Finding pages in:', dir, 'with base path:', basePath);
-    
-    // Check if directory exists
-    try {
-      const dirStats = await stat(dir);
-      if (!dirStats.isDirectory()) {
-        console.error('Path is not a directory:', dir);
-        return [];
-      }
-    } catch (error) {
-      console.error('Error checking directory:', dir, error);
-      return [];
+// Recursively find all page.tsx files under dir
+async function findAllPages(dir: string): Promise<string[]> {
+  let results: string[] = [];
+  const items = await readdir(dir, { withFileTypes: true });
+  for (const item of items) {
+    if (item.name.startsWith('.') || item.name === 'node_modules') continue;
+    const fullPath = join(dir, item.name);
+    if (item.isDirectory()) {
+      results = results.concat(await findAllPages(fullPath));
+    } else if (item.isFile() && item.name === 'page.tsx') {
+      results.push(fullPath);
     }
-    
-    const items = await readdir(dir, { withFileTypes: true });
-    console.log('Found items in directory:', dir, items.map(i => i.name));
-    const pages: NavItem[] = [];
-
-    for (const item of items) {
-      const fullPath = join(dir, item.name);
-      const relativePath = join(basePath, item.name);
-
-      if (item.isDirectory()) {
-        // Skip node_modules and .git directories
-        if (item.name === 'node_modules' || item.name === '.git' || item.name.startsWith('.')) {
-          console.log('Skipping directory:', item.name);
-          continue;
-        }
-
-        // Check if this directory has a page.tsx
-        try {
-          const pagePath = join(fullPath, 'page.tsx');
-          console.log('Checking for page.tsx at:', pagePath);
-          const stats = await stat(pagePath);
-          
-          if (stats.isFile()) {
-            console.log('Found page:', relativePath);
-            pages.push({
-              name: item.name,
-              path: `/${relativePath}`
-            });
-          }
-        } catch (error) {
-          // No page.tsx in this directory, check subdirectories
-          console.log('No page.tsx found in:', fullPath, 'checking subdirectories...');
-          try {
-            const subPages = await findPages(fullPath, relativePath);
-            if (subPages.length > 0) {
-              console.log('Found subpages in:', relativePath, subPages);
-              pages.push({
-                name: item.name,
-                path: `/${relativePath}`,
-                children: subPages
-              });
-            }
-          } catch (subError) {
-            console.error('Error reading subdirectory:', fullPath, subError);
-          }
-        }
-      }
-    }
-
-    return pages;
-  } catch (error) {
-    console.error('Error in findPages:', error);
-    return [];
   }
+  return results;
 }
 
 export async function getNavigation() {
+  const protectedDir = join(process.cwd(), 'app', '(protected)');
+  let pageFiles: string[] = [];
   try {
-    // Get the absolute path to the app directory
-    const appDir = join(process.cwd(), 'app');
-    const protectedDir = join(appDir, '(protected)');
-    
-    console.log('App directory:', appDir);
-    console.log('Protected directory:', protectedDir);
-    
-    // Verify the directories exist
-    try {
-      const appStats = await stat(appDir);
-      if (!appStats.isDirectory()) {
-        console.error('App directory is not a directory:', appDir);
-        return [];
-      }
-      
-      const protectedStats = await stat(protectedDir);
-      if (!protectedStats.isDirectory()) {
-        console.error('Protected directory is not a directory:', protectedDir);
-        return [];
-      }
-    } catch (error) {
-      console.error('Directory not found:', error);
-      return [];
-    }
-
-    const pages = await findPages(protectedDir);
-    console.log('Found all pages:', pages);
-    
-    // Group pages by their top-level directory
-    const groups = new Map<string, NavItem[]>();
-    
-    for (const page of pages) {
-      const parts = page.path.split('/').filter(Boolean);
-      const groupName = parts.length > 1 ? parts[0] : 'root';
-      console.log('Processing page:', page.path, 'in group:', groupName);
-      
-      if (!groups.has(groupName)) {
-        groups.set(groupName, []);
-      }
-      
-      if (parts.length === 1) {
-        // This is a root-level page
-        groups.get(groupName)?.push(page);
-      } else {
-        // This is a subdirectory page
-        const existingGroup = groups.get(groupName)?.find(g => g.name === parts[0]);
-        if (existingGroup) {
-          if (!existingGroup.children) {
-            existingGroup.children = [];
-          }
-          existingGroup.children.push({
-            name: parts[parts.length - 1],
-            path: page.path
-          });
-        } else {
-          groups.get(groupName)?.push({
-            name: parts[0],
-            path: `/${parts[0]}`,
-            children: [{
-              name: parts[parts.length - 1],
-              path: page.path
-            }]
-          });
-        }
-      }
-    }
-
-    // Convert groups to final navigation structure
-    const navItems: NavItem[] = [];
-    for (const [groupName, pages] of groups) {
-      navItems.push({
-        name: groupName,
-        path: `/${groupName}`,
-        children: pages
-      });
-    }
-
-    console.log('Final navigation structure:', navItems);
-    return navItems;
-  } catch (error) {
-    console.error('Error in getNavigation:', error);
+    pageFiles = await findAllPages(protectedDir);
+  } catch (e) {
+    console.error('Error reading protectedDir:', e);
     return [];
   }
+
+  // Build nav structure
+  const groups: Record<string, NavItem> = {};
+  for (const file of pageFiles) {
+    // Get the path after (protected)
+    const rel = relative(protectedDir, file);
+    const parts = rel.split(sep); // e.g. ['fbin2', 'panjar1', 'page.tsx']
+    let group = 'root';
+    let pageName = '';
+    let pagePath = '';
+    if (parts.length === 2) {
+      // e.g. ['profile', 'page.tsx']
+      group = 'root';
+      pageName = parts[0];
+      pagePath = `/${parts[0]}`;
+    } else if (parts.length > 2) {
+      // e.g. ['fbin2', 'panjar1', 'page.tsx']
+      group = parts[0];
+      pageName = parts[1];
+      pagePath = `/${parts[0]}/${parts[1]}`;
+    }
+    if (!groups[group]) {
+      groups[group] = { name: group, children: [] };
+    }
+    groups[group].children!.push({ name: pageName, path: pagePath });
+  }
+
+  // Convert to array, sort groups and children alphabetically
+  const navItems: NavItem[] = Object.values(groups)
+    .map(group => ({
+      name: group.name,
+      children: group.children?.sort((a, b) => a.name.localeCompare(b.name)),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return navItems;
 } 
