@@ -50,8 +50,13 @@ export default function Panjar2UI({ images }: Panjar2UIProps) {
           </button>
         </div>
         {error && (
-          <div className="mt-4 text-red-600">
-            {error}
+          <div className="mt-4">
+            <div className="text-red-600">
+              {error}
+            </div>
+            <pre className="mt-2 p-4 bg-gray-100 rounded-lg overflow-auto text-sm">
+              {JSON.stringify(error, null, 2)}
+            </pre>
           </div>
         )}
       </div>

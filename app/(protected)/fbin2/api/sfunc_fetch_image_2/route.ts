@@ -32,15 +32,40 @@ export async function POST(request: Request) {
     if (apiKeyError) {
       console.error('Supabase error:', apiKeyError);
       return NextResponse.json(
-        { success: false, error: `Database error: ${apiKeyError.message}` },
+        { 
+          success: false, 
+          error: `Database error: ${apiKeyError.message}`,
+          debug: {
+            error: apiKeyError,
+            query: {
+              table: 'tapikeys2',
+              filters: {
+                key_type: 'openai',
+                is_active: true
+              }
+            }
+          }
+        },
         { status: 500 }
       );
     }
 
     if (!apiKeyData || apiKeyData.length === 0) {
-      console.log('No API key found in database');
       return NextResponse.json(
-        { success: false, error: 'No active OpenAI API key found in tapikeys2 table' },
+        { 
+          success: false, 
+          error: 'No active OpenAI API key found in tapikeys2 table',
+          debug: {
+            query: {
+              table: 'tapikeys2',
+              filters: {
+                key_type: 'openai',
+                is_active: true
+              }
+            },
+            result: apiKeyData
+          }
+        },
         { status: 404 }
       );
     }
@@ -49,7 +74,20 @@ export async function POST(request: Request) {
     console.log('API Key found:', apiKey ? 'Yes' : 'No');
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: 'OpenAI API key is empty in tapikeys2 table' },
+        { 
+          success: false, 
+          error: 'OpenAI API key is empty in tapikeys2 table',
+          debug: {
+            query: {
+              table: 'tapikeys2',
+              filters: {
+                key_type: 'openai',
+                is_active: true
+              }
+            },
+            result: apiKeyData
+          }
+        },
         { status: 400 }
       );
     }
