@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React from "react";
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -17,19 +18,22 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [navItems, setNavItems] = useState<NavItem[]>([]);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownRefs, setDropdownRefs] = useState<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
+      if (
+        activeDropdown &&
+        dropdownRefs[activeDropdown] &&
+        dropdownRefs[activeDropdown].current &&
+        !dropdownRefs[activeDropdown].current!.contains(event.target as Node)
+      ) {
         setActiveDropdown(null);
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [activeDropdown, dropdownRefs]);
 
   useEffect(() => {
     // Fetch navigation items when component mounts
@@ -48,6 +52,15 @@ export default function Header() {
 
     fetchNavItems();
   }, []);
+
+  // Set up refs for each group
+  useEffect(() => {
+    const refs: { [key: string]: React.RefObject<HTMLDivElement> } = {};
+    navItems.forEach(group => {
+      refs[group.name] = refs[group.name] || React.createRef<HTMLDivElement>();
+    });
+    setDropdownRefs(refs);
+  }, [navItems]);
 
   const handleLogout = async () => {
     try {
@@ -74,7 +87,7 @@ export default function Header() {
             </div>
             <nav className="ml-6 flex space-x-8">
               {navItems.map((group) => (
-                <div key={group.name} className="relative" ref={dropdownRef}>
+                <div key={group.name} className="relative" ref={dropdownRefs[group.name]}>
                   <button
                     onClick={() => toggleDropdown(group.name)}
                     className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
@@ -107,7 +120,7 @@ export default function Header() {
             </nav>
           </div>
           <div className="flex items-center">
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative" ref={dropdownRefs['user']}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
