@@ -81,10 +81,11 @@ export default function Panjar1Page() {
         size: "1024x1024",
       });
 
-      const imageUrl = response.data[0].url;
-      if (!imageUrl) {
+      if (!response.data || !response.data[0]?.url) {
         throw new Error('No image URL returned from OpenAI');
       }
+
+      const imageUrl = response.data[0].url;
 
       // Fetch the image data
       const imageResponse = await fetch(imageUrl);
