@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
@@ -13,15 +15,36 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    // Get the user's session
+    const supabase = createRouteHandlerClient({ cookies });
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      return NextResponse.json(
+        { success: false, error: 'User not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    // Get the user's ID from the users table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', session.user.id)
+      .single();
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { success: false, error: 'User record not found' },
+        { status: 404 }
+      );
+    }
 
     // Get API key from tapikeys2 table
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('tapikeys2')
       .select('key_value')
+      .eq('fk_users_id', userData.id)
       .eq('key_type', 'openai')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
