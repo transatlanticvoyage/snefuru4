@@ -4,25 +4,31 @@ import { func_fetch_image_4 } from '../utils/cfunc_fetch_image_4';
 
 interface Panjar4UIProps {
   images: ImageRecord[];
+  onImagesRefresh?: () => void; // callback to refresh images from parent
 }
 
-export default function Panjar4UI({ images }: Panjar4UIProps) {
+export default function Panjar4UI({ images, onImagesRefresh }: Panjar4UIProps) {
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [debug, setDebug] = useState<any>(null);
 
   const handleGenerate = async () => {
     try {
       setIsLoading(true);
       setError(null);
+      setDebug(null);
       const result = await func_fetch_image_4(prompt);
-      
+      setDebug(result);
       if (!result.success) {
         setError(result.error || 'Failed to generate image');
         return;
       }
-
       setPrompt('');
+      // If parent provided a refresh callback, call it to reload images
+      if (onImagesRefresh) {
+        await onImagesRefresh();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
@@ -56,6 +62,24 @@ export default function Panjar4UI({ images }: Panjar4UIProps) {
             <pre className="mt-2 p-4 bg-gray-100 rounded-lg overflow-auto text-sm">
               {JSON.stringify(error, null, 2)}
             </pre>
+          </div>
+        )}
+        {/* Debug Panel */}
+        {debug && (
+          <div className="mt-4">
+            <div className="font-bold">Debug Panel (last API response):</div>
+            <pre className="mt-2 p-4 bg-gray-200 rounded-lg overflow-auto text-xs">
+              {JSON.stringify(debug, null, 2)}
+            </pre>
+            {debug.image?.img_file_url1 && (
+              <div className="mt-2">
+                <span className="font-bold">Returned Image URL: </span>
+                <a href={debug.image.img_file_url1} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">{debug.image.img_file_url1}</a>
+                <div className="mt-2">
+                  <img src={debug.image.img_file_url1} alt="Debug Preview" className="h-32 w-32 object-cover border" />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

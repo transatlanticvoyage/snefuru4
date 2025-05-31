@@ -90,5 +90,5 @@ export default function Panjar4Page() {
     return <div className="text-red-600 p-4">Please log in to view your images</div>;
   }
 
-  return <Panjar4UI images={images} />;
+  return <Panjar4UI images={images} onImagesRefresh={fetchImages} />;
 } 
