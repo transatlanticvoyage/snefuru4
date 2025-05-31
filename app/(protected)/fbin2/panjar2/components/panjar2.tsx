@@ -1,18 +1,26 @@
 import { ImageRecord } from '../types';
 import { useState } from 'react';
 import { func_fetch_image_2 } from '../../utils/cfunc_fetch_image_2';
+import { useAuth } from '@/app/context/AuthContext';
 
 interface Panjar2UIProps {
   images: ImageRecord[];
 }
 
 export default function Panjar2UI({ images }: Panjar2UIProps) {
+  const { user } = useAuth();
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     try {
+      if (!user) {
+        setError('You must be logged in to generate images');
+        return;
+      }
+
+      console.log('Current user:', user); // Debug log
       setIsLoading(true);
       setError(null);
       const result = await func_fetch_image_2(prompt);
@@ -25,6 +33,7 @@ export default function Panjar2UI({ images }: Panjar2UIProps) {
       // Clear the prompt after successful generation
       setPrompt('');
     } catch (err) {
+      console.error('Error in handleGenerate:', err); // Debug log
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);

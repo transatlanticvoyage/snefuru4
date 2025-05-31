@@ -17,14 +17,28 @@ export async function POST(request: Request) {
 
     // Get the user's session
     const supabase = createRouteHandlerClient({ cookies });
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    console.log('Session data:', session); // Debug log
+    console.log('Session error:', sessionError); // Debug log
+
+    if (sessionError) {
+      console.error('Session error:', sessionError);
+      return NextResponse.json(
+        { success: false, error: `Authentication error: ${sessionError.message}` },
+        { status: 401 }
+      );
+    }
 
     if (!session?.user) {
+      console.error('No session or user found');
       return NextResponse.json(
         { success: false, error: 'User not authenticated' },
         { status: 401 }
       );
     }
+
+    console.log('User ID from session:', session.user.id); // Debug log
 
     // Get the user's ID from the users table
     const { data: userData, error: userError } = await supabase
@@ -32,6 +46,9 @@ export async function POST(request: Request) {
       .select('id')
       .eq('auth_id', session.user.id)
       .single();
+
+    console.log('User data:', userData); // Debug log
+    console.log('User error:', userError); // Debug log
 
     if (userError || !userData) {
       return NextResponse.json(
