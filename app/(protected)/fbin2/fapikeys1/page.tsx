@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function FApikeys1Page() {
   const { user } = useAuth();
@@ -20,6 +14,7 @@ export default function FApikeys1Page() {
   const [isVisible, setIsVisible] = useState(false);
   const [hasActiveKey, setHasActiveKey] = useState(false);
   const [currentKeyName, setCurrentKeyName] = useState('');
+  const supabase = createClientComponentClient();
 
   // Check for active API key on component mount
   useEffect(() => {
@@ -54,7 +49,7 @@ export default function FApikeys1Page() {
     };
 
     checkActiveKey();
-  }, [user?.id]);
+  }, [user?.id, supabase]);
 
   const func_save_api_keys_2 = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,7 +112,7 @@ export default function FApikeys1Page() {
         throw deactivateError;
       }
 
-      // Now insert the API key
+      // Now insert the new API key
       const { error: insertError } = await supabase
         .from('tapikeys2')
         .insert({
