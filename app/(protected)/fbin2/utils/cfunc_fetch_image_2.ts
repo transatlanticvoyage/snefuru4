@@ -5,6 +5,7 @@ interface FetchImageResponse {
   success: boolean;
   error?: string;
   image?: ImageRecord;
+  debug?: any;
 }
 
 export async function func_fetch_image_2(prompt: string): Promise<FetchImageResponse> {
@@ -47,19 +48,21 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
       body: JSON.stringify({ prompt }),
     });
 
-    const data = await response.json();
-    console.log('Server response:', data);
-
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response' }));
+      console.error('Server error:', errorData);
       return {
         success: false,
-        error: data.error || 'Failed to generate image'
+        error: errorData.error || `Server error: ${response.status}`,
+        debug: errorData.debug
       };
     }
+
+    const data = await response.json();
+    console.log('Server response:', data);
 
     return data;
 
