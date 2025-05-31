@@ -1,4 +1,5 @@
 import { ImageRecord } from '../panjar2/types';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface FetchImageResponse {
   success: boolean;
@@ -16,7 +17,18 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
       };
     }
 
-    // Call our server-side API endpoint
+    // 2. Check authentication
+    const supabase = createClientComponentClient();
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      return {
+        success: false,
+        error: 'User not authenticated'
+      };
+    }
+
+    // 3. Call our server-side API endpoint
     const response = await fetch('/fbin2/api/sfunc_fetch_image_2', {
       method: 'POST',
       headers: {
