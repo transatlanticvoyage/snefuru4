@@ -9,6 +9,21 @@ export default function Panjar2UI({ images }: Panjar2UIProps) {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Images Database</h1>
       
+      {/* Prompt Input Section */}
+      <div className="mb-8">
+        <textarea
+          placeholder="Enter your prompt here"
+          className="w-[400px] h-[150px] p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+        />
+        <div className="mt-4">
+          <button
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            fetch with func_fetch_image_2
+          </button>
+        </div>
+      </div>
+      
       {/* Images Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
