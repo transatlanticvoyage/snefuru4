@@ -162,6 +162,14 @@ export default function Tebnar1() {
   return (
     <div>
       <ExcelPasteGrid />
+      <div className="my-4">
+        <button
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          // onClick will be added later
+        >
+          Submit func_create_plans_from_xls_1
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
