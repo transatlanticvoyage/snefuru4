@@ -33,6 +33,15 @@ function ExcelPasteGrid() {
     setSelected({ row, col });
   };
 
+  // Handle cell change
+  const handleCellChange = (row: number, col: number, value: string) => {
+    setGrid(prev => {
+      const newGrid = prev.map(rowArr => [...rowArr]);
+      newGrid[row][col] = value;
+      return newGrid;
+    });
+  };
+
   // Handle paste
   const handlePaste = (e: React.ClipboardEvent<HTMLTableElement>) => {
     e.preventDefault();
@@ -80,14 +89,21 @@ function ExcelPasteGrid() {
                     className={`border border-gray-300 w-16 h-8 text-center cursor-pointer ${selected.row === rowIdx && selected.col === colIdx ? 'bg-blue-100' : ''}`}
                     onClick={() => handleCellClick(rowIdx, colIdx)}
                   >
-                    {grid[rowIdx][colIdx]}
+                    <input
+                      type="text"
+                      value={grid[rowIdx][colIdx]}
+                      onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
+                      className="w-full h-full text-center bg-transparent outline-none"
+                      style={{ minWidth: 0 }}
+                      onFocus={() => handleCellClick(rowIdx, colIdx)}
+                    />
                   </td>
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
-        <div className="text-xs text-gray-500 mt-2">Click a cell, then paste (Ctrl+V or Cmd+V) from Excel or Google Sheets. Data will fill from the selected cell.</div>
+        <div className="text-xs text-gray-500 mt-2">Click a cell to edit, or paste (Ctrl+V or Cmd+V) from Excel or Google Sheets. Data will fill from the selected cell.</div>
       </div>
     </div>
   );
