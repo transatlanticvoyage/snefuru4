@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import { readdir } from 'fs/promises';
+import { join } from 'path';
 
 interface NavItem {
   name: string;
@@ -8,47 +8,46 @@ interface NavItem {
 }
 
 export async function getNavigation() {
-  const protectedDir = path.join(process.cwd(), 'app', '(protected)');
+  const protectedDir = join(process.cwd(), 'app', '(protected)');
   const navItems: NavItem[] = [];
 
-  // Read the protected directory
-  const items = fs.readdirSync(protectedDir);
+  try {
+    // Read the protected directory
+    const items = await readdir(protectedDir, { withFileTypes: true });
+    
+    // Group by parent directory
+    const groups = new Map<string, NavItem[]>();
 
-  // Group by parent directory (fbin2, fbin3, etc.)
-  const groups = new Map<string, NavItem[]>();
-
-  for (const item of items) {
-    const fullPath = path.join(protectedDir, item);
-    const stat = fs.statSync(fullPath);
-
-    if (stat.isDirectory()) {
-      // Check if it's a page directory (contains page.tsx)
-      const hasPage = fs.existsSync(path.join(fullPath, 'page.tsx'));
-      
-      if (hasPage) {
-        // Get the parent directory name (e.g., 'fbin2' from '/fbin2/gambar1')
-        const parentDir = item.split('/')[0];
+    for (const item of items) {
+      if (item.isDirectory()) {
+        const fullPath = join(protectedDir, item.name);
+        const subItems = await readdir(fullPath, { withFileTypes: true });
         
-        if (!groups.has(parentDir)) {
-          groups.set(parentDir, []);
-        }
+        const pages = subItems
+          .filter(subItem => subItem.isDirectory())
+          .map(subItem => ({
+            name: subItem.name,
+            path: `/${item.name}/${subItem.name}`
+          }));
 
-        groups.get(parentDir)?.push({
-          name: item,
-          path: `/${item}`
-        });
+        if (pages.length > 0) {
+          groups.set(item.name, pages);
+        }
       }
     }
-  }
 
-  // Convert groups to navigation structure
-  for (const [groupName, pages] of groups) {
-    navItems.push({
-      name: groupName,
-      path: `/${groupName}`,
-      children: pages
-    });
-  }
+    // Convert groups to navigation structure
+    for (const [groupName, pages] of groups) {
+      navItems.push({
+        name: groupName,
+        path: `/${groupName}`,
+        children: pages
+      });
+    }
 
-  return navItems;
+    return navItems;
+  } catch (error) {
+    console.error('Error getting navigation:', error);
+    return [];
+  }
 } 

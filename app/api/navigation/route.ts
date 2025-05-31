@@ -1,6 +1,8 @@
 import { getNavigation } from '@/app/utils/getNavigation';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic'; // This ensures the route is not cached
+
 export async function GET() {
   try {
     const navItems = await getNavigation();
