@@ -105,9 +105,7 @@ export default function Header() {
                             key={page.path}
                             href={page.path}
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onMouseDown={e => {
-                              if (e.button === 0) setTimeout(() => setActiveDropdown(null), 0);
-                            }}
+                            onClick={() => setTimeout(() => setActiveDropdown(null), 0)}
                           >
                             {page.name}
                           </Link>
