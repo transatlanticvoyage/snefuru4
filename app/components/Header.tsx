@@ -66,6 +66,9 @@ export default function Header() {
               <Link href="/fbin2/panjar1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
                 Panjar1
               </Link>
+              <Link href="/fbin2/panjar2" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
+                Panjar2
+              </Link>
               <Link href="/fbin2/fapikeys1" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900">
                 FApikeys1
               </Link>
