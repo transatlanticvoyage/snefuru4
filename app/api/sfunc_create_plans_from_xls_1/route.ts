@@ -23,8 +23,18 @@ export async function POST(request: Request) {
     if (userError || !userData) {
       return NextResponse.json({ success: false, message: 'Could not find user record' }, { status: 400 });
     }
-    // Insert each record, adding rel_users_id
-    const recordsToInsert = records.map((rec: any) => ({ ...rec, rel_users_id: userData.id }));
+    // 1. Create a new batch row
+    const { data: batchData, error: batchError } = await supabase
+      .from('images_plans_batches')
+      .insert({ rel_users_id: userData.id })
+      .select('id')
+      .single();
+    if (batchError || !batchData) {
+      return NextResponse.json({ success: false, message: 'Failed to create batch: ' + (batchError?.message || 'Unknown error') }, { status: 500 });
+    }
+    const batchId = batchData.id;
+    // 2. Insert all images_plans rows with rel_images_plans_batches_id set
+    const recordsToInsert = records.map((rec: any) => ({ ...rec, rel_users_id: userData.id, rel_images_plans_batches_id: batchId }));
     const { data, error } = await supabase
       .from('images_plans')
       .insert(recordsToInsert)
@@ -32,7 +42,7 @@ export async function POST(request: Request) {
     if (error) {
       return NextResponse.json({ success: false, message: error.message }, { status: 500 });
     }
-    return NextResponse.json({ success: true, message: `Inserted ${data.length} rows.`, inserted: data });
+    return NextResponse.json({ success: true, message: `Inserted ${data.length} rows in batch ${batchId}.`, batch_id: batchId, inserted: data });
   } catch (error) {
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
