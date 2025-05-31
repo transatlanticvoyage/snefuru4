@@ -15,12 +15,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get the user's session
-    const supabase = createRouteHandlerClient({ cookies });
+    // Get the user's session using the route handler client
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    
+    // Refresh the session
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-    console.log('Session data:', session); // Debug log
-    console.log('Session error:', sessionError); // Debug log
 
     if (sessionError) {
       console.error('Session error:', sessionError);
@@ -38,8 +38,6 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log('User ID from session:', session.user.id); // Debug log
-
     // Get the user's ID from the users table
     const { data: userData, error: userError } = await supabase
       .from('users')
@@ -47,10 +45,8 @@ export async function POST(request: Request) {
       .eq('auth_id', session.user.id)
       .single();
 
-    console.log('User data:', userData); // Debug log
-    console.log('User error:', userError); // Debug log
-
     if (userError || !userData) {
+      console.error('User lookup error:', userError);
       return NextResponse.json(
         { success: false, error: 'User record not found' },
         { status: 404 }
