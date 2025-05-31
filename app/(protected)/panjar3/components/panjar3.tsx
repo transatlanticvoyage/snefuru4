@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { func_fetch_image_4 } from '@/app/(protected)/bin4/utils/cfunc_fetch_image_4';
 
 interface ImageRecord {
   id: string;
@@ -19,10 +20,24 @@ export default function Panjar3UI() {
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [images] = useState<ImageRecord[]>([]);
+  const [images, setImages] = useState<ImageRecord[]>([]);
 
-  const handleGenerate = () => {
-    // No active functionality
+  const handleGenerate = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await func_fetch_image_4(prompt);
+      if (result.success && result.image) {
+        setImages([result.image, ...images]);
+        setPrompt('');
+      } else {
+        setError(result.error || 'Unknown error');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -76,7 +91,51 @@ export default function Panjar3UI() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {/* No images to show, just interface */}
+            {images.map((image) => (
+              <tr key={image.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {image.img_file_url1 && (
+                    <img 
+                      src={image.img_file_url1} 
+                      alt="Generated" 
+                      className="h-20 w-20 object-cover"
+                    />
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.rel_users_id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{new Date(image.created_at).toLocaleString()}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.rel_images_plans_id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {image.img_file_url1 ? (
+                    <a 
+                      href={image.img_file_url1} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      View Image
+                    </a>
+                  ) : (
+                    <span className="text-gray-400">No URL</span>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.img_file_extension}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.img_file_size}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.width}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.height}</td>
+                <td className="px-6 py-4">
+                  <div 
+                    className="max-w-xs truncate" 
+                    title={image.prompt1 || undefined}
+                  >
+                    {image.prompt1 || 'No prompt'}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.status}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.function_used_to_fetch_the_image}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
