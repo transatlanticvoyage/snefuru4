@@ -8,51 +8,78 @@ interface NavItem {
 }
 
 async function findPages(dir: string, basePath: string = ''): Promise<NavItem[]> {
-  console.log('Finding pages in:', dir, 'with base path:', basePath);
-  const items = await readdir(dir, { withFileTypes: true });
-  console.log('Found items:', items.map(i => i.name));
-  const pages: NavItem[] = [];
+  try {
+    console.log('Finding pages in:', dir, 'with base path:', basePath);
+    const items = await readdir(dir, { withFileTypes: true });
+    console.log('Found items:', items.map(i => i.name));
+    const pages: NavItem[] = [];
 
-  for (const item of items) {
-    const fullPath = join(dir, item.name);
-    const relativePath = join(basePath, item.name);
+    for (const item of items) {
+      const fullPath = join(dir, item.name);
+      const relativePath = join(basePath, item.name);
 
-    if (item.isDirectory()) {
-      // Check if this directory has a page.tsx
-      try {
-        const stats = await stat(join(fullPath, 'page.tsx'));
-        if (stats.isFile()) {
-          console.log('Found page:', relativePath);
-          // This is a page directory
-          pages.push({
-            name: item.name,
-            path: `/${relativePath}`
-          });
+      if (item.isDirectory()) {
+        // Skip node_modules and .git directories
+        if (item.name === 'node_modules' || item.name === '.git') {
+          continue;
         }
-      } catch (error) {
-        // No page.tsx in this directory, check subdirectories
-        const subPages = await findPages(fullPath, relativePath);
-        if (subPages.length > 0) {
-          console.log('Found subpages in:', relativePath, subPages);
-          // This directory has pages in its subdirectories
-          pages.push({
-            name: item.name,
-            path: `/${relativePath}`,
-            children: subPages
-          });
+
+        // Check if this directory has a page.tsx
+        try {
+          const pagePath = join(fullPath, 'page.tsx');
+          const stats = await stat(pagePath);
+          
+          if (stats.isFile()) {
+            console.log('Found page:', relativePath);
+            pages.push({
+              name: item.name,
+              path: `/${relativePath}`
+            });
+          }
+        } catch (error) {
+          // No page.tsx in this directory, check subdirectories
+          try {
+            const subPages = await findPages(fullPath, relativePath);
+            if (subPages.length > 0) {
+              console.log('Found subpages in:', relativePath, subPages);
+              pages.push({
+                name: item.name,
+                path: `/${relativePath}`,
+                children: subPages
+              });
+            }
+          } catch (subError) {
+            console.error('Error reading subdirectory:', fullPath, subError);
+          }
         }
       }
     }
-  }
 
-  return pages;
+    return pages;
+  } catch (error) {
+    console.error('Error in findPages:', error);
+    return [];
+  }
 }
 
 export async function getNavigation() {
-  const protectedDir = join(process.cwd(), 'app', '(protected)');
-  console.log('Getting navigation from:', protectedDir);
-  
   try {
+    // Get the absolute path to the app directory
+    const appDir = join(process.cwd(), 'app');
+    const protectedDir = join(appDir, '(protected)');
+    
+    console.log('App directory:', appDir);
+    console.log('Protected directory:', protectedDir);
+    
+    // Verify the directories exist
+    try {
+      await stat(appDir);
+      await stat(protectedDir);
+    } catch (error) {
+      console.error('Directory not found:', error);
+      return [];
+    }
+
     const pages = await findPages(protectedDir);
     console.log('Found all pages:', pages);
     
@@ -108,7 +135,7 @@ export async function getNavigation() {
     console.log('Final navigation structure:', navItems);
     return navItems;
   } catch (error) {
-    console.error('Error getting navigation:', error);
+    console.error('Error in getNavigation:', error);
     return [];
   }
 } 

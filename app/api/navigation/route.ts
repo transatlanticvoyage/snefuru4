@@ -8,9 +8,18 @@ export async function GET() {
     console.log('API: Getting navigation items...');
     const navItems = await getNavigation();
     console.log('API: Navigation items:', navItems);
+    
+    if (!navItems || navItems.length === 0) {
+      console.log('API: No navigation items found');
+      return NextResponse.json([], { status: 200 });
+    }
+    
     return NextResponse.json(navItems);
   } catch (error) {
     console.error('API: Error getting navigation:', error);
-    return NextResponse.json({ error: 'Failed to get navigation' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to get navigation', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
   }
 } 
