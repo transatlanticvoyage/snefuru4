@@ -1,6 +1,6 @@
 import { ImageRecord } from '../types';
 import { useState } from 'react';
-import { func_fetch_image_2 } from '../../utils/func_fetch_image_2';
+import { func_fetch_image_2 } from '../../utils/cfunc_fetch_image_2';
 
 interface Panjar2UIProps {
   images: ImageRecord[];
