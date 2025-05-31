@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
@@ -18,6 +18,80 @@ const columns = [
   'e_prompt1',
   'e_ai_tool1',
 ];
+
+const gridCols = 9; // A-I
+const gridRows = 11;
+const colHeaders = Array.from({ length: gridCols }, (_, i) => String.fromCharCode(65 + i)); // ['A',...,'I']
+
+function ExcelPasteGrid() {
+  const [grid, setGrid] = useState<string[][]>(Array.from({ length: gridRows }, () => Array(gridCols).fill('')));
+  const [selected, setSelected] = useState<{ row: number; col: number }>({ row: 0, col: 0 });
+  const gridRef = useRef<HTMLTableElement>(null);
+
+  // Handle cell click
+  const handleCellClick = (row: number, col: number) => {
+    setSelected({ row, col });
+  };
+
+  // Handle paste
+  const handlePaste = (e: React.ClipboardEvent<HTMLTableElement>) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    const rows = text.split(/\r?\n/).filter(Boolean);
+    const newGrid = grid.map(row => [...row]);
+    rows.forEach((rowStr, i) => {
+      const cells = rowStr.split(/\t/);
+      cells.forEach((cell, j) => {
+        const r = selected.row + i;
+        const c = selected.col + j;
+        if (r < gridRows && c < gridCols) {
+          newGrid[r][c] = cell;
+        }
+      });
+    });
+    setGrid(newGrid);
+  };
+
+  return (
+    <div className="mb-8">
+      <div className="font-bold mb-2">kzelement6</div>
+      <div className="overflow-x-auto">
+        <table
+          ref={gridRef}
+          className="border border-gray-300"
+          tabIndex={0}
+          onPaste={handlePaste}
+        >
+          <thead>
+            <tr>
+              <th className="border border-gray-300 bg-gray-100 w-8"></th>
+              {colHeaders.map((col, idx) => (
+                <th key={col} className="border border-gray-300 bg-gray-100 w-16 text-center">{col}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: gridRows }).map((_, rowIdx) => (
+              <tr key={rowIdx}>
+                <th className="border border-gray-300 bg-gray-100 text-center">{rowIdx + 1}</th>
+                {Array.from({ length: gridCols }).map((_, colIdx) => (
+                  <td
+                    key={colIdx}
+                    className={`border border-gray-300 w-16 h-8 text-center cursor-pointer ${selected.row === rowIdx && selected.col === colIdx ? 'bg-blue-100' : ''}`}
+                    onClick={() => handleCellClick(rowIdx, colIdx)}
+                  >
+                    {grid[rowIdx][colIdx]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="text-xs text-gray-500 mt-2">Click a cell, then paste (Ctrl+V or Cmd+V) from Excel or Google Sheets. Data will fill from the selected cell.</div>
+      </div>
+    </div>
+  );
+}
 
 export default function Tebnar1() {
   const { user } = useAuth();
@@ -70,26 +144,29 @@ export default function Tebnar1() {
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            {columns.map(col => (
-              <th key={col} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {plans.map(plan => (
-            <tr key={plan.id}>
+    <div>
+      <ExcelPasteGrid />
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
               {columns.map(col => (
-                <td key={col} className="px-4 py-2 whitespace-nowrap">{String(plan[col] ?? '')}</td>
+                <th key={col} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{col}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {plans.length === 0 && <div className="mt-4 text-gray-500">No plans found for your user.</div>}
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {plans.map(plan => (
+              <tr key={plan.id}>
+                {columns.map(col => (
+                  <td key={col} className="px-4 py-2 whitespace-nowrap">{String(plan[col] ?? '')}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {plans.length === 0 && <div className="mt-4 text-gray-500">No plans found for your user.</div>}
+      </div>
     </div>
   );
 } 
