@@ -1,8 +1,5 @@
-'use client';
-
 import { useState } from 'react';
 
-// Dummy image record type for interface
 interface ImageRecord {
   id: string;
   rel_users_id: string;
@@ -18,11 +15,11 @@ interface ImageRecord {
   function_used_to_fetch_the_image?: string;
 }
 
-export default function Panjar3Page() {
+export default function Panjar3UI() {
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [images] = useState<ImageRecord[]>([]); // No active functionality
+  const [images] = useState<ImageRecord[]>([]);
 
   const handleGenerate = () => {
     // No active functionality
