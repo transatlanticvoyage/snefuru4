@@ -35,8 +35,11 @@ export default function Header() {
     // Fetch navigation items when component mounts
     const fetchNavItems = async () => {
       try {
+        console.log('Fetching navigation items...');
         const response = await fetch('/api/navigation');
+        console.log('Navigation response:', response);
         const data = await response.json();
+        console.log('Navigation data:', data);
         setNavItems(data);
       } catch (error) {
         console.error('Error fetching navigation:', error);
