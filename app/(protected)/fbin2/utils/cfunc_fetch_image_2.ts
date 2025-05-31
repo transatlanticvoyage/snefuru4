@@ -22,6 +22,7 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ prompt }),
     });
 
