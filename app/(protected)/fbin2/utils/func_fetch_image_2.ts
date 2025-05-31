@@ -26,7 +26,9 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     // 2. Get API key from tapikeys2 table
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('tapikeys2')
-      .select('api_key')
+      .select('key_value')
+      .eq('key_type', 'openai')
+      .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(1);
 
@@ -41,15 +43,15 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     if (!apiKeyData || apiKeyData.length === 0) {
       return {
         success: false,
-        error: 'No API key found in tapikeys2 table'
+        error: 'No active OpenAI API key found in tapikeys2 table'
       };
     }
 
-    const apiKey = apiKeyData[0].api_key;
+    const apiKey = apiKeyData[0].key_value;
     if (!apiKey) {
       return {
         success: false,
-        error: 'API key is empty in tapikeys2 table'
+        error: 'OpenAI API key is empty in tapikeys2 table'
       };
     }
 
