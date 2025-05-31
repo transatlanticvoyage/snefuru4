@@ -42,7 +42,7 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     console.log('User authenticated:', session.user.id);
 
     // 3. Call our server-side API endpoint
-    const response = await fetch('/fbin2/api/sfunc_fetch_image_2', {
+    const response = await fetch('/api/sfunc_fetch_image_2', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
