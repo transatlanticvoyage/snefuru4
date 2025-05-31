@@ -176,7 +176,8 @@ export async function POST(request: Request) {
         img_file_size: imageBlob.size,
         width: 1024,
         height: 1024,
-        status: 'completed'
+        status: 'completed',
+        rel_users_id: existingUser.id
       })
       .select()
       .single();
