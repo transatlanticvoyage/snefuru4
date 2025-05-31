@@ -40,7 +40,7 @@ export async function func_fetch_image_4(prompt: string): Promise<FetchImageResp
 
     console.log('User authenticated:', session.user.id);
 
-    const response = await fetch('/bin31/panjar4/api/sfunc_fetch_image_4', {
+    const response = await fetch('/api/sfunc_fetch_image_4', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
