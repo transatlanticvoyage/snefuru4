@@ -27,18 +27,35 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('tapikeys2')
       .select('api_key')
-      .single();
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    if (apiKeyError || !apiKeyData?.api_key) {
+    if (apiKeyError) {
+      console.error('Supabase error:', apiKeyError);
       return {
         success: false,
-        error: 'Failed to retrieve API key from tapikeys2 table'
+        error: `Database error: ${apiKeyError.message}`
+      };
+    }
+
+    if (!apiKeyData || apiKeyData.length === 0) {
+      return {
+        success: false,
+        error: 'No API key found in tapikeys2 table'
+      };
+    }
+
+    const apiKey = apiKeyData[0].api_key;
+    if (!apiKey) {
+      return {
+        success: false,
+        error: 'API key is empty in tapikeys2 table'
       };
     }
 
     // 3. Generate image with DALL-E
     const openai = new OpenAI({
-      apiKey: apiKeyData.api_key
+      apiKey: apiKey
     });
 
     const response = await openai.images.generate({
@@ -76,9 +93,10 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
       });
 
     if (uploadError) {
+      console.error('Storage upload error:', uploadError);
       return {
         success: false,
-        error: 'Failed to upload image to storage'
+        error: `Storage error: ${uploadError.message}`
       };
     }
 
@@ -105,9 +123,10 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
       .single();
 
     if (dbError) {
+      console.error('Database insert error:', dbError);
       return {
         success: false,
-        error: 'Failed to create image record in database'
+        error: `Database error: ${dbError.message}`
       };
     }
 
@@ -117,6 +136,7 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     };
 
   } catch (error) {
+    console.error('Unexpected error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'An unknown error occurred'
