@@ -10,8 +10,21 @@ interface NavItem {
 async function findPages(dir: string, basePath: string = ''): Promise<NavItem[]> {
   try {
     console.log('Finding pages in:', dir, 'with base path:', basePath);
+    
+    // Check if directory exists
+    try {
+      const dirStats = await stat(dir);
+      if (!dirStats.isDirectory()) {
+        console.error('Path is not a directory:', dir);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error checking directory:', dir, error);
+      return [];
+    }
+    
     const items = await readdir(dir, { withFileTypes: true });
-    console.log('Found items:', items.map(i => i.name));
+    console.log('Found items in directory:', dir, items.map(i => i.name));
     const pages: NavItem[] = [];
 
     for (const item of items) {
@@ -20,13 +33,15 @@ async function findPages(dir: string, basePath: string = ''): Promise<NavItem[]>
 
       if (item.isDirectory()) {
         // Skip node_modules and .git directories
-        if (item.name === 'node_modules' || item.name === '.git') {
+        if (item.name === 'node_modules' || item.name === '.git' || item.name.startsWith('.')) {
+          console.log('Skipping directory:', item.name);
           continue;
         }
 
         // Check if this directory has a page.tsx
         try {
           const pagePath = join(fullPath, 'page.tsx');
+          console.log('Checking for page.tsx at:', pagePath);
           const stats = await stat(pagePath);
           
           if (stats.isFile()) {
@@ -38,6 +53,7 @@ async function findPages(dir: string, basePath: string = ''): Promise<NavItem[]>
           }
         } catch (error) {
           // No page.tsx in this directory, check subdirectories
+          console.log('No page.tsx found in:', fullPath, 'checking subdirectories...');
           try {
             const subPages = await findPages(fullPath, relativePath);
             if (subPages.length > 0) {
@@ -73,8 +89,17 @@ export async function getNavigation() {
     
     // Verify the directories exist
     try {
-      await stat(appDir);
-      await stat(protectedDir);
+      const appStats = await stat(appDir);
+      if (!appStats.isDirectory()) {
+        console.error('App directory is not a directory:', appDir);
+        return [];
+      }
+      
+      const protectedStats = await stat(protectedDir);
+      if (!protectedStats.isDirectory()) {
+        console.error('Protected directory is not a directory:', protectedDir);
+        return [];
+      }
     } catch (error) {
       console.error('Directory not found:', error);
       return [];
