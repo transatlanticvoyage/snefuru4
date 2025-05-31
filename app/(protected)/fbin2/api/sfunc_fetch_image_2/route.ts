@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
@@ -13,10 +15,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    // Initialize Supabase with auth context
+    const supabase = createRouteHandlerClient({ cookies });
 
     // Get API key from tapikeys2 table
     const { data: apiKeyData, error: apiKeyError } = await supabase
@@ -27,6 +27,8 @@ export async function POST(request: Request) {
       .order('created_at', { ascending: false })
       .limit(1);
 
+    console.log('API Key Query Result:', { apiKeyData, apiKeyError });
+
     if (apiKeyError) {
       console.error('Supabase error:', apiKeyError);
       return NextResponse.json(
@@ -36,6 +38,7 @@ export async function POST(request: Request) {
     }
 
     if (!apiKeyData || apiKeyData.length === 0) {
+      console.log('No API key found in database');
       return NextResponse.json(
         { success: false, error: 'No active OpenAI API key found in tapikeys2 table' },
         { status: 404 }
@@ -43,6 +46,7 @@ export async function POST(request: Request) {
     }
 
     const apiKey = apiKeyData[0].key_value;
+    console.log('API Key found:', apiKey ? 'Yes' : 'No');
     if (!apiKey) {
       return NextResponse.json(
         { success: false, error: 'OpenAI API key is empty in tapikeys2 table' },
