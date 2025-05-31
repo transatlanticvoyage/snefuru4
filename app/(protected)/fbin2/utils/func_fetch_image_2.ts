@@ -1,4 +1,7 @@
 import { ImageRecord } from '../panjar2/types';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import OpenAI from 'openai';
+import { createClient } from '@supabase/supabase-js';
 
 interface FetchImageResponse {
   success: boolean;
@@ -8,18 +11,107 @@ interface FetchImageResponse {
 
 export async function func_fetch_image_2(prompt: string): Promise<FetchImageResponse> {
   try {
-    // TODO: Implement the image fetching logic
-    // This will include:
-    // 1. Validating the prompt
-    // 2. Getting the user's OpenAI API key
-    // 3. Generating the image with DALL-E
-    // 4. Uploading to Supabase storage
-    // 5. Creating a record in the images table
+    // 1. Prompt validation
+    if (!prompt || prompt.trim().length === 0) {
+      return {
+        success: false,
+        error: 'Prompt cannot be empty'
+      };
+    }
+
+    // 2. Get API key from tapikeys2 table
+    const { data: apiKeyData, error: apiKeyError } = await supabaseAdmin
+      .from('tapikeys2')
+      .select('api_key')
+      .single();
+
+    if (apiKeyError || !apiKeyData?.api_key) {
+      return {
+        success: false,
+        error: 'Failed to retrieve API key from tapikeys2 table'
+      };
+    }
+
+    // 3. Generate image with DALL-E
+    const openai = new OpenAI({
+      apiKey: apiKeyData.api_key
+    });
+
+    const response = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "standard",
+      style: "natural"
+    });
+
+    if (!response.data?.[0]?.url) {
+      return {
+        success: false,
+        error: 'Failed to generate image with DALL-E'
+      };
+    }
+
+    const imageUrl = response.data[0].url;
+
+    // 4. Download and upload to Supabase storage
+    const imageResponse = await fetch(imageUrl);
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const imageBlob = new Blob([imageBuffer], { type: 'image/png' });
     
+    const timestamp = new Date().getTime();
+    const fileName = `image_${timestamp}.png`;
+    
+    const { data: uploadData, error: uploadError } = await supabaseAdmin
+      .storage
+      .from('images')
+      .upload(fileName, imageBlob, {
+        contentType: 'image/png',
+        upsert: false
+      });
+
+    if (uploadError) {
+      return {
+        success: false,
+        error: 'Failed to upload image to storage'
+      };
+    }
+
+    // Get the public URL for the uploaded image
+    const { data: { publicUrl } } = supabaseAdmin
+      .storage
+      .from('images')
+      .getPublicUrl(fileName);
+
+    // 5. Create record in images table
+    const { data: newImage, error: dbError } = await supabaseAdmin
+      .from('images')
+      .insert({
+        prompt1: prompt,
+        function_used_to_fetch_the_image: 'func_fetch_image_2',
+        img_file_url1: publicUrl,
+        img_file_extension: 'png',
+        img_file_size: imageBlob.size,
+        width: 1024,
+        height: 1024,
+        status: 'completed'
+      })
+      .select()
+      .single();
+
+    if (dbError) {
+      return {
+        success: false,
+        error: 'Failed to create image record in database'
+      };
+    }
+
     return {
-      success: false,
-      error: 'Function not implemented yet'
+      success: true,
+      image: newImage
     };
+
   } catch (error) {
     return {
       success: false,
