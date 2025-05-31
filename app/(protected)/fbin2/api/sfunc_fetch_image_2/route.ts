@@ -1,21 +1,16 @@
-import { ImageRecord } from '../panjar2/types';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { NextResponse } from 'next/server';
 
-interface FetchImageResponse {
-  success: boolean;
-  error?: string;
-  image?: ImageRecord;
-}
-
-export async function func_fetch_image_2(prompt: string): Promise<FetchImageResponse> {
+export async function POST(request: Request) {
   try {
-    // 1. Prompt validation
+    const { prompt } = await request.json();
+
     if (!prompt || prompt.trim().length === 0) {
-      return {
-        success: false,
-        error: 'Prompt cannot be empty'
-      };
+      return NextResponse.json(
+        { success: false, error: 'Prompt cannot be empty' },
+        { status: 400 }
+      );
     }
 
     const supabase = createClient(
@@ -23,7 +18,7 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // 2. Get API key from tapikeys2 table
+    // Get API key from tapikeys2 table
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('tapikeys2')
       .select('key_value')
@@ -34,28 +29,28 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
 
     if (apiKeyError) {
       console.error('Supabase error:', apiKeyError);
-      return {
-        success: false,
-        error: `Database error: ${apiKeyError.message}`
-      };
+      return NextResponse.json(
+        { success: false, error: `Database error: ${apiKeyError.message}` },
+        { status: 500 }
+      );
     }
 
     if (!apiKeyData || apiKeyData.length === 0) {
-      return {
-        success: false,
-        error: 'No active OpenAI API key found in tapikeys2 table'
-      };
+      return NextResponse.json(
+        { success: false, error: 'No active OpenAI API key found in tapikeys2 table' },
+        { status: 404 }
+      );
     }
 
     const apiKey = apiKeyData[0].key_value;
     if (!apiKey) {
-      return {
-        success: false,
-        error: 'OpenAI API key is empty in tapikeys2 table'
-      };
+      return NextResponse.json(
+        { success: false, error: 'OpenAI API key is empty in tapikeys2 table' },
+        { status: 400 }
+      );
     }
 
-    // 3. Generate image with DALL-E
+    // Generate image with DALL-E
     const openai = new OpenAI({
       apiKey: apiKey
     });
@@ -70,15 +65,15 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     });
 
     if (!response.data?.[0]?.url) {
-      return {
-        success: false,
-        error: 'Failed to generate image with DALL-E'
-      };
+      return NextResponse.json(
+        { success: false, error: 'Failed to generate image with DALL-E' },
+        { status: 500 }
+      );
     }
 
     const imageUrl = response.data[0].url;
 
-    // 4. Download and upload to Supabase storage
+    // Download and upload to Supabase storage
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = await imageResponse.arrayBuffer();
     const imageBlob = new Blob([imageBuffer], { type: 'image/png' });
@@ -96,10 +91,10 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
 
     if (uploadError) {
       console.error('Storage upload error:', uploadError);
-      return {
-        success: false,
-        error: `Storage error: ${uploadError.message}`
-      };
+      return NextResponse.json(
+        { success: false, error: `Storage error: ${uploadError.message}` },
+        { status: 500 }
+      );
     }
 
     // Get the public URL for the uploaded image
@@ -108,12 +103,12 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
       .from('images')
       .getPublicUrl(fileName);
 
-    // 5. Create record in images table
+    // Create record in images table
     const { data: newImage, error: dbError } = await supabase
       .from('images')
       .insert({
         prompt1: prompt,
-        function_used_to_fetch_the_image: 'func_fetch_image_2',
+        function_used_to_fetch_the_image: 'sfunc_fetch_image_2',
         img_file_url1: publicUrl,
         img_file_extension: 'png',
         img_file_size: imageBlob.size,
@@ -126,22 +121,25 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
 
     if (dbError) {
       console.error('Database insert error:', dbError);
-      return {
-        success: false,
-        error: `Database error: ${dbError.message}`
-      };
+      return NextResponse.json(
+        { success: false, error: `Database error: ${dbError.message}` },
+        { status: 500 }
+      );
     }
 
-    return {
+    return NextResponse.json({
       success: true,
       image: newImage
-    };
+    });
 
   } catch (error) {
     console.error('Unexpected error:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'An unknown error occurred'
-    };
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'An unknown error occurred' 
+      },
+      { status: 500 }
+    );
   }
 } 
