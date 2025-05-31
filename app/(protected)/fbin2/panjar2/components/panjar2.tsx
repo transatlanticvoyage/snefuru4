@@ -71,8 +71,11 @@ export default function Panjar2UI({ images }: Panjar2UIProps) {
                 <td className="px-4 py-2 border">{image.width}</td>
                 <td className="px-4 py-2 border">{image.height}</td>
                 <td className="px-4 py-2 border">
-                  <div className="max-w-xs truncate" title={image.prompt1}>
-                    {image.prompt1}
+                  <div 
+                    className="max-w-xs truncate" 
+                    title={image.prompt1 || undefined}
+                  >
+                    {image.prompt1 || 'No prompt'}
                   </div>
                 </td>
                 <td className="px-4 py-2 border">{image.status}</td>
