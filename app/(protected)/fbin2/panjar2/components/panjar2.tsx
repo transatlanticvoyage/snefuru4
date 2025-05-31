@@ -1,91 +1,115 @@
 import { ImageRecord } from '../types';
+import { useState } from 'react';
+import { func_fetch_image_2 } from '../../utils/func_fetch_image_2';
 
 interface Panjar2UIProps {
   images: ImageRecord[];
 }
 
 export default function Panjar2UI({ images }: Panjar2UIProps) {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Images Database</h1>
+  const [prompt, setPrompt] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleGenerate = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const result = await func_fetch_image_2(prompt);
       
-      {/* Prompt Input Section */}
+      if (!result.success) {
+        setError(result.error || 'Failed to generate image');
+        return;
+      }
+
+      // Clear the prompt after successful generation
+      setPrompt('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
           placeholder="Enter your prompt here"
-          className="w-[400px] h-[150px] p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+          className="w-[400px] h-[150px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
         />
         <div className="mt-4">
           <button
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            onClick={handleGenerate}
+            disabled={isLoading || !prompt.trim()}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            fetch with func_fetch_image_2
+            {isLoading ? 'Generating...' : 'fetch with func_fetch_image_2'}
           </button>
         </div>
+        {error && (
+          <div className="mt-4 text-red-600">
+            {error}
+          </div>
+        )}
       </div>
-      
-      {/* Images Table */}
+
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-2 border">Image Preview</th>
-              <th className="px-4 py-2 border">ID</th>
-              <th className="px-4 py-2 border">User ID</th>
-              <th className="px-4 py-2 border">Created At</th>
-              <th className="px-4 py-2 border">Plan ID</th>
-              <th className="px-4 py-2 border">File URL</th>
-              <th className="px-4 py-2 border">File Extension</th>
-              <th className="px-4 py-2 border">File Size</th>
-              <th className="px-4 py-2 border">Width</th>
-              <th className="px-4 py-2 border">Height</th>
-              <th className="px-4 py-2 border">Prompt</th>
-              <th className="px-4 py-2 border">Status</th>
-              <th className="px-4 py-2 border">Function Used</th>
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image Preview</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File URL</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Extension</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Size</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Width</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Height</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prompt</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Function Used</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-white divide-y divide-gray-200">
             {images.map((image) => (
-              <tr key={image.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">
-                  {image.img_file_url1 ? (
+              <tr key={image.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {image.img_file_url1 && (
                     <img 
                       src={image.img_file_url1} 
-                      alt="Preview" 
-                      className="w-20 h-20 object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://via.placeholder.com/80?text=No+Image';
-                      }}
+                      alt="Generated" 
+                      className="h-20 w-20 object-cover"
                     />
-                  ) : (
-                    <div className="w-20 h-20 bg-gray-100 flex items-center justify-center text-gray-400">
-                      No Image
-                    </div>
                   )}
                 </td>
-                <td className="px-4 py-2 border">{image.id}</td>
-                <td className="px-4 py-2 border">{image.rel_users_id}</td>
-                <td className="px-4 py-2 border">{new Date(image.created_at).toLocaleString()}</td>
-                <td className="px-4 py-2 border">{image.rel_images_plans_id}</td>
-                <td className="px-4 py-2 border">
+                <td className="px-6 py-4 whitespace-nowrap">{image.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.rel_users_id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{new Date(image.created_at).toLocaleString()}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.rel_images_plans_id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
                   {image.img_file_url1 ? (
                     <a 
-                      href={image.img_file_url1}
+                      href={image.img_file_url1} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline truncate block max-w-xs"
+                      className="text-indigo-600 hover:text-indigo-900"
                     >
-                      {image.img_file_url1}
+                      View Image
                     </a>
                   ) : (
                     <span className="text-gray-400">No URL</span>
                   )}
                 </td>
-                <td className="px-4 py-2 border">{image.img_file_extension}</td>
-                <td className="px-4 py-2 border">{image.img_file_size}</td>
-                <td className="px-4 py-2 border">{image.width}</td>
-                <td className="px-4 py-2 border">{image.height}</td>
-                <td className="px-4 py-2 border">
+                <td className="px-6 py-4 whitespace-nowrap">{image.img_file_extension}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.img_file_size}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.width}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.height}</td>
+                <td className="px-6 py-4">
                   <div 
                     className="max-w-xs truncate" 
                     title={image.prompt1 || undefined}
@@ -93,8 +117,8 @@ export default function Panjar2UI({ images }: Panjar2UIProps) {
                     {image.prompt1 || 'No prompt'}
                   </div>
                 </td>
-                <td className="px-4 py-2 border">{image.status}</td>
-                <td className="px-4 py-2 border">{image.function_used_to_fetch_the_image}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.status}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{image.function_used_to_fetch_the_image}</td>
               </tr>
             ))}
           </tbody>
