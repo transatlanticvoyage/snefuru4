@@ -1,6 +1,6 @@
 export interface ImageRecord {
   id: number;
-  rel_users_id: number;
+  rel_users_id: number | null;
   created_at: string;
   rel_images_plans_id: number | null;
   img_file_url1: string | null;

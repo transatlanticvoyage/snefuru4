@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Panjar2UI from './components/panjar2';
 import { ImageRecord } from './types';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { createClient } from '@supabase/supabase-js';
 
 export default function Panjar2Page() {
   const [images, setImages] = useState<ImageRecord[]>([]);
@@ -12,7 +12,12 @@ export default function Panjar2Page() {
 
   const fetchImages = async () => {
     try {
-      const { data, error } = await supabaseAdmin
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const { data, error } = await supabase
         .from('images')
         .select('*')
         .order('created_at', { ascending: false });

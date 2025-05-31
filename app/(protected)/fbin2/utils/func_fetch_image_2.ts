@@ -1,7 +1,6 @@
 import { ImageRecord } from '../panjar2/types';
-import { supabaseAdmin } from '@/lib/supabase-admin';
-import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
 
 interface FetchImageResponse {
   success: boolean;
@@ -19,8 +18,13 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
       };
     }
 
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
     // 2. Get API key from tapikeys2 table
-    const { data: apiKeyData, error: apiKeyError } = await supabaseAdmin
+    const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('tapikeys2')
       .select('api_key')
       .single();
@@ -63,7 +67,7 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     const timestamp = new Date().getTime();
     const fileName = `image_${timestamp}.png`;
     
-    const { data: uploadData, error: uploadError } = await supabaseAdmin
+    const { data: uploadData, error: uploadError } = await supabase
       .storage
       .from('images')
       .upload(fileName, imageBlob, {
@@ -79,13 +83,13 @@ export async function func_fetch_image_2(prompt: string): Promise<FetchImageResp
     }
 
     // Get the public URL for the uploaded image
-    const { data: { publicUrl } } = supabaseAdmin
+    const { data: { publicUrl } } = supabase
       .storage
       .from('images')
       .getPublicUrl(fileName);
 
     // 5. Create record in images table
-    const { data: newImage, error: dbError } = await supabaseAdmin
+    const { data: newImage, error: dbError } = await supabase
       .from('images')
       .insert({
         prompt1: prompt,
