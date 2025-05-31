@@ -19,6 +19,7 @@ export default function Panjar1UI({
 }: Panjar1UIProps) {
   return (
     <div className="p-6">
+      <div className="text-2xl font-bold mb-6">kzelement3</div>
       <h1 className="text-2xl font-bold mb-6">Images Database</h1>
       
       {/* Prompt Input and Generate Button */}
