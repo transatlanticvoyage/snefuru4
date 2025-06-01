@@ -51,6 +51,32 @@ export async function POST(request: Request) {
     }
     const batchId = batchData.id;
 
+    // Get batch creation date and sequence number for the day
+    // Fetch the batch row to get created_at
+    const { data: batchRow } = await supabase
+      .from('images_plans_batches')
+      .select('created_at')
+      .eq('id', batchId)
+      .single();
+    let batchDate = 'unknown_date';
+    let batchSeq = 1;
+    if (batchRow && batchRow.created_at) {
+      const dateObj = new Date(batchRow.created_at);
+      const yyyy = dateObj.getFullYear();
+      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const dd = String(dateObj.getDate()).padStart(2, '0');
+      batchDate = `${yyyy}_${mm}_${dd}`;
+      // Count how many batches exist for this user on this date (including this one)
+      const { count } = await supabase
+        .from('images_plans_batches')
+        .select('id', { count: 'exact', head: true })
+        .eq('rel_users_id', userData.id)
+        .gte('created_at', `${yyyy}-${mm}-${dd}T00:00:00.000Z`)
+        .lte('created_at', `${yyyy}-${mm}-${dd}T23:59:59.999Z`);
+      batchSeq = (count || 1);
+    }
+    const batchFolder = `${batchDate} - ${batchSeq}`;
+
     // 2. Insert all images_plans rows with rel_images_plans_batches_id set
     //    and collect their ids for later update
     const recordsToInsert = records.map((rec: any) => ({ ...rec, rel_users_id: userData.id, rel_images_plans_batches_id: batchId }));
@@ -70,7 +96,7 @@ export async function POST(request: Request) {
       for (let j = 0; j < Math.min(qty, 4); j++) {
         // Generate image using OpenAI
         let prompt = plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1 || 'AI Image';
-        const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id });
+        const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id, batchFolder });
         if (!imageResult.success) {
           imageIds.push(null);
           continue;
