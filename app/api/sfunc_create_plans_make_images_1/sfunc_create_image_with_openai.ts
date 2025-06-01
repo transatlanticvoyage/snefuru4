@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
-export async function sfunc_create_image_with_openai({ prompt, userId, batchFolder }: { prompt: string, userId: string, batchFolder: string }) {
+export async function sfunc_create_image_with_openai({ prompt, userId, batchFolder, fileName }: { prompt: string, userId: string, batchFolder: string, fileName?: string }) {
   const supabase = createRouteHandlerClient({ cookies });
   // Get API key from tapikeys2 table for this specific user
   const { data: apiKeyData, error: apiKeyError } = await supabase
@@ -47,10 +47,11 @@ export async function sfunc_create_image_with_openai({ prompt, userId, batchFold
       return { success: false, error: 'Failed to download image from OpenAI' };
     }
     const imageBuffer = await imageRes.arrayBuffer();
-    // Generate a filename
-    const timestamp = Date.now();
-    const fileName = `image_${timestamp}.png`;
-    const storagePath = `barge1/${batchFolder}/${fileName}`;
+    // Use provided fileName or fallback to timestamp
+    let safeFileName = fileName && typeof fileName === 'string' && fileName.trim() ? fileName.trim() : `image_${Date.now()}.png`;
+    // Ensure the filename is safe (no path traversal)
+    safeFileName = safeFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const storagePath = `barge1/${batchFolder}/${safeFileName}`;
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('bucket-images-b1')

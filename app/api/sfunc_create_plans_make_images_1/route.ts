@@ -96,7 +96,8 @@ export async function POST(request: Request) {
       for (let j = 0; j < Math.min(qty, 4); j++) {
         // Generate image using OpenAI
         let prompt = plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1 || 'AI Image';
-        const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id, batchFolder });
+        const fileName = plan.e_file_name1;
+        const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id, batchFolder, fileName });
         if (!imageResult.success) {
           imageIds.push(null);
           continue;
