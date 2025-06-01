@@ -17,6 +17,10 @@ const columns = [
   'e_more_instructions1',
   'e_prompt1',
   'e_ai_tool1',
+  'fk_image1_id',
+  'fk_image2_id',
+  'fk_image3_id',
+  'fk_image4_id',
 ];
 
 const gridCols = 9; // A-I
