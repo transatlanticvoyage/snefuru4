@@ -39,7 +39,32 @@ export default function StatusJar1() {
     completedJobs: 0,
     failedJobs: 0
   });
+  const [savingSettings, setSavingSettings] = useState(false);
   const supabase = createClientComponentClient();
+
+  // Load settings on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/background-jobs/load-settings');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.settings) {
+            setBackgroundSettings(data.settings);
+          }
+        } else {
+          // If loading fails, just use default settings
+          console.warn('Failed to load settings, using defaults');
+        }
+      } catch (err) {
+        console.warn('Failed to load settings, using defaults:', err);
+      }
+    };
+
+    if (user?.id) {
+      loadSettings();
+    }
+  }, [user]);
 
   // Fetch tasks and their status
   useEffect(() => {
@@ -443,6 +468,35 @@ export default function StatusJar1() {
     }
   };
 
+  // Function to save settings
+  const saveSettings = async () => {
+    try {
+      setSavingSettings(true);
+      setError(null);
+      
+      const response = await fetch('/api/background-jobs/save-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: backgroundSettings })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setError('Settings saved successfully!');
+      } else {
+        if (result.message.includes('column') || result.message.includes('does not exist')) {
+          setError('Database column missing. Please add "background_processing_settings" JSONB column to users table in Supabase dashboard.');
+        } else {
+          setError(result.message || 'Failed to save settings');
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save settings');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
@@ -690,6 +744,19 @@ export default function StatusJar1() {
                   className="form-checkbox h-5 w-5 text-indigo-600"
                 />
               </div>
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={saveSettings}
+                disabled={savingSettings}
+                className={`px-4 py-2 rounded transition-colors ${
+                  savingSettings
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
+              >
+                {savingSettings ? 'Saving...' : 'Save Settings'}
+              </button>
             </div>
           </div>
 
