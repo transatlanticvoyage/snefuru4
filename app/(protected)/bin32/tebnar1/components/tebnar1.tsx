@@ -123,6 +123,7 @@ export default function Tebnar1() {
   const [submitResult, setSubmitResult] = useState<string | null>(null);
   const [batches, setBatches] = useState<any[]>([]);
   const [selectedBatchId, setSelectedBatchId] = useState<string>('');
+  const [qtyPerPlan, setQtyPerPlan] = useState<number>(1);
   const supabase = createClientComponentClient();
 
   // Fetch batches for dropdown
@@ -252,6 +253,22 @@ export default function Tebnar1() {
       </div>
       <div>
         <ExcelPasteGrid onGridDataChange={setGridData} />
+        {/* QTY Of Images Per Plan To Generate selector */}
+        <div className="mb-4">
+          <div className="font-bold mb-2">QTY Of Images Per Plan To Generate</div>
+          <div className="flex space-x-2">
+            {[1, 2, 3, 4].map(opt => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => setQtyPerPlan(opt)}
+                className={`px-4 py-2 rounded-full border font-bold transition-colors duration-150 ${qtyPerPlan === opt ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-indigo-100'}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="my-4">
           <button
             className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
@@ -268,7 +285,17 @@ export default function Tebnar1() {
             <thead className="bg-gray-50">
               <tr>
                 {columns.map(col => (
-                  <th key={col} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{col}</th>
+                  <th
+                    key={col}
+                    className={
+                      [
+                        'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                        (col === 'id' || col === 'rel_users_id' || col === 'rel_images_plans_batches_id' || col === 'created_at') ? 'max-w-[50px] overflow-hidden whitespace-nowrap' : ''
+                      ].join(' ')
+                    }
+                  >
+                    {col}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -276,7 +303,17 @@ export default function Tebnar1() {
               {filteredPlans.map(plan => (
                 <tr key={plan.id}>
                   {columns.map(col => (
-                    <td key={col} className="px-4 py-2 whitespace-nowrap">{String(plan[col] ?? '')}</td>
+                    <td
+                      key={col}
+                      className={
+                        [
+                          'px-4 py-2',
+                          (col === 'id' || col === 'rel_users_id' || col === 'rel_images_plans_batches_id' || col === 'created_at') ? 'max-w-[50px] overflow-hidden whitespace-nowrap' : ''
+                        ].join(' ')
+                      }
+                    >
+                      {String(plan[col] ?? '')}
+                    </td>
                   ))}
                 </tr>
               ))}
