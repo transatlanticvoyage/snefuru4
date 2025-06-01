@@ -128,6 +128,9 @@ export default function Tebnar1() {
   const [batches, setBatches] = useState<any[]>([]);
   const [selectedBatchId, setSelectedBatchId] = useState<string>('');
   const [qtyPerPlan, setQtyPerPlan] = useState<number>(1);
+  const [aiModel, setAiModel] = useState<string>('openai');
+  const [makeImagesLoading, setMakeImagesLoading] = useState(false);
+  const [makeImagesResult, setMakeImagesResult] = useState<string | null>(null);
   const supabase = createClientComponentClient();
 
   // Fetch batches for dropdown
@@ -285,12 +288,52 @@ export default function Tebnar1() {
               </button>
             ))}
           </div>
+          {/* AI Model Selector */}
+          <div className="font-bold mb-2">Select AI Model To Use</div>
+          <div className="flex space-x-2 mb-2">
+            {['openai', 'grok', 'gemini'].map(model => (
+              <button
+                key={model}
+                type="button"
+                onClick={() => setAiModel(model)}
+                className={`px-4 py-2 rounded-full border font-bold transition-colors duration-150 capitalize ${aiModel === model ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-teal-100'}`}
+              >
+                {model}
+              </button>
+            ))}
+          </div>
           <button
             className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
-            // onClick handler for func_create_plans_make_images_1 to be implemented
+            onClick={async () => {
+              setMakeImagesLoading(true);
+              setMakeImagesResult(null);
+              try {
+                if (!user?.id) throw new Error('User not authenticated');
+                if (!gridData || gridData.length < 2) throw new Error('No data to submit');
+                const fieldNames = gridData[0].map(f => f.trim()).filter(Boolean);
+                const rows = gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+                if (fieldNames.length === 0 || rows.length === 0) throw new Error('Grid is empty or missing headers');
+                const records = rows.map(row => {
+                  const obj: Record<string, string> = {};
+                  fieldNames.forEach((field, idx) => {
+                    if (field) obj[field] = row[idx] ?? '';
+                  });
+                  return obj;
+                });
+                const { func_create_plans_make_images_1 } = await import('../utils/cfunc_create_plans_make_images_1');
+                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel });
+                setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
+              } catch (err) {
+                setMakeImagesResult(err instanceof Error ? err.message : String(err));
+              } finally {
+                setMakeImagesLoading(false);
+              }
+            }}
+            disabled={makeImagesLoading}
           >
-            Submit func_create_plans_make_images_1
+            {makeImagesLoading ? 'Submitting...' : 'Submit func_create_plans_make_images_1'}
           </button>
+          {makeImagesResult && <div className="mt-2 text-sm text-gray-700">{makeImagesResult}</div>}
         </div>
         {/* uitablegrid21 label */}
         <div className="font-bold mb-2">uitablegrid21</div>
