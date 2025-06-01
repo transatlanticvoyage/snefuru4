@@ -196,42 +196,44 @@ export default function Tebnar1() {
 
   return (
     <div>
-      {/* Sticky black bar below header */}
+      {/* Fixed, full-width black bar directly below header */}
       <div
-        className="w-full h-10 bg-black z-30 sticky"
-        style={{ top: 0 }}
+        className="fixed left-0 w-screen h-10 bg-black z-30"
+        style={{ top: 64 }} // Adjust if your header is a different height
       ></div>
-      <ExcelPasteGrid onGridDataChange={setGridData} />
-      <div className="my-4">
-        <button
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-          onClick={handleSubmit}
-          disabled={submitLoading}
-        >
-          {submitLoading ? 'Submitting...' : 'Submit func_create_plans_from_xls_1'}
-        </button>
-        {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
-      </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              {columns.map(col => (
-                <th key={col} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{col}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {plans.map(plan => (
-              <tr key={plan.id}>
+      <div className="pt-10"> {/* Push content below the bar */}
+        <ExcelPasteGrid onGridDataChange={setGridData} />
+        <div className="my-4">
+          <button
+            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            onClick={handleSubmit}
+            disabled={submitLoading}
+          >
+            {submitLoading ? 'Submitting...' : 'Submit func_create_plans_from_xls_1'}
+          </button>
+          {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
                 {columns.map(col => (
-                  <td key={col} className="px-4 py-2 whitespace-nowrap">{String(plan[col] ?? '')}</td>
+                  <th key={col} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{col}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {plans.length === 0 && <div className="mt-4 text-gray-500">No plans found for your user.</div>}
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {plans.map(plan => (
+                <tr key={plan.id}>
+                  {columns.map(col => (
+                    <td key={col} className="px-4 py-2 whitespace-nowrap">{String(plan[col] ?? '')}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {plans.length === 0 && <div className="mt-4 text-gray-500">No plans found for your user.</div>}
+        </div>
       </div>
     </div>
   );
