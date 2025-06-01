@@ -262,6 +262,7 @@ export default function Tebnar1() {
           </button>
           {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
         </div>
+        <div className="font-bold mb-2">uitablegrid21</div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
