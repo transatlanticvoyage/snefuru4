@@ -23,6 +23,7 @@ export default function StatusJar1() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'status' | 'errors'>('status');
   const [errorLogs, setErrorLogs] = useState<any[]>([]);
+  const [retryingBatches, setRetryingBatches] = useState<Set<string>>(new Set());
   const supabase = createClientComponentClient();
 
   // Fetch tasks and their status
@@ -68,6 +69,46 @@ export default function StatusJar1() {
 
         if (!failedImagesError && failedImages) {
           setErrorLogs(failedImages);
+        }
+
+        // Also check for incomplete plans (missing expected images)
+        const { data: allPlans, error: allPlansError } = await supabase
+          .from('images_plans')
+          .select(`
+            id,
+            created_at,
+            fk_image1_id,
+            fk_image2_id,
+            fk_image3_id,
+            fk_image4_id,
+            rel_images_plans_batches_id,
+            e_prompt1,
+            e_file_name1
+          `)
+          .eq('rel_users_id', userData.id)
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (!allPlansError && allPlans) {
+          // Find plans with missing images and add them to error logs
+          const incompletePlans = allPlans.filter(plan => {
+            const imageCount = [plan.fk_image1_id, plan.fk_image2_id, plan.fk_image3_id, plan.fk_image4_id].filter(Boolean).length;
+            // If any image slot is missing, it's incomplete
+            return imageCount === 0 || (plan.fk_image1_id && !plan.fk_image2_id) || (plan.fk_image2_id && !plan.fk_image3_id) || (plan.fk_image3_id && !plan.fk_image4_id);
+          });
+
+          const planErrors = incompletePlans.map(plan => ({
+            id: `plan-${plan.id}`,
+            created_at: plan.created_at,
+            status: 'incomplete_plan',
+            prompt1: plan.e_prompt1 || 'No prompt',
+            function_used_to_fetch_the_image: 'plan_processing',
+            rel_images_plans_id: plan.id,
+            images_plans: { rel_images_plans_batches_id: plan.rel_images_plans_batches_id },
+            missing_images: [plan.fk_image1_id, plan.fk_image2_id, plan.fk_image3_id, plan.fk_image4_id].map((img, idx) => img ? null : `image${idx + 1}`).filter(Boolean)
+          }));
+
+          setErrorLogs(prev => [...(failedImages || []), ...planErrors]);
         }
 
         // For each batch, get the task status
@@ -169,8 +210,9 @@ export default function StatusJar1() {
   // Function to retry failed images
   const retryFailedImages = async (batchId: string) => {
     try {
-      setError('Retry functionality temporarily disabled. Please use the original tebnar1 page to regenerate images.');
-      /*
+      setError(null); // Clear any previous errors
+      setRetryingBatches(prev => new Set([...prev, batchId])); // Mark batch as retrying
+      
       // Get all plans in the batch
       const { data: plans, error: plansError } = await supabase
         .from('images_plans')
@@ -178,6 +220,9 @@ export default function StatusJar1() {
         .eq('rel_images_plans_batches_id', batchId);
 
       if (plansError) throw plansError;
+
+      let totalMissingImages = 0;
+      let retriedPlans = 0;
 
       // For each plan, check if any images are missing
       for (const plan of plans) {
@@ -188,20 +233,43 @@ export default function StatusJar1() {
         if (!plan.fk_image4_id) missingImages.push(4);
 
         if (missingImages.length > 0) {
-          // Call the image generation function for missing images
-          const { func_create_plans_make_images_1 } = await import('../../bin32/tebnar1/utils/cfunc_create_plans_make_images_1');
-          await func_create_plans_make_images_1({
-            records: [plan],
-            qty: missingImages.length,
-            aiModel: 'openai', // You might want to store this in the plan
-            generateZip: false,
-            wipeMeta: false
+          totalMissingImages += missingImages.length;
+          retriedPlans++;
+          
+          // Call the API route directly instead of importing the client function
+          const response = await fetch('/api/sfunc_create_plans_make_images_1', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              records: [plan], 
+              qty: missingImages.length, 
+              aiModel: 'openai',
+              generateZip: false,
+              wipeMeta: false
+            }),
           });
+          
+          const result = await response.json();
+          if (!result.success) {
+            console.error(`Failed to retry images for plan ${plan.id}:`, result.message);
+          }
+
+          // Add a small delay between plans to avoid overwhelming the API
+          if (retriedPlans < plans.length) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
         }
       }
-      */
+      
+      setError(`Retry completed for batch ${batchId}. Attempted to regenerate ${totalMissingImages} images across ${retriedPlans} plans. Check the status for updates.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to retry images');
+    } finally {
+      setRetryingBatches(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(batchId);
+        return newSet;
+      });
     }
   };
 
@@ -297,9 +365,14 @@ export default function StatusJar1() {
               {task.status !== 'completed' && (
                 <button
                   onClick={() => retryFailedImages(task.batch_id)}
-                  className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                  disabled={retryingBatches.has(task.batch_id)}
+                  className={`mt-4 px-4 py-2 rounded transition-colors ${
+                    retryingBatches.has(task.batch_id)
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  }`}
                 >
-                  Retry Failed Images
+                  {retryingBatches.has(task.batch_id) ? 'Retrying...' : 'Retry Failed Images'}
                 </button>
               )}
             </div>
@@ -326,8 +399,10 @@ export default function StatusJar1() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium text-red-600">
-                          Status: {log.status || 'unknown'}
+                        <span className={`text-sm font-medium ${
+                          log.status === 'incomplete_plan' ? 'text-orange-600' : 'text-red-600'
+                        }`}>
+                          Status: {log.status === 'incomplete_plan' ? 'Missing Images' : log.status || 'unknown'}
                         </span>
                         <span className="text-xs text-gray-500">
                           {new Date(log.created_at).toLocaleString()}
@@ -342,6 +417,16 @@ export default function StatusJar1() {
                       <p className="text-xs text-gray-500 mt-1">
                         Batch: {log.images_plans?.rel_images_plans_batches_id || 'unknown'}
                       </p>
+                      {log.missing_images && (
+                        <p className="text-xs text-orange-600 mt-1">
+                          Missing: {log.missing_images.join(', ')}
+                        </p>
+                      )}
+                      {log.status === 'incomplete_plan' && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          Plan ID: {log.rel_images_plans_id}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
