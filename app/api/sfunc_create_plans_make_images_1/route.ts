@@ -93,11 +93,26 @@ export async function POST(request: Request) {
     for (let i = 0; i < plansData.length; i++) {
       const plan = plansData[i];
       const imageIds: (string | null)[] = [];
+      // Plan folder: SEQ - FILENAME
+      const seq = i + 1;
+      let baseFileName = plan.e_file_name1 && typeof plan.e_file_name1 === 'string' && plan.e_file_name1.trim() ? plan.e_file_name1.trim() : `image_${seq}.png`;
+      // Ensure the filename is safe
+      baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const planFolder = `${seq} - ${baseFileName}`;
       for (let j = 0; j < Math.min(qty, 4); j++) {
         // Generate image using OpenAI
         let prompt = plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1 || 'AI Image';
-        const fileName = plan.e_file_name1;
-        const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id, batchFolder, fileName });
+        // Image file name: FILENAME, FILENAME-2, FILENAME-3, ...
+        let imageFileName = baseFileName;
+        if (j > 0) {
+          const extIdx = baseFileName.lastIndexOf('.');
+          if (extIdx > 0) {
+            imageFileName = baseFileName.slice(0, extIdx) + `-${j + 1}` + baseFileName.slice(extIdx);
+          } else {
+            imageFileName = baseFileName + `-${j + 1}`;
+          }
+        }
+        const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id, batchFolder: `${batchFolder}/${planFolder}`, fileName: imageFileName });
         if (!imageResult.success) {
           imageIds.push(null);
           continue;
