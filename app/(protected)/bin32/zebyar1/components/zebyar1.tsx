@@ -316,4 +316,93 @@ export default function Zebyar1() {
                 key={opt}
                 type="button"
                 onClick={() => setQtyPerPlan(opt)}
-                className={`px-4 py-2 rounded-full border font-bold transition-colors duration-150 ${qtyPerPlan === opt ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-indigo-100'}`
+                className={`px-4 py-2 rounded-full border font-bold transition-colors duration-150 ${qtyPerPlan === opt ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-indigo-100'}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+          {/* AI Model Selector */}
+          <div className="font-bold mb-2">Select AI Model To Use</div>
+          <div className="flex space-x-2 mb-2">
+            {['openai', 'grok', 'gemini'].map(model => (
+              <button
+                key={model}
+                type="button"
+                onClick={() => setAiModel(model)}
+                className={`px-4 py-2 rounded-full border font-bold transition-colors duration-150 capitalize ${aiModel === model ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-teal-100'}`}
+              >
+                {model}
+              </button>
+            ))}
+          </div>
+          <button
+            className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
+            onClick={async () => {
+              setMakeImagesLoading(true);
+              setMakeImagesResult(null);
+              try {
+                if (!user?.id) throw new Error('User not authenticated');
+                if (!gridData || gridData.length < 2) throw new Error('No data to submit');
+                const fieldNames = gridData[0].map(f => f.trim()).filter(Boolean);
+                const rows = gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+                if (fieldNames.length === 0 || rows.length === 0) throw new Error('Grid is empty or missing headers');
+                const records = rows.map(row => {
+                  const obj: Record<string, string> = {};
+                  fieldNames.forEach((field, idx) => {
+                    if (field) obj[field] = row[idx] ?? '';
+                  });
+                  return obj;
+                });
+                const { func_create_plans_make_images_1 } = await import('../utils/cfunc_create_plans_make_images_1');
+                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel });
+                setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
+              } catch (err) {
+                setMakeImagesResult(err instanceof Error ? err.message : String(err));
+              } finally {
+                setMakeImagesLoading(false);
+              }
+            }}
+            disabled={makeImagesLoading}
+          >
+            {makeImagesLoading ? 'Submitting...' : 'Submit func_create_plans_make_images_1'}
+          </button>
+          {makeImagesResult && <div className="mt-2 text-sm text-gray-700">{makeImagesResult}</div>}
+        </div>
+        {/* uitablegrid21 label */}
+        <div className="font-bold mb-2">uitablegrid21</div>
+        <div className="overflow-x-auto w-full">
+          <table className="w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                {columns.map(col => (
+                  <th
+                    key={col}
+                    className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredPlans.map(plan => (
+                <tr key={plan.id}>
+                  {columns.map(col => (
+                    <td
+                      key={col}
+                      className="px-4 py-2"
+                    >
+                      {String(plan[col] ?? '')}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filteredPlans.length === 0 && <div className="mt-4 text-gray-500">No plans found for your user.</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
