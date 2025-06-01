@@ -137,6 +137,7 @@ export default function Tebnar1() {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   // New: images lookup
   const [imagesById, setImagesById] = useState<Record<string, any>>({});
+  const [generateZip, setGenerateZip] = useState(false);
 
   // Fetch all images for the user and map by id
   useEffect(() => {
@@ -391,6 +392,17 @@ export default function Tebnar1() {
               </button>
             ))}
           </div>
+          {/* Generate Zip Checkbox */}
+          <div className="flex items-center mb-2">
+            <input
+              id="generate-zip"
+              type="checkbox"
+              checked={generateZip}
+              onChange={e => setGenerateZip(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="generate-zip" className="text-sm font-medium">Generate .zip file inside the main folder</label>
+          </div>
           <button
             className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
             onClick={async () => {
@@ -410,7 +422,7 @@ export default function Tebnar1() {
                   return obj;
                 });
                 const { func_create_plans_make_images_1 } = await import('../utils/cfunc_create_plans_make_images_1');
-                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel });
+                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel, generateZip });
                 setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
                 if (result?.batch_id) {
                   await refreshBatchesAndSelect(result.batch_id);

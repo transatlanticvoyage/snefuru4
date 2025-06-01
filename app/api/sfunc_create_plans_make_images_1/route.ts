@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { sfunc_create_image_with_openai } from './sfunc_create_image_with_openai';
+import JSZip from 'jszip';
 
 // Mock image generation function
 async function generateImage({ plan, aiModel }: { plan: any; aiModel: string }) {
@@ -21,7 +22,7 @@ async function generateImage({ plan, aiModel }: { plan: any; aiModel: string }) 
 
 export async function POST(request: Request) {
   try {
-    const { records, qty, aiModel } = await request.json();
+    const { records, qty, aiModel, generateZip } = await request.json();
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ success: false, message: 'No records provided' }, { status: 400 });
     }
@@ -151,6 +152,53 @@ export async function POST(request: Request) {
         .update(updateObj)
         .eq('id', plan.id);
       updatedPlans.push({ ...plan, ...updateObj });
+    }
+
+    // After all images are uploaded, if generateZip is true, create a zip file in the batch folder
+    if (generateZip) {
+      // List all plan folders in the batch folder
+      const { data: planFolders, error: listError } = await supabase.storage
+        .from('bucket-images-b1')
+        .list(`barge1/${batchFolder}`, { limit: 100, offset: 0 });
+      if (!listError && planFolders && planFolders.length > 0) {
+        const zip = new JSZip();
+        let firstPlanFolder = '';
+        for (let idx = 0; idx < planFolders.length; idx++) {
+          const planFolder = planFolders[idx];
+          if (planFolder && planFolder.name) {
+            if (idx === 0) firstPlanFolder = planFolder.name;
+            // List all files in this plan folder
+            const { data: files } = await supabase.storage
+              .from('bucket-images-b1')
+              .list(`barge1/${batchFolder}/${planFolder.name}`, { limit: 20, offset: 0 });
+            if (files && files.length > 0) {
+              for (const file of files) {
+                // Download file
+                const { data: fileData } = await supabase.storage
+                  .from('bucket-images-b1')
+                  .download(`barge1/${batchFolder}/${planFolder.name}/${file.name}`);
+                if (fileData) {
+                  // Add to zip under the correct folder
+                  zip.file(`${planFolder.name}/${file.name}`, await fileData.arrayBuffer());
+                }
+              }
+            }
+          }
+        }
+        if (firstPlanFolder) {
+          // Generate the zip file
+          const zipBlob = await zip.generateAsync({ type: 'blob' });
+          const zipFileName = `${batchFolder}-${firstPlanFolder}.zip`;
+          const zipPath = `barge1/${batchFolder}/${zipFileName}`;
+          // Upload zip to Supabase Storage
+          await supabase.storage
+            .from('bucket-images-b1')
+            .upload(zipPath, zipBlob, {
+              contentType: 'application/zip',
+              upsert: true,
+            });
+        }
+      }
     }
 
     return NextResponse.json({
