@@ -351,6 +351,7 @@ export default function Tebnar1() {
       </div>
       <div>
         <ExcelPasteGrid onGridDataChange={setGridData} />
+        <hr className="my-6 border-t-2 border-gray-300" />
         {/* OPTION 1: Submit func_create_plans_from_xls_1 button */}
         <div className="my-4">
           <div className="font-bold mb-1">Option 1</div>
@@ -363,6 +364,7 @@ export default function Tebnar1() {
           </button>
           {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
         </div>
+        <hr className="my-6 border-t-2 border-gray-300" />
         {/* OPTION 2: QTY selector and Submit func_create_plans_make_images_1 button */}
         <div className="mb-4">
           <div className="font-bold mb-2">Option 2</div>
@@ -452,6 +454,7 @@ export default function Tebnar1() {
           </button>
           {makeImagesResult && <div className="mt-2 text-sm text-gray-700">{makeImagesResult}</div>}
         </div>
+        <hr className="my-6 border-t-2 border-gray-300" />
         {/* uitablegrid21 label */}
         <div className="font-bold mb-2">uitablegrid21</div>
         <div className="overflow-x-auto w-full">
