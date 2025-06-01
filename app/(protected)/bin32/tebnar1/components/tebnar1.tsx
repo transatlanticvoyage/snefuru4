@@ -70,39 +70,38 @@ function ExcelPasteGrid({ onGridDataChange }: { onGridDataChange?: (grid: string
   };
 
   return (
-    <div className="mb-8">
+    <div className="mb-8 w-full">
       <div className="font-bold mb-2">kzelement6</div>
-      <div className="overflow-x-auto">
+      <div className="w-full">
         <table
           ref={gridRef}
-          className="border border-gray-300"
+          className="border border-gray-300 w-full"
           tabIndex={0}
           onPaste={handlePaste}
         >
           <thead>
             <tr>
-              <th className="border border-gray-300 bg-gray-100 w-8"></th>
+              <th className="border border-gray-300 bg-gray-100 w-12 text-center">Row</th>
               {colHeaders.map((col, idx) => (
-                <th key={col} className="border border-gray-300 bg-gray-100 w-16 text-center">{col}</th>
+                <th key={col} className="border border-gray-300 bg-gray-100 min-w-[120px] text-center">{col}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {Array.from({ length: gridRows }).map((_, rowIdx) => (
               <tr key={rowIdx}>
-                <th className="border border-gray-300 bg-gray-100 text-center">{rowIdx + 1}</th>
+                <th className="border border-gray-300 bg-gray-100 text-center w-12">{rowIdx + 1}</th>
                 {Array.from({ length: gridCols }).map((_, colIdx) => (
                   <td
                     key={colIdx}
-                    className={`border border-gray-300 w-16 h-8 text-center cursor-pointer ${selected.row === rowIdx && selected.col === colIdx ? 'bg-blue-100' : ''}`}
+                    className={`border border-gray-300 min-w-[120px] h-10 cursor-pointer ${selected.row === rowIdx && selected.col === colIdx ? 'bg-blue-100' : ''}`}
                     onClick={() => handleCellClick(rowIdx, colIdx)}
                   >
                     <input
                       type="text"
                       value={grid[rowIdx][colIdx]}
                       onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
-                      className="w-full h-full text-center bg-transparent outline-none"
-                      style={{ minWidth: 0 }}
+                      className="w-full h-full px-2 bg-transparent outline-none border-none"
                       onFocus={() => handleCellClick(rowIdx, colIdx)}
                     />
                   </td>
@@ -333,7 +332,7 @@ export default function Tebnar1() {
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (
-    <div className="w-full max-w-[95vw] mx-auto">
+    <div className="w-full mx-auto">
       {/* Black bar with batch dropdown, only on tebnar1 */}
       <div className="sticky top-0 w-full h-10 bg-black z-30 flex items-center px-4 text-white space-x-4">
         <span>rel_images_plans_batches_id</span>
@@ -349,7 +348,7 @@ export default function Tebnar1() {
           ))}
         </select>
       </div>
-      <div>
+      <div className="w-full px-4">
         <ExcelPasteGrid onGridDataChange={setGridData} />
         <hr className="my-6 border-t-2 border-gray-300" />
         {/* OPTION 1: Submit func_create_plans_from_xls_1 button */}

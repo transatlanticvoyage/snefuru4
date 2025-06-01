@@ -40,6 +40,8 @@ export default function StatusJar1() {
     failedJobs: 0
   });
   const [savingSettings, setSavingSettings] = useState(false);
+  const [endingProcess, setEndingProcess] = useState<string | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState<string | null>(null);
   const supabase = createClientComponentClient();
 
   // Load settings on mount
@@ -497,6 +499,51 @@ export default function StatusJar1() {
     }
   };
 
+  // Function to end a process
+  const endProcess = async (batchId: string) => {
+    try {
+      setEndingProcess(batchId);
+      setError(null);
+      
+      const response = await fetch('/api/background-jobs/end-process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batchId })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setError(`Process ended for batch ${batchId}`);
+        // Refresh tasks to show updated status
+        // The useEffect will automatically refresh the data
+      } else {
+        setError(result.message || 'Failed to end process');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to end process');
+    } finally {
+      setEndingProcess(null);
+      setShowConfirmDialog(null);
+    }
+  };
+
+  // Function to show confirmation dialog
+  const handleEndProcessClick = (batchId: string) => {
+    setShowConfirmDialog(batchId);
+  };
+
+  // Function to handle confirmation
+  const handleConfirmEndProcess = () => {
+    if (showConfirmDialog) {
+      endProcess(showConfirmDialog);
+    }
+  };
+
+  // Function to cancel confirmation
+  const handleCancelEndProcess = () => {
+    setShowConfirmDialog(null);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
@@ -614,6 +661,17 @@ export default function StatusJar1() {
                     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                   >
                     Queue for Background
+                  </button>
+                  <button
+                    onClick={() => handleEndProcessClick(task.batch_id)}
+                    disabled={endingProcess === task.batch_id}
+                    className={`px-4 py-2 rounded transition-colors ${
+                      endingProcess === task.batch_id
+                        ? 'bg-gray-400 text-white cursor-not-allowed'
+                        : 'bg-red-600 text-white hover:bg-red-700'
+                    }`}
+                  >
+                    {endingProcess === task.batch_id ? 'Ending...' : 'End Process'}
                   </button>
                 </div>
               )}
@@ -812,6 +870,33 @@ export default function StatusJar1() {
             <p className="text-xs text-gray-500 mt-2">
               {!backgroundSettings.enabled && 'Enable background processing to use these controls.'}
             </p>
+          </div>
+        </div>
+      )}
+      
+      {/* Confirmation Dialog */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
+            <h3 className="text-lg font-medium mb-4">Confirm End Process</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to end the process for batch {showConfirmDialog}? 
+              This will stop all ongoing operations for this task.
+            </p>
+            <div className="flex space-x-3 justify-end">
+              <button
+                onClick={handleCancelEndProcess}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+              >
+                No
+              </button>
+              <button
+                onClick={handleConfirmEndProcess}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                Yes
+              </button>
+            </div>
           </div>
         </div>
       )}
