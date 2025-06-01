@@ -344,6 +344,9 @@ export default function Tebnar1() {
                 const { func_create_plans_make_images_1 } = await import('../utils/cfunc_create_plans_make_images_1');
                 const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel });
                 setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
+                if (result?.batch_id) {
+                  setSelectedBatchId(result.batch_id);
+                }
               } catch (err) {
                 setMakeImagesResult(err instanceof Error ? err.message : String(err));
               } finally {
