@@ -253,10 +253,21 @@ export default function Tebnar1() {
       </div>
       <div>
         <ExcelPasteGrid onGridDataChange={setGridData} />
-        {/* QTY Of Images Per Plan To Generate selector */}
+        {/* OPTION 1: Submit func_create_plans_from_xls_1 button */}
+        <div className="my-4">
+          <button
+            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            onClick={handleSubmit}
+            disabled={submitLoading}
+          >
+            {submitLoading ? 'Submitting...' : 'Submit func_create_plans_from_xls_1'}
+          </button>
+          {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
+        </div>
+        {/* OPTION 2: QTY selector and Submit func_create_plans_make_images_1 button */}
         <div className="mb-4">
           <div className="font-bold mb-2">QTY Of Images Per Plan To Generate</div>
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 mb-2">
             {[1, 2, 3, 4].map(opt => (
               <button
                 key={opt}
@@ -268,17 +279,14 @@ export default function Tebnar1() {
               </button>
             ))}
           </div>
-        </div>
-        <div className="my-4">
           <button
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-            onClick={handleSubmit}
-            disabled={submitLoading}
+            className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
+            // onClick handler for func_create_plans_make_images_1 to be implemented
           >
-            {submitLoading ? 'Submitting...' : 'Submit func_create_plans_from_xls_1'}
+            Submit func_create_plans_make_images_1
           </button>
-          {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
         </div>
+        {/* uitablegrid21 label */}
         <div className="font-bold mb-2">uitablegrid21</div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
