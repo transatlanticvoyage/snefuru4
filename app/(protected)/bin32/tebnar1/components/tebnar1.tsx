@@ -196,6 +196,11 @@ export default function Tebnar1() {
 
   return (
     <div>
+      {/* Sticky black bar below header */}
+      <div
+        className="w-full h-10 bg-black z-30 sticky"
+        style={{ top: 0 }}
+      ></div>
       <ExcelPasteGrid onGridDataChange={setGridData} />
       <div className="my-4">
         <button
