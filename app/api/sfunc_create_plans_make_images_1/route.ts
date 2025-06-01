@@ -180,8 +180,9 @@ export async function POST(request: Request) {
                   .download(`barge1/${batchFolder}/${planFolder.name}/${file.name}`);
                 if (fileData) {
                   const arrayBuffer = await fileData.arrayBuffer();
-                  // @ts-ignore
-                  let buffer = Buffer.from(new Uint8Array(arrayBuffer).buffer);
+                  // @ts-ignore - Buffer type mismatch in serverless environment
+                  let buffer = Buffer.from(new Uint8Array(arrayBuffer));
+                  // @ts-ignore - Buffer type mismatch in serverless environment
                   if (wipeMeta) {
                     // Use sharp to strip metadata
                     buffer = await sharp(buffer).toBuffer();
