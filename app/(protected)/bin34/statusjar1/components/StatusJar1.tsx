@@ -21,6 +21,8 @@ export default function StatusJar1() {
   const [tasks, setTasks] = useState<TaskStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'status' | 'errors'>('status');
+  const [errorLogs, setErrorLogs] = useState<any[]>([]);
   const supabase = createClientComponentClient();
 
   // Fetch tasks and their status
@@ -46,6 +48,27 @@ export default function StatusJar1() {
           .order('created_at', { ascending: false });
 
         if (batchesError) throw batchesError;
+
+        // Fetch error logs - get recent failed images
+        const { data: failedImages, error: failedImagesError } = await supabase
+          .from('images')
+          .select(`
+            id,
+            created_at,
+            status,
+            prompt1,
+            function_used_to_fetch_the_image,
+            rel_images_plans_id,
+            images_plans!inner(rel_images_plans_batches_id)
+          `)
+          .eq('rel_users_id', userData.id)
+          .neq('status', 'completed')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (!failedImagesError && failedImages) {
+          setErrorLogs(failedImages);
+        }
 
         // For each batch, get the task status
         const taskStatuses: TaskStatus[] = await Promise.all(
@@ -189,77 +212,150 @@ export default function StatusJar1() {
     <div className="w-full max-w-[95vw] mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Task Status Monitor</h1>
       
-      <div className="space-y-4">
-        {tasks.map(task => (
-          <div key={task.id} className="bg-white rounded-lg shadow p-4">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-lg font-semibold">Batch {task.batch_id}</h2>
-                <p className="text-sm text-gray-500">
-                  Created: {new Date(task.created_at).toLocaleString()}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Qty per plan: {task.qty_images_per_plan} images
-                </p>
-              </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                task.status === 'completed' ? 'bg-green-100 text-green-800' :
-                task.status === 'failed' ? 'bg-red-100 text-red-800' :
-                'bg-blue-100 text-blue-800'
-              }`}>
-                {task.status}
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">Plans Progress</span>
-                  <span className="text-sm text-gray-500">
-                    {task.completed_plans} / {task.total_plans}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${(task.completed_plans / task.total_plans) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">Images Progress</span>
-                  <span className="text-sm text-gray-500">
-                    {task.completed_images} / {task.total_images}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-green-600 h-2 rounded-full"
-                    style={{ width: `${(task.completed_images / task.total_images) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {task.status !== 'completed' && (
-              <button
-                onClick={() => retryFailedImages(task.batch_id)}
-                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
-              >
-                Retry Failed Images
-              </button>
-            )}
-          </div>
-        ))}
-
-        {tasks.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
-            No tasks found
-          </div>
-        )}
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200 mb-6">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('status')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'status'
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Task Status
+          </button>
+          <button
+            onClick={() => setActiveTab('errors')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'errors'
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Error Logs ({errorLogs.length})
+          </button>
+        </nav>
       </div>
+
+      {/* Tab Content */}
+      {activeTab === 'status' && (
+        <div className="space-y-4">
+          {tasks.map(task => (
+            <div key={task.id} className="bg-white rounded-lg shadow p-4">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold">Batch {task.batch_id}</h2>
+                  <p className="text-sm text-gray-500">
+                    Created: {new Date(task.created_at).toLocaleString()}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Qty per plan: {task.qty_images_per_plan} images
+                  </p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  task.status === 'completed' ? 'bg-green-100 text-green-800' :
+                  task.status === 'failed' ? 'bg-red-100 text-red-800' :
+                  'bg-blue-100 text-blue-800'
+                }`}>
+                  {task.status}
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium">Plans Progress</span>
+                    <span className="text-sm text-gray-500">
+                      {task.completed_plans} / {task.total_plans}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full"
+                      style={{ width: `${(task.completed_plans / task.total_plans) * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium">Images Progress</span>
+                    <span className="text-sm text-gray-500">
+                      {task.completed_images} / {task.total_images}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-green-600 h-2 rounded-full"
+                      style={{ width: `${(task.completed_images / task.total_images) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {task.status !== 'completed' && (
+                <button
+                  onClick={() => retryFailedImages(task.batch_id)}
+                  className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                >
+                  Retry Failed Images
+                </button>
+              )}
+            </div>
+          ))}
+
+          {tasks.length === 0 && (
+            <div className="text-center text-gray-500 py-8">
+              No tasks found
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'errors' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-lg shadow">
+            <div className="px-4 py-3 border-b border-gray-200">
+              <h3 className="text-lg font-medium">Recent Error Logs</h3>
+              <p className="text-sm text-gray-500">Failed or problematic image generation attempts</p>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {errorLogs.map((log, index) => (
+                <div key={log.id || index} className="px-4 py-3">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium text-red-600">
+                          Status: {log.status || 'unknown'}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {new Date(log.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Model: {log.function_used_to_fetch_the_image || 'unknown'}
+                      </p>
+                      <p className="text-sm text-gray-800 mt-1">
+                        Prompt: {log.prompt1 || 'No prompt available'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Batch: {log.images_plans?.rel_images_plans_batches_id || 'unknown'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {errorLogs.length === 0 && (
+                <div className="px-4 py-8 text-center text-gray-500">
+                  No error logs found
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
