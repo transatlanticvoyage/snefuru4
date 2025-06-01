@@ -21,9 +21,24 @@ export default function StatusJar1() {
   const [tasks, setTasks] = useState<TaskStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'status' | 'errors'>('status');
+  const [activeTab, setActiveTab] = useState<'status' | 'errors' | 'background'>('status');
   const [errorLogs, setErrorLogs] = useState<any[]>([]);
   const [retryingBatches, setRetryingBatches] = useState<Set<string>>(new Set());
+  const [backgroundSettings, setBackgroundSettings] = useState({
+    enabled: false,
+    delayBetweenImages: 2000, // milliseconds
+    delayBetweenPlans: 1000,
+    maxConcurrentJobs: 1,
+    retryAttempts: 3,
+    autoRetry: true
+  });
+  const [backgroundStatus, setBackgroundStatus] = useState({
+    isRunning: false,
+    queueLength: 0,
+    currentJob: null,
+    completedJobs: 0,
+    failedJobs: 0
+  });
   const supabase = createClientComponentClient();
 
   // Fetch tasks and their status
@@ -49,6 +64,17 @@ export default function StatusJar1() {
           .order('created_at', { ascending: false });
 
         if (batchesError) throw batchesError;
+
+        // Fetch background job status
+        if (backgroundSettings.enabled) {
+          const statusResponse = await fetch('/api/background-jobs/status');
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json();
+            if (statusData.success) {
+              setBackgroundStatus(statusData.status);
+            }
+          }
+        }
 
         // Fetch error logs - get recent failed images
         const { data: failedImages, error: failedImagesError } = await supabase
@@ -273,6 +299,150 @@ export default function StatusJar1() {
     }
   };
 
+  // Function to queue missing images for background processing
+  const queueMissingImages = async (batchId: string) => {
+    try {
+      // Get all plans in the batch
+      const { data: plans, error: plansError } = await supabase
+        .from('images_plans')
+        .select('*')
+        .eq('rel_images_plans_batches_id', batchId);
+
+      if (plansError) throw plansError;
+
+      // Get batch details for folder structure
+      const { data: batchRow } = await supabase
+        .from('images_plans_batches')
+        .select('created_at')
+        .eq('id', batchId)
+        .single();
+
+      let batchDate = 'unknown_date';
+      let batchSeq = 1;
+      if (batchRow && batchRow.created_at) {
+        const dateObj = new Date(batchRow.created_at);
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        batchDate = `${yyyy}_${mm}_${dd}`;
+        
+        // Get user's DB id for counting batches
+        const { data: userData } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user?.id)
+          .single();
+          
+        if (userData) {
+          const { count } = await supabase
+            .from('images_plans_batches')
+            .select('id', { count: 'exact', head: true })
+            .eq('rel_users_id', userData.id)
+            .gte('created_at', `${yyyy}-${mm}-${dd}T00:00:00.000Z`)
+            .lte('created_at', `${yyyy}-${mm}-${dd}T23:59:59.999Z`);
+          batchSeq = (count || 1);
+        }
+      }
+      const batchFolder = `${batchDate} - ${batchSeq}`;
+
+      let jobsQueued = 0;
+      
+      // For each plan, queue missing images
+      for (let i = 0; i < plans.length; i++) {
+        const plan = plans[i];
+        const seq = i + 1;
+        let baseFileName = plan.e_file_name1 && typeof plan.e_file_name1 === 'string' && plan.e_file_name1.trim() ? plan.e_file_name1.trim() : `image_${seq}.png`;
+        baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const planFolder = `${seq} - ${baseFileName}`;
+        
+        const missingSlots = [];
+        if (!plan.fk_image1_id) missingSlots.push(1);
+        if (!plan.fk_image2_id) missingSlots.push(2);
+        if (!plan.fk_image3_id) missingSlots.push(3);
+        if (!plan.fk_image4_id) missingSlots.push(4);
+
+        for (const slot of missingSlots) {
+          let imageFileName = baseFileName;
+          if (slot > 1) {
+            const extIdx = baseFileName.lastIndexOf('.');
+            if (extIdx > 0) {
+              imageFileName = baseFileName.slice(0, extIdx) + `-${slot}` + baseFileName.slice(extIdx);
+            } else {
+              imageFileName = baseFileName + `-${slot}`;
+            }
+          }
+
+          // Queue the job
+          const response = await fetch('/api/background-jobs/add-job', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jobType: 'generate_image',
+              data: {
+                plan,
+                imageSlot: slot,
+                batchFolder: `${batchFolder}/${planFolder}`,
+                fileName: imageFileName
+              },
+              priority: 5 - slot // Higher priority for earlier image slots
+            })
+          });
+
+          if (response.ok) {
+            jobsQueued++;
+          }
+        }
+      }
+
+      setError(`Successfully queued ${jobsQueued} image generation jobs for batch ${batchId}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to queue missing images');
+    }
+  };
+
+  // Function to start background processing
+  const startBackgroundProcessing = async () => {
+    try {
+      const response = await fetch('/api/background-jobs/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: backgroundSettings })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setError(result.message);
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start background processing');
+    }
+  };
+
+  // Function to clear completed and failed jobs
+  const clearCompletedJobs = async () => {
+    try {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user?.id)
+        .single();
+        
+      if (userData) {
+        await supabase
+          .from('background_jobs')
+          .delete()
+          .eq('user_id', userData.id)
+          .in('status', ['completed', 'failed']);
+        
+        setError('Cleared completed and failed jobs');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to clear jobs');
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
@@ -302,6 +472,16 @@ export default function StatusJar1() {
             }`}
           >
             Error Logs ({errorLogs.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('background')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'background'
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Background Processing Settings
           </button>
         </nav>
       </div>
@@ -363,17 +543,25 @@ export default function StatusJar1() {
               </div>
 
               {task.status !== 'completed' && (
-                <button
-                  onClick={() => retryFailedImages(task.batch_id)}
-                  disabled={retryingBatches.has(task.batch_id)}
-                  className={`mt-4 px-4 py-2 rounded transition-colors ${
-                    retryingBatches.has(task.batch_id)
-                      ? 'bg-gray-400 text-white cursor-not-allowed'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  }`}
-                >
-                  {retryingBatches.has(task.batch_id) ? 'Retrying...' : 'Retry Failed Images'}
-                </button>
+                <div className="mt-4 space-x-2">
+                  <button
+                    onClick={() => retryFailedImages(task.batch_id)}
+                    disabled={retryingBatches.has(task.batch_id)}
+                    className={`px-4 py-2 rounded transition-colors ${
+                      retryingBatches.has(task.batch_id)
+                        ? 'bg-gray-400 text-white cursor-not-allowed'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    }`}
+                  >
+                    {retryingBatches.has(task.batch_id) ? 'Retrying...' : 'Retry Failed Images'}
+                  </button>
+                  <button
+                    onClick={() => queueMissingImages(task.batch_id)}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                  >
+                    Queue for Background
+                  </button>
+                </div>
               )}
             </div>
           ))}
@@ -438,6 +626,125 @@ export default function StatusJar1() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'background' && (
+        <div className="space-y-4">
+          {/* Background Processing Settings Form */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-lg font-medium mb-4">Background Processing Settings</h3>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Enabled</span>
+                <input
+                  type="checkbox"
+                  checked={backgroundSettings.enabled}
+                  onChange={(e) => setBackgroundSettings(prev => ({ ...prev, enabled: e.target.checked }))}
+                  className="form-checkbox h-5 w-5 text-indigo-600"
+                />
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Delay Between Images</span>
+                <input
+                  type="number"
+                  value={backgroundSettings.delayBetweenImages}
+                  onChange={(e) => setBackgroundSettings(prev => ({ ...prev, delayBetweenImages: Number(e.target.value) }))}
+                  className="form-input w-20"
+                />
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Delay Between Plans</span>
+                <input
+                  type="number"
+                  value={backgroundSettings.delayBetweenPlans}
+                  onChange={(e) => setBackgroundSettings(prev => ({ ...prev, delayBetweenPlans: Number(e.target.value) }))}
+                  className="form-input w-20"
+                />
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Max Concurrent Jobs</span>
+                <input
+                  type="number"
+                  value={backgroundSettings.maxConcurrentJobs}
+                  onChange={(e) => setBackgroundSettings(prev => ({ ...prev, maxConcurrentJobs: Number(e.target.value) }))}
+                  className="form-input w-20"
+                />
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Retry Attempts</span>
+                <input
+                  type="number"
+                  value={backgroundSettings.retryAttempts}
+                  onChange={(e) => setBackgroundSettings(prev => ({ ...prev, retryAttempts: Number(e.target.value) }))}
+                  className="form-input w-20"
+                />
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Auto Retry</span>
+                <input
+                  type="checkbox"
+                  checked={backgroundSettings.autoRetry}
+                  onChange={(e) => setBackgroundSettings(prev => ({ ...prev, autoRetry: e.target.checked }))}
+                  className="form-checkbox h-5 w-5 text-indigo-600"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Background Status */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-lg font-medium mb-4">Background Processing Status</h3>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Is Running</span>
+                <span className="text-sm text-gray-500">{backgroundStatus.isRunning ? 'Yes' : 'No'}</span>
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Queue Length</span>
+                <span className="text-sm text-gray-500">{backgroundStatus.queueLength}</span>
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Current Job</span>
+                <span className="text-sm text-gray-500">{backgroundStatus.currentJob || 'None'}</span>
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Completed Jobs</span>
+                <span className="text-sm text-gray-500">{backgroundStatus.completedJobs}</span>
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Failed Jobs</span>
+                <span className="text-sm text-gray-500">{backgroundStatus.failedJobs}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Background Processing Controls */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-lg font-medium mb-4">Background Processing Controls</h3>
+            <div className="space-x-2">
+              <button
+                onClick={startBackgroundProcessing}
+                disabled={!backgroundSettings.enabled}
+                className={`px-4 py-2 rounded transition-colors ${
+                  !backgroundSettings.enabled
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                Process Queue
+              </button>
+              <button
+                onClick={clearCompletedJobs}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                Clear Completed Jobs
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {!backgroundSettings.enabled && 'Enable background processing to use these controls.'}
+            </p>
           </div>
         </div>
       )}
