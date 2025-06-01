@@ -121,7 +121,41 @@ export default function Tebnar1() {
   const [gridData, setGridData] = useState<string[][]>([]);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitResult, setSubmitResult] = useState<string | null>(null);
+  const [batches, setBatches] = useState<any[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState<string>('');
   const supabase = createClientComponentClient();
+
+  // Fetch batches for dropdown
+  useEffect(() => {
+    const fetchBatches = async () => {
+      if (!user?.id) {
+        setBatches([]);
+        return;
+      }
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      if (userError || !userData) {
+        setBatches([]);
+        return;
+      }
+      // Fetch images_plans_batches for this user
+      const { data, error } = await supabase
+        .from('images_plans_batches')
+        .select('*')
+        .eq('rel_users_id', userData.id)
+        .order('created_at', { ascending: false });
+      if (error) {
+        setBatches([]);
+        return;
+      }
+      setBatches(data || []);
+    };
+    fetchBatches();
+  }, [user, supabase]);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -163,6 +197,11 @@ export default function Tebnar1() {
     fetchPlans();
   }, [user, supabase]);
 
+  // Filter plans by selected batch
+  const filteredPlans = selectedBatchId
+    ? plans.filter(plan => plan.rel_images_plans_batches_id === selectedBatchId)
+    : plans;
+
   const handleSubmit = async () => {
     setSubmitLoading(true);
     setSubmitResult(null);
@@ -196,7 +235,30 @@ export default function Tebnar1() {
 
   return (
     <div>
-      {/* Remove the lower black bar; only use the layout bar */}
+      {/* Black bar content is now in layout, but we need to control the dropdown here */}
+      <script dangerouslySetInnerHTML={{__html:`
+        document.addEventListener('DOMContentLoaded', function() {
+          const bar = document.querySelector('.rel-batch-bar');
+          if (bar) {
+            const reactRoot = document.createElement('span');
+            bar.appendChild(reactRoot);
+          }
+        });
+      `}} />
+      <div className="rel-batch-bar flex items-center space-x-4">
+        <span>rel_images_plans_batches_id</span>
+        <select
+          value={selectedBatchId}
+          onChange={e => setSelectedBatchId(e.target.value)}
+          className={`h-7 px-2 rounded text-black ${selectedBatchId ? 'bg-teal-200' : 'bg-white'}`}
+          style={{ minWidth: 120 }}
+        >
+          <option value="">All Batches ({batches.length})</option>
+          {batches.map(batch => (
+            <option key={batch.id} value={batch.id}>{batch.id}</option>
+          ))}
+        </select>
+      </div>
       <div>
         <ExcelPasteGrid onGridDataChange={setGridData} />
         <div className="my-4">
@@ -219,7 +281,7 @@ export default function Tebnar1() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {plans.map(plan => (
+              {filteredPlans.map(plan => (
                 <tr key={plan.id}>
                   {columns.map(col => (
                     <td key={col} className="px-4 py-2 whitespace-nowrap">{String(plan[col] ?? '')}</td>
@@ -228,7 +290,7 @@ export default function Tebnar1() {
               ))}
             </tbody>
           </table>
-          {plans.length === 0 && <div className="mt-4 text-gray-500">No plans found for your user.</div>}
+          {filteredPlans.length === 0 && <div className="mt-4 text-gray-500">No plans found for your user.</div>}
         </div>
       </div>
     </div>
