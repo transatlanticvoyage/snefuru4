@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { sfunc_create_image_with_openai } from './sfunc_create_image_with_openai';
 
 // Mock image generation function
 async function generateImage({ plan, aiModel }: { plan: any; aiModel: string }) {
@@ -67,15 +68,27 @@ export async function POST(request: Request) {
       const plan = plansData[i];
       const imageIds: (string | null)[] = [];
       for (let j = 0; j < Math.min(qty, 4); j++) {
-        // Generate image (mocked)
-        const imageData = await generateImage({ plan, aiModel });
+        // Generate image using OpenAI
+        let prompt = plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1 || 'AI Image';
+        const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id });
+        if (!imageResult.success) {
+          imageIds.push(null);
+          continue;
+        }
         // Insert image into images table
         const { data: imageInsert, error: imageError } = await supabase
           .from('images')
           .insert({
             rel_users_id: userData.id,
             rel_images_plans_id: plan.id,
-            ...imageData,
+            img_file_url1: imageResult.url,
+            img_file_extension: 'png',
+            img_file_size: null,
+            width: 1024,
+            height: 1024,
+            prompt1: prompt,
+            status: 'completed',
+            function_used_to_fetch_the_image: aiModel,
           })
           .select('id')
           .single();
