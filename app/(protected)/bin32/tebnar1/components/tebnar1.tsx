@@ -196,10 +196,9 @@ export default function Tebnar1() {
 
   return (
     <div>
-      {/* Sticky, full-width black bar directly below header */}
+      {/* Sticky black bar below header, full width of parent */}
       <div
-        className="sticky top-0 w-screen h-10 bg-black z-30"
-        style={{ left: 0 }}
+        className="sticky top-0 h-10 bg-black z-30"
       ></div>
       <div className="pt-10"> {/* Push content below the bar */}
         <ExcelPasteGrid onGridDataChange={setGridData} />
