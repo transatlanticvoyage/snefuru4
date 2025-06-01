@@ -182,9 +182,9 @@ export async function POST(request: Request) {
                   const arrayBuffer = await fileData.arrayBuffer();
                   // @ts-ignore - Buffer type mismatch in serverless environment
                   let buffer = Buffer.from(new Uint8Array(arrayBuffer));
-                  // @ts-ignore - Buffer type mismatch in serverless environment
                   if (wipeMeta) {
                     // Use sharp to strip metadata
+                    // @ts-ignore - Buffer type mismatch in serverless environment
                     buffer = await sharp(buffer).toBuffer();
                   }
                   // Add to zip under the correct folder
