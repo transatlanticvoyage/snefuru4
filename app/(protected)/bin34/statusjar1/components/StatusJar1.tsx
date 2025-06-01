@@ -109,6 +109,8 @@ export default function StatusJar1() {
   // Function to retry failed images
   const retryFailedImages = async (batchId: string) => {
     try {
+      setError('Retry functionality temporarily disabled. Please use the original tebnar1 page to regenerate images.');
+      /*
       // Get all plans in the batch
       const { data: plans, error: plansError } = await supabase
         .from('images_plans')
@@ -137,6 +139,7 @@ export default function StatusJar1() {
           });
         }
       }
+      */
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to retry images');
     }
