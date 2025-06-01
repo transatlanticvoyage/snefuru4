@@ -3,6 +3,7 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { sfunc_create_image_with_openai } from './sfunc_create_image_with_openai';
 import JSZip from 'jszip';
+import sharp from 'sharp';
 
 // Mock image generation function
 async function generateImage({ plan, aiModel }: { plan: any; aiModel: string }) {
@@ -22,7 +23,7 @@ async function generateImage({ plan, aiModel }: { plan: any; aiModel: string }) 
 
 export async function POST(request: Request) {
   try {
-    const { records, qty, aiModel, generateZip } = await request.json();
+    const { records, qty, aiModel, generateZip, wipeMeta } = await request.json();
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ success: false, message: 'No records provided' }, { status: 400 });
     }
@@ -178,8 +179,14 @@ export async function POST(request: Request) {
                   .from('bucket-images-b1')
                   .download(`barge1/${batchFolder}/${planFolder.name}/${file.name}`);
                 if (fileData) {
+                  const arrayBuffer = await fileData.arrayBuffer();
+                  let buffer = Buffer.from(new Uint8Array(arrayBuffer));
+                  if (wipeMeta) {
+                    // Use sharp to strip metadata
+                    buffer = await sharp(buffer).toBuffer();
+                  }
                   // Add to zip under the correct folder
-                  zip.file(`${planFolder.name}/${file.name}`, await fileData.arrayBuffer());
+                  zip.file(`${planFolder.name}/${file.name}`, buffer);
                 }
               }
             }

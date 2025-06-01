@@ -138,6 +138,7 @@ export default function Tebnar1() {
   // New: images lookup
   const [imagesById, setImagesById] = useState<Record<string, any>>({});
   const [generateZip, setGenerateZip] = useState(false);
+  const [wipeMeta, setWipeMeta] = useState(false);
 
   // Fetch all images for the user and map by id
   useEffect(() => {
@@ -403,6 +404,18 @@ export default function Tebnar1() {
             />
             <label htmlFor="generate-zip" className="text-sm font-medium">Generate .zip file inside the main folder</label>
           </div>
+          {/* Wipe Meta Checkbox */}
+          <div className="flex items-center mb-2">
+            <input
+              id="wipe-meta"
+              type="checkbox"
+              checked={wipeMeta}
+              onChange={e => setWipeMeta(e.target.checked)}
+              className="mr-2"
+              disabled={!generateZip}
+            />
+            <label htmlFor="wipe-meta" className="text-sm font-medium">Wipe all meta data from images</label>
+          </div>
           <button
             className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
             onClick={async () => {
@@ -422,7 +435,7 @@ export default function Tebnar1() {
                   return obj;
                 });
                 const { func_create_plans_make_images_1 } = await import('../utils/cfunc_create_plans_make_images_1');
-                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel, generateZip });
+                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel, generateZip, wipeMeta });
                 setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
                 if (result?.batch_id) {
                   await refreshBatchesAndSelect(result.batch_id);
