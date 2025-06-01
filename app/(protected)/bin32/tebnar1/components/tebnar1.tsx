@@ -198,8 +198,8 @@ export default function Tebnar1() {
     <div>
       {/* Sticky, full-screen-width black bar below header */}
       <div
-        className="sticky top-0 h-10 bg-black z-30 flex items-center px-4 text-white space-x-4 w-[100vw] left-1/2 -translate-x-1/2"
-        style={{ marginLeft: 'calc(50% - 50vw)' }}
+        className="sticky top-0 left-0 w-[100vw] h-10 bg-black z-30 flex items-center px-4 text-white space-x-4"
+        style={{ minWidth: '100vw' }}
       >
         <span>rel_images_plans_batches_id</span>
         <input
