@@ -168,6 +168,30 @@ export default function Tebnar1() {
     fetchBatches();
   }, [user, supabase]);
 
+  // Helper to refresh batches and select a batch by id
+  const refreshBatchesAndSelect = async (batchId: string) => {
+    if (!user?.id) return;
+    // Get user's DB id from users table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', user.id)
+      .single();
+    if (userError || !userData) return;
+    // Fetch images_plans_batches for this user
+    const { data, error } = await supabase
+      .from('images_plans_batches')
+      .select('*')
+      .eq('rel_users_id', userData.id)
+      .order('created_at', { ascending: false });
+    if (error) return;
+    setBatches(data || []);
+    // Only set selectedBatchId if the batch is present
+    if (data && data.some((b: any) => b.id === batchId)) {
+      setSelectedBatchId(batchId);
+    }
+  };
+
   useEffect(() => {
     const fetchPlans = async () => {
       setLoading(true);
@@ -345,7 +369,7 @@ export default function Tebnar1() {
                 const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel });
                 setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
                 if (result?.batch_id) {
-                  setSelectedBatchId(result.batch_id);
+                  await refreshBatchesAndSelect(result.batch_id);
                 }
               } catch (err) {
                 setMakeImagesResult(err instanceof Error ? err.message : String(err));
