@@ -196,8 +196,8 @@ export default function Tebnar1() {
 
   return (
     <div>
-      {/* Fixed, full-width black bar below header */}
-      <div className="fixed left-0 top-0 w-screen h-10 bg-black z-30 flex items-center px-4 text-white space-x-4">
+      {/* Sticky black bar below header, full width of parent */}
+      <div className="sticky top-0 h-10 bg-black z-30 flex items-center px-4 text-white space-x-4">
         <span>rel_images_plans_batches_id</span>
         <input
           type="text"
