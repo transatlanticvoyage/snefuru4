@@ -255,6 +255,7 @@ export default function Tebnar1() {
         <ExcelPasteGrid onGridDataChange={setGridData} />
         {/* OPTION 1: Submit func_create_plans_from_xls_1 button */}
         <div className="my-4">
+          <div className="font-bold mb-1">Option 1</div>
           <button
             className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
             onClick={handleSubmit}
@@ -266,6 +267,7 @@ export default function Tebnar1() {
         </div>
         {/* OPTION 2: QTY selector and Submit func_create_plans_make_images_1 button */}
         <div className="mb-4">
+          <div className="font-bold mb-2">Option 2</div>
           <div className="font-bold mb-2">QTY Of Images Per Plan To Generate</div>
           <div className="flex space-x-2 mb-2">
             {[1, 2, 3, 4].map(opt => (
