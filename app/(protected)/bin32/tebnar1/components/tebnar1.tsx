@@ -132,6 +132,9 @@ export default function Tebnar1() {
   const [makeImagesLoading, setMakeImagesLoading] = useState(false);
   const [makeImagesResult, setMakeImagesResult] = useState<string | null>(null);
   const supabase = createClientComponentClient();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
 
   // Fetch batches for dropdown
   useEffect(() => {
@@ -210,6 +213,24 @@ export default function Tebnar1() {
     ? plans.filter(plan => plan.rel_images_plans_batches_id === selectedBatchId)
     : plans;
 
+  // Pagination calculations
+  const totalItems = filteredPlans.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const currentItems = filteredPlans.slice(startIndex, endIndex);
+
+  // Handle page change
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
+  };
+
+  // Handle page size change
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
   const handleSubmit = async () => {
     setSubmitLoading(true);
     setSubmitResult(null);
@@ -242,7 +263,7 @@ export default function Tebnar1() {
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (
-    <div>
+    <div className="w-full max-w-[95vw] mx-auto">
       {/* Black bar with batch dropdown, only on tebnar1 */}
       <div className="sticky top-0 w-full h-10 bg-black z-30 flex items-center px-4 text-white space-x-4">
         <span>rel_images_plans_batches_id</span>
@@ -337,19 +358,14 @@ export default function Tebnar1() {
         </div>
         {/* uitablegrid21 label */}
         <div className="font-bold mb-2">uitablegrid21</div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 {columns.map(col => (
                   <th
                     key={col}
-                    className={
-                      [
-                        'px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-                        (col === 'id' || col === 'rel_users_id' || col === 'rel_images_plans_batches_id' || col === 'created_at') ? 'max-w-[50px] overflow-hidden whitespace-nowrap' : ''
-                      ].join(' ')
-                    }
+                    className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {col}
                   </th>
@@ -357,17 +373,12 @@ export default function Tebnar1() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredPlans.map(plan => (
+              {currentItems.map(plan => (
                 <tr key={plan.id}>
                   {columns.map(col => (
                     <td
                       key={col}
-                      className={
-                        [
-                          'px-4 py-2',
-                          (col === 'id' || col === 'rel_users_id' || col === 'rel_images_plans_batches_id' || col === 'created_at') ? 'max-w-[50px] overflow-hidden whitespace-nowrap' : ''
-                        ].join(' ')
-                      }
+                      className="px-4 py-2"
                     >
                       {String(plan[col] ?? '')}
                     </td>
@@ -376,6 +387,65 @@ export default function Tebnar1() {
               ))}
             </tbody>
           </table>
+          
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
+            <div className="flex items-center">
+              <span className="text-sm text-gray-700">
+                Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
+                <span className="font-medium">{endIndex}</span> of{' '}
+                <span className="font-medium">{totalItems}</span> results
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="ml-4 rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+              >
+                {pageSizeOptions.map(size => (
+                  <option key={size} value={size}>
+                    {size} per page
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                First
+              </button>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              
+              <span className="text-sm text-gray-700">
+                Page {currentPage} of {totalPages}
+              </span>
+              
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+              <button
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Last
+              </button>
+            </div>
+          </div>
+          
           {filteredPlans.length === 0 && <div className="mt-4 text-gray-500">No plans found for your user.</div>}
         </div>
       </div>
