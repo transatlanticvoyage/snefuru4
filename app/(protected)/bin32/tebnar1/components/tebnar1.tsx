@@ -374,11 +374,12 @@ export default function Tebnar1() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {currentItems.map(plan => (
-                <tr key={plan.id}>
+                <tr key={plan.id} style={{ maxHeight: '80px' }} className="max-h-[80px]">
                   {columns.map(col => (
                     <td
                       key={col}
                       className="px-4 py-2"
+                      style={{ maxHeight: '80px', overflow: 'hidden' }}
                     >
                       {String(plan[col] ?? '')}
                     </td>
