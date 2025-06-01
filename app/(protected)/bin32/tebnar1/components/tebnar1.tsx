@@ -135,6 +135,41 @@ export default function Tebnar1() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = [5, 10, 20, 50, 100];
+  // New: images lookup
+  const [imagesById, setImagesById] = useState<Record<string, any>>({});
+
+  // Fetch all images for the user and map by id
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (!user?.id) {
+        setImagesById({});
+        return;
+      }
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      if (userError || !userData) {
+        setImagesById({});
+        return;
+      }
+      // Fetch all images for this user
+      const { data, error } = await supabase
+        .from('images')
+        .select('*')
+        .eq('rel_users_id', userData.id);
+      if (error) {
+        setImagesById({});
+        return;
+      }
+      const map: Record<string, any> = {};
+      (data || []).forEach(img => { if (img.id) map[img.id] = img; });
+      setImagesById(map);
+    };
+    fetchImages();
+  }, [user, supabase]);
 
   // Fetch batches for dropdown
   useEffect(() => {
@@ -283,6 +318,15 @@ export default function Tebnar1() {
     }
   };
 
+  // For uitablegrid21, build columns with preview columns after each fk_imageX_id
+  const tableColumns = [
+    'fk_image1_id', 'image1-preview',
+    'fk_image2_id', 'image2-preview',
+    'fk_image3_id', 'image3-preview',
+    'fk_image4_id', 'image4-preview',
+    ...columns.slice(4),
+  ];
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
@@ -389,12 +433,12 @@ export default function Tebnar1() {
           <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {columns.map(col => (
+                {tableColumns.map(col => (
                   <th
                     key={col}
                     className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    {col}
+                    {col.startsWith('image') ? 'Preview' : col}
                   </th>
                 ))}
               </tr>
@@ -402,14 +446,69 @@ export default function Tebnar1() {
             <tbody className="bg-white divide-y divide-gray-200">
               {currentItems.map(plan => (
                 <tr key={plan.id}>
-                  {columns.map(col => (
-                    <td
-                      key={col}
-                      className="px-4 py-2 h-[80px] max-h-[80px] overflow-hidden align-middle whitespace-nowrap"
-                    >
-                      {String(plan[col] ?? '')}
-                    </td>
-                  ))}
+                  {tableColumns.map(col => {
+                    if (col === 'image1-preview') {
+                      const imgId = plan['fk_image1_id'];
+                      const img = imgId ? imagesById[imgId] : null;
+                      return (
+                        <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
+                          {img && img.img_file_url1 ? (
+                            <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          ) : (
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto">No Image</div>
+                          )}
+                        </td>
+                      );
+                    }
+                    if (col === 'image2-preview') {
+                      const imgId = plan['fk_image2_id'];
+                      const img = imgId ? imagesById[imgId] : null;
+                      return (
+                        <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
+                          {img && img.img_file_url1 ? (
+                            <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          ) : (
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto">No Image</div>
+                          )}
+                        </td>
+                      );
+                    }
+                    if (col === 'image3-preview') {
+                      const imgId = plan['fk_image3_id'];
+                      const img = imgId ? imagesById[imgId] : null;
+                      return (
+                        <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
+                          {img && img.img_file_url1 ? (
+                            <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          ) : (
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto">No Image</div>
+                          )}
+                        </td>
+                      );
+                    }
+                    if (col === 'image4-preview') {
+                      const imgId = plan['fk_image4_id'];
+                      const img = imgId ? imagesById[imgId] : null;
+                      return (
+                        <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
+                          {img && img.img_file_url1 ? (
+                            <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          ) : (
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto">No Image</div>
+                          )}
+                        </td>
+                      );
+                    }
+                    // Default: show value for non-preview columns
+                    return (
+                      <td
+                        key={col}
+                        className="px-4 py-2 h-[80px] max-h-[80px] overflow-hidden align-middle whitespace-nowrap"
+                      >
+                        {String(plan[col] ?? '')}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
