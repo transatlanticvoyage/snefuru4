@@ -180,8 +180,8 @@ export async function POST(request: Request) {
                   .download(`barge1/${batchFolder}/${planFolder.name}/${file.name}`);
                 if (fileData) {
                   const arrayBuffer = await fileData.arrayBuffer();
-                  // @ts-expect-error
-                  let buffer = Buffer.from(arrayBuffer as ArrayBuffer);
+                  // @ts-ignore
+                  let buffer = Buffer.from(new Uint8Array(arrayBuffer).buffer);
                   if (wipeMeta) {
                     // Use sharp to strip metadata
                     buffer = await sharp(buffer).toBuffer();
