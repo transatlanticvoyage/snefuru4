@@ -10,6 +10,7 @@ interface TaskStatus {
   completed_plans: number;
   total_images: number;
   completed_images: number;
+  qty_images_per_plan: number;
   status: 'running' | 'completed' | 'failed';
   created_at: string;
   error?: string;
@@ -73,19 +74,55 @@ export default function StatusJar1() {
               ].filter(Boolean).length;
             }, 0);
 
+            // Calculate the intended qty per plan by looking at the highest number of images in any plan
+            let qtyImagesPerPlan = 1;
+            if (plans.length > 0) {
+              qtyImagesPerPlan = Math.max(...plans.map(plan => {
+                return [
+                  plan.fk_image1_id,
+                  plan.fk_image2_id,
+                  plan.fk_image3_id,
+                  plan.fk_image4_id
+                ].filter(Boolean).length;
+              }));
+              // If no images exist yet, try to infer from the first plan that has any image slots filled
+              if (qtyImagesPerPlan === 0) {
+                for (const plan of plans) {
+                  const imageSlots = [
+                    plan.fk_image1_id !== null,
+                    plan.fk_image2_id !== null,
+                    plan.fk_image3_id !== null,
+                    plan.fk_image4_id !== null
+                  ];
+                  const lastFilledIndex = imageSlots.lastIndexOf(true);
+                  if (lastFilledIndex >= 0) {
+                    qtyImagesPerPlan = Math.max(qtyImagesPerPlan, lastFilledIndex + 1);
+                  }
+                }
+                // If still 0, default to 4 as a reasonable assumption
+                if (qtyImagesPerPlan === 0) qtyImagesPerPlan = 4;
+              }
+            }
+
             // Calculate completion status
-            const completedPlans = plans.filter(plan => 
-              plan.fk_image1_id && plan.fk_image2_id && 
-              plan.fk_image3_id && plan.fk_image4_id
-            ).length;
+            const completedPlans = plans.filter(plan => {
+              const imageCount = [
+                plan.fk_image1_id,
+                plan.fk_image2_id,
+                plan.fk_image3_id,
+                plan.fk_image4_id
+              ].filter(Boolean).length;
+              return imageCount >= qtyImagesPerPlan;
+            }).length;
 
             return {
               id: batch.id,
               batch_id: batch.id,
               total_plans: totalPlans || 0,
               completed_plans: completedPlans,
-              total_images: (totalPlans || 0) * 4, // Assuming 4 images per plan
+              total_images: (totalPlans || 0) * qtyImagesPerPlan,
               completed_images: completedImages,
+              qty_images_per_plan: qtyImagesPerPlan,
               status: completedPlans === totalPlans ? 'completed' : 'running',
               created_at: batch.created_at
             };
@@ -160,6 +197,9 @@ export default function StatusJar1() {
                 <h2 className="text-lg font-semibold">Batch {task.batch_id}</h2>
                 <p className="text-sm text-gray-500">
                   Created: {new Date(task.created_at).toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Qty per plan: {task.qty_images_per_plan} images
                 </p>
               </div>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
