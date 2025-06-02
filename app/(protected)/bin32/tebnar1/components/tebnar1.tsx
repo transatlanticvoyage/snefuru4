@@ -65,6 +65,14 @@ const rowSettings = {
 
 // Enhanced row and table styling settings
 const tableStyleSettings = {
+  // Table-level settings for strict layout control
+  table: {
+    tableLayout: 'fixed' as 'auto' | 'fixed', // Forces columns to respect width settings
+    width: '100%',
+    maxWidth: '100%',
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto',
+  },
+  
   // Row styling
   row: {
     height: '80px',
@@ -74,46 +82,67 @@ const tableStyleSettings = {
     backgroundColor: '#ffffff',
     hoverBackgroundColor: '#f9fafb',
     borderBottom: '1px solid #e5e7eb',
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto', // Prevent row overflow
   },
   
-  // Cell styling
+  // Cell styling - Enhanced for strict overflow control
   cell: {
     overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto',
     textOverflow: 'ellipsis' as 'clip' | 'ellipsis',
     whiteSpace: 'nowrap' as 'normal' | 'nowrap' | 'pre' | 'pre-wrap' | 'pre-line',
-    wordBreak: 'normal' as 'normal' | 'break-all' | 'keep-all' | 'break-word',
+    wordBreak: 'break-word' as 'normal' | 'break-all' | 'keep-all' | 'break-word', // Better handling of long words
+    wordWrap: 'break-word' as 'normal' | 'break-word' | 'anywhere', // Additional word breaking
     verticalAlign: 'middle' as 'top' | 'middle' | 'bottom' | 'baseline',
     padding: '8px 16px',
+    maxWidth: '100%', // Ensure cells don't exceed their allocated width
+    minWidth: '0', // Allow cells to shrink if needed
+    boxSizing: 'border-box' as 'content-box' | 'border-box', // Include padding in width calculations
   },
   
-  // Text cell specific styling (for data columns)
+  // Text cell specific styling (for data columns) - Enhanced overflow control
   textCell: {
     fontSize: '14px',
     lineHeight: '1.5',
     color: '#374151',
     fontWeight: 'normal' as 'normal' | 'bold' | 'lighter' | 'bolder',
+    overflow: 'hidden', // Explicit overflow hidden for text cells
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '100%',
+    wordBreak: 'break-word',
   },
   
-  // Preview cell specific styling (for image columns)
+  // Preview cell specific styling (for image columns) - Enhanced overflow control
   previewCell: {
     padding: '8px',
     textAlign: 'center' as 'left' | 'center' | 'right',
     backgroundColor: '#fafafa',
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto', // Prevent image overflow
+    display: 'flex' as 'block' | 'flex' | 'inline-block',
+    alignItems: 'center' as 'flex-start' | 'center' | 'flex-end',
+    justifyContent: 'center' as 'flex-start' | 'center' | 'flex-end',
+    maxWidth: '100%',
+    maxHeight: '100%',
   },
   
-  // Image styling within preview cells
+  // Image styling within preview cells - Strict size control
   previewImage: {
     width: '64px',
     height: '64px',
+    maxWidth: '64px', // Explicit max-width
+    maxHeight: '64px', // Explicit max-height
     objectFit: 'cover' as 'fill' | 'contain' | 'cover' | 'none' | 'scale-down',
     borderRadius: '4px',
     border: '1px solid #e5e7eb',
+    flexShrink: 0, // Prevent image from shrinking
   },
   
-  // Fetch button styling
+  // Fetch button styling - Strict size control
   fetchButton: {
     width: '64px',
     height: '64px',
+    maxWidth: '64px', // Explicit max-width
+    maxHeight: '64px', // Explicit max-height
     borderRadius: '8px',
     fontSize: '12px',
     fontWeight: '600',
@@ -122,15 +151,23 @@ const tableStyleSettings = {
     borderColor: '#93c5fd',
     hoverBackgroundColor: '#bfdbfe',
     textColor: '#1d4ed8',
+    overflow: 'hidden', // Prevent button content overflow
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    flexShrink: 0, // Prevent button from shrinking
   },
   
-  // Loading spinner styling
+  // Loading spinner styling - Strict size control
   loadingSpinner: {
     width: '64px',
     height: '64px',
+    maxWidth: '64px', // Explicit max-width
+    maxHeight: '64px', // Explicit max-height
     backgroundColor: '#f3f4f6',
     spinnerSize: '32px',
     spinnerColor: '#2563eb',
+    overflow: 'hidden', // Prevent spinner overflow
+    flexShrink: 0, // Prevent spinner from shrinking
   },
   
   // Table header styling
@@ -143,6 +180,10 @@ const tableStyleSettings = {
     letterSpacing: '0.05em',
     padding: '12px 16px',
     borderBottom: '1px solid #e5e7eb',
+    overflow: 'hidden', // Prevent header text overflow
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '100%',
   },
   
   // Pagination styling
@@ -152,6 +193,7 @@ const tableStyleSettings = {
     padding: '12px 24px',
     fontSize: '14px',
     color: '#374151',
+    overflow: 'hidden', // Prevent pagination overflow
   }
 };
 
@@ -810,7 +852,15 @@ export default function Tebnar1() {
         {/* uitablegrid21 label */}
         <div className="font-bold mb-2">uitablegrid21</div>
         <div className="overflow-x-auto w-full">
-          <table className="w-full divide-y divide-gray-200">
+          <table 
+            className="w-full divide-y divide-gray-200"
+            style={{
+              tableLayout: tableStyleSettings.table.tableLayout,
+              width: tableStyleSettings.table.width,
+              maxWidth: tableStyleSettings.table.maxWidth,
+              overflow: tableStyleSettings.table.overflow,
+            }}
+          >
             <thead className="bg-gray-50">
               <tr>
                 {tableColumns.map(col => {
@@ -852,6 +902,7 @@ export default function Tebnar1() {
                     verticalAlign: tableStyleSettings.row.verticalAlign,
                     backgroundColor: tableStyleSettings.row.backgroundColor,
                     borderBottom: tableStyleSettings.row.borderBottom,
+                    overflow: tableStyleSettings.row.overflow,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = tableStyleSettings.row.hoverBackgroundColor;
