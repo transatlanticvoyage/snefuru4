@@ -361,6 +361,9 @@ export default function Tebnar1() {
 
   // Function to fetch a single image for a specific plan and slot
   const fetchSingleImage = async (plan: any, imageSlot: number) => {
+    console.log('🚀 FETCH SINGLE IMAGE FUNCTION CALLED!', { plan_id: plan.id, imageSlot });
+    alert(`Fetch single image function called for plan ${plan.id}, slot ${imageSlot}`);
+    
     const fetchKey = `${plan.id}-${imageSlot}`;
     
     try {
