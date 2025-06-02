@@ -58,7 +58,7 @@ const columnSettings: Record<string, { width: string; minWidth: string; maxWidth
 
 // Row settings
 const rowSettings = {
-  height: '80px',
+  height: '40px',
   minHeight: '80px',
   maxHeight: '80px',
 };
