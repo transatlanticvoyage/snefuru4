@@ -82,7 +82,12 @@ export async function POST(request: Request) {
 
     // 2. Insert all images_plans rows with rel_images_plans_batches_id set
     //    and collect their ids for later update
-    const recordsToInsert = records.map((rec: any) => ({ ...rec, rel_users_id: userData.id, rel_images_plans_batches_id: batchId }));
+    const recordsToInsert = records.map((rec: any, index: number) => ({ 
+      ...rec, 
+      rel_users_id: userData.id, 
+      rel_images_plans_batches_id: batchId,
+      submission_order: index + 1  // Store 1-based submission order
+    }));
     const { data: plansData, error: plansError } = await supabase
       .from('images_plans')
       .insert(recordsToInsert)

@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     // Verify the plan belongs to this user
     const { data: planData, error: planError } = await supabase
       .from('images_plans')
-      .select('id, fk_image1_id, fk_image2_id, fk_image3_id, fk_image4_id')
+      .select('id, fk_image1_id, fk_image2_id, fk_image3_id, fk_image4_id, rel_images_plans_batches_id, e_file_name1, submission_order')
       .eq('id', plan_id)
       .eq('rel_users_id', userData.id)
       .single();
@@ -164,23 +164,9 @@ export async function POST(request: NextRequest) {
       const imageBuffer = await imageDownloadResponse.arrayBuffer();
       console.log('✅ Image downloaded successfully, size:', imageBuffer.byteLength);
 
-      // Step 3: Create proper folder structure and upload to Supabase Storage
-      // Get the plan data and batch info to recreate exact same folder structure as bulk generation
-      const { data: fullPlanData, error: planDetailsError } = await supabase
-        .from('images_plans')
-        .select('rel_images_plans_batches_id, e_file_name1, e_prompt1')
-        .eq('id', plan_id)
-        .single();
-
-      if (planDetailsError || !fullPlanData) {
-        console.error('❌ Failed to get plan details for folder structure');
-        return NextResponse.json({ 
-          success: false, 
-          message: 'Failed to get plan details for storage' 
-        }, { status: 500 });
-      }
-
-      const batchId = fullPlanData.rel_images_plans_batches_id;
+      // Step 3: Find the existing folder structure in Supabase Storage
+      // The folder should have already been created during bulk generation
+      const batchId = planData.rel_images_plans_batches_id;
       if (!batchId) {
         console.error('❌ Plan has no batch ID');
         return NextResponse.json({ 
@@ -189,64 +175,144 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
 
-      // Get batch creation date and sequence number for the day (same as bulk generation)
-      const { data: batchRow } = await supabase
-        .from('images_plans_batches')
-        .select('created_at')
-        .eq('id', batchId)
-        .single();
+      console.log('🔍 Searching for existing folder structure for batch:', batchId);
 
-      let batchDate = 'unknown_date';
-      let batchSeq = 1;
-      if (batchRow && batchRow.created_at) {
-        const dateObj = new Date(batchRow.created_at);
-        const yyyy = dateObj.getFullYear();
-        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const dd = String(dateObj.getDate()).padStart(2, '0');
-        batchDate = `${yyyy}_${mm}_${dd}`;
-        
-        // Count how many batches exist for this user on this date (including this one)
-        const { count } = await supabase
-          .from('images_plans_batches')
-          .select('id', { count: 'exact', head: true })
-          .eq('rel_users_id', userData.id)
-          .gte('created_at', `${yyyy}-${mm}-${dd}T00:00:00.000Z`)
-          .lte('created_at', `${yyyy}-${mm}-${dd}T23:59:59.999Z`);
-        batchSeq = (count || 1);
-      }
-      const batchFolder = `${batchDate} - ${batchSeq}`;
+      // First, let's find what folders exist in barge1/ for this batch
+      const { data: barge1Contents, error: listError } = await supabase.storage
+        .from('bucket-images-b1')
+        .list('barge1', { limit: 100, offset: 0 });
 
-      // Get the plan's sequence number within the batch (same as bulk generation)
-      const { data: allPlansInBatch, error: plansError } = await supabase
-        .from('images_plans')
-        .select('id, created_at')
-        .eq('rel_images_plans_batches_id', batchId)
-        .order('created_at', { ascending: true });
-
-      if (plansError || !allPlansInBatch) {
-        console.error('❌ Failed to get plans in batch for sequence number');
+      if (listError) {
+        console.error('❌ Failed to list barge1 contents:', listError);
         return NextResponse.json({ 
           success: false, 
-          message: 'Failed to determine plan sequence' 
+          message: 'Failed to access storage folders' 
         }, { status: 500 });
       }
 
-      // Find the sequence number (1-based index) of this plan in the batch
-      const planIndex = allPlansInBatch.findIndex(p => p.id === plan_id);
-      const seq = planIndex + 1; // 1-based sequence
+      console.log('📁 Found barge1 folders:', barge1Contents?.map(f => f.name));
 
-      // Create base filename (same logic as bulk generation)
-      let baseFileName = fullPlanData.e_file_name1 && typeof fullPlanData.e_file_name1 === 'string' && fullPlanData.e_file_name1.trim() 
-        ? fullPlanData.e_file_name1.trim() 
-        : `image_${seq}.png`;
-      
-      // Ensure the filename is safe (no path traversal)
-      baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-      
-      // Create plan folder name: SEQ - FILENAME (same as bulk generation)
-      const planFolder = `${seq} - ${baseFileName}`;
-      
+      // Look for existing batch folder that contains plans from this batch
+      let foundBatchFolder = null;
+      let foundPlanFolder = null;
+
+      if (barge1Contents) {
+        for (const folder of barge1Contents) {
+          if (folder.name) {
+            // List contents of this potential batch folder
+            const { data: batchContents } = await supabase.storage
+              .from('bucket-images-b1')
+              .list(`barge1/${folder.name}`, { limit: 100, offset: 0 });
+
+            if (batchContents) {
+              // Check if any plan folders in this batch folder contain images from our batch
+              for (const planFolder of batchContents) {
+                if (planFolder.name) {
+                  // Check if there are any images in this plan folder
+                  const { data: planImages } = await supabase.storage
+                    .from('bucket-images-b1')
+                    .list(`barge1/${folder.name}/${planFolder.name}`, { limit: 10, offset: 0 });
+
+                  if (planImages && planImages.length > 0) {
+                    // Check if any of these images belong to plans from our batch
+                    const { data: existingImages } = await supabase
+                      .from('images')
+                      .select('rel_images_plans_id, images_plans!inner(rel_images_plans_batches_id)')
+                      .eq('images_plans.rel_images_plans_batches_id', batchId)
+                      .limit(1);
+
+                    if (existingImages && existingImages.length > 0) {
+                      foundBatchFolder = folder.name;
+                      console.log('✅ Found existing batch folder:', foundBatchFolder);
+                      break;
+                    }
+                  }
+                }
+              }
+              if (foundBatchFolder) break;
+            }
+          }
+        }
+      }
+
+      if (!foundBatchFolder) {
+        console.error('❌ Could not find existing batch folder for batch:', batchId);
+        return NextResponse.json({ 
+          success: false, 
+          message: 'Could not find existing batch folder. Make sure some images were generated in the original batch.' 
+        }, { status: 500 });
+      }
+
+      // Now find the specific plan folder for this plan
+      const { data: planFolders } = await supabase.storage
+        .from('bucket-images-b1')
+        .list(`barge1/${foundBatchFolder}`, { limit: 100, offset: 0 });
+
+      if (planFolders) {
+        // Find which plan folder corresponds to our plan by checking existing images
+        for (const folder of planFolders) {
+          if (folder.name) {
+            const { data: folderImages } = await supabase.storage
+              .from('bucket-images-b1')
+              .list(`barge1/${foundBatchFolder}/${folder.name}`, { limit: 10, offset: 0 });
+
+            if (folderImages && folderImages.length > 0) {
+              // Check if any image in this folder belongs to our plan
+              const { data: planImages } = await supabase
+                .from('images')
+                .select('img_file_url1')
+                .eq('rel_images_plans_id', plan_id);
+
+              if (planImages) {
+                const imageInThisFolder = planImages.find(img => 
+                  img.img_file_url1 && img.img_file_url1.includes(`${foundBatchFolder}/${folder.name}`)
+                );
+                
+                if (imageInThisFolder) {
+                  foundPlanFolder = folder.name;
+                  console.log('✅ Found existing plan folder:', foundPlanFolder);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // If we still haven't found the plan folder, we need to determine it from the plan sequence
+      if (!foundPlanFolder) {
+        console.log('📂 Plan folder not found, determining from stored submission order...');
+        
+        // Use the stored submission_order directly (this is the original submission order)
+        const seq = planData.submission_order;
+        
+        if (!seq) {
+          console.error('❌ Plan has no submission_order stored');
+          return NextResponse.json({ 
+            success: false, 
+            message: 'Plan has no submission order stored. This plan may have been created before the submission order feature was implemented.' 
+          }, { status: 500 });
+        }
+
+        // Create base filename (same logic as bulk generation)
+        let baseFileName = planData.e_file_name1 && typeof planData.e_file_name1 === 'string' && planData.e_file_name1.trim() 
+          ? planData.e_file_name1.trim() 
+          : `image_${seq}.png`;
+        
+        // Ensure the filename is safe (no path traversal)
+        baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        
+        // Create plan folder name: SEQ - FILENAME (same as bulk generation)
+        foundPlanFolder = `${seq} - ${baseFileName}`;
+        console.log('📂 Determined plan folder from submission_order:', foundPlanFolder);
+      }
+
       // Create image filename with slot suffix if not slot 1 (same as bulk generation)
+      let baseFileName = planData.e_file_name1 && typeof planData.e_file_name1 === 'string' && planData.e_file_name1.trim() 
+        ? planData.e_file_name1.trim() 
+        : `image_${image_slot}.png`;
+      baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+
       let imageFileName = baseFileName;
       if (image_slot > 1) {
         const extIdx = baseFileName.lastIndexOf('.');
@@ -257,13 +323,14 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Full storage path: barge1/${batchFolder}/${planFolder}/${imageFileName}
-      const storagePath = `barge1/${batchFolder}/${planFolder}/${imageFileName}`;
+      // Full storage path using the EXISTING folder structure
+      const storagePath = `barge1/${foundBatchFolder}/${foundPlanFolder}/${imageFileName}`;
       
-      console.log('📁 Uploading to storage path:', storagePath);
-      console.log('📁 Batch folder:', batchFolder);
-      console.log('📁 Plan folder:', planFolder);
+      console.log('📁 Using existing folder structure:');
+      console.log('📁 Batch folder:', foundBatchFolder);
+      console.log('📁 Plan folder:', foundPlanFolder);
       console.log('📁 Image filename:', imageFileName);
+      console.log('📁 Full storage path:', storagePath);
 
       // Step 4: Upload to Supabase Storage
       const uploadController = new AbortController();
