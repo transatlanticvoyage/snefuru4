@@ -24,6 +24,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Could not find user record' }, { status: 400 });
     }
     
+    // Check for duplicate jobs (for image generation jobs)
+    if (jobType === 'generate_image' && data?.plan?.id && data?.imageSlot) {
+      const { data: existingJobs, error: checkError } = await supabase
+        .from('background_jobs')
+        .select('id, status')
+        .eq('user_id', userData.id)
+        .eq('job_type', 'generate_image')
+        .in('status', ['pending', 'processing']) // Only check active jobs
+        .contains('data', { 
+          plan: { id: data.plan.id },
+          imageSlot: data.imageSlot 
+        });
+        
+      if (checkError) {
+        console.error('Error checking for duplicate jobs:', checkError);
+        // Continue anyway, better to have duplicates than fail
+      } else if (existingJobs && existingJobs.length > 0) {
+        return NextResponse.json({ 
+          success: false, 
+          message: `Job already exists for plan ${data.plan.id} image slot ${data.imageSlot}`,
+          isDuplicate: true 
+        });
+      }
+    }
+    
     // Add job to queue
     const { data: jobData, error: jobError } = await supabase
       .from('background_jobs')
@@ -32,7 +57,9 @@ export async function POST(request: Request) {
         job_type: jobType,
         data: data,
         priority: priority,
-        status: 'pending'
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        max_attempts: 3
       })
       .select()
       .single();

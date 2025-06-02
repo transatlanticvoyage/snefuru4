@@ -406,7 +406,9 @@ export default function StatusJar1() {
       const batchFolder = `${batchDate} - ${batchSeq}`;
 
       let jobsQueued = 0;
+      let duplicateJobs = 0;
       let incompleteParPlans = 0;
+      let totalMissingImages = 0;
       
       // For each plan, queue missing images only up to the intended qty
       for (let i = 0; i < plans.length; i++) {
@@ -437,6 +439,8 @@ export default function StatusJar1() {
             }
           }
 
+          totalMissingImages += missingSlots.length;
+
           for (const slot of missingSlots) {
             let imageFileName = baseFileName;
             if (slot > 1) {
@@ -464,14 +468,26 @@ export default function StatusJar1() {
               })
             });
 
-            if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
               jobsQueued++;
+            } else if (result.isDuplicate) {
+              duplicateJobs++;
+            } else {
+              console.error('Failed to queue job:', result.message);
             }
           }
         }
       }
 
-      setError(`Successfully queued ${jobsQueued} image generation jobs for batch ${batchId} (${incompleteParPlans} incomplete plans, ${qtyImagesPerPlan} images per plan intended)`);
+      let message = `Queuing complete for batch ${batchId}: `;
+      message += `${jobsQueued} new jobs queued`;
+      if (duplicateJobs > 0) {
+        message += `, ${duplicateJobs} jobs already existed`;
+      }
+      message += ` (${incompleteParPlans} incomplete plans, ${totalMissingImages} missing images total, ${qtyImagesPerPlan} images per plan intended)`;
+      
+      setError(message);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to queue missing images');
     }
@@ -517,6 +533,24 @@ export default function StatusJar1() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to clear jobs');
+    }
+  };
+
+  // Function to clear all pending jobs
+  const clearPendingJobs = async () => {
+    try {
+      const response = await fetch('/api/background-jobs/clear-pending', {
+        method: 'DELETE'
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setError(result.message);
+      } else {
+        setError(result.message || 'Failed to clear pending jobs');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to clear pending jobs');
     }
   };
 
@@ -1070,6 +1104,12 @@ export default function StatusJar1() {
                   className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                 >
                   Clear Completed Jobs
+                </button>
+                <button
+                  onClick={clearPendingJobs}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                >
+                  Clear All Pending Jobs
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-2">
