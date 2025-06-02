@@ -544,104 +544,104 @@ const tableBorderSettings = {
     borderCollapse: 'collapse' as 'separate' | 'collapse', // Border collapse model
     borderSpacing: '0px',            // Border spacing when separate
     borderStyle: 'solid',            // Global border style
-    borderColor: '#e5e7eb',          // Global border color
+    borderColor: '#c7cbd3',          // Global border color - updated to requested color
     borderWidth: '1px',              // Global border width
   },
   
   // Table outer borders
   tableBorders: {
     enabled: true,                   // Enable table outer borders
-    top: '2px solid #d1d5db',        // Top border of entire table
-    right: '2px solid #d1d5db',      // Right border of entire table
-    bottom: '2px solid #d1d5db',     // Bottom border of entire table
-    left: '2px solid #d1d5db',       // Left border of entire table
-    borderRadius: '8px',             // Border radius for table corners
+    top: '1px solid #c7cbd3',        // Top border of entire table
+    right: '1px solid #c7cbd3',      // Right border of entire table
+    bottom: '1px solid #c7cbd3',     // Bottom border of entire table
+    left: '1px solid #c7cbd3',       // Left border of entire table
+    borderRadius: '0px',             // Border radius for table corners
   },
   
   // Row borders (horizontal lines)
   rowBorders: {
     enabled: true,                   // Enable row borders
-    headerBottom: '2px solid #d1d5db', // Border below header row
-    dataRowBottom: '1px solid #e5e7eb', // Border below each data row
-    lastRowBottom: '0px',            // Border below last row (usually none)
+    headerBottom: '1px solid #c7cbd3', // Border below header row
+    dataRowBottom: '1px solid #c7cbd3', // Border below each data row
+    lastRowBottom: '1px solid #c7cbd3', // Border below last row
     alternatingRows: {
       enabled: false,                // Enable alternating row border styles
-      evenRowBorder: '1px solid #f3f4f6', // Even row border
-      oddRowBorder: '1px solid #e5e7eb',  // Odd row border
+      evenRowBorder: '1px solid #c7cbd3', // Even row border
+      oddRowBorder: '1px solid #c7cbd3',  // Odd row border
     },
-    hoverBorder: '1px solid #cbd5e1', // Border color on row hover
+    hoverBorder: '1px solid #c7cbd3', // Border color on row hover
   },
   
   // Column borders (vertical lines)
   columnBorders: {
     enabled: true,                   // Enable column borders
-    defaultRight: '1px solid #e5e7eb', // Default right border for columns
-    defaultLeft: '0px',              // Default left border for columns
-    firstColumnLeft: '0px',          // Left border of first column
-    lastColumnRight: '0px',          // Right border of last column
+    defaultRight: '1px solid #c7cbd3', // Default right border for columns
+    defaultLeft: '1px solid #c7cbd3', // Default left border for columns
+    firstColumnLeft: '1px solid #c7cbd3', // Left border of first column
+    lastColumnRight: '1px solid #c7cbd3', // Right border of last column
     
-    // Column-specific border overrides
+    // Column-specific border overrides - all consistent now
     columnSpecific: {
-      // Image preview columns - subtle borders
-      'image1-preview': { right: '1px solid #f3f4f6', left: '0px' },
-      'image2-preview': { right: '1px solid #f3f4f6', left: '0px' },
-      'image3-preview': { right: '1px solid #f3f4f6', left: '0px' },
-      'image4-preview': { right: '1px solid #f3f4f6', left: '0px' },
+      // Image preview columns
+      'image1-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'image2-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'image3-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'image4-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
       
-      // Image ID columns - standard borders
-      'fk_image1_id': { right: '1px solid #e5e7eb', left: '0px' },
-      'fk_image2_id': { right: '1px solid #e5e7eb', left: '0px' },
-      'fk_image3_id': { right: '1px solid #e5e7eb', left: '0px' },
-      'fk_image4_id': { right: '1px solid #e5e7eb', left: '0px' },
+      // Image ID columns
+      'fk_image1_id': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'fk_image2_id': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'fk_image3_id': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'fk_image4_id': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
       
-      // Data columns - emphasized borders for separation
-      'id': { right: '1px solid #d1d5db', left: '0px' },
-      'rel_users_id': { right: '1px solid #e5e7eb', left: '0px' },
-      'rel_images_plans_batches_id': { right: '1px solid #e5e7eb', left: '0px' },
-      'created_at': { right: '1px solid #d1d5db', left: '0px' },
+      // Data columns
+      'id': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'rel_users_id': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'rel_images_plans_batches_id': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'created_at': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
       
-      // Content columns - lighter borders for readability
-      'e_zpf_img_code': { right: '1px solid #e5e7eb', left: '0px' },
-      'e_width': { right: '1px solid #e5e7eb', left: '0px' },
-      'e_height': { right: '1px solid #e5e7eb', left: '0px' },
-      'e_associated_content1': { right: '1px solid #e5e7eb', left: '0px' },
-      'e_file_name1': { right: '1px solid #e5e7eb', left: '0px' },
-      'e_more_instructions1': { right: '1px solid #e5e7eb', left: '0px' },
-      'e_prompt1': { right: '1px solid #e5e7eb', left: '0px' },
-      'e_ai_tool1': { right: '0px', left: '0px' }, // Last column, no right border
+      // Content columns
+      'e_zpf_img_code': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'e_width': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'e_height': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'e_associated_content1': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'e_file_name1': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'e_more_instructions1': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'e_prompt1': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'e_ai_tool1': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' }, // Last column now has right border too
     } as Record<string, { right: string; left: string }>,
   },
   
   // Header-specific borders
   headerBorders: {
     enabled: true,                   // Enable header-specific borders
-    cellBorderRight: '1px solid #d1d5db', // Right border for header cells
-    cellBorderLeft: '0px',           // Left border for header cells
-    cellBorderTop: '0px',            // Top border for header cells
-    cellBorderBottom: '2px solid #d1d5db', // Bottom border for header cells
-    lastHeaderCellRight: '0px',      // Right border of last header cell
+    cellBorderRight: '1px solid #c7cbd3', // Right border for header cells
+    cellBorderLeft: '1px solid #c7cbd3', // Left border for header cells
+    cellBorderTop: '1px solid #c7cbd3', // Top border for header cells
+    cellBorderBottom: '1px solid #c7cbd3', // Bottom border for header cells
+    lastHeaderCellRight: '1px solid #c7cbd3', // Right border of last header cell
   },
   
   // Cell border styles
   cellBorders: {
     defaultStyle: 'solid',           // Default border style for cells
-    defaultColor: '#e5e7eb',         // Default border color for cells
+    defaultColor: '#c7cbd3',         // Default border color for cells - updated
     defaultWidth: '1px',             // Default border width for cells
     
     // Special cell border styles
     previewCells: {
       style: 'solid',
-      color: '#f3f4f6',
+      color: '#c7cbd3',              // Updated to consistent color
       width: '1px',
     },
     dataCells: {
       style: 'solid',
-      color: '#e5e7eb',
+      color: '#c7cbd3',              // Updated to consistent color
       width: '1px',
     },
     headerCells: {
       style: 'solid',
-      color: '#d1d5db',
+      color: '#c7cbd3',              // Updated to consistent color
       width: '1px',
     },
   },
