@@ -143,14 +143,104 @@ export async function POST(request: NextRequest) {
 
       console.log('✅ Image generated successfully:', imageUrl);
 
+      // Step 2: Download the image from OpenAI
+      console.log('📥 Downloading image from OpenAI...');
+      const downloadController = new AbortController();
+      const downloadTimeoutId = setTimeout(() => downloadController.abort(), 30000); // 30 second timeout
+
+      const imageDownloadResponse = await fetch(imageUrl, {
+        signal: downloadController.signal
+      });
+      clearTimeout(downloadTimeoutId);
+
+      if (!imageDownloadResponse.ok) {
+        console.error('❌ Failed to download image from OpenAI');
+        return NextResponse.json({ 
+          success: false, 
+          message: `Failed to download image from OpenAI: ${imageDownloadResponse.statusText}` 
+        }, { status: 500 });
+      }
+
+      const imageBuffer = await imageDownloadResponse.arrayBuffer();
+      console.log('✅ Image downloaded successfully, size:', imageBuffer.byteLength);
+
+      // Step 3: Create proper folder structure and upload to Supabase Storage
+      // Get the plan data to create proper folder structure
+      const { data: fullPlanData, error: planDetailsError } = await supabase
+        .from('images_plans')
+        .select('rel_images_plans_batches_id, e_file_name1, e_prompt1')
+        .eq('id', plan_id)
+        .single();
+
+      if (planDetailsError || !fullPlanData) {
+        console.error('❌ Failed to get plan details for folder structure');
+        return NextResponse.json({ 
+          success: false, 
+          message: 'Failed to get plan details for storage' 
+        }, { status: 500 });
+      }
+
+      // Create batch folder name (use batch ID or fallback)
+      const batchId = fullPlanData.rel_images_plans_batches_id || 'default';
+      const batchFolder = `batch_${batchId}`;
+      
+      // Create plan folder name (use plan ID)
+      const planFolder = `plan_${plan_id}`;
+      
+      // Create safe filename
+      let safeFileName = fullPlanData.e_file_name1 && typeof fullPlanData.e_file_name1 === 'string' && fullPlanData.e_file_name1.trim() 
+        ? fullPlanData.e_file_name1.trim() 
+        : `image_${image_slot}_${Date.now()}`;
+      
+      // Ensure the filename is safe (no path traversal)
+      safeFileName = safeFileName.replace(/[^a-zA-Z0-9._-]/g, '_') + '.png';
+      
+      // Full storage path: barge1/batch_ID/plan_ID/filename.png
+      const storagePath = `barge1/${batchFolder}/${planFolder}/${safeFileName}`;
+      
+      console.log('📁 Uploading to storage path:', storagePath);
+
+      // Step 4: Upload to Supabase Storage
+      const uploadController = new AbortController();
+      const uploadTimeoutId = setTimeout(() => uploadController.abort(), 20000); // 20 second timeout
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('bucket-images-b1')
+        .upload(storagePath, imageBuffer, {
+          contentType: 'image/png',
+          upsert: false,
+        });
+
+      clearTimeout(uploadTimeoutId);
+
+      if (uploadError) {
+        console.error('❌ Failed to upload to Supabase Storage:', uploadError);
+        return NextResponse.json({ 
+          success: false, 
+          message: `Failed to upload to storage: ${uploadError.message}` 
+        }, { status: 500 });
+      }
+
+      // Step 5: Get the public URL from Supabase Storage
+      const { data: publicUrlData } = supabase.storage
+        .from('bucket-images-b1')
+        .getPublicUrl(storagePath);
+
+      const finalImageUrl = publicUrlData.publicUrl;
+      console.log('✅ Image uploaded to storage successfully:', finalImageUrl);
+
       // Create image record in database
       console.log('💾 Saving image to database...');
       console.log('Image data to insert:', {
         rel_users_id: userData.id,
         rel_images_plans_id: plan_id,
-        img_file_url1: imageUrl,
+        img_file_url1: finalImageUrl,
         prompt1: prompt,
-        status: 'generated'
+        status: 'generated',
+        img_file_extension: 'png',
+        img_file_size: imageBuffer.byteLength,
+        width: 1024,
+        height: 1024
       });
       
       const { data: newImage, error: imageError } = await supabase
@@ -158,9 +248,13 @@ export async function POST(request: NextRequest) {
         .insert({
           rel_users_id: userData.id,
           rel_images_plans_id: plan_id,
-          img_file_url1: imageUrl,
+          img_file_url1: finalImageUrl,
           prompt1: prompt,
-          status: 'generated'
+          status: 'generated',
+          img_file_extension: 'png',
+          img_file_size: imageBuffer.byteLength,
+          width: 1024,
+          height: 1024
         })
         .select()
         .single();
@@ -203,7 +297,7 @@ export async function POST(request: NextRequest) {
         success: true, 
         message: `Image ${image_slot} generated successfully`,
         image_id: newImage.id,
-        image_url: imageUrl
+        image_url: finalImageUrl
       });
 
     } catch (fetchError) {
