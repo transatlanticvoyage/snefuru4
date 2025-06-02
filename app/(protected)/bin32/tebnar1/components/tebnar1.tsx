@@ -454,6 +454,232 @@ const tableStyleSettings = {
   }
 };
 
+// TABLE CELL PADDING
+const tableCellPaddingSettings = {
+  // Global default padding (applies to all cells unless overridden)
+  globalDefault: {
+    padding: '8px 16px',             // Default padding for all cells
+    paddingTop: '8px',               // Default top padding
+    paddingRight: '16px',            // Default right padding
+    paddingBottom: '8px',            // Default bottom padding
+    paddingLeft: '16px',             // Default left padding
+  },
+  
+  // Column-specific padding overrides
+  columnPadding: {
+    // Image preview columns - compact padding
+    'image1-preview': { padding: '4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image2-preview': { padding: '4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image3-preview': { padding: '4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image4-preview': { padding: '4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
+    // Image ID columns - minimal padding
+    'fk_image1_id': { padding: '6px 8px', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px' },
+    'fk_image2_id': { padding: '6px 8px', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px' },
+    'fk_image3_id': { padding: '6px 8px', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px' },
+    'fk_image4_id': { padding: '6px 8px', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px' },
+    
+    // Data columns - standard padding
+    'id': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+    'rel_users_id': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+    'rel_images_plans_batches_id': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+    'created_at': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+    
+    // Content columns - generous padding for readability
+    'e_zpf_img_code': { padding: '10px 16px', paddingTop: '10px', paddingRight: '16px', paddingBottom: '10px', paddingLeft: '16px' },
+    'e_width': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+    'e_height': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+    'e_associated_content1': { padding: '10px 16px', paddingTop: '10px', paddingRight: '16px', paddingBottom: '10px', paddingLeft: '16px' },
+    'e_file_name1': { padding: '10px 16px', paddingTop: '10px', paddingRight: '16px', paddingBottom: '10px', paddingLeft: '16px' },
+    'e_more_instructions1': { padding: '12px 18px', paddingTop: '12px', paddingRight: '18px', paddingBottom: '12px', paddingLeft: '18px' },
+    'e_prompt1': { padding: '12px 18px', paddingTop: '12px', paddingRight: '18px', paddingBottom: '12px', paddingLeft: '18px' },
+    'e_ai_tool1': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+  } as Record<string, { padding: string; paddingTop: string; paddingRight: string; paddingBottom: string; paddingLeft: string }>,
+  
+  // Row type specific padding
+  rowTypePadding: {
+    headerRow: {
+      padding: '12px 16px',          // Header row cell padding
+      paddingTop: '12px',
+      paddingRight: '16px',
+      paddingBottom: '12px',
+      paddingLeft: '16px',
+    },
+    dataRow: {
+      padding: '8px 16px',           // Data row cell padding
+      paddingTop: '8px',
+      paddingRight: '16px',
+      paddingBottom: '8px',
+      paddingLeft: '16px',
+    },
+    firstRow: {
+      paddingTop: '12px',            // Extra padding for first data row
+    },
+    lastRow: {
+      paddingBottom: '12px',         // Extra padding for last data row
+    },
+  },
+  
+  // Responsive padding adjustments
+  responsivePadding: {
+    mobile: {
+      globalPadding: '6px 8px',      // Smaller padding on mobile
+      previewPadding: '2px',         // Minimal padding for previews on mobile
+    },
+    tablet: {
+      globalPadding: '8px 12px',     // Medium padding on tablet
+      previewPadding: '3px',         // Small padding for previews on tablet
+    },
+    desktop: {
+      globalPadding: '8px 16px',     // Full padding on desktop
+      previewPadding: '4px',         // Standard padding for previews on desktop
+    },
+  }
+};
+
+// TABLE BORDERS
+const tableBorderSettings = {
+  // Global border settings
+  global: {
+    borderCollapse: 'collapse' as 'separate' | 'collapse', // Border collapse model
+    borderSpacing: '0px',            // Border spacing when separate
+    borderStyle: 'solid',            // Global border style
+    borderColor: '#e5e7eb',          // Global border color
+    borderWidth: '1px',              // Global border width
+  },
+  
+  // Table outer borders
+  tableBorders: {
+    enabled: true,                   // Enable table outer borders
+    top: '2px solid #d1d5db',        // Top border of entire table
+    right: '2px solid #d1d5db',      // Right border of entire table
+    bottom: '2px solid #d1d5db',     // Bottom border of entire table
+    left: '2px solid #d1d5db',       // Left border of entire table
+    borderRadius: '8px',             // Border radius for table corners
+  },
+  
+  // Row borders (horizontal lines)
+  rowBorders: {
+    enabled: true,                   // Enable row borders
+    headerBottom: '2px solid #d1d5db', // Border below header row
+    dataRowBottom: '1px solid #e5e7eb', // Border below each data row
+    lastRowBottom: '0px',            // Border below last row (usually none)
+    alternatingRows: {
+      enabled: false,                // Enable alternating row border styles
+      evenRowBorder: '1px solid #f3f4f6', // Even row border
+      oddRowBorder: '1px solid #e5e7eb',  // Odd row border
+    },
+    hoverBorder: '1px solid #cbd5e1', // Border color on row hover
+  },
+  
+  // Column borders (vertical lines)
+  columnBorders: {
+    enabled: true,                   // Enable column borders
+    defaultRight: '1px solid #e5e7eb', // Default right border for columns
+    defaultLeft: '0px',              // Default left border for columns
+    firstColumnLeft: '0px',          // Left border of first column
+    lastColumnRight: '0px',          // Right border of last column
+    
+    // Column-specific border overrides
+    columnSpecific: {
+      // Image preview columns - subtle borders
+      'image1-preview': { right: '1px solid #f3f4f6', left: '0px' },
+      'image2-preview': { right: '1px solid #f3f4f6', left: '0px' },
+      'image3-preview': { right: '1px solid #f3f4f6', left: '0px' },
+      'image4-preview': { right: '1px solid #f3f4f6', left: '0px' },
+      
+      // Image ID columns - standard borders
+      'fk_image1_id': { right: '1px solid #e5e7eb', left: '0px' },
+      'fk_image2_id': { right: '1px solid #e5e7eb', left: '0px' },
+      'fk_image3_id': { right: '1px solid #e5e7eb', left: '0px' },
+      'fk_image4_id': { right: '1px solid #e5e7eb', left: '0px' },
+      
+      // Data columns - emphasized borders for separation
+      'id': { right: '1px solid #d1d5db', left: '0px' },
+      'rel_users_id': { right: '1px solid #e5e7eb', left: '0px' },
+      'rel_images_plans_batches_id': { right: '1px solid #e5e7eb', left: '0px' },
+      'created_at': { right: '1px solid #d1d5db', left: '0px' },
+      
+      // Content columns - lighter borders for readability
+      'e_zpf_img_code': { right: '1px solid #e5e7eb', left: '0px' },
+      'e_width': { right: '1px solid #e5e7eb', left: '0px' },
+      'e_height': { right: '1px solid #e5e7eb', left: '0px' },
+      'e_associated_content1': { right: '1px solid #e5e7eb', left: '0px' },
+      'e_file_name1': { right: '1px solid #e5e7eb', left: '0px' },
+      'e_more_instructions1': { right: '1px solid #e5e7eb', left: '0px' },
+      'e_prompt1': { right: '1px solid #e5e7eb', left: '0px' },
+      'e_ai_tool1': { right: '0px', left: '0px' }, // Last column, no right border
+    } as Record<string, { right: string; left: string }>,
+  },
+  
+  // Header-specific borders
+  headerBorders: {
+    enabled: true,                   // Enable header-specific borders
+    cellBorderRight: '1px solid #d1d5db', // Right border for header cells
+    cellBorderLeft: '0px',           // Left border for header cells
+    cellBorderTop: '0px',            // Top border for header cells
+    cellBorderBottom: '2px solid #d1d5db', // Bottom border for header cells
+    lastHeaderCellRight: '0px',      // Right border of last header cell
+  },
+  
+  // Cell border styles
+  cellBorders: {
+    defaultStyle: 'solid',           // Default border style for cells
+    defaultColor: '#e5e7eb',         // Default border color for cells
+    defaultWidth: '1px',             // Default border width for cells
+    
+    // Special cell border styles
+    previewCells: {
+      style: 'solid',
+      color: '#f3f4f6',
+      width: '1px',
+    },
+    dataCells: {
+      style: 'solid',
+      color: '#e5e7eb',
+      width: '1px',
+    },
+    headerCells: {
+      style: 'solid',
+      color: '#d1d5db',
+      width: '1px',
+    },
+  },
+  
+  // Border effects and animations
+  borderEffects: {
+    hoverEnabled: true,              // Enable border changes on hover
+    hoverColor: '#cbd5e1',           // Border color on hover
+    hoverWidth: '1px',               // Border width on hover
+    hoverStyle: 'solid',             // Border style on hover
+    transition: 'border-color 0.15s ease-in-out', // Border transition animation
+    
+    focusEnabled: true,              // Enable border changes on focus
+    focusColor: '#3b82f6',           // Border color on focus
+    focusWidth: '2px',               // Border width on focus
+    focusStyle: 'solid',             // Border style on focus
+  },
+  
+  // Responsive border adjustments
+  responsiveBorders: {
+    mobile: {
+      tableBorder: '1px solid #e5e7eb', // Thinner table border on mobile
+      rowBorder: '1px solid #f3f4f6',   // Lighter row borders on mobile
+      columnBorder: '0px',              // No column borders on mobile
+    },
+    tablet: {
+      tableBorder: '1px solid #d1d5db', // Medium table border on tablet
+      rowBorder: '1px solid #e5e7eb',   // Standard row borders on tablet
+      columnBorder: '1px solid #f3f4f6', // Light column borders on tablet
+    },
+    desktop: {
+      tableBorder: '2px solid #d1d5db', // Full table border on desktop
+      rowBorder: '1px solid #e5e7eb',   // Standard row borders on desktop
+      columnBorder: '1px solid #e5e7eb', // Full column borders on desktop
+    },
+  }
+};
+
 const gridCols = 9; // A-I
 const gridRows = 11;
 const colHeaders = Array.from({ length: gridCols }, (_, i) => String.fromCharCode(65 + i)); // ['A',...,'I']
@@ -1239,6 +1465,10 @@ export default function Tebnar1() {
               width: tableStyleSettings.table.width,
               maxWidth: tableStyleSettings.table.maxWidth,
               overflow: tableStyleSettings.table.overflow,
+              borderCollapse: tableBorderSettings.global.borderCollapse,
+              borderSpacing: tableBorderSettings.global.borderSpacing,
+              border: tableBorderSettings.tableBorders.enabled ? `${tableBorderSettings.tableBorders.top}` : 'none',
+              borderRadius: tableBorderSettings.tableBorders.borderRadius,
             }}
           >
             <thead className="bg-gray-50">
@@ -1265,6 +1495,24 @@ export default function Tebnar1() {
                   const textAlign = headerCustomizationSettings.headerTextAlign[col] || 
                                   headerCustomizationSettings.headerCell.textAlign;
                   
+                  // Get padding settings - tableCellPaddingSettings takes precedence
+                  const paddingSettings = tableCellPaddingSettings.rowTypePadding.headerRow;
+                  
+                  // Get border settings - tableBorderSettings takes precedence
+                  const borderSettings = tableBorderSettings.headerBorders.enabled ? {
+                    borderRight: index < tableColumns.length - 1 ? 
+                               tableBorderSettings.headerBorders.cellBorderRight : 
+                               tableBorderSettings.headerBorders.lastHeaderCellRight,
+                    borderLeft: tableBorderSettings.headerBorders.cellBorderLeft,
+                    borderTop: tableBorderSettings.headerBorders.cellBorderTop,
+                    borderBottom: tableBorderSettings.headerBorders.cellBorderBottom,
+                  } : {
+                    borderRight: headerCustomizationSettings.headerBorders.cellBorderRight,
+                    borderLeft: headerCustomizationSettings.headerBorders.cellBorderLeft,
+                    borderTop: headerCustomizationSettings.headerBorders.topBorder,
+                    borderBottom: headerCustomizationSettings.headerBorders.bottomBorder,
+                  };
+                  
                   return (
                     <th
                       key={col}
@@ -1276,7 +1524,7 @@ export default function Tebnar1() {
                         height: headerCustomizationSettings.headerRow.height,
                         
                         // Cell styling
-                        padding: headerCustomizationSettings.headerCell.padding,
+                        padding: paddingSettings.padding,
                         verticalAlign: headerCustomizationSettings.headerCell.verticalAlign,
                         textAlign: textAlign,
                         backgroundColor: headerCustomizationSettings.headerCell.backgroundColor,
@@ -1296,12 +1544,10 @@ export default function Tebnar1() {
                         fontFamily: headerCustomizationSettings.headerText.fontFamily,
                         
                         // Borders
-                        borderRight: index < tableColumns.length - 1 ? 
-                                   headerCustomizationSettings.headerBorders.cellBorderRight : 
-                                   headerCustomizationSettings.headerBorders.rightBorder,
-                        borderLeft: index === 0 ? 
-                                  headerCustomizationSettings.headerBorders.leftBorder : 
-                                  headerCustomizationSettings.headerBorders.cellBorderLeft,
+                        borderRight: borderSettings.borderRight,
+                        borderLeft: borderSettings.borderLeft,
+                        borderTop: borderSettings.borderTop,
+                        borderBottom: borderSettings.borderBottom,
                         borderRadius: headerCustomizationSettings.headerBorders.borderRadius,
                         
                         // Hover effects
@@ -1355,6 +1601,15 @@ export default function Tebnar1() {
                   {tableColumns.map(col => {
                     const settings = columnSettings[col] || { width: 'auto', minWidth: '100px', maxWidth: 'none', textAlign: 'left' };
                     
+                    // Get padding settings for this column
+                    const columnPadding = tableCellPaddingSettings.columnPadding[col] || tableCellPaddingSettings.globalDefault;
+                    
+                    // Get border settings for this column
+                    const columnBorder = tableBorderSettings.columnBorders.columnSpecific[col] || {
+                      right: tableBorderSettings.columnBorders.defaultRight,
+                      left: tableBorderSettings.columnBorders.defaultLeft,
+                    };
+                    
                     if (col === 'image1-preview') {
                       const imgId = plan['fk_image1_id'];
                       const img = imgId ? imagesById[imgId] : null;
@@ -1371,10 +1626,13 @@ export default function Tebnar1() {
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'center',
                             height: tableStyleSettings.row.height,
-                            padding: tableStyleSettings.previewCell.padding,
+                            padding: columnPadding.padding,
                             backgroundColor: tableStyleSettings.previewCell.backgroundColor,
                             verticalAlign: tableStyleSettings.cell.verticalAlign,
                             overflow: tableStyleSettings.cell.overflow,
+                            borderRight: tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
+                            borderLeft: tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
+                            borderBottom: tableBorderSettings.rowBorders.enabled ? tableBorderSettings.rowBorders.dataRowBottom : '0px',
                           }}
                         >
                           {img ? (
@@ -1453,10 +1711,13 @@ export default function Tebnar1() {
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'center',
                             height: tableStyleSettings.row.height,
-                            padding: tableStyleSettings.previewCell.padding,
+                            padding: columnPadding.padding,
                             backgroundColor: tableStyleSettings.previewCell.backgroundColor,
                             verticalAlign: tableStyleSettings.cell.verticalAlign,
                             overflow: tableStyleSettings.cell.overflow,
+                            borderRight: tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
+                            borderLeft: tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
+                            borderBottom: tableBorderSettings.rowBorders.enabled ? tableBorderSettings.rowBorders.dataRowBottom : '0px',
                           }}
                         >
                           {img ? (
@@ -1535,10 +1796,13 @@ export default function Tebnar1() {
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'center',
                             height: tableStyleSettings.row.height,
-                            padding: tableStyleSettings.previewCell.padding,
+                            padding: columnPadding.padding,
                             backgroundColor: tableStyleSettings.previewCell.backgroundColor,
                             verticalAlign: tableStyleSettings.cell.verticalAlign,
                             overflow: tableStyleSettings.cell.overflow,
+                            borderRight: tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
+                            borderLeft: tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
+                            borderBottom: tableBorderSettings.rowBorders.enabled ? tableBorderSettings.rowBorders.dataRowBottom : '0px',
                           }}
                         >
                           {img ? (
@@ -1617,10 +1881,13 @@ export default function Tebnar1() {
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'center',
                             height: tableStyleSettings.row.height,
-                            padding: tableStyleSettings.previewCell.padding,
+                            padding: columnPadding.padding,
                             backgroundColor: tableStyleSettings.previewCell.backgroundColor,
                             verticalAlign: tableStyleSettings.cell.verticalAlign,
                             overflow: tableStyleSettings.cell.overflow,
+                            borderRight: tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
+                            borderLeft: tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
+                            borderBottom: tableBorderSettings.rowBorders.enabled ? tableBorderSettings.rowBorders.dataRowBottom : '0px',
                           }}
                         >
                           {img ? (
@@ -1693,7 +1960,7 @@ export default function Tebnar1() {
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'left',
                             height: tableStyleSettings.row.height,
-                            padding: tableStyleSettings.cell.padding,
+                            padding: columnPadding.padding,
                             verticalAlign: tableStyleSettings.cell.verticalAlign,
                             overflow: tableStyleSettings.cell.overflow,
                             textOverflow: tableStyleSettings.cell.textOverflow,
@@ -1703,6 +1970,9 @@ export default function Tebnar1() {
                             lineHeight: tableStyleSettings.textCell.lineHeight,
                             color: tableStyleSettings.textCell.color,
                             fontWeight: tableStyleSettings.textCell.fontWeight,
+                            borderRight: tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
+                            borderLeft: tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
+                            borderBottom: tableBorderSettings.rowBorders.enabled ? tableBorderSettings.rowBorders.dataRowBottom : '0px',
                           }}
                         >
                           {String(plan[col as keyof typeof plan] ?? '')}
