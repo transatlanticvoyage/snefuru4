@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
-    const { records } = await request.json();
+    const { records, gridData } = await request.json();
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ success: false, message: 'No records provided' }, { status: 400 });
     }
@@ -23,10 +23,27 @@ export async function POST(request: Request) {
     if (userError || !userData) {
       return NextResponse.json({ success: false, message: 'Could not find user record' }, { status: 400 });
     }
-    // 1. Create a new batch row
+    
+    // Prepare the original submission data for storage
+    const originalSubmissionData = {
+      headers: gridData && gridData.length > 0 ? gridData[0] : [],
+      rows: gridData && gridData.length > 1 ? gridData.slice(1).filter((row: string[]) => row.some(cell => cell.trim() !== '')) : [],
+      metadata: {
+        submitted_at: new Date().toISOString(),
+        total_rows: gridData && gridData.length > 1 ? gridData.slice(1).filter((row: string[]) => row.some(cell => cell.trim() !== '')).length : 0,
+        total_columns: gridData && gridData.length > 0 ? gridData[0].length : 0,
+        processed_records_count: records.length,
+        function_used: 'sfunc_create_plans_from_xls_1'
+      }
+    };
+    
+    // 1. Create a new batch row with original submission data
     const { data: batchData, error: batchError } = await supabase
       .from('images_plans_batches')
-      .insert({ rel_users_id: userData.id })
+      .insert({ 
+        rel_users_id: userData.id,
+        xlslike_original_submission: originalSubmissionData
+      })
       .select('id')
       .single();
     if (batchError || !batchData) {
@@ -38,7 +55,7 @@ export async function POST(request: Request) {
       ...rec, 
       rel_users_id: userData.id, 
       rel_images_plans_batches_id: batchId,
-      submission_order: index + 1  // Store 1-based submission order
+      submission_order: index + 1  // Store 1-based submission order (index 0 = spreadsheet row 2, index 1 = spreadsheet row 3, etc.)
     }));
     const { data, error } = await supabase
       .from('images_plans')

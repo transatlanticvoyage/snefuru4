@@ -4,20 +4,22 @@ export async function func_create_plans_make_images_1({
   aiModel, 
   generateZip, 
   wipeMeta, 
-  throttle1 
+  throttle1,
+  gridData
 }: { 
   records: any[], 
   qty: number, 
   aiModel: string, 
   generateZip?: boolean, 
   wipeMeta?: boolean,
-  throttle1?: { enabled: boolean, delayBetweenImages: number, delayBetweenPlans: number }
+  throttle1?: { enabled: boolean, delayBetweenImages: number, delayBetweenPlans: number },
+  gridData?: string[][]
 }): Promise<any> {
   try {
     const response = await fetch('/api/sfunc_create_plans_make_images_1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records, qty, aiModel, generateZip, wipeMeta, throttle1 }),
+      body: JSON.stringify({ records, qty, aiModel, generateZip, wipeMeta, throttle1, gridData }),
     });
     return await response.json();
   } catch (error) {

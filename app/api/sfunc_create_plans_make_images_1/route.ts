@@ -24,7 +24,7 @@ async function generateImage({ plan, aiModel }: { plan: any; aiModel: string }) 
 
 export async function POST(request: Request) {
   try {
-    const { records, qty, aiModel, generateZip, wipeMeta, throttle1 } = await request.json();
+    const { records, qty, aiModel, generateZip, wipeMeta, throttle1, gridData } = await request.json();
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ success: false, message: 'No records provided' }, { status: 400 });
     }
@@ -43,10 +43,38 @@ export async function POST(request: Request) {
     if (userError || !userData) {
       return NextResponse.json({ success: false, message: 'Could not find user record' }, { status: 400 });
     }
-    // 1. Create a new batch row
+    
+    // Prepare the original submission data for storage
+    const originalSubmissionData = {
+      headers: gridData && gridData.length > 0 ? gridData[0] : [],
+      rows: gridData && gridData.length > 1 ? gridData.slice(1).filter((row: string[]) => row.some(cell => cell.trim() !== '')) : [],
+      metadata: {
+        submitted_at: new Date().toISOString(),
+        total_rows: gridData && gridData.length > 1 ? gridData.slice(1).filter((row: string[]) => row.some(cell => cell.trim() !== '')).length : 0,
+        total_columns: gridData && gridData.length > 0 ? gridData[0].length : 0,
+        processed_records_count: records.length,
+        function_used: 'sfunc_create_plans_make_images_1',
+        generation_settings: {
+          qty_per_plan: qty,
+          ai_model: aiModel,
+          generate_zip: generateZip,
+          wipe_meta: wipeMeta,
+          throttle1_enabled: throttle1?.enabled || false,
+          throttle1_settings: throttle1?.enabled ? {
+            delay_between_images: throttle1.delayBetweenImages,
+            delay_between_plans: throttle1.delayBetweenPlans
+          } : null
+        }
+      }
+    };
+    
+    // 1. Create a new batch row with original submission data
     const { data: batchData, error: batchError } = await supabase
       .from('images_plans_batches')
-      .insert({ rel_users_id: userData.id })
+      .insert({ 
+        rel_users_id: userData.id,
+        xlslike_original_submission: originalSubmissionData
+      })
       .select('id')
       .single();
     if (batchError || !batchData) {
@@ -86,7 +114,7 @@ export async function POST(request: Request) {
       ...rec, 
       rel_users_id: userData.id, 
       rel_images_plans_batches_id: batchId,
-      submission_order: index + 1  // Store 1-based submission order
+      submission_order: index + 1  // Store 1-based submission order (index 0 = spreadsheet row 2, index 1 = spreadsheet row 3, etc.)
     }));
     const { data: plansData, error: plansError } = await supabase
       .from('images_plans')
@@ -122,7 +150,8 @@ export async function POST(request: Request) {
       const plan = plansData[i];
       const imageIds: (string | null)[] = [];
       // Plan folder: SEQ - FILENAME
-      const seq = i + 1;
+      // Use the stored submission_order instead of array index to ensure correct sequencing
+      const seq = plan.submission_order || (i + 1); // Fallback to index + 1 if no submission_order
       let baseFileName = plan.e_file_name1 && typeof plan.e_file_name1 === 'string' && plan.e_file_name1.trim() ? plan.e_file_name1.trim() : `image_${seq}.png`;
       // Ensure the filename is safe
       baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');

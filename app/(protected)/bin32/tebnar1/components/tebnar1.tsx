@@ -316,7 +316,7 @@ export default function Tebnar1() {
       });
       // Import client function
       const { func_create_plans_from_xls_1 } = await import('../utils/cfunc_create_plans_from_xls_1');
-      const result = await func_create_plans_from_xls_1(records);
+      const result = await func_create_plans_from_xls_1(records, gridData);
       setSubmitResult(result?.message || (result?.success ? 'Success' : 'Failed'));
     } catch (err) {
       setSubmitResult(err instanceof Error ? err.message : String(err));
@@ -362,7 +362,6 @@ export default function Tebnar1() {
   // Function to fetch a single image for a specific plan and slot
   const fetchSingleImage = async (plan: any, imageSlot: number) => {
     console.log('🚀 FETCH SINGLE IMAGE FUNCTION CALLED!', { plan_id: plan.id, imageSlot });
-    alert(`Fetch single image function called for plan ${plan.id}, slot ${imageSlot}`);
     
     const fetchKey = `${plan.id}-${imageSlot}`;
     
@@ -639,7 +638,7 @@ export default function Tebnar1() {
                 setMakeImagesResult('🚀 Starting image generation... Check the statusbox1 logs for detailed progress!');
                 
                 const { func_create_plans_make_images_1 } = await import('../utils/cfunc_create_plans_make_images_1');
-                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel, generateZip, wipeMeta, throttle1 });
+                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel, generateZip, wipeMeta, throttle1, gridData });
                 setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
                 if (result?.batch_id) {
                   await refreshBatchesAndSelect(result.batch_id);
