@@ -565,43 +565,79 @@ export default function StatusJar1() {
       const batchSize = backgroundSettings.maxConcurrentJobs || 1;
       
       while (processedCount < totalJobs) {
-        const response = await fetch('/api/background-jobs/process', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ settings: backgroundSettings })
-        });
+        try {
+          const response = await fetch('/api/background-jobs/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ settings: backgroundSettings })
+          });
 
-        const result = await response.json();
-        if (result.success) {
-          processedCount += result.processedJobs || 0;
-          setProcessAllProgress({ current: processedCount, total: totalJobs });
-          
-          // Update background status
-          const statusResponse = await fetch('/api/background-jobs/status');
-          if (statusResponse.ok) {
-            const statusData = await statusResponse.json();
-            if (statusData.success) {
-              setBackgroundStatus(statusData.status);
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error (${response.status}): ${errorText || 'Unknown error'}`);
+          }
+
+          const result = await response.json();
+          if (result.success) {
+            processedCount += result.processedJobs || 0;
+            setProcessAllProgress({ current: processedCount, total: totalJobs });
+            
+            // Update background status
+            try {
+              const statusResponse = await fetch('/api/background-jobs/status');
+              if (statusResponse.ok) {
+                const statusData = await statusResponse.json();
+                if (statusData.success) {
+                  setBackgroundStatus(statusData.status);
+                }
+              }
+            } catch (statusError) {
+              console.warn('Failed to update status:', statusError);
+              // Don't stop processing for status update failures
             }
+            
+            // Break if no more jobs were processed
+            if ((result.processedJobs || 0) === 0) {
+              break;
+            }
+            
+            // Add delay between batches to avoid overwhelming the system
+            if (processedCount < totalJobs) {
+              await new Promise(resolve => setTimeout(resolve, backgroundSettings.delayBetweenImages));
+            }
+          } else {
+            throw new Error(result.message || 'Failed to process jobs batch');
           }
-          
-          // Break if no more jobs were processed
-          if ((result.processedJobs || 0) === 0) {
-            break;
+        } catch (fetchError) {
+          // Handle fetch-specific errors with more helpful messages
+          const error = fetchError as Error;
+          if (error instanceof TypeError && error.message.includes('fetch')) {
+            throw new Error('Network error: Unable to connect to server. Please check if your development server is running.');
+          } else if (error.message && error.message.includes('Failed to fetch')) {
+            throw new Error('Connection failed: Server may be down or unreachable. Please verify your development server is running on the correct port.');
+          } else {
+            throw error;
           }
-          
-          // Add delay between batches to avoid overwhelming the system
-          if (processedCount < totalJobs) {
-            await new Promise(resolve => setTimeout(resolve, backgroundSettings.delayBetweenImages));
-          }
-        } else {
-          throw new Error(result.message || 'Failed to process jobs');
         }
       }
       
-      setError(`Processing complete! Processed ${processedCount} jobs total.`);
+      setError(`Processing complete! Successfully processed ${processedCount} jobs total.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process all jobs');
+      console.error('Process all jobs error:', err);
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Failed to process all jobs';
+      if (err instanceof Error) {
+        if (err.message.includes('fetch') || err.message.includes('Network')) {
+          errorMessage = `Connection Error: ${err.message}`;
+        } else if (err.message.includes('Server error')) {
+          errorMessage = `Server Error: ${err.message}`;
+        } else {
+          errorMessage = `Processing Error: ${err.message}`;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setProcessingAllJobs(false);
       setProcessAllProgress({ current: 0, total: 0 });
