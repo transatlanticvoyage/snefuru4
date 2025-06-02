@@ -177,11 +177,36 @@ export async function POST(request: NextRequest) {
 
       console.log('🔍 Searching for existing folder structure for batch:', batchId);
 
-      // Find existing images from the same batch to determine folder structure
+      // First, get all plans from this batch
+      const { data: batchPlans, error: batchPlansError } = await supabase
+        .from('images_plans')
+        .select('id')
+        .eq('rel_images_plans_batches_id', batchId);
+
+      if (batchPlansError) {
+        console.error('❌ Failed to query plans in batch:', batchPlansError);
+        return NextResponse.json({ 
+          success: false, 
+          message: 'Failed to query plans in batch for folder detection' 
+        }, { status: 500 });
+      }
+
+      if (!batchPlans || batchPlans.length === 0) {
+        console.error('❌ No plans found in batch:', batchId);
+        return NextResponse.json({ 
+          success: false, 
+          message: 'No plans found in the specified batch' 
+        }, { status: 500 });
+      }
+
+      // Extract plan IDs
+      const planIds = batchPlans.map(p => p.id);
+
+      // Find existing images from any plan in this batch
       const { data: existingImages, error: existingImagesError } = await supabase
         .from('images')
-        .select('img_file_url1, images_plans!inner(rel_images_plans_batches_id)')
-        .eq('images_plans.rel_images_plans_batches_id', batchId)
+        .select('img_file_url1')
+        .in('rel_images_plans_id', planIds)
         .not('img_file_url1', 'is', null)
         .limit(1);
 
