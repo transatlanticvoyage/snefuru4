@@ -25,11 +25,11 @@ const columns = [
 
 // Column width and styling settings
 const columnSettings: Record<string, { width: string; minWidth: string; maxWidth: string; textAlign?: 'left' | 'center' | 'right' }> = {
-  // Image ID columns (compact)
-  fk_image1_id: { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
-  fk_image2_id: { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
-  fk_image3_id: { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
-  fk_image4_id: { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  // Image ID columns (compact) - Updated to 45px fixed width
+  fk_image1_id: { width: '45px', minWidth: '45px', maxWidth: '45px', textAlign: 'center' },
+  fk_image2_id: { width: '45px', minWidth: '45px', maxWidth: '45px', textAlign: 'center' },
+  fk_image3_id: { width: '45px', minWidth: '45px', maxWidth: '45px', textAlign: 'center' },
+  fk_image4_id: { width: '45px', minWidth: '45px', maxWidth: '45px', textAlign: 'center' },
   
   // Preview columns (fixed size for images)
   'image1-preview': { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
@@ -202,11 +202,11 @@ const headerCustomizationSettings = {
     'image3-preview': { width: '120px', minWidth: '100px', maxWidth: '150px' },
     'image4-preview': { width: '120px', minWidth: '100px', maxWidth: '150px' },
     
-    // Image ID columns
-    'fk_image1_id': { width: '100px', minWidth: '80px', maxWidth: '120px' },
-    'fk_image2_id': { width: '100px', minWidth: '80px', maxWidth: '120px' },
-    'fk_image3_id': { width: '100px', minWidth: '80px', maxWidth: '120px' },
-    'fk_image4_id': { width: '100px', minWidth: '80px', maxWidth: '120px' },
+    // Image ID columns - Updated to 45px fixed width
+    'fk_image1_id': { width: '45px', minWidth: '45px', maxWidth: '45px' },
+    'fk_image2_id': { width: '45px', minWidth: '45px', maxWidth: '45px' },
+    'fk_image3_id': { width: '45px', minWidth: '45px', maxWidth: '45px' },
+    'fk_image4_id': { width: '45px', minWidth: '45px', maxWidth: '45px' },
     
     // Data columns
     'id': { width: '200px', minWidth: '150px', maxWidth: '300px' },
