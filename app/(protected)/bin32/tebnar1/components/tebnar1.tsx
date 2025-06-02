@@ -5,9 +5,13 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 // Table columns based on schema in setup-database/route.ts
 const columns = [
+  'int1',
   'fk_image1_id',
+  'int2',
   'fk_image2_id',
+  'int3',
   'fk_image3_id',
+  'int4',
   'fk_image4_id',
   'id',
   'rel_users_id',
@@ -25,6 +29,12 @@ const columns = [
 
 // Column width and styling settings
 const columnSettings: Record<string, { width: string; minWidth: string; maxWidth: string; textAlign?: 'left' | 'center' | 'right' }> = {
+  // Intent columns (new) - positioned before fk_ columns
+  int1: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
+  int2: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
+  int3: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
+  int4: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
+  
   // Image ID columns (compact) - Updated to 45px fixed width
   fk_image1_id: { width: '45px', minWidth: '45px', maxWidth: '45px', textAlign: 'center' },
   fk_image2_id: { width: '45px', minWidth: '45px', maxWidth: '45px', textAlign: 'center' },
@@ -196,6 +206,12 @@ const headerCustomizationSettings = {
   
   // Individual header cell width overrides (takes precedence over columnSettings)
   headerCellWidths: {
+    // Intent columns (new) - positioned before fk_ columns
+    'int1': { width: '60px', minWidth: '60px', maxWidth: '60px' },
+    'int2': { width: '60px', minWidth: '60px', maxWidth: '60px' },
+    'int3': { width: '60px', minWidth: '60px', maxWidth: '60px' },
+    'int4': { width: '60px', minWidth: '60px', maxWidth: '60px' },
+    
     // Image preview columns
     'image1-preview': { width: '120px', minWidth: '100px', maxWidth: '150px' },
     'image2-preview': { width: '120px', minWidth: '100px', maxWidth: '150px' },
@@ -272,6 +288,12 @@ const headerCustomizationSettings = {
   
   // Header column-specific text alignment overrides
   headerTextAlign: {
+    // Intent columns - center aligned
+    'int1': 'center' as 'left' | 'center' | 'right',
+    'int2': 'center' as 'left' | 'center' | 'right',
+    'int3': 'center' as 'left' | 'center' | 'right',
+    'int4': 'center' as 'left' | 'center' | 'right',
+    
     // Preview columns - center aligned
     'image1-preview': 'center' as 'left' | 'center' | 'right',
     'image2-preview': 'center' as 'left' | 'center' | 'right',
@@ -467,6 +489,12 @@ const tableCellPaddingSettings = {
   
   // Column-specific padding overrides - ALL SET TO 4px 4px
   columnPadding: {
+    // Intent columns - 4px padding
+    'int1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'int2': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'int3': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'int4': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
     // Image preview columns - 4px padding
     'image1-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     'image2-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
@@ -582,6 +610,12 @@ const tableBorderSettings = {
     
     // Column-specific border overrides - all consistent now
     columnSpecific: {
+      // Intent columns
+      'int1': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'int2': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'int3': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'int4': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      
       // Image preview columns
       'image1-preview': { right: '1px solid #c7cbd3', left: '1px solidrgb(57, 72, 102)' },
       'image2-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
@@ -1107,11 +1141,11 @@ export default function Tebnar1() {
 
   // For uitablegrid21, build columns with preview columns after each fk_imageX_id
   const tableColumns = [
-    'fk_image1_id', 'image1-preview',
-    'fk_image2_id', 'image2-preview',
-    'fk_image3_id', 'image3-preview',
-    'fk_image4_id', 'image4-preview',
-    ...columns.slice(4),
+    'int1', 'fk_image1_id', 'image1-preview',
+    'int2', 'fk_image2_id', 'image2-preview',
+    'int3', 'fk_image3_id', 'image3-preview',
+    'int4', 'fk_image4_id', 'image4-preview',
+    ...columns.slice(8), // Skip the first 8 columns (int1-4, fk_image1-4) since we've already included them above
   ];
 
   // Helper function to determine if "fetch now" button should be shown
