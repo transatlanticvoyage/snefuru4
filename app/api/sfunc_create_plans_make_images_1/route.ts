@@ -146,6 +146,20 @@ export async function POST(request: Request) {
       });
     }
     
+    // Log the start of bulk image generation
+    await logger.info({
+      category: 'bulk_generation',
+      message: `Starting bulk image generation for batch ${batchId}`,
+      details: {
+        totalPlans: plansData.length,
+        qtyPerPlan: qty,
+        batchFolder: batchFolder,
+        userId: userData.id,
+        totalImagesToGenerate: plansData.length * Math.min(qty, 4)
+      },
+      batch_id: batchId
+    });
+    
     for (let i = 0; i < plansData.length; i++) {
       const plan = plansData[i];
       const imageIds: (string | null)[] = [];
@@ -199,7 +213,10 @@ export async function POST(request: Request) {
               details: { 
                 error: imageResult.error,
                 prompt: prompt.substring(0, 100) + '...',
-                imageFileName
+                imageFileName,
+                batchFolder: `${batchFolder}/${planFolder}`,
+                planId: plan.id,
+                imageSlot: j + 1
               },
               batch_id: batchId,
               plan_id: plan.id
@@ -237,7 +254,15 @@ export async function POST(request: Request) {
               message: `Failed to insert image ${j + 1} into database for plan ${seq}`,
               details: { 
                 error: imageError?.message || 'No insert data returned',
-                imageUrl: imageResult.url
+                imageUrl: imageResult.url,
+                planId: plan.id,
+                imageSlot: j + 1,
+                databaseRecord: {
+                  rel_users_id: userData.id,
+                  rel_images_plans_id: plan.id,
+                  img_file_url1: imageResult.url,
+                  prompt1: prompt.substring(0, 100) + '...'
+                }
               },
               batch_id: batchId,
               plan_id: plan.id
@@ -249,7 +274,10 @@ export async function POST(request: Request) {
               message: `Successfully generated and saved image ${j + 1} for plan ${seq}`,
               details: { 
                 imageId: imageInsert.id,
-                imageUrl: imageResult.url
+                imageUrl: imageResult.url,
+                planId: plan.id,
+                imageSlot: j + 1,
+                storagePath: `Expected: barge1/${batchFolder}/${planFolder}/${imageFileName}`
               },
               batch_id: batchId,
               plan_id: plan.id
