@@ -103,21 +103,4 @@ export async function POST(request: NextRequest) {
       message: 'Internal server error' 
     }, { status: 500 });
   }
-}
-
-// Helper function for easy logging from other parts of the application
-export async function logError(params: LogEntry) {
-  try {
-    const response = await fetch('/api/error-logs/add-log', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to log error:', await response.text());
-    }
-  } catch (err) {
-    console.error('Failed to send log to API:', err);
-  }
 } 
