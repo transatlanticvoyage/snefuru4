@@ -459,64 +459,64 @@ const tableCellPaddingSettings = {
   // Global default padding (applies to all cells unless overridden)
   globalDefault: {
     padding: '4px 4px',             // Default padding for all cells
-    paddingTop: '8px',               // Default top padding
-    paddingRight: '16px',            // Default right padding
-    paddingBottom: '8px',            // Default bottom padding
-    paddingLeft: '16px',             // Default left padding
+    paddingTop: '4px',               // Default top padding
+    paddingRight: '4px',            // Default right padding
+    paddingBottom: '4px',            // Default bottom padding
+    paddingLeft: '4px',             // Default left padding
   },
   
-  // Column-specific padding overrides
+  // Column-specific padding overrides - ALL SET TO 4px 4px
   columnPadding: {
-    // Image preview columns - compact padding
-    'image1-preview': { padding: '4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
-    'image2-preview': { padding: '4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
-    'image3-preview': { padding: '4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
-    'image4-preview': { padding: '4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    // Image preview columns - 4px padding
+    'image1-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image2-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image3-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image4-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     
-    // Image ID columns - minimal padding
-    'fk_image1_id': { padding: '6px 8px', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px' },
-    'fk_image2_id': { padding: '6px 8px', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px' },
-    'fk_image3_id': { padding: '6px 8px', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px' },
-    'fk_image4_id': { padding: '6px 8px', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px' },
+    // Image ID columns - 4px padding
+    'fk_image1_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'fk_image2_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'fk_image3_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'fk_image4_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     
-    // Data columns - standard padding
-    'id': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
-    'rel_users_id': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
-    'rel_images_plans_batches_id': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
-    'created_at': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+    // Data columns - 4px padding
+    'id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'rel_users_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'rel_images_plans_batches_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'created_at': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     
-    // Content columns - generous padding for readability
-    'e_zpf_img_code': { padding: '10px 16px', paddingTop: '10px', paddingRight: '16px', paddingBottom: '10px', paddingLeft: '16px' },
-    'e_width': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
-    'e_height': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
-    'e_associated_content1': { padding: '10px 16px', paddingTop: '10px', paddingRight: '16px', paddingBottom: '10px', paddingLeft: '16px' },
-    'e_file_name1': { padding: '10px 16px', paddingTop: '10px', paddingRight: '16px', paddingBottom: '10px', paddingLeft: '16px' },
-    'e_more_instructions1': { padding: '12px 18px', paddingTop: '12px', paddingRight: '18px', paddingBottom: '12px', paddingLeft: '18px' },
-    'e_prompt1': { padding: '12px 18px', paddingTop: '12px', paddingRight: '18px', paddingBottom: '12px', paddingLeft: '18px' },
-    'e_ai_tool1': { padding: '8px 12px', paddingTop: '8px', paddingRight: '12px', paddingBottom: '8px', paddingLeft: '12px' },
+    // Content columns - 4px padding
+    'e_zpf_img_code': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_width': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_height': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_associated_content1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_file_name1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_more_instructions1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_prompt1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_ai_tool1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
   } as Record<string, { padding: string; paddingTop: string; paddingRight: string; paddingBottom: string; paddingLeft: string }>,
   
-  // Row type specific padding
+  // Row type specific padding - ALL SET TO 4px 4px
   rowTypePadding: {
     headerRow: {
-      padding: '12px 16px',          // Header row cell padding
-      paddingTop: '12px',
-      paddingRight: '16px',
-      paddingBottom: '12px',
-      paddingLeft: '16px',
+      padding: '4px 4px',          // Header row cell padding
+      paddingTop: '4px',
+      paddingRight: '4px',
+      paddingBottom: '4px',
+      paddingLeft: '4px',
     },
     dataRow: {
-      padding: '8px 16px',           // Data row cell padding
-      paddingTop: '8px',
-      paddingRight: '16px',
-      paddingBottom: '8px',
-      paddingLeft: '16px',
+      padding: '4px 4px',           // Data row cell padding
+      paddingTop: '4px',
+      paddingRight: '4px',
+      paddingBottom: '4px',
+      paddingLeft: '4px',
     },
     firstRow: {
-      paddingTop: '12px',            // Extra padding for first data row
+      paddingTop: '4px',            // Consistent padding for first data row
     },
     lastRow: {
-      paddingBottom: '12px',         // Extra padding for last data row
+      paddingBottom: '4px',         // Consistent padding for last data row
     },
   },
   
