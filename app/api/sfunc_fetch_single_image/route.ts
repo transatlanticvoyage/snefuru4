@@ -177,105 +177,70 @@ export async function POST(request: NextRequest) {
 
       console.log('🔍 Searching for existing folder structure for batch:', batchId);
 
-      // First, let's find what folders exist in barge1/ for this batch
-      const { data: barge1Contents, error: listError } = await supabase.storage
-        .from('bucket-images-b1')
-        .list('barge1', { limit: 100, offset: 0 });
+      // Find existing images from the same batch to determine folder structure
+      const { data: existingImages, error: existingImagesError } = await supabase
+        .from('images')
+        .select('img_file_url1, images_plans!inner(rel_images_plans_batches_id)')
+        .eq('images_plans.rel_images_plans_batches_id', batchId)
+        .not('img_file_url1', 'is', null)
+        .limit(1);
 
-      if (listError) {
-        console.error('❌ Failed to list barge1 contents:', listError);
+      if (existingImagesError) {
+        console.error('❌ Failed to query existing images:', existingImagesError);
         return NextResponse.json({ 
           success: false, 
-          message: 'Failed to access storage folders' 
+          message: 'Failed to query existing images for batch folder detection' 
         }, { status: 500 });
       }
 
-      console.log('📁 Found barge1 folders:', barge1Contents?.map(f => f.name));
-
-      // Look for existing batch folder that contains plans from this batch
       let foundBatchFolder = null;
       let foundPlanFolder = null;
 
-      if (barge1Contents) {
-        for (const folder of barge1Contents) {
-          if (folder.name) {
-            // List contents of this potential batch folder
-            const { data: batchContents } = await supabase.storage
-              .from('bucket-images-b1')
-              .list(`barge1/${folder.name}`, { limit: 100, offset: 0 });
-
-            if (batchContents) {
-              // Check if any plan folders in this batch folder contain images from our batch
-              for (const planFolder of batchContents) {
-                if (planFolder.name) {
-                  // Check if there are any images in this plan folder
-                  const { data: planImages } = await supabase.storage
-                    .from('bucket-images-b1')
-                    .list(`barge1/${folder.name}/${planFolder.name}`, { limit: 10, offset: 0 });
-
-                  if (planImages && planImages.length > 0) {
-                    // Check if any of these images belong to plans from our batch
-                    const { data: existingImages } = await supabase
-                      .from('images')
-                      .select('rel_images_plans_id, images_plans!inner(rel_images_plans_batches_id)')
-                      .eq('images_plans.rel_images_plans_batches_id', batchId)
-                      .limit(1);
-
-                    if (existingImages && existingImages.length > 0) {
-                      foundBatchFolder = folder.name;
-                      console.log('✅ Found existing batch folder:', foundBatchFolder);
-                      break;
-                    }
-                  }
-                }
-              }
-              if (foundBatchFolder) break;
-            }
-          }
+      if (existingImages && existingImages.length > 0) {
+        // Extract batch folder from the first existing image URL
+        const imageUrl = existingImages[0].img_file_url1;
+        console.log('📁 Found existing image URL:', imageUrl);
+        
+        // Parse the URL to extract the batch folder
+        // Expected format: .../bucket-images-b1/barge1/BATCH_FOLDER/PLAN_FOLDER/image.png
+        const match = imageUrl.match(/barge1\/([^\/]+)\//);
+        if (match) {
+          foundBatchFolder = match[1];
+          console.log('✅ Extracted batch folder from existing image:', foundBatchFolder);
+        } else {
+          console.error('❌ Could not parse batch folder from image URL:', imageUrl);
+          return NextResponse.json({ 
+            success: false, 
+            message: 'Could not parse batch folder from existing image URL' 
+          }, { status: 500 });
         }
-      }
-
-      if (!foundBatchFolder) {
-        console.error('❌ Could not find existing batch folder for batch:', batchId);
+      } else {
+        console.error('❌ No existing images found for batch:', batchId);
         return NextResponse.json({ 
           success: false, 
           message: 'Could not find existing batch folder. Make sure some images were generated in the original batch.' 
         }, { status: 500 });
       }
 
-      // Now find the specific plan folder for this plan
-      const { data: planFolders } = await supabase.storage
-        .from('bucket-images-b1')
-        .list(`barge1/${foundBatchFolder}`, { limit: 100, offset: 0 });
+      // Now find the specific plan folder for this plan by checking existing images
+      const { data: planImages } = await supabase
+        .from('images')
+        .select('img_file_url1')
+        .eq('rel_images_plans_id', plan_id)
+        .not('img_file_url1', 'is', null)
+        .limit(1);
 
-      if (planFolders) {
-        // Find which plan folder corresponds to our plan by checking existing images
-        for (const folder of planFolders) {
-          if (folder.name) {
-            const { data: folderImages } = await supabase.storage
-              .from('bucket-images-b1')
-              .list(`barge1/${foundBatchFolder}/${folder.name}`, { limit: 10, offset: 0 });
-
-            if (folderImages && folderImages.length > 0) {
-              // Check if any image in this folder belongs to our plan
-              const { data: planImages } = await supabase
-                .from('images')
-                .select('img_file_url1')
-                .eq('rel_images_plans_id', plan_id);
-
-              if (planImages) {
-                const imageInThisFolder = planImages.find(img => 
-                  img.img_file_url1 && img.img_file_url1.includes(`${foundBatchFolder}/${folder.name}`)
-                );
-                
-                if (imageInThisFolder) {
-                  foundPlanFolder = folder.name;
-                  console.log('✅ Found existing plan folder:', foundPlanFolder);
-                  break;
-                }
-              }
-            }
-          }
+      if (planImages && planImages.length > 0) {
+        // Extract plan folder from existing image for this plan
+        const planImageUrl = planImages[0].img_file_url1;
+        console.log('📁 Found existing image URL for this plan:', planImageUrl);
+        
+        // Parse the URL to extract the plan folder
+        // Expected format: .../barge1/BATCH_FOLDER/PLAN_FOLDER/image.png
+        const planMatch = planImageUrl.match(/barge1\/[^\/]+\/([^\/]+)\//);
+        if (planMatch) {
+          foundPlanFolder = planMatch[1];
+          console.log('✅ Found existing plan folder:', foundPlanFolder);
         }
       }
 
