@@ -23,6 +23,46 @@ const columns = [
   'e_ai_tool1',
 ];
 
+// Column width and styling settings
+const columnSettings: Record<string, { width: string; minWidth: string; maxWidth: string; textAlign?: 'left' | 'center' | 'right' }> = {
+  // Image ID columns (compact)
+  fk_image1_id: { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  fk_image2_id: { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  fk_image3_id: { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  fk_image4_id: { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  
+  // Preview columns (fixed size for images)
+  'image1-preview': { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  'image2-preview': { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  'image3-preview': { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  'image4-preview': { width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' },
+  
+  // ID and relationship columns
+  id: { width: '200px', minWidth: '150px', maxWidth: '250px', textAlign: 'left' },
+  rel_users_id: { width: '150px', minWidth: '120px', maxWidth: '200px', textAlign: 'center' },
+  rel_images_plans_batches_id: { width: '150px', minWidth: '120px', maxWidth: '200px', textAlign: 'center' },
+  
+  // Date column
+  created_at: { width: '160px', minWidth: '140px', maxWidth: '200px', textAlign: 'center' },
+  
+  // Content columns (wider for text)
+  e_zpf_img_code: { width: '120px', minWidth: '100px', maxWidth: '150px', textAlign: 'left' },
+  e_width: { width: '80px', minWidth: '60px', maxWidth: '100px', textAlign: 'center' },
+  e_height: { width: '80px', minWidth: '60px', maxWidth: '100px', textAlign: 'center' },
+  e_associated_content1: { width: '200px', minWidth: '150px', maxWidth: '300px', textAlign: 'left' },
+  e_file_name1: { width: '200px', minWidth: '150px', maxWidth: '300px', textAlign: 'left' },
+  e_more_instructions1: { width: '250px', minWidth: '200px', maxWidth: '400px', textAlign: 'left' },
+  e_prompt1: { width: '300px', minWidth: '200px', maxWidth: '500px', textAlign: 'left' },
+  e_ai_tool1: { width: '120px', minWidth: '100px', maxWidth: '150px', textAlign: 'center' },
+};
+
+// Row settings
+const rowSettings = {
+  height: '80px',
+  minHeight: '80px',
+  maxHeight: '80px',
+};
+
 const gridCols = 9; // A-I
 const gridRows = 11;
 const colHeaders = Array.from({ length: gridCols }, (_, i) => String.fromCharCode(65 + i)); // ['A',...,'I']
@@ -681,20 +721,31 @@ export default function Tebnar1() {
           <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {tableColumns.map(col => (
-                  <th
-                    key={col}
-                    className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    {col.startsWith('image') ? 'Preview' : col}
-                  </th>
-                ))}
+                {tableColumns.map(col => {
+                  const settings = columnSettings[col] || { width: 'auto', minWidth: '100px', maxWidth: 'none', textAlign: 'left' };
+                  return (
+                    <th
+                      key={col}
+                      className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      style={{
+                        width: settings.width,
+                        minWidth: settings.minWidth,
+                        maxWidth: settings.maxWidth,
+                        textAlign: settings.textAlign || 'left',
+                      }}
+                    >
+                      {col.startsWith('image') ? 'Preview' : col}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {currentItems.map(plan => (
-                <tr key={plan.id}>
+                <tr key={plan.id} style={{ height: rowSettings.height, minHeight: rowSettings.minHeight, maxHeight: rowSettings.maxHeight }}>
                   {tableColumns.map(col => {
+                    const settings = columnSettings[col] || { width: 'auto', minWidth: '100px', maxWidth: 'none', textAlign: 'left' };
+                    
                     if (col === 'image1-preview') {
                       const imgId = plan['fk_image1_id'];
                       const img = imgId ? imagesById[imgId] : null;
@@ -703,7 +754,17 @@ export default function Tebnar1() {
                       const showFetchButton = shouldShowFetchButton(plan, 1);
                       
                       return (
-                        <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
+                        <td 
+                          key={col} 
+                          className="px-2 py-2 align-middle"
+                          style={{
+                            width: settings.width,
+                            minWidth: settings.minWidth,
+                            maxWidth: settings.maxWidth,
+                            textAlign: settings.textAlign || 'center',
+                            height: rowSettings.height,
+                          }}
+                        >
                           {img && img.img_file_url1 ? (
                             <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
                           ) : isFetching ? (
@@ -731,7 +792,17 @@ export default function Tebnar1() {
                       const showFetchButton = shouldShowFetchButton(plan, 2);
                       
                       return (
-                        <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
+                        <td 
+                          key={col} 
+                          className="px-2 py-2 align-middle"
+                          style={{
+                            width: settings.width,
+                            minWidth: settings.minWidth,
+                            maxWidth: settings.maxWidth,
+                            textAlign: settings.textAlign || 'center',
+                            height: rowSettings.height,
+                          }}
+                        >
                           {img && img.img_file_url1 ? (
                             <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
                           ) : isFetching ? (
@@ -759,7 +830,17 @@ export default function Tebnar1() {
                       const showFetchButton = shouldShowFetchButton(plan, 3);
                       
                       return (
-                        <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
+                        <td 
+                          key={col} 
+                          className="px-2 py-2 align-middle"
+                          style={{
+                            width: settings.width,
+                            minWidth: settings.minWidth,
+                            maxWidth: settings.maxWidth,
+                            textAlign: settings.textAlign || 'center',
+                            height: rowSettings.height,
+                          }}
+                        >
                           {img && img.img_file_url1 ? (
                             <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
                           ) : isFetching ? (
@@ -787,7 +868,17 @@ export default function Tebnar1() {
                       const showFetchButton = shouldShowFetchButton(plan, 4);
                       
                       return (
-                        <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
+                        <td 
+                          key={col} 
+                          className="px-2 py-2 align-middle"
+                          style={{
+                            width: settings.width,
+                            minWidth: settings.minWidth,
+                            maxWidth: settings.maxWidth,
+                            textAlign: settings.textAlign || 'center',
+                            height: rowSettings.height,
+                          }}
+                        >
                           {img && img.img_file_url1 ? (
                             <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
                           ) : isFetching ? (
@@ -811,7 +902,15 @@ export default function Tebnar1() {
                     return (
                       <td
                         key={col}
-                        className="px-4 py-2 h-[80px] max-h-[80px] overflow-hidden align-middle whitespace-nowrap"
+                        className="px-4 py-2 overflow-hidden align-middle"
+                        style={{
+                          width: settings.width,
+                          minWidth: settings.minWidth,
+                          maxWidth: settings.maxWidth,
+                          textAlign: settings.textAlign || 'left',
+                          height: rowSettings.height,
+                          whiteSpace: settings.textAlign === 'left' ? 'nowrap' : 'normal',
+                        }}
                       >
                         {String(plan[col] ?? '')}
                       </td>
