@@ -36,40 +36,11 @@ export async function GET(request: NextRequest) {
       .limit(1);
 
     if (tableCheckError && tableCheckError.message.includes('relation "error_logs" does not exist')) {
-      // Create the error_logs table
-      const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS error_logs (
-          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-          timestamp TIMESTAMPTZ DEFAULT NOW(),
-          level TEXT NOT NULL CHECK (level IN ('error', 'warning', 'info', 'debug')),
-          category TEXT NOT NULL,
-          message TEXT NOT NULL,
-          details JSONB,
-          stack_trace TEXT,
-          batch_id TEXT,
-          plan_id TEXT,
-          job_id TEXT,
-          created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-        
-        CREATE INDEX IF NOT EXISTS idx_error_logs_user_id ON error_logs(user_id);
-        CREATE INDEX IF NOT EXISTS idx_error_logs_timestamp ON error_logs(timestamp);
-        CREATE INDEX IF NOT EXISTS idx_error_logs_level ON error_logs(level);
-        CREATE INDEX IF NOT EXISTS idx_error_logs_category ON error_logs(category);
-      `;
-
-      const { error: createError } = await supabase.rpc('exec_sql', { 
-        sql: createTableQuery 
-      });
-
-      if (createError) {
-        console.error('Failed to create error_logs table:', createError);
-        return NextResponse.json({ 
-          success: false, 
-          message: 'Database table missing. Please create error_logs table in Supabase.' 
-        }, { status: 500 });
-      }
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Error logs table does not exist. Please create it using the "Setup DB Table" button or manually in Supabase dashboard.',
+        details: 'Table "error_logs" not found in database'
+      }, { status: 404 });
     }
 
     // Fetch error logs for the user

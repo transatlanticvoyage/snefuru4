@@ -2,7 +2,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import TestLogging from './test-logging';
 
 interface ErrorLog {
   id: string;
@@ -36,13 +35,19 @@ export default function StatusBox1() {
     if (!user?.id) return;
     
     try {
+      console.log('Fetching error logs for user:', user.id);
       const response = await fetch('/api/error-logs/get-logs');
+      console.log('API response status:', response.status);
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const result = await response.json();
+      console.log('API response data:', result);
+      
       if (result.success) {
+        console.log('Setting logs:', result.logs?.length || 0, 'logs found');
         setErrorLogs(result.logs || []);
       } else {
         throw new Error(result.message || 'Failed to fetch logs');
@@ -213,11 +218,23 @@ export default function StatusBox1() {
           <h1 className="text-2xl font-bold">Detailed Error Logging System</h1>
           <div className="text-sm text-gray-500">
             Total Logs: {errorLogs.length} | Filtered: {filteredLogs.length}
+            {autoRefresh && <span className="ml-2 text-green-600">● Auto-refreshing</span>}
           </div>
         </div>
 
-        {/* Test Logging Component */}
-        <TestLogging />
+        {/* Debugging Info */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <h3 className="text-lg font-medium text-yellow-800 mb-2">🔍 Debug Information</h3>
+          <div className="text-sm text-yellow-700 space-y-1">
+            <div>User ID: {user?.id || 'Not available'}</div>
+            <div>Logs fetched: {errorLogs.length}</div>
+            <div>Auto-refresh: {autoRefresh ? 'Enabled (3s)' : 'Disabled'}</div>
+            <div>Last fetch: {new Date().toLocaleTimeString()}</div>
+            <div className="text-xs mt-2">
+              💡 Check browser console (F12) for detailed API responses
+            </div>
+          </div>
+        </div>
 
         {/* Controls Section */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -287,6 +304,42 @@ export default function StatusBox1() {
               className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
             >
               🔧 Setup DB Table
+            </button>
+            
+            {/* Debug Test Button */}
+            <button
+              onClick={async () => {
+                try {
+                  console.log('Creating test log entry...');
+                  const response = await fetch('/api/error-logs/add-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      level: 'info',
+                      category: 'debug_test',
+                      message: 'Manual test log entry created from statusbox1',
+                      details: { timestamp: new Date().toISOString(), testData: 'Hello World!' }
+                    })
+                  });
+                  
+                  const result = await response.json();
+                  console.log('Add log response:', result);
+                  
+                  if (result.success) {
+                    setError('✅ Test log created! Check logs below.');
+                    // Force refresh logs
+                    await fetchErrorLogs();
+                  } else {
+                    setError('❌ Failed to create test log: ' + (result.message || 'Unknown error'));
+                  }
+                } catch (err) {
+                  console.error('Test log error:', err);
+                  setError('❌ Error creating test log: ' + (err instanceof Error ? err.message : 'Unknown error'));
+                }
+              }}
+              className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            >
+              🧪 Create Test Log
             </button>
           </div>
 
