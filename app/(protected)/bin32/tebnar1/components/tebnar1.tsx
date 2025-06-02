@@ -63,6 +63,146 @@ const rowSettings = {
   maxHeight: '80px',
 };
 
+// Comprehensive Header Customization Controls
+const headerCustomizationSettings = {
+  // Header row overall settings
+  headerRow: {
+    height: '60px',                    // Overall header row height
+    minHeight: '40px',                 // Minimum header row height
+    maxHeight: '100px',                // Maximum header row height
+    backgroundColor: '#f9fafb',        // Header row background color
+    borderBottom: '2px solid #e5e7eb', // Header row bottom border
+    position: 'sticky' as 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky', // For sticky headers
+    top: '0px',                        // Top position if sticky
+    zIndex: 10,                        // Z-index for layering
+  },
+  
+  // Individual header cell width overrides (takes precedence over columnSettings)
+  headerCellWidths: {
+    // Image preview columns
+    'image1-preview': { width: '120px', minWidth: '100px', maxWidth: '150px' },
+    'image2-preview': { width: '120px', minWidth: '100px', maxWidth: '150px' },
+    'image3-preview': { width: '120px', minWidth: '100px', maxWidth: '150px' },
+    'image4-preview': { width: '120px', minWidth: '100px', maxWidth: '150px' },
+    
+    // Image ID columns
+    'fk_image1_id': { width: '100px', minWidth: '80px', maxWidth: '120px' },
+    'fk_image2_id': { width: '100px', minWidth: '80px', maxWidth: '120px' },
+    'fk_image3_id': { width: '100px', minWidth: '80px', maxWidth: '120px' },
+    'fk_image4_id': { width: '100px', minWidth: '80px', maxWidth: '120px' },
+    
+    // Data columns
+    'id': { width: '200px', minWidth: '150px', maxWidth: '300px' },
+    'rel_users_id': { width: '120px', minWidth: '100px', maxWidth: '150px' },
+    'rel_images_plans_batches_id': { width: '180px', minWidth: '150px', maxWidth: '220px' },
+    'created_at': { width: '160px', minWidth: '140px', maxWidth: '200px' },
+    'e_zpf_img_code': { width: '120px', minWidth: '100px', maxWidth: '150px' },
+    'e_width': { width: '80px', minWidth: '60px', maxWidth: '100px' },
+    'e_height': { width: '80px', minWidth: '60px', maxWidth: '100px' },
+    'e_associated_content1': { width: '200px', minWidth: '150px', maxWidth: '350px' },
+    'e_file_name1': { width: '200px', minWidth: '150px', maxWidth: '350px' },
+    'e_more_instructions1': { width: '250px', minWidth: '200px', maxWidth: '400px' },
+    'e_prompt1': { width: '300px', minWidth: '200px', maxWidth: '500px' },
+    'e_ai_tool1': { width: '120px', minWidth: '100px', maxWidth: '150px' },
+  } as Record<string, { width: string; minWidth: string; maxWidth: string }>,
+  
+  // Header cell styling
+  headerCell: {
+    padding: '12px 16px',             // Header cell padding
+    verticalAlign: 'middle' as 'top' | 'middle' | 'bottom' | 'baseline', // Vertical alignment
+    textAlign: 'center' as 'left' | 'center' | 'right', // Default text alignment
+    borderRight: '1px solid #e5e7eb', // Right border between headers
+    borderLeft: '0px solid transparent', // Left border
+    backgroundColor: '#f9fafb',       // Individual cell background
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto', // Overflow behavior
+    textOverflow: 'ellipsis' as 'clip' | 'ellipsis', // Text overflow behavior
+    whiteSpace: 'nowrap' as 'normal' | 'nowrap' | 'pre' | 'pre-wrap' | 'pre-line', // White space handling
+    wordBreak: 'normal' as 'normal' | 'break-all' | 'keep-all' | 'break-word', // Word breaking
+    boxSizing: 'border-box' as 'content-box' | 'border-box', // Box sizing model
+  },
+  
+  // Header text typography
+  headerText: {
+    fontSize: '12px',                 // Header text size
+    fontWeight: '600' as 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900', // Font weight
+    color: '#374151',                 // Text color
+    textTransform: 'uppercase' as 'none' | 'capitalize' | 'uppercase' | 'lowercase', // Text transformation
+    letterSpacing: '0.05em',          // Letter spacing
+    lineHeight: '1.4',                // Line height
+    fontFamily: 'inherit',            // Font family
+  },
+  
+  // Header hover effects
+  headerHover: {
+    enabled: true,                    // Enable hover effects
+    backgroundColor: '#f3f4f6',      // Hover background color
+    textColor: '#1f2937',            // Hover text color
+    borderColor: '#d1d5db',          // Hover border color
+    transition: 'all 0.2s ease-in-out', // Hover transition
+    cursor: 'pointer' as 'default' | 'pointer' | 'text' | 'help', // Hover cursor
+  },
+  
+  // Header borders and spacing
+  headerBorders: {
+    topBorder: '0px solid transparent',    // Top border of header row
+    bottomBorder: '2px solid #e5e7eb',     // Bottom border of header row
+    leftBorder: '0px solid transparent',   // Left border of first header
+    rightBorder: '0px solid transparent',  // Right border of last header
+    cellBorderRight: '1px solid #e5e7eb', // Border between header cells
+    cellBorderLeft: '0px solid transparent', // Left border of each cell
+    borderRadius: '0px',                   // Border radius for corners
+  },
+  
+  // Header column-specific text alignment overrides
+  headerTextAlign: {
+    // Preview columns - center aligned
+    'image1-preview': 'center' as 'left' | 'center' | 'right',
+    'image2-preview': 'center' as 'left' | 'center' | 'right',
+    'image3-preview': 'center' as 'left' | 'center' | 'right',
+    'image4-preview': 'center' as 'left' | 'center' | 'right',
+    
+    // Image ID columns - center aligned
+    'fk_image1_id': 'center' as 'left' | 'center' | 'right',
+    'fk_image2_id': 'center' as 'left' | 'center' | 'right',
+    'fk_image3_id': 'center' as 'left' | 'center' | 'right',
+    'fk_image4_id': 'center' as 'left' | 'center' | 'right',
+    
+    // Data columns - left aligned for text, center for numbers/dates
+    'id': 'left' as 'left' | 'center' | 'right',
+    'rel_users_id': 'center' as 'left' | 'center' | 'right',
+    'rel_images_plans_batches_id': 'center' as 'left' | 'center' | 'right',
+    'created_at': 'center' as 'left' | 'center' | 'right',
+    'e_zpf_img_code': 'left' as 'left' | 'center' | 'right',
+    'e_width': 'center' as 'left' | 'center' | 'right',
+    'e_height': 'center' as 'left' | 'center' | 'right',
+    'e_associated_content1': 'left' as 'left' | 'center' | 'right',
+    'e_file_name1': 'left' as 'left' | 'center' | 'right',
+    'e_more_instructions1': 'left' as 'left' | 'center' | 'right',
+    'e_prompt1': 'left' as 'left' | 'center' | 'right',
+    'e_ai_tool1': 'center' as 'left' | 'center' | 'right',
+  } as Record<string, 'left' | 'center' | 'right'>,
+  
+  // Header sorting/interaction settings
+  headerInteraction: {
+    enableSorting: false,             // Enable column sorting
+    sortIndicatorColor: '#6b7280',    // Color for sort indicators
+    sortIndicatorSize: '12px',        // Size of sort indicators
+    enableResizing: false,            // Enable column resizing
+    resizeHandleColor: '#d1d5db',     // Color of resize handles
+    resizeHandleWidth: '2px',         // Width of resize handles
+  },
+  
+  // Header responsive settings
+  headerResponsive: {
+    enableResponsive: true,           // Enable responsive behavior
+    mobileHeaderHeight: '50px',       // Header height on mobile
+    mobileHeaderFontSize: '11px',     // Header font size on mobile
+    mobileHeaderPadding: '8px 12px',  // Header padding on mobile
+    tabletBreakpoint: '768px',        // Tablet breakpoint
+    mobileBreakpoint: '640px',        // Mobile breakpoint
+  }
+};
+
 // Enhanced row and table styling settings
 const tableStyleSettings = {
   // Table-level settings for strict layout control
@@ -862,26 +1002,87 @@ export default function Tebnar1() {
             }}
           >
             <thead className="bg-gray-50">
-              <tr>
-                {tableColumns.map(col => {
-                  const settings = columnSettings[col] || { width: 'auto', minWidth: '100px', maxWidth: 'none', textAlign: 'left' };
+              <tr
+                style={{
+                  height: headerCustomizationSettings.headerRow.height,
+                  minHeight: headerCustomizationSettings.headerRow.minHeight,
+                  maxHeight: headerCustomizationSettings.headerRow.maxHeight,
+                  backgroundColor: headerCustomizationSettings.headerRow.backgroundColor,
+                  borderBottom: headerCustomizationSettings.headerRow.borderBottom,
+                  position: headerCustomizationSettings.headerRow.position,
+                  top: headerCustomizationSettings.headerRow.top,
+                  zIndex: headerCustomizationSettings.headerRow.zIndex,
+                  borderTop: headerCustomizationSettings.headerBorders.topBorder,
+                }}
+              >
+                {tableColumns.map((col, index) => {
+                  // Get width settings - headerCellWidths takes precedence over columnSettings
+                  const widthSettings = headerCustomizationSettings.headerCellWidths[col] || 
+                                      columnSettings[col] || 
+                                      { width: 'auto', minWidth: '100px', maxWidth: 'none' };
+                  
+                  // Get text alignment - headerTextAlign takes precedence
+                  const textAlign = headerCustomizationSettings.headerTextAlign[col] || 
+                                  headerCustomizationSettings.headerCell.textAlign;
+                  
                   return (
                     <th
                       key={col}
-                      className="text-xs font-medium text-gray-500 uppercase tracking-wider"
                       style={{
-                        width: settings.width,
-                        minWidth: settings.minWidth,
-                        maxWidth: settings.maxWidth,
-                        textAlign: settings.textAlign || 'left',
-                        backgroundColor: tableStyleSettings.header.backgroundColor,
-                        fontSize: tableStyleSettings.header.fontSize,
-                        fontWeight: tableStyleSettings.header.fontWeight,
-                        color: tableStyleSettings.header.color,
-                        textTransform: tableStyleSettings.header.textTransform,
-                        letterSpacing: tableStyleSettings.header.letterSpacing,
-                        padding: tableStyleSettings.header.padding,
-                        borderBottom: tableStyleSettings.header.borderBottom,
+                        // Width and sizing
+                        width: widthSettings.width,
+                        minWidth: widthSettings.minWidth,
+                        maxWidth: widthSettings.maxWidth,
+                        height: headerCustomizationSettings.headerRow.height,
+                        
+                        // Cell styling
+                        padding: headerCustomizationSettings.headerCell.padding,
+                        verticalAlign: headerCustomizationSettings.headerCell.verticalAlign,
+                        textAlign: textAlign,
+                        backgroundColor: headerCustomizationSettings.headerCell.backgroundColor,
+                        overflow: headerCustomizationSettings.headerCell.overflow,
+                        textOverflow: headerCustomizationSettings.headerCell.textOverflow,
+                        whiteSpace: headerCustomizationSettings.headerCell.whiteSpace,
+                        wordBreak: headerCustomizationSettings.headerCell.wordBreak,
+                        boxSizing: headerCustomizationSettings.headerCell.boxSizing,
+                        
+                        // Text styling
+                        fontSize: headerCustomizationSettings.headerText.fontSize,
+                        fontWeight: headerCustomizationSettings.headerText.fontWeight,
+                        color: headerCustomizationSettings.headerText.color,
+                        textTransform: headerCustomizationSettings.headerText.textTransform,
+                        letterSpacing: headerCustomizationSettings.headerText.letterSpacing,
+                        lineHeight: headerCustomizationSettings.headerText.lineHeight,
+                        fontFamily: headerCustomizationSettings.headerText.fontFamily,
+                        
+                        // Borders
+                        borderRight: index < tableColumns.length - 1 ? 
+                                   headerCustomizationSettings.headerBorders.cellBorderRight : 
+                                   headerCustomizationSettings.headerBorders.rightBorder,
+                        borderLeft: index === 0 ? 
+                                  headerCustomizationSettings.headerBorders.leftBorder : 
+                                  headerCustomizationSettings.headerBorders.cellBorderLeft,
+                        borderRadius: headerCustomizationSettings.headerBorders.borderRadius,
+                        
+                        // Hover effects
+                        cursor: headerCustomizationSettings.headerHover.enabled ? 
+                               headerCustomizationSettings.headerHover.cursor : 'default',
+                        transition: headerCustomizationSettings.headerHover.enabled ? 
+                                  headerCustomizationSettings.headerHover.transition : 'none',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (headerCustomizationSettings.headerHover.enabled) {
+                          e.currentTarget.style.backgroundColor = headerCustomizationSettings.headerHover.backgroundColor;
+                          e.currentTarget.style.color = headerCustomizationSettings.headerHover.textColor;
+                          e.currentTarget.style.borderColor = headerCustomizationSettings.headerHover.borderColor;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (headerCustomizationSettings.headerHover.enabled) {
+                          e.currentTarget.style.backgroundColor = headerCustomizationSettings.headerCell.backgroundColor;
+                          e.currentTarget.style.color = headerCustomizationSettings.headerText.color;
+                          e.currentTarget.style.borderColor = headerCustomizationSettings.headerBorders.cellBorderRight.split(' ')[2] || 'transparent';
+                        }
                       }}
                     >
                       {col.startsWith('image') ? 'Preview' : col}
