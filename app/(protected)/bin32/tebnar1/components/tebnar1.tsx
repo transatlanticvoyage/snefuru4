@@ -63,6 +63,98 @@ const rowSettings = {
   maxHeight: '80px',
 };
 
+// Enhanced row and table styling settings
+const tableStyleSettings = {
+  // Row styling
+  row: {
+    height: '80px',
+    minHeight: '80px',
+    maxHeight: '80px',
+    verticalAlign: 'middle' as 'top' | 'middle' | 'bottom',
+    backgroundColor: '#ffffff',
+    hoverBackgroundColor: '#f9fafb',
+    borderBottom: '1px solid #e5e7eb',
+  },
+  
+  // Cell styling
+  cell: {
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto',
+    textOverflow: 'ellipsis' as 'clip' | 'ellipsis',
+    whiteSpace: 'nowrap' as 'normal' | 'nowrap' | 'pre' | 'pre-wrap' | 'pre-line',
+    wordBreak: 'normal' as 'normal' | 'break-all' | 'keep-all' | 'break-word',
+    verticalAlign: 'middle' as 'top' | 'middle' | 'bottom' | 'baseline',
+    padding: '8px 16px',
+  },
+  
+  // Text cell specific styling (for data columns)
+  textCell: {
+    fontSize: '14px',
+    lineHeight: '1.5',
+    color: '#374151',
+    fontWeight: 'normal' as 'normal' | 'bold' | 'lighter' | 'bolder',
+  },
+  
+  // Preview cell specific styling (for image columns)
+  previewCell: {
+    padding: '8px',
+    textAlign: 'center' as 'left' | 'center' | 'right',
+    backgroundColor: '#fafafa',
+  },
+  
+  // Image styling within preview cells
+  previewImage: {
+    width: '64px',
+    height: '64px',
+    objectFit: 'cover' as 'fill' | 'contain' | 'cover' | 'none' | 'scale-down',
+    borderRadius: '4px',
+    border: '1px solid #e5e7eb',
+  },
+  
+  // Fetch button styling
+  fetchButton: {
+    width: '64px',
+    height: '64px',
+    borderRadius: '8px',
+    fontSize: '12px',
+    fontWeight: '600',
+    transition: 'all 0.2s ease-in-out',
+    backgroundColor: '#dbeafe',
+    borderColor: '#93c5fd',
+    hoverBackgroundColor: '#bfdbfe',
+    textColor: '#1d4ed8',
+  },
+  
+  // Loading spinner styling
+  loadingSpinner: {
+    width: '64px',
+    height: '64px',
+    backgroundColor: '#f3f4f6',
+    spinnerSize: '32px',
+    spinnerColor: '#2563eb',
+  },
+  
+  // Table header styling
+  header: {
+    backgroundColor: '#f9fafb',
+    fontSize: '12px',
+    fontWeight: '500',
+    color: '#6b7280',
+    textTransform: 'uppercase' as 'none' | 'capitalize' | 'uppercase' | 'lowercase',
+    letterSpacing: '0.05em',
+    padding: '12px 16px',
+    borderBottom: '1px solid #e5e7eb',
+  },
+  
+  // Pagination styling
+  pagination: {
+    backgroundColor: '#ffffff',
+    borderTop: '1px solid #e5e7eb',
+    padding: '12px 24px',
+    fontSize: '14px',
+    color: '#374151',
+  }
+};
+
 const gridCols = 9; // A-I
 const gridRows = 11;
 const colHeaders = Array.from({ length: gridCols }, (_, i) => String.fromCharCode(65 + i)); // ['A',...,'I']
@@ -726,12 +818,20 @@ export default function Tebnar1() {
                   return (
                     <th
                       key={col}
-                      className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="text-xs font-medium text-gray-500 uppercase tracking-wider"
                       style={{
                         width: settings.width,
                         minWidth: settings.minWidth,
                         maxWidth: settings.maxWidth,
                         textAlign: settings.textAlign || 'left',
+                        backgroundColor: tableStyleSettings.header.backgroundColor,
+                        fontSize: tableStyleSettings.header.fontSize,
+                        fontWeight: tableStyleSettings.header.fontWeight,
+                        color: tableStyleSettings.header.color,
+                        textTransform: tableStyleSettings.header.textTransform,
+                        letterSpacing: tableStyleSettings.header.letterSpacing,
+                        padding: tableStyleSettings.header.padding,
+                        borderBottom: tableStyleSettings.header.borderBottom,
                       }}
                     >
                       {col.startsWith('image') ? 'Preview' : col}
@@ -742,7 +842,24 @@ export default function Tebnar1() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {currentItems.map(plan => (
-                <tr key={plan.id} style={{ height: rowSettings.height, minHeight: rowSettings.minHeight, maxHeight: rowSettings.maxHeight }}>
+                <tr 
+                  key={plan.id} 
+                  className="hover:bg-gray-50"
+                  style={{ 
+                    height: tableStyleSettings.row.height,
+                    minHeight: tableStyleSettings.row.minHeight,
+                    maxHeight: tableStyleSettings.row.maxHeight,
+                    verticalAlign: tableStyleSettings.row.verticalAlign,
+                    backgroundColor: tableStyleSettings.row.backgroundColor,
+                    borderBottom: tableStyleSettings.row.borderBottom,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = tableStyleSettings.row.hoverBackgroundColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = tableStyleSettings.row.backgroundColor;
+                  }}
+                >
                   {tableColumns.map(col => {
                     const settings = columnSettings[col] || { width: 'auto', minWidth: '100px', maxWidth: 'none', textAlign: 'left' };
                     
@@ -754,32 +871,76 @@ export default function Tebnar1() {
                       const showFetchButton = shouldShowFetchButton(plan, 1);
                       
                       return (
-                        <td 
-                          key={col} 
-                          className="px-2 py-2 align-middle"
+                        <td
+                          key={col}
                           style={{
                             width: settings.width,
                             minWidth: settings.minWidth,
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'center',
-                            height: rowSettings.height,
+                            height: tableStyleSettings.row.height,
+                            padding: tableStyleSettings.previewCell.padding,
+                            backgroundColor: tableStyleSettings.previewCell.backgroundColor,
+                            verticalAlign: tableStyleSettings.cell.verticalAlign,
+                            overflow: tableStyleSettings.cell.overflow,
                           }}
                         >
-                          {img && img.img_file_url1 ? (
-                            <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          {img ? (
+                            <img
+                              src={img.img_file_url1}
+                              alt={`Image ${1}`}
+                              style={{
+                                width: tableStyleSettings.previewImage.width,
+                                height: tableStyleSettings.previewImage.height,
+                                objectFit: tableStyleSettings.previewImage.objectFit,
+                                borderRadius: tableStyleSettings.previewImage.borderRadius,
+                                border: tableStyleSettings.previewImage.border,
+                              }}
+                            />
                           ) : isFetching ? (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center mx-auto">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <div 
+                              className="flex items-center justify-center bg-gray-100 rounded"
+                              style={{
+                                width: tableStyleSettings.loadingSpinner.width,
+                                height: tableStyleSettings.loadingSpinner.height,
+                                backgroundColor: tableStyleSettings.loadingSpinner.backgroundColor,
+                              }}
+                            >
+                              <div 
+                                className="animate-spin rounded-full border-b-2 border-blue-600"
+                                style={{
+                                  width: tableStyleSettings.loadingSpinner.spinnerSize,
+                                  height: tableStyleSettings.loadingSpinner.spinnerSize,
+                                  borderColor: `transparent transparent ${tableStyleSettings.loadingSpinner.spinnerColor} transparent`,
+                                }}
+                              ></div>
                             </div>
-                          ) : showFetchButton ? (
+                          ) : shouldShowFetchButton(plan, 1) ? (
                             <button
                               onClick={() => fetchSingleImage(plan, 1)}
-                              className="h-16 w-16 bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded flex items-center justify-center text-xs font-medium text-blue-700 mx-auto transition-colors"
+                              className="border border-blue-300 text-blue-700 hover:bg-blue-100 font-semibold rounded-lg transition-colors duration-200 ease-in-out"
+                              style={{
+                                width: tableStyleSettings.fetchButton.width,
+                                height: tableStyleSettings.fetchButton.height,
+                                borderRadius: tableStyleSettings.fetchButton.borderRadius,
+                                fontSize: tableStyleSettings.fetchButton.fontSize,
+                                fontWeight: tableStyleSettings.fetchButton.fontWeight,
+                                transition: tableStyleSettings.fetchButton.transition,
+                                backgroundColor: tableStyleSettings.fetchButton.backgroundColor,
+                                borderColor: tableStyleSettings.fetchButton.borderColor,
+                                color: tableStyleSettings.fetchButton.textColor,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = tableStyleSettings.fetchButton.hoverBackgroundColor;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = tableStyleSettings.fetchButton.backgroundColor;
+                              }}
                             >
                               Fetch Now
                             </button>
                           ) : (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto text-xs">No Image</div>
+                            <div className="text-gray-400 text-sm">No image</div>
                           )}
                         </td>
                       );
@@ -792,32 +953,76 @@ export default function Tebnar1() {
                       const showFetchButton = shouldShowFetchButton(plan, 2);
                       
                       return (
-                        <td 
-                          key={col} 
-                          className="px-2 py-2 align-middle"
+                        <td
+                          key={col}
                           style={{
                             width: settings.width,
                             minWidth: settings.minWidth,
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'center',
-                            height: rowSettings.height,
+                            height: tableStyleSettings.row.height,
+                            padding: tableStyleSettings.previewCell.padding,
+                            backgroundColor: tableStyleSettings.previewCell.backgroundColor,
+                            verticalAlign: tableStyleSettings.cell.verticalAlign,
+                            overflow: tableStyleSettings.cell.overflow,
                           }}
                         >
-                          {img && img.img_file_url1 ? (
-                            <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          {img ? (
+                            <img
+                              src={img.img_file_url1}
+                              alt={`Image ${2}`}
+                              style={{
+                                width: tableStyleSettings.previewImage.width,
+                                height: tableStyleSettings.previewImage.height,
+                                objectFit: tableStyleSettings.previewImage.objectFit,
+                                borderRadius: tableStyleSettings.previewImage.borderRadius,
+                                border: tableStyleSettings.previewImage.border,
+                              }}
+                            />
                           ) : isFetching ? (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center mx-auto">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <div 
+                              className="flex items-center justify-center bg-gray-100 rounded"
+                              style={{
+                                width: tableStyleSettings.loadingSpinner.width,
+                                height: tableStyleSettings.loadingSpinner.height,
+                                backgroundColor: tableStyleSettings.loadingSpinner.backgroundColor,
+                              }}
+                            >
+                              <div 
+                                className="animate-spin rounded-full border-b-2 border-blue-600"
+                                style={{
+                                  width: tableStyleSettings.loadingSpinner.spinnerSize,
+                                  height: tableStyleSettings.loadingSpinner.spinnerSize,
+                                  borderColor: `transparent transparent ${tableStyleSettings.loadingSpinner.spinnerColor} transparent`,
+                                }}
+                              ></div>
                             </div>
-                          ) : showFetchButton ? (
+                          ) : shouldShowFetchButton(plan, 2) ? (
                             <button
                               onClick={() => fetchSingleImage(plan, 2)}
-                              className="h-16 w-16 bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded flex items-center justify-center text-xs font-medium text-blue-700 mx-auto transition-colors"
+                              className="border border-blue-300 text-blue-700 hover:bg-blue-100 font-semibold rounded-lg transition-colors duration-200 ease-in-out"
+                              style={{
+                                width: tableStyleSettings.fetchButton.width,
+                                height: tableStyleSettings.fetchButton.height,
+                                borderRadius: tableStyleSettings.fetchButton.borderRadius,
+                                fontSize: tableStyleSettings.fetchButton.fontSize,
+                                fontWeight: tableStyleSettings.fetchButton.fontWeight,
+                                transition: tableStyleSettings.fetchButton.transition,
+                                backgroundColor: tableStyleSettings.fetchButton.backgroundColor,
+                                borderColor: tableStyleSettings.fetchButton.borderColor,
+                                color: tableStyleSettings.fetchButton.textColor,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = tableStyleSettings.fetchButton.hoverBackgroundColor;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = tableStyleSettings.fetchButton.backgroundColor;
+                              }}
                             >
                               Fetch Now
                             </button>
                           ) : (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto text-xs">No Image</div>
+                            <div className="text-gray-400 text-sm">No image</div>
                           )}
                         </td>
                       );
@@ -830,32 +1035,76 @@ export default function Tebnar1() {
                       const showFetchButton = shouldShowFetchButton(plan, 3);
                       
                       return (
-                        <td 
-                          key={col} 
-                          className="px-2 py-2 align-middle"
+                        <td
+                          key={col}
                           style={{
                             width: settings.width,
                             minWidth: settings.minWidth,
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'center',
-                            height: rowSettings.height,
+                            height: tableStyleSettings.row.height,
+                            padding: tableStyleSettings.previewCell.padding,
+                            backgroundColor: tableStyleSettings.previewCell.backgroundColor,
+                            verticalAlign: tableStyleSettings.cell.verticalAlign,
+                            overflow: tableStyleSettings.cell.overflow,
                           }}
                         >
-                          {img && img.img_file_url1 ? (
-                            <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          {img ? (
+                            <img
+                              src={img.img_file_url1}
+                              alt={`Image ${3}`}
+                              style={{
+                                width: tableStyleSettings.previewImage.width,
+                                height: tableStyleSettings.previewImage.height,
+                                objectFit: tableStyleSettings.previewImage.objectFit,
+                                borderRadius: tableStyleSettings.previewImage.borderRadius,
+                                border: tableStyleSettings.previewImage.border,
+                              }}
+                            />
                           ) : isFetching ? (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center mx-auto">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <div 
+                              className="flex items-center justify-center bg-gray-100 rounded"
+                              style={{
+                                width: tableStyleSettings.loadingSpinner.width,
+                                height: tableStyleSettings.loadingSpinner.height,
+                                backgroundColor: tableStyleSettings.loadingSpinner.backgroundColor,
+                              }}
+                            >
+                              <div 
+                                className="animate-spin rounded-full border-b-2 border-blue-600"
+                                style={{
+                                  width: tableStyleSettings.loadingSpinner.spinnerSize,
+                                  height: tableStyleSettings.loadingSpinner.spinnerSize,
+                                  borderColor: `transparent transparent ${tableStyleSettings.loadingSpinner.spinnerColor} transparent`,
+                                }}
+                              ></div>
                             </div>
-                          ) : showFetchButton ? (
+                          ) : shouldShowFetchButton(plan, 3) ? (
                             <button
                               onClick={() => fetchSingleImage(plan, 3)}
-                              className="h-16 w-16 bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded flex items-center justify-center text-xs font-medium text-blue-700 mx-auto transition-colors"
+                              className="border border-blue-300 text-blue-700 hover:bg-blue-100 font-semibold rounded-lg transition-colors duration-200 ease-in-out"
+                              style={{
+                                width: tableStyleSettings.fetchButton.width,
+                                height: tableStyleSettings.fetchButton.height,
+                                borderRadius: tableStyleSettings.fetchButton.borderRadius,
+                                fontSize: tableStyleSettings.fetchButton.fontSize,
+                                fontWeight: tableStyleSettings.fetchButton.fontWeight,
+                                transition: tableStyleSettings.fetchButton.transition,
+                                backgroundColor: tableStyleSettings.fetchButton.backgroundColor,
+                                borderColor: tableStyleSettings.fetchButton.borderColor,
+                                color: tableStyleSettings.fetchButton.textColor,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = tableStyleSettings.fetchButton.hoverBackgroundColor;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = tableStyleSettings.fetchButton.backgroundColor;
+                              }}
                             >
                               Fetch Now
                             </button>
                           ) : (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto text-xs">No Image</div>
+                            <div className="text-gray-400 text-sm">No image</div>
                           )}
                         </td>
                       );
@@ -868,114 +1117,178 @@ export default function Tebnar1() {
                       const showFetchButton = shouldShowFetchButton(plan, 4);
                       
                       return (
-                        <td 
-                          key={col} 
-                          className="px-2 py-2 align-middle"
+                        <td
+                          key={col}
                           style={{
                             width: settings.width,
                             minWidth: settings.minWidth,
                             maxWidth: settings.maxWidth,
                             textAlign: settings.textAlign || 'center',
-                            height: rowSettings.height,
+                            height: tableStyleSettings.row.height,
+                            padding: tableStyleSettings.previewCell.padding,
+                            backgroundColor: tableStyleSettings.previewCell.backgroundColor,
+                            verticalAlign: tableStyleSettings.cell.verticalAlign,
+                            overflow: tableStyleSettings.cell.overflow,
                           }}
                         >
-                          {img && img.img_file_url1 ? (
-                            <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          {img ? (
+                            <img
+                              src={img.img_file_url1}
+                              alt={`Image ${4}`}
+                              style={{
+                                width: tableStyleSettings.previewImage.width,
+                                height: tableStyleSettings.previewImage.height,
+                                objectFit: tableStyleSettings.previewImage.objectFit,
+                                borderRadius: tableStyleSettings.previewImage.borderRadius,
+                                border: tableStyleSettings.previewImage.border,
+                              }}
+                            />
                           ) : isFetching ? (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center mx-auto">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <div 
+                              className="flex items-center justify-center bg-gray-100 rounded"
+                              style={{
+                                width: tableStyleSettings.loadingSpinner.width,
+                                height: tableStyleSettings.loadingSpinner.height,
+                                backgroundColor: tableStyleSettings.loadingSpinner.backgroundColor,
+                              }}
+                            >
+                              <div 
+                                className="animate-spin rounded-full border-b-2 border-blue-600"
+                                style={{
+                                  width: tableStyleSettings.loadingSpinner.spinnerSize,
+                                  height: tableStyleSettings.loadingSpinner.spinnerSize,
+                                  borderColor: `transparent transparent ${tableStyleSettings.loadingSpinner.spinnerColor} transparent`,
+                                }}
+                              ></div>
                             </div>
-                          ) : showFetchButton ? (
+                          ) : shouldShowFetchButton(plan, 4) ? (
                             <button
                               onClick={() => fetchSingleImage(plan, 4)}
-                              className="h-16 w-16 bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded flex items-center justify-center text-xs font-medium text-blue-700 mx-auto transition-colors"
+                              className="border border-blue-300 text-blue-700 hover:bg-blue-100 font-semibold rounded-lg transition-colors duration-200 ease-in-out"
+                              style={{
+                                width: tableStyleSettings.fetchButton.width,
+                                height: tableStyleSettings.fetchButton.height,
+                                borderRadius: tableStyleSettings.fetchButton.borderRadius,
+                                fontSize: tableStyleSettings.fetchButton.fontSize,
+                                fontWeight: tableStyleSettings.fetchButton.fontWeight,
+                                transition: tableStyleSettings.fetchButton.transition,
+                                backgroundColor: tableStyleSettings.fetchButton.backgroundColor,
+                                borderColor: tableStyleSettings.fetchButton.borderColor,
+                                color: tableStyleSettings.fetchButton.textColor,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = tableStyleSettings.fetchButton.hoverBackgroundColor;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = tableStyleSettings.fetchButton.backgroundColor;
+                              }}
                             >
                               Fetch Now
                             </button>
                           ) : (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto text-xs">No Image</div>
+                            <div className="text-gray-400 text-sm">No image</div>
                           )}
                         </td>
                       );
+                    } else {
+                      // Regular data cell
+                      return (
+                        <td
+                          key={col}
+                          style={{
+                            width: settings.width,
+                            minWidth: settings.minWidth,
+                            maxWidth: settings.maxWidth,
+                            textAlign: settings.textAlign || 'left',
+                            height: tableStyleSettings.row.height,
+                            padding: tableStyleSettings.cell.padding,
+                            verticalAlign: tableStyleSettings.cell.verticalAlign,
+                            overflow: tableStyleSettings.cell.overflow,
+                            textOverflow: tableStyleSettings.cell.textOverflow,
+                            whiteSpace: tableStyleSettings.cell.whiteSpace,
+                            wordBreak: tableStyleSettings.cell.wordBreak,
+                            fontSize: tableStyleSettings.textCell.fontSize,
+                            lineHeight: tableStyleSettings.textCell.lineHeight,
+                            color: tableStyleSettings.textCell.color,
+                            fontWeight: tableStyleSettings.textCell.fontWeight,
+                          }}
+                        >
+                          {String(plan[col as keyof typeof plan] ?? '')}
+                        </td>
+                      );
                     }
-                    // Default: show value for non-preview columns
-                    return (
-                      <td
-                        key={col}
-                        className="px-4 py-2 overflow-hidden align-middle"
-                        style={{
-                          width: settings.width,
-                          minWidth: settings.minWidth,
-                          maxWidth: settings.maxWidth,
-                          textAlign: settings.textAlign || 'left',
-                          height: rowSettings.height,
-                          whiteSpace: settings.textAlign === 'left' ? 'nowrap' : 'normal',
-                        }}
-                      >
-                        {String(plan[col] ?? '')}
-                      </td>
-                    );
                   })}
                 </tr>
               ))}
             </tbody>
           </table>
           
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
-            <div className="flex items-center">
-              <span className="text-sm text-gray-700">
-                Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-                <span className="font-medium">{endIndex}</span> of{' '}
-                <span className="font-medium">{totalItems}</span> results
-              </span>
-              <select
-                value={pageSize}
-                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                className="ml-4 rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-              >
-                {pageSizeOptions.map(size => (
-                  <option key={size} value={size}>
-                    {size} per page
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                First
-              </button>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
+          {/* Pagination */}
+          <div 
+            className="px-6 py-3 border-t border-gray-200 bg-white"
+            style={{
+              backgroundColor: tableStyleSettings.pagination.backgroundColor,
+              borderTop: tableStyleSettings.pagination.borderTop,
+              padding: tableStyleSettings.pagination.padding,
+              fontSize: tableStyleSettings.pagination.fontSize,
+              color: tableStyleSettings.pagination.color,
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <span className="text-sm text-gray-700">
+                  Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
+                  <span className="font-medium">{endIndex}</span> of{' '}
+                  <span className="font-medium">{totalItems}</span> results
+                </span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                  className="ml-4 rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                >
+                  {pageSizeOptions.map(size => (
+                    <option key={size} value={size}>
+                      {size} per page
+                    </option>
+                  ))}
+                </select>
+              </div>
               
-              <span className="text-sm text-gray-700">
-                Page {currentPage} of {totalPages}
-              </span>
-              
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-              <button
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Last
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handlePageChange(1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  First
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                
+                <span className="text-sm text-gray-700">
+                  Page {currentPage} of {totalPages}
+                </span>
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Last
+                </button>
+              </div>
             </div>
           </div>
           
