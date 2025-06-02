@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { option_name: string } }
+  context: { params: Promise<{ option_name: string }> }
 ) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
@@ -18,7 +18,7 @@ export async function GET(
       );
     }
 
-    const { option_name } = params;
+    const { option_name } = await context.params;
 
     // Fetch the admin option by name
     const { data: adminOption, error } = await supabase
