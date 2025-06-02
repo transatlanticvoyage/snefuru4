@@ -339,6 +339,37 @@ export default function StatusJar1() {
 
       if (plansError) throw plansError;
 
+      // Determine the intended qty per plan by looking at the highest number of images in any plan
+      let qtyImagesPerPlan = 1;
+      if (plans.length > 0) {
+        qtyImagesPerPlan = Math.max(...plans.map(plan => {
+          return [
+            plan.fk_image1_id,
+            plan.fk_image2_id,
+            plan.fk_image3_id,
+            plan.fk_image4_id
+          ].filter(Boolean).length;
+        }));
+        
+        // If no images exist yet, try to infer from the first plan that has any image slots filled
+        if (qtyImagesPerPlan === 0) {
+          for (const plan of plans) {
+            const imageSlots = [
+              plan.fk_image1_id !== null,
+              plan.fk_image2_id !== null,
+              plan.fk_image3_id !== null,
+              plan.fk_image4_id !== null
+            ];
+            const lastFilledIndex = imageSlots.lastIndexOf(true);
+            if (lastFilledIndex >= 0) {
+              qtyImagesPerPlan = Math.max(qtyImagesPerPlan, lastFilledIndex + 1);
+            }
+          }
+          // If still 0, default to 4 as a reasonable assumption
+          if (qtyImagesPerPlan === 0) qtyImagesPerPlan = 4;
+        }
+      }
+
       // Get batch details for folder structure
       const { data: batchRow } = await supabase
         .from('images_plans_batches')
@@ -375,8 +406,9 @@ export default function StatusJar1() {
       const batchFolder = `${batchDate} - ${batchSeq}`;
 
       let jobsQueued = 0;
+      let incompleteParPlans = 0;
       
-      // For each plan, queue missing images
+      // For each plan, queue missing images only up to the intended qty
       for (let i = 0; i < plans.length; i++) {
         const plan = plans[i];
         const seq = i + 1;
@@ -384,46 +416,62 @@ export default function StatusJar1() {
         baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
         const planFolder = `${seq} - ${baseFileName}`;
         
-        const missingSlots = [];
-        if (!plan.fk_image1_id) missingSlots.push(1);
-        if (!plan.fk_image2_id) missingSlots.push(2);
-        if (!plan.fk_image3_id) missingSlots.push(3);
-        if (!plan.fk_image4_id) missingSlots.push(4);
-
-        for (const slot of missingSlots) {
-          let imageFileName = baseFileName;
-          if (slot > 1) {
-            const extIdx = baseFileName.lastIndexOf('.');
-            if (extIdx > 0) {
-              imageFileName = baseFileName.slice(0, extIdx) + `-${slot}` + baseFileName.slice(extIdx);
-            } else {
-              imageFileName = baseFileName + `-${slot}`;
+        // Calculate how many images this plan currently has
+        const currentImageCount = [
+          plan.fk_image1_id,
+          plan.fk_image2_id,
+          plan.fk_image3_id,
+          plan.fk_image4_id
+        ].filter(Boolean).length;
+        
+        // Only process plans that are incomplete
+        if (currentImageCount < qtyImagesPerPlan) {
+          incompleteParPlans++;
+          
+          // Find missing slots up to the intended qty
+          const missingSlots = [];
+          for (let slot = 1; slot <= qtyImagesPerPlan; slot++) {
+            const imageFieldName = `fk_image${slot}_id`;
+            if (!plan[imageFieldName]) {
+              missingSlots.push(slot);
             }
           }
 
-          // Queue the job
-          const response = await fetch('/api/background-jobs/add-job', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jobType: 'generate_image',
-              data: {
-                plan,
-                imageSlot: slot,
-                batchFolder: `${batchFolder}/${planFolder}`,
-                fileName: imageFileName
-              },
-              priority: 5 - slot // Higher priority for earlier image slots
-            })
-          });
+          for (const slot of missingSlots) {
+            let imageFileName = baseFileName;
+            if (slot > 1) {
+              const extIdx = baseFileName.lastIndexOf('.');
+              if (extIdx > 0) {
+                imageFileName = baseFileName.slice(0, extIdx) + `-${slot}` + baseFileName.slice(extIdx);
+              } else {
+                imageFileName = baseFileName + `-${slot}`;
+              }
+            }
 
-          if (response.ok) {
-            jobsQueued++;
+            // Queue the job
+            const response = await fetch('/api/background-jobs/add-job', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jobType: 'generate_image',
+                data: {
+                  plan,
+                  imageSlot: slot,
+                  batchFolder: `${batchFolder}/${planFolder}`,
+                  fileName: imageFileName
+                },
+                priority: 5 - slot // Higher priority for earlier image slots
+              })
+            });
+
+            if (response.ok) {
+              jobsQueued++;
+            }
           }
         }
       }
 
-      setError(`Successfully queued ${jobsQueued} image generation jobs for batch ${batchId}`);
+      setError(`Successfully queued ${jobsQueued} image generation jobs for batch ${batchId} (${incompleteParPlans} incomplete plans, ${qtyImagesPerPlan} images per plan intended)`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to queue missing images');
     }
