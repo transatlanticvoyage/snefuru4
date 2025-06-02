@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
       console.log('✅ Image downloaded successfully, size:', imageBuffer.byteLength);
 
       // Step 3: Create proper folder structure and upload to Supabase Storage
-      // Get the plan data to create proper folder structure
+      // Get the plan data and batch info to recreate exact same folder structure as bulk generation
       const { data: fullPlanData, error: planDetailsError } = await supabase
         .from('images_plans')
         .select('rel_images_plans_batches_id, e_file_name1, e_prompt1')
@@ -180,25 +180,90 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
 
-      // Create batch folder name (use batch ID or fallback)
-      const batchId = fullPlanData.rel_images_plans_batches_id || 'default';
-      const batchFolder = `batch_${batchId}`;
-      
-      // Create plan folder name (use plan ID)
-      const planFolder = `plan_${plan_id}`;
-      
-      // Create safe filename
-      let safeFileName = fullPlanData.e_file_name1 && typeof fullPlanData.e_file_name1 === 'string' && fullPlanData.e_file_name1.trim() 
+      const batchId = fullPlanData.rel_images_plans_batches_id;
+      if (!batchId) {
+        console.error('❌ Plan has no batch ID');
+        return NextResponse.json({ 
+          success: false, 
+          message: 'Plan has no associated batch' 
+        }, { status: 500 });
+      }
+
+      // Get batch creation date and sequence number for the day (same as bulk generation)
+      const { data: batchRow } = await supabase
+        .from('images_plans_batches')
+        .select('created_at')
+        .eq('id', batchId)
+        .single();
+
+      let batchDate = 'unknown_date';
+      let batchSeq = 1;
+      if (batchRow && batchRow.created_at) {
+        const dateObj = new Date(batchRow.created_at);
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        batchDate = `${yyyy}_${mm}_${dd}`;
+        
+        // Count how many batches exist for this user on this date (including this one)
+        const { count } = await supabase
+          .from('images_plans_batches')
+          .select('id', { count: 'exact', head: true })
+          .eq('rel_users_id', userData.id)
+          .gte('created_at', `${yyyy}-${mm}-${dd}T00:00:00.000Z`)
+          .lte('created_at', `${yyyy}-${mm}-${dd}T23:59:59.999Z`);
+        batchSeq = (count || 1);
+      }
+      const batchFolder = `${batchDate} - ${batchSeq}`;
+
+      // Get the plan's sequence number within the batch (same as bulk generation)
+      const { data: allPlansInBatch, error: plansError } = await supabase
+        .from('images_plans')
+        .select('id, created_at')
+        .eq('rel_images_plans_batches_id', batchId)
+        .order('created_at', { ascending: true });
+
+      if (plansError || !allPlansInBatch) {
+        console.error('❌ Failed to get plans in batch for sequence number');
+        return NextResponse.json({ 
+          success: false, 
+          message: 'Failed to determine plan sequence' 
+        }, { status: 500 });
+      }
+
+      // Find the sequence number (1-based index) of this plan in the batch
+      const planIndex = allPlansInBatch.findIndex(p => p.id === plan_id);
+      const seq = planIndex + 1; // 1-based sequence
+
+      // Create base filename (same logic as bulk generation)
+      let baseFileName = fullPlanData.e_file_name1 && typeof fullPlanData.e_file_name1 === 'string' && fullPlanData.e_file_name1.trim() 
         ? fullPlanData.e_file_name1.trim() 
-        : `image_${image_slot}_${Date.now()}`;
+        : `image_${seq}.png`;
       
       // Ensure the filename is safe (no path traversal)
-      safeFileName = safeFileName.replace(/[^a-zA-Z0-9._-]/g, '_') + '.png';
+      baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
       
-      // Full storage path: barge1/batch_ID/plan_ID/filename.png
-      const storagePath = `barge1/${batchFolder}/${planFolder}/${safeFileName}`;
+      // Create plan folder name: SEQ - FILENAME (same as bulk generation)
+      const planFolder = `${seq} - ${baseFileName}`;
+      
+      // Create image filename with slot suffix if not slot 1 (same as bulk generation)
+      let imageFileName = baseFileName;
+      if (image_slot > 1) {
+        const extIdx = baseFileName.lastIndexOf('.');
+        if (extIdx > 0) {
+          imageFileName = baseFileName.slice(0, extIdx) + `-${image_slot}` + baseFileName.slice(extIdx);
+        } else {
+          imageFileName = baseFileName + `-${image_slot}`;
+        }
+      }
+
+      // Full storage path: barge1/${batchFolder}/${planFolder}/${imageFileName}
+      const storagePath = `barge1/${batchFolder}/${planFolder}/${imageFileName}`;
       
       console.log('📁 Uploading to storage path:', storagePath);
+      console.log('📁 Batch folder:', batchFolder);
+      console.log('📁 Plan folder:', planFolder);
+      console.log('📁 Image filename:', imageFileName);
 
       // Step 4: Upload to Supabase Storage
       const uploadController = new AbortController();
