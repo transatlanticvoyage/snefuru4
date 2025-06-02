@@ -145,22 +145,33 @@ export async function POST(request: NextRequest) {
 
       // Create image record in database
       console.log('💾 Saving image to database...');
+      console.log('Image data to insert:', {
+        rel_users_id: userData.id,
+        rel_images_plans_id: plan_id,
+        img_file_url1: imageUrl,
+        prompt1: prompt,
+        status: 'generated'
+      });
+      
       const { data: newImage, error: imageError } = await supabase
         .from('images')
         .insert({
           rel_users_id: userData.id,
+          rel_images_plans_id: plan_id,
           img_file_url1: imageUrl,
-          e_prompt1: prompt,
-          e_image_generator1: aiModel || 'dall-e-3'
+          prompt1: prompt,
+          status: 'generated'
         })
         .select()
         .single();
 
       if (imageError || !newImage) {
         console.error('❌ Failed to save image to database:', imageError);
+        console.error('❌ Detailed error:', JSON.stringify(imageError, null, 2));
         return NextResponse.json({ 
           success: false, 
-          message: 'Failed to save image to database' 
+          message: `Failed to save image to database: ${imageError?.message || 'Unknown error'}`,
+          details: imageError
         }, { status: 500 });
       }
 
