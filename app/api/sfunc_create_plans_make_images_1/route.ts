@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { sfunc_create_image_with_openai } from './sfunc_create_image_with_openai';
 import JSZip from 'jszip';
 import sharp from 'sharp';
+import { logger } from '@/lib/error-logger';
 
 // Mock image generation function
 async function generateImage({ plan, aiModel }: { plan: any; aiModel: string }) {
@@ -23,7 +24,7 @@ async function generateImage({ plan, aiModel }: { plan: any; aiModel: string }) 
 
 export async function POST(request: Request) {
   try {
-    const { records, qty, aiModel, generateZip, wipeMeta } = await request.json();
+    const { records, qty, aiModel, generateZip, wipeMeta, throttle1 } = await request.json();
     if (!Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ success: false, message: 'No records provided' }, { status: 400 });
     }
@@ -92,6 +93,26 @@ export async function POST(request: Request) {
 
     // 3. For each plan, generate images, insert them, and update the plan with fk_imageX_id
     const updatedPlans = [];
+    
+    // Helper function for throttling delays
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    
+    // Log throttling configuration if enabled
+    if (throttle1?.enabled) {
+      await logger.info({
+        category: 'throttle_system',
+        message: `Throttle1 enabled for batch ${batchId}`,
+        details: {
+          delayBetweenImages: throttle1.delayBetweenImages,
+          delayBetweenPlans: throttle1.delayBetweenPlans,
+          totalPlans: plansData.length,
+          qtyPerPlan: qty,
+          estimatedTotalTime: (plansData.length * throttle1.delayBetweenPlans + plansData.length * qty * throttle1.delayBetweenImages) / 1000
+        },
+        batch_id: batchId
+      });
+    }
+    
     for (let i = 0; i < plansData.length; i++) {
       const plan = plansData[i];
       const imageIds: (string | null)[] = [];
@@ -101,6 +122,7 @@ export async function POST(request: Request) {
       // Ensure the filename is safe
       baseFileName = baseFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
       const planFolder = `${seq} - ${baseFileName}`;
+      
       for (let j = 0; j < Math.min(qty, 4); j++) {
         // Generate image using OpenAI
         let prompt = plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1 || 'AI Image';
@@ -114,11 +136,17 @@ export async function POST(request: Request) {
             imageFileName = baseFileName + `-${j + 1}`;
           }
         }
+        
         const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id, batchFolder: `${batchFolder}/${planFolder}`, fileName: imageFileName });
         if (!imageResult.success) {
           imageIds.push(null);
+          // Add throttle delay even for failed images to maintain consistent pacing
+          if (throttle1?.enabled && throttle1.delayBetweenImages > 0 && j < Math.min(qty, 4) - 1) {
+            await delay(throttle1.delayBetweenImages);
+          }
           continue;
         }
+        
         // Insert image into images table
         const { data: imageInsert, error: imageError } = await supabase
           .from('images')
@@ -141,7 +169,13 @@ export async function POST(request: Request) {
         } else {
           imageIds.push(imageInsert.id);
         }
+        
+        // Throttle1: Add delay between images (but not after the last image in the plan)
+        if (throttle1?.enabled && throttle1.delayBetweenImages > 0 && j < Math.min(qty, 4) - 1) {
+          await delay(throttle1.delayBetweenImages);
+        }
       }
+      
       // Prepare update object for fk_image1_id ... fk_image4_id
       const updateObj: Record<string, string | null> = {};
       for (let k = 0; k < 4; k++) {
@@ -153,6 +187,26 @@ export async function POST(request: Request) {
         .update(updateObj)
         .eq('id', plan.id);
       updatedPlans.push({ ...plan, ...updateObj });
+      
+      // Throttle1: Add delay between plans (but not after the last plan)
+      if (throttle1?.enabled && throttle1.delayBetweenPlans > 0 && i < plansData.length - 1) {
+        await delay(throttle1.delayBetweenPlans);
+      }
+    }
+
+    // Log completion if throttling was used
+    if (throttle1?.enabled) {
+      await logger.info({
+        category: 'throttle_system',
+        message: `Throttled image generation completed for batch ${batchId}`,
+        details: {
+          totalPlansProcessed: plansData.length,
+          totalImagesGenerated: updatedPlans.reduce((acc, plan) => {
+            return acc + [plan.fk_image1_id, plan.fk_image2_id, plan.fk_image3_id, plan.fk_image4_id].filter(Boolean).length;
+          }, 0)
+        },
+        batch_id: batchId
+      });
     }
 
     // After all images are uploaded, if generateZip is true, create a zip file in the batch folder

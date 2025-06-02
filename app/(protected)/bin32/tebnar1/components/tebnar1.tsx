@@ -138,6 +138,11 @@ export default function Tebnar1() {
   const [imagesById, setImagesById] = useState<Record<string, any>>({});
   const [generateZip, setGenerateZip] = useState(false);
   const [wipeMeta, setWipeMeta] = useState(false);
+  const [throttle1, setThrottle1] = useState({
+    enabled: false,
+    delayBetweenImages: 3000, // milliseconds, default 3 seconds
+    delayBetweenPlans: 1000,  // milliseconds, default 1 second
+  });
 
   // Fetch all images for the user and map by id
   useEffect(() => {
@@ -417,6 +422,62 @@ export default function Tebnar1() {
             />
             <label htmlFor="wipe-meta" className="text-sm font-medium">Wipe all meta data from images</label>
           </div>
+          
+          {/* Throttle1 Controls */}
+          <div className="border-t border-gray-200 pt-4 mt-4">
+            <div className="flex items-center mb-3">
+              <input
+                id="throttle1-enabled"
+                type="checkbox"
+                checked={throttle1.enabled}
+                onChange={e => setThrottle1(prev => ({ ...prev, enabled: e.target.checked }))}
+                className="mr-2"
+              />
+              <label htmlFor="throttle1-enabled" className="text-sm font-medium text-blue-700">
+                🐌 Enable Throttle1 (Slow down API requests to prevent timeouts)
+              </label>
+            </div>
+            
+            {throttle1.enabled && (
+              <div className="ml-6 space-y-3 bg-blue-50 p-3 rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <label className="text-sm font-medium text-gray-700 min-w-[140px]">
+                    Delay between images:
+                  </label>
+                  <input
+                    type="number"
+                    value={throttle1.delayBetweenImages}
+                    onChange={e => setThrottle1(prev => ({ ...prev, delayBetweenImages: Number(e.target.value) }))}
+                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                    min="1000"
+                    max="30000"
+                    step="500"
+                  />
+                  <span className="text-sm text-gray-500">ms ({(throttle1.delayBetweenImages / 1000).toFixed(1)}s)</span>
+                </div>
+                
+                <div className="flex items-center space-x-4">
+                  <label className="text-sm font-medium text-gray-700 min-w-[140px]">
+                    Delay between plans:
+                  </label>
+                  <input
+                    type="number"
+                    value={throttle1.delayBetweenPlans}
+                    onChange={e => setThrottle1(prev => ({ ...prev, delayBetweenPlans: Number(e.target.value) }))}
+                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                    min="500"
+                    max="10000"
+                    step="250"
+                  />
+                  <span className="text-sm text-gray-500">ms ({(throttle1.delayBetweenPlans / 1000).toFixed(1)}s)</span>
+                </div>
+                
+                <div className="text-xs text-gray-600 mt-2">
+                  💡 Recommended: 3-5 seconds between images, 1-2 seconds between plans. Higher values reduce API timeouts but take longer.
+                </div>
+              </div>
+            )}
+          </div>
           <button
             className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
             onClick={async () => {
@@ -436,7 +497,7 @@ export default function Tebnar1() {
                   return obj;
                 });
                 const { func_create_plans_make_images_1 } = await import('../utils/cfunc_create_plans_make_images_1');
-                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel, generateZip, wipeMeta });
+                const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel, generateZip, wipeMeta, throttle1 });
                 setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
                 if (result?.batch_id) {
                   await refreshBatchesAndSelect(result.batch_id);
