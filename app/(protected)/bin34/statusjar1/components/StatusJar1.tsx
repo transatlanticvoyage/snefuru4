@@ -42,6 +42,8 @@ export default function StatusJar1() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [endingProcess, setEndingProcess] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState<string | null>(null);
+  const [processingAllJobs, setProcessingAllJobs] = useState(false);
+  const [processAllProgress, setProcessAllProgress] = useState({ current: 0, total: 0 });
   const supabase = createClientComponentClient();
 
   // Load settings on mount
@@ -544,6 +546,68 @@ export default function StatusJar1() {
     setShowConfirmDialog(null);
   };
 
+  // Function to process all jobs in queue
+  const processAllJobs = async () => {
+    try {
+      setProcessingAllJobs(true);
+      setError(null);
+      
+      const totalJobs = backgroundStatus.queueLength;
+      setProcessAllProgress({ current: 0, total: totalJobs });
+      
+      if (totalJobs === 0) {
+        setError('No jobs in queue to process');
+        return;
+      }
+
+      // Process jobs in batches to avoid overwhelming the system
+      let processedCount = 0;
+      const batchSize = backgroundSettings.maxConcurrentJobs || 1;
+      
+      while (processedCount < totalJobs) {
+        const response = await fetch('/api/background-jobs/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ settings: backgroundSettings })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          processedCount += result.processedJobs || 0;
+          setProcessAllProgress({ current: processedCount, total: totalJobs });
+          
+          // Update background status
+          const statusResponse = await fetch('/api/background-jobs/status');
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json();
+            if (statusData.success) {
+              setBackgroundStatus(statusData.status);
+            }
+          }
+          
+          // Break if no more jobs were processed
+          if ((result.processedJobs || 0) === 0) {
+            break;
+          }
+          
+          // Add delay between batches to avoid overwhelming the system
+          if (processedCount < totalJobs) {
+            await new Promise(resolve => setTimeout(resolve, backgroundSettings.delayBetweenImages));
+          }
+        } else {
+          throw new Error(result.message || 'Failed to process jobs');
+        }
+      }
+      
+      setError(`Processing complete! Processed ${processedCount} jobs total.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process all jobs');
+    } finally {
+      setProcessingAllJobs(false);
+      setProcessAllProgress({ current: 0, total: 0 });
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -862,6 +926,29 @@ export default function StatusJar1() {
                   <span className="text-sm font-medium">Failed Jobs</span>
                   <span className="text-sm text-gray-500">{backgroundStatus.failedJobs}</span>
                 </div>
+                
+                {/* Progress Bar for Processing All Jobs */}
+                {processingAllJobs && processAllProgress.total > 0 && (
+                  <div className="mt-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-blue-600">Processing All Jobs</span>
+                      <span className="text-sm text-gray-500">
+                        {processAllProgress.current} / {processAllProgress.total}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div
+                        className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                        style={{ 
+                          width: `${processAllProgress.total > 0 ? (processAllProgress.current / processAllProgress.total) * 100 : 0}%` 
+                        }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {Math.round(processAllProgress.total > 0 ? (processAllProgress.current / processAllProgress.total) * 100 : 0)}% Complete
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -879,6 +966,20 @@ export default function StatusJar1() {
                   }`}
                 >
                   Process Queue
+                </button>
+                <button
+                  onClick={processAllJobs}
+                  disabled={!backgroundSettings.enabled || processingAllJobs || backgroundStatus.queueLength === 0}
+                  className={`px-4 py-2 rounded transition-colors ${
+                    !backgroundSettings.enabled || processingAllJobs || backgroundStatus.queueLength === 0
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-purple-600 text-white hover:bg-purple-700'
+                  }`}
+                >
+                  {processingAllJobs 
+                    ? 'Processing...' 
+                    : `Process All (${backgroundStatus.queueLength}) Jobs Now`
+                  }
                 </button>
                 <button
                   onClick={clearCompletedJobs}
