@@ -187,7 +187,7 @@ const headerCustomizationSettings = {
     height: '60px',                    // Overall header row height
     minHeight: '40px',                 // Minimum header row height
     maxHeight: '100px',                // Maximum header row height
-    backgroundColor: '#fbf5d4',        // Header row background color - changed to requested color
+    backgroundColor: '#f7ead4',        // Header row background color - updated to new color
     borderBottom: '2px solid #e5e7eb', // Header row bottom border
     position: 'sticky' as 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky', // For sticky headers
     top: '0px',                        // Top position if sticky
@@ -230,7 +230,7 @@ const headerCustomizationSettings = {
     textAlign: 'center' as 'left' | 'center' | 'right', // Default text alignment
     borderRight: '1px solid #e5e7eb', // Right border between headers
     borderLeft: '0px solid transparent', // Left border
-    backgroundColor: '#fbf5d4',       // Individual cell background - changed to requested color
+    backgroundColor: '#f7ead4',       // Individual cell background - updated to new color
     overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto', // Overflow behavior
     textOverflow: 'ellipsis' as 'clip' | 'ellipsis', // Text overflow behavior
     whiteSpace: 'nowrap' as 'normal' | 'nowrap' | 'pre' | 'pre-wrap' | 'pre-line', // White space handling
@@ -583,7 +583,7 @@ const tableBorderSettings = {
     // Column-specific border overrides - all consistent now
     columnSpecific: {
       // Image preview columns
-      'image1-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      'image1-preview': { right: '1px solid #c7cbd3', left: '1px solidrgb(57, 72, 102)' },
       'image2-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
       'image3-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
       'image4-preview': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
