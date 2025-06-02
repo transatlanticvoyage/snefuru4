@@ -312,6 +312,16 @@ export async function POST(request: Request) {
       for (let k = 0; k < 4; k++) {
         updateObj[`fk_image${k + 1}_id`] = imageIds[k] || null;
       }
+      
+      // Set int fields based on qty (mark intended images)
+      // QTY = 1: int1 = "yes"
+      // QTY = 2: int1 = "yes", int2 = "yes"  
+      // QTY = 3: int1 = "yes", int2 = "yes", int3 = "yes"
+      // QTY = 4: int1 = "yes", int2 = "yes", int3 = "yes", int4 = "yes"
+      for (let m = 1; m <= Math.min(qty, 4); m++) {
+        updateObj[`int${m}`] = 'yes';
+      }
+      
       // Update the plan row
       await supabase
         .from('images_plans')
