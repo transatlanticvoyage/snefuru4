@@ -243,7 +243,7 @@ const headerCustomizationSettings = {
     fontSize: '12px',                 // Header text size
     fontWeight: '600' as 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900', // Font weight
     color: '#374151',                 // Text color
-    textTransform: 'uppercase' as 'none' | 'capitalize' | 'uppercase' | 'lowercase', // Text transformation
+    textTransform: 'lowercase' as 'none' | 'capitalize' | 'uppercase' | 'lowercase', // Text transformation - changed to lowercase
     letterSpacing: '0.05em',          // Letter spacing
     lineHeight: '1.4',                // Line height
     fontFamily: 'inherit',            // Font family
@@ -349,7 +349,7 @@ const tableStyleSettings = {
     whiteSpace: 'nowrap' as 'normal' | 'nowrap' | 'pre' | 'pre-wrap' | 'pre-line',
     wordBreak: 'break-word' as 'normal' | 'break-all' | 'keep-all' | 'break-word', // Better handling of long words
     wordWrap: 'break-word' as 'normal' | 'break-word' | 'anywhere', // Additional word breaking
-    verticalAlign: 'middle' as 'top' | 'middle' | 'bottom' | 'baseline',
+    verticalAlign: 'top' as 'top' | 'middle' | 'bottom' | 'baseline', // Changed from 'middle' to 'top' for upper left justification
     padding: '8px 16px',
     maxWidth: '100%', // Ensure cells don't exceed their allocated width
     minWidth: '0', // Allow cells to shrink if needed
