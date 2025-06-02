@@ -94,14 +94,12 @@ export default function StatusJar1() {
 
         if (batchesError) throw batchesError;
 
-        // Fetch background job status
-        if (backgroundSettings.enabled) {
-          const statusResponse = await fetch('/api/background-jobs/status');
-          if (statusResponse.ok) {
-            const statusData = await statusResponse.json();
-            if (statusData.success) {
-              setBackgroundStatus(statusData.status);
-            }
+        // Fetch background job status (always check, not just when enabled)
+        const statusResponse = await fetch('/api/background-jobs/status');
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          if (statusData.success) {
+            setBackgroundStatus(statusData.status);
           }
         }
 
@@ -488,6 +486,15 @@ export default function StatusJar1() {
       message += ` (${incompleteParPlans} incomplete plans, ${totalMissingImages} missing images total, ${qtyImagesPerPlan} images per plan intended)`;
       
       setError(message);
+      
+      // Refresh background status to show updated queue length
+      const statusResponse = await fetch('/api/background-jobs/status');
+      if (statusResponse.ok) {
+        const statusData = await statusResponse.json();
+        if (statusData.success) {
+          setBackgroundStatus(statusData.status);
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to queue missing images');
     }
@@ -1087,9 +1094,9 @@ export default function StatusJar1() {
                 </button>
                 <button
                   onClick={processAllJobs}
-                  disabled={!backgroundSettings.enabled || processingAllJobs || backgroundStatus.queueLength === 0}
+                  disabled={processingAllJobs || backgroundStatus.queueLength === 0}
                   className={`px-4 py-2 rounded transition-colors ${
-                    !backgroundSettings.enabled || processingAllJobs || backgroundStatus.queueLength === 0
+                    processingAllJobs || backgroundStatus.queueLength === 0
                       ? 'bg-gray-400 text-white cursor-not-allowed'
                       : 'bg-purple-600 text-white hover:bg-purple-700'
                   }`}
@@ -1113,7 +1120,7 @@ export default function StatusJar1() {
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                {!backgroundSettings.enabled && 'Enable background processing to use these controls.'}
+                {!backgroundSettings.enabled && 'Enable background processing to use continuous queue processing.'}
               </p>
             </div>
           </div>
