@@ -496,6 +496,10 @@ export default function Tebnar1() {
                   });
                   return obj;
                 });
+                
+                // Show progress message
+                setMakeImagesResult('🚀 Starting image generation... Check the statusbox1 logs for detailed progress!');
+                
                 const { func_create_plans_make_images_1 } = await import('../utils/cfunc_create_plans_make_images_1');
                 const result = await func_create_plans_make_images_1({ records, qty: qtyPerPlan, aiModel, generateZip, wipeMeta, throttle1 });
                 setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
@@ -510,9 +514,28 @@ export default function Tebnar1() {
             }}
             disabled={makeImagesLoading}
           >
-            {makeImagesLoading ? 'Submitting...' : 'Submit func_create_plans_make_images_1'}
+            {makeImagesLoading ? 'Generating Images...' : 'Submit func_create_plans_make_images_1'}
           </button>
-          {makeImagesResult && <div className="mt-2 text-sm text-gray-700">{makeImagesResult}</div>}
+          {makeImagesResult && (
+            <div className="mt-2 text-sm">
+              <div className={makeImagesResult.includes('🚀') ? 'text-blue-700' : 'text-gray-700'}>
+                {makeImagesResult}
+              </div>
+              {makeImagesLoading && (
+                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+                  <div className="text-sm text-blue-800">
+                    <strong>💡 Debug Tips:</strong>
+                    <ul className="mt-1 ml-4 list-disc text-xs">
+                      <li>Go to <strong>bin35/statusbox1</strong> to see real-time logs</li>
+                      <li>Filter by "image_generation" or "throttle_system" category</li>
+                      <li>Watch for timeout errors or OpenAI API failures</li>
+                      <li>Each image generation step is logged with details</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <hr className="my-6 border-t-2 border-gray-300" />
         {/* uitablegrid21 label */}

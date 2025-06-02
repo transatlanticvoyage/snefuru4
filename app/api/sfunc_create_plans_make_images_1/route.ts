@@ -137,37 +137,106 @@ export async function POST(request: Request) {
           }
         }
         
-        const imageResult = await sfunc_create_image_with_openai({ prompt, userId: userData.id, batchFolder: `${batchFolder}/${planFolder}`, fileName: imageFileName });
-        if (!imageResult.success) {
-          imageIds.push(null);
-          // Add throttle delay even for failed images to maintain consistent pacing
-          if (throttle1?.enabled && throttle1.delayBetweenImages > 0 && j < Math.min(qty, 4) - 1) {
-            await delay(throttle1.delayBetweenImages);
-          }
-          continue;
-        }
+        // Log individual image generation attempt
+        await logger.info({
+          category: 'image_generation',
+          message: `Generating image ${j + 1}/${Math.min(qty, 4)} for plan ${seq}`,
+          details: { 
+            prompt: prompt.substring(0, 100) + '...',
+            imageFileName,
+            planId: plan.id
+          },
+          batch_id: batchId,
+          plan_id: plan.id
+        });
         
-        // Insert image into images table
-        const { data: imageInsert, error: imageError } = await supabase
-          .from('images')
-          .insert({
-            rel_users_id: userData.id,
-            rel_images_plans_id: plan.id,
-            img_file_url1: imageResult.url,
-            img_file_extension: 'png',
-            img_file_size: null,
-            width: 1024,
-            height: 1024,
-            prompt1: prompt,
-            status: 'completed',
-            function_used_to_fetch_the_image: aiModel,
-          })
-          .select('id')
-          .single();
-        if (imageError || !imageInsert) {
+        try {
+          const imageResult = await sfunc_create_image_with_openai({ 
+            prompt, 
+            userId: userData.id, 
+            batchFolder: `${batchFolder}/${planFolder}`, 
+            fileName: imageFileName 
+          });
+          
+          if (!imageResult.success) {
+            await logger.error({
+              category: 'image_generation',
+              message: `Failed to generate image ${j + 1} for plan ${seq}`,
+              details: { 
+                error: imageResult.error,
+                prompt: prompt.substring(0, 100) + '...',
+                imageFileName
+              },
+              batch_id: batchId,
+              plan_id: plan.id
+            });
+            
+            imageIds.push(null);
+            // Add throttle delay even for failed images to maintain consistent pacing
+            if (throttle1?.enabled && throttle1.delayBetweenImages > 0 && j < Math.min(qty, 4) - 1) {
+              await delay(throttle1.delayBetweenImages);
+            }
+            continue;
+          }
+          
+          // Insert image into images table
+          const { data: imageInsert, error: imageError } = await supabase
+            .from('images')
+            .insert({
+              rel_users_id: userData.id,
+              rel_images_plans_id: plan.id,
+              img_file_url1: imageResult.url,
+              img_file_extension: 'png',
+              img_file_size: null,
+              width: 1024,
+              height: 1024,
+              prompt1: prompt,
+              status: 'completed',
+              function_used_to_fetch_the_image: aiModel,
+            })
+            .select('id')
+            .single();
+            
+          if (imageError || !imageInsert) {
+            await logger.error({
+              category: 'database',
+              message: `Failed to insert image ${j + 1} into database for plan ${seq}`,
+              details: { 
+                error: imageError?.message || 'No insert data returned',
+                imageUrl: imageResult.url
+              },
+              batch_id: batchId,
+              plan_id: plan.id
+            });
+            imageIds.push(null);
+          } else {
+            await logger.info({
+              category: 'image_generation',
+              message: `Successfully generated and saved image ${j + 1} for plan ${seq}`,
+              details: { 
+                imageId: imageInsert.id,
+                imageUrl: imageResult.url
+              },
+              batch_id: batchId,
+              plan_id: plan.id
+            });
+            imageIds.push(imageInsert.id);
+          }
+          
+        } catch (error) {
+          await logger.error({
+            category: 'image_generation',
+            message: `Unexpected error generating image ${j + 1} for plan ${seq}`,
+            details: { 
+              error: error instanceof Error ? error.message : String(error),
+              prompt: prompt.substring(0, 100) + '...',
+              imageFileName
+            },
+            batch_id: batchId,
+            plan_id: plan.id,
+            stack_trace: error instanceof Error ? error.stack : undefined
+          });
           imageIds.push(null);
-        } else {
-          imageIds.push(imageInsert.id);
         }
         
         // Throttle1: Add delay between images (but not after the last image in the plan)
