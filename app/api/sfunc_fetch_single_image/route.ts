@@ -284,14 +284,41 @@ export async function POST(request: NextRequest) {
         console.log('📂 Plan folder not found, determining from stored submission order...');
         
         // Use the stored submission_order directly (this is the original submission order)
-        const seq = planData.submission_order;
+        let seq = planData.submission_order;
         
+        // Fallback for plans created before submission_order feature
         if (!seq) {
-          console.error('❌ Plan has no submission_order stored');
-          return NextResponse.json({ 
-            success: false, 
-            message: 'Plan has no submission order stored. This plan may have been created before the submission order feature was implemented.' 
-          }, { status: 500 });
+          console.log('📂 No submission_order found, calculating from batch position (fallback for old plans)...');
+          
+          // Get all plans in this batch to determine sequence (fallback method)
+          const { data: allPlansInBatch, error: plansError } = await supabase
+            .from('images_plans')
+            .select('id, created_at')
+            .eq('rel_images_plans_batches_id', batchId)
+            .order('created_at', { ascending: true });
+
+          if (plansError || !allPlansInBatch) {
+            console.error('❌ Failed to get plans in batch for sequence calculation');
+            return NextResponse.json({ 
+              success: false, 
+              message: 'Failed to determine plan sequence (both submission_order and fallback method failed)' 
+            }, { status: 500 });
+          }
+
+          // Find the sequence number (1-based index) of this plan in the batch
+          const planIndex = allPlansInBatch.findIndex(p => p.id === plan_id);
+          if (planIndex === -1) {
+            console.error('❌ Plan not found in batch');
+            return NextResponse.json({ 
+              success: false, 
+              message: 'Plan not found in its associated batch' 
+            }, { status: 500 });
+          }
+          
+          seq = planIndex + 1; // 1-based sequence
+          console.log('📂 Calculated sequence from position:', seq);
+        } else {
+          console.log('📂 Using stored submission_order:', seq);
         }
 
         // Create base filename (same logic as bulk generation)
@@ -304,7 +331,7 @@ export async function POST(request: NextRequest) {
         
         // Create plan folder name: SEQ - FILENAME (same as bulk generation)
         foundPlanFolder = `${seq} - ${baseFileName}`;
-        console.log('📂 Determined plan folder from submission_order:', foundPlanFolder);
+        console.log('📂 Determined plan folder:', foundPlanFolder);
       }
 
       // Create image filename with slot suffix if not slot 1 (same as bulk generation)
