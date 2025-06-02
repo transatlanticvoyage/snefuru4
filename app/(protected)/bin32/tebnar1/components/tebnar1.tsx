@@ -241,7 +241,7 @@ const headerCustomizationSettings = {
   
   // Header cell styling
   headerCell: {
-    padding: '4px 4px',             // Header cell padding
+    padding: '4px 4px',             // Header cell padding - ensure 4px for all headers
     verticalAlign: 'middle' as 'top' | 'middle' | 'bottom' | 'baseline', // Vertical alignment
     textAlign: 'center' as 'left' | 'center' | 'right', // Default text alignment
     borderRight: '1px solid #e5e7eb', // Right border between headers
@@ -495,7 +495,7 @@ const tableCellPaddingSettings = {
     'int3': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     'int4': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     
-    // Image preview columns - 4px padding
+    // Image preview columns - 4px padding (ensuring these are set correctly)
     'image1-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     'image2-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     'image3-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
@@ -718,7 +718,7 @@ const gridCols = 9; // A-I
 const gridRows = 11;
 const colHeaders = Array.from({ length: gridCols }, (_, i) => String.fromCharCode(65 + i)); // ['A',...,'I']
 
-function ExcelPasteGrid({ onGridDataChange }: { onGridDataChange?: (grid: string[][]) => void }) {
+function ExcelPasteGrid({ onGridDataChange, presetData }: { onGridDataChange?: (grid: string[][]) => void; presetData?: string[][] | null }) {
   const [grid, setGrid] = useState<string[][]>(Array.from({ length: gridRows }, () => Array(gridCols).fill('')));
   const [selected, setSelected] = useState<{ row: number; col: number }>({ row: 0, col: 0 });
   const gridRef = useRef<HTMLTableElement>(null);
@@ -726,6 +726,27 @@ function ExcelPasteGrid({ onGridDataChange }: { onGridDataChange?: (grid: string
   useEffect(() => {
     if (onGridDataChange) onGridDataChange(grid);
   }, [grid, onGridDataChange]);
+
+  // Handle preset data when it changes
+  useEffect(() => {
+    if (presetData && presetData.length > 0) {
+      // Create a new grid with preset data
+      const newGrid = Array.from({ length: gridRows }, () => Array(gridCols).fill(''));
+      
+      // Fill the grid with preset data
+      presetData.forEach((row, rowIndex) => {
+        if (rowIndex < gridRows) {
+          row.forEach((cell, colIndex) => {
+            if (colIndex < gridCols) {
+              newGrid[rowIndex][colIndex] = cell;
+            }
+          });
+        }
+      });
+      
+      setGrid(newGrid);
+    }
+  }, [presetData]);
 
   // Handle cell click
   const handleCellClick = (row: number, col: number) => {
@@ -835,6 +856,8 @@ export default function Tebnar1() {
     delayBetweenPlans: 1000,  // milliseconds, default 1 second
   });
   const [fetchingImages, setFetchingImages] = useState<Set<string>>(new Set()); // Track which images are being fetched
+  const [loadingPreset, setLoadingPreset] = useState(false); // Track loading state for preset button
+  const [presetData, setPresetData] = useState<string[][] | null>(null); // Store preset data to pass to grid
 
   // Inject CSS styles for main element styling
   useEffect(() => {
@@ -1265,6 +1288,34 @@ export default function Tebnar1() {
     }
   };
 
+  // Function to load dummy data from admin_options
+  const loadDummyData = async () => {
+    setLoadingPreset(true);
+    try {
+      const response = await fetch('/api/admin-options/kregno_xls_info_1');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+      
+      const result = await response.json();
+      if (result.success && result.data?.json1) {
+        const { headers, rows } = result.data.json1;
+        
+        // Create grid data with headers as first row
+        const newGridData = [headers, ...rows];
+        setPresetData(newGridData);
+        setError('✅ Dummy data loaded successfully!');
+      } else {
+        throw new Error('No data found or invalid format');
+      }
+    } catch (err) {
+      console.error('Error loading dummy data:', err);
+      setError(`❌ Failed to load dummy data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setLoadingPreset(false);
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -1305,7 +1356,18 @@ export default function Tebnar1() {
       )}
       
       <div className="w-full px-4">
-        <ExcelPasteGrid onGridDataChange={setGridData} />
+        {/* Preset Data Button - positioned above kzelement6 */}
+        <div className="mb-4">
+          <button
+            onClick={loadDummyData}
+            disabled={loadingPreset}
+            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          >
+            {loadingPreset ? 'Loading...' : 'use dummy kregno xls info 1'}
+          </button>
+        </div>
+
+        <ExcelPasteGrid onGridDataChange={setGridData} presetData={presetData} />
         <hr className="my-6 border-t-2 border-gray-300" />
         {/* OPTION 1: Submit func_create_plans_from_xls_1 button */}
         <div className="my-4">
