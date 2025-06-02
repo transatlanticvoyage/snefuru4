@@ -143,6 +143,7 @@ export default function Tebnar1() {
     delayBetweenImages: 3000, // milliseconds, default 3 seconds
     delayBetweenPlans: 1000,  // milliseconds, default 1 second
   });
+  const [fetchingImages, setFetchingImages] = useState<Set<string>>(new Set()); // Track which images are being fetched
 
   // Fetch all images for the user and map by id
   useEffect(() => {
@@ -333,6 +334,83 @@ export default function Tebnar1() {
     ...columns.slice(4),
   ];
 
+  // Helper function to determine if "fetch now" button should be shown
+  const shouldShowFetchButton = (plan: any, imageSlot: number): boolean => {
+    if (!plan) return false;
+    
+    // Check if this specific image slot is missing
+    const imageFieldName = `fk_image${imageSlot}_id`;
+    const hasImage = plan[imageFieldName];
+    
+    if (hasImage) return false; // Already has image
+    
+    // Show fetch button if:
+    // 1. Plan has at least one image (indicating generation was attempted)
+    // 2. Or if image slot 1 is missing (always allow fetching first image)
+    const hasAnyImage = plan.fk_image1_id || plan.fk_image2_id || plan.fk_image3_id || plan.fk_image4_id;
+    return imageSlot === 1 || hasAnyImage;
+  };
+
+  // Function to fetch a single image for a specific plan and slot
+  const fetchSingleImage = async (plan: any, imageSlot: number) => {
+    const fetchKey = `${plan.id}-${imageSlot}`;
+    
+    try {
+      setFetchingImages(prev => new Set([...prev, fetchKey]));
+      
+      // Create a single record for this image generation
+      const imageData = {
+        plan_id: plan.id,
+        image_slot: imageSlot,
+        prompt: plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1 || 'AI Image',
+        aiModel: aiModel
+      };
+      
+      const response = await fetch('/api/sfunc_fetch_single_image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(imageData)
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Refresh images data to show the new image
+        if (user?.id) {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('id')
+            .eq('auth_id', user.id)
+            .single();
+            
+          if (userData) {
+            const { data } = await supabase
+              .from('images')
+              .select('*')
+              .eq('rel_users_id', userData.id);
+            
+            const map: Record<string, any> = {};
+            (data || []).forEach(img => { if (img.id) map[img.id] = img; });
+            setImagesById(map);
+          }
+        }
+        
+        setError(`✅ Image ${imageSlot} generated successfully for plan ${plan.id}`);
+      } else {
+        setError(`❌ Failed to generate image ${imageSlot}: ${result.message || 'Unknown error'}`);
+      }
+      
+    } catch (err) {
+      setError(`❌ Error fetching image: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setFetchingImages(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fetchKey);
+        return newSet;
+      });
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
@@ -353,6 +431,26 @@ export default function Tebnar1() {
           ))}
         </select>
       </div>
+      
+      {/* Error/Success Message Banner */}
+      {error && (
+        <div className={`w-full px-4 py-3 text-sm font-medium ${
+          error.includes('✅') 
+            ? 'bg-green-100 text-green-700 border-b border-green-200' 
+            : 'bg-red-100 text-red-700 border-b border-red-200'
+        }`}>
+          <div className="flex justify-between items-center">
+            <span>{error}</span>
+            <button 
+              onClick={() => setError(null)}
+              className="ml-4 text-lg font-bold hover:opacity-70"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+      
       <div className="w-full px-4">
         <ExcelPasteGrid onGridDataChange={setGridData} />
         <hr className="my-6 border-t-2 border-gray-300" />
@@ -561,12 +659,27 @@ export default function Tebnar1() {
                     if (col === 'image1-preview') {
                       const imgId = plan['fk_image1_id'];
                       const img = imgId ? imagesById[imgId] : null;
+                      const fetchKey = `${plan.id}-1`;
+                      const isFetching = fetchingImages.has(fetchKey);
+                      const showFetchButton = shouldShowFetchButton(plan, 1);
+                      
                       return (
                         <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
                           {img && img.img_file_url1 ? (
                             <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          ) : isFetching ? (
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center mx-auto">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            </div>
+                          ) : showFetchButton ? (
+                            <button
+                              onClick={() => fetchSingleImage(plan, 1)}
+                              className="h-16 w-16 bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded flex items-center justify-center text-xs font-medium text-blue-700 mx-auto transition-colors"
+                            >
+                              Fetch Now
+                            </button>
                           ) : (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto">No Image</div>
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto text-xs">No Image</div>
                           )}
                         </td>
                       );
@@ -574,12 +687,27 @@ export default function Tebnar1() {
                     if (col === 'image2-preview') {
                       const imgId = plan['fk_image2_id'];
                       const img = imgId ? imagesById[imgId] : null;
+                      const fetchKey = `${plan.id}-2`;
+                      const isFetching = fetchingImages.has(fetchKey);
+                      const showFetchButton = shouldShowFetchButton(plan, 2);
+                      
                       return (
                         <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
                           {img && img.img_file_url1 ? (
                             <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          ) : isFetching ? (
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center mx-auto">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            </div>
+                          ) : showFetchButton ? (
+                            <button
+                              onClick={() => fetchSingleImage(plan, 2)}
+                              className="h-16 w-16 bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded flex items-center justify-center text-xs font-medium text-blue-700 mx-auto transition-colors"
+                            >
+                              Fetch Now
+                            </button>
                           ) : (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto">No Image</div>
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto text-xs">No Image</div>
                           )}
                         </td>
                       );
@@ -587,12 +715,27 @@ export default function Tebnar1() {
                     if (col === 'image3-preview') {
                       const imgId = plan['fk_image3_id'];
                       const img = imgId ? imagesById[imgId] : null;
+                      const fetchKey = `${plan.id}-3`;
+                      const isFetching = fetchingImages.has(fetchKey);
+                      const showFetchButton = shouldShowFetchButton(plan, 3);
+                      
                       return (
                         <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
                           {img && img.img_file_url1 ? (
                             <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          ) : isFetching ? (
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center mx-auto">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            </div>
+                          ) : showFetchButton ? (
+                            <button
+                              onClick={() => fetchSingleImage(plan, 3)}
+                              className="h-16 w-16 bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded flex items-center justify-center text-xs font-medium text-blue-700 mx-auto transition-colors"
+                            >
+                              Fetch Now
+                            </button>
                           ) : (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto">No Image</div>
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto text-xs">No Image</div>
                           )}
                         </td>
                       );
@@ -600,12 +743,27 @@ export default function Tebnar1() {
                     if (col === 'image4-preview') {
                       const imgId = plan['fk_image4_id'];
                       const img = imgId ? imagesById[imgId] : null;
+                      const fetchKey = `${plan.id}-4`;
+                      const isFetching = fetchingImages.has(fetchKey);
+                      const showFetchButton = shouldShowFetchButton(plan, 4);
+                      
                       return (
                         <td key={col} className="px-2 py-2 h-[80px] max-h-[80px] align-middle text-center">
                           {img && img.img_file_url1 ? (
                             <img src={img.img_file_url1} alt="Preview" className="h-16 w-16 object-cover mx-auto" />
+                          ) : isFetching ? (
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center mx-auto">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            </div>
+                          ) : showFetchButton ? (
+                            <button
+                              onClick={() => fetchSingleImage(plan, 4)}
+                              className="h-16 w-16 bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded flex items-center justify-center text-xs font-medium text-blue-700 mx-auto transition-colors"
+                            >
+                              Fetch Now
+                            </button>
                           ) : (
-                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto">No Image</div>
+                            <div className="h-16 w-16 bg-gray-100 flex items-center justify-center text-gray-400 mx-auto text-xs">No Image</div>
                           )}
                         </td>
                       );
