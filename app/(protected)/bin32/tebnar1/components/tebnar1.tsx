@@ -63,6 +63,123 @@ const rowSettings = {
   maxHeight: '80px',
 };
 
+// Main Element Styling Controls (targets the first <main> element on the page)
+const mainElementStyling = {
+  // Main element dimensions and spacing
+  layout: {
+    width: '100%',                    // Main element width
+    maxWidth: 'none',                 // Maximum width constraint
+    minWidth: '0px',                  // Minimum width
+    height: 'auto',                   // Main element height
+    minHeight: '100vh',               // Minimum height (full viewport)
+    maxHeight: 'none',                // Maximum height constraint
+  },
+  
+  // Margin overrides (high specificity to override existing styles)
+  margins: {
+    margin: '0',                      // All margins
+    marginTop: '0',                   // Top margin override
+    marginRight: '0',                 // Right margin override  
+    marginBottom: '0',                // Bottom margin override
+    marginLeft: '0',                  // Left margin override
+    marginBlock: '0',                 // Block margins (top/bottom)
+    marginInline: '0',                // Inline margins (left/right)
+  },
+  
+  // Padding controls
+  padding: {
+    padding: '0',                     // All padding
+    paddingTop: '0',                  // Top padding
+    paddingRight: '0',                // Right padding
+    paddingBottom: '0',               // Bottom padding
+    paddingLeft: '0',                 // Left padding
+    paddingBlock: '0',                // Block padding (top/bottom)
+    paddingInline: '0',               // Inline padding (left/right)
+  },
+  
+  // Background and appearance
+  appearance: {
+    backgroundColor: '#ffffff',       // Main background color
+    backgroundImage: 'none',          // Background image
+    backgroundSize: 'cover',          // Background size
+    backgroundPosition: 'center',     // Background position
+    backgroundRepeat: 'no-repeat',    // Background repeat
+    backgroundAttachment: 'scroll',   // Background attachment
+  },
+  
+  // Overflow controls
+  overflow: {
+    overflow: 'visible',              // Overall overflow behavior
+    overflowX: 'visible',             // Horizontal overflow
+    overflowY: 'visible',             // Vertical overflow
+    overflowWrap: 'normal',           // Text overflow wrapping
+    wordWrap: 'normal',               // Word wrapping
+  },
+  
+  // Display and positioning
+  display: {
+    display: 'block',                 // Display type
+    position: 'relative',             // Position type
+    top: 'auto',                      // Top position
+    right: 'auto',                    // Right position
+    bottom: 'auto',                   // Bottom position
+    left: 'auto',                     // Left position
+    zIndex: 'auto',                   // Z-index layering
+  },
+  
+  // Flexbox controls (if display is flex)
+  flexbox: {
+    flexDirection: 'column',          // Flex direction
+    flexWrap: 'nowrap',               // Flex wrap
+    justifyContent: 'flex-start',     // Main axis alignment
+    alignItems: 'stretch',            // Cross axis alignment
+    alignContent: 'stretch',          // Multi-line alignment
+    gap: '0px',                       // Gap between flex items
+  },
+  
+  // Border controls
+  borders: {
+    border: 'none',                   // All borders
+    borderTop: 'none',                // Top border
+    borderRight: 'none',              // Right border
+    borderBottom: 'none',             // Bottom border
+    borderLeft: 'none',               // Left border
+    borderRadius: '0px',              // Border radius
+    outline: 'none',                  // Outline
+  },
+  
+  // Box model controls
+  boxModel: {
+    boxSizing: 'border-box',          // Box sizing model
+    float: 'none',                    // Float behavior
+    clear: 'none',                    // Clear behavior
+    resize: 'none',                   // Resize behavior
+  },
+  
+  // Typography inheritance controls
+  typography: {
+    fontFamily: 'inherit',            // Font family
+    fontSize: 'inherit',              // Font size
+    fontWeight: 'inherit',            // Font weight
+    lineHeight: 'inherit',            // Line height
+    color: 'inherit',                 // Text color
+    textAlign: 'inherit',             // Text alignment
+  },
+  
+  // CSS injection settings
+  injection: {
+    enabled: true,                    // Enable CSS injection
+    important: true,                  // Use !important declarations
+    selector: 'main:first-of-type',   // CSS selector to target
+    additionalSelectors: [            // Additional selectors for higher specificity
+      'body main:first-of-type',
+      'div main:first-of-type',
+      '#__next main:first-of-type',
+      '.app main:first-of-type',
+    ],
+  }
+};
+
 // Comprehensive Header Customization Controls
 const headerCustomizationSettings = {
   // Header row overall settings
@@ -458,6 +575,129 @@ export default function Tebnar1() {
     delayBetweenPlans: 1000,  // milliseconds, default 1 second
   });
   const [fetchingImages, setFetchingImages] = useState<Set<string>>(new Set()); // Track which images are being fetched
+
+  // Inject CSS styles for main element styling
+  useEffect(() => {
+    if (!mainElementStyling.injection.enabled) return;
+
+    const generateCSS = () => {
+      const important = mainElementStyling.injection.important ? ' !important' : '';
+      const selectors = [
+        mainElementStyling.injection.selector,
+        ...mainElementStyling.injection.additionalSelectors
+      ];
+      
+      const cssRules = selectors.map(selector => {
+        return `
+          ${selector} {
+            /* Layout */
+            width: ${mainElementStyling.layout.width}${important};
+            max-width: ${mainElementStyling.layout.maxWidth}${important};
+            min-width: ${mainElementStyling.layout.minWidth}${important};
+            height: ${mainElementStyling.layout.height}${important};
+            min-height: ${mainElementStyling.layout.minHeight}${important};
+            max-height: ${mainElementStyling.layout.maxHeight}${important};
+            
+            /* Margins - High specificity overrides */
+            margin: ${mainElementStyling.margins.margin}${important};
+            margin-top: ${mainElementStyling.margins.marginTop}${important};
+            margin-right: ${mainElementStyling.margins.marginRight}${important};
+            margin-bottom: ${mainElementStyling.margins.marginBottom}${important};
+            margin-left: ${mainElementStyling.margins.marginLeft}${important};
+            margin-block: ${mainElementStyling.margins.marginBlock}${important};
+            margin-inline: ${mainElementStyling.margins.marginInline}${important};
+            
+            /* Padding */
+            padding: ${mainElementStyling.padding.padding}${important};
+            padding-top: ${mainElementStyling.padding.paddingTop}${important};
+            padding-right: ${mainElementStyling.padding.paddingRight}${important};
+            padding-bottom: ${mainElementStyling.padding.paddingBottom}${important};
+            padding-left: ${mainElementStyling.padding.paddingLeft}${important};
+            padding-block: ${mainElementStyling.padding.paddingBlock}${important};
+            padding-inline: ${mainElementStyling.padding.paddingInline}${important};
+            
+            /* Background */
+            background-color: ${mainElementStyling.appearance.backgroundColor}${important};
+            background-image: ${mainElementStyling.appearance.backgroundImage}${important};
+            background-size: ${mainElementStyling.appearance.backgroundSize}${important};
+            background-position: ${mainElementStyling.appearance.backgroundPosition}${important};
+            background-repeat: ${mainElementStyling.appearance.backgroundRepeat}${important};
+            background-attachment: ${mainElementStyling.appearance.backgroundAttachment}${important};
+            
+            /* Overflow */
+            overflow: ${mainElementStyling.overflow.overflow}${important};
+            overflow-x: ${mainElementStyling.overflow.overflowX}${important};
+            overflow-y: ${mainElementStyling.overflow.overflowY}${important};
+            overflow-wrap: ${mainElementStyling.overflow.overflowWrap}${important};
+            word-wrap: ${mainElementStyling.overflow.wordWrap}${important};
+            
+            /* Display and Position */
+            display: ${mainElementStyling.display.display}${important};
+            position: ${mainElementStyling.display.position}${important};
+            top: ${mainElementStyling.display.top}${important};
+            right: ${mainElementStyling.display.right}${important};
+            bottom: ${mainElementStyling.display.bottom}${important};
+            left: ${mainElementStyling.display.left}${important};
+            z-index: ${mainElementStyling.display.zIndex}${important};
+            
+            /* Flexbox */
+            flex-direction: ${mainElementStyling.flexbox.flexDirection}${important};
+            flex-wrap: ${mainElementStyling.flexbox.flexWrap}${important};
+            justify-content: ${mainElementStyling.flexbox.justifyContent}${important};
+            align-items: ${mainElementStyling.flexbox.alignItems}${important};
+            align-content: ${mainElementStyling.flexbox.alignContent}${important};
+            gap: ${mainElementStyling.flexbox.gap}${important};
+            
+            /* Borders */
+            border: ${mainElementStyling.borders.border}${important};
+            border-top: ${mainElementStyling.borders.borderTop}${important};
+            border-right: ${mainElementStyling.borders.borderRight}${important};
+            border-bottom: ${mainElementStyling.borders.borderBottom}${important};
+            border-left: ${mainElementStyling.borders.borderLeft}${important};
+            border-radius: ${mainElementStyling.borders.borderRadius}${important};
+            outline: ${mainElementStyling.borders.outline}${important};
+            
+            /* Box Model */
+            box-sizing: ${mainElementStyling.boxModel.boxSizing}${important};
+            float: ${mainElementStyling.boxModel.float}${important};
+            clear: ${mainElementStyling.boxModel.clear}${important};
+            resize: ${mainElementStyling.boxModel.resize}${important};
+            
+            /* Typography */
+            font-family: ${mainElementStyling.typography.fontFamily}${important};
+            font-size: ${mainElementStyling.typography.fontSize}${important};
+            font-weight: ${mainElementStyling.typography.fontWeight}${important};
+            line-height: ${mainElementStyling.typography.lineHeight}${important};
+            color: ${mainElementStyling.typography.color}${important};
+            text-align: ${mainElementStyling.typography.textAlign}${important};
+          }
+        `;
+      }).join('\n');
+      
+      return cssRules;
+    };
+
+    // Create and inject style element
+    const styleId = 'tebnar1-main-element-styles';
+    let existingStyle = document.getElementById(styleId);
+    
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+    
+    const styleElement = document.createElement('style');
+    styleElement.id = styleId;
+    styleElement.textContent = generateCSS();
+    document.head.appendChild(styleElement);
+    
+    // Cleanup function
+    return () => {
+      const styleToRemove = document.getElementById(styleId);
+      if (styleToRemove) {
+        styleToRemove.remove();
+      }
+    };
+  }, []); // Empty dependency array means this runs once on mount
 
   // Fetch all images for the user and map by id
   useEffect(() => {
