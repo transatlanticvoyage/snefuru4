@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // Verify the plan belongs to this user
     const { data: planData, error: planError } = await supabase
-      .from('plans')
+      .from('images_plans')
       .select('id, fk_image1_id, fk_image2_id, fk_image3_id, fk_image4_id')
       .eq('id', plan_id)
       .eq('rel_users_id', userData.id)
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
                        'fk_image4_id';
 
     const { error: updateError } = await supabase
-      .from('plans')
+      .from('images_plans')
       .update({ [updateField]: newImage.id })
       .eq('id', plan_id);
 

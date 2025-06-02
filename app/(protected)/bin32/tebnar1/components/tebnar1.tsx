@@ -338,17 +338,25 @@ export default function Tebnar1() {
   const shouldShowFetchButton = (plan: any, imageSlot: number): boolean => {
     if (!plan) return false;
     
-    // Check if this specific image slot is missing
+    // Check if this specific image slot already has an image
     const imageFieldName = `fk_image${imageSlot}_id`;
     const hasImage = plan[imageFieldName];
     
     if (hasImage) return false; // Already has image
     
-    // Show fetch button if:
-    // 1. Plan has at least one image (indicating generation was attempted)
-    // 2. Or if image slot 1 is missing (always allow fetching first image)
-    const hasAnyImage = plan.fk_image1_id || plan.fk_image2_id || plan.fk_image3_id || plan.fk_image4_id;
-    return imageSlot === 1 || hasAnyImage;
+    // Always allow fetching image 1 if it's missing
+    if (imageSlot === 1) return true;
+    
+    // For slots 2-4, only show if all previous slots have images
+    // This ensures we fill images in order: 1, then 2, then 3, then 4
+    for (let i = 1; i < imageSlot; i++) {
+      const prevImageField = `fk_image${i}_id`;
+      if (!plan[prevImageField]) {
+        return false; // Previous slot is empty, don't show this slot
+      }
+    }
+    
+    return true; // All previous slots have images, this slot can be fetched
   };
 
   // Function to fetch a single image for a specific plan and slot
@@ -357,6 +365,9 @@ export default function Tebnar1() {
     
     try {
       setFetchingImages(prev => new Set([...prev, fetchKey]));
+      setError(null); // Clear any previous errors
+      
+      console.log('Fetching single image:', { plan_id: plan.id, imageSlot, aiModel });
       
       // Create a single record for this image generation
       const imageData = {
@@ -366,17 +377,29 @@ export default function Tebnar1() {
         aiModel: aiModel
       };
       
+      console.log('Sending request with data:', imageData);
+      
       const response = await fetch('/api/sfunc_fetch_single_image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(imageData)
       });
       
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       const result = await response.json();
+      console.log('Response result:', result);
       
       if (result.success) {
         // Refresh images data to show the new image
         if (user?.id) {
+          console.log('Refreshing images data...');
           const { data: userData } = await supabase
             .from('users')
             .select('id')
@@ -392,6 +415,7 @@ export default function Tebnar1() {
             const map: Record<string, any> = {};
             (data || []).forEach(img => { if (img.id) map[img.id] = img; });
             setImagesById(map);
+            console.log('Images refreshed, new count:', Object.keys(map).length);
           }
         }
         
@@ -401,6 +425,7 @@ export default function Tebnar1() {
       }
       
     } catch (err) {
+      console.error('Fetch single image error:', err);
       setError(`❌ Error fetching image: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setFetchingImages(prev => {
@@ -412,7 +437,6 @@ export default function Tebnar1() {
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <div className="w-full mx-auto">
