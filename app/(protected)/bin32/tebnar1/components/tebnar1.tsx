@@ -407,15 +407,28 @@ export default function Tebnar1() {
             .single();
             
           if (userData) {
-            const { data } = await supabase
+            // Refresh images
+            const { data: imagesData } = await supabase
               .from('images')
               .select('*')
               .eq('rel_users_id', userData.id);
             
-            const map: Record<string, any> = {};
-            (data || []).forEach(img => { if (img.id) map[img.id] = img; });
-            setImagesById(map);
-            console.log('Images refreshed, new count:', Object.keys(map).length);
+            const imageMap: Record<string, any> = {};
+            (imagesData || []).forEach(img => { if (img.id) imageMap[img.id] = img; });
+            setImagesById(imageMap);
+            console.log('Images refreshed, new count:', Object.keys(imageMap).length);
+            
+            // Also refresh plans to get updated fk_image fields
+            const { data: plansData } = await supabase
+              .from('images_plans')
+              .select('*')
+              .eq('rel_users_id', userData.id)
+              .order('created_at', { ascending: false });
+              
+            if (plansData) {
+              setPlans(plansData);
+              console.log('Plans refreshed, count:', plansData.length);
+            }
           }
         }
         
