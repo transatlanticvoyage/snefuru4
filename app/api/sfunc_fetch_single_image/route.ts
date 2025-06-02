@@ -185,6 +185,7 @@ export async function POST(request: NextRequest) {
 
       if (batchPlansError) {
         console.error('❌ Failed to query plans in batch:', batchPlansError);
+        console.error('❌ Full error details:', JSON.stringify(batchPlansError, null, 2));
         return NextResponse.json({ 
           success: false, 
           message: 'Failed to query plans in batch for folder detection' 
@@ -199,8 +200,11 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
 
+      console.log('✅ Found', batchPlans.length, 'plans in batch');
+
       // Extract plan IDs
       const planIds = batchPlans.map(p => p.id);
+      console.log('🔍 Looking for existing images from plan IDs:', planIds);
 
       // Find existing images from any plan in this batch
       const { data: existingImages, error: existingImagesError } = await supabase
@@ -212,11 +216,15 @@ export async function POST(request: NextRequest) {
 
       if (existingImagesError) {
         console.error('❌ Failed to query existing images:', existingImagesError);
+        console.error('❌ Full error details:', JSON.stringify(existingImagesError, null, 2));
+        console.error('❌ Query details - planIds:', planIds);
         return NextResponse.json({ 
           success: false, 
           message: 'Failed to query existing images for batch folder detection' 
         }, { status: 500 });
       }
+
+      console.log('✅ Existing images query result:', existingImages?.length || 0, 'images found');
 
       let foundBatchFolder = null;
       let foundPlanFolder = null;
@@ -230,8 +238,9 @@ export async function POST(request: NextRequest) {
         // Expected format: .../bucket-images-b1/barge1/BATCH_FOLDER/PLAN_FOLDER/image.png
         const match = imageUrl.match(/barge1\/([^\/]+)\//);
         if (match) {
-          foundBatchFolder = match[1];
-          console.log('✅ Extracted batch folder from existing image:', foundBatchFolder);
+          // Decode URL-encoded characters in the folder name
+          foundBatchFolder = decodeURIComponent(match[1]);
+          console.log('✅ Extracted and decoded batch folder from existing image:', foundBatchFolder);
         } else {
           console.error('❌ Could not parse batch folder from image URL:', imageUrl);
           return NextResponse.json({ 
@@ -264,8 +273,9 @@ export async function POST(request: NextRequest) {
         // Expected format: .../barge1/BATCH_FOLDER/PLAN_FOLDER/image.png
         const planMatch = planImageUrl.match(/barge1\/[^\/]+\/([^\/]+)\//);
         if (planMatch) {
-          foundPlanFolder = planMatch[1];
-          console.log('✅ Found existing plan folder:', foundPlanFolder);
+          // Decode URL-encoded characters in the folder name
+          foundPlanFolder = decodeURIComponent(planMatch[1]);
+          console.log('✅ Found and decoded existing plan folder:', foundPlanFolder);
         }
       }
 
@@ -323,6 +333,14 @@ export async function POST(request: NextRequest) {
         foundPlanFolder = `${seq} - ${baseFileName}`;
         console.log('📂 Determined plan folder:', foundPlanFolder);
       }
+
+      // Sanitize folder names to prevent invalid storage paths
+      foundBatchFolder = foundBatchFolder.replace(/[<>:"/\\|?*%]/g, '_');
+      foundPlanFolder = foundPlanFolder.replace(/[<>:"/\\|?*%]/g, '_');
+      
+      console.log('📂 Sanitized folder names:');
+      console.log('📂 Batch folder:', foundBatchFolder);
+      console.log('📂 Plan folder:', foundPlanFolder);
 
       // Create image filename with slot suffix if not slot 1 (same as bulk generation)
       let baseFileName = planData.e_file_name1 && typeof planData.e_file_name1 === 'string' && planData.e_file_name1.trim() 
