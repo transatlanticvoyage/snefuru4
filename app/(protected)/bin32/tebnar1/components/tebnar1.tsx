@@ -225,7 +225,7 @@ const headerCustomizationSettings = {
   
   // Header cell styling
   headerCell: {
-    padding: '12px 16px',             // Header cell padding
+    padding: '4px 4px',             // Header cell padding
     verticalAlign: 'middle' as 'top' | 'middle' | 'bottom' | 'baseline', // Vertical alignment
     textAlign: 'center' as 'left' | 'center' | 'right', // Default text alignment
     borderRight: '1px solid #e5e7eb', // Right border between headers
@@ -458,7 +458,7 @@ const tableStyleSettings = {
 const tableCellPaddingSettings = {
   // Global default padding (applies to all cells unless overridden)
   globalDefault: {
-    padding: '8px 16px',             // Default padding for all cells
+    padding: '4px 4px',             // Default padding for all cells
     paddingTop: '8px',               // Default top padding
     paddingRight: '16px',            // Default right padding
     paddingBottom: '8px',            // Default bottom padding
