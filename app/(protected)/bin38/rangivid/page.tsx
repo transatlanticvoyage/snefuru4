@@ -13,6 +13,9 @@ export default function RangividPage() {
   const [selectedDomainId, setSelectedDomainId] = useState<string>('');
   const [domainUpdateLoading, setDomainUpdateLoading] = useState(false);
   const [domainUpdateResult, setDomainUpdateResult] = useState<string | null>(null);
+  const [selectedNufuPageType, setSelectedNufuPageType] = useState<string>('');
+  const [nufuPageTypeLoading, setNufuPageTypeLoading] = useState(false);
+  const [nufuPageTypeResult, setNufuPageTypeResult] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const batchId = searchParams?.get('batch');
   const supabase = createClientComponentClient();
@@ -63,6 +66,10 @@ export default function RangividPage() {
           // Set the selected domain if batch has one
           if (data.fk_domains_id) {
             setSelectedDomainId(data.fk_domains_id);
+          }
+          // Set the selected nufu page type if batch has one
+          if (data.nufu_page_type_1) {
+            setSelectedNufuPageType(data.nufu_page_type_1);
           }
         }
       } catch (err) {
@@ -138,6 +145,36 @@ export default function RangividPage() {
       setDomainUpdateResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setDomainUpdateLoading(false);
+    }
+  };
+
+  const handleNufuPageTypeSave = async () => {
+    if (!selectedNufuPageType || !batchId) {
+      setNufuPageTypeResult('Please select a nufu page type.');
+      return;
+    }
+
+    setNufuPageTypeLoading(true);
+    setNufuPageTypeResult(null);
+    
+    try {
+      // Update the batch with the selected nufu page type
+      const { error } = await supabase
+        .from('images_plans_batches')
+        .update({ nufu_page_type_1: selectedNufuPageType })
+        .eq('id', batchId);
+        
+      if (error) throw error;
+      
+      setNufuPageTypeResult('✅ Nufu page type saved successfully!');
+      
+      // Refresh batch data to show updated information
+      setBatch((prev: any) => ({ ...prev, nufu_page_type_1: selectedNufuPageType }));
+      
+    } catch (err) {
+      setNufuPageTypeResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setNufuPageTypeLoading(false);
     }
   };
 
@@ -360,6 +397,72 @@ export default function RangividPage() {
                 {domains.length === 0 && (
                   <div className="mt-3 text-sm text-gray-500">
                     No domains found. <a href="/bin36/domjar1" className="text-indigo-600 hover:text-indigo-500">Add domains</a> to associate with this batch.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Nufu Page Goal Settings Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Nufu Page Goal Settings</h2>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Current Nufu Page Type Display */}
+              {batch.nufu_page_type_1 && (
+                <div className="mb-4 p-3 bg-green-50 rounded-md">
+                  <p className="text-sm text-green-700">
+                    <strong>Current Nufu Page Type:</strong> {batch.nufu_page_type_1}
+                  </p>
+                </div>
+              )}
+
+              {/* Nufu Page Type Selection Dropdown */}
+              <div>
+                <label htmlFor="nufu-page-type-select" className="block text-sm font-medium text-gray-700 mb-2">
+                  nufu page type 1
+                </label>
+                <div className="flex items-center space-x-3">
+                  <select
+                    id="nufu-page-type-select"
+                    value={selectedNufuPageType}
+                    onChange={(e) => setSelectedNufuPageType(e.target.value)}
+                    className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    disabled={nufuPageTypeLoading}
+                  >
+                    <option value="">-- Select page type --</option>
+                    <option value="Home Page">Home Page</option>
+                    <option value="Services Hub Page">Services Hub Page</option>
+                    <option value="Individual Service Page">Individual Service Page</option>
+                  </select>
+                  
+                  <button
+                    onClick={handleNufuPageTypeSave}
+                    disabled={nufuPageTypeLoading || !selectedNufuPageType}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {nufuPageTypeLoading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Saving...
+                      </>
+                    ) : (
+                      'Save'
+                    )}
+                  </button>
+                </div>
+                
+                {/* Result Message */}
+                {nufuPageTypeResult && (
+                  <div className={`mt-3 text-sm ${nufuPageTypeResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                    {nufuPageTypeResult}
                   </div>
                 )}
               </div>
