@@ -9,6 +9,10 @@ export default function DomnividPage() {
   const [domain, setDomain] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [wpUser1, setWpUser1] = useState<string>('');
+  const [wpPass1, setWpPass1] = useState<string>('');
+  const [wpCredentialsLoading, setWpCredentialsLoading] = useState(false);
+  const [wpCredentialsResult, setWpCredentialsResult] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const domainBase = searchParams?.get('domain_base');
   const supabase = createClientComponentClient();
@@ -61,6 +65,9 @@ export default function DomnividPage() {
           setDomain(null);
         } else {
           setDomain(data);
+          // Populate WordPress credentials if they exist
+          setWpUser1(data.wpuser1 || '');
+          setWpPass1(data.wppass1 || '');
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch domain details');
@@ -72,6 +79,44 @@ export default function DomnividPage() {
     
     fetchDomainDetails();
   }, [domainBase, user, supabase]);
+
+  // Handle WordPress credentials update
+  const handleWpCredentialsUpdate = async () => {
+    if (!domain?.id) {
+      setWpCredentialsResult('No domain found to update.');
+      return;
+    }
+
+    setWpCredentialsLoading(true);
+    setWpCredentialsResult(null);
+    
+    try {
+      // Update the domain with WordPress credentials
+      const { error } = await supabase
+        .from('domains1')
+        .update({ 
+          wpuser1: wpUser1.trim() || null,
+          wppass1: wpPass1.trim() || null
+        })
+        .eq('id', domain.id);
+        
+      if (error) throw error;
+      
+      setWpCredentialsResult('✅ WordPress credentials updated successfully!');
+      
+      // Refresh domain data to show updated information
+      setDomain((prev: any) => ({ 
+        ...prev, 
+        wpuser1: wpUser1.trim() || null,
+        wppass1: wpPass1.trim() || null
+      }));
+      
+    } catch (err) {
+      setWpCredentialsResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setWpCredentialsLoading(false);
+    }
+  };
 
   // If no domain_base parameter, show empty state
   if (!domainBase) {
@@ -221,6 +266,118 @@ export default function DomnividPage() {
                 </div>
               ))}
             </dl>
+          </div>
+        </div>
+
+        {/* WordPress Credentials Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">WordPress Credentials</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Manage WordPress login credentials for this domain
+            </p>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Current Credentials Display */}
+              {(domain.wpuser1 || domain.wppass1) && (
+                <div className="mb-4 p-3 bg-blue-50 rounded-md">
+                  <p className="text-sm text-blue-700">
+                    <strong>Current WordPress User:</strong> {domain.wpuser1 || 'Not set'}
+                    <br />
+                    <strong>Password Status:</strong> {domain.wppass1 ? 'Set' : 'Not set'}
+                  </p>
+                </div>
+              )}
+
+              {/* WordPress Username Field */}
+              <div>
+                <label htmlFor="wp-username" className="block text-sm font-medium text-gray-700 mb-2">
+                  WordPress Username
+                </label>
+                <input
+                  type="text"
+                  id="wp-username"
+                  value={wpUser1}
+                  onChange={(e) => setWpUser1(e.target.value)}
+                  placeholder="Enter WordPress username"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  disabled={wpCredentialsLoading}
+                />
+              </div>
+
+              {/* WordPress Password Field */}
+              <div>
+                <label htmlFor="wp-password" className="block text-sm font-medium text-gray-700 mb-2">
+                  WordPress Password
+                </label>
+                <input
+                  type="password"
+                  id="wp-password"
+                  value={wpPass1}
+                  onChange={(e) => setWpPass1(e.target.value)}
+                  placeholder="Enter WordPress password"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  disabled={wpCredentialsLoading}
+                />
+              </div>
+
+              {/* Update Button */}
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleWpCredentialsUpdate}
+                  disabled={wpCredentialsLoading}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {wpCredentialsLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating...
+                    </>
+                  ) : (
+                    'Update WordPress Credentials'
+                  )}
+                </button>
+                
+                {/* Clear Button */}
+                <button
+                  onClick={() => {
+                    setWpUser1('');
+                    setWpPass1('');
+                  }}
+                  disabled={wpCredentialsLoading}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Clear Fields
+                </button>
+              </div>
+              
+              {/* Result Message */}
+              {wpCredentialsResult && (
+                <div className={`mt-3 text-sm ${wpCredentialsResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                  {wpCredentialsResult}
+                </div>
+              )}
+              
+              {/* Security Note */}
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="flex">
+                  <svg className="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.863-.833-2.632 0L4.182 18.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <div>
+                    <h3 className="text-sm font-medium text-yellow-800">Security Notice</h3>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      WordPress credentials are stored securely. Consider using application passwords instead of your main account password for better security.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -16,6 +16,7 @@ export default function RangividPage() {
   const [selectedNufuPageType, setSelectedNufuPageType] = useState<string>('');
   const [nufuPageTypeLoading, setNufuPageTypeLoading] = useState(false);
   const [nufuPageTypeResult, setNufuPageTypeResult] = useState<string | null>(null);
+  const [kareench1, setKareench1] = useState<string>('');
   const searchParams = useSearchParams();
   const batchId = searchParams?.get('batch');
   const supabase = createClientComponentClient();
@@ -470,6 +471,36 @@ export default function RangividPage() {
                     {nufuPageTypeResult}
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* narpi push to wordpress options Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">narpi push to wordpress options</h2>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* kareench1 Text Field */}
+              <div>
+                <label htmlFor="kareench1" className="block text-sm font-medium text-gray-700 mb-2">
+                  kareench1
+                </label>
+                <textarea
+                  id="kareench1"
+                  value={kareench1}
+                  onChange={(e) => setKareench1(e.target.value)}
+                  placeholder="Enter kareench1 content..."
+                  className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm resize-none"
+                  style={{ 
+                    width: '600px', 
+                    height: '200px',
+                    maxWidth: '100%' // Ensure it doesn't overflow on smaller screens
+                  }}
+                />
               </div>
             </div>
           </div>
