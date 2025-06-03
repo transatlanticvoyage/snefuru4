@@ -16,24 +16,21 @@ export default function Header() {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [navItems, setNavItems] = useState<NavItem[]>([]);
-  const [dropdownRefs, setDropdownRefs] = useState<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
-        activeDropdown &&
-        dropdownRefs[activeDropdown] &&
-        dropdownRefs[activeDropdown].current &&
-        !dropdownRefs[activeDropdown].current!.contains(event.target as Node)
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
       ) {
-        setActiveDropdown(null);
+        setIsDropdownOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [activeDropdown, dropdownRefs]);
+  }, []);
 
   useEffect(() => {
     // Fetch navigation items when component mounts
@@ -53,15 +50,6 @@ export default function Header() {
     fetchNavItems();
   }, []);
 
-  // Set up refs for each group
-  useEffect(() => {
-    const refs: { [key: string]: React.RefObject<HTMLDivElement> } = {};
-    navItems.forEach(group => {
-      refs[group.name] = refs[group.name] || React.createRef<HTMLDivElement>();
-    });
-    setDropdownRefs(refs);
-  }, [navItems]);
-
   const handleLogout = async () => {
     try {
       await signOut();
@@ -69,10 +57,6 @@ export default function Header() {
     } catch (error) {
       console.error('Error signing out:', error);
     }
-  };
-
-  const toggleDropdown = (dropdown: string) => {
-    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
   };
 
   return (
@@ -86,39 +70,19 @@ export default function Header() {
               </Link>
             </div>
             <nav className="ml-6 flex space-x-8">
-              {navItems.map((group) => (
-                <div key={group.name} className="relative" ref={dropdownRefs[group.name]}>
-                  <button
-                    onClick={() => toggleDropdown(group.name)}
-                    className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
-                  >
-                    {group.name}
-                    <svg className="ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {activeDropdown === group.name && group.children && (
-                    <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                      <div className="py-1">
-                        {group.children.map((page) => (
-                          <Link
-                            key={page.path}
-                            href={page.path}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setTimeout(() => setActiveDropdown(null), 0)}
-                          >
-                            {page.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+                >
+                  {item.name}
+                </Link>
               ))}
             </nav>
           </div>
           <div className="flex items-center">
-            <div className="relative" ref={dropdownRefs['user']}>
+            <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

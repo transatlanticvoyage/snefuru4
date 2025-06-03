@@ -33,39 +33,30 @@ export async function getNavigation() {
     return [];
   }
 
-  // Build nav structure
-  const groups: Record<string, NavItem> = {};
+  // Build flat nav structure - just extract the page names directly
+  const navItems: NavItem[] = [];
   for (const file of pageFiles) {
     // Get the path after (protected)
     const rel = relative(protectedDir, file);
     const parts = rel.split(sep); // e.g. ['fbin2', 'panjar1', 'page.tsx']
-    let group = 'root';
     let pageName = '';
     let pagePath = '';
+    
     if (parts.length === 2) {
       // e.g. ['profile', 'page.tsx']
-      group = 'root';
       pageName = parts[0];
       pagePath = `/${parts[0]}`;
     } else if (parts.length > 2) {
-      // e.g. ['fbin2', 'panjar1', 'page.tsx']
-      group = parts[0];
-      pageName = parts[1];
-      pagePath = `/${parts[0]}/${parts[1]}`;
+      // e.g. ['fbin2', 'panjar1', 'page.tsx'] -> use the last folder name
+      pageName = parts[parts.length - 2]; // Get the page name (e.g., 'panjar1')
+      pagePath = `/${parts.slice(0, -1).join('/')}`; // Full path without page.tsx
     }
-    if (!groups[group]) {
-      groups[group] = { name: group, children: [] };
+    
+    if (pageName) {
+      navItems.push({ name: pageName, path: pagePath });
     }
-    groups[group].children!.push({ name: pageName, path: pagePath });
   }
 
-  // Convert to array, sort groups and children alphabetically
-  const navItems: NavItem[] = Object.values(groups)
-    .map(group => ({
-      name: group.name,
-      children: group.children?.sort((a, b) => a.name.localeCompare(b.name)),
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  return navItems;
+  // Sort alphabetically by name
+  return navItems.sort((a, b) => a.name.localeCompare(b.name));
 } 
