@@ -2,11 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'domjar1',
-};
 
 // Define columns to display (reordered with actions first)
 const columns = [
@@ -20,20 +15,24 @@ const columns = [
 ];
 
 export default function Domjar1Page() {
-  const { user } = useAuth();
-  const [domains, setDomains] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [newDomain, setNewDomain] = useState('');
+  const [addingDomain, setAddingDomain] = useState(false);
+  const [addSuccess, setAddSuccess] = useState<string | null>(null);
+  const [addError, setAddError] = useState<string | null>(null);
+  
   const pageSizeOptions = [5, 10, 20, 50, 100];
-  
-  // New state for domains text box functionality
-  const [domainsText, setDomainsText] = useState<string>('');
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [submitResult, setSubmitResult] = useState<string | null>(null);
-  
+  const { user } = useAuth();
   const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'domjar1 - Snefuru';
+  }, []);
 
   useEffect(() => {
     const fetchDomains = async () => {
@@ -41,7 +40,7 @@ export default function Domjar1Page() {
       setError(null);
       try {
         if (!user?.id) {
-          setDomains([]);
+          setData([]);
           setLoading(false);
           return;
         }
@@ -55,7 +54,7 @@ export default function Domjar1Page() {
           
         if (userError || !userData) {
           setError('Could not find user record.');
-          setDomains([]);
+          setData([]);
           setLoading(false);
           return;
         }
@@ -68,10 +67,10 @@ export default function Domjar1Page() {
           .order('created_at', { ascending: false });
           
         if (error) throw error;
-        setDomains(data || []);
+        setData(data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch domains');
-        setDomains([]);
+        setData([]);
       } finally {
         setLoading(false);
       }
@@ -81,11 +80,11 @@ export default function Domjar1Page() {
   }, [user, supabase]);
 
   // Pagination calculations
-  const totalItems = domains.length;
+  const totalItems = data.length;
   const totalPages = Math.ceil(totalItems / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalItems);
-  const currentItems = domains.slice(startIndex, endIndex);
+  const currentItems = data.slice(startIndex, endIndex);
 
   // Handle page change
   const handlePageChange = (newPage: number) => {
@@ -93,8 +92,8 @@ export default function Domjar1Page() {
   };
 
   // Handle page size change
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
     setCurrentPage(1); // Reset to first page when changing page size
   };
 
@@ -123,7 +122,7 @@ export default function Domjar1Page() {
         return;
       }
       
-      setDomains(data || []);
+      setData(data || []);
     } catch (err) {
       console.error('Error in refreshDomainsData:', err);
     }
@@ -131,19 +130,19 @@ export default function Domjar1Page() {
 
   // Handle domains submission
   const handleDomainsSubmit = async () => {
-    if (!domainsText.trim()) {
-      setSubmitResult('Please enter some domains to add.');
+    if (!newDomain.trim()) {
+      setAddError('Please enter some domains to add.');
       return;
     }
 
-    setSubmitLoading(true);
-    setSubmitResult(null);
+    setAddingDomain(true);
+    setAddSuccess(null);
     
     try {
       if (!user?.id) throw new Error('User not authenticated');
       
       // Split domains by lines and clean them up
-      const domainLines = domainsText
+      const domainLines = newDomain
         .split(/\r?\n/)
         .map(line => line.trim())
         .filter(line => line.length > 0);
@@ -157,16 +156,16 @@ export default function Domjar1Page() {
       const result = await func_44_add_domains(domainLines);
       
       if (result.success) {
-        setSubmitResult(`✅ Successfully added ${result.count || domainLines.length} domains!`);
-        setDomainsText(''); // Clear the text box
+        setAddSuccess(`✅ Successfully added ${result.count || domainLines.length} domains!`);
+        setNewDomain(''); // Clear the text box
         await refreshDomainsData(); // Refresh the table
       } else {
-        setSubmitResult(`❌ ${result.message || 'Failed to add domains'}`);
+        setAddError(`❌ ${result.message || 'Failed to add domains'}`);
       }
     } catch (err) {
-      setSubmitResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setAddError(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
-      setSubmitLoading(false);
+      setAddingDomain(false);
     }
   };
 
@@ -268,21 +267,21 @@ export default function Domjar1Page() {
         
         <div className="space-y-4">
           <textarea
-            value={domainsText}
-            onChange={(e) => setDomainsText(e.target.value)}
+            value={newDomain}
+            onChange={(e) => setNewDomain(e.target.value)}
             placeholder="Enter domains, one per line..."
             className="block border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             style={{ width: '400px', height: '150px' }}
-            disabled={submitLoading}
+            disabled={addingDomain}
           />
           
           <div className="flex items-center space-x-4">
             <button
               onClick={handleDomainsSubmit}
-              disabled={submitLoading}
+              disabled={addingDomain}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitLoading ? (
+              {addingDomain ? (
                 <>
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -295,9 +294,9 @@ export default function Domjar1Page() {
               )}
             </button>
             
-            {submitResult && (
-              <div className={`text-sm ${submitResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
-                {submitResult}
+            {addSuccess && (
+              <div className={`text-sm ${addSuccess.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                {addSuccess}
               </div>
             )}
           </div>
@@ -488,7 +487,7 @@ export default function Domjar1Page() {
       </div>
 
       {/* Empty State */}
-      {domains.length === 0 && (
+      {data.length === 0 && (
         <div className="text-center py-12">
           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9" />

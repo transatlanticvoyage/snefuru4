@@ -26,6 +26,11 @@ export default function RangividPage() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
+    // Set document title
+    document.title = 'rangivid - Snefuru';
+  }, []);
+
+  useEffect(() => {
     const fetchBatchDetails = async () => {
       if (!batchId || !user?.id) {
         setBatch(null);

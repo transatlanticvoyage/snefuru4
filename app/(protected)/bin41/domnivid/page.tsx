@@ -19,6 +19,11 @@ export default function DomnividPage() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
+    // Set document title
+    document.title = 'domnivid - Snefuru';
+  }, []);
+
+  useEffect(() => {
     const fetchDomainDetails = async () => {
       if (!domainBase || !user?.id) {
         setDomain(null);

@@ -6,11 +6,6 @@ import { useAuth } from '@/app/context/AuthContext';
 import OpenAI from 'openai';
 import Panjar1UI from './components/panjar1';
 import { ImageRecord } from './types';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'panjar1',
-};
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -25,6 +20,11 @@ export default function Panjar1Page() {
   const [error, setError] = useState<string | null>(null);
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'panjar1 - Snefuru';
+  }, []);
 
   const func_fetch_image_2 = async () => {
     if (!user?.id || !prompt.trim()) {

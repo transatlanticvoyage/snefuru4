@@ -28,6 +28,11 @@ export default function Rungi1Page() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
+    // Set document title
+    document.title = 'rungi1 - Snefuru';
+  }, []);
+
+  useEffect(() => {
     const fetchBatches = async () => {
       setLoading(true);
       setError(null);

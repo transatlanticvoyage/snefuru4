@@ -3,22 +3,20 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './context/AuthContext';
-import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Snefuru',
-};
-
-export default function RootPage() {
+export default function HomePage() {
   const router = useRouter();
   const { user, loading } = useAuth();
 
   useEffect(() => {
+    // Set document title
+    document.title = 'Snefuru';
+    
     if (!loading) {
       if (user) {
-        router.replace('/home');
+        router.push('/home');
       } else {
-        router.replace('/login');
+        router.push('/login');
       }
     }
   }, [user, loading, router]);

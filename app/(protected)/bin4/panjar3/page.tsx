@@ -1,11 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'panjar3',
-};
+import { useState, useEffect } from 'react';
 
 // Dummy image record type for interface
 interface ImageRecord {
@@ -28,6 +23,11 @@ export default function Panjar3Page() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [images] = useState<ImageRecord[]>([]); // No active functionality
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'panjar3 - Snefuru';
+  }, []);
 
   const handleGenerate = () => {
     // No active functionality

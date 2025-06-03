@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'setup',
-};
+import { useState, useEffect } from 'react';
 
 export default function SetupPage() {
   const [status, setStatus] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'setup - Snefuru';
+  }, []);
 
   const handleSetup = async () => {
     try {

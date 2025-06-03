@@ -3,19 +3,21 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'stuff1',
-};
 
 export default function Stuff1Page() {
-  const { user, loading } = useAuth();
   const router = useRouter();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
+    // Set document title
+    document.title = 'stuff1 - Snefuru';
+    
+    if (!loading) {
+      if (user) {
+        router.push('/home');
+      } else {
+        router.push('/login');
+      }
     }
   }, [user, loading, router]);
 

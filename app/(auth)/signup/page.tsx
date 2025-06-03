@@ -1,14 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'signup',
-};
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -16,7 +11,17 @@ export default function SignUp() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { signUp } = useAuth();
+  const { signUp, user } = useAuth();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'signup - Snefuru';
+    
+    // Redirect if user is already logged in
+    if (user) {
+      router.push('/home');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,11 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'papikeys2',
-};
 
 interface ApiKey {
   id: string;
@@ -16,13 +11,18 @@ interface ApiKey {
   is_active: boolean;
 }
 
-export default function ApiKeysPage2() {
+export default function Papikeys2Page() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [newKey, setNewKey] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const { user } = useAuth();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'papikeys2 - Snefuru';
+  }, []);
 
   useEffect(() => {
     if (user) {

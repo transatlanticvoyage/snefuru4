@@ -3,11 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'papikeys3',
-};
 
 interface ApiKey {
   id: string;
@@ -17,7 +12,7 @@ interface ApiKey {
   updated_at: string;
 }
 
-export default function ApiKeysPage3() {
+export default function Papikeys3Page() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [newKey, setNewKey] = useState('');
   const [loading, setLoading] = useState(true);
@@ -25,6 +20,11 @@ export default function ApiKeysPage3() {
   const [success, setSuccess] = useState<string | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'papikeys3 - Snefuru';
+  }, []);
 
   useEffect(() => {
     if (user) {

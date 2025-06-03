@@ -4,11 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'login',
-};
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -21,6 +16,9 @@ export default function Login() {
   const { signIn, user } = useAuth();
 
   useEffect(() => {
+    // Set document title
+    document.title = 'login - Snefuru';
+    
     // Redirect if user is already logged in
     if (user) {
       router.push('/home');

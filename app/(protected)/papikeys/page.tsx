@@ -2,11 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'papikeys',
-};
 
 interface ApiKey {
   id: string;
@@ -16,13 +11,18 @@ interface ApiKey {
   is_active: boolean;
 }
 
-export default function ApiKeysPage() {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+export default function PapikeysPage() {
+  const [keys, setKeys] = useState<ApiKey[]>([]);
   const [newKey, setNewKey] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const { user } = useAuth();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'papikeys - Snefuru';
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -41,7 +41,7 @@ export default function ApiKeysPage() {
         throw new Error(data.error || 'Failed to fetch API keys');
       }
 
-      setApiKeys(data.apiKeys || []);
+      setKeys(data.apiKeys || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -159,11 +159,11 @@ export default function ApiKeysPage() {
 
       <div>
         <h2 className="text-xl font-semibold mb-2">Your API Keys</h2>
-        {apiKeys.length === 0 ? (
+        {keys.length === 0 ? (
           <p className="text-gray-500">No API keys configured</p>
         ) : (
           <div className="space-y-4">
-            {apiKeys.map((key) => (
+            {keys.map((key) => (
               <div
                 key={key.id}
                 className="flex items-center justify-between p-4 bg-white rounded-lg shadow"

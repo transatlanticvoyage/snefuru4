@@ -1,14 +1,15 @@
 'use client';
 
 import { useAuth } from '../../context/AuthContext';
-import { Metadata } from 'next';
+import { useEffect } from 'react';
 
-export const metadata: Metadata = {
-  title: 'home',
-};
-
-export default function HomePage() {
+export default function Home() {
   const { user } = useAuth();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'home - Snefuru';
+  }, []);
 
   return (
     <div className="py-6">

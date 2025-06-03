@@ -3,11 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'profile',
-};
 
 type Profile = {
   id: string;
@@ -16,13 +11,14 @@ type Profile = {
   updated_at: string;
 };
 
-export default function ProfilePage() {
+export default function Profile() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -48,6 +44,11 @@ export default function ProfilePage() {
 
     fetchProfile();
   }, [user]);
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'profile - Snefuru';
+  }, []);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();

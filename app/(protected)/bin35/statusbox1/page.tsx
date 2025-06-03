@@ -34,6 +34,12 @@ export default function StatusBox1() {
   const [copying, setCopying] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const supabase = createClientComponentClient();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'statusbox1 - Snefuru';
+  }, []);
 
   // Fetch error logs
   const fetchErrorLogs = async () => {
