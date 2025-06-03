@@ -2,11 +2,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'statusbox1',
-};
 
 interface ErrorLog {
   id: string;

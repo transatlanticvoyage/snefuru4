@@ -3,13 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'gapikeys1',
-};
-
-export default function GApikeys1Page() {
+export default function Gapikeys1Page() {
   const { user } = useAuth();
   const [apiKey, setApiKey] = useState('');
   const [keyName, setKeyName] = useState('');
@@ -20,6 +15,11 @@ export default function GApikeys1Page() {
   const [hasActiveKey, setHasActiveKey] = useState(false);
   const [currentKeyName, setCurrentKeyName] = useState('');
   const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'gapikeys1 - Snefuru';
+  }, []);
 
   // Check for active API key on component mount
   useEffect(() => {

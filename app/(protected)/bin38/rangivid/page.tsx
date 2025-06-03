@@ -3,11 +3,6 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useSearchParams } from 'next/navigation';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'rangivid',
-};
 
 export default function RangividPage() {
   const { user } = useAuth();

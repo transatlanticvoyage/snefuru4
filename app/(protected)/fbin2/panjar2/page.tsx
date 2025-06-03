@@ -5,11 +5,6 @@ import Panjar2UI from './components/panjar2';
 import { ImageRecord } from './types';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'panjar2',
-};
 
 export default function Panjar2Page() {
   const [images, setImages] = useState<ImageRecord[]>([]);
@@ -17,6 +12,11 @@ export default function Panjar2Page() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'panjar2 - Snefuru';
+  }, []);
 
   useEffect(() => {
     // Debug: Check auth state

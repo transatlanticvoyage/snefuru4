@@ -1,14 +1,15 @@
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'panjar1',
-};
+import { useEffect } from 'react';
 
 export default function Panjar1Page() {
   const { user } = useAuth();
+
+  useEffect(() => {
+    // Set document title
+    document.title = 'panjar1 - Snefuru';
+  }, []);
 
   return (
     <div className="py-6">
