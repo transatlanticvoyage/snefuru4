@@ -35,6 +35,18 @@ export async function POST(request: NextRequest) {
 
     const supabase = createRouteHandlerClient({ cookies });
 
+    // Get the authenticated user to satisfy RLS policy
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'User not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    console.log('🔍 Debug - Authenticated user:', { id: user.id, email: user.email });
+
     // Step 1: Get user from request (you may need to implement auth checking)
     // For now, we'll get user from the batch relationship
     const { data: batchData, error: batchError } = await supabase
@@ -125,11 +137,12 @@ export async function POST(request: NextRequest) {
       push_name: `Push ${new Date().toISOString().split('T')[0]} - Batch ${batch_id.substring(0, 8)}`,
       push_desc: `Automated image push using ${push_method} method`,
       push_status1: 'processing',
+      fk_user_id: user.id,
       fk_batch_id: batch_id,
       kareench1: []
     };
 
-    console.log('🔍 Debug - narpi_pushes insert data (without fk_user_id):', insertData);
+    console.log('🔍 Debug - narpi_pushes insert data (with auth fk_user_id):', insertData);
 
     const { data: newPush, error: pushError } = await supabase
       .from('narpi_pushes')
