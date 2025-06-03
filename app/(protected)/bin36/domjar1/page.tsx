@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Metadata } from 'next';
 
 // Define the columns based on the domains1 schema
 const columns = [
@@ -13,10 +12,6 @@ const columns = [
   'created_at',
   'updated_at'
 ];
-
-export const metadata: Metadata = {
-  title: 'domjar1',
-};
 
 export default function Domjar1Page() {
   const { user } = useAuth();
