@@ -9,6 +9,10 @@ export default function RangividPage() {
   const [batch, setBatch] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [domains, setDomains] = useState<any[]>([]);
+  const [selectedDomainId, setSelectedDomainId] = useState<string>('');
+  const [domainUpdateLoading, setDomainUpdateLoading] = useState(false);
+  const [domainUpdateResult, setDomainUpdateResult] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const batchId = searchParams?.get('batch');
   const supabase = createClientComponentClient();
@@ -56,6 +60,10 @@ export default function RangividPage() {
           setBatch(null);
         } else {
           setBatch(data);
+          // Set the selected domain if batch has one
+          if (data.fk_domains_id) {
+            setSelectedDomainId(data.fk_domains_id);
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch batch details');
@@ -67,6 +75,71 @@ export default function RangividPage() {
     
     fetchBatchDetails();
   }, [batchId, user, supabase]);
+
+  useEffect(() => {
+    const fetchDomains = async () => {
+      if (!user?.id) return;
+      
+      try {
+        // Get user's DB id from users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+          
+        if (userError || !userData) return;
+        
+        // Fetch domains for this user
+        const { data, error } = await supabase
+          .from('domains1')
+          .select('id, domain_base')
+          .eq('fk_user_id', userData.id)
+          .order('domain_base', { ascending: true });
+          
+        if (error) {
+          console.error('Error fetching domains:', error);
+          return;
+        }
+        
+        setDomains(data || []);
+      } catch (err) {
+        console.error('Error in fetchDomains:', err);
+      }
+    };
+    
+    fetchDomains();
+  }, [user, supabase]);
+
+  const handleDomainAssociation = async () => {
+    if (!selectedDomainId || !batchId) {
+      setDomainUpdateResult('Please select a domain.');
+      return;
+    }
+
+    setDomainUpdateLoading(true);
+    setDomainUpdateResult(null);
+    
+    try {
+      // Update the batch with the selected domain
+      const { error } = await supabase
+        .from('images_plans_batches')
+        .update({ fk_domains_id: selectedDomainId })
+        .eq('id', batchId);
+        
+      if (error) throw error;
+      
+      setDomainUpdateResult('✅ Domain association updated successfully!');
+      
+      // Refresh batch data to show updated information
+      setBatch((prev: any) => ({ ...prev, fk_domains_id: selectedDomainId }));
+      
+    } catch (err) {
+      setDomainUpdateResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setDomainUpdateLoading(false);
+    }
+  };
 
   // If no batch parameter, show empty state
   if (!batchId) {
@@ -183,7 +256,7 @@ export default function RangividPage() {
           </div>
         </div>
 
-        {/* Batch Details Card */}
+        {/* Batch Details Card - Xlslike Original Submission area */}
         <div className="bg-white shadow-sm rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-900">Batch Information</h2>
@@ -212,6 +285,85 @@ export default function RangividPage() {
                 </div>
               ))}
             </dl>
+          </div>
+        </div>
+
+        {/* Dark HR Separator */}
+        <hr className="my-8 border-0 h-[3px] bg-black" />
+
+        {/* Domain Association Section */}
+        <div className="bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Domain Associated To This Batch</h2>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Current Domain Display */}
+              {batch.fk_domains_id && (
+                <div className="mb-4 p-3 bg-blue-50 rounded-md">
+                  <p className="text-sm text-blue-700">
+                    <strong>Currently Associated Domain:</strong>{' '}
+                    {domains.find(d => d.id === batch.fk_domains_id)?.domain_base || batch.fk_domains_id}
+                  </p>
+                </div>
+              )}
+
+              {/* Domain Selection Dropdown */}
+              <div>
+                <label htmlFor="domain-select" className="block text-sm font-medium text-gray-700 mb-2">
+                  Select a domain
+                </label>
+                <div className="flex items-center space-x-3">
+                  <select
+                    id="domain-select"
+                    value={selectedDomainId}
+                    onChange={(e) => setSelectedDomainId(e.target.value)}
+                    className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    disabled={domainUpdateLoading}
+                  >
+                    <option value="">-- Select a domain --</option>
+                    {domains.map((domain) => (
+                      <option key={domain.id} value={domain.id}>
+                        {domain.domain_base}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  <button
+                    onClick={handleDomainAssociation}
+                    disabled={domainUpdateLoading || !selectedDomainId}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {domainUpdateLoading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Updating...
+                      </>
+                    ) : (
+                      'Associate Domain'
+                    )}
+                  </button>
+                </div>
+                
+                {/* Result Message */}
+                {domainUpdateResult && (
+                  <div className={`mt-3 text-sm ${domainUpdateResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                    {domainUpdateResult}
+                  </div>
+                )}
+                
+                {/* No Domains Message */}
+                {domains.length === 0 && (
+                  <div className="mt-3 text-sm text-gray-500">
+                    No domains found. <a href="/bin36/domjar1" className="text-indigo-600 hover:text-indigo-500">Add domains</a> to associate with this batch.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
