@@ -484,6 +484,35 @@ export default function RangividPage() {
           
           <div className="p-6">
             <div className="space-y-4">
+              {/* Push Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <button
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  onClick={() => {
+                    // TODO: Implement push images using wp login credentials
+                    alert('func_61 push images using wp login credentials - functionality coming soon!');
+                  }}
+                >
+                  <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  func_61 push images using wp login credentials
+                </button>
+                
+                <button
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  onClick={() => {
+                    // TODO: Implement push images using wp plugin connection
+                    alert('func_62 push images using wp plugin connection (snefuruplin) - functionality coming soon!');
+                  }}
+                >
+                  <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  func_62 push images using wp plugin connection (snefuruplin)
+                </button>
+              </div>
+
               {/* kareench1 Text Field */}
               <div>
                 <label htmlFor="kareench1" className="block text-sm font-medium text-gray-700 mb-2">
