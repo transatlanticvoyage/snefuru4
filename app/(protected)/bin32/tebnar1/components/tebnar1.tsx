@@ -1552,7 +1552,20 @@ export default function Tebnar1() {
         </div>
         <hr className="my-6 border-t-2 border-gray-300" />
         {/* uitablegrid21 label */}
-        <div className="font-bold mb-2">uitablegrid21</div>
+        <div className="mb-2 flex items-center gap-2 flex-wrap">
+          <span className="font-bold">uitablegrid21</span>
+          <span>- uitablegrid chiefly represents rows of</span>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText('db table images_plans');
+            }}
+            className="px-2 py-1 border border-solid border-gray-400 rounded text-sm hover:bg-gray-50 transition-colors"
+            title="Click to copy"
+          >
+            db table images_plans
+          </button>
+          <span>(copy button)</span>
+        </div>
         <div className="overflow-x-auto w-full">
           <table 
             className="w-full divide-y divide-gray-200"

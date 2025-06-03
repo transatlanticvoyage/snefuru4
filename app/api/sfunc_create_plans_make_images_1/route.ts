@@ -322,11 +322,41 @@ export async function POST(request: Request) {
         updateObj[`int${m}`] = 'yes';
       }
       
-      // Update the plan row
-      await supabase
+      // Update the plan row with error handling
+      const { error: updateError } = await supabase
         .from('images_plans')
         .update(updateObj)
         .eq('id', plan.id);
+        
+      if (updateError) {
+        await logger.error({
+          category: 'database',
+          message: `Failed to update plan ${seq} with int values and fk_image ids`,
+          details: { 
+            error: updateError.message,
+            planId: plan.id,
+            updateData: updateObj,
+            seq: seq
+          },
+          batch_id: batchId,
+          plan_id: plan.id
+        });
+        // Continue processing other plans even if one fails
+      } else {
+        await logger.info({
+          category: 'database',
+          message: `Successfully updated plan ${seq} with int values and fk_image ids`,
+          details: { 
+            planId: plan.id,
+            intValuesSet: Object.keys(updateObj).filter(key => key.startsWith('int')).map(key => `${key}=${updateObj[key]}`),
+            imageIdsSet: Object.keys(updateObj).filter(key => key.startsWith('fk_image')).length,
+            seq: seq
+          },
+          batch_id: batchId,
+          plan_id: plan.id
+        });
+      }
+      
       updatedPlans.push({ ...plan, ...updateObj });
       
       // Throttle1: Add delay between plans (but not after the last plan)
@@ -345,6 +375,43 @@ export async function POST(request: Request) {
           totalImagesGenerated: updatedPlans.reduce((acc, plan) => {
             return acc + [plan.fk_image1_id, plan.fk_image2_id, plan.fk_image3_id, plan.fk_image4_id].filter(Boolean).length;
           }, 0)
+        },
+        batch_id: batchId
+      });
+    }
+
+    // BACKUP: Ensure ALL plans in this batch have their int values set correctly
+    // This is a safety net in case any individual updates failed
+    const bulkIntUpdate: Record<string, string> = {};
+    for (let m = 1; m <= Math.min(qty, 4); m++) {
+      bulkIntUpdate[`int${m}`] = 'yes';
+    }
+    
+    const { error: bulkUpdateError } = await supabase
+      .from('images_plans')
+      .update(bulkIntUpdate)
+      .eq('rel_images_plans_batches_id', batchId);
+      
+    if (bulkUpdateError) {
+      await logger.error({
+        category: 'database',
+        message: `Failed bulk update of int values for batch ${batchId}`,
+        details: { 
+          error: bulkUpdateError.message,
+          batchId: batchId,
+          updateData: bulkIntUpdate,
+          totalPlansInBatch: plansData.length
+        },
+        batch_id: batchId
+      });
+    } else {
+      await logger.info({
+        category: 'database',
+        message: `Successfully bulk updated int values for all plans in batch ${batchId}`,
+        details: { 
+          batchId: batchId,
+          intValuesSet: Object.keys(bulkIntUpdate).map(key => `${key}=${bulkIntUpdate[key]}`),
+          totalPlansUpdated: plansData.length
         },
         batch_id: batchId
       });
