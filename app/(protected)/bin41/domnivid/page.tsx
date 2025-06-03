@@ -13,6 +13,10 @@ export default function DomnividPage() {
   const [wpPass1, setWpPass1] = useState<string>('');
   const [wpCredentialsLoading, setWpCredentialsLoading] = useState(false);
   const [wpCredentialsResult, setWpCredentialsResult] = useState<string | null>(null);
+  const [wpPluginInstalled1, setWpPluginInstalled1] = useState<boolean>(false);
+  const [wpPluginConnected2, setWpPluginConnected2] = useState<boolean>(false);
+  const [installActivateLoading, setInstallActivateLoading] = useState(false);
+  const [installActivateResult, setInstallActivateResult] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const domainBase = searchParams?.get('domain_base');
   const supabase = createClientComponentClient();
@@ -68,6 +72,9 @@ export default function DomnividPage() {
           // Populate WordPress credentials if they exist
           setWpUser1(data.wpuser1 || '');
           setWpPass1(data.wppass1 || '');
+          // Populate WordPress plugin status
+          setWpPluginInstalled1(data.wp_plugin_installed1 || false);
+          setWpPluginConnected2(data.wp_plugin_connected2 || false);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch domain details');
@@ -112,9 +119,95 @@ export default function DomnividPage() {
       }));
       
     } catch (err) {
-      setWpCredentialsResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.error('Error updating WordPress credentials:', err);
+      setWpCredentialsResult('❌ Error updating WordPress credentials. Please try again.');
     } finally {
       setWpCredentialsLoading(false);
+    }
+  };
+
+  // Handle WordPress plugin status update
+  const handleWpPluginStatusUpdate = async (field: 'wp_plugin_installed1' | 'wp_plugin_connected2', value: boolean) => {
+    if (!domain?.id) return;
+
+    try {
+      const { error } = await supabase
+        .from('domains1')
+        .update({ [field]: value })
+        .eq('id', domain.id);
+        
+      if (error) throw error;
+      
+      // Update local state
+      if (field === 'wp_plugin_installed1') {
+        setWpPluginInstalled1(value);
+      } else {
+        setWpPluginConnected2(value);
+      }
+      
+      // Refresh domain data
+      const { data: refreshedData } = await supabase
+        .from('domains1')
+        .select('*')
+        .eq('id', domain.id)
+        .single();
+        
+      if (refreshedData) {
+        setDomain(refreshedData);
+      }
+      
+    } catch (error) {
+      console.error('Error updating WordPress plugin status:', error);
+    }
+  };
+
+  // Handle automatic WordPress plugin installation and activation
+  const handleInstallActivatePlugin = async () => {
+    if (!domain?.id || !domain?.domain_base) {
+      setInstallActivateResult('❌ Domain information not available.');
+      return;
+    }
+
+    if (!domain?.wpuser1 || !domain?.wppass1) {
+      setInstallActivateResult('❌ WordPress credentials are required. Please add wpuser1 and wppass1 first.');
+      return;
+    }
+
+    setInstallActivateLoading(true);
+    setInstallActivateResult(null);
+
+    try {
+      const response = await fetch('/api/wordpress/install-activate-plugin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          domain_id: domain.id,
+          domain_base: domain.domain_base,
+          wp_username: domain.wpuser1,
+          wp_password: domain.wppass1,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setInstallActivateResult(`✅ ${result.message}`);
+        
+        // Update plugin status if installation was successful
+        if (result.success) {
+          await handleWpPluginStatusUpdate('wp_plugin_installed1', true);
+          await handleWpPluginStatusUpdate('wp_plugin_connected2', true);
+        }
+      } else {
+        setInstallActivateResult(`❌ ${result.error || 'Failed to install and activate plugin'}`);
+      }
+    } catch (error) {
+      console.error('Error installing WordPress plugin:', error);
+      setInstallActivateResult('❌ Network error. Please try again.');
+    } finally {
+      setInstallActivateLoading(false);
     }
   };
 
@@ -373,6 +466,212 @@ export default function DomnividPage() {
                     <h3 className="text-sm font-medium text-yellow-800">Security Notice</h3>
                     <p className="text-sm text-yellow-700 mt-1">
                       WordPress credentials are stored securely. Consider using application passwords instead of your main account password for better security.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* WordPress Plugin Status Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">WordPress Plugin Status</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Current status of the Snefuruplin Cloud Connector plugin for this domain
+            </p>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-6">
+              {/* Plugin Installed Status */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    WP Plugin Currently Installed
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Whether the plugin is installed on this WordPress site
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className={`text-lg font-semibold ${wpPluginInstalled1 ? 'text-green-600' : 'text-red-600'}`}>
+                    {wpPluginInstalled1 ? 'Yes' : 'No'}
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_installed1', true)}
+                      className={`px-3 py-1 text-xs rounded ${wpPluginInstalled1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-800'}`}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_installed1', false)}
+                      className={`px-3 py-1 text-xs rounded ${!wpPluginInstalled1 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-800'}`}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Plugin Connected Status */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    WP Plugin Currently Connected
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Whether the plugin is actively connected and syncing data
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className={`text-lg font-semibold ${wpPluginConnected2 ? 'text-green-600' : 'text-red-600'}`}>
+                    {wpPluginConnected2 ? 'Yes' : 'No'}
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_connected2', true)}
+                      className={`px-3 py-1 text-xs rounded ${wpPluginConnected2 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-800'}`}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_connected2', false)}
+                      className={`px-3 py-1 text-xs rounded ${!wpPluginConnected2 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-800'}`}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Plugin Download Link */}
+              <div className="pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      Plugin Download
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Download the latest version of the Snefuruplin Cloud Connector plugin
+                    </p>
+                  </div>
+                  <a
+                    href="/api/snefuruplin/download"
+                    target="_blank"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download Plugin
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Install And Activate WP Plugin Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Install And Activate WP Plugin Using The wpuser1 and wppass1</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Automatically install and activate the Snefuruplin Cloud Connector plugin on this WordPress site
+            </p>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Prerequisites Check */}
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                <h3 className="text-sm font-medium text-blue-800 mb-2">Prerequisites:</h3>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li className="flex items-center">
+                    <span className={`mr-2 ${domain?.domain_base ? 'text-green-600' : 'text-red-600'}`}>
+                      {domain?.domain_base ? '✓' : '✗'}
+                    </span>
+                    Domain URL: {domain?.domain_base || 'Not available'}
+                  </li>
+                  <li className="flex items-center">
+                    <span className={`mr-2 ${domain?.wpuser1 ? 'text-green-600' : 'text-red-600'}`}>
+                      {domain?.wpuser1 ? '✓' : '✗'}
+                    </span>
+                    WordPress Username: {domain?.wpuser1 ? 'Set' : 'Not set'}
+                  </li>
+                  <li className="flex items-center">
+                    <span className={`mr-2 ${domain?.wppass1 ? 'text-green-600' : 'text-red-600'}`}>
+                      {domain?.wppass1 ? '✓' : '✗'}
+                    </span>
+                    WordPress Password: {domain?.wppass1 ? 'Set' : 'Not set'}
+                  </li>
+                </ul>
+              </div>
+
+              {/* Installation Process Description */}
+              <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+                <h3 className="text-sm font-medium text-gray-800 mb-2">What this will do:</h3>
+                <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                  <li>Connect to your WordPress site using the provided credentials</li>
+                  <li>Download the latest Snefuruplin Cloud Connector plugin</li>
+                  <li>Install the plugin on your WordPress site</li>
+                  <li>Activate the plugin automatically</li>
+                  <li>Update the plugin status in our system</li>
+                </ol>
+              </div>
+
+              {/* Install/Activate Button */}
+              <div className="flex items-center justify-between pt-4">
+                <div>
+                  <p className="text-sm text-gray-600">
+                    Ready to install and activate the WordPress plugin automatically?
+                  </p>
+                </div>
+                <button
+                  onClick={handleInstallActivatePlugin}
+                  disabled={installActivateLoading || !domain?.wpuser1 || !domain?.wppass1}
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {installActivateLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Installing...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      func_52_install_activate
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Result Message */}
+              {installActivateResult && (
+                <div className={`mt-4 p-3 rounded-md ${installActivateResult.startsWith('✅') ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                  <p className={`text-sm ${installActivateResult.startsWith('✅') ? 'text-green-700' : 'text-red-700'}`}>
+                    {installActivateResult}
+                  </p>
+                </div>
+              )}
+
+              {/* Security Warning */}
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="flex">
+                  <svg className="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.863-.833-2.632 0L4.182 18.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <div>
+                    <h3 className="text-sm font-medium text-yellow-800">Security Notice</h3>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      This process will use your WordPress admin credentials to install the plugin. Ensure your credentials are secure and consider using application passwords for better security.
                     </p>
                   </div>
                 </div>
