@@ -211,12 +211,13 @@ export default function RangividPage() {
         // Update kareench1 textarea with upload details if available
         if (result.results?.upload_details) {
           const uploadDetails = result.results.upload_details
-            .map((detail: any, index: number) => 
-              `${detail.nupload_id}\t${detail.nupload_status1}\t${detail.img_url_returned}\t${detail.wp_img_id_returned || ''}`
-            )
+            .map((detail: any, index: number) => {
+              const errorMsg = detail.error_message ? `\t${detail.error_message}` : '';
+              return `${detail.nupload_id}\t${detail.nupload_status1}\t${detail.img_url_returned}\t${detail.wp_img_id_returned || ''}${errorMsg}`;
+            })
             .join('\n');
           
-          const header = 'nupload_id\tnupload_status1\timg_url_returned\twp_img_id_returned';
+          const header = 'nupload_id\tnupload_status1\timg_url_returned\twp_img_id_returned\terror_message';
           setKareench1(`${header}\n${uploadDetails}`);
         }
       } else {
