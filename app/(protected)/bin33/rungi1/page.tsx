@@ -5,6 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 // Define the columns based on the schema
 const columns = [
+  'actions', // New action column for individual view button
   'id',
   'rel_users_id',
   'created_at',
@@ -175,7 +176,7 @@ export default function Rungi1Page() {
                   key={col} 
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {col}
+                  {col === 'actions' ? 'Actions' : col}
                 </th>
               ))}
             </tr>
@@ -185,10 +186,47 @@ export default function Rungi1Page() {
               <tr key={batch.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 {columns.map(col => (
                   <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {col === 'created_at' ? 
-                      new Date(batch[col]).toLocaleString() : 
+                    {col === 'actions' ? (
+                      <div className="flex space-x-2">
+                        {/* Same tab button */}
+                        <a
+                          href={`/bin38/rangivid?batch=${batch.id}`}
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-navy-600 hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500 transition-colors"
+                          style={{ backgroundColor: '#1e3a8a', borderColor: '#1e3a8a' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1e40af';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1e3a8a';
+                          }}
+                        >
+                          Individual View
+                        </a>
+                        {/* New tab button */}
+                        <a
+                          href={`/bin38/rangivid?batch=${batch.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-2 py-1.5 border border-navy-600 text-xs font-medium rounded text-navy-600 bg-white hover:bg-navy-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500 transition-colors"
+                          style={{ borderColor: '#1e3a8a', color: '#1e3a8a' }}
+                          title="Open in new tab"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#f0f9ff';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#ffffff';
+                          }}
+                        >
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </div>
+                    ) : col === 'created_at' ? (
+                      new Date(batch[col]).toLocaleString()
+                    ) : (
                       String(batch[col] ?? '')
-                    }
+                    )}
                   </td>
                 ))}
               </tr>

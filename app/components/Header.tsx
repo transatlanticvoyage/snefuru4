@@ -3,6 +3,7 @@
 import React from "react";
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -86,8 +87,22 @@ export default function Header() {
         <div className="flex justify-between h-20"> {/* Increased height for 2 rows */}
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-xl font-bold text-indigo-600">
-                Snefuru4
+              <Link href="/" className="flex items-center space-x-3">
+                {/* Logo Image */}
+                <div className="relative h-10 w-10 flex-shrink-0">
+                  <Image
+                    src="/assets/images/snefuru-logo.png"
+                    alt="Snefuru Logo"
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                {/* App Name */}
+                <span className="text-xl font-bold text-indigo-600">
+                  Snefuru4
+                </span>
               </Link>
             </div>
             <nav className="ml-6 flex flex-col justify-center space-y-1"> {/* Changed to flex-col with space-y-1 */}
