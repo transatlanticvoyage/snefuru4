@@ -1,6 +1,11 @@
 'use client';
 
 import { useAuth } from '../../context/AuthContext';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'home',
+};
 
 export default function HomePage() {
   const { user } = useAuth();

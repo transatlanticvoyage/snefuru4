@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'profile',
+};
 
 type Profile = {
   id: string;

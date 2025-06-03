@@ -2,6 +2,11 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'rungi1',
+};
 
 // Define the columns based on the schema
 const columns = [

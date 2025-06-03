@@ -2,10 +2,15 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Metadata } from 'next';
 
-// Define the columns based on the domains1 schema
+export const metadata: Metadata = {
+  title: 'domjar1',
+};
+
+// Define columns to display (reordered with actions first)
 const columns = [
-  'actions', // New action column for individual view button
+  'actions',
   'id',
   'domain_base',
   'note1',

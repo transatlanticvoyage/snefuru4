@@ -6,6 +6,11 @@ import { useAuth } from '@/app/context/AuthContext';
 import OpenAI from 'openai';
 import Panjar1UI from './components/panjar1';
 import { ImageRecord } from './types';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'panjar1',
+};
 
 // Initialize Supabase client
 const supabase = createClient(
