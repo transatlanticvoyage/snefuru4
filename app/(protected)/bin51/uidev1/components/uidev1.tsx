@@ -1422,6 +1422,16 @@ export default function Uidev1() {
         >
           <option value="">Dropdown 4</option>
         </select>
+        
+        {/* Button added to the right */}
+        <button
+          className="h-7 px-3 rounded text-black bg-white hover:bg-gray-100 text-sm font-medium whitespace-nowrap"
+          onClick={() => {
+            // No functionality needed right now
+          }}
+        >
+          func_51_save_batch_settings
+        </button>
       </div>
       
       {/* Error/Success Message Banner */}
