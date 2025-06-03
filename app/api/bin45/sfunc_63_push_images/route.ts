@@ -145,7 +145,14 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Debug - batchData structure:', {
       id: batchData.id,
       rel_users_id: batchData.rel_users_id,
-      domains1: batchData.domains1 ? 'present' : 'missing'
+      domains1: batchData.domains1 ? 'present' : 'missing',
+      domain_details: batchData.domains1 ? {
+        domain_base: batchData.domains1.domain_base,
+        has_wpuser: !!batchData.domains1.wpuser1,
+        has_wppass: !!batchData.domains1.wppass1,
+        wp_plugin_installed: batchData.domains1.wp_plugin_installed1,
+        wp_plugin_connected: batchData.domains1.wp_plugin_connected2
+      } : null
     });
 
     // Step 3: Create narpi_pushes record (no user ID needed - relationship through batch)
@@ -210,6 +217,13 @@ export async function POST(request: NextRequest) {
           wp_img_id_returned: uploadResult.wp_image_id || null
         };
 
+        // Add error message to failed uploads for debugging
+        if (!uploadResult.success && uploadResult.error) {
+          console.error(`Upload ${i + 1} failed:`, uploadResult.error);
+          // Add error to the result (we'll need to update the interface)
+          (result as any).error_message = uploadResult.error;
+        }
+
         uploadResults.push(result);
 
         if (uploadResult.success) {
@@ -225,6 +239,12 @@ export async function POST(request: NextRequest) {
           img_url_returned: image.image_url,
           wp_img_id_returned: null
         };
+        
+        // Add error message for debugging
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`Upload ${i + 1} exception:`, errorMessage);
+        (failResult as any).error_message = errorMessage;
+        
         uploadResults.push(failResult);
         failureCount++;
       }
