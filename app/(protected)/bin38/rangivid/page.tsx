@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useSearchParams } from 'next/navigation';
+import { cfunc_63_push_images } from '@/app/bin45/cfunc_63_push_images';
 
 export default function RangividPage() {
   const { user } = useAuth();
@@ -17,8 +18,10 @@ export default function RangividPage() {
   const [nufuPageTypeLoading, setNufuPageTypeLoading] = useState(false);
   const [nufuPageTypeResult, setNufuPageTypeResult] = useState<string | null>(null);
   const [kareench1, setKareench1] = useState<string>('');
-  const [whichImages, setWhichImages] = useState<string>('');
+  const [whichImages, setWhichImages] = useState<string>('image1_only');
   const [pushMethod, setPushMethod] = useState<string>('');
+  const [pushLoading, setPushLoading] = useState(false);
+  const [pushResult, setPushResult] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const batchId = searchParams?.get('batch');
   const supabase = createClientComponentClient();
@@ -183,6 +186,47 @@ export default function RangividPage() {
       setNufuPageTypeResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setNufuPageTypeLoading(false);
+    }
+  };
+
+  const handlePushImages = async () => {
+    if (!pushMethod) {
+      setPushResult('❌ Please select a push method before proceeding.');
+      return;
+    }
+
+    if (!batchId) {
+      setPushResult('❌ No batch ID found.');
+      return;
+    }
+
+    setPushLoading(true);
+    setPushResult(null);
+    
+    try {
+      const result = await cfunc_63_push_images(batchId, pushMethod);
+      
+      if (result.success) {
+        setPushResult(`✅ ${result.message}`);
+        // Update kareench1 textarea with upload details if available
+        if (result.results?.upload_details) {
+          const uploadDetails = result.results.upload_details
+            .map((detail: any, index: number) => 
+              `${detail.nupload_id}\t${detail.nupload_status1}\t${detail.img_url_returned}\t${detail.wp_img_id_returned || ''}`
+            )
+            .join('\n');
+          
+          const header = 'nupload_id\tnupload_status1\timg_url_returned\twp_img_id_returned';
+          setKareench1(`${header}\n${uploadDetails}`);
+        }
+      } else {
+        setPushResult(`❌ ${result.error}`);
+      }
+      
+    } catch (err) {
+      setPushResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error occurred'}`);
+    } finally {
+      setPushLoading(false);
     }
   };
 
@@ -495,8 +539,8 @@ export default function RangividPage() {
                       type="radio"
                       name="whichImages"
                       value="image1_only"
-                      checked={whichImages === 'image1_only'}
-                      onChange={(e) => setWhichImages(e.target.value)}
+                      checked={true}
+                      disabled={true}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                     />
                     <span className="ml-2 text-sm text-gray-700">
@@ -548,21 +592,34 @@ export default function RangividPage() {
               {/* Submit Button */}
               <div className="pt-2">
                 <button
-                  onClick={() => {
-                    if (!whichImages || !pushMethod) {
-                      alert('Please select both image options and push method before proceeding.');
-                      return;
-                    }
-                    // TODO: Implement func_63_push_images functionality
-                    alert(`func_63_push_images - Images: ${whichImages}, Method: ${pushMethod}`);
-                  }}
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  onClick={handlePushImages}
+                  disabled={pushLoading || !pushMethod}
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  func_63_push_images
+                  {pushLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Pushing Images...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      func_63_push_images
+                    </>
+                  )}
                 </button>
+                
+                {/* Push Result Message */}
+                {pushResult && (
+                  <div className={`mt-3 text-sm ${pushResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                    {pushResult}
+                  </div>
+                )}
               </div>
 
               {/* kareench1 Text Field */}

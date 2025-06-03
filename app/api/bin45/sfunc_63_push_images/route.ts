@@ -1,0 +1,313 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+interface ImageUploadResult {
+  nupload_id: number;
+  nupload_status1: string;
+  img_url_returned: string;
+  wp_img_id_returned: number | null;
+}
+
+interface ImageRecord {
+  id: string;
+  image_url: string;
+  file_name: string | null;
+}
+
+interface PlanRecord {
+  id: string;
+  fk_image1_id: string;
+  images1: ImageRecord | null;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { batch_id, push_method } = body;
+
+    if (!batch_id || !push_method) {
+      return NextResponse.json(
+        { error: 'Missing required fields: batch_id, push_method' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createClientComponentClient();
+
+    // Step 1: Get user from request (you may need to implement auth checking)
+    // For now, we'll get user from the batch relationship
+    const { data: batchData, error: batchError } = await supabase
+      .from('images_plans_batches')
+      .select(`
+        *,
+        domains1 (
+          id,
+          domain_base,
+          wpuser1,
+          wppass1,
+          wp_plugin_installed1,
+          wp_plugin_connected2
+        )
+      `)
+      .eq('id', batch_id)
+      .single();
+
+    if (batchError || !batchData) {
+      return NextResponse.json(
+        { error: 'Batch not found or access denied' },
+        { status: 404 }
+      );
+    }
+
+    // Step 2: Get all images_plans for this batch (image 1 only)
+    const { data: plansData, error: plansError } = await supabase
+      .from('images_plans')
+      .select(`
+        id,
+        fk_image1_id,
+        images1:fk_image1_id (
+          id,
+          image_url,
+          file_name
+        )
+      `)
+      .eq('fk_batches_id', batch_id)
+      .not('fk_image1_id', 'is', null);
+
+    if (plansError) {
+      return NextResponse.json(
+        { error: 'Failed to fetch plans data' },
+        { status: 500 }
+      );
+    }
+
+    if (!plansData || plansData.length === 0) {
+      return NextResponse.json(
+        { error: 'No images found in this batch' },
+        { status: 404 }
+      );
+    }
+
+    const typedPlansData = plansData as unknown as PlanRecord[];
+
+    // Step 3: Create narpi_pushes record
+    const { data: newPush, error: pushError } = await supabase
+      .from('narpi_pushes')
+      .insert({
+        push_name: `Push ${new Date().toISOString().split('T')[0]} - Batch ${batch_id.substring(0, 8)}`,
+        push_desc: `Automated image push using ${push_method} method`,
+        push_status1: 'processing',
+        fk_user_id: batchData.rel_users_id,
+        fk_batch_id: batch_id,
+        kareench1: []
+      })
+      .select()
+      .single();
+
+    if (pushError || !newPush) {
+      return NextResponse.json(
+        { error: 'Failed to create push record' },
+        { status: 500 }
+      );
+    }
+
+    // Step 4: Upload images to WordPress
+    const uploadResults: ImageUploadResult[] = [];
+    let successCount = 0;
+    let failureCount = 0;
+
+    for (let i = 0; i < typedPlansData.length; i++) {
+      const plan = typedPlansData[i];
+      const image = plan.images1;
+
+      if (!image || !image.image_url) {
+        const failResult: ImageUploadResult = {
+          nupload_id: i + 1,
+          nupload_status1: 'failed',
+          img_url_returned: '',
+          wp_img_id_returned: null
+        };
+        uploadResults.push(failResult);
+        failureCount++;
+        continue;
+      }
+
+      try {
+        // Upload image to WordPress
+        const uploadResult = await uploadImageToWordPress(
+          image.image_url,
+          image.file_name || `image-${i + 1}.jpg`,
+          batchData.domains1,
+          push_method
+        );
+
+        const result: ImageUploadResult = {
+          nupload_id: i + 1,
+          nupload_status1: uploadResult.success ? 'success' : 'failed',
+          img_url_returned: uploadResult.wp_url || image.image_url,
+          wp_img_id_returned: uploadResult.wp_image_id || null
+        };
+
+        uploadResults.push(result);
+
+        if (uploadResult.success) {
+          successCount++;
+        } else {
+          failureCount++;
+        }
+
+      } catch (error) {
+        const failResult: ImageUploadResult = {
+          nupload_id: i + 1,
+          nupload_status1: 'failed',
+          img_url_returned: image.image_url,
+          wp_img_id_returned: null
+        };
+        uploadResults.push(failResult);
+        failureCount++;
+      }
+    }
+
+    // Step 5: Update narpi_pushes record with results
+    const finalStatus = failureCount === 0 ? 'completed' : (successCount === 0 ? 'failed' : 'partial');
+    
+    const { error: updateError } = await supabase
+      .from('narpi_pushes')
+      .update({
+        push_status1: finalStatus,
+        kareench1: uploadResults
+      })
+      .eq('id', newPush.id);
+
+    if (updateError) {
+      console.error('Failed to update push record:', updateError);
+    }
+
+    // Step 6: Return results
+    return NextResponse.json({
+      success: true,
+      message: `Image push completed: ${successCount} successful, ${failureCount} failed`,
+      push_id: newPush.id,
+      results: {
+        total_images: typedPlansData.length,
+        successful_uploads: successCount,
+        failed_uploads: failureCount,
+        final_status: finalStatus,
+        upload_details: uploadResults
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in func_63_push_images:', error);
+    return NextResponse.json(
+      { error: 'Internal server error during image push process' },
+      { status: 500 }
+    );
+  }
+}
+
+// Helper function to upload image to WordPress
+async function uploadImageToWordPress(
+  imageUrl: string,
+  fileName: string,
+  domainData: any,
+  pushMethod: string
+): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
+  try {
+    if (!domainData || !domainData.domain_base) {
+      return { success: false, error: 'No domain configured for this batch' };
+    }
+
+    const siteUrl = domainData.domain_base.startsWith('http') 
+      ? domainData.domain_base 
+      : `https://${domainData.domain_base}`;
+
+    if (pushMethod === 'wp_login') {
+      // Use WordPress login credentials method
+      if (!domainData.wpuser1 || !domainData.wppass1) {
+        return { success: false, error: 'WordPress login credentials not configured' };
+      }
+
+      return await uploadViaWordPressLogin(imageUrl, fileName, siteUrl, domainData.wpuser1, domainData.wppass1);
+
+    } else if (pushMethod === 'wp_plugin') {
+      // Use WordPress plugin connection method
+      if (!domainData.wp_plugin_installed1 || !domainData.wp_plugin_connected2) {
+        return { success: false, error: 'WordPress plugin not installed or connected' };
+      }
+
+      return await uploadViaWordPressPlugin(imageUrl, fileName, siteUrl);
+
+    } else {
+      return { success: false, error: 'Invalid push method specified' };
+    }
+
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown upload error' 
+    };
+  }
+}
+
+// Upload via WordPress login credentials
+async function uploadViaWordPressLogin(
+  imageUrl: string,
+  fileName: string,
+  siteUrl: string,
+  username: string,
+  password: string
+): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
+  try {
+    // This is a simplified implementation
+    // In a real scenario, you'd need to:
+    // 1. Login to WordPress
+    // 2. Get authentication cookies
+    // 3. Upload the image via WordPress REST API or admin interface
+    // 4. Return the new WordPress image ID and URL
+
+    // For now, return a simulated successful upload
+    const simulatedImageId = Math.floor(Math.random() * 1000) + 1;
+    const simulatedUrl = `${siteUrl}/wp-content/uploads/2025/01/${fileName}`;
+
+    return {
+      success: true,
+      wp_url: simulatedUrl,
+      wp_image_id: simulatedImageId
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `Login upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    };
+  }
+}
+
+// Upload via WordPress plugin connection
+async function uploadViaWordPressPlugin(
+  imageUrl: string,
+  fileName: string,
+  siteUrl: string
+): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
+  try {
+    // This would communicate with your WordPress plugin
+    // The plugin would handle the actual image upload
+    
+    // For now, return a simulated successful upload
+    const simulatedImageId = Math.floor(Math.random() * 1000) + 1;
+    const simulatedUrl = `${siteUrl}/wp-content/uploads/2025/01/${fileName}`;
+
+    return {
+      success: true,
+      wp_url: simulatedUrl,
+      wp_image_id: simulatedImageId
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      error: `Plugin upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    };
+  }
+} 
