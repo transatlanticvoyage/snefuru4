@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     // Step 2b: Get the image details for each plan
     const imageIds = plansData.map(plan => plan.fk_image1_id);
     const { data: imagesData, error: imagesError } = await supabase
-      .from('images1')
+      .from('images')
       .select('id, image_url, file_name')
       .in('id', imageIds);
 
