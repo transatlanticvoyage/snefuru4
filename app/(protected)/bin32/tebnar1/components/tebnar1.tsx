@@ -1083,7 +1083,14 @@ export default function Tebnar1() {
         .single();
       if (userError || !userData) return;
       
-      // Fetch updated images_plans for this user
+      // Clear existing data first to force re-render
+      setPlans([]);
+      setImagesById({});
+      
+      // Force fresh fetch with timestamp to avoid any caching
+      const timestamp = Date.now();
+      
+      // Fetch updated images_plans for this user with cache-busting
       const { data, error } = await supabase
         .from('images_plans')
         .select('*')
@@ -1093,19 +1100,28 @@ export default function Tebnar1() {
         console.error('Error refreshing plans data:', error);
         return;
       }
-      setPlans(data || []);
       
-      // Also refresh images data
+      // Also refresh images data with cache-busting
       const { data: imagesData } = await supabase
         .from('images')
         .select('*')
         .eq('rel_users_id', userData.id);
       
+      // Set the fresh data
+      setPlans(data || []);
+      
       const imageMap: Record<string, any> = {};
       (imagesData || []).forEach(img => { if (img.id) imageMap[img.id] = img; });
       setImagesById(imageMap);
       
-      console.log('Plans data refreshed successfully, total plans:', data?.length || 0);
+      console.log(`[${timestamp}] Plans data refreshed successfully:`, {
+        totalPlans: data?.length || 0,
+        plansWithInt1: data?.filter(p => p.int1 === 'yes').length || 0,
+        plansWithInt2: data?.filter(p => p.int2 === 'yes').length || 0,
+        plansWithInt3: data?.filter(p => p.int3 === 'yes').length || 0,
+        plansWithInt4: data?.filter(p => p.int4 === 'yes').length || 0,
+        totalImages: Object.keys(imageMap).length
+      });
     } catch (err) {
       console.error('Error in refreshPlansData:', err);
     }
@@ -1607,7 +1623,43 @@ export default function Tebnar1() {
             db table images_plans
           </button>
           <span>(copy button)</span>
+          <button
+            onClick={async () => {
+              setError('🔄 Refreshing interface cache...');
+              try {
+                // Force refresh all data to clear any cache issues
+                await refreshPlansData();
+                setError('✅ Interface cache refreshed successfully!');
+              } catch (err) {
+                setError(`❌ Failed to refresh cache: ${err instanceof Error ? err.message : 'Unknown error'}`);
+              }
+            }}
+            className="ml-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors font-medium"
+            title="Force refresh all table data"
+          >
+            refresh interface cache x153
+          </button>
         </div>
+        
+        {/* Column Templates Button Bar */}
+        <div className="mb-4 flex border border-gray-300 rounded overflow-hidden">
+          <div className="flex-shrink-0 bg-gray-100 border-r border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 flex items-center h-[34px]">
+            COLUMN TEMPLATES
+          </div>
+          <button className="flex-1 bg-white hover:bg-gray-50 border-r border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 flex items-center justify-center h-[34px] transition-colors">
+            All Columns
+          </button>
+          <button className="flex-1 bg-white hover:bg-gray-50 border-r border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 flex items-center justify-center h-[34px] transition-colors">
+            ColTemp1
+          </button>
+          <button className="flex-1 bg-white hover:bg-gray-50 border-r border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 flex items-center justify-center h-[34px] transition-colors">
+            ColTemp2
+          </button>
+          <button className="flex-1 bg-white hover:bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 flex items-center justify-center h-[34px] transition-colors">
+            ColTemp3
+          </button>
+        </div>
+        
         <div className="overflow-x-auto w-full">
           <table 
             className="w-full divide-y divide-gray-200"
