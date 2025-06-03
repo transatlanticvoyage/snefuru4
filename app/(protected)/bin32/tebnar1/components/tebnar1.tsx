@@ -1071,6 +1071,46 @@ export default function Tebnar1() {
     }
   };
 
+  // Helper to refresh plans data
+  const refreshPlansData = async () => {
+    if (!user?.id) return;
+    try {
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      if (userError || !userData) return;
+      
+      // Fetch updated images_plans for this user
+      const { data, error } = await supabase
+        .from('images_plans')
+        .select('*')
+        .eq('rel_users_id', userData.id)
+        .order('created_at', { ascending: false });
+      if (error) {
+        console.error('Error refreshing plans data:', error);
+        return;
+      }
+      setPlans(data || []);
+      
+      // Also refresh images data
+      const { data: imagesData } = await supabase
+        .from('images')
+        .select('*')
+        .eq('rel_users_id', userData.id);
+      
+      const imageMap: Record<string, any> = {};
+      (imagesData || []).forEach(img => { if (img.id) imageMap[img.id] = img; });
+      setImagesById(imageMap);
+      
+      console.log('Plans data refreshed successfully, total plans:', data?.length || 0);
+    } catch (err) {
+      console.error('Error in refreshPlansData:', err);
+    }
+  };
+
   useEffect(() => {
     const fetchPlans = async () => {
       setLoading(true);
@@ -1518,6 +1558,8 @@ export default function Tebnar1() {
                 setMakeImagesResult(result?.message || (result?.success ? 'Success' : 'Failed'));
                 if (result?.batch_id) {
                   await refreshBatchesAndSelect(result.batch_id);
+                  // CRITICAL: Refresh plans data immediately to show updated int1 values
+                  await refreshPlansData();
                 }
               } catch (err) {
                 setMakeImagesResult(err instanceof Error ? err.message : String(err));
