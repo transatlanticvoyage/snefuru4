@@ -1390,6 +1390,38 @@ export default function Uidev1() {
             <option key={batch.id} value={batch.id}>{batch.id}</option>
           ))}
         </select>
+        
+        {/* Additional Dropdown 1 */}
+        <select
+          className="h-7 px-2 rounded text-black bg-white"
+          style={{ minWidth: 120 }}
+        >
+          <option value="">Dropdown 1</option>
+        </select>
+        
+        {/* Additional Dropdown 2 */}
+        <select
+          className="h-7 px-2 rounded text-black bg-white"
+          style={{ minWidth: 120 }}
+        >
+          <option value="">Dropdown 2</option>
+        </select>
+        
+        {/* Additional Dropdown 3 */}
+        <select
+          className="h-7 px-2 rounded text-black bg-white"
+          style={{ minWidth: 120 }}
+        >
+          <option value="">Dropdown 3</option>
+        </select>
+        
+        {/* Additional Dropdown 4 */}
+        <select
+          className="h-7 px-2 rounded text-black bg-white"
+          style={{ minWidth: 120 }}
+        >
+          <option value="">Dropdown 4</option>
+        </select>
       </div>
       
       {/* Error/Success Message Banner */}
