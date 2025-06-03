@@ -11,8 +11,7 @@ export async function middleware(req: NextRequest) {
 
   // If there's no session and the user is trying to access a protected route
   if (!session && (
-    req.nextUrl.pathname.startsWith('/papikeys') ||
-    req.nextUrl.pathname.startsWith('/gambar1')
+    req.nextUrl.pathname.startsWith('/papikeys')
   )) {
     // Create a new URL for the login page
     const redirectUrl = new URL('/login', req.url);
@@ -35,7 +34,6 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/papikeys/:path*',
-    '/gambar1/:path*',
     '/login',
     '/signup'
   ],
