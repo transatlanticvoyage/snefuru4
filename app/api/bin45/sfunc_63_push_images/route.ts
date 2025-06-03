@@ -149,17 +149,16 @@ export async function POST(request: NextRequest) {
       domains1: batchData.domains1 ? 'present' : 'missing'
     });
 
-    // Step 3: Create narpi_pushes record
+    // Step 3: Create narpi_pushes record (no user ID needed - relationship through batch)
     const insertData = {
       push_name: `Push ${new Date().toISOString().split('T')[0]} - Batch ${batch_id.substring(0, 8)}`,
       push_desc: `Automated image push using ${push_method} method`,
       push_status1: 'processing',
-      fk_user_id: dbUser.id,
       fk_batch_id: batch_id,
       kareench1: []
     };
 
-    console.log('🔍 Debug - narpi_pushes insert data (with db fk_user_id):', insertData);
+    console.log('🔍 Debug - narpi_pushes insert data (no user ID):', insertData);
 
     const { data: newPush, error: pushError } = await supabase
       .from('narpi_pushes')
