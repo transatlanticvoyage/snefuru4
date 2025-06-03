@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     const { data: plansData, error: plansError } = await supabase
       .from('images_plans')
       .select('id, fk_image1_id')
-      .eq('fk_batches_id', batch_id)
+      .eq('rel_images_plans_batches_id', batch_id)
       .not('fk_image1_id', 'is', null);
 
     if (plansError) {
