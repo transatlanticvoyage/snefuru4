@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       .from('images_plans_batches')
       .select(`
         *,
-        domains1 (
+        domains1:fk_domains_id (
           id,
           domain_base,
           wpuser1,
@@ -53,8 +53,9 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (batchError || !batchData) {
+      console.error('Supabase batch query error:', batchError);
       return NextResponse.json(
-        { error: 'Batch not found or access denied' },
+        { error: `Batch not found or access denied: ${batchError?.message || 'Unknown error'}` },
         { status: 404 }
       );
     }
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
     // Step 2: Get all images_plans for this batch (image 1 only) 
     const { data: plansData, error: plansError } = await supabase
       .from('images_plans')
-      .select('id, fk_image1_id')
+      .select('id, fk_image1_id, e_file_name1')
       .eq('rel_images_plans_batches_id', batch_id)
       .not('fk_image1_id', 'is', null);
 
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
     const imageIds = plansData.map(plan => plan.fk_image1_id);
     const { data: imagesData, error: imagesError } = await supabase
       .from('images')
-      .select('id, image_url, file_name')
+      .select('id, img_file_url1')
       .in('id', imageIds);
 
     if (imagesError) {
@@ -101,7 +102,11 @@ export async function POST(request: NextRequest) {
       const image = imagesData?.find(img => img.id === plan.fk_image1_id);
       return {
         ...plan,
-        images1: image || null
+        images1: image ? {
+          id: image.id,
+          image_url: image.img_file_url1,
+          file_name: plan.e_file_name1 || null // Use e_file_name1 from images_plans
+        } : null
       };
     });
 
