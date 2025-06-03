@@ -293,7 +293,7 @@ async function uploadImageToWordPress(
       return await uploadViaWordPressLogin(imageUrl, fileName, siteUrl, domainData.wpuser1, domainData.wppass1);
 
     } else if (pushMethod === 'wp_plugin') {
-      // Use WordPress plugin connection method
+      // Use WordPress plugin connection
       if (!domainData.wp_plugin_installed1 || !domainData.wp_plugin_connected2) {
         return { success: false, error: 'WordPress plugin not installed or connected' };
       }
@@ -321,27 +321,89 @@ async function uploadViaWordPressLogin(
   password: string
 ): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
   try {
-    // This is a simplified implementation
-    // In a real scenario, you'd need to:
-    // 1. Login to WordPress
-    // 2. Get authentication cookies
-    // 3. Upload the image via WordPress REST API or admin interface
-    // 4. Return the new WordPress image ID and URL
+    console.log(`🔄 Starting WordPress REST API upload: ${fileName} to ${siteUrl}`);
 
-    // For now, return a simulated successful upload
-    const simulatedImageId = Math.floor(Math.random() * 1000) + 1;
-    const simulatedUrl = `${siteUrl}/wp-content/uploads/2025/01/${fileName}`;
+    // Step 1: Download the image from the URL
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      return { 
+        success: false, 
+        error: `Failed to download image: ${imageResponse.status} ${imageResponse.statusText}` 
+      };
+    }
+
+    const imageBuffer = await imageResponse.arrayBuffer();
+    console.log(`✅ Downloaded image: ${imageBuffer.byteLength} bytes`);
+
+    // Step 2: Prepare WordPress REST API endpoint
+    const wpApiUrl = `${siteUrl}/wp-json/wp/v2/media`;
+    
+    // Step 3: Create FormData for multipart upload
+    const formData = new FormData();
+    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    formData.append('file', blob, fileName);
+    formData.append('title', fileName.replace(/\.[^/.]+$/, "")); // Remove extension for title
+    formData.append('alt_text', fileName.replace(/\.[^/.]+$/, ""));
+
+    // Step 4: Create Basic Auth header
+    const authString = btoa(`${username}:${password}`);
+    
+    console.log(`🔄 Uploading to WordPress: ${wpApiUrl}`);
+
+    // Step 5: Upload to WordPress
+    const uploadResponse = await fetch(wpApiUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${authString}`,
+        // Don't set Content-Type - let the browser set it with boundary for FormData
+      },
+      body: formData
+    });
+
+    const responseText = await uploadResponse.text();
+    console.log(`📝 WordPress API Response Status: ${uploadResponse.status}`);
+    console.log(`📝 WordPress API Response: ${responseText.substring(0, 500)}...`);
+
+    if (!uploadResponse.ok) {
+      let errorMessage = `WordPress API error: ${uploadResponse.status}`;
+      
+      try {
+        const errorData = JSON.parse(responseText);
+        errorMessage = errorData.message || errorData.code || errorMessage;
+      } catch (e) {
+        errorMessage = `${errorMessage} - ${responseText.substring(0, 200)}`;
+      }
+
+      return { 
+        success: false, 
+        error: errorMessage
+      };
+    }
+
+    // Step 6: Parse successful response
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      return { 
+        success: false, 
+        error: 'Invalid JSON response from WordPress API' 
+      };
+    }
+
+    console.log(`✅ WordPress upload successful: ID ${responseData.id}`);
 
     return {
       success: true,
-      wp_url: simulatedUrl,
-      wp_image_id: simulatedImageId
+      wp_url: responseData.source_url || responseData.guid?.rendered || `${siteUrl}/wp-content/uploads/${fileName}`,
+      wp_image_id: responseData.id
     };
 
   } catch (error) {
+    console.error('WordPress upload error:', error);
     return {
       success: false,
-      error: `Login upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      error: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
   }
 }
@@ -353,8 +415,11 @@ async function uploadViaWordPressPlugin(
   siteUrl: string
 ): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
   try {
+    // 🎭 SIMULATED: This method is not yet implemented
     // This would communicate with your WordPress plugin
     // The plugin would handle the actual image upload
+    
+    console.log(`🎭 SIMULATED Plugin upload: ${fileName} to ${siteUrl}`);
     
     // For now, return a simulated successful upload
     const simulatedImageId = Math.floor(Math.random() * 1000) + 1;
