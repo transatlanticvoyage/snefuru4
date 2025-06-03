@@ -59,26 +59,64 @@ export default function Header() {
     }
   };
 
+  // Split navigation items into 2 rows, with break after panjar3
+  const splitNavItems = () => {
+    const panjar3Index = navItems.findIndex(item => item.name === 'panjar3');
+    if (panjar3Index === -1) {
+      // If panjar3 not found, split roughly in half
+      const midPoint = Math.ceil(navItems.length / 2);
+      return {
+        firstRow: navItems.slice(0, midPoint),
+        secondRow: navItems.slice(midPoint)
+      };
+    } else {
+      // Split after panjar3 (include panjar3 in first row)
+      return {
+        firstRow: navItems.slice(0, panjar3Index + 1),
+        secondRow: navItems.slice(panjar3Index + 1)
+      };
+    }
+  };
+
+  const { firstRow, secondRow } = splitNavItems();
+
   return (
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-20"> {/* Increased height for 2 rows */}
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="text-xl font-bold text-indigo-600">
                 Snefuru4
               </Link>
             </div>
-            <nav className="ml-6 flex space-x-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-700"
-                >
-                  {item.name}
-                </Link>
-              ))}
+            <nav className="ml-6 flex flex-col justify-center space-y-1"> {/* Changed to flex-col with space-y-1 */}
+              {/* First row */}
+              <div className="flex space-x-8">
+                {firstRow.map((item) => (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+              {/* Second row */}
+              {secondRow.length > 0 && (
+                <div className="flex space-x-8">
+                  {secondRow.map((item) => (
+                    <Link
+                      key={item.path}
+                      href={item.path}
+                      className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </nav>
           </div>
           <div className="flex items-center">
