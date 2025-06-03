@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'gapikeys1',
+};
 
 export default function GApikeys1Page() {
   const { user } = useAuth();

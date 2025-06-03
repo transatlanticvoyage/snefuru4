@@ -5,6 +5,11 @@ import Panjar2UI from './components/panjar2';
 import { ImageRecord } from './types';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'panjar2',
+};
 
 export default function Panjar2Page() {
   const [images, setImages] = useState<ImageRecord[]>([]);

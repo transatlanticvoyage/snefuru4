@@ -1,6 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'setup',
+};
 
 export default function SetupPage() {
   const [status, setStatus] = useState<string>('');

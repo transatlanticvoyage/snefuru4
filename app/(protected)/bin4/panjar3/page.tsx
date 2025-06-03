@@ -1,6 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'panjar3',
+};
 
 // Dummy image record type for interface
 interface ImageRecord {

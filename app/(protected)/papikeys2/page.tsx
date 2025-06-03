@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'papikeys2',
+};
 
 interface ApiKey {
   id: string;

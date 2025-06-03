@@ -1,6 +1,11 @@
 'use client';
 
 import { useAuth } from '@/app/context/AuthContext';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'panjar1',
+};
 
 export default function Panjar1Page() {
   const { user } = useAuth();

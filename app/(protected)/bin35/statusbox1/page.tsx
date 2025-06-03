@@ -2,7 +2,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import Head from 'next/head';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'statusbox1',
+};
 
 interface ErrorLog {
   id: string;
@@ -194,10 +198,6 @@ export default function StatusBox1() {
 
   return (
     <div className="w-full max-w-[95vw] mx-auto p-4">
-      <Head>
-        <title>Statusbox1 - Snefuru</title>
-      </Head>
-      
       {/* Fixed Error/Success Message Area */}
       {error && (
         <div className={`fixed top-0 left-0 right-0 z-50 px-4 py-3 text-sm font-medium shadow-lg ${
