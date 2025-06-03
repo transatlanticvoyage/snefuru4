@@ -6,7 +6,10 @@ import { AuthProvider } from "./context/AuthContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Snefuru",
+  title: {
+    template: "%s - Snefuru",
+    default: "Snefuru"
+  },
   description: "Your AI Image Generation Platform",
 };
 

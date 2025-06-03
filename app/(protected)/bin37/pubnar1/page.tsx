@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Pubnar1 - Snefuru',
+  title: 'pubnar1',
 };
 
 export default function Pubnar1Page() {

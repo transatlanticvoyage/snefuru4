@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Domjar1 - Snefuru',
+  title: 'domjar1',
 };
 
 export default function Domjar1Page() {
