@@ -498,7 +498,8 @@ export default function RangividPage() {
                   style={{ 
                     width: '600px', 
                     height: '200px',
-                    maxWidth: '100%' // Ensure it doesn't overflow on smaller screens
+                    maxWidth: '100%', // Ensure it doesn't overflow on smaller screens
+                    border: '1px solid #4B5563' // Dark gray border
                   }}
                 />
               </div>
