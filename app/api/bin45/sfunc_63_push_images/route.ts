@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 interface ImageUploadResult {
   nupload_id: number;
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createClientComponentClient();
+    const supabase = createRouteHandlerClient({ cookies });
 
     // Step 1: Get user from request (you may need to implement auth checking)
     // For now, we'll get user from the batch relationship
