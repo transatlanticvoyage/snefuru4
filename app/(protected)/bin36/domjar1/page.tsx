@@ -21,6 +21,12 @@ export default function Domjar1Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = [5, 10, 20, 50, 100];
+  
+  // New state for domains text box functionality
+  const [domainsText, setDomainsText] = useState<string>('');
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitResult, setSubmitResult] = useState<string | null>(null);
+  
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -84,6 +90,78 @@ export default function Domjar1Page() {
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
     setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  // Function to refresh domains data
+  const refreshDomainsData = async () => {
+    if (!user?.id) return;
+    try {
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+        
+      if (userError || !userData) return;
+      
+      // Fetch updated domains1 for this user
+      const { data, error } = await supabase
+        .from('domains1')
+        .select('*')
+        .eq('fk_user_id', userData.id)
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error refreshing domains data:', error);
+        return;
+      }
+      
+      setDomains(data || []);
+    } catch (err) {
+      console.error('Error in refreshDomainsData:', err);
+    }
+  };
+
+  // Handle domains submission
+  const handleDomainsSubmit = async () => {
+    if (!domainsText.trim()) {
+      setSubmitResult('Please enter some domains to add.');
+      return;
+    }
+
+    setSubmitLoading(true);
+    setSubmitResult(null);
+    
+    try {
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      // Split domains by lines and clean them up
+      const domainLines = domainsText
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+      
+      if (domainLines.length === 0) {
+        throw new Error('No valid domains found');
+      }
+
+      // Import and call the client function
+      const { func_44_add_domains } = await import('./utils/cfunc_44_add_domains');
+      const result = await func_44_add_domains(domainLines);
+      
+      if (result.success) {
+        setSubmitResult(`✅ Successfully added ${result.count || domainLines.length} domains!`);
+        setDomainsText(''); // Clear the text box
+        await refreshDomainsData(); // Refresh the table
+      } else {
+        setSubmitResult(`❌ ${result.message || 'Failed to add domains'}`);
+      }
+    } catch (err) {
+      setSubmitResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   // Generate page numbers for pagination display
@@ -175,8 +253,50 @@ export default function Domjar1Page() {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Domains Management</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Domains Management</h1>
       
+      {/* Add Domains Section */}
+      <div className="mb-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Add Domains Text Box 1</h2>
+        
+        <div className="space-y-4">
+          <textarea
+            value={domainsText}
+            onChange={(e) => setDomainsText(e.target.value)}
+            placeholder="Enter domains, one per line..."
+            className="block border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            style={{ width: '400px', height: '150px' }}
+            disabled={submitLoading}
+          />
+          
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleDomainsSubmit}
+              disabled={submitLoading}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                'submit func_44_add_domains'
+              )}
+            </button>
+            
+            {submitResult && (
+              <div className={`text-sm ${submitResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                {submitResult}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Statistics Bar */}
       <div className="mb-4 p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center justify-between text-sm text-gray-600">
