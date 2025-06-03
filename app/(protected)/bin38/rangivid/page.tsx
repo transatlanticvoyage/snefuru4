@@ -17,6 +17,8 @@ export default function RangividPage() {
   const [nufuPageTypeLoading, setNufuPageTypeLoading] = useState(false);
   const [nufuPageTypeResult, setNufuPageTypeResult] = useState<string | null>(null);
   const [kareench1, setKareench1] = useState<string>('');
+  const [whichImages, setWhichImages] = useState<string>('');
+  const [pushMethod, setPushMethod] = useState<string>('');
   const searchParams = useSearchParams();
   const batchId = searchParams?.get('batch');
   const supabase = createClientComponentClient();
@@ -484,32 +486,82 @@ export default function RangividPage() {
           
           <div className="p-6">
             <div className="space-y-4">
-              {/* Push Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              {/* WHICH IMAGES TO PUSH Section */}
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 mb-3">WHICH IMAGES TO PUSH</h3>
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="whichImages"
+                      value="image1_only"
+                      checked={whichImages === 'image1_only'}
+                      onChange={(e) => setWhichImages(e.target.value)}
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">
+                      only use image 1 for each plan - use fk_image1_id from images_plans
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* HR Separator */}
+              <hr className="border-gray-300" />
+
+              {/* PUSH METHOD Section */}
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 mb-3">PUSH METHOD</h3>
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="pushMethod"
+                      value="wp_login"
+                      checked={pushMethod === 'wp_login'}
+                      onChange={(e) => setPushMethod(e.target.value)}
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">
+                      push images using wp login credentials
+                    </span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="pushMethod"
+                      value="wp_plugin"
+                      checked={pushMethod === 'wp_plugin'}
+                      onChange={(e) => setPushMethod(e.target.value)}
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">
+                      push images using wp plugin connection (snefuruplin)
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* HR Separator */}
+              <hr className="border-gray-300" />
+
+              {/* Submit Button */}
+              <div className="pt-2">
                 <button
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   onClick={() => {
-                    // TODO: Implement push images using wp login credentials
-                    alert('func_61 push images using wp login credentials - functionality coming soon!');
+                    if (!whichImages || !pushMethod) {
+                      alert('Please select both image options and push method before proceeding.');
+                      return;
+                    }
+                    // TODO: Implement func_63_push_images functionality
+                    alert(`func_63_push_images - Images: ${whichImages}, Method: ${pushMethod}`);
                   }}
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 >
                   <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  func_61 push images using wp login credentials
-                </button>
-                
-                <button
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  onClick={() => {
-                    // TODO: Implement push images using wp plugin connection
-                    alert('func_62 push images using wp plugin connection (snefuruplin) - functionality coming soon!');
-                  }}
-                >
-                  <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  func_62 push images using wp plugin connection (snefuruplin)
+                  func_63_push_images
                 </button>
               </div>
 
