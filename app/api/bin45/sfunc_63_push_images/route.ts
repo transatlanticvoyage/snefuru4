@@ -112,23 +112,35 @@ export async function POST(request: NextRequest) {
 
     const typedPlansData = plansWithImages as unknown as PlanRecord[];
 
+    // Debug logging to understand the batch data structure
+    console.log('🔍 Debug - batchData structure:', {
+      id: batchData.id,
+      rel_users_id: batchData.rel_users_id,
+      domains1: batchData.domains1 ? 'present' : 'missing'
+    });
+
     // Step 3: Create narpi_pushes record
+    const insertData = {
+      push_name: `Push ${new Date().toISOString().split('T')[0]} - Batch ${batch_id.substring(0, 8)}`,
+      push_desc: `Automated image push using ${push_method} method`,
+      push_status1: 'processing',
+      fk_user_id: batchData.rel_users_id,
+      fk_batch_id: batch_id,
+      kareench1: []
+    };
+
+    console.log('🔍 Debug - narpi_pushes insert data:', insertData);
+
     const { data: newPush, error: pushError } = await supabase
       .from('narpi_pushes')
-      .insert({
-        push_name: `Push ${new Date().toISOString().split('T')[0]} - Batch ${batch_id.substring(0, 8)}`,
-        push_desc: `Automated image push using ${push_method} method`,
-        push_status1: 'processing',
-        fk_user_id: batchData.rel_users_id,
-        fk_batch_id: batch_id,
-        kareench1: []
-      })
+      .insert(insertData)
       .select()
       .single();
 
     if (pushError || !newPush) {
+      console.error('Supabase narpi_pushes insert error:', pushError);
       return NextResponse.json(
-        { error: 'Failed to create push record' },
+        { error: `Failed to create push record: ${pushError?.message || pushError?.code || 'Unknown error'}` },
         { status: 500 }
       );
     }
