@@ -125,12 +125,11 @@ export async function POST(request: NextRequest) {
       push_name: `Push ${new Date().toISOString().split('T')[0]} - Batch ${batch_id.substring(0, 8)}`,
       push_desc: `Automated image push using ${push_method} method`,
       push_status1: 'processing',
-      fk_user_id: batchData.rel_users_id,
       fk_batch_id: batch_id,
       kareench1: []
     };
 
-    console.log('🔍 Debug - narpi_pushes insert data:', insertData);
+    console.log('🔍 Debug - narpi_pushes insert data (without fk_user_id):', insertData);
 
     const { data: newPush, error: pushError } = await supabase
       .from('narpi_pushes')
