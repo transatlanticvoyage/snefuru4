@@ -1425,7 +1425,7 @@ export default function Uidev1() {
         
         {/* Button added to the right */}
         <button
-          className="h-7 px-3 rounded text-black bg-white hover:bg-gray-100 text-sm font-medium whitespace-nowrap"
+          className="h-7 px-3 rounded text-white bg-blue-900 hover:bg-blue-800 text-sm font-medium whitespace-nowrap"
           onClick={() => {
             // No functionality needed right now
           }}

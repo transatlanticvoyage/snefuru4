@@ -491,6 +491,18 @@ export default function RangividPage() {
             Last updated: {batch.updated_at ? new Date(batch.updated_at).toLocaleString() : 'N/A'}
           </div>
         </div>
+
+        {/* func_51_save_batch_settings Button */}
+        <div className="mt-6 flex justify-center">
+          <button
+            className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            onClick={() => {
+              // No functionality needed right now
+            }}
+          >
+            func_51_save_batch_settings
+          </button>
+        </div>
       </div>
     </div>
   );
