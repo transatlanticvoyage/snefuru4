@@ -206,25 +206,36 @@ export default function RangividPage() {
     try {
       const result = await cfunc_63_push_images(batchId, pushMethod);
       
+      // Debug: Log the full result to see what we're getting
+      console.log('🔍 Client Debug - Full API result:', result);
+      console.log('🔍 Client Debug - Upload details:', result.results?.upload_details);
+      
       if (result.success) {
         setPushResult(`✅ ${result.message}`);
         // Update kareench1 textarea with upload details if available
         if (result.results?.upload_details) {
+          console.log('🔍 Client Debug - Processing upload details...');
+          
           const uploadDetails = result.results.upload_details
             .map((detail: any, index: number) => {
+              console.log(`🔍 Client Debug - Detail ${index + 1}:`, detail);
               const errorMsg = detail.error_message ? `\t${detail.error_message}` : '';
               return `${detail.nupload_id}\t${detail.nupload_status1}\t${detail.img_url_returned}\t${detail.wp_img_id_returned || ''}${errorMsg}`;
             })
             .join('\n');
           
           const header = 'nupload_id\tnupload_status1\timg_url_returned\twp_img_id_returned\terror_message';
-          setKareench1(`${header}\n${uploadDetails}`);
+          const finalContent = `${header}\n${uploadDetails}`;
+          
+          console.log('🔍 Client Debug - Final textarea content:', finalContent);
+          setKareench1(finalContent);
         }
       } else {
         setPushResult(`❌ ${result.error}`);
       }
       
     } catch (err) {
+      console.error('🔍 Client Debug - Exception:', err);
       setPushResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error occurred'}`);
     } finally {
       setPushLoading(false);
