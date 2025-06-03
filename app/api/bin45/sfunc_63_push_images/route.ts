@@ -59,24 +59,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Get all images_plans for this batch (image 1 only)
+    // Step 2: Get all images_plans for this batch (image 1 only) 
     const { data: plansData, error: plansError } = await supabase
       .from('images_plans')
-      .select(`
-        id,
-        fk_image1_id,
-        images1:fk_image1_id (
-          id,
-          image_url,
-          file_name
-        )
-      `)
+      .select('id, fk_image1_id')
       .eq('fk_batches_id', batch_id)
       .not('fk_image1_id', 'is', null);
 
     if (plansError) {
+      console.error('Supabase plans query error:', plansError);
       return NextResponse.json(
-        { error: 'Failed to fetch plans data' },
+        { error: `Failed to fetch plans data: ${plansError.message || plansError.code || 'Unknown error'}` },
         { status: 500 }
       );
     }
@@ -88,7 +81,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const typedPlansData = plansData as unknown as PlanRecord[];
+    // Step 2b: Get the image details for each plan
+    const imageIds = plansData.map(plan => plan.fk_image1_id);
+    const { data: imagesData, error: imagesError } = await supabase
+      .from('images1')
+      .select('id, image_url, file_name')
+      .in('id', imageIds);
+
+    if (imagesError) {
+      console.error('Supabase images query error:', imagesError);
+      return NextResponse.json(
+        { error: `Failed to fetch images data: ${imagesError.message || imagesError.code || 'Unknown error'}` },
+        { status: 500 }
+      );
+    }
+
+    // Combine plans with their images
+    const plansWithImages = plansData.map(plan => {
+      const image = imagesData?.find(img => img.id === plan.fk_image1_id);
+      return {
+        ...plan,
+        images1: image || null
+      };
+    });
+
+    const typedPlansData = plansWithImages as unknown as PlanRecord[];
 
     // Step 3: Create narpi_pushes record
     const { data: newPush, error: pushError } = await supabase
