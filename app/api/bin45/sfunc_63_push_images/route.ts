@@ -64,8 +64,7 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 Debug - Database user:', { auth_id: user.id, db_id: dbUser.id });
 
-    // Step 1: Get user from request (you may need to implement auth checking)
-    // For now, we'll get user from the batch relationship
+    // Step 1: Get batch data with domain information
     const { data: batchData, error: batchError } = await supabase
       .from('images_plans_batches')
       .select(`
