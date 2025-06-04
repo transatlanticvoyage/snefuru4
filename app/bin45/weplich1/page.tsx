@@ -71,12 +71,11 @@ export default function Weplich1Page() {
 
       console.log('Found user data:', userData);
 
-      // Now fetch ywp_sites data for this user
-      // Note: You may need to adjust this query based on how sites are linked to users
-      // For now, I'll assume there's a user_id column or similar relationship
+      // Now fetch ywp_sites data for this specific user only
       const { data, error } = await supabase
         .from('ywp_sites')
         .select('*')
+        .eq('fk_user_id', userData.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
