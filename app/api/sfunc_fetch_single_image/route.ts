@@ -49,34 +49,70 @@ const processMetadataStripping = async (imageBuffer: ArrayBuffer): Promise<Array
   
   console.log('📊 Original image metadata:', {
     format: metadata.format,
+    width: metadata.width,
+    height: metadata.height,
     hasExif: !!metadata.exif,
     hasIcc: !!metadata.icc,
     hasIptc: !!metadata.iptc,
     hasXmp: !!metadata.xmp,
-    originalSize: inputBuffer.length
+    originalSize: inputBuffer.length,
+    channels: metadata.channels,
+    depth: metadata.depth,
+    density: metadata.density
   });
   
   // Reprocess the image based on its format to strip metadata
   let outputBuffer: Buffer;
   if (metadata.format === 'jpeg') {
-    outputBuffer = await image.jpeg().toBuffer();
+    outputBuffer = await image
+      .jpeg({ quality: 90, progressive: false, mozjpeg: false })
+      .toBuffer();
   } else if (metadata.format === 'png') {
-    outputBuffer = await image.png().toBuffer();
+    outputBuffer = await image
+      .png({ 
+        compressionLevel: 9, // Maximum compression
+        progressive: false,
+        palette: false, // Don't convert to palette
+        quality: 100, // Maximum quality for PNG
+        effort: 10 // Maximum effort for compression
+      })
+      .toBuffer();
   } else if (metadata.format === 'webp') {
-    outputBuffer = await image.webp().toBuffer();
+    outputBuffer = await image
+      .webp({ quality: 90, effort: 6 })
+      .toBuffer();
   } else {
-    // Default to PNG for unknown formats
-    outputBuffer = await image.png().toBuffer();
+    // Default to PNG for unknown formats with optimized settings
+    outputBuffer = await image
+      .png({ 
+        compressionLevel: 9,
+        progressive: false,
+        palette: false,
+        quality: 100,
+        effort: 10
+      })
+      .toBuffer();
   }
   
   const processedBuffer = outputBuffer.buffer.slice(outputBuffer.byteOffset, outputBuffer.byteOffset + outputBuffer.byteLength) as ArrayBuffer;
   
+  const sizeDiff = outputBuffer.length - inputBuffer.length;
+  const sizeChangePercent = ((sizeDiff / inputBuffer.length) * 100).toFixed(2);
+  
   console.log('✅ Metadata stripped successfully:', {
     originalSize: inputBuffer.length,
     processedSize: outputBuffer.length,
-    reduction: inputBuffer.length - outputBuffer.length,
-    format: metadata.format
+    sizeDifference: sizeDiff,
+    sizeChangePercent: `${sizeChangePercent}%`,
+    format: metadata.format,
+    compressionApplied: metadata.format === 'png' ? 'PNG Level 9' : metadata.format,
+    note: sizeDiff > 0 ? 'File increased (possibly due to re-compression/format optimization)' : 'File reduced'
   });
+  
+  // If the processed file is significantly larger, log a warning
+  if (sizeDiff > (inputBuffer.length * 0.1)) { // If more than 10% larger
+    console.log('⚠️ Warning: Processed file is significantly larger than original. This may indicate the original was already highly compressed or the processing added overhead.');
+  }
   
   return processedBuffer;
 };
@@ -482,31 +518,66 @@ export async function POST(request: NextRequest) {
       console.log('📁 Image filename:', imageFileName);
       console.log('📁 Full storage path:', storagePath);
 
-      // Step 4: Upload to Supabase Storage
-      const uploadController = new AbortController();
-      const uploadTimeoutId = setTimeout(() => uploadController.abort(), 20000); // 20 second timeout
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      // Step 4: Upload to Supabase Storage (with timeout and retry)
+      console.log('☁️ Uploading to Supabase Storage (with retry logic)...');
+      
+      // Check if file already exists in storage
+      const { data: existingFile } = supabase.storage
         .from('bucket-images-b1')
-        .upload(storagePath, processedBuffer, {
-          contentType: 'image/png',
-          upsert: false,
-        });
+        .getPublicUrl(storagePath);
+      
+      // If file exists, create a unique filename with timestamp
+      let finalStoragePath = storagePath;
+      if (existingFile) {
+        console.log('⚠️ File already exists in storage, checking if accessible...');
+        try {
+          const testResponse = await fetch(existingFile.publicUrl, { method: 'HEAD' });
+          if (testResponse.ok) {
+            console.log('⚠️ Existing file is accessible, creating unique filename...');
+            // Extract filename parts
+            const pathParts = storagePath.split('/');
+            const filename = pathParts[pathParts.length - 1];
+            const extIdx = filename.lastIndexOf('.');
+            const name = extIdx > 0 ? filename.slice(0, extIdx) : filename;
+            const ext = extIdx > 0 ? filename.slice(extIdx) : '';
+            
+            // Create unique filename with timestamp
+            const timestamp = Date.now();
+            const uniqueFilename = `${name}-${timestamp}${ext}`;
+            pathParts[pathParts.length - 1] = uniqueFilename;
+            finalStoragePath = pathParts.join('/');
+            
+            console.log('📁 Using unique storage path:', finalStoragePath);
+          }
+        } catch (checkError) {
+          console.log('ℹ️ Existing file check failed, proceeding with original path');
+        }
+      }
+      
+      const uploadResult = await withRetry(async () => {
+        return await withTimeout(
+          supabase.storage
+            .from('bucket-images-b1')
+            .upload(finalStoragePath, processedBuffer, {
+              contentType: 'image/png',
+              upsert: true, // Allow overwriting if file exists
+            }),
+          20000 // 20 second timeout for upload
+        );
+      }, 3, 1000); // 3 retries with 1s base delay
 
-      clearTimeout(uploadTimeoutId);
-
-      if (uploadError) {
-        console.error('❌ Failed to upload to Supabase Storage:', uploadError);
+      if (uploadResult.error) {
+        console.error('❌ Failed to upload to Supabase Storage after retries:', uploadResult.error);
         return NextResponse.json({ 
           success: false, 
-          message: `Failed to upload to storage: ${uploadError.message}` 
+          message: `Failed to upload to storage: ${uploadResult.error.message}` 
         }, { status: 500 });
       }
 
-      // Step 5: Get the public URL from Supabase Storage
+      // Step 5: Get the public URL from Supabase Storage (using final path)
       const { data: publicUrlData } = supabase.storage
         .from('bucket-images-b1')
-        .getPublicUrl(storagePath);
+        .getPublicUrl(finalStoragePath);
 
       const finalImageUrl = publicUrlData.publicUrl;
       console.log('✅ Image uploaded to storage successfully:', finalImageUrl);

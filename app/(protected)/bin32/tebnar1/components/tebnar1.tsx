@@ -857,7 +857,12 @@ export default function Tebnar1() {
   });
   const [fetchingImages, setFetchingImages] = useState<Set<string>>(new Set()); // Track which images are being fetched
   const [loadingPreset, setLoadingPreset] = useState(false); // Track loading state for preset button
-  const [presetData, setPresetData] = useState<string[][] | null>(null); // Store preset data to pass to grid
+  const [presetData, setPresetData] = useState<string[][] | null>(null);
+  const [lastClickTime, setLastClickTime] = useState<Record<string, number>>({}); // Debounce tracking
+
+  // Debounce constants
+  const DEBOUNCE_MS = 2000; // 2 seconds between clicks
+  const RECENT_GENERATION_CHECK_MS = 30000; // 30 seconds for recent generation check
 
   // Inject CSS styles for main element styling
   useEffect(() => {
@@ -1257,20 +1262,51 @@ export default function Tebnar1() {
     console.log('🚀 FETCH SINGLE IMAGE FUNCTION CALLED!', { plan_id: plan.id, imageSlot });
     
     const fetchKey = `${plan.id}-${imageSlot}`;
+    const now = Date.now();
+    
+    // Debounce: prevent multiple clicks within DEBOUNCE_MS
+    if (lastClickTime[fetchKey] && (now - lastClickTime[fetchKey]) < DEBOUNCE_MS) {
+      console.log('⏳ Request debounced - too soon since last click');
+      setError(`⏳ Please wait ${Math.ceil((DEBOUNCE_MS - (now - lastClickTime[fetchKey])) / 1000)} seconds before trying again`);
+      return;
+    }
+    
+    // Check if already fetching this image
+    if (fetchingImages.has(fetchKey)) {
+      console.log('⏳ Request already in progress for this image');
+      setError('⏳ Image generation already in progress for this slot');
+      return;
+    }
+    
+    setLastClickTime(prev => ({ ...prev, [fetchKey]: now }));
     
     try {
       setFetchingImages(prev => new Set([...prev, fetchKey]));
       setError(null); // Clear any previous errors
       
-      console.log('Fetching single image:', { plan_id: plan.id, imageSlot, aiModel });
+      console.log('🧹 WIPE META DEBUG - Frontend:', {
+        wipeMeta,
+        timestamp: new Date().toISOString(),
+        plan_id: plan.id,
+        imageSlot,
+        aiModel
+      });
+      
+      console.log('Fetching single image:', { plan_id: plan.id, imageSlot, aiModel, wipeMeta });
+      
+      // Validate prompt data
+      const prompt = plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1;
+      if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+        throw new Error('No valid prompt found for this plan. Please ensure the plan has prompt text.');
+      }
       
       // Create a single record for this image generation
       const imageData = {
         plan_id: plan.id,
         image_slot: imageSlot,
-        prompt: plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1 || 'AI Image',
+        prompt: prompt.trim(),
         aiModel: aiModel,
-        wipeMeta: wipeMeta // Pass the current wipeMeta state
+        wipeMeta: wipeMeta // Always true for individual fetch now
       };
       
       console.log('Sending request with data:', imageData);
@@ -1286,7 +1322,17 @@ export default function Tebnar1() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Response error:', errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+        
+        // Handle specific error cases
+        if (response.status === 429) {
+          throw new Error('Please wait before generating another image (rate limited)');
+        } else if (response.status === 400) {
+          throw new Error('Invalid request - please check the plan data');
+        } else if (response.status === 500) {
+          throw new Error('Server error - please try again in a moment');
+        } else {
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
       }
       
       const result = await response.json();
@@ -1303,39 +1349,66 @@ export default function Tebnar1() {
             .single();
             
           if (userData) {
-            // Refresh images
-            const { data: imagesData } = await supabase
-              .from('images')
-              .select('*')
-              .eq('rel_users_id', userData.id);
-            
-            const imageMap: Record<string, any> = {};
-            (imagesData || []).forEach(img => { if (img.id) imageMap[img.id] = img; });
-            setImagesById(imageMap);
-            console.log('Images refreshed, new count:', Object.keys(imageMap).length);
+            // Refresh images with error handling
+            try {
+              const { data: imagesData, error: imagesError } = await supabase
+                .from('images')
+                .select('*')
+                .eq('rel_users_id', userData.id);
+              
+              if (imagesError) {
+                console.error('Failed to refresh images:', imagesError);
+              } else {
+                const imageMap: Record<string, any> = {};
+                (imagesData || []).forEach(img => { if (img.id) imageMap[img.id] = img; });
+                setImagesById(imageMap);
+                console.log('Images refreshed, new count:', Object.keys(imageMap).length);
+              }
+            } catch (imgError) {
+              console.error('Error refreshing images:', imgError);
+            }
             
             // Also refresh plans to get updated fk_image fields
-            const { data: plansData } = await supabase
-              .from('images_plans')
-              .select('*')
-              .eq('rel_users_id', userData.id)
-              .order('created_at', { ascending: false });
-              
-            if (plansData) {
-              setPlans(plansData);
-              console.log('Plans refreshed, count:', plansData.length);
+            try {
+              const { data: plansData, error: plansError } = await supabase
+                .from('images_plans')
+                .select('*')
+                .eq('rel_users_id', userData.id)
+                .order('created_at', { ascending: false });
+                
+              if (plansError) {
+                console.error('Failed to refresh plans:', plansError);
+              } else if (plansData) {
+                setPlans(plansData);
+                console.log('Plans refreshed, count:', plansData.length);
+              }
+            } catch (planError) {
+              console.error('Error refreshing plans:', planError);
             }
           }
         }
         
         setError(`✅ Image ${imageSlot} generated successfully for plan ${plan.id}`);
+        
+        // Clear the success message after 5 seconds
+        setTimeout(() => {
+          setError(null);
+        }, 5000);
+        
       } else {
         setError(`❌ Failed to generate image ${imageSlot}: ${result.message || 'Unknown error'}`);
       }
       
     } catch (err) {
       console.error('Fetch single image error:', err);
-      setError(`❌ Error fetching image: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`❌ Error fetching image: ${errorMessage}`);
+      
+      // Clear error message after 10 seconds for errors
+      setTimeout(() => {
+        setError(null);
+      }, 10000);
+      
     } finally {
       setFetchingImages(prev => {
         const newSet = new Set(prev);
