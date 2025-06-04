@@ -173,7 +173,8 @@ export async function POST(request: Request) {
             prompt,
             userId: userData.id,
             batchFolder,
-            fileName
+            fileName,
+            wipeMeta: false
           });
           const imageGenDuration = Date.now() - imageGenStartTime;
           
