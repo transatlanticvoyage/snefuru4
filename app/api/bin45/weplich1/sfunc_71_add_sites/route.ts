@@ -23,19 +23,31 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Get authorization header
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({
+        success: false,
+        message: 'Authentication required'
+      }, { status: 401 });
+    }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+
     // Initialize Supabase client with service role
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Get the authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Verify the token and get user
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
+      console.error('Authentication error:', authError);
       return NextResponse.json({
         success: false,
-        message: 'Authentication required'
+        message: 'Invalid or expired authentication token'
       }, { status: 401 });
     }
 

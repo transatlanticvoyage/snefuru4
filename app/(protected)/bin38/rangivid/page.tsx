@@ -14,6 +14,10 @@ export default function RangividPage() {
   const [selectedDomainId, setSelectedDomainId] = useState<string>('');
   const [domainUpdateLoading, setDomainUpdateLoading] = useState(false);
   const [domainUpdateResult, setDomainUpdateResult] = useState<string | null>(null);
+  const [wpSites, setWpSites] = useState<any[]>([]);
+  const [selectedWpSiteId, setSelectedWpSiteId] = useState<string>('');
+  const [wpSiteUpdateLoading, setWpSiteUpdateLoading] = useState(false);
+  const [wpSiteUpdateResult, setWpSiteUpdateResult] = useState<string | null>(null);
   const [selectedNufuPageType, setSelectedNufuPageType] = useState<string>('');
   const [nufuPageTypeLoading, setNufuPageTypeLoading] = useState(false);
   const [nufuPageTypeResult, setNufuPageTypeResult] = useState<string | null>(null);
@@ -129,6 +133,41 @@ export default function RangividPage() {
     fetchDomains();
   }, [user, supabase]);
 
+  useEffect(() => {
+    const fetchWpSites = async () => {
+      if (!user?.id) return;
+      
+      try {
+        // Get user's DB id from users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+          
+        if (userError || !userData) return;
+        
+        // Fetch WP sites for this user
+        const { data, error } = await supabase
+          .from('ywp_sites')
+          .select('id, site_name, site_url')
+          .eq('fk_user_id', userData.id)
+          .order('site_name', { ascending: true });
+          
+        if (error) {
+          console.error('Error fetching WP sites:', error);
+          return;
+        }
+        
+        setWpSites(data || []);
+      } catch (err) {
+        console.error('Error in fetchWpSites:', err);
+      }
+    };
+    
+    fetchWpSites();
+  }, [user, supabase]);
+
   const handleDomainAssociation = async () => {
     if (!selectedDomainId || !batchId) {
       setDomainUpdateResult('Please select a domain.');
@@ -156,6 +195,41 @@ export default function RangividPage() {
       setDomainUpdateResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setDomainUpdateLoading(false);
+    }
+  };
+
+  const handleWpSiteAssociation = async () => {
+    if (!selectedWpSiteId || !batchId) {
+      setWpSiteUpdateResult('Please select a WP site.');
+      return;
+    }
+
+    setWpSiteUpdateLoading(true);
+    setWpSiteUpdateResult(null);
+    
+    try {
+      // Update the WP site with the batch ID
+      const { error } = await supabase
+        .from('ywp_sites')
+        .update({ fk_images_plans_batches_id: batchId })
+        .eq('id', selectedWpSiteId);
+        
+      if (error) throw error;
+      
+      setWpSiteUpdateResult('✅ WP Site association updated successfully!');
+      
+      // Refresh WP sites data to show updated information
+      const updatedSites = wpSites.map(site => 
+        site.id === selectedWpSiteId 
+          ? { ...site, fk_images_plans_batches_id: batchId }
+          : site
+      );
+      setWpSites(updatedSites);
+      
+    } catch (err) {
+      setWpSiteUpdateResult(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setWpSiteUpdateLoading(false);
     }
   };
 
@@ -461,6 +535,83 @@ export default function RangividPage() {
                 {domains.length === 0 && (
                   <div className="mt-3 text-sm text-gray-500">
                     No domains found. <a href="/bin36/domjar1" className="text-indigo-600 hover:text-indigo-500">Add domains</a> to associate with this batch.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* WP Site Association Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">WP Site Associated To This Batch</h2>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Current WP Site Display */}
+              {wpSites.find(site => site.fk_images_plans_batches_id === batchId) && (
+                <div className="mb-4 p-3 bg-purple-50 rounded-md">
+                  <p className="text-sm text-purple-700">
+                    <strong>Currently Associated WP Site:</strong>{' '}
+                    {wpSites.find(site => site.fk_images_plans_batches_id === batchId)?.site_name} 
+                    {' '}({wpSites.find(site => site.fk_images_plans_batches_id === batchId)?.site_url})
+                  </p>
+                </div>
+              )}
+
+              {/* WP Site Selection Dropdown */}
+              <div>
+                <label htmlFor="wp-site-select" className="block text-sm font-medium text-gray-700 mb-2">
+                  Select a WP site
+                </label>
+                <div className="flex items-center space-x-3">
+                  <select
+                    id="wp-site-select"
+                    value={selectedWpSiteId}
+                    onChange={(e) => setSelectedWpSiteId(e.target.value)}
+                    className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                    disabled={wpSiteUpdateLoading}
+                  >
+                    <option value="">-- Select a WP site --</option>
+                    {wpSites.map((site) => (
+                      <option key={site.id} value={site.id}>
+                        {site.site_name} ({site.site_url})
+                      </option>
+                    ))}
+                  </select>
+                  
+                  <button
+                    onClick={handleWpSiteAssociation}
+                    disabled={wpSiteUpdateLoading || !selectedWpSiteId}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {wpSiteUpdateLoading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Updating...
+                      </>
+                    ) : (
+                      'Associate WP Site'
+                    )}
+                  </button>
+                </div>
+                
+                {/* Result Message */}
+                {wpSiteUpdateResult && (
+                  <div className={`mt-3 text-sm ${wpSiteUpdateResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                    {wpSiteUpdateResult}
+                  </div>
+                )}
+                
+                {/* No WP Sites Message */}
+                {wpSites.length === 0 && (
+                  <div className="mt-3 text-sm text-gray-500">
+                    No WP sites found. <a href="/bin45/weplich1" className="text-purple-600 hover:text-purple-500">Add WP sites</a> to associate with this batch.
                   </div>
                 )}
               </div>
