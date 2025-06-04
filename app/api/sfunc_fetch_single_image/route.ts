@@ -3,6 +3,84 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import sharp from 'sharp';
 
+// Helper function to create a timeout promise
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ]);
+};
+
+// Helper function for retry logic
+const withRetry = async <T>(
+  operation: () => Promise<T>, 
+  maxRetries: number = 3, 
+  baseDelay: number = 1000
+): Promise<T> => {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      
+      if (attempt === maxRetries) {
+        throw lastError;
+      }
+      
+      // Exponential backoff: 1s, 2s, 4s
+      const delay = baseDelay * Math.pow(2, attempt - 1);
+      console.log(`⏳ Retry attempt ${attempt}/${maxRetries} failed, waiting ${delay}ms before next retry`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError || new Error('Unknown retry error');
+};
+
+// Helper function for metadata stripping
+const processMetadataStripping = async (imageBuffer: ArrayBuffer): Promise<ArrayBuffer> => {
+  const inputBuffer = Buffer.from(imageBuffer);
+  const image = sharp(inputBuffer);
+  const metadata = await image.metadata();
+  
+  console.log('📊 Original image metadata:', {
+    format: metadata.format,
+    hasExif: !!metadata.exif,
+    hasIcc: !!metadata.icc,
+    hasIptc: !!metadata.iptc,
+    hasXmp: !!metadata.xmp,
+    originalSize: inputBuffer.length
+  });
+  
+  // Reprocess the image based on its format to strip metadata
+  let outputBuffer: Buffer;
+  if (metadata.format === 'jpeg') {
+    outputBuffer = await image.jpeg().toBuffer();
+  } else if (metadata.format === 'png') {
+    outputBuffer = await image.png().toBuffer();
+  } else if (metadata.format === 'webp') {
+    outputBuffer = await image.webp().toBuffer();
+  } else {
+    // Default to PNG for unknown formats
+    outputBuffer = await image.png().toBuffer();
+  }
+  
+  const processedBuffer = outputBuffer.buffer.slice(outputBuffer.byteOffset, outputBuffer.byteOffset + outputBuffer.byteLength) as ArrayBuffer;
+  
+  console.log('✅ Metadata stripped successfully:', {
+    originalSize: inputBuffer.length,
+    processedSize: outputBuffer.length,
+    reduction: inputBuffer.length - outputBuffer.length,
+    format: metadata.format
+  });
+  
+  return processedBuffer;
+};
+
 export async function POST(request: NextRequest) {
   try {
     console.log('🚀 Starting sfunc_fetch_single_image API call');
@@ -23,6 +101,12 @@ export async function POST(request: NextRequest) {
     // Get request data
     const { plan_id, image_slot, prompt, aiModel, wipeMeta = true } = await request.json();
     console.log('📥 Request data:', { plan_id, image_slot, prompt: prompt?.substring(0, 100) + '...', aiModel, wipeMeta });
+    console.log('🧹 WIPE META DEBUG:', {
+      wipeMeta,
+      timestamp: new Date().toISOString(),
+      plan_id,
+      imageSlot: image_slot
+    });
     
     if (!plan_id || !image_slot || !prompt) {
       console.error('❌ Missing required fields:', { plan_id, image_slot, prompt: !!prompt });
@@ -30,6 +114,22 @@ export async function POST(request: NextRequest) {
         success: false, 
         message: 'Missing required fields: plan_id, image_slot, prompt' 
       }, { status: 400 });
+    }
+
+    // Check for recent generation to avoid duplicates
+    const { data: recentImage } = await supabase
+      .from('images')
+      .select('created_at')
+      .eq('rel_images_plans_id', plan_id)
+      .gte('created_at', new Date(Date.now() - 30000).toISOString()) // Last 30 seconds
+      .limit(1);
+      
+    if (recentImage && recentImage.length > 0) {
+      console.log('⏳ Recent image generation detected, skipping duplicate request');
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Image was recently generated, please wait 30 seconds before retrying' 
+      }, { status: 429 });
     }
 
     // Get user's database ID
@@ -91,45 +191,39 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('🎨 Generating image with OpenAI...');
+    console.log('🎨 Generating image with OpenAI (with retry logic)...');
     console.log('Model:', aiModel || 'dall-e-3');
     console.log('Prompt:', prompt);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
-
     try {
-      const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAiApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: aiModel === 'openai' ? 'dall-e-3' : 'dall-e-3', // Map openai to dall-e-3
-          prompt: prompt,
-          n: 1,
-          size: '1024x1024',
-          quality: 'standard',
-          response_format: 'url'
-        }),
-        signal: controller.signal
-      });
+      // Step 2: Generate image with OpenAI (with timeout and retry)
+      const imageData = await withRetry(async () => {
+        return await withTimeout(
+          fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${openAiApiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: aiModel === 'openai' ? 'dall-e-3' : 'dall-e-3', // Map openai to dall-e-3
+              prompt: prompt,
+              n: 1,
+              size: '1024x1024',
+              quality: 'standard',
+              response_format: 'url'
+            })
+          }).then(async (response) => {
+            if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`OpenAI API error: ${response.status} ${errorText}`);
+            }
+            return response.json();
+          }),
+          60000 // 60 second timeout for OpenAI API
+        );
+      }, 3, 2000); // 3 retries with 2s base delay
 
-      clearTimeout(timeoutId);
-
-      console.log('🎨 OpenAI response status:', imageResponse.status);
-
-      if (!imageResponse.ok) {
-        const errorText = await imageResponse.text();
-        console.error('❌ OpenAI API error:', errorText);
-        return NextResponse.json({ 
-          success: false, 
-          message: `OpenAI API error: ${errorText}` 
-        }, { status: 500 });
-      }
-
-      const imageData = await imageResponse.json();
       console.log('🎨 OpenAI response data:', imageData);
       
       const imageUrl = imageData.data[0]?.url;
@@ -144,71 +238,42 @@ export async function POST(request: NextRequest) {
 
       console.log('✅ Image generated successfully:', imageUrl);
 
-      // Step 2: Download the image from OpenAI
-      console.log('📥 Downloading image from OpenAI...');
-      const downloadController = new AbortController();
-      const downloadTimeoutId = setTimeout(() => downloadController.abort(), 30000); // 30 second timeout
+      // Step 2.5: Download the image from OpenAI (with timeout and retry)
+      console.log('📥 Downloading image from OpenAI (with retry logic)...');
+      const imageBuffer = await withRetry(async () => {
+        const imageRes = await withTimeout(
+          fetch(imageUrl),
+          30000 // 30 second timeout for image download
+        );
+        
+        if (!imageRes.ok) {
+          throw new Error(`Failed to download image: ${imageRes.status} ${imageRes.statusText}`);
+        }
+        
+        return await withTimeout(
+          imageRes.arrayBuffer(),
+          30000 // 30 second timeout for reading buffer
+        );
+      }, 3, 1000); // 3 retries with 1s base delay
 
-      const imageDownloadResponse = await fetch(imageUrl, {
-        signal: downloadController.signal
-      });
-      clearTimeout(downloadTimeoutId);
-
-      if (!imageDownloadResponse.ok) {
-        console.error('❌ Failed to download image from OpenAI');
-        return NextResponse.json({ 
-          success: false, 
-          message: `Failed to download image from OpenAI: ${imageDownloadResponse.statusText}` 
-        }, { status: 500 });
-      }
-
-      const imageBuffer = await imageDownloadResponse.arrayBuffer();
       console.log('✅ Image downloaded successfully, size:', imageBuffer.byteLength);
 
-      // Step 2.5: Strip metadata if requested
+      // Step 2.6: Strip metadata if requested (with retry and timeout)
       let processedBuffer = imageBuffer;
       if (wipeMeta) {
-        console.log('🧹 Stripping metadata from downloaded image...');
+        console.log('🧹 Stripping metadata from downloaded image (with retry logic)...');
         try {
-          // Convert ArrayBuffer to Buffer and process with Sharp
-          const inputBuffer = Buffer.from(imageBuffer);
-          const image = sharp(inputBuffer);
-          const metadata = await image.metadata();
+          processedBuffer = await withRetry(async () => {
+            return await withTimeout(
+              processMetadataStripping(imageBuffer),
+              30000 // 30 second timeout for metadata processing
+            );
+          }, 2, 1000); // 2 retries with 1s base delay
           
-          console.log('📊 Original image metadata:', {
-            format: metadata.format,
-            hasExif: !!metadata.exif,
-            hasIcc: !!metadata.icc,
-            hasIptc: !!metadata.iptc,
-            hasXmp: !!metadata.xmp,
-            originalSize: inputBuffer.length
-          });
-          
-          // Reprocess the image based on its format to strip metadata
-          let outputBuffer: Buffer;
-          if (metadata.format === 'jpeg') {
-            outputBuffer = await image.jpeg().toBuffer();
-          } else if (metadata.format === 'png') {
-            outputBuffer = await image.png().toBuffer();
-          } else if (metadata.format === 'webp') {
-            outputBuffer = await image.webp().toBuffer();
-          } else {
-            // Default to PNG for unknown formats
-            outputBuffer = await image.png().toBuffer();
-          }
-          
-          processedBuffer = outputBuffer.buffer.slice(outputBuffer.byteOffset, outputBuffer.byteOffset + outputBuffer.byteLength) as ArrayBuffer;
-          
-          console.log('✅ Metadata stripped successfully:', {
-            originalSize: inputBuffer.length,
-            processedSize: outputBuffer.length,
-            reduction: inputBuffer.length - outputBuffer.length,
-            format: metadata.format
-          });
-          
+          console.log('✅ Metadata stripping completed successfully');
         } catch (metadataError) {
-          console.error('⚠️ Failed to strip metadata, using original image:', metadataError);
-          // Continue with original buffer if metadata stripping fails
+          console.error('⚠️ Failed to strip metadata after retries, using original image:', metadataError);
+          // Continue with original buffer if metadata stripping fails after retries
         }
       } else {
         console.log('⏭️ Skipping metadata stripping (wipeMeta=false)');
@@ -518,16 +583,6 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (fetchError) {
-      clearTimeout(timeoutId);
-      
-      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        console.error('❌ OpenAI request timed out');
-        return NextResponse.json({ 
-          success: false, 
-          message: 'OpenAI request timed out (60s)' 
-        }, { status: 500 });
-      }
-      
       console.error('❌ OpenAI fetch error:', fetchError);
       return NextResponse.json({ 
         success: false, 
