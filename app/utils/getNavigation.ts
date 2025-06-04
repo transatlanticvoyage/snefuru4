@@ -7,6 +7,32 @@ interface NavItem {
   children?: NavItem[];
 }
 
+// Custom rule system for navigation grouping
+const NAVIGATION_GROUPS = {
+  navgroup5: {
+    name: 'navgroup5',
+    displayName: 'API Keys', // You can customize this display name
+    children: [
+      { name: 'fapikeys1', path: '/fbin2/fapikeys1' },
+      { name: 'gapikeys1', path: '/fbin3/gapikeys1' },
+      { name: 'papikeys', path: '/papikeys' },
+      { name: 'papikeys2', path: '/papikeys2' },
+      { name: 'papikeys3', path: '/papikeys3' }
+    ]
+  }
+};
+
+// Get list of paths that should be excluded from main navigation
+function getExcludedPaths(): string[] {
+  const excludedPaths: string[] = [];
+  Object.values(NAVIGATION_GROUPS).forEach(group => {
+    group.children.forEach(child => {
+      excludedPaths.push(child.path);
+    });
+  });
+  return excludedPaths;
+}
+
 // Recursively find all page.tsx files under dir
 async function findAllPages(dir: string): Promise<string[]> {
   let results: string[] = [];
@@ -56,8 +82,26 @@ export async function getNavigation() {
     console.error('Error scanning bin directories:', e);
   }
 
-  // Build flat nav structure - extract page names from all directories
+  // Also scan fbin directories (fbin2, fbin3, etc.)
+  try {
+    const appItems = await readdir(appDir, { withFileTypes: true });
+    for (const item of appItems) {
+      if (item.isDirectory() && item.name.match(/^fbin\d+$/)) {
+        const fbinDir = join(appDir, item.name);
+        const fbinPages = await findAllPages(fbinDir);
+        pageFiles = pageFiles.concat(fbinPages);
+      }
+    }
+  } catch (e) {
+    console.error('Error scanning fbin directories:', e);
+  }
+
+  // Get excluded paths for filtering
+  const excludedPaths = getExcludedPaths();
+
+  // Build navigation structure - extract page names from all directories
   const navItems: NavItem[] = [];
+  
   for (const file of pageFiles) {
     const rel = relative(appDir, file);
     const parts = rel.split(sep);
@@ -82,13 +126,36 @@ export async function getNavigation() {
         pageName = parts[1]; // Get the page name (e.g., 'weplich1')
         pagePath = `/${parts.slice(0, -1).join('/')}`; // Full path without page.tsx
       }
+    } else if (parts[0].match(/^fbin\d+$/)) {
+      // Handle fbin routes: fbin2/fapikeys1/page.tsx
+      if (parts.length === 3) {
+        // e.g. ['fbin2', 'fapikeys1', 'page.tsx']
+        pageName = parts[1]; // Get the page name (e.g., 'fapikeys1')
+        pagePath = `/${parts.slice(0, -1).join('/')}`; // Full path without page.tsx
+      }
+    } else if (parts.length === 2) {
+      // Handle root level routes: papikeys/page.tsx
+      pageName = parts[0]; // Get the page name (e.g., 'papikeys')
+      pagePath = `/${parts[0]}`; // Simple root path
     }
     
-    if (pageName) {
+    // Only add to main navigation if not excluded and has valid name/path
+    if (pageName && pagePath && !excludedPaths.includes(pagePath)) {
       navItems.push({ name: pageName, path: pagePath });
     }
   }
 
-  // Sort alphabetically by name
+  // Add navigation groups as parent items with children
+  Object.values(NAVIGATION_GROUPS).forEach(group => {
+    navItems.push({
+      name: group.name,
+      children: group.children.map(child => ({
+        name: child.name,
+        path: child.path
+      }))
+    });
+  });
+
+  // Sort alphabetically by name (parent items will be mixed with regular items)
   return navItems.sort((a, b) => a.name.localeCompare(b.name));
 } 
