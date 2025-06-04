@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import sharp from 'sharp';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,8 +21,8 @@ export async function POST(request: NextRequest) {
     console.log('✅ User authenticated:', user.id);
 
     // Get request data
-    const { plan_id, image_slot, prompt, aiModel } = await request.json();
-    console.log('📥 Request data:', { plan_id, image_slot, prompt: prompt?.substring(0, 100) + '...', aiModel });
+    const { plan_id, image_slot, prompt, aiModel, wipeMeta = true } = await request.json();
+    console.log('📥 Request data:', { plan_id, image_slot, prompt: prompt?.substring(0, 100) + '...', aiModel, wipeMeta });
     
     if (!plan_id || !image_slot || !prompt) {
       console.error('❌ Missing required fields:', { plan_id, image_slot, prompt: !!prompt });
@@ -163,6 +164,55 @@ export async function POST(request: NextRequest) {
 
       const imageBuffer = await imageDownloadResponse.arrayBuffer();
       console.log('✅ Image downloaded successfully, size:', imageBuffer.byteLength);
+
+      // Step 2.5: Strip metadata if requested
+      let processedBuffer = imageBuffer;
+      if (wipeMeta) {
+        console.log('🧹 Stripping metadata from downloaded image...');
+        try {
+          // Convert ArrayBuffer to Buffer and process with Sharp
+          const inputBuffer = Buffer.from(imageBuffer);
+          const image = sharp(inputBuffer);
+          const metadata = await image.metadata();
+          
+          console.log('📊 Original image metadata:', {
+            format: metadata.format,
+            hasExif: !!metadata.exif,
+            hasIcc: !!metadata.icc,
+            hasIptc: !!metadata.iptc,
+            hasXmp: !!metadata.xmp,
+            originalSize: inputBuffer.length
+          });
+          
+          // Reprocess the image based on its format to strip metadata
+          let outputBuffer: Buffer;
+          if (metadata.format === 'jpeg') {
+            outputBuffer = await image.jpeg().toBuffer();
+          } else if (metadata.format === 'png') {
+            outputBuffer = await image.png().toBuffer();
+          } else if (metadata.format === 'webp') {
+            outputBuffer = await image.webp().toBuffer();
+          } else {
+            // Default to PNG for unknown formats
+            outputBuffer = await image.png().toBuffer();
+          }
+          
+          processedBuffer = outputBuffer.buffer.slice(outputBuffer.byteOffset, outputBuffer.byteOffset + outputBuffer.byteLength) as ArrayBuffer;
+          
+          console.log('✅ Metadata stripped successfully:', {
+            originalSize: inputBuffer.length,
+            processedSize: outputBuffer.length,
+            reduction: inputBuffer.length - outputBuffer.length,
+            format: metadata.format
+          });
+          
+        } catch (metadataError) {
+          console.error('⚠️ Failed to strip metadata, using original image:', metadataError);
+          // Continue with original buffer if metadata stripping fails
+        }
+      } else {
+        console.log('⏭️ Skipping metadata stripping (wipeMeta=false)');
+      }
 
       // Step 3: Find the existing folder structure in Supabase Storage
       // The folder should have already been created during bulk generation
@@ -373,7 +423,7 @@ export async function POST(request: NextRequest) {
 
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('bucket-images-b1')
-        .upload(storagePath, imageBuffer, {
+        .upload(storagePath, processedBuffer, {
           contentType: 'image/png',
           upsert: false,
         });
@@ -405,7 +455,7 @@ export async function POST(request: NextRequest) {
         prompt1: prompt,
         status: 'generated',
         img_file_extension: 'png',
-        img_file_size: imageBuffer.byteLength,
+        img_file_size: processedBuffer.byteLength,
         width: 1024,
         height: 1024
       });
@@ -419,7 +469,7 @@ export async function POST(request: NextRequest) {
           prompt1: prompt,
           status: 'generated',
           img_file_extension: 'png',
-          img_file_size: imageBuffer.byteLength,
+          img_file_size: processedBuffer.byteLength,
           width: 1024,
           height: 1024
         })

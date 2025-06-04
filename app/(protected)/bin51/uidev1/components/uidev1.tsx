@@ -1269,7 +1269,8 @@ export default function Uidev1() {
         plan_id: plan.id,
         image_slot: imageSlot,
         prompt: plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1 || 'AI Image',
-        aiModel: aiModel
+        aiModel: aiModel,
+        wipeMeta: wipeMeta // Pass the current wipeMeta state
       };
       
       console.log('Sending request with data:', imageData);
