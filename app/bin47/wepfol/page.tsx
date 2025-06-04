@@ -21,6 +21,8 @@ interface WpContent {
   post_author: number;
   post_slug: string;
   site_url: string;
+  sync_method: string;
+  raw_metadata: any;
   created_at: string;
   updated_at: string;
 }
@@ -87,13 +89,20 @@ function WepfolContent() {
         setSiteInfo(siteData);
       }
 
-      // Now fetch posts/pages for this site
-      // Note: We'll need to create a posts table or API endpoint to fetch WordPress content
-      // For now, I'll create a placeholder structure
-      
-      // TODO: Implement actual WordPress content fetching
-      // This would typically come from a wp_posts table or WordPress API
-      setPosts([]);
+      // Now fetch synced content for this site
+      const { data: contentData, error: contentError } = await supabase
+        .from('ywp_content')
+        .select('*')
+        .eq('site_url', siteParam.startsWith('http') ? siteParam : `https://${siteParam}`)
+        .order('post_modified', { ascending: false });
+
+      if (contentError) {
+        console.error('Error fetching content:', contentError);
+        // Don't throw error, just set empty posts - site might not have synced content yet
+        setPosts([]);
+      } else {
+        setPosts(contentData || []);
+      }
 
     } catch (err) {
       console.error('Error in fetchSiteAndContent:', err);
@@ -204,6 +213,9 @@ function WepfolContent() {
         <div className="bg-white shadow-sm rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-900">Posts & Pages</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Synced content from WordPress site
+            </p>
           </div>
           
           <div className="overflow-x-auto">
@@ -218,6 +230,9 @@ function WepfolContent() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Sync Method
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
@@ -238,7 +253,7 @@ function WepfolContent() {
                         {post.post_title || 'Untitled'}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {post.post_slug}
+                        ID: {post.post_id} • {post.post_slug}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -261,6 +276,15 @@ function WepfolContent() {
                         {post.post_status}
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        post.sync_method === 'plugin_api' 
+                          ? 'bg-purple-100 text-purple-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {post.sync_method === 'plugin_api' ? 'Plugin API' : 'REST API'}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatFieldValue('post_date', post.post_date)}
                     </td>
@@ -276,6 +300,21 @@ function WepfolContent() {
                 ))}
               </tbody>
             </table>
+          </div>
+          
+          {/* Stats */}
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div className="flex justify-between text-sm text-gray-600">
+              <div>
+                <span className="font-medium">{posts.length}</span> total items
+              </div>
+              <div className="space-x-4">
+                <span>Posts: <span className="font-medium">{posts.filter(p => p.post_type === 'post').length}</span></span>
+                <span>Pages: <span className="font-medium">{posts.filter(p => p.post_type === 'page').length}</span></span>
+                <span>Plugin API: <span className="font-medium">{posts.filter(p => p.sync_method === 'plugin_api').length}</span></span>
+                <span>REST API: <span className="font-medium">{posts.filter(p => p.sync_method === 'rest_api').length}</span></span>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
@@ -294,9 +333,17 @@ function WepfolContent() {
             <p className="text-gray-500 mb-4">
               No posts or pages have been synced for this WordPress site yet.
             </p>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-400 mb-4">
               Content will appear here after synchronization with the WordPress site.
             </p>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">To sync content:</p>
+              <ol className="text-sm text-gray-500 space-y-1">
+                <li>1. Go back to the Sites page</li>
+                <li>2. Click the "Plugin API" or "REST API" sync button for this site</li>
+                <li>3. Return here to view the synced content</li>
+              </ol>
+            </div>
           </div>
         </div>
       )}
