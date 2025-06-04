@@ -24,8 +24,14 @@ interface YwpSite {
 // Sync state for each site
 interface SiteSync {
   [siteId: string]: {
-    loading: boolean;
-    result?: SyncResult;
+    plugin_api?: {
+      loading: boolean;
+      result?: SyncResult;
+    };
+    rest_api?: {
+      loading: boolean;
+      result?: SyncResult;
+    };
   };
 }
 
@@ -139,7 +145,10 @@ export default function Weplich1Page() {
   const handleSync = async (site: YwpSite, method: SyncMethod) => {
     setSyncStates(prev => ({
       ...prev,
-      [site.id]: { loading: true }
+      [site.id]: {
+        ...prev[site.id], // Preserve existing method states
+        [method]: { loading: true }
+      }
     }));
 
     try {
@@ -153,14 +162,20 @@ export default function Weplich1Page() {
 
       setSyncStates(prev => ({
         ...prev,
-        [site.id]: { loading: false, result }
+        [site.id]: {
+          ...prev[site.id], // Preserve existing method states
+          [method]: { loading: false, result }
+        }
       }));
 
       // Clear result after 5 seconds
       setTimeout(() => {
         setSyncStates(prev => ({
           ...prev,
-          [site.id]: { loading: false }
+          [site.id]: {
+            ...prev[site.id], // Preserve existing method states
+            [method]: { loading: false }
+          }
         }));
       }, 5000);
 
@@ -171,12 +186,15 @@ export default function Weplich1Page() {
     } catch (error) {
       setSyncStates(prev => ({
         ...prev,
-        [site.id]: { 
-          loading: false, 
-          result: {
-            success: false,
-            message: `Sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            method
+        [site.id]: {
+          ...prev[site.id], // Preserve existing method states
+          [method]: { 
+            loading: false, 
+            result: {
+              success: false,
+              message: `Sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              method
+            }
           }
         }
       }));
@@ -185,7 +203,10 @@ export default function Weplich1Page() {
       setTimeout(() => {
         setSyncStates(prev => ({
           ...prev,
-          [site.id]: { loading: false }
+          [site.id]: {
+            ...prev[site.id], // Preserve existing method states
+            [method]: { loading: false }
+          }
         }));
       }, 5000);
     }
@@ -346,10 +367,10 @@ export default function Weplich1Page() {
                               <div className="flex space-x-1">
                                 <button
                                   onClick={() => handleSync(site, 'plugin_api')}
-                                  disabled={syncState?.loading}
+                                  disabled={syncState?.plugin_api?.loading}
                                   className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  {syncState?.loading ? (
+                                  {syncState?.plugin_api?.loading ? (
                                     <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
                                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -366,10 +387,10 @@ export default function Weplich1Page() {
                                 
                                 <button
                                   onClick={() => handleSync(site, 'rest_api')}
-                                  disabled={syncState?.loading}
+                                  disabled={syncState?.rest_api?.loading}
                                   className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  {syncState?.loading ? (
+                                  {syncState?.rest_api?.loading ? (
                                     <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
                                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -386,14 +407,24 @@ export default function Weplich1Page() {
                               </div>
                               
                               {/* Sync Results */}
-                              {syncState?.result && (
+                              {syncState?.plugin_api?.result && (
                                 <div className={`text-xs px-2 py-1 rounded ${
-                                  syncState.result.success 
+                                  syncState.plugin_api.result.success 
                                     ? 'bg-green-100 text-green-800' 
                                     : 'bg-red-100 text-red-800'
                                 }`}>
-                                  {syncState.result.success ? '✅' : '❌'} {syncState.result.message}
-                                  {syncState.result.count && ` (${syncState.result.count} items)`}
+                                  {syncState.plugin_api.result.success ? '✅' : '❌'} {syncState.plugin_api.result.message}
+                                  {syncState.plugin_api.result.count && ` (${syncState.plugin_api.result.count} items)`}
+                                </div>
+                              )}
+                              {syncState?.rest_api?.result && (
+                                <div className={`text-xs px-2 py-1 rounded ${
+                                  syncState.rest_api.result.success 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {syncState.rest_api.result.success ? '✅' : '❌'} {syncState.rest_api.result.message}
+                                  {syncState.rest_api.result.count && ` (${syncState.rest_api.result.count} items)`}
                                 </div>
                               )}
                             </div>
