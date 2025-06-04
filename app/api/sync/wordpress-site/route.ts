@@ -181,8 +181,21 @@ async function syncViaPluginApi(siteUrl: string, apiKey: string) {
       success: data.success, 
       total: data.total, 
       message: data.message,
-      dataLength: data.data?.length 
+      dataLength: data.data?.length,
+      fullData: data
     });
+    
+    // More detailed logging for debugging
+    if (data.data && Array.isArray(data.data)) {
+      console.log(`📝 First few posts sample:`, data.data.slice(0, 3));
+      console.log(`📊 Posts by type:`, {
+        posts: data.data.filter((p: any) => p.post_type === 'post').length,
+        pages: data.data.filter((p: any) => p.post_type === 'page').length,
+        published: data.data.filter((p: any) => p.post_status === 'publish').length,
+        draft: data.data.filter((p: any) => p.post_status === 'draft').length,
+        private: data.data.filter((p: any) => p.post_status === 'private').length
+      });
+    }
     
     if (!data.success) {
       throw new Error(data.message || 'Plugin API returned error');
@@ -286,6 +299,7 @@ async function syncViaRestApi(siteUrl: string) {
 // Save content to database
 async function saveContentToDatabase(posts: any[], siteUrl: string, syncMethod: string, supabase: any): Promise<number> {
   let savedCount = 0;
+  console.log(`💾 Starting to save ${posts.length} posts to database for ${siteUrl}`);
 
   for (const post of posts) {
     try {
@@ -316,6 +330,7 @@ async function saveContentToDatabase(posts: any[], siteUrl: string, syncMethod: 
             ping_status: post.ping_status,
           }
         };
+        console.log(`📝 Processing Plugin API post: ID=${post.ID}, title="${post.post_title}", type=${post.post_type}, status=${post.post_status}`);
       } else {
         // REST API format
         contentData = {
@@ -340,6 +355,7 @@ async function saveContentToDatabase(posts: any[], siteUrl: string, syncMethod: 
             link: post.link,
           }
         };
+        console.log(`📝 Processing REST API post: ID=${post.id}, title="${post.title?.rendered || post.title}", type=${post.type}, status=${post.status}`);
       }
 
       // Upsert content
@@ -351,14 +367,16 @@ async function saveContentToDatabase(posts: any[], siteUrl: string, syncMethod: 
         });
 
       if (error) {
-        console.error('Error saving post:', post.ID || post.id, error);
+        console.error(`❌ Error saving post ${post.ID || post.id}:`, error);
       } else {
         savedCount++;
+        console.log(`✅ Saved post ${post.ID || post.id}: "${contentData.post_title}"`);
       }
     } catch (postError) {
-      console.error('Error processing post:', post.ID || post.id, postError);
+      console.error(`💥 Error processing post ${post.ID || post.id}:`, postError);
     }
   }
 
+  console.log(`💾 Database save complete: ${savedCount}/${posts.length} posts saved successfully`);
   return savedCount;
 } 
