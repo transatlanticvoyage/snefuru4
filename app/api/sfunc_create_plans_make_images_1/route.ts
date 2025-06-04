@@ -203,7 +203,8 @@ export async function POST(request: Request) {
             prompt, 
             userId: userData.id, 
             batchFolder: `${batchFolder}/${planFolder}`, 
-            fileName: imageFileName 
+            fileName: imageFileName,
+            wipeMeta: wipeMeta || false
           });
           
           if (!imageResult.success) {
@@ -419,6 +420,17 @@ export async function POST(request: Request) {
 
     // After all images are uploaded, if generateZip is true, create a zip file in the batch folder
     if (generateZip) {
+      await logger.info({
+        category: 'zip_generation',
+        message: `Starting ZIP generation for batch ${batchId}`,
+        details: {
+          generateZip: generateZip,
+          wipeMeta: wipeMeta,
+          batchFolder: batchFolder
+        },
+        batch_id: batchId
+      });
+      
       // List all plan folders in the batch folder
       const { data: planFolders, error: listError } = await supabase.storage
         .from('bucket-images-b1')
@@ -426,6 +438,9 @@ export async function POST(request: Request) {
       if (!listError && planFolders && planFolders.length > 0) {
         const zip = new JSZip();
         let firstPlanFolder = '';
+        let processedFilesCount = 0;
+        let metadataStrippedCount = 0;
+        
         for (let idx = 0; idx < planFolders.length; idx++) {
           const planFolder = planFolders[idx];
           if (planFolder && planFolder.name) {
@@ -445,12 +460,43 @@ export async function POST(request: Request) {
                   // @ts-ignore - Buffer type mismatch in serverless environment
                   let buffer = Buffer.from(new Uint8Array(arrayBuffer));
                   if (wipeMeta) {
-                    // Use sharp to strip metadata
+                    // Use sharp to strip metadata - reprocess the image without any metadata
                     // @ts-ignore - Buffer type mismatch in serverless environment
-                    buffer = await sharp(buffer).toBuffer();
+                    const image = sharp(buffer);
+                    const metadata = await image.metadata();
+                    
+                    await logger.info({
+                      category: 'metadata_removal',
+                      message: `Stripping metadata from ${file.name}`,
+                      details: {
+                        originalFormat: metadata.format,
+                        hasMetadata: !!(metadata.exif || metadata.icc || metadata.iptc || metadata.xmp),
+                        fileSize: buffer.length
+                      },
+                      batch_id: batchId
+                    });
+                    
+                    // Reprocess the image based on its format to strip metadata
+                    if (metadata.format === 'jpeg') {
+                      // @ts-ignore - Buffer type mismatch in serverless environment
+                      buffer = Buffer.from(await image.jpeg().toBuffer());
+                    } else if (metadata.format === 'png') {
+                      // @ts-ignore - Buffer type mismatch in serverless environment
+                      buffer = Buffer.from(await image.png().toBuffer());
+                    } else if (metadata.format === 'webp') {
+                      // @ts-ignore - Buffer type mismatch in serverless environment
+                      buffer = Buffer.from(await image.webp().toBuffer());
+                    } else {
+                      // Default to original format processing
+                      // @ts-ignore - Buffer type mismatch in serverless environment
+                      buffer = Buffer.from(await image.toBuffer());
+                    }
+                    
+                    metadataStrippedCount++;
                   }
                   // Add to zip under the correct folder
                   zip.file(`${planFolder.name}/${file.name}`, buffer);
+                  processedFilesCount++;
                 }
               }
             }
@@ -468,6 +514,19 @@ export async function POST(request: Request) {
               contentType: 'application/zip',
               upsert: true,
             });
+            
+          await logger.info({
+            category: 'zip_generation',
+            message: `ZIP file generated successfully for batch ${batchId}`,
+            details: {
+              zipFileName: zipFileName,
+              totalFilesProcessed: processedFilesCount,
+              metadataStrippedFromFiles: metadataStrippedCount,
+              wipeMeta: wipeMeta,
+              zipSizeBytes: zipBlob.size
+            },
+            batch_id: batchId
+          });
         }
       }
     }

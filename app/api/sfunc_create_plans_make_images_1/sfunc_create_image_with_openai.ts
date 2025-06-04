@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/error-logger';
+import sharp from 'sharp';
 
 // Helper function to create a timeout promise
 const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
@@ -40,7 +41,7 @@ const withRetry = async <T>(
   throw lastError || new Error('Unknown retry error');
 };
 
-export async function sfunc_create_image_with_openai({ prompt, userId, batchFolder, fileName }: { prompt: string, userId: string, batchFolder: string, fileName?: string }) {
+export async function sfunc_create_image_with_openai({ prompt, userId, batchFolder, fileName, wipeMeta }: { prompt: string, userId: string, batchFolder: string, fileName?: string, wipeMeta: boolean }) {
   const supabase = createRouteHandlerClient({ cookies });
   
   // Log the start of image generation
@@ -168,6 +169,71 @@ export async function sfunc_create_image_with_openai({ prompt, userId, batchFold
     let safeFileName = fileName && typeof fileName === 'string' && fileName.trim() ? fileName.trim() : `image_${Date.now()}.png`;
     // Ensure the filename is safe (no path traversal)
     safeFileName = safeFileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+    // Step 2.5: Strip metadata if requested
+    let processedBuffer = imageBuffer;
+    if (wipeMeta) {
+      await logger.info({
+        category: 'metadata_removal',
+        message: 'Stripping metadata from generated image',
+        details: { 
+          originalSize: imageBuffer.byteLength,
+          fileName: safeFileName 
+        },
+        user_id: userId
+      });
+      
+      try {
+        // Convert ArrayBuffer to Buffer and process with Sharp
+        // @ts-ignore - Buffer type mismatch in serverless environment  
+        let buffer = Buffer.from(new Uint8Array(imageBuffer));
+        const image = sharp(buffer);
+        const metadata = await image.metadata();
+        
+        // Reprocess the image based on its format to strip metadata
+        if (metadata.format === 'jpeg') {
+          // @ts-ignore - Buffer type mismatch in serverless environment
+          buffer = Buffer.from(await image.jpeg().toBuffer());
+        } else if (metadata.format === 'png') {
+          // @ts-ignore - Buffer type mismatch in serverless environment
+          buffer = Buffer.from(await image.png().toBuffer());
+        } else if (metadata.format === 'webp') {
+          // @ts-ignore - Buffer type mismatch in serverless environment
+          buffer = Buffer.from(await image.webp().toBuffer());
+        } else {
+          // Default to PNG for unknown formats (since OpenAI generates PNG)
+          // @ts-ignore - Buffer type mismatch in serverless environment
+          buffer = Buffer.from(await image.png().toBuffer());
+        }
+        
+        processedBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+        
+        await logger.info({
+          category: 'metadata_removal',
+          message: 'Metadata stripped successfully',
+          details: { 
+            originalSize: imageBuffer.byteLength,
+            processedSize: processedBuffer.byteLength,
+            sizeDifference: imageBuffer.byteLength - processedBuffer.byteLength,
+            fileName: safeFileName
+          },
+          user_id: userId
+        });
+      } catch (metadataError) {
+        await logger.error({
+          category: 'metadata_removal',
+          message: 'Failed to strip metadata, using original image',
+          details: { 
+            error: metadataError instanceof Error ? metadataError.message : String(metadataError),
+            fileName: safeFileName
+          },
+          user_id: userId
+        });
+        // Continue with original buffer if metadata stripping fails
+        processedBuffer = imageBuffer;
+      }
+    }
+
     const storagePath = `barge1/${batchFolder}/${safeFileName}`;
     
     // Step 3: Upload to Supabase Storage (with timeout and retry)
@@ -175,7 +241,7 @@ export async function sfunc_create_image_with_openai({ prompt, userId, batchFold
       return await withTimeout(
         supabase.storage
           .from('bucket-images-b1')
-          .upload(storagePath, imageBuffer, {
+          .upload(storagePath, processedBuffer, {
             contentType: 'image/png',
             upsert: false,
           }),

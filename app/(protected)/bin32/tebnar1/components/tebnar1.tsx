@@ -1487,7 +1487,6 @@ export default function Tebnar1() {
               checked={wipeMeta}
               onChange={e => setWipeMeta(e.target.checked)}
               className="mr-2"
-              disabled={!generateZip}
             />
             <label htmlFor="wipe-meta" className="text-sm font-medium">Wipe all meta data from images</label>
           </div>
