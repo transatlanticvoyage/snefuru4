@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
 import { useSearchParams } from 'next/navigation';
@@ -25,7 +25,8 @@ interface WpContent {
   updated_at: string;
 }
 
-export default function WepfolPage() {
+// Separate component that uses useSearchParams
+function WepfolContent() {
   const [posts, setPosts] = useState<WpContent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,210 +135,210 @@ export default function WepfolPage() {
 
   if (!siteParam) {
     return (
-      <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50">
-          <Header />
-          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div className="text-center py-12">
-              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Site Selected</h3>
-              <p className="text-gray-500 mb-4">
-                Add a site parameter to the URL to view WordPress content.
-              </p>
-              <p className="text-sm text-gray-400 font-mono">
-                Example: /bin47/wepfol?site=bluedogtoys.com
-              </p>
-            </div>
-          </main>
+      <div className="text-center py-12">
+        <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+          </svg>
         </div>
-      </ProtectedRoute>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">No Site Selected</h3>
+        <p className="text-gray-500 mb-4">
+          Add a site parameter to the URL to view WordPress content.
+        </p>
+        <p className="text-sm text-gray-400 font-mono">
+          Example: /bin47/wepfol?site=bluedogtoys.com
+        </p>
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50">
-          <Header />
-          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading WordPress content...</p>
-            </div>
-          </main>
-        </div>
-      </ProtectedRoute>
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading WordPress content...</p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50">
-          <Header />
-          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div className="text-center py-12">
-              <div className="mx-auto h-12 w-12 text-red-400 mb-4">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-red-900 mb-2">Error Loading Content</h3>
-              <p className="text-red-600">{error}</p>
-            </div>
-          </main>
+      <div className="text-center py-12">
+        <div className="mx-auto h-12 w-12 text-red-400 mb-4">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
         </div>
-      </ProtectedRoute>
+        <h3 className="text-lg font-medium text-red-900 mb-2">Error Loading Content</h3>
+        <p className="text-red-600">{error}</p>
+      </div>
     );
   }
 
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">WordPress Content</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Site: <span className="font-medium text-gray-700">{siteParam}</span>
+            </p>
+            {siteInfo && (
+              <p className="text-sm text-gray-500">
+                {siteInfo.site_name} • Last sync: {siteInfo.last_sync_at ? new Date(siteInfo.last_sync_at).toLocaleString() : 'Never'}
+              </p>
+            )}
+          </div>
+          <div className="text-sm text-gray-500">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              {posts.length} {posts.length === 1 ? 'item' : 'items'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Table */}
+      {posts.length > 0 ? (
+        <div className="bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Posts & Pages</h2>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Modified
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Excerpt
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {posts.map((post) => (
+                  <tr key={post.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {post.post_title || 'Untitled'}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {post.post_slug}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        post.post_type === 'post' 
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {post.post_type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        post.post_status === 'publish' 
+                          ? 'bg-green-100 text-green-800'
+                          : post.post_status === 'draft'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {post.post_status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatFieldValue('post_date', post.post_date)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatFieldValue('post_modified', post.post_modified)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs">
+                      <div className="truncate">
+                        {post.post_excerpt || 'No excerpt'}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Posts & Pages</h2>
+          </div>
+          
+          <div className="p-12 text-center">
+            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Content Found</h3>
+            <p className="text-gray-500 mb-4">
+              No posts or pages have been synced for this WordPress site yet.
+            </p>
+            <p className="text-sm text-gray-400">
+              Content will appear here after synchronization with the WordPress site.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Back Button */}
+      <div className="mt-6">
+        <button
+          onClick={() => window.history.back()}
+          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Sites
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Loading fallback component
+function WepfolLoading() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main page component
+export default function WepfolPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         <Header />
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="container mx-auto px-4 py-8">
-            {/* Header */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">WordPress Content</h1>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Site: <span className="font-medium text-gray-700">{siteParam}</span>
-                  </p>
-                  {siteInfo && (
-                    <p className="text-sm text-gray-500">
-                      {siteInfo.site_name} • Last sync: {siteInfo.last_sync_at ? new Date(siteInfo.last_sync_at).toLocaleString() : 'Never'}
-                    </p>
-                  )}
-                </div>
-                <div className="text-sm text-gray-500">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {posts.length} {posts.length === 1 ? 'item' : 'items'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Content Table */}
-            {posts.length > 0 ? (
-              <div className="bg-white shadow-sm rounded-lg border border-gray-200">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Posts & Pages</h2>
-                </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Title
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Modified
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Excerpt
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {posts.map((post) => (
-                        <tr key={post.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {post.post_title || 'Untitled'}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {post.post_slug}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              post.post_type === 'post' 
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-green-100 text-green-800'
-                            }`}>
-                              {post.post_type}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              post.post_status === 'publish' 
-                                ? 'bg-green-100 text-green-800'
-                                : post.post_status === 'draft'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {post.post_status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {formatFieldValue('post_date', post.post_date)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {formatFieldValue('post_modified', post.post_modified)}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-500 max-w-xs">
-                            <div className="truncate">
-                              {post.post_excerpt || 'No excerpt'}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white shadow-sm rounded-lg border border-gray-200">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Posts & Pages</h2>
-                </div>
-                
-                <div className="p-12 text-center">
-                  <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Content Found</h3>
-                  <p className="text-gray-500 mb-4">
-                    No posts or pages have been synced for this WordPress site yet.
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    Content will appear here after synchronization with the WordPress site.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Back Button */}
-            <div className="mt-6">
-              <button
-                onClick={() => window.history.back()}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to Sites
-              </button>
-            </div>
-          </div>
+          <Suspense fallback={<WepfolLoading />}>
+            <WepfolContent />
+          </Suspense>
         </main>
       </div>
     </ProtectedRoute>
