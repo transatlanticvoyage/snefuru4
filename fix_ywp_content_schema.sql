@@ -80,19 +80,34 @@ BEGIN
     END IF;
 END $$;
 
--- Create unique constraint for site_url + post_id (for upserts)
+-- Check current ywp_content table structure
+SELECT column_name, data_type, is_nullable 
+FROM information_schema.columns 
+WHERE table_name = 'ywp_content' 
+ORDER BY ordinal_position;
+
+-- Add unique constraint for fk_site_id + post_id (for upserts)
+-- This is the only thing we need to add since all columns already exist
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ywp_content_site_url_post_id_key') THEN
-        ALTER TABLE ywp_content ADD CONSTRAINT ywp_content_site_url_post_id_key UNIQUE (site_url, post_id);
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ywp_content_fk_site_id_post_id_key') THEN
+        ALTER TABLE ywp_content ADD CONSTRAINT ywp_content_fk_site_id_post_id_key UNIQUE (fk_site_id, post_id);
+        RAISE NOTICE 'Added unique constraint on fk_site_id, post_id';
+    ELSE
+        RAISE NOTICE 'Unique constraint already exists';
     END IF;
 END $$;
 
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_ywp_content_site_url ON ywp_content (site_url);
+-- Create useful indexes if they don't exist
+CREATE INDEX IF NOT EXISTS idx_ywp_content_fk_site_id ON ywp_content (fk_site_id);
 CREATE INDEX IF NOT EXISTS idx_ywp_content_post_type ON ywp_content (post_type);
 CREATE INDEX IF NOT EXISTS idx_ywp_content_sync_method ON ywp_content (sync_method);
 CREATE INDEX IF NOT EXISTS idx_ywp_content_post_status ON ywp_content (post_status);
+
+-- Show any existing constraints
+SELECT conname, contype, pg_get_constraintdef(oid) 
+FROM pg_constraint 
+WHERE conrelid = 'ywp_content'::regclass;
 
 -- Show final table structure
 SELECT column_name, data_type, is_nullable, column_default 

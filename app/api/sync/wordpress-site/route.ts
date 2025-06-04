@@ -301,6 +301,21 @@ async function saveContentToDatabase(posts: any[], siteUrl: string, syncMethod: 
   let savedCount = 0;
   console.log(`💾 Starting to save ${posts.length} posts to database for ${siteUrl}`);
 
+  // First, get the site UUID for the foreign key
+  const { data: siteData, error: siteError } = await supabase
+    .from('ywp_sites')
+    .select('id')
+    .eq('site_url', siteUrl)
+    .single();
+    
+  if (siteError || !siteData) {
+    console.error(`❌ Could not find site record for ${siteUrl}:`, siteError);
+    return 0;
+  }
+  
+  const siteId = siteData.id;
+  console.log(`🔗 Using site ID: ${siteId} for ${siteUrl}`);
+
   for (const post of posts) {
     try {
       let contentData;
@@ -308,7 +323,7 @@ async function saveContentToDatabase(posts: any[], siteUrl: string, syncMethod: 
       if (syncMethod === 'plugin_api') {
         // Plugin API format
         contentData = {
-          site_url: siteUrl,
+          fk_site_id: siteId,  // Use UUID foreign key instead of site_url
           post_id: post.ID,
           post_title: post.post_title,
           post_content: post.post_content,
@@ -319,22 +334,25 @@ async function saveContentToDatabase(posts: any[], siteUrl: string, syncMethod: 
           post_modified: post.post_modified,
           post_author: parseInt(post.post_author),
           post_slug: post.post_name,
+          post_parent: post.post_parent || 0,
+          menu_order: post.menu_order || 0,
+          comment_status: post.comment_status,
+          ping_status: post.ping_status,
+          guid: post.guid,
+          post_name: post.post_name,
           sync_method: 'plugin_api',
           raw_metadata: {
             featured_media: post.featured_media,
             categories: post.categories,
             tags: post.tags,
             meta: post.meta || {},
-            guid: post.guid,
-            comment_status: post.comment_status,
-            ping_status: post.ping_status,
           }
         };
         console.log(`📝 Processing Plugin API post: ID=${post.ID}, title="${post.post_title}", type=${post.post_type}, status=${post.post_status}`);
       } else {
         // REST API format
         contentData = {
-          site_url: siteUrl,
+          fk_site_id: siteId,  // Use UUID foreign key instead of site_url
           post_id: post.id,
           post_title: post.title?.rendered || post.title || '',
           post_content: post.content?.rendered || post.content || '',
@@ -345,24 +363,27 @@ async function saveContentToDatabase(posts: any[], siteUrl: string, syncMethod: 
           post_modified: post.modified,
           post_author: post.author || 1,
           post_slug: post.slug,
+          post_parent: post.parent || 0,
+          menu_order: post.menu_order || 0,
+          guid: post.guid?.rendered || post.guid || '',
+          post_name: post.slug,
           sync_method: 'rest_api',
           raw_metadata: {
             featured_media: post.featured_media,
             categories: post.categories || [],
             tags: post.tags || [],
             meta: {},
-            guid: post.guid?.rendered || post.guid || '',
             link: post.link,
           }
         };
         console.log(`📝 Processing REST API post: ID=${post.id}, title="${post.title?.rendered || post.title}", type=${post.type}, status=${post.status}`);
       }
 
-      // Upsert content
+      // Upsert content using the correct conflict resolution
       const { error } = await supabase
         .from('ywp_content')
         .upsert(contentData, {
-          onConflict: 'site_url,post_id',
+          onConflict: 'fk_site_id,post_id',  // Use correct column names
           ignoreDuplicates: false
         });
 
