@@ -19,6 +19,20 @@ const NAVIGATION_GROUPS = {
       { name: 'papikeys2', path: '/papikeys2' },
       { name: 'papikeys3', path: '/papikeys3' }
     ]
+  },
+  navgroup6: {
+    name: 'navgroup6',
+    displayName: 'navgroup6', // You can customize this display name
+    children: [
+      { name: 'panjar1', path: '/fbin2/panjar1' },
+      { name: 'panjar1', path: '/panjar1' },
+      { name: 'panjar2', path: '/fbin2/panjar2' },
+      { name: 'panjar3', path: '/bin4/panjar3' },
+      { name: 'panjar3', path: '/panjar3' },
+      { name: 'panjar4', path: '/bin31/panjar4' },
+      { name: 'profile', path: '/profile' },
+      { name: 'pubnar1', path: '/bin37/pubnar1' }
+    ]
   }
 };
 
