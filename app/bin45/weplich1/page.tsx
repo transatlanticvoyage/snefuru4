@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
+import ProtectedRoute from '@/app/components/ProtectedRoute';
+import Header from '@/app/components/Header';
 
 // Interface for ywp_sites table structure
 interface YwpSite {
@@ -98,124 +100,158 @@ export default function Weplich1Page() {
   }, [user]);
 
   if (isLoading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50">
+          <Header />
+          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div className="flex justify-center items-center min-h-screen">Loading...</div>
+          </main>
+        </div>
+      </ProtectedRoute>
+    );
   }
 
   if (error) {
-    return <div className="text-red-600 p-4">{error}</div>;
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50">
+          <Header />
+          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div className="text-red-600 p-4">{error}</div>
+          </main>
+        </div>
+      </ProtectedRoute>
+    );
   }
 
   if (!user) {
-    return <div className="text-red-600 p-4">Please log in to view WordPress sites</div>;
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50">
+          <Header />
+          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div className="text-red-600 p-4">Please log in to view WordPress sites</div>
+          </main>
+        </div>
+      </ProtectedRoute>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">WordPress Sites</h1>
-      
-      <div className="mb-4">
-        <p className="text-gray-600">
-          Total sites: <span className="font-semibold">{sites.length}</span>
-        </p>
-      </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-8">WordPress Sites</h1>
+            
+            <div className="mb-4">
+              <p className="text-gray-600">
+                Total sites: <span className="font-semibold">{sites.length}</span>
+              </p>
+            </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site URL</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WP Version</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">API Key</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sync Enabled</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Sync</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated At</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sites.length === 0 ? (
-              <tr>
-                <td colSpan={10} className="px-6 py-8 text-center text-gray-500">
-                  No WordPress sites found
-                </td>
-              </tr>
-            ) : (
-              sites.map((site) => (
-                <tr key={site.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {site.id.substring(0, 8)}...
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <a 
-                      href={site.site_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-indigo-600 hover:text-indigo-900 text-sm"
-                    >
-                      {site.site_url}
-                    </a>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {site.site_name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {site.admin_email || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {site.wp_version || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
-                    <span 
-                      className="cursor-pointer hover:text-gray-900" 
-                      title="Click to reveal full API key"
-                      onClick={(e) => {
-                        const span = e.target as HTMLSpanElement;
-                        if (span.textContent?.includes('...')) {
-                          span.textContent = site.api_key;
-                        } else {
-                          span.textContent = site.api_key.substring(0, 12) + '...';
-                        }
-                      }}
-                    >
-                      {site.api_key.substring(0, 12)}...
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      site.sync_enabled 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {site.sync_enabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {site.last_sync_at 
-                      ? new Date(site.last_sync_at).toLocaleString()
-                      : 'Never'
-                    }
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(site.created_at).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(site.updated_at).toLocaleString()}
-                  </td>
-                </tr>
-              ))
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site URL</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin Email</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WP Version</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">API Key</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sync Enabled</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Sync</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated At</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {sites.length === 0 ? (
+                    <tr>
+                      <td colSpan={10} className="px-6 py-8 text-center text-gray-500">
+                        No WordPress sites found
+                      </td>
+                    </tr>
+                  ) : (
+                    sites.map((site) => (
+                      <tr key={site.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {site.id.substring(0, 8)}...
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <a 
+                            href={site.site_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-indigo-600 hover:text-indigo-900 text-sm"
+                          >
+                            {site.site_url}
+                          </a>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {site.site_name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {site.admin_email || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {site.wp_version || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                          <span 
+                            className="cursor-pointer hover:text-gray-900" 
+                            title="Click to reveal full API key"
+                            onClick={(e) => {
+                              const span = e.target as HTMLSpanElement;
+                              if (span.textContent?.includes('...')) {
+                                span.textContent = site.api_key;
+                              } else {
+                                span.textContent = site.api_key.substring(0, 12) + '...';
+                              }
+                            }}
+                          >
+                            {site.api_key.substring(0, 12)}...
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            site.sync_enabled 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {site.sync_enabled ? 'Enabled' : 'Disabled'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {site.last_sync_at 
+                            ? new Date(site.last_sync_at).toLocaleString()
+                            : 'Never'
+                          }
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(site.created_at).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(site.updated_at).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {sites.length > 0 && (
+              <div className="mt-4 text-sm text-gray-500">
+                <p>💡 Click on truncated API keys to reveal the full key</p>
+              </div>
             )}
-          </tbody>
-        </table>
+          </div>
+        </main>
       </div>
-
-      {sites.length > 0 && (
-        <div className="mt-4 text-sm text-gray-500">
-          <p>💡 Click on truncated API keys to reveal the full key</p>
-        </div>
-      )}
-    </div>
+    </ProtectedRoute>
   );
 } 
