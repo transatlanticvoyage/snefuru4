@@ -849,7 +849,7 @@ export default function Uidev1() {
   // New: images lookup
   const [imagesById, setImagesById] = useState<Record<string, any>>({});
   const [generateZip, setGenerateZip] = useState(false);
-  const [wipeMeta, setWipeMeta] = useState(false);
+  const [wipeMeta, setWipeMeta] = useState(true);
   const [throttle1, setThrottle1] = useState({
     enabled: false,
     delayBetweenImages: 3000, // milliseconds, default 3 seconds
