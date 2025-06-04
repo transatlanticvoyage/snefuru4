@@ -1,6 +1,5 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { SyncManager } from '@/app/lib/sync/SyncManager';
-import { SyncConfig, SyncResult, SyncMethod } from '@/app/lib/sync/types';
+import { SyncResult, SyncMethod } from '@/app/lib/sync/types';
 
 interface SiteSyncOptions {
   siteId: string;
@@ -24,65 +23,29 @@ export async function cfunc_sync_site(options: SiteSyncOptions): Promise<SyncRes
       };
     }
 
-    // Get user record to verify ownership
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', session.user.id)
-      .single();
+    // Call our server-side sync API
+    const response = await fetch('/api/sync/wordpress-site', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        siteId: options.siteId,
+        method: options.method || 'plugin_api',
+        fallbackEnabled: options.fallbackEnabled !== false
+      })
+    });
 
-    if (userError || !userData) {
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Unknown server error' }));
       return {
         success: false,
-        message: 'User record not found',
+        message: errorData.message || `Server error: ${response.status} ${response.statusText}`,
         method: options.method || 'plugin_api'
       };
     }
 
-    // Get site record with API key
-    const { data: siteData, error: siteError } = await supabase
-      .from('ywp_sites')
-      .select('*')
-      .eq('id', options.siteId)
-      .eq('fk_user_id', userData.id)
-      .single();
-
-    if (siteError || !siteData) {
-      return {
-        success: false,
-        message: 'Site not found or access denied',
-        method: options.method || 'plugin_api'
-      };
-    }
-
-    // Prepare sync configuration
-    const syncConfig: SyncConfig = {
-      siteId: options.siteId,
-      siteUrl: options.siteUrl,
-      preferredMethod: options.method || 'plugin_api',
-      fallbackEnabled: options.fallbackEnabled !== false, // Default to true
-      apiKey: siteData.api_key,
-    };
-
-    // Initialize sync manager and perform sync
-    const syncManager = new SyncManager();
-    const result = await syncManager.syncSite(syncConfig);
-
-    // Update last sync timestamp if successful
-    if (result.success) {
-      const { error: updateError } = await supabase
-        .from('ywp_sites')
-        .update({ 
-          last_sync_at: new Date().toISOString(),
-          sync_enabled: true 
-        })
-        .eq('id', options.siteId);
-
-      if (updateError) {
-        console.error('Failed to update last sync timestamp:', updateError);
-      }
-    }
-
+    const result = await response.json();
     return result;
 
   } catch (error) {
