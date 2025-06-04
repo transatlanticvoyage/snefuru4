@@ -7,9 +7,10 @@ import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/app/components/ProtectedRoute';
 import Header from '@/app/components/Header';
 
-// Interface for WordPress posts/pages
+// Interface for WordPress content from ywp_content table
 interface WpContent {
   id: string;
+  fk_site_id: string;  // UUID foreign key to ywp_sites
   post_id: number;
   post_title: string;
   post_content: string;
@@ -20,9 +21,15 @@ interface WpContent {
   post_modified: string;
   post_author: number;
   post_slug: string;
-  site_url: string;
+  post_parent?: number;
+  menu_order?: number;
+  comment_status?: string;
+  ping_status?: string;
+  guid?: string;
+  post_name?: string;
   sync_method: string;
   raw_metadata: any;
+  sync_version?: number;
   created_at: string;
   updated_at: string;
 }
@@ -72,8 +79,10 @@ function WepfolContent() {
         .eq('site_url', siteParam.startsWith('http') ? siteParam : `https://${siteParam}`)
         .single();
 
+      let foundSite = null;
+      
       if (siteError) {
-        // Try without https prefix
+        // Try without https prefix or with partial match
         const { data: siteData2, error: siteError2 } = await supabase
           .from('ywp_sites')
           .select('*')
@@ -84,21 +93,22 @@ function WepfolContent() {
         if (siteError2) {
           throw new Error('Site not found or you do not have access to it');
         }
-        setSiteInfo(siteData2);
+        foundSite = siteData2;
       } else {
-        setSiteInfo(siteData);
+        foundSite = siteData;
       }
 
-      // Now fetch synced content for this site
+      setSiteInfo(foundSite);
+
+      // Fetch content using the site ID foreign key relationship
       const { data: contentData, error: contentError } = await supabase
         .from('ywp_content')
         .select('*')
-        .eq('site_url', siteParam.startsWith('http') ? siteParam : `https://${siteParam}`)
+        .eq('fk_site_id', foundSite.id)
         .order('post_modified', { ascending: false });
 
       if (contentError) {
         console.error('Error fetching content:', contentError);
-        // Don't throw error, just set empty posts - site might not have synced content yet
         setPosts([]);
       } else {
         setPosts(contentData || []);
