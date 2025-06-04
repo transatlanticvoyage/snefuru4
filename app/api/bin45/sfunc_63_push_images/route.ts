@@ -435,23 +435,104 @@ async function uploadViaWordPressPlugin(
   siteUrl: string
 ): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
   try {
-    // 🎭 SIMULATED: This method is not yet implemented
-    // This would communicate with your WordPress plugin
-    // The plugin would handle the actual image upload
+    console.log(`🔄 Starting WordPress Plugin upload: ${fileName} to ${siteUrl}`);
+
+    // Step 1: Download the image from the URL
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      return { 
+        success: false, 
+        error: `Failed to download image: ${imageResponse.status} ${imageResponse.statusText}` 
+      };
+    }
+
+    const imageBuffer = await imageResponse.arrayBuffer();
+    console.log(`✅ Downloaded image: ${imageBuffer.byteLength} bytes`);
+
+    // Step 2: Get WordPress plugin API key from environment
+    const pluginApiKey = process.env.WORDPRESS_UPLOAD_API_KEY;
+    if (!pluginApiKey) {
+      return {
+        success: false,
+        error: 'WordPress plugin API key not configured in environment variables'
+      };
+    }
+
+    // Step 3: Prepare WordPress plugin upload endpoint
+    const wpPluginUrl = `${siteUrl}/wp-json/snefuru/v1/upload-image`;
     
-    console.log(`🎭 SIMULATED Plugin upload: ${fileName} to ${siteUrl}`);
+    // Step 4: Create FormData for multipart upload
+    const formData = new FormData();
+    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    formData.append('file', blob, fileName);
+    formData.append('api_key', pluginApiKey);
+    formData.append('filename', fileName);
     
-    // For now, return a simulated successful upload
-    const simulatedImageId = Math.floor(Math.random() * 1000) + 1;
-    const simulatedUrl = `${siteUrl}/wp-content/uploads/2025/01/${fileName}`;
+    // Add metadata if available
+    // These would come from the calling function's context
+    // formData.append('batch_id', batchId);
+    // formData.append('plan_id', planId);
+
+    console.log(`🔄 Uploading to WordPress Plugin: ${wpPluginUrl}`);
+
+    // Step 5: Upload to WordPress via plugin
+    const uploadResponse = await fetch(wpPluginUrl, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        // Don't set Content-Type - let the browser set it with boundary for FormData
+        'User-Agent': 'Snefuru-NextJS-App/1.0'
+      }
+    });
+
+    const responseText = await uploadResponse.text();
+    console.log(`📝 WordPress Plugin Response Status: ${uploadResponse.status}`);
+    console.log(`📝 WordPress Plugin Response: ${responseText.substring(0, 500)}...`);
+
+    if (!uploadResponse.ok) {
+      let errorMessage = `WordPress Plugin API error: ${uploadResponse.status}`;
+      
+      try {
+        const errorData = JSON.parse(responseText);
+        errorMessage = errorData.message || errorData.code || errorMessage;
+      } catch (e) {
+        errorMessage = `${errorMessage} - ${responseText.substring(0, 200)}`;
+      }
+
+      return { 
+        success: false, 
+        error: errorMessage
+      };
+    }
+
+    // Step 6: Parse successful response
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      return { 
+        success: false, 
+        error: 'Invalid JSON response from WordPress Plugin API' 
+      };
+    }
+
+    if (!responseData.success) {
+      return {
+        success: false,
+        error: responseData.message || 'Plugin upload failed for unknown reason'
+      };
+    }
+
+    console.log(`✅ WordPress Plugin upload successful: ID ${responseData.data.attachment_id}`);
 
     return {
       success: true,
-      wp_url: simulatedUrl,
-      wp_image_id: simulatedImageId
+      wp_url: responseData.data.url,
+      wp_image_id: responseData.data.attachment_id
     };
 
   } catch (error) {
+    console.error('WordPress Plugin upload error:', error);
     return {
       success: false,
       error: `Plugin upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
