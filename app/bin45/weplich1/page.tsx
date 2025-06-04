@@ -24,6 +24,10 @@ export default function Weplich1Page() {
   const [sites, setSites] = useState<YwpSite[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newSites, setNewSites] = useState('');
+  const [addingSites, setAddingSites] = useState(false);
+  const [addSuccess, setAddSuccess] = useState<string | null>(null);
+  const [addError, setAddError] = useState<string | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
 
@@ -90,6 +94,48 @@ export default function Weplich1Page() {
     }
   };
 
+  // Handle sites submission
+  const handleSitesSubmit = async () => {
+    if (!newSites.trim()) {
+      setAddError('Please enter some sites to add.');
+      return;
+    }
+
+    setAddingSites(true);
+    setAddSuccess(null);
+    setAddError(null);
+    
+    try {
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      // Split sites by lines and clean them up
+      const siteLines = newSites
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+      
+      if (siteLines.length === 0) {
+        throw new Error('No valid sites found');
+      }
+
+      // Import and call the client function
+      const { func_71_add_sites } = await import('./utils/cfunc_71_add_sites');
+      const result = await func_71_add_sites(siteLines);
+      
+      if (result.success) {
+        setAddSuccess(`✅ Successfully added ${result.count || 0} sites!`);
+        setNewSites(''); // Clear the text box
+        await fetchSites(); // Refresh the table
+      } else {
+        setAddError(`❌ ${result.message || 'Failed to add sites'}`);
+      }
+    } catch (err) {
+      setAddError(`❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setAddingSites(false);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchSites();
@@ -145,6 +191,54 @@ export default function Weplich1Page() {
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8">WordPress Sites</h1>
+
+            {/* Add Sites Section */}
+            <div className="mb-8 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Add WP Sites Text Box 1</h2>
+              
+              <div className="space-y-4">
+                <textarea
+                  value={newSites}
+                  onChange={(e) => setNewSites(e.target.value)}
+                  placeholder="Enter WordPress sites, one per line..."
+                  className="block border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  style={{ width: '400px', height: '150px' }}
+                  disabled={addingSites}
+                />
+                
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={handleSitesSubmit}
+                    disabled={addingSites}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {addingSites ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      'submit func_71_add_sites'
+                    )}
+                  </button>
+                  
+                  {addSuccess && (
+                    <div className={`text-sm ${addSuccess.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                      {addSuccess}
+                    </div>
+                  )}
+                  
+                  {addError && (
+                    <div className="text-sm text-red-600">
+                      {addError}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
             
             <div className="mb-4">
               <p className="text-gray-600">
