@@ -11,6 +11,7 @@
 		F4A1234567890123456789AD /* MonitorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1234567890123456789AC /* MonitorManager.swift */; };
 		F4A1234567890123456789AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4A1234567890123456789AE /* Assets.xcassets */; };
 		F4A1234567890123456789B1 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4A1234567890123456789B0 /* MainMenu.xib */; };
+		F4A1234567890123456789B8 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A1234567890123456789B9 /* SettingsWindowController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +21,7 @@
 		F4A1234567890123456789AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4A1234567890123456789B0 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		F4A1234567890123456789B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F4A1234567890123456789B9 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +48,7 @@
 			children = (
 				F4A1234567890123456789AA /* AppDelegate.swift */,
 				F4A1234567890123456789AC /* MonitorManager.swift */,
+				F4A1234567890123456789B9 /* SettingsWindowController.swift */,
 				F4A1234567890123456789AE /* Assets.xcassets */,
 				F4A1234567890123456789B0 /* MainMenu.xib */,
 				F4A1234567890123456789B2 /* Info.plist */,
@@ -133,6 +136,7 @@
 			files = (
 				F4A1234567890123456789AB /* AppDelegate.swift in Sources */,
 				F4A1234567890123456789AD /* MonitorManager.swift in Sources */,
+				F4A1234567890123456789B8 /* SettingsWindowController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
