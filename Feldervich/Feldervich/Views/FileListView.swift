@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension URL: @retroactive Identifiable {
+extension URL: Identifiable {
     public var id: String { self.absoluteString }
 }
 
@@ -11,23 +11,58 @@ struct FileListView: View {
     let onDoubleClick: (URL) -> Void
     let onContextMenu: (URL) -> AnyView
     
+    @State private var isColumnView: Bool = false
+    @State private var showTarjnonSaves: Bool = false
+    @State private var selectedTarjnonFolders: Set<String> = []
+    
     // Convert between URL and URL.ID for Table selection
     private var selectedFileIDs: Binding<Set<String>> {
         Binding(
-            get: { Set(selectedFiles.map { $0.id }) },
+            get: { Set(selectedFiles.map { $0.absoluteString }) },
             set: { newIDs in
-                selectedFiles = Set(files.filter { newIDs.contains($0.id) })
+                selectedFiles = Set(files.filter { newIDs.contains($0.absoluteString) })
             }
         )
     }
     
     var body: some View {
-        print("DEBUG FileListView: Rendering with \(files.count) files")
-        return Group {
-            if viewMode == .list {
-                listView
+        VStack {
+            // Top bar with toggle and Tarjnon Saves button
+            HStack {
+                Button(action: {
+                    isColumnView.toggle()
+                }) {
+                    Text(isColumnView ? "Switch to List View" : "Switch to Column View")
+                }
+                .padding()
+
+                Button(action: {
+                    showTarjnonSaves.toggle()
+                }) {
+                    Text("Tarjnon Saves")
+                }
+                .padding()
+
+                Spacer()
+            }
+
+            // Conditional view rendering
+            if showTarjnonSaves {
+                tarjnonSavesView
+            } else if isColumnView {
+                columnView
             } else {
-                iconView
+                if viewMode == .list {
+                    listView
+                } else {
+                    iconView
+                }
+            }
+        }
+        .onAppear {
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                handleKeyEvent(event)
+                return event
             }
         }
     }
@@ -37,6 +72,19 @@ struct FileListView: View {
             TableColumn("Name") { file in
                 FileRowView(
                     file: file,
+                    isSelected: selectedFiles.contains(file),
+                    onTap: {
+                        // Normal click: Replace selection with just this file
+                        selectedFiles = [file]
+                    },
+                    onCommandTap: {
+                        // Command+Click: Toggle selection (add/remove from selection)
+                        if selectedFiles.contains(file) {
+                            selectedFiles.remove(file)
+                        } else {
+                            selectedFiles.insert(file)
+                        }
+                    },
                     onDoubleClick: onDoubleClick,
                     onContextMenu: onContextMenu
                 )
@@ -69,12 +117,17 @@ struct FileListView: View {
     
     private var iconView: some View {
         ScrollView {
-            LazyVGrid(columns: Array(repeating: GridItem(.adaptive(minimum: 80, maximum: 120), spacing: 16), count: 1), spacing: 16) {
+            LazyVGrid(columns: Array(repeating: GridItem(.adaptive(minimum: 80, maximum: 120), spacing: 0), count: 1), spacing: 0) {
                 ForEach(files, id: \.self) { file in
                     FileIconView(
                         file: file,
                         isSelected: selectedFiles.contains(file),
                         onTap: {
+                            // Normal click: Replace selection with just this file
+                            selectedFiles = [file]
+                        },
+                        onCommandTap: {
+                            // Command+Click: Toggle selection (add/remove from selection)
                             if selectedFiles.contains(file) {
                                 selectedFiles.remove(file)
                             } else {
@@ -86,8 +139,74 @@ struct FileListView: View {
                     )
                 }
             }
+        }
+    }
+    
+    private var columnView: some View {
+        // Placeholder for Column View implementation
+        Text("Column View")
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.gray.opacity(0.1))
+    }
+    
+    private var tarjnonSavesView: some View {
+        VStack {
+            Button("Add new Tarjnon save folder") {
+                addNewTarjnonFolder()
+            }
+            .padding()
+
+            // Add Remove Folder from Tarjnon button
+            Button(action: {
+                removeSelectedTarjnonFolders()
+            }) {
+                Text("Remove Folder from Tarjnon")
+            }
+            .padding()
+
+            // Display current Tarjnon folders with checkboxes
+            VStack(alignment: .leading) {
+                Text("Current Tarjnon Folders:").bold()
+                ForEach(DatabaseManager.shared.getTarjnonFolders(), id: \ .self) { folder in
+                    HStack {
+                        Toggle(isOn: Binding(
+                            get: { selectedTarjnonFolders.contains(folder) },
+                            set: { isSelected in
+                                if isSelected {
+                                    selectedTarjnonFolders.insert(folder)
+                                } else {
+                                    selectedTarjnonFolders.remove(folder)
+                                }
+                            }
+                        )) {
+                            Text(folder)
+                        }
+                    }
+                }
+            }
             .padding()
         }
+    }
+    
+    private func addNewTarjnonFolder() {
+        let dialog = NSOpenPanel()
+        dialog.title = "Choose a folder"
+        dialog.canChooseDirectories = true
+        dialog.canChooseFiles = false
+        dialog.allowsMultipleSelection = false
+
+        if dialog.runModal() == .OK, let url = dialog.url {
+            // Save the selected folder to the database
+            DatabaseManager.shared.addTarjnonFolder(path: url.path, name: url.lastPathComponent)
+        }
+    }
+    
+    private func removeSelectedTarjnonFolders() {
+        for folder in selectedTarjnonFolders {
+            // Implement the logic to remove the folder from the database
+            // Example: DatabaseManager.shared.removeTarjnonFolder(path: folder)
+        }
+        selectedTarjnonFolders.removeAll()
     }
     
     private func getModificationDate(for url: URL) -> Date? {
@@ -127,10 +246,33 @@ struct FileListView: View {
         formatter.countStyle = .file
         return formatter.string(fromByteCount: size)
     }
+
+    // Add a function to handle key events.
+    private func handleKeyEvent(_ event: NSEvent) {
+        guard let characters = event.charactersIgnoringModifiers else { return }
+        switch characters {
+        case "\u{F700}": // Up arrow
+            moveSelection(up: true)
+        case "\u{F701}": // Down arrow
+            moveSelection(up: false)
+        default:
+            break
+        }
+    }
+
+    // Add a function to move the selection.
+    private func moveSelection(up: Bool) {
+        guard let currentIndex = files.firstIndex(where: { selectedFiles.contains($0) }) else { return }
+        let newIndex = up ? max(currentIndex - 1, 0) : min(currentIndex + 1, files.count - 1)
+        selectedFiles = [files[newIndex]]
+    }
 }
 
 struct FileRowView: View {
     let file: URL
+    let isSelected: Bool
+    let onTap: () -> Void
+    let onCommandTap: () -> Void
     let onDoubleClick: (URL) -> Void
     let onContextMenu: (URL) -> AnyView
     
@@ -145,13 +287,30 @@ struct FileRowView: View {
             Text(file.lastPathComponent)
                 .lineLimit(1)
                 .truncationMode(.middle)
+                .foregroundColor(isSelected ? .white : .primary)
             
             Spacer()
         }
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
+        .background(isSelected ? Color.accentColor : Color.clear)
         .contentShape(Rectangle())
         .onTapGesture(count: 2) {
             onDoubleClick(file)
         }
+        .simultaneousGesture(
+            TapGesture(count: 1)
+                .modifiers(.command)
+                .onEnded { _ in
+                    onCommandTap()
+                }
+        )
+        .simultaneousGesture(
+            TapGesture(count: 1)
+                .onEnded { _ in
+                    onTap()
+                }
+        )
         .contextMenu {
             onContextMenu(file)
         }
@@ -194,24 +353,27 @@ struct FileRowView: View {
     
     private func getFileColor() -> Color {
         if isDirectory {
-            return .blue
+            return isSelected ? .white : .blue
         }
         
         let pathExtension = file.pathExtension.lowercased()
+        let baseColor: Color
         switch pathExtension {
         case "jpg", "jpeg", "png", "gif", "bmp", "tiff":
-            return .green
+            baseColor = .green
         case "mov", "mp4", "avi", "mkv":
-            return .purple
+            baseColor = .purple
         case "mp3", "wav", "aac", "flac":
-            return .orange
+            baseColor = .orange
         case "zip", "rar", "7z", "tar", "gz":
-            return .brown
+            baseColor = .brown
         case "app":
-            return .blue
+            baseColor = .blue
         default:
-            return .primary
+            baseColor = .primary
         }
+        
+        return isSelected ? .white : baseColor
     }
 }
 
@@ -219,6 +381,7 @@ struct FileIconView: View {
     let file: URL
     let isSelected: Bool
     let onTap: () -> Void
+    let onCommandTap: () -> Void
     let onDoubleClick: (URL) -> Void
     let onContextMenu: (URL) -> AnyView
     
@@ -241,12 +404,22 @@ struct FileIconView: View {
         .background(isSelected ? Color.accentColor.opacity(0.3) : Color.clear)
         .cornerRadius(8)
         .contentShape(Rectangle())
-        .onTapGesture {
-            onTap()
-        }
         .onTapGesture(count: 2) {
             onDoubleClick(file)
         }
+        .simultaneousGesture(
+            TapGesture(count: 1)
+                .modifiers(.command)
+                .onEnded { _ in
+                    onCommandTap()
+                }
+        )
+        .simultaneousGesture(
+            TapGesture(count: 1)
+                .onEnded { _ in
+                    onTap()
+                }
+        )
         .contextMenu {
             onContextMenu(file)
         }

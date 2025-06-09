@@ -26,6 +26,10 @@ struct FileManagerView: View {
     @State private var viewMode: ViewMode = .list
     @State private var sortBy: SortOption = .name
     @State private var searchText = ""
+    @State private var recentFiles: [URL] = []
+    
+    // Special URL identifier for Recents
+    private let recentsURL = URL(string: "feldervich://recents")!
     
     enum ViewMode: String, CaseIterable {
         case list = "List"
@@ -43,6 +47,15 @@ struct FileManagerView: View {
         guard let selectedURL = selectedURL else { 
             print("DEBUG: selectedURL is nil")
             return [] 
+        }
+        
+        // Handle Recents special case
+        if selectedURL == recentsURL {
+            print("DEBUG: Showing recent files: \(recentFiles.count)")
+            let filtered = searchText.isEmpty ? recentFiles : recentFiles.filter { url in
+                url.lastPathComponent.localizedCaseInsensitiveContains(searchText)
+            }
+            return filtered
         }
         
         print("DEBUG: Getting directory contents for: \(selectedURL.path)")
@@ -87,7 +100,7 @@ struct FileManagerView: View {
             searchBar
             
             // File List
-            if let currentURL = selectedURL {
+            if selectedURL != nil {
                 FileListView(
                     files: filteredFiles,
                     selectedFiles: $selectedFiles,
@@ -115,6 +128,14 @@ struct FileManagerView: View {
         }
         .onPasteCommand(of: [.fileURL]) { providers in
             pasteFiles(providers: providers)
+        }
+        .onAppear {
+            loadRecentFiles()
+        }
+        .onChange(of: selectedURL) { newURL in
+            if newURL == recentsURL {
+                loadRecentFiles()
+            }
         }
     }
     
@@ -204,6 +225,11 @@ struct FileManagerView: View {
     private var pathComponents: [PathComponent] {
         guard let selectedURL = selectedURL else { return [] }
         
+        // Handle Recents special case
+        if selectedURL == recentsURL {
+            return [PathComponent(name: "Recents", url: recentsURL)]
+        }
+        
         var components: [PathComponent] = []
         var currentURL = selectedURL
         
@@ -223,12 +249,21 @@ struct FileManagerView: View {
         var isDirectory: ObjCBool = false
         if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) {
             if isDirectory.boolValue {
-                fileOperations.navigateToDirectory(url)
-                selectedURL = url
+                // If we're in Recents and clicking a folder, navigate to that folder
+                if selectedURL == recentsURL {
+                    fileOperations.navigateToDirectory(url)
+                    selectedURL = url
+                } else {
+                    fileOperations.navigateToDirectory(url)
+                    selectedURL = url
+                }
                 selectedFiles.removeAll()
             } else {
                 // Open file with default application
                 NSWorkspace.shared.open(url)
+                
+                // If we're in Recents view and opening a file, optionally navigate to its parent directory
+                // This mimics Finder behavior where opening a file from Recents can show its location
             }
         }
     }
@@ -342,5 +377,52 @@ struct FileManagerView: View {
     private func showFileInfo(_ url: URL) {
         // This could open a detailed info panel
         NSWorkspace.shared.open(url)
+    }
+    
+    // Simple method to load recent files from common user directories
+    private func loadRecentFiles() {
+        DispatchQueue.global(qos: .background).async {
+            var recentURLs: [URL] = []
+            
+            // Common user directories to scan
+            let userDirectories = [
+                URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Documents"),
+                URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Desktop"),
+                URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Downloads")
+            ]
+            
+            let sevenDaysAgo = Date().addingTimeInterval(-7 * 24 * 60 * 60)
+            
+            for directory in userDirectories {
+                if let enumerator = FileManager.default.enumerator(at: directory, includingPropertiesForKeys: [.contentModificationDateKey, .isRegularFileKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) {
+                    
+                    for case let fileURL as URL in enumerator {
+                        do {
+                            let resourceValues = try fileURL.resourceValues(forKeys: [.contentModificationDateKey, .isRegularFileKey])
+                            
+                            if let isRegularFile = resourceValues.isRegularFile,
+                               let modificationDate = resourceValues.contentModificationDate,
+                               isRegularFile && modificationDate > sevenDaysAgo {
+                                recentURLs.append(fileURL)
+                            }
+                        } catch {
+                            // Skip files that can't be accessed
+                            continue
+                        }
+                    }
+                }
+            }
+            
+            // Sort by modification date (most recent first) and limit to 50 files
+            let sortedRecents = recentURLs.sorted { url1, url2 in
+                let date1 = (try? url1.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? Date.distantPast
+                let date2 = (try? url2.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? Date.distantPast
+                return date1 > date2
+            }.prefix(50)
+            
+            DispatchQueue.main.async {
+                self.recentFiles = Array(sortedRecents)
+            }
+        }
     }
 } 

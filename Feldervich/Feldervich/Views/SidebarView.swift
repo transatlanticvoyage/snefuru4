@@ -4,6 +4,9 @@ struct SidebarView: View {
     @ObservedObject var pinnedFoldersManager: PinnedFoldersManager
     @Binding var selectedURL: URL?
     
+    // Special URL identifier for Recents
+    private let recentsURL = URL(string: "feldervich://recents")!
+    
     private let systemLocations: [(name: String, url: URL, icon: String)] = [
         ("Desktop", URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Desktop"), "desktopcomputer"),
         ("Documents", URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Documents"), "doc.text"),
@@ -14,6 +17,15 @@ struct SidebarView: View {
     
     var body: some View {
         List(selection: $selectedURL) {
+            Section("Recents") {
+                SidebarItem(
+                    name: "Recents",
+                    icon: "clock",
+                    url: recentsURL
+                )
+                .tag(recentsURL)
+            }
+            
             Section("Favorites") {
                 ForEach(systemLocations, id: \.url) { location in
                     SidebarItem(
