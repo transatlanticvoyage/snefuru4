@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 extension URL: Identifiable {
     public var id: String { self.absoluteString }
@@ -14,6 +15,10 @@ struct FileListView: View {
     @State private var isColumnView: Bool = false
     @State private var showTarjnonSaves: Bool = false
     @State private var selectedTarjnonFolders: Set<String> = []
+    @State private var showNelderCreator: Bool = false
+    @StateObject private var borchinFolderManager = BorchinFolderManager()
+    @State private var showTemplatechuk: Bool = false
+    @State private var templatechukFolder: String? = nil
     
     // Convert between URL and URL.ID for Table selection
     private var selectedFileIDs: Binding<Set<String>> {
@@ -28,26 +33,52 @@ struct FileListView: View {
     var body: some View {
         VStack {
             // Top bar with toggle and Tarjnon Saves button
-            HStack {
-                Button(action: {
-                    isColumnView.toggle()
-                }) {
-                    Text(isColumnView ? "Switch to List View" : "Switch to Column View")
-                }
-                .padding()
+            if !showNelderCreator {
+                HStack {
+                    Button(action: {
+                        isColumnView.toggle()
+                    }) {
+                        Text(isColumnView ? "Switch to List View" : "Switch to Column View")
+                    }
+                    .padding()
 
-                Button(action: {
-                    showTarjnonSaves.toggle()
-                }) {
-                    Text("Tarjnon Saves")
-                }
-                .padding()
+                    Button(action: {
+                        showTarjnonSaves.toggle()
+                    }) {
+                        Text("Tarjnon Saves")
+                            .foregroundColor(showTarjnonSaves ? .white : .primary)
+                            .padding()
+                            .background(showTarjnonSaves ? Color.blue : Color.clear)
+                            .cornerRadius(8)
+                    }
 
-                Spacer()
+                    Button(action: {
+                        showNelderCreator.toggle()
+                    }) {
+                        Text("Nelder Creator")
+                            .foregroundColor(showNelderCreator ? .white : .primary)
+                            .padding()
+                            .background(showNelderCreator ? Color.blue : Color.clear)
+                            .cornerRadius(8)
+                    }
+
+                    Button(action: {
+                        showTemplatechuk.toggle()
+                    }) {
+                        Text("Templatechuk")
+                    }
+                    .padding()
+
+                    Spacer()
+                }
             }
 
             // Conditional view rendering
-            if showTarjnonSaves {
+            if showTemplatechuk {
+                templatechukView
+            } else if showNelderCreator {
+                nelderCreatorView
+            } else if showTarjnonSaves {
                 tarjnonSavesView
             } else if isColumnView {
                 columnView
@@ -64,6 +95,7 @@ struct FileListView: View {
                 handleKeyEvent(event)
                 return event
             }
+            borchinFolderManager.loadBorchinFolder()
         }
     }
     
@@ -164,6 +196,14 @@ struct FileListView: View {
             }
             .padding()
 
+            // Add Designate Folder as Borchin button
+            Button(action: {
+                designateFolderAsBorchin()
+            }) {
+                Text("Designate Folder as Borchin")
+            }
+            .padding()
+
             // Display current Tarjnon folders with checkboxes
             VStack(alignment: .leading) {
                 Text("Current Tarjnon Folders:").bold()
@@ -207,6 +247,14 @@ struct FileListView: View {
             // Example: DatabaseManager.shared.removeTarjnonFolder(path: folder)
         }
         selectedTarjnonFolders.removeAll()
+    }
+    
+    private func designateFolderAsBorchin() {
+        guard let selectedFolder = selectedTarjnonFolders.first else { return }
+        borchinFolderManager.borchinFolder = selectedFolder
+        // Store the borchinFolder setting
+        UserDefaults.standard.set(selectedFolder, forKey: "borchinFolder")
+        print("DEBUG: borchinFolder designated as: \(selectedFolder)")
     }
     
     private func getModificationDate(for url: URL) -> Date? {
@@ -265,6 +313,84 @@ struct FileListView: View {
         guard let currentIndex = files.firstIndex(where: { selectedFiles.contains($0) }) else { return }
         let newIndex = up ? max(currentIndex - 1, 0) : min(currentIndex + 1, files.count - 1)
         selectedFiles = [files[newIndex]]
+    }
+
+    private var nelderCreatorView: some View {
+        VStack {
+            if let borchinFolder = borchinFolderManager.borchinFolder {
+                Text("Borchin Folder: \(borchinFolder)")
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.red.opacity(0.1))
+
+                FileListView(
+                    files: getFilesInDirectory(borchinFolder),
+                    selectedFiles: $selectedFiles,
+                    viewMode: viewMode,
+                    onDoubleClick: { file in
+                        if FileManager.default.fileExists(atPath: file.path, isDirectory: nil) {
+                            // Navigate into the directory
+                            borchinFolderManager.borchinFolder = file.path
+                            print("DEBUG: Navigated into borchinFolder: \(borchinFolder ?? "None")")
+                            UserDefaults.standard.set(borchinFolder, forKey: "borchinFolder")
+                        } else {
+                            onDoubleClick(file)
+                        }
+                    },
+                    onContextMenu: onContextMenu
+                )
+            } else {
+                Text("No Borchin Folder Selected")
+                    .padding()
+            }
+        }
+    }
+
+    private func getFilesInDirectory(_ path: String) -> [URL] {
+        let url = URL(fileURLWithPath: path)
+        let fileManager = FileManager.default
+        let files = (try? fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: nil)) ?? []
+        return files
+    }
+
+    private var templatechukView: some View {
+        VStack {
+            Button("Select Templatechuk Folder") {
+                selectTemplatechukFolder()
+            }
+            .padding()
+
+            if let templatechukFolder = templatechukFolder {
+                Text("Selected Folder: \(templatechukFolder)")
+                    .padding()
+            }
+
+            Button("Save Templatechuk Folder") {
+                saveTemplatechukFolder()
+            }
+            .padding()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.gray.opacity(0.1))
+    }
+
+    private func selectTemplatechukFolder() {
+        let dialog = NSOpenPanel()
+        dialog.title = "Choose a Templatechuk folder"
+        dialog.canChooseDirectories = true
+        dialog.canChooseFiles = false
+        dialog.allowsMultipleSelection = false
+
+        if dialog.runModal() == .OK, let url = dialog.url {
+            templatechukFolder = url.path
+        }
+    }
+
+    private func saveTemplatechukFolder() {
+        guard let templatechukFolder = templatechukFolder else { return }
+        // Store the templatechukFolder setting
+        UserDefaults.standard.set(templatechukFolder, forKey: "templatechukFolder")
+        print("Templatechuk folder designated: \(templatechukFolder)")
     }
 }
 

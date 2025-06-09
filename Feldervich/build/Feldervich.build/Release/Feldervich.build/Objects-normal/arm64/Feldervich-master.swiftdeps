@@ -1,0 +1,15 @@
+version: "Apple Swift version 6.1.2 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)"
+options: "30e19b91fb30e17057852133c29a5e15c9ab1b1bf98baa8a6fa14993aac347d7"
+build_start_time: [1749510234, 673530000]
+build_end_time: [1749510239, 656064000]
+inputs:
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/ContentView.swift": !dirty [1749427346, 111480894]
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/FeldervichApp.swift": !dirty [1749415831, 480355620]
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Models/DatabaseManager.swift": !dirty [1749499922, 44133111]
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Models/FileOperations.swift": !dirty [1749417099, 506851048]
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Models/PinnedFoldersManager.swift": !dirty [1749415939, 912336070]
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Views/FileListView.swift": !dirty [1749509534, 544252871]
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Views/FileManagerView.swift": !dirty [1749483410, 256825025]
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Views/SidebarView.swift": !dirty [1749483217, 473681232]
+  ? "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/DerivedSources/GeneratedAssetSymbols.swift"
+  : !dirty [1749510234, 663262399]

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BuildMachineOSBuild</key>
+	<string>24F74</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>Feldervich</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.feldervich.app</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Feldervich</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>DTPlatformBuild</key>
+	<string>24F74</string>
+	<key>DTPlatformName</key>
+	<string>macosx</string>
+	<key>DTPlatformVersion</key>
+	<string>15.5</string>
+	<key>DTSDKBuild</key>
+	<string>24F74</string>
+	<key>DTSDKName</key>
+	<string>macosx15.5</string>
+	<key>DTXcode</key>
+	<string>1640</string>
+	<key>DTXcodeBuild</key>
+	<string>16F6</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.0</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Feldervich needs access to Apple Events to interact with other applications for file operations.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>Feldervich needs access to your Desktop folder to browse and manage files.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Feldervich needs access to your Documents folder to browse and manage files.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Feldervich needs access to your Downloads folder to browse and manage files.</string>
+	<key>NSMainStoryboardFile</key>
+	<string>Main</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>Feldervich needs access to network volumes to browse and manage files.</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSRemovableVolumesUsageDescription</key>
+	<string>Feldervich needs access to removable volumes to browse and manage files.</string>
+	<key>NSSupportsAutomaticTermination</key>
+	<true/>
+	<key>NSSupportsSuddenTermination</key>
+	<true/>
+</dict>
+</plist>

@@ -1,0 +1,55 @@
+{
+  "" : {
+    "const-values" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/Feldervich-master.swiftconstvalues",
+    "dependencies" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/Feldervich-master.d",
+    "diagnostics" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/Feldervich-master.dia",
+    "emit-module-dependencies" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/Feldervich-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/Feldervich-master-emit-module.dia",
+    "swift-dependencies" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/Feldervich-master.swiftdeps"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/ContentView.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/ContentView.o"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/FeldervichApp.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FeldervichApp.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FeldervichApp.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FeldervichApp.o"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Models/DatabaseManager.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/DatabaseManager.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/DatabaseManager.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/DatabaseManager.o"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Models/FileOperations.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileOperations.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileOperations.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileOperations.o"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Models/PinnedFoldersManager.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/PinnedFoldersManager.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/PinnedFoldersManager.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/PinnedFoldersManager.o"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Views/FileListView.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileListView.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileListView.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileListView.o"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Views/FileManagerView.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileManagerView.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileManagerView.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/FileManagerView.o"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/Feldervich/Views/SidebarView.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/SidebarView.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/SidebarView.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/SidebarView.o"
+  },
+  "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/Feldervich/build/Feldervich.build/Release/Feldervich.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}
