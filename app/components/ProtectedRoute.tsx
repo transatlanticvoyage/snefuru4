@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !user && !pathname.startsWith('/login')) {
+    if (!loading && !user && pathname && !pathname.startsWith('/login')) {
       router.push(`/login?redirectedFrom=${encodeURIComponent(pathname)}`);
     }
   }, [user, loading, router, pathname]);
