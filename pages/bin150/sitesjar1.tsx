@@ -15,6 +15,7 @@ const SitesJar1 = () => {
                 <div className="min-h-screen bg-gray-50">
                     <Header />
                     <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                        <h1 className="font-bold text-xl">. people</h1>
                         {/* Additional content will be added here later */}
                     </main>
                 </div>
