@@ -758,7 +758,7 @@ export default function StatusJar1() {
       
       {/* Add top margin when error is showing */}
       <div className={error ? 'mt-12' : ''}>
-        <h1 className="text-2xl font-bold mb-6">Task Status Monitor</h1>
+        <h1 className="text-2xl font-bold mb-6">Task Status Monitor Page</h1>
         
         {/* Tab Navigation */}
         <div className="border-b border-gray-200 mb-6">
