@@ -24,7 +24,7 @@ export default function Login() {
       router.push('/home');
     }
     // Show message from URL if present
-    const message = searchParams.get('message');
+    const message = searchParams ? searchParams.get('message') : null;
     if (message) {
       setMessage(message);
     }
