@@ -1,9 +1,10 @@
 import React from 'react';
+import Header from '@/app/components/Header';
 
 const SitesJar1 = () => {
     return (
         <div>
-            <h1>SitesJar1</h1>
+            <Header />
             {/* Additional content will be added here later */}
         </div>
     );
