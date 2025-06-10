@@ -5,47 +5,31 @@ export async function func_45_addtositespren(prenbaseLines: string[]) {
   const supabase = createClientComponentClient();
   const { user } = useAuth();
 
-  console.log('Starting func_45_addtositespren with prenbaseLines:', prenbaseLines);
-
   if (!user?.id) {
-    console.error('User not authenticated');
     return { success: false, message: 'User not authenticated' };
   }
 
   try {
-    // Get user's DB id from users table
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', user.id)
-      .single();
+    const response = await fetch('/api/bin36b/domjar2/sfunc_45_addtositespren', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prenbaseLines }),
+    });
 
-    if (userError || !userData) {
-      console.error('Error fetching user data:', userError);
-      return { success: false, message: 'Could not find user record.' };
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
-    console.log('User data retrieved:', userData);
-
-    // Insert prenbase entries into sitespren table
-    const { data, error } = await supabase
-      .from('sitespren')
-      .insert(
-        prenbaseLines.map(prenbase => ({
-          prenbase1: prenbase,
-          fk_users_id: userData.id
-        }))
-      );
-
-    if (error) {
-      console.error('Error inserting data into sitespren:', error);
-      return { success: false, message: error.message };
-    }
-
-    console.log('Data inserted successfully:', data);
-    return { success: true, count: data ? (data as any[]).length : 0 };
-  } catch (err) {
-    console.error('Error in func_45_addtositespren:', err);
-    return { success: false, message: err instanceof Error ? err.message : 'Unknown error' };
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error in func_45_addtositespren:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
   }
 } 

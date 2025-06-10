@@ -140,6 +140,7 @@ export default function Domjar2Page() {
 
     setAddingPrenbase(true);
     setAddSuccess(null);
+    setAddError(null);
     
     try {
       if (!user?.id) throw new Error('User not authenticated');
