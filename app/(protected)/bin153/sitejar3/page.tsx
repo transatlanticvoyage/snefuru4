@@ -52,27 +52,19 @@ export default function Sitejar3Page() {
   return (
     <div className="p-6 min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* New Interface Elements */}
         <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Sitejar3 Details</h1>
-              <p className="text-sm text-gray-500 mt-1">
-                {id ? `Viewing details for ID: ${id}` : 'No ID provided'}
-              </p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => window.history.back()}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back
-              </button>
-            </div>
-          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">add new sites</h2>
+          <textarea
+            className="w-[340px] h-[250px] border border-gray-300 rounded-md p-2 mb-4"
+            placeholder="Enter site details here..."
+          />
+          <button
+            className="w-full bg-navy-500 text-white font-bold py-2 px-4 rounded-md"
+            style={{ backgroundColor: '#001f3f' }}
+          >
+            func_47_addsites
+          </button>
         </div>
 
         {/* Main Content Area - Table */}
