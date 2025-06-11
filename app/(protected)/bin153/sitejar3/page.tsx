@@ -77,6 +77,11 @@ export default function Sitejar3Page() {
 
         {/* Main Content Area - Table */}
         <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-6 overflow-x-auto">
+          <style jsx>{`
+            th {
+              text-transform: none;
+            }
+          `}</style>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
