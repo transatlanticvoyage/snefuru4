@@ -1,14 +1,52 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+type SitesprenRow = {
+  id: string;
+  created_at: string;
+  prenbase1: string;
+  prenbase2: string;
+  true_root_domain: string;
+  full_subdomain: string;
+  webproperty_type: string;
+  fk_users_id: string;
+  updated_at: string;
+  wpuser1: string;
+  wppass1: string;
+  wp_plugin_installed1: boolean;
+  wp_plugin_connected2: boolean;
+};
 
 export default function Sitejar3Page() {
   const searchParams = useSearchParams();
   const id = searchParams?.get('id');
+  const [sitesprenData, setSitesprenData] = useState<SitesprenRow[]>([]);
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
     // Set document title
     document.title = 'sitejar3 - Snefuru';
+
+    // Fetch sitespren data for the logged-in user
+    const fetchSitesprenData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('sitespren')
+          .select('*')
+          .eq('fk_users_id', user.id);
+
+        if (error) {
+          console.error('Error fetching sitespren data:', error);
+        } else {
+          setSitesprenData(data);
+        }
+      }
+    };
+
+    fetchSitesprenData();
   }, []);
 
   return (
@@ -37,24 +75,46 @@ export default function Sitejar3Page() {
           </div>
         </div>
 
-        {/* Main Content Area - Currently Blank */}
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-6">
-          <div className="text-center py-12">
-            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Page Content Coming Soon</h3>
-            <p className="text-gray-500">
-              Individual sitejar3 details and functionality will be implemented here.
-            </p>
-            {id && (
-              <p className="text-sm text-gray-400 mt-2 font-mono">
-                ID: {id}
-              </p>
-            )}
-          </div>
+        {/* Main Content Area - Table */}
+        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-6 overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">id</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">created_at</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">prenbase1</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">prenbase2</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">true_root_domain</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">full_subdomain</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">webproperty_type</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">fk_users_id</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">updated_at</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">wpuser1</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">wppass1</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">wp_plugin_installed1</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">wp_plugin_connected2</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {sitesprenData.map((row) => (
+                <tr key={row.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.created_at}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.prenbase1}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.prenbase2}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.true_root_domain}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.full_subdomain}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.webproperty_type}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.fk_users_id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.updated_at}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.wpuser1}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.wppass1}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.wp_plugin_installed1 ? 'Yes' : 'No'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{row.wp_plugin_connected2 ? 'Yes' : 'No'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
