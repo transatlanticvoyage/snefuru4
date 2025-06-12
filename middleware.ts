@@ -9,16 +9,6 @@ export async function middleware(req: NextRequest) {
   // Refresh session if expired - required for Server Components
   const { data: { session } } = await supabase.auth.getSession();
 
-  // If there's no session and the user is trying to access a protected route
-  if (!session && (
-    req.nextUrl.pathname.startsWith('/papikeys')
-  )) {
-    // Create a new URL for the login page
-    const redirectUrl = new URL('/login', req.url);
-    redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname);
-    return NextResponse.redirect(redirectUrl);
-  }
-
   // If there is a session and the user is trying to access login/register pages
   if (session && (
     req.nextUrl.pathname.startsWith('/login') ||
@@ -33,7 +23,6 @@ export async function middleware(req: NextRequest) {
 // Specify which routes this middleware should run on
 export const config = {
   matcher: [
-    '/papikeys/:path*',
     '/login',
     '/signup'
   ],

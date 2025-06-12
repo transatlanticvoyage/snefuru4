@@ -13,11 +13,7 @@ const NAVIGATION_GROUPS = {
     name: 'navgroup5',
     displayName: 'API Keys', // You can customize this display name
     children: [
-      { name: 'fapikeys1', path: '/fbin2/fapikeys1' },
-      { name: 'gapikeys1', path: '/fbin3/gapikeys1' },
-      { name: 'papikeys', path: '/papikeys' },
-      { name: 'papikeys2', path: '/papikeys2' },
-      { name: 'papikeys3', path: '/papikeys3' }
+      { name: 'fapikeys1', path: '/fbin2/fapikeys1' }
     ]
   },
   navgroup6: {
@@ -148,8 +144,8 @@ export async function getNavigation() {
         pagePath = `/${parts.slice(0, -1).join('/')}`; // Full path without page.tsx
       }
     } else if (parts.length === 2) {
-      // Handle root level routes: papikeys/page.tsx
-      pageName = parts[0]; // Get the page name (e.g., 'papikeys')
+      // Handle root level routes: profile/page.tsx
+      pageName = parts[0]; // Get the page name (e.g., 'profile')
       pagePath = `/${parts[0]}`; // Simple root path
     }
     

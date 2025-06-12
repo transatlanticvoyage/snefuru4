@@ -60,7 +60,7 @@ export default function Sitejar3Page() {
             placeholder="Enter site details here..."
           />
           <button
-            className="w-full bg-navy-500 text-white font-bold py-2 px-4 rounded-md"
+            className="w-[340px] bg-navy-500 text-white font-bold py-2 px-4 rounded-md"
             style={{ backgroundColor: '#001f3f' }}
           >
             func_47_addsites
