@@ -49,9 +49,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get API key from tapikeys2 table for this specific user
+    // Get API key from api_keys_t1 table for this specific user
     const { data: apiKeyData, error: apiKeyError } = await supabase
-      .from('tapikeys2')
+      .from('api_keys_t1')
       .select('key_value')
       .eq('fk_users_id', existingUser.id)
       .eq('key_type', 'openai')
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
           debug: {
             error: apiKeyError,
             query: {
-              table: 'tapikeys2',
+              table: 'api_keys_t1',
               filters: {
                 fk_users_id: existingUser.id,
                 key_type: 'openai',
@@ -85,10 +85,10 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'No active OpenAI API key found in tapikeys2 table',
+          error: 'No active OpenAI API key found in api_keys_t1 table',
           debug: {
             query: {
-              table: 'tapikeys2',
+              table: 'api_keys_t1',
               filters: {
                 fk_users_id: existingUser.id,
                 key_type: 'openai',
@@ -107,10 +107,10 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'OpenAI API key is empty in tapikeys2 table',
+          error: 'OpenAI API key is empty in api_keys_t1 table',
           debug: {
             query: {
-              table: 'tapikeys2',
+              table: 'api_keys_t1',
               filters: {
                 fk_users_id: existingUser.id,
                 key_type: 'openai',

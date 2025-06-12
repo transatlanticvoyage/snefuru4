@@ -36,7 +36,7 @@ export default function Panjar1Page() {
     setError(null);
 
     try {
-      // Get user's OpenAI API key from tapikeys2
+      // Get user's OpenAI API key from api_keys_t1
       const { data: userData } = await supabase
         .from('users')
         .select('id')
@@ -48,7 +48,7 @@ export default function Panjar1Page() {
       }
 
       const { data: apiKeyData } = await supabase
-        .from('tapikeys2')
+        .from('api_keys_t1')
         .select('key_value')
         .eq('fk_users_id', userData.id)
         .eq('key_type', 'openai')

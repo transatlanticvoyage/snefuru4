@@ -53,9 +53,9 @@ export async function sfunc_create_image_with_openai({ prompt, userId, batchFold
   });
   
   try {
-    // Get API key from tapikeys2 table for this specific user
+    // Get API key from api_keys_t1 table for this specific user
     const { data: apiKeyData, error: apiKeyError } = await supabase
-      .from('tapikeys2')
+      .from('api_keys_t1')
       .select('key_value')
       .eq('fk_users_id', userId)
       .eq('key_type', 'openai')
@@ -75,7 +75,7 @@ export async function sfunc_create_image_with_openai({ prompt, userId, batchFold
     }
     
     if (!apiKeyData || apiKeyData.length === 0) {
-      const error = 'No active OpenAI API key found in tapikeys2 table';
+      const error = 'No active OpenAI API key found in api_keys_t1 table';
       await logger.error({
         category: 'image_generation',
         message: error,
@@ -86,7 +86,7 @@ export async function sfunc_create_image_with_openai({ prompt, userId, batchFold
     
     const apiKey = apiKeyData[0].key_value;
     if (!apiKey) {
-      const error = 'OpenAI API key is empty in tapikeys2 table';
+      const error = 'OpenAI API key is empty in api_keys_t1 table';
       await logger.error({
         category: 'image_generation',
         message: error,

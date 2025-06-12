@@ -32,7 +32,7 @@ export default function Fapikeys1Page() {
 
         if (existingUser) {
           const { data: activeKey } = await supabase
-            .from('tapikeys2')
+            .from('api_keys_t1')
             .select('key_value, key_name')
             .eq('fk_users_id', existingUser.id)
             .eq('key_type', 'openai')
@@ -104,7 +104,7 @@ export default function Fapikeys1Page() {
 
       // First, deactivate any existing keys of the same type
       const { error: deactivateError } = await supabase
-        .from('tapikeys2')
+        .from('api_keys_t1')
         .update({ is_active: false })
         .eq('fk_users_id', userId)
         .eq('key_type', 'openai');
@@ -116,7 +116,7 @@ export default function Fapikeys1Page() {
 
       // Now insert the new API key
       const { error: insertError } = await supabase
-        .from('tapikeys2')
+        .from('api_keys_t1')
         .insert({
           fk_users_id: userId,
           key_type: 'openai',
