@@ -14,7 +14,7 @@ export default function HaccjarPage() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    document.title = 'Host Accounts Management - Snefuru';
+    document.title = 'haccjar - Snefuru';
   }, []);
 
   useEffect(() => {

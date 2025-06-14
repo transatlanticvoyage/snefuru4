@@ -19,7 +19,7 @@ export default function Sitejar4Page() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    document.title = 'Site Management - Snefuru';
+    document.title = 'sitejar4 - Snefuru';
   }, []);
 
   useEffect(() => {

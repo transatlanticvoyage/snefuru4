@@ -16,7 +16,7 @@ export default function HcomjarPage() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    document.title = 'Host Company Management - Snefuru';
+    document.title = 'hcomjar - Snefuru';
   }, []);
 
   useEffect(() => {

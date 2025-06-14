@@ -34,7 +34,7 @@ export default function SitnividPage() {
   const site = searchParams?.get('site') || null;
 
   useEffect(() => {
-    document.title = 'Edit Site - Snefuru';
+    document.title = 'sitnivid - Snefuru';
   }, []);
 
   useEffect(() => {
