@@ -67,7 +67,12 @@ export default function Sitejar4Page() {
 
   // Function to refetch data after creating new sites
   const refetchSitesprenData = async () => {
-    if (!user?.id || !userInternalId) return;
+    console.log('Refetching data...', { userId: user?.id, userInternalId });
+    
+    if (!user?.id || !userInternalId) {
+      console.log('Missing user data for refetch');
+      return;
+    }
 
     try {
       const { data: sitespren, error } = await supabase
@@ -76,8 +81,13 @@ export default function Sitejar4Page() {
         .eq('fk_users_id', userInternalId)
         .order('created_at', { ascending: false });
 
+      console.log('Refetch result:', { sitespren, error });
+
       if (!error && sitespren) {
+        console.log('Setting new data:', sitespren);
         setSitesprenData(sitespren);
+      } else {
+        console.error('Error in refetch:', error);
       }
     } catch (err) {
       console.error('Error refetching data:', err);

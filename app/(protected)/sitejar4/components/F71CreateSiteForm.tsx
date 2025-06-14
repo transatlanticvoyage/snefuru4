@@ -29,6 +29,7 @@ export default function F71CreateSiteForm({ userInternalId, onSitesCreated }: F7
       const result = await cfunc_f71_createsite(userInternalId, sitesList);
       
       if (result.success) {
+        console.log('Sites created successfully, calling onSitesCreated()');
         setNotification({
           type: 'success',
           message: `Successfully created ${result.data?.sitesCreated} site(s)!`
