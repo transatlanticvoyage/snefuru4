@@ -2,6 +2,16 @@
 
 import { useState, useMemo } from 'react';
 
+interface HostCompany {
+  id: string;
+  name: string | null;
+  portal_url1: string | null;
+  fk_user_id: string;
+  notes1: string | null;
+  notes2: string | null;
+  notes3: string | null;
+}
+
 interface HostAccountRecord {
   id: string; // UUID
   username: string | null;
@@ -9,6 +19,7 @@ interface HostAccountRecord {
   hostacct_apikey1: string | null;
   fk_user_id: string;
   fk_host_company_id: string | null;
+  host_company: HostCompany | null;
 }
 
 interface HostAccountsUITableV2Props {
@@ -35,7 +46,12 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
       const matchesSearch = !searchTerm || 
         item.username?.toLowerCase().includes(searchLower) ||
         item.id?.toLowerCase().includes(searchLower) ||
-        item.fk_host_company_id?.toLowerCase().includes(searchLower);
+        item.fk_host_company_id?.toLowerCase().includes(searchLower) ||
+        item.host_company?.name?.toLowerCase().includes(searchLower) ||
+        item.host_company?.portal_url1?.toLowerCase().includes(searchLower) ||
+        item.host_company?.notes1?.toLowerCase().includes(searchLower) ||
+        item.host_company?.notes2?.toLowerCase().includes(searchLower) ||
+        item.host_company?.notes3?.toLowerCase().includes(searchLower);
 
       return matchesSearch;
     });
@@ -131,38 +147,97 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
+                {/* Host Company columns on the left */}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  company.id
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  company.name
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  company.portal_url1
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  company.fk_user_id
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  company.notes1
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  company.notes2
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  company.notes3
+                </th>
+                {/* Separator column */}
+                <th className="px-2 bg-gray-200"></th>
+                {/* Host Account columns on the right */}
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('id')}
                 >
-                  id {sortField === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  account.id {sortField === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('username')}
                 >
-                  username {sortField === 'username' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  account.username {sortField === 'username' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  pass
+                  account.pass
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  hostacct_apikey1
+                  account.hostacct_apikey1
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  fk_user_id
+                  account.fk_user_id
                 </th>
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('fk_host_company_id')}
                 >
-                  fk_host_company_id {sortField === 'fk_host_company_id' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  account.fk_host_company_id {sortField === 'fk_host_company_id' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
+                  {/* Host Company columns */}
+                  <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
+                    {item.host_company ? truncateText(item.host_company.id, 8) + '...' : '-'}
+                  </td>
+                  <td className="px-4 py-2 text-gray-900 font-medium">
+                    {item.host_company?.name || '-'}
+                  </td>
+                  <td className="px-4 py-2 text-blue-600 hover:text-blue-800">
+                    {item.host_company?.portal_url1 ? (
+                      <a 
+                        href={item.host_company.portal_url1} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        {truncateText(item.host_company.portal_url1, 30)}
+                      </a>
+                    ) : '-'}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
+                    {item.host_company ? truncateText(item.host_company.fk_user_id, 8) + '...' : '-'}
+                  </td>
+                  <td className="px-4 py-2 text-gray-600">
+                    {truncateText(item.host_company?.notes1, 20)}
+                  </td>
+                  <td className="px-4 py-2 text-gray-600">
+                    {truncateText(item.host_company?.notes2, 20)}
+                  </td>
+                  <td className="px-4 py-2 text-gray-600">
+                    {truncateText(item.host_company?.notes3, 20)}
+                  </td>
+                  {/* Separator column */}
+                  <td className="px-2 bg-gray-200"></td>
+                  {/* Host Account columns */}
                   <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
                     {truncateText(item.id, 8)}...
                   </td>
@@ -185,7 +260,7 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
               ))}
               {paginatedData.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={15} className="px-4 py-8 text-center text-gray-500">
                     No host accounts found
                   </td>
                 </tr>

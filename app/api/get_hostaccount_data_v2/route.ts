@@ -20,23 +20,34 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('Fetching host account for user ID (V2):', userInternalId);
+    console.log('Fetching host account with company join for user ID (V2):', userInternalId);
 
-    // Fetch all host account records for this user
+    // Fetch all host account records with joined host_company data
     const { data: hostAccounts, error } = await supabase
       .from('host_account')
-      .select('*')
+      .select(`
+        *,
+        host_company:fk_host_company_id (
+          id,
+          name,
+          portal_url1,
+          fk_user_id,
+          notes1,
+          notes2,
+          notes3
+        )
+      `)
       .eq('fk_user_id', userInternalId);
 
     if (error) {
-      console.error('Error fetching host account (V2):', error);
+      console.error('Error fetching host account with join (V2):', error);
       return NextResponse.json(
-        { success: false, error: 'Failed to fetch host account' },
+        { success: false, error: 'Failed to fetch host account data' },
         { status: 500 }
       );
     }
 
-    console.log(`Found ${hostAccounts?.length || 0} host account records for user (V2)`);
+    console.log(`Found ${hostAccounts?.length || 0} host account records with company data for user (V2)`);
 
     return NextResponse.json({
       success: true,
