@@ -43,24 +43,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Prepare records for insertion
+    // Prepare records for insertion - only include required fields
     const sitesToInsert = validUrls.map(url => {
-      const domainParts = extractDomainParts(url);
-      
       return {
         sitespren_base: url,
         fk_users_id: user_internal_id,
-        true_root_domain: domainParts.true_root_domain || null,
-        full_subdomain: domainParts.full_subdomain || null,
-        webproperty_type: domainParts.webproperty_type || null,
-        wpuser1: null,
-        wppass1: null,
-        wp_plugin_installed1: null,
-        wp_plugin_connected2: null,
-        fk_domreg_hostaccount: null,
-        is_wp_site: null
+        // Only include fields that are in the initial insert
+        // Other fields can be updated later
       };
     });
+
+    console.log('Attempting to insert sites:', sitesToInsert);
 
     // Insert sites in batch
     const { data: insertedSites, error: insertError } = await supabase
@@ -70,6 +63,12 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Error inserting sites:', insertError);
+      console.error('Error details:', {
+        message: insertError.message,
+        code: insertError.code,
+        details: insertError.details,
+        hint: insertError.hint
+      });
       
       // Check if it's a duplicate key error
       if (insertError.message?.includes('duplicate')) {
@@ -84,7 +83,11 @@ export async function POST(request: NextRequest) {
       }
       
       return NextResponse.json(
-        { success: false, error: 'Failed to create sites' },
+        { 
+          success: false, 
+          error: 'Failed to create sites',
+          details: insertError.message || 'Unknown database error'
+        },
         { status: 500 }
       );
     }

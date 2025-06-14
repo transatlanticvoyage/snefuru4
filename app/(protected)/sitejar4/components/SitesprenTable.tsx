@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 
 interface SitesprenRecord {
-  id: number;
+  id: string; // Changed from number to string for UUID
   created_at: string;
   sitespren_base: string | null;
   true_root_domain: string | null;
@@ -234,8 +234,8 @@ export default function SitesprenTable({ data }: SitesprenTableProps) {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-900">
-                    {item.id}
+                  <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
+                    {truncateText(item.id, 8)}...
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-gray-500">
                     {formatDate(item.created_at)}
