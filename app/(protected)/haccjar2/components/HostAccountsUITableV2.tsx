@@ -231,13 +231,13 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                     {item.host_company ? truncateText(item.host_company.fk_user_id, 8) + '...' : '-'}
                   </td>
                   <td className="px-4 py-2 text-gray-600">
-                    {truncateText(item.host_company?.notes1, 20)}
+                    {truncateText(item.host_company?.notes1 || null, 20)}
                   </td>
                   <td className="px-4 py-2 text-gray-600">
-                    {truncateText(item.host_company?.notes2, 20)}
+                    {truncateText(item.host_company?.notes2 || null, 20)}
                   </td>
                   <td className="px-4 py-2 text-gray-600">
-                    {truncateText(item.host_company?.notes3, 20)}
+                    {truncateText(item.host_company?.notes3 || null, 20)}
                   </td>
                   {/* Separator column */}
                   <td className="px-2 bg-gray-200"></td>
