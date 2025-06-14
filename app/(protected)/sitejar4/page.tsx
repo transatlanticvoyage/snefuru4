@@ -12,6 +12,9 @@ export default function Sitejar4Page() {
   const [error, setError] = useState<string | null>(null);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
   const [debugExpanded, setDebugExpanded] = useState(false);
+  const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteNotification, setDeleteNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
 
@@ -94,6 +97,78 @@ export default function Sitejar4Page() {
     }
   };
 
+  // Handle selection change from table
+  const handleSelectionChange = (selectedIds: string[]) => {
+    setSelectedSiteIds(selectedIds);
+  };
+
+  // f18_deletesites function
+  const f18_deletesites = async () => {
+    if (selectedSiteIds.length === 0) {
+      setDeleteNotification({
+        type: 'error',
+        message: 'Please select at least one site to delete'
+      });
+      return;
+    }
+
+    if (!userInternalId) {
+      setDeleteNotification({
+        type: 'error',
+        message: 'User verification failed'
+      });
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${selectedSiteIds.length} selected site(s)? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setIsDeleting(true);
+    setDeleteNotification(null);
+
+    try {
+      const response = await fetch('/api/f18_deletesites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_ids: selectedSiteIds,
+          user_internal_id: userInternalId
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setDeleteNotification({
+          type: 'success',
+          message: `Successfully deleted ${result.data?.deletedCount || 0} site(s)`
+        });
+        setSelectedSiteIds([]); // Clear selection
+        await refetchSitesprenData(); // Refresh the table
+      } else {
+        setDeleteNotification({
+          type: 'error',
+          message: result.error || 'Failed to delete sites'
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting sites:', error);
+      setDeleteNotification({
+        type: 'error',
+        message: 'An error occurred while deleting sites'
+      });
+    } finally {
+      setIsDeleting(false);
+      // Clear notification after 5 seconds
+      setTimeout(() => setDeleteNotification(null), 5000);
+    }
+  };
+
   if (!user) {
     return (
       <div className="container mx-auto p-4">
@@ -133,11 +208,45 @@ export default function Sitejar4Page() {
         </p>
       </div>
 
+      {/* Delete notification */}
+      {deleteNotification && (
+        <div className={`mb-4 p-4 rounded-md ${
+          deleteNotification.type === 'success' 
+            ? 'bg-green-100 border border-green-400 text-green-700' 
+            : 'bg-red-100 border border-red-400 text-red-700'
+        }`}>
+          {deleteNotification.message}
+        </div>
+      )}
+
       {/* F71 Create Site Form */}
       <F71CreateSiteForm 
         userInternalId={userInternalId!}
         onSitesCreated={refetchSitesprenData}
       />
+
+      {/* Bulk Actions */}
+      {selectedSiteIds.length > 0 && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-medium text-red-800">
+                {selectedSiteIds.length} site(s) selected
+              </h3>
+              <p className="text-sm text-red-600">
+                Choose an action to perform on the selected sites.
+              </p>
+            </div>
+            <button
+              onClick={f18_deletesites}
+              disabled={isDeleting}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium rounded-md transition-colors"
+            >
+              {isDeleting ? 'Deleting...' : 'f18_deletesites'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Debug Info */}
       <div className="mb-4 bg-yellow-100 border border-yellow-400 rounded overflow-hidden">
@@ -171,6 +280,7 @@ export default function Sitejar4Page() {
       <SitesprenTable 
         data={sitesprenData} 
         userId={user.id}
+        onSelectionChange={handleSelectionChange}
       />
     </div>
   );

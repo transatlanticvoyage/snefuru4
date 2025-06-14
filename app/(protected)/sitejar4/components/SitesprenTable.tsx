@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 
 interface SitesprenRecord {
   id: string; // Changed from number to string for UUID
@@ -22,18 +23,20 @@ interface SitesprenRecord {
 interface SitesprenTableProps {
   data: SitesprenRecord[];
   userId: string;
+  onSelectionChange?: (selectedIds: string[]) => void;
 }
 
 type SortField = keyof SitesprenRecord;
 type SortOrder = 'asc' | 'desc';
 
-export default function SitesprenTable({ data }: SitesprenTableProps) {
+export default function SitesprenTable({ data, onSelectionChange }: SitesprenTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [filterWpSite, setFilterWpSite] = useState<string>('');
+  const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -105,6 +108,31 @@ export default function SitesprenTable({ data }: SitesprenTableProps) {
     }
   };
 
+  // Handle selection
+  const handleSiteSelection = (siteId: string, checked: boolean) => {
+    const newSelected = new Set(selectedSites);
+    if (checked) {
+      newSelected.add(siteId);
+    } else {
+      newSelected.delete(siteId);
+    }
+    setSelectedSites(newSelected);
+    onSelectionChange?.(Array.from(newSelected));
+  };
+
+  const handleSelectAll = () => {
+    const allPageIds = new Set(paginatedData.map(item => item.id));
+    setSelectedSites(allPageIds);
+    onSelectionChange?.(Array.from(allPageIds));
+  };
+
+  const handleClearAll = () => {
+    setSelectedSites(new Set());
+    onSelectionChange?.([]);
+  };
+
+  const isAllSelected = paginatedData.length > 0 && paginatedData.every(item => selectedSites.has(item.id));
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleString('en-US', {
@@ -161,9 +189,32 @@ export default function SitesprenTable({ data }: SitesprenTableProps) {
         </div>
       </div>
 
-      {/* Results count */}
-      <div className="text-sm text-gray-600">
-        Showing {paginatedData.length} of {sortedData.length} results
+      {/* Selection controls and results count */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-600">
+            Showing {paginatedData.length} of {sortedData.length} results
+          </div>
+          {selectedSites.size > 0 && (
+            <div className="text-sm text-blue-600 font-medium">
+              {selectedSites.size} site(s) selected
+            </div>
+          )}
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleSelectAll}
+            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
+          >
+            Select All on Page
+          </button>
+          <button
+            onClick={handleClearAll}
+            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
+          >
+            Clear Selection
+          </button>
+        </div>
       </div>
 
       {/* Table */}
@@ -172,6 +223,17 @@ export default function SitesprenTable({ data }: SitesprenTableProps) {
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <input
+                    type="checkbox"
+                    checked={isAllSelected}
+                    onChange={isAllSelected ? handleClearAll : handleSelectAll}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tool Buttons
+                </th>
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('id')}
@@ -234,6 +296,22 @@ export default function SitesprenTable({ data }: SitesprenTableProps) {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedSites.has(item.id)}
+                      onChange={(e) => handleSiteSelection(item.id, e.target.checked)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    <Link
+                      href={`/sitnivid?site=${encodeURIComponent(item.sitespren_base || '')}`}
+                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Individual View
+                    </Link>
+                  </td>
                   <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
                     {truncateText(item.id, 8)}...
                   </td>
