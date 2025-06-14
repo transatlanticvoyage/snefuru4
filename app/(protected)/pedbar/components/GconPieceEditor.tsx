@@ -11,8 +11,8 @@ interface GconPiece {
   pgb_h1title: string | null;
   corpus1: string | null;
   corpus2: string | null;
-  asn_sitespren: string | null;
-  asn_page_intended: string | null;
+  asn_sitespren_base: string | null;
+  asn_nwpi_posts_id: string | null;
   image_pack1: any;
   created_at: string;
   updated_at: string;
@@ -31,8 +31,8 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
     pgb_h1title: gconPiece.pgb_h1title || '',
     corpus1: gconPiece.corpus1 || '',
     corpus2: gconPiece.corpus2 || '',
-    asn_sitespren: gconPiece.asn_sitespren || '',
-    asn_page_intended: gconPiece.asn_page_intended || '',
+    asn_sitespren_base: gconPiece.asn_sitespren_base || '',
+    asn_nwpi_posts_id: gconPiece.asn_nwpi_posts_id || '',
     image_pack1: gconPiece.image_pack1 ? JSON.stringify(gconPiece.image_pack1, null, 2) : ''
   });
   
@@ -89,8 +89,8 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         pgb_h1title: formData.pgb_h1title || null,
         corpus1: formData.corpus1 || null,
         corpus2: formData.corpus2 || null,
-        asn_sitespren: formData.asn_sitespren || null,
-        asn_page_intended: formData.asn_page_intended || null,
+        asn_sitespren_base: formData.asn_sitespren_base || null,
+        asn_nwpi_posts_id: formData.asn_nwpi_posts_id || null,
         image_pack1: parsedImagePack1,
         updated_at: new Date().toISOString()
       };
@@ -139,8 +139,8 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
       pgb_h1title: gconPiece.pgb_h1title || '',
       corpus1: gconPiece.corpus1 || '',
       corpus2: gconPiece.corpus2 || '',
-      asn_sitespren: gconPiece.asn_sitespren || '',
-      asn_page_intended: gconPiece.asn_page_intended || '',
+      asn_sitespren_base: gconPiece.asn_sitespren_base || '',
+      asn_nwpi_posts_id: gconPiece.asn_nwpi_posts_id || '',
       image_pack1: gconPiece.image_pack1 ? JSON.stringify(gconPiece.image_pack1, null, 2) : ''
     });
     setHasUnsavedChanges(false);
@@ -187,27 +187,27 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         {/* Site Assignment */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="asn_sitespren" className="block text-sm font-medium text-gray-700 mb-2">
-              Site Assignment (asn_sitespren)
+            <label htmlFor="asn_sitespren_base" className="block text-sm font-medium text-gray-700 mb-2">
+              Site Assignment (asn_sitespren_base)
             </label>
             <input
               type="text"
-              id="asn_sitespren"
-              value={formData.asn_sitespren}
-              onChange={(e) => handleInputChange('asn_sitespren', e.target.value)}
+              id="asn_sitespren_base"
+              value={formData.asn_sitespren_base}
+              onChange={(e) => handleInputChange('asn_sitespren_base', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="e.g., rnr1.ksit.me"
             />
           </div>
           <div>
-            <label htmlFor="asn_page_intended" className="block text-sm font-medium text-gray-700 mb-2">
-              Page Assignment (asn_page_intended)
+            <label htmlFor="asn_nwpi_posts_id" className="block text-sm font-medium text-gray-700 mb-2">
+              Page Assignment (asn_nwpi_posts_id)
             </label>
             <input
               type="text"
-              id="asn_page_intended"
-              value={formData.asn_page_intended}
-              onChange={(e) => handleInputChange('asn_page_intended', e.target.value)}
+              id="asn_nwpi_posts_id"
+              value={formData.asn_nwpi_posts_id}
+              onChange={(e) => handleInputChange('asn_nwpi_posts_id', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="e.g., example.com->postid562"
             />

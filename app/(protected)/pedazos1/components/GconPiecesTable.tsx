@@ -11,8 +11,8 @@ interface GconPiece {
   pgb_h1title: string | null;
   corpus1: string | null;
   corpus2: string | null;
-  asn_sitespren: string | null;
-  asn_page_intended: string | null;
+  asn_sitespren_base: string | null;
+  asn_nwpi_posts_id: string | null;
   image_pack1: any;
   created_at: string;
   updated_at: string;
@@ -23,7 +23,7 @@ interface GconPiecesTableProps {
   userId: string;
 }
 
-type SortField = "meta_title" | "asn_sitespren" | "created_at" | "updated_at";
+type SortField = "meta_title" | "asn_sitespren_base" | "created_at" | "updated_at";
 type SortOrder = "asc" | "desc";
 
 export default function GconPiecesTable({ initialData, userId }: GconPiecesTableProps) {
@@ -39,14 +39,14 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   // Get unique sites and pages for filter dropdowns
   const uniqueSites = useMemo(() => {
     const sites = data
-      .map(item => item.asn_sitespren)
+      .map(item => item.asn_sitespren_base)
       .filter(Boolean) as string[];
     return [...new Set(sites)].sort();
   }, [data]);
 
   const uniquePages = useMemo(() => {
     const pages = data
-      .map(item => item.asn_page_intended)
+      .map(item => item.asn_nwpi_posts_id)
       .filter(Boolean) as string[];
     return [...new Set(pages)].sort();
   }, [data]);
@@ -64,10 +64,10 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
         item.corpus2?.toLowerCase().includes(searchLower);
 
       // Site filter
-      const matchesSite = !filterSite || item.asn_sitespren === filterSite;
+      const matchesSite = !filterSite || item.asn_sitespren_base === filterSite;
 
       // Page filter
-      const matchesPage = !filterPage || item.asn_page_intended === filterPage;
+      const matchesPage = !filterPage || item.asn_nwpi_posts_id === filterPage;
 
       return matchesSearch && matchesSite && matchesPage;
     });
@@ -213,9 +213,9 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                 </th>
                 <th 
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("asn_sitespren")}
+                  onClick={() => handleSort("asn_sitespren_base")}
                 >
-                  Site {sortField === "asn_sitespren" && (sortOrder === "asc" ? "↑" : "↓")}
+                  Site {sortField === "asn_sitespren_base" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Page
@@ -252,10 +252,10 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                     {truncateText(item.h1title, 60)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {item.asn_sitespren || "-"}
+                    {item.asn_sitespren_base || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {truncateText(item.asn_page_intended, 30)}
+                    {truncateText(item.asn_nwpi_posts_id, 30)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(item.created_at)}

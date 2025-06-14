@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
         pgb_h1title: null,
         corpus1: null,
         corpus2: null,
-        asn_sitespren: null,
-        asn_page_intended: null,
+        asn_sitespren_base: null,
+        asn_nwpi_posts_id: null,
         image_pack1: null
       })
       .select()

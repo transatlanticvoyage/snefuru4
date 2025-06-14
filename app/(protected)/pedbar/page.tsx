@@ -15,8 +15,8 @@ interface GconPiece {
   pgb_h1title: string | null;
   corpus1: string | null;
   corpus2: string | null;
-  asn_sitespren: string | null;
-  asn_page_intended: string | null;
+  asn_sitespren_base: string | null;
+  asn_nwpi_posts_id: string | null;
   image_pack1: any;
   created_at: string;
   updated_at: string;
