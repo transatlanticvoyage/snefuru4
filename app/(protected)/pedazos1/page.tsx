@@ -4,11 +4,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import GconPiecesTable from "./components/GconPiecesTable";
+import { cfunc_215_createpiece } from "./utils/cfunc_215_createpiece";
 
 export default function Pedazos1Page() {
   const [gconPieces, setGconPieces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
 
@@ -61,6 +64,69 @@ export default function Pedazos1Page() {
     fetchGconPieces();
   }, [user?.id, supabase]);
 
+  // Function to refetch data after creating new piece
+  const refetchGconPieces = async () => {
+    if (!user?.id) return;
+
+    try {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userData) {
+        const { data: gconPieces, error } = await supabase
+          .from("gcon_pieces")
+          .select("*")
+          .eq("fk_users_id", userData.id)
+          .order("created_at", { ascending: false });
+
+        if (!error && gconPieces) {
+          setGconPieces(gconPieces);
+        }
+      }
+    } catch (err) {
+      console.error("Error refetching data:", err);
+    }
+  };
+
+  // Handle create new piece
+  const handleCreateNewPiece = async () => {
+    if (!user?.id) return;
+
+    setIsCreating(true);
+    setNotification(null);
+
+    try {
+      const result = await cfunc_215_createpiece(user.id);
+      
+      if (result.success) {
+        setNotification({
+          type: 'success',
+          message: 'New content piece created successfully!'
+        });
+        // Refetch data to update the table
+        await refetchGconPieces();
+      } else {
+        setNotification({
+          type: 'error',
+          message: result.error || 'Failed to create content piece'
+        });
+      }
+    } catch (error) {
+      console.error('Error creating piece:', error);
+      setNotification({
+        type: 'error',
+        message: 'An error occurred while creating the content piece'
+      });
+    } finally {
+      setIsCreating(false);
+      // Clear notification after 5 seconds
+      setTimeout(() => setNotification(null), 5000);
+    }
+  };
+
   if (!user) {
     return (
       <div className="container mx-auto p-4">
@@ -93,11 +159,31 @@ export default function Pedazos1Page() {
 
   return (
     <div className="container mx-auto p-4">
+      {/* Notification */}
+      {notification && (
+        <div className={`mb-4 p-4 rounded-md ${
+          notification.type === 'success' 
+            ? 'bg-green-100 border border-green-400 text-green-700' 
+            : 'bg-red-100 border border-red-400 text-red-700'
+        }`}>
+          {notification.message}
+        </div>
+      )}
+
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Content Pieces</h1>
-        <p className="text-gray-600">
-          Manage your article content for future publishing
-        </p>
+        <div className="flex justify-between items-center">
+          <p className="text-gray-600">
+            Manage your article content for future publishing
+          </p>
+          <button
+            onClick={handleCreateNewPiece}
+            disabled={isCreating}
+            className="px-4 py-2 bg-green-800 hover:bg-green-900 disabled:bg-green-600 text-white font-bold rounded-md transition-colors"
+          >
+            {isCreating ? 'Creating...' : 'func_215_createpiece'}
+          </button>
+        </div>
       </div>
 
       <GconPiecesTable 
