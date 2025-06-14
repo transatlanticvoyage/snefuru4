@@ -42,16 +42,21 @@ export default function Sitejar4Page() {
         setUserInternalId(userData.id);
 
         // Fetch user's sitespren data
+        console.log('Fetching sitespren data for user ID:', userData.id);
+        
         const { data: sitespren, error } = await supabase
           .from('sitespren')
           .select('*')
           .eq('fk_users_id', userData.id)
           .order('created_at', { ascending: false });
 
+        console.log('Fetch result:', { sitespren, error, count: sitespren?.length });
+
         if (error) {
           console.error('Error fetching sitespren:', error);
           setError('Error fetching sites data');
         } else {
+          console.log('Setting sitespren data:', sitespren);
           setSitesprenData(sitespren || []);
         }
       } catch (err) {
