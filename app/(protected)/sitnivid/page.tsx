@@ -23,11 +23,20 @@ interface SitesprenRecord {
   is_wp_site: boolean | null;
 }
 
+interface HostAccountOption {
+  id: string;
+  username: string | null;
+  host_company: {
+    name: string | null;
+  } | null;
+}
+
 export default function SitnividPage() {
   const [sitesprenRecord, setSitesprenRecord] = useState<SitesprenRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
+  const [hostAccountOptions, setHostAccountOptions] = useState<HostAccountOption[]>([]);
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -59,6 +68,14 @@ export default function SitnividPage() {
         }
 
         setUserInternalId(userResult.data.internal_id);
+
+        // Fetch host account options for dropdown
+        const hostAccountResponse = await fetch(`/api/get_hostaccount_data_v2?user_internal_id=${userResult.data.internal_id}`);
+        const hostAccountResult = await hostAccountResponse.json();
+        
+        if (hostAccountResult.success) {
+          setHostAccountOptions(hostAccountResult.data || []);
+        }
 
         // Fetch the specific sitespren record for this user and site
         const response = await fetch(`/api/get_sitespren_record?site=${encodeURIComponent(site)}&user_internal_id=${userResult.data.internal_id}`);
@@ -175,6 +192,7 @@ export default function SitnividPage() {
       <SitesprenEditor 
         sitesprenRecord={sitesprenRecord}
         userInternalId={userInternalId!}
+        hostAccountOptions={hostAccountOptions}
         onUpdate={(updatedRecord) => setSitesprenRecord(updatedRecord)}
       />
     </div>

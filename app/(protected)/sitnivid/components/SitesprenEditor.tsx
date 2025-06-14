@@ -19,13 +19,22 @@ interface SitesprenRecord {
   is_wp_site: boolean | null;
 }
 
+interface HostAccountOption {
+  id: string;
+  username: string | null;
+  host_company: {
+    name: string | null;
+  } | null;
+}
+
 interface SitesprenEditorProps {
   sitesprenRecord: SitesprenRecord;
   userInternalId: string;
+  hostAccountOptions: HostAccountOption[];
   onUpdate: (updatedRecord: SitesprenRecord) => void;
 }
 
-export default function SitesprenEditor({ sitesprenRecord, userInternalId, onUpdate }: SitesprenEditorProps) {
+export default function SitesprenEditor({ sitesprenRecord, userInternalId, hostAccountOptions, onUpdate }: SitesprenEditorProps) {
   const [formData, setFormData] = useState({
     sitespren_base: sitesprenRecord.sitespren_base || '',
     true_root_domain: sitesprenRecord.true_root_domain || '',
@@ -304,14 +313,19 @@ export default function SitesprenEditor({ sitesprenRecord, userInternalId, onUpd
             <label htmlFor="fk_domreg_hostaccount" className="block text-sm font-medium text-gray-700 mb-2">
               Domain Registration/Host Account ID
             </label>
-            <input
-              type="text"
+            <select
               id="fk_domreg_hostaccount"
               value={formData.fk_domreg_hostaccount}
               onChange={(e) => handleInputChange('fk_domreg_hostaccount', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Host account UUID"
-            />
+            >
+              <option value="">Select host account...</option>
+              {hostAccountOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.host_company?.name || 'Unknown Company'} - {option.username || 'No Username'}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex items-center">
             <input
