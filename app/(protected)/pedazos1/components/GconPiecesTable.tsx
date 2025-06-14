@@ -76,8 +76,8 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   // Sort logic
   const sortedData = useMemo(() => {
     const sorted = [...filteredData].sort((a, b) => {
-      let aVal = a[sortField] || "";
-      let bVal = b[sortField] || "";
+      let aVal: string | number = a[sortField] || "";
+      let bVal: string | number = b[sortField] || "";
 
       if (sortField === "created_at" || sortField === "updated_at") {
         aVal = new Date(aVal).getTime();
