@@ -166,6 +166,49 @@ export async function getNavigation() {
     });
   });
 
+  // Group remaining items by their first letter
+  const alphabeticalGroups: { [key: string]: NavItem[] } = {};
+  const finalNavItems: NavItem[] = [];
+  
+  // Separate navigation groups from regular items
+  const navigationGroups: NavItem[] = [];
+  const regularItems: NavItem[] = [];
+  
+  navItems.forEach(item => {
+    if (item.children && item.children.length > 0) {
+      navigationGroups.push(item);
+    } else {
+      regularItems.push(item);
+    }
+  });
+
+  // Group regular items by first letter
+  regularItems.forEach(item => {
+    const firstLetter = item.name.charAt(0).toLowerCase();
+    if (!alphabeticalGroups[firstLetter]) {
+      alphabeticalGroups[firstLetter] = [];
+    }
+    alphabeticalGroups[firstLetter].push(item);
+  });
+
+  // Create parent items for each letter that has items
+  Object.keys(alphabeticalGroups).sort().forEach(letter => {
+    const items = alphabeticalGroups[letter];
+    if (items.length === 1) {
+      // If only one item, add it directly without grouping
+      finalNavItems.push(items[0]);
+    } else {
+      // Create a parent group for this letter
+      finalNavItems.push({
+        name: letter.toUpperCase(),
+        children: items.sort((a, b) => a.name.localeCompare(b.name))
+      });
+    }
+  });
+
+  // Add existing navigation groups
+  finalNavItems.push(...navigationGroups);
+
   // Sort alphabetically by name (parent items will be mixed with regular items)
-  return navItems.sort((a, b) => a.name.localeCompare(b.name));
+  return finalNavItems.sort((a, b) => a.name.localeCompare(b.name));
 } 
