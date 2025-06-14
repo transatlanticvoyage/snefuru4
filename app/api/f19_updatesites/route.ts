@@ -168,7 +168,16 @@ export async function POST(request: NextRequest) {
     console.log(`Bulk update completed: ${createdCount} created, ${updatedCount} updated, ${errors.length} errors`);
 
     // Return results
-    const response = {
+    const response: {
+      success: boolean;
+      data: {
+        created: number;
+        updated: number;
+        errors: number;
+        errorDetails?: string[];
+      };
+      message: string;
+    } = {
       success: true,
       data: {
         created: createdCount,
