@@ -82,21 +82,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Test with just the first URL for now
-    const testUrl = validUrls[0];
+    // Limit to 300 URLs maximum
+    const urlsToProcess = validUrls.slice(0, 300);
     
-    // Prepare one record for insertion
-    const siteToInsert = {
-      sitespren_base: testUrl,
+    if (urlsToProcess.length !== validUrls.length) {
+      console.log(`Limited to 300 URLs, processing ${urlsToProcess.length} out of ${validUrls.length}`);
+    }
+    
+    // Prepare records for insertion
+    const sitesToInsert = urlsToProcess.map(url => ({
+      sitespren_base: url,
       fk_users_id: user_internal_id
-    };
+    }));
 
-    console.log('Attempting to insert single site:', siteToInsert);
+    console.log(`Attempting to insert ${sitesToInsert.length} sites:`, sitesToInsert);
 
-    // Insert single site first
+    // Insert all sites
     const { data: insertedSites, error: insertError } = await supabase
       .from('sitespren')
-      .insert([siteToInsert])
+      .insert(sitesToInsert)
       .select();
 
     if (insertError) {
@@ -131,14 +135,25 @@ export async function POST(request: NextRequest) {
     }
 
     const sitesCreated = insertedSites?.length || 0;
+    const invalidCount = cleanedUrls.length - validUrls.length;
+    const limitedCount = validUrls.length - urlsToProcess.length;
+
+    let message = `Successfully created ${sitesCreated} site(s)`;
+    if (limitedCount > 0) {
+      message += ` (${limitedCount} sites were skipped due to 300 limit)`;
+    }
+    if (invalidCount > 0) {
+      message += ` (${invalidCount} invalid URLs were skipped)`;
+    }
 
     return NextResponse.json({
       success: true,
       data: {
         sitesCreated,
-        sitesRequested: 1, // Testing with one site for now
-        invalidUrls: 0,
-        message: `Successfully created ${sitesCreated} site(s)`
+        sitesRequested: cleanedUrls.length,
+        invalidUrls: invalidCount,
+        limitedUrls: limitedCount,
+        message
       }
     });
 
