@@ -54,7 +54,16 @@ export async function POST(request: NextRequest) {
           name
         )
       `)
-      .eq('fk_user_id', user_internal_id);
+      .eq('fk_user_id', user_internal_id) as {
+        data: Array<{
+          id: string;
+          username: string | null;
+          host_company: {
+            name: string | null;
+          } | null;
+        }> | null;
+        error: any;
+      };
 
     if (hostAccountsError) {
       console.error('Error fetching host accounts:', hostAccountsError);
