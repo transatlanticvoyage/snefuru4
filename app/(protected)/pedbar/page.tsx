@@ -31,7 +31,7 @@ export default function PedbarPage() {
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const id = searchParams.get('id');
+  const id = searchParams?.get('id') || null;
 
   useEffect(() => {
     document.title = 'Edit Content Piece - Snefuru';
