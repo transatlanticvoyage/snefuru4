@@ -11,6 +11,7 @@ export default function Sitejar4Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
+  const [debugExpanded, setDebugExpanded] = useState(false);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
 
@@ -139,12 +140,31 @@ export default function Sitejar4Page() {
       />
 
       {/* Debug Info */}
-      <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded">
-        <h3 className="font-bold">Debug Info:</h3>
-        <p>User ID: {user.id}</p>
-        <p>Internal User ID: {userInternalId}</p>
-        <p>Data Count: {sitesprenData.length}</p>
-        <p>Data: {JSON.stringify(sitesprenData, null, 2)}</p>
+      <div className="mb-4 bg-yellow-100 border border-yellow-400 rounded overflow-hidden">
+        <div 
+          className="flex items-center justify-between p-2 cursor-pointer hover:bg-yellow-200"
+          onClick={() => setDebugExpanded(!debugExpanded)}
+        >
+          <h3 className="font-bold text-sm">Debug Info (Count: {sitesprenData.length})</h3>
+          <button className="text-yellow-800 hover:text-yellow-900">
+            {debugExpanded ? '−' : '+'}
+          </button>
+        </div>
+        {debugExpanded && (
+          <div className="p-4 pt-0 border-t border-yellow-300">
+            <div className="space-y-1 text-sm">
+              <p><strong>User ID:</strong> {user.id}</p>
+              <p><strong>Internal User ID:</strong> {userInternalId}</p>
+              <p><strong>Data Count:</strong> {sitesprenData.length}</p>
+              <div>
+                <strong>Data:</strong>
+                <pre className="mt-1 text-xs bg-yellow-50 p-2 rounded border overflow-x-auto">
+                  {JSON.stringify(sitesprenData, null, 2)}
+                </pre>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sitespren Table */}
