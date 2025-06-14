@@ -169,12 +169,43 @@ export default function PedbarPage() {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold">Edit Content Piece</h1>
-          <Link 
-            href="/pedazos1"
-            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-          >
-            ← Back to List
-          </Link>
+          
+          <div className="flex items-center gap-4">
+            {/* Horizontal button bar */}
+            <div className="flex border border-gray-300 rounded-md overflow-hidden h-[30px]">
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline border-r border-gray-300"
+              >
+                FRONTEND
+              </a>
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline border-r border-gray-300"
+              >
+                ELEM.EDITOR
+              </a>
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline"
+              >
+                WP EDITOR
+              </a>
+            </div>
+            
+            <Link 
+              href="/pedazos1"
+              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+            >
+              ← Back to List
+            </Link>
+          </div>
         </div>
         <div className="text-sm text-gray-600">
           <p><strong>ID:</strong> {gconPiece.id}</p>
