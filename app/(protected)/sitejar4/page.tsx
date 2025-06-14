@@ -144,6 +144,15 @@ export default function Sitejar4Page() {
         onSitesCreated={refetchSitesprenData}
       />
 
+      {/* Debug Info */}
+      <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded">
+        <h3 className="font-bold">Debug Info:</h3>
+        <p>User ID: {user.id}</p>
+        <p>Internal User ID: {userInternalId}</p>
+        <p>Data Count: {sitesprenData.length}</p>
+        <p>Data: {JSON.stringify(sitesprenData, null, 2)}</p>
+      </div>
+
       {/* Sitespren Table */}
       <SitesprenTable 
         data={sitesprenData} 
