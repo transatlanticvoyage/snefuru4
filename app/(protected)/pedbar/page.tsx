@@ -208,6 +208,7 @@ export default function PedbarPage() {
           </div>
         </div>
         <div className="text-sm text-gray-600">
+          <p><strong>db table:</strong> gcon_pieces</p>
           <p><strong>ID:</strong> {gconPiece.id}</p>
           <p><strong>Created:</strong> {new Date(gconPiece.created_at).toLocaleString()}</p>
           <p><strong>Updated:</strong> {new Date(gconPiece.updated_at).toLocaleString()}</p>
