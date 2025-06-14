@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
     
     console.log('Received request:', { user_internal_id, sites_list });
     
-    // Initialize Supabase client for server-side use
+    // Initialize Supabase client with service role key to bypass RLS
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
     
     console.log('Supabase client initialized');
