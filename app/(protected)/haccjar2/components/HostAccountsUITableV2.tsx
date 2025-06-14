@@ -60,12 +60,16 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   // Sort logic
   const sortedData = useMemo(() => {
     const sorted = [...filteredData].sort((a, b) => {
-      let aVal: string | number = a[sortField] ?? '';
-      let bVal: string | number = b[sortField] ?? '';
+      let aVal: any = a[sortField];
+      let bVal: any = b[sortField];
 
       // Handle null values
       if (aVal === null || aVal === undefined) aVal = '';
       if (bVal === null || bVal === undefined) bVal = '';
+
+      // Handle object values (like host_company) by converting to string
+      if (typeof aVal === 'object') aVal = '';
+      if (typeof bVal === 'object') bVal = '';
 
       // Convert to lowercase for string comparison
       if (typeof aVal === 'string') {
