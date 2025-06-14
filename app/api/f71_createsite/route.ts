@@ -1,4 +1,4 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 // URL cleaning functions (moved here to avoid import issues)
@@ -31,12 +31,20 @@ function isValidCleanedUrl(url: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClientComponentClient();
+    console.log('API route called');
     
     // Get the request body
     const { user_internal_id, sites_list } = await request.json();
     
     console.log('Received request:', { user_internal_id, sites_list });
+    
+    // Initialize Supabase client for server-side use
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    
+    console.log('Supabase client initialized');
     
     if (!user_internal_id) {
       return NextResponse.json(
@@ -74,22 +82,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Prepare records for insertion - only include required fields
-    const sitesToInsert = validUrls.map(url => {
-      return {
-        sitespren_base: url,
-        fk_users_id: user_internal_id,
-        // Only include fields that are in the initial insert
-        // Other fields can be updated later
-      };
-    });
+    // Test with just the first URL for now
+    const testUrl = validUrls[0];
+    
+    // Prepare one record for insertion
+    const siteToInsert = {
+      sitespren_base: testUrl,
+      fk_users_id: user_internal_id
+    };
 
-    console.log('Attempting to insert sites:', sitesToInsert);
+    console.log('Attempting to insert single site:', siteToInsert);
 
-    // Insert sites in batch
+    // Insert single site first
     const { data: insertedSites, error: insertError } = await supabase
       .from('sitespren')
-      .insert(sitesToInsert)
+      .insert([siteToInsert])
       .select();
 
     if (insertError) {
@@ -124,14 +131,13 @@ export async function POST(request: NextRequest) {
     }
 
     const sitesCreated = insertedSites?.length || 0;
-    const invalidCount = cleanedUrls.length - validUrls.length;
 
     return NextResponse.json({
       success: true,
       data: {
         sitesCreated,
-        sitesRequested: cleanedUrls.length,
-        invalidUrls: invalidCount,
+        sitesRequested: 1, // Testing with one site for now
+        invalidUrls: 0,
         message: `Successfully created ${sitesCreated} site(s)`
       }
     });
