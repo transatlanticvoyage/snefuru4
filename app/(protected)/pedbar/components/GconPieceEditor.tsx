@@ -184,6 +184,36 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
 
       {/* Form Fields */}
       <div className="space-y-6">
+        {/* Site Assignment */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="asn_sitespren" className="block text-sm font-medium text-gray-700 mb-2">
+              Site Assignment (asn_sitespren)
+            </label>
+            <input
+              type="text"
+              id="asn_sitespren"
+              value={formData.asn_sitespren}
+              onChange={(e) => handleInputChange('asn_sitespren', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g., rnr1.ksit.me"
+            />
+          </div>
+          <div>
+            <label htmlFor="asn_page_intended" className="block text-sm font-medium text-gray-700 mb-2">
+              Page Assignment (asn_page_intended)
+            </label>
+            <input
+              type="text"
+              id="asn_page_intended"
+              value={formData.asn_page_intended}
+              onChange={(e) => handleInputChange('asn_page_intended', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g., example.com->postid562"
+            />
+          </div>
+        </div>
+
         {/* Meta Title */}
         <div>
           <label htmlFor="meta_title" className="block text-sm font-medium text-gray-700 mb-2">
@@ -227,36 +257,6 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter PGB H1 title..."
           />
-        </div>
-
-        {/* Site Assignment */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="asn_sitespren" className="block text-sm font-medium text-gray-700 mb-2">
-              Site Assignment (asn_sitespren)
-            </label>
-            <input
-              type="text"
-              id="asn_sitespren"
-              value={formData.asn_sitespren}
-              onChange={(e) => handleInputChange('asn_sitespren', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="e.g., rnr1.ksit.me"
-            />
-          </div>
-          <div>
-            <label htmlFor="asn_page_intended" className="block text-sm font-medium text-gray-700 mb-2">
-              Page Assignment (asn_page_intended)
-            </label>
-            <input
-              type="text"
-              id="asn_page_intended"
-              value={formData.asn_page_intended}
-              onChange={(e) => handleInputChange('asn_page_intended', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="e.g., example.com->postid562"
-            />
-          </div>
         </div>
 
         {/* Corpus 1 */}
