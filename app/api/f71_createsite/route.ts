@@ -1,6 +1,33 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { NextRequest, NextResponse } from 'next/server';
-import { processUrlList, isValidCleanedUrl, extractDomainParts } from '@/app/(protected)/sitejar4/utils/urlCleaner';
+
+// URL cleaning functions (moved here to avoid import issues)
+function cleanUrl(url: string): string {
+  if (!url) return '';
+  
+  let cleaned = url.trim();
+  cleaned = cleaned.replace(/^https?:\/\//, '');
+  cleaned = cleaned.replace(/^www\./, '');
+  
+  return cleaned;
+}
+
+function processUrlList(urlList: string): string[] {
+  return urlList
+    .split('\n')
+    .map(line => cleanUrl(line))
+    .filter(url => url.length > 0);
+}
+
+function isValidCleanedUrl(url: string): boolean {
+  if (!url || url.length === 0) return false;
+  if (!url.includes('.')) return false;
+  
+  const invalidChars = /[<>"\s]/;
+  if (invalidChars.test(url)) return false;
+  
+  return true;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,6 +35,8 @@ export async function POST(request: NextRequest) {
     
     // Get the request body
     const { user_internal_id, sites_list } = await request.json();
+    
+    console.log('Received request:', { user_internal_id, sites_list });
     
     if (!user_internal_id) {
       return NextResponse.json(
@@ -25,6 +54,7 @@ export async function POST(request: NextRequest) {
 
     // Process the URL list
     const cleanedUrls = processUrlList(sites_list);
+    console.log('Cleaned URLs:', cleanedUrls);
     
     if (cleanedUrls.length === 0) {
       return NextResponse.json(
@@ -35,6 +65,7 @@ export async function POST(request: NextRequest) {
 
     // Filter out invalid URLs
     const validUrls = cleanedUrls.filter(url => isValidCleanedUrl(url));
+    console.log('Valid URLs:', validUrls);
     
     if (validUrls.length === 0) {
       return NextResponse.json(
