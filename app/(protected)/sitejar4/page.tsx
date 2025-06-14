@@ -41,23 +41,20 @@ export default function Sitejar4Page() {
 
         setUserInternalId(userData.id);
 
-        // Fetch user's sitespren data
+        // Fetch user's sitespren data via API (bypasses RLS)
         console.log('Fetching sitespren data for user ID:', userData.id);
         
-        const { data: sitespren, error } = await supabase
-          .from('sitespren')
-          .select('*')
-          .eq('fk_users_id', userData.id)
-          .order('created_at', { ascending: false });
+        const response = await fetch(`/api/get_sitespren_data?user_internal_id=${userData.id}`);
+        const result = await response.json();
 
-        console.log('Fetch result:', { sitespren, error, count: sitespren?.length });
+        console.log('API fetch result:', result);
 
-        if (error) {
-          console.error('Error fetching sitespren:', error);
-          setError('Error fetching sites data');
+        if (result.success) {
+          console.log('Setting sitespren data:', result.data);
+          setSitesprenData(result.data || []);
         } else {
-          console.log('Setting sitespren data:', sitespren);
-          setSitesprenData(sitespren || []);
+          console.error('Error fetching sitespren:', result.error);
+          setError('Error fetching sites data');
         }
       } catch (err) {
         console.error('Error:', err);
@@ -80,19 +77,16 @@ export default function Sitejar4Page() {
     }
 
     try {
-      const { data: sitespren, error } = await supabase
-        .from('sitespren')
-        .select('*')
-        .eq('fk_users_id', userInternalId)
-        .order('created_at', { ascending: false });
+      const response = await fetch(`/api/get_sitespren_data?user_internal_id=${userInternalId}`);
+      const result = await response.json();
 
-      console.log('Refetch result:', { sitespren, error });
+      console.log('Refetch API result:', result);
 
-      if (!error && sitespren) {
-        console.log('Setting new data:', sitespren);
-        setSitesprenData(sitespren);
+      if (result.success) {
+        console.log('Setting new data:', result.data);
+        setSitesprenData(result.data || []);
       } else {
-        console.error('Error in refetch:', error);
+        console.error('Error in refetch:', result.error);
       }
     } catch (err) {
       console.error('Error refetching data:', err);
