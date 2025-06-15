@@ -37,6 +37,8 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [filterWpSite, setFilterWpSite] = useState<string>('');
   const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
+  const [syncLoading, setSyncLoading] = useState<Set<string>>(new Set());
+  const [syncResults, setSyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -152,6 +154,130 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
   const truncateText = (text: string | null, maxLength: number = 30) => {
     if (!text) return '-';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  // WPSv2 Sync handlers
+  const handleWpsv2Sync = async (siteId: string, method: 'plugin_api' | 'rest_api') => {
+    // Add to loading set
+    setSyncLoading(prev => new Set([...prev, siteId]));
+    
+    // Clear previous result for this site
+    setSyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[siteId];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/wpsv2/sync-site', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId,
+          method: method,
+          fallbackEnabled: false
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSyncResults(prev => ({
+          ...prev,
+          [siteId]: {
+            type: 'success',
+            message: `✅ ${data.message} (${data.count} items)`
+          }
+        }));
+      } else {
+        setSyncResults(prev => ({
+          ...prev,
+          [siteId]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setSyncResults(prev => ({
+        ...prev,
+        [siteId]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      // Remove from loading set
+      setSyncLoading(prev => {
+        const newLoading = new Set(prev);
+        newLoading.delete(siteId);
+        return newLoading;
+      });
+    }
+  };
+
+  const handleWpsv2TestPlugin = async (siteId: string) => {
+    // Add to loading set
+    setSyncLoading(prev => new Set([...prev, `test_${siteId}`]));
+    
+    // Clear previous result for this site
+    setSyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[`test_${siteId}`];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/wpsv2/test-connection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const pluginStatus = data.results.plugin_api.success ? '✅' : '❌';
+        const restStatus = data.results.rest_api.success ? '✅' : '❌';
+        
+        setSyncResults(prev => ({
+          ...prev,
+          [`test_${siteId}`]: {
+            type: 'success',
+            message: `Plugin: ${pluginStatus} | REST: ${restStatus} | ${data.results.recommendations[0] || 'Test completed'}`
+          }
+        }));
+      } else {
+        setSyncResults(prev => ({
+          ...prev,
+          [`test_${siteId}`]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setSyncResults(prev => ({
+        ...prev,
+        [`test_${siteId}`]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      // Remove from loading set
+      setSyncLoading(prev => {
+        const newLoading = new Set(prev);
+        newLoading.delete(`test_${siteId}`);
+        return newLoading;
+      });
+    }
   };
 
   return (
@@ -316,25 +442,40 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                     </Link>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
-                    <div className="flex gap-2">
-                      <button
-                        className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                        onClick={() => {}}
-                      >
-                        Plugin API
-                      </button>
-                      <button
-                        className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                        onClick={() => {}}
-                      >
-                        Rest API
-                      </button>
-                      <button
-                        className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                        onClick={() => {}}
-                      >
-                        Test Plugin
-                      </button>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <button
+                          className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                          onClick={() => handleWpsv2Sync(item.id, 'plugin_api')}
+                          disabled={syncLoading.has(item.id)}
+                        >
+                          {syncLoading.has(item.id) ? 'Syncing...' : 'Plugin API'}
+                        </button>
+                        <button
+                          className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                          onClick={() => handleWpsv2Sync(item.id, 'rest_api')}
+                          disabled={syncLoading.has(item.id)}
+                        >
+                          {syncLoading.has(item.id) ? 'Syncing...' : 'Rest API'}
+                        </button>
+                        <button
+                          className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+                          onClick={() => handleWpsv2TestPlugin(item.id)}
+                          disabled={syncLoading.has(`test_${item.id}`)}
+                        >
+                          {syncLoading.has(`test_${item.id}`) ? 'Testing...' : 'Test Plugin'}
+                        </button>
+                      </div>
+                      {/* Sync result display */}
+                      {(syncResults[item.id] || syncResults[`test_${item.id}`]) && (
+                        <div className={`text-xs p-2 rounded ${
+                          (syncResults[item.id]?.type === 'success' || syncResults[`test_${item.id}`]?.type === 'success') 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {syncResults[item.id]?.message || syncResults[`test_${item.id}`]?.message}
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
