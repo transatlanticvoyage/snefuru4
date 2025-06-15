@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     // Try Plugin API first
     if (method === 'plugin_api' || fallbackEnabled) {
       console.log(`🔄 WPSv2: Attempting Plugin API sync for ${siteData.sitespren_base}`);
-      syncResult = await wpsv2SyncViaPluginApi(siteData.sitespren_base, siteData.wppass1);
+      syncResult = await wpsv2SyncViaPluginApi(siteData.sitespren_base, siteData.ruplin_apikey);
       
       if (syncResult.success) {
         console.log(`✅ WPSv2: Plugin API sync successful`);

@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     console.log(`🔍 WPSv2: Testing connection for ${siteData.sitespren_base}`);
 
     // Test plugin connection
-    const pluginTest = await wpsv2TestPluginConnection(siteData.sitespren_base, siteData.wppass1);
+    const pluginTest = await wpsv2TestPluginConnection(siteData.sitespren_base, siteData.ruplin_apikey);
     
     // Test REST API connection
     const restTest = await wpsv2TestRestConnection(siteData.sitespren_base);
