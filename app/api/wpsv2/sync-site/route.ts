@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     // Try REST API if Plugin API failed or is specifically requested
     if (method === 'rest_api' || (fallbackEnabled && (!syncResult || !syncResult.success))) {
       console.log(`🔄 WPSv2: Attempting REST API sync for ${siteData.sitespren_base}`);
-      syncResult = await wpsv2SyncViaRestApi(siteData.sitespren_base);
+      syncResult = await wpsv2SyncViaRestApi(siteData.sitespren_base, siteData.wp_rest_app_pass);
       
       if (syncResult.success) {
         console.log(`✅ WPSv2: REST API sync successful`);
@@ -187,9 +187,23 @@ async function wpsv2SyncViaPluginApi(siteUrl: string, apiKey: string) {
 }
 
 // REST API sync method
-async function wpsv2SyncViaRestApi(siteUrl: string) {
+async function wpsv2SyncViaRestApi(siteUrl: string, appPassword?: string) {
   try {
     const allPosts = [];
+    
+    // Prepare headers with authentication if available
+    const headers: any = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Snefuru-WPSv2/1.0'
+    };
+    
+    // Add authentication if application password is provided
+    if (appPassword) {
+      console.log(`🔑 WPSv2: Using REST API authentication`);
+      headers['Authorization'] = `Basic ${Buffer.from(appPassword).toString('base64')}`;
+    } else {
+      console.log(`🔓 WPSv2: Using REST API without authentication (public posts only)`);
+    }
     
     // Fetch posts
     let page = 1;
@@ -198,10 +212,7 @@ async function wpsv2SyncViaRestApi(siteUrl: string) {
     while (hasMore && page <= 50) { // Safety limit
       const postsUrl = `https://${siteUrl}/wp-json/wp/v2/posts?page=${page}&per_page=100`;
       const response = await fetch(postsUrl, {
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'Snefuru-WPSv2/1.0'
-        }
+        headers: headers
       });
       
       if (response.ok) {
@@ -227,10 +238,7 @@ async function wpsv2SyncViaRestApi(siteUrl: string) {
     while (hasMore && page <= 50) { // Safety limit
       const pagesUrl = `https://${siteUrl}/wp-json/wp/v2/pages?page=${page}&per_page=100`;
       const response = await fetch(pagesUrl, {
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'Snefuru-WPSv2/1.0'
-        }
+        headers: headers
       });
       
       if (response.ok) {

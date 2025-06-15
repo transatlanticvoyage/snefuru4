@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const pluginTest = await wpsv2TestPluginConnection(siteData.sitespren_base, siteData.ruplin_apikey);
     
     // Test REST API connection
-    const restTest = await wpsv2TestRestConnection(siteData.sitespren_base);
+    const restTest = await wpsv2TestRestConnection(siteData.sitespren_base, siteData.wp_rest_app_pass);
 
     return NextResponse.json({
       success: true,
@@ -170,19 +170,30 @@ async function wpsv2TestPluginConnection(siteUrl: string, apiKey: string) {
 }
 
 // Test WordPress REST API connection
-async function wpsv2TestRestConnection(siteUrl: string) {
+async function wpsv2TestRestConnection(siteUrl: string, appPassword?: string) {
   try {
     console.log(`🌐 WPSv2: Testing REST API connection to ${siteUrl}`);
+    
+    // Prepare headers with authentication if available
+    const headers: any = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Snefuru-WPSv2-Test/1.0'
+    };
+    
+    // Add authentication if application password is provided
+    if (appPassword) {
+      console.log(`🔑 WPSv2: Testing REST API with authentication`);
+      headers['Authorization'] = `Basic ${Buffer.from(appPassword).toString('base64')}`;
+    } else {
+      console.log(`🔓 WPSv2: Testing REST API without authentication (public only)`);
+    }
     
     const startTime = Date.now();
     const endpoint = `https://${siteUrl}/wp-json/wp/v2/posts?per_page=1`;
     
     const response = await fetch(endpoint, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Snefuru-WPSv2-Test/1.0'
-      },
+      headers: headers,
       // Add timeout for testing
       signal: AbortSignal.timeout(10000) // 10 second timeout
     });
@@ -215,12 +226,15 @@ async function wpsv2TestRestConnection(siteUrl: string) {
     // Try to get total count from headers
     const totalPosts = response.headers.get('X-WP-Total') || 'unknown';
 
+    const authStatus = appPassword ? ' (authenticated)' : ' (public only)';
+    
     return {
       success: true,
       status: 'connected',
-      message: `REST API working - ${totalPosts} posts available`,
+      message: `REST API working${authStatus} - ${totalPosts} posts available`,
       response_time: responseTime,
       posts_available: totalPosts,
+      authenticated: !!appPassword,
       sample_post: data[0] ? {
         id: data[0].id,
         title: data[0].title?.rendered?.substring(0, 50) + '...',
@@ -263,8 +277,13 @@ function generateWpsv2Recommendations(pluginTest: any, restTest: any): string[] 
     recommendations.push('✅ Plugin API is working. Use Plugin API for syncing.');
     recommendations.push('⚠️ REST API is not working. Check WordPress permalinks and REST API settings.');
   } else if (!pluginTest.success && restTest.success) {
-    recommendations.push('✅ REST API is working. Use REST API for syncing.');
+    const authMsg = restTest.authenticated ? 'with authentication' : 'without authentication (public posts only)';
+    recommendations.push(`✅ REST API is working ${authMsg}. Use REST API for syncing.`);
     recommendations.push('⚠️ Plugin API failed. Check if Snefuruplin plugin is installed and API key is correct.');
+    
+    if (!restTest.authenticated) {
+      recommendations.push('🔑 Consider adding WordPress Application Password for full REST API access to private/draft posts.');
+    }
   } else {
     recommendations.push('❌ Both connections failed. Check site URL, hosting, and WordPress configuration.');
     
