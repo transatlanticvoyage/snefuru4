@@ -23,7 +23,6 @@ interface ImagePlanBatch {
   id: string;
   name: string | null;
   note1: string | null;
-  rel_users_id: string;
 }
 
 interface GconPieceEditorProps {
