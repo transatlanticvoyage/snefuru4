@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface GconPiece {
@@ -13,9 +13,17 @@ interface GconPiece {
   corpus2: string | null;
   asn_sitespren_base: string | null;
   asn_nwpi_posts_id: string | null;
+  asn_imgplanbatch_id: string | null;
   image_pack1: any;
   created_at: string;
   updated_at: string;
+}
+
+interface ImagePlanBatch {
+  id: string;
+  name: string | null;
+  note1: string | null;
+  rel_users_id: string;
 }
 
 interface GconPieceEditorProps {
@@ -33,14 +41,41 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
     corpus2: gconPiece.corpus2 || '',
     asn_sitespren_base: gconPiece.asn_sitespren_base || '',
     asn_nwpi_posts_id: gconPiece.asn_nwpi_posts_id || '',
+    asn_imgplanbatch_id: gconPiece.asn_imgplanbatch_id || '',
     image_pack1: gconPiece.image_pack1 ? JSON.stringify(gconPiece.image_pack1, null, 2) : ''
   });
   
   const [isSaving, setIsSaving] = useState(false);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [imagePlanBatches, setImagePlanBatches] = useState<ImagePlanBatch[]>([]);
+  const [batchesLoading, setBatchesLoading] = useState(true);
   
   const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const fetchImagePlanBatches = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('images_plans_batches')
+          .select('id, name, note1')
+          .eq('rel_users_id', userInternalId)
+          .order('name', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching image plan batches:', error);
+        } else {
+          setImagePlanBatches(data || []);
+        }
+      } catch (err) {
+        console.error('Error in fetchImagePlanBatches:', err);
+      } finally {
+        setBatchesLoading(false);
+      }
+    };
+
+    fetchImagePlanBatches();
+  }, [userInternalId, supabase]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
