@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
         corpus2: null,
         asn_sitespren_base: null,
         asn_nwpi_posts_id: null,
+        asn_imgplanbatch_id: null,
         image_pack1: null
       })
       .select()

@@ -126,6 +126,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         corpus2: formData.corpus2 || null,
         asn_sitespren_base: formData.asn_sitespren_base || null,
         asn_nwpi_posts_id: formData.asn_nwpi_posts_id || null,
+        asn_imgplanbatch_id: formData.asn_imgplanbatch_id || null,
         image_pack1: parsedImagePack1,
         updated_at: new Date().toISOString()
       };
@@ -176,6 +177,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
       corpus2: gconPiece.corpus2 || '',
       asn_sitespren_base: gconPiece.asn_sitespren_base || '',
       asn_nwpi_posts_id: gconPiece.asn_nwpi_posts_id || '',
+      asn_imgplanbatch_id: gconPiece.asn_imgplanbatch_id || '',
       image_pack1: gconPiece.image_pack1 ? JSON.stringify(gconPiece.image_pack1, null, 2) : ''
     });
     setHasUnsavedChanges(false);
@@ -247,6 +249,30 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
               placeholder="e.g., example.com->postid562"
             />
           </div>
+        </div>
+
+        {/* Image Plan Batch Assignment */}
+        <div>
+          <label htmlFor="asn_imgplanbatch_id" className="block text-sm font-medium text-gray-700 mb-2">
+            Image Plan Batch Assignment (asn_imgplanbatch_id)
+          </label>
+          <select
+            id="asn_imgplanbatch_id"
+            value={formData.asn_imgplanbatch_id}
+            onChange={(e) => handleInputChange('asn_imgplanbatch_id', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={batchesLoading}
+          >
+            <option value="" disabled className="text-gray-500 font-medium">
+              id - name - note1
+            </option>
+            <option value="">Select a batch...</option>
+            {imagePlanBatches.map((batch) => (
+              <option key={batch.id} value={batch.id}>
+                {batch.id} - {batch.name || 'N/A'} - {batch.note1 || 'N/A'}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Meta Title */}
