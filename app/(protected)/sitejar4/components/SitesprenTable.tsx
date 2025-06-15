@@ -234,6 +234,9 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tool Buttons
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Sync Actions
+                </th>
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('id')}
@@ -311,6 +314,28 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                     >
                       Individual View
                     </Link>
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    <div className="flex gap-2">
+                      <button
+                        className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        onClick={() => {}}
+                      >
+                        Plugin API
+                      </button>
+                      <button
+                        className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        onClick={() => {}}
+                      >
+                        Rest API
+                      </button>
+                      <button
+                        className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                        onClick={() => {}}
+                      >
+                        Test Plugin
+                      </button>
+                    </div>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
                     {truncateText(item.id, 8)}...
