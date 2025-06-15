@@ -14,6 +14,8 @@ interface SitesprenRecord {
   updated_at: string | null;
   wpuser1: string | null;
   wppass1: string | null;
+  ruplin_apikey: string | null;
+  wp_rest_app_pass: string | null;
   wp_plugin_installed1: boolean | null;
   wp_plugin_connected2: boolean | null;
   fk_domreg_hostaccount: string | null;
@@ -409,6 +411,12 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                   wppass1
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ruplin_apikey
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  wp_rest_app_pass
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   wp_plugin_installed1
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -507,6 +515,12 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                   </td>
                   <td className="px-4 py-2 text-gray-900">
                     {item.wppass1 ? '***' : '-'}
+                  </td>
+                  <td className="px-4 py-2 text-gray-900">
+                    {item.ruplin_apikey ? truncateText(item.ruplin_apikey, 15) : '-'}
+                  </td>
+                  <td className="px-4 py-2 text-gray-900">
+                    {item.wp_rest_app_pass ? truncateText(item.wp_rest_app_pass, 15) : '-'}
                   </td>
                   <td className="px-4 py-2 text-center">
                     {formatBoolean(item.wp_plugin_installed1)}
