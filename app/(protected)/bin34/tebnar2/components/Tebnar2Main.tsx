@@ -156,6 +156,34 @@ export default function Tebnar2Main() {
     setTbn2Loading(false);
   };
 
+  // Function to load dummy data from admin_options - exact clone from tebnar1
+  const tbn2_loadDummyData = async () => {
+    setTbn2LoadingPreset(true);
+    try {
+      const response = await fetch('/api/admin-options/kregno_xls_info_1');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+      
+      const result = await response.json();
+      if (result.success && result.data?.json1) {
+        const { headers, rows } = result.data.json1;
+        
+        // Create grid data with headers as first row
+        const newGridData = [headers, ...rows];
+        setTbn2PresetData(newGridData);
+        setTbn2Error('✅ Dummy data loaded successfully!');
+      } else {
+        throw new Error('No data found or invalid format');
+      }
+    } catch (err) {
+      console.error('Error loading dummy data:', err);
+      setTbn2Error(`❌ Failed to load dummy data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setTbn2LoadingPreset(false);
+    }
+  };
+
   // Effect hooks for data fetching using centralized functions
   useEffect(() => {
     tbn2_fetchImages();
@@ -218,7 +246,7 @@ export default function Tebnar2Main() {
         makeImagesLoading={tbn2_makeImagesLoading}
         makeImagesResult={tbn2_makeImagesResult}
         loadingPreset={tbn2_loadingPreset}
-        onPresetLoad={() => {}} // TODO: Implement preset loading
+        onPresetLoad={tbn2_loadDummyData}
         gridData={tbn2_gridData}
         onGridDataChange={setTbn2GridData}
         presetData={tbn2_presetData}
