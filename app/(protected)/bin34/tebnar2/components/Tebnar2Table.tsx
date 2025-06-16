@@ -333,11 +333,11 @@ export default function Tebnar2Table({
                   <th
                     key={col}
                     style={{
+                      ...tbn2_tableStyleSettings.header,
                       width: settings.width,
                       minWidth: settings.minWidth,
                       maxWidth: settings.maxWidth,
                       textAlign: settings.textAlign || 'center',
-                      ...tbn2_tableStyleSettings.header,
                       padding: paddingSettings.padding,
                       paddingTop: paddingSettings.paddingTop,
                       paddingRight: paddingSettings.paddingRight,
@@ -385,11 +385,11 @@ export default function Tebnar2Table({
                       <td
                         key={col}
                         style={{
+                          ...tbn2_tableStyleSettings.previewCell,
                           width: settings.width,
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'center',
-                          ...tbn2_tableStyleSettings.previewCell,
                           padding: paddingSettings.padding,
                           paddingTop: paddingSettings.paddingTop,
                           paddingRight: paddingSettings.paddingRight,
@@ -419,11 +419,11 @@ export default function Tebnar2Table({
                       <td
                         key={col}
                         style={{
+                          ...tbn2_tableStyleSettings.previewCell,
                           width: settings.width,
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'center',
-                          ...tbn2_tableStyleSettings.previewCell,
                           padding: paddingSettings.padding,
                           paddingTop: paddingSettings.paddingTop,
                           paddingRight: paddingSettings.paddingRight,
@@ -453,11 +453,11 @@ export default function Tebnar2Table({
                       <td
                         key={col}
                         style={{
+                          ...tbn2_tableStyleSettings.previewCell,
                           width: settings.width,
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'center',
-                          ...tbn2_tableStyleSettings.previewCell,
                           padding: paddingSettings.padding,
                           paddingTop: paddingSettings.paddingTop,
                           paddingRight: paddingSettings.paddingRight,
@@ -487,11 +487,11 @@ export default function Tebnar2Table({
                       <td
                         key={col}
                         style={{
+                          ...tbn2_tableStyleSettings.previewCell,
                           width: settings.width,
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'center',
-                          ...tbn2_tableStyleSettings.previewCell,
                           padding: paddingSettings.padding,
                           paddingTop: paddingSettings.paddingTop,
                           paddingRight: paddingSettings.paddingRight,
@@ -519,12 +519,12 @@ export default function Tebnar2Table({
                       <td
                         key={col}
                         style={{
+                          ...tbn2_tableStyleSettings.cell,
+                          ...tbn2_tableStyleSettings.textCell,
                           width: settings.width,
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'left',
-                          ...tbn2_tableStyleSettings.cell,
-                          ...tbn2_tableStyleSettings.textCell,
                           padding: paddingSettings.padding,
                           paddingTop: paddingSettings.paddingTop,
                           paddingRight: paddingSettings.paddingRight,
