@@ -1,6 +1,7 @@
 'use client';
 
 import { Tebnar2ThrottleSettings } from '../types/tebnar2-types';
+import Tebnar2ExcelPasteGrid from './Tebnar2ExcelPasteGrid';
 
 interface Tebnar2ActionsProps {
   qtyPerPlan: number;
@@ -19,6 +20,9 @@ interface Tebnar2ActionsProps {
   makeImagesResult: string | null;
   loadingPreset: boolean;
   onPresetLoad: () => void;
+  gridData: string[][];
+  onGridDataChange: (grid: string[][]) => void;
+  presetData: string[][] | null;
 }
 
 export default function Tebnar2Actions({
@@ -37,7 +41,10 @@ export default function Tebnar2Actions({
   makeImagesLoading,
   makeImagesResult,
   loadingPreset,
-  onPresetLoad
+  onPresetLoad,
+  gridData,
+  onGridDataChange,
+  presetData
 }: Tebnar2ActionsProps) {
 
   return (
@@ -53,12 +60,8 @@ export default function Tebnar2Actions({
         </button>
       </div>
 
-      {/* ExcelPasteGrid component would go here - for now just a placeholder */}
-      <div className="border border-gray-300 p-4 rounded mb-4">
-        <div className="text-gray-500 text-center py-8">
-          [ExcelPasteGrid component placeholder - exact clone from tebnar1 needed]
-        </div>
-      </div>
+      {/* ExcelPasteGrid component - exact clone from tebnar1 */}
+      <Tebnar2ExcelPasteGrid onGridDataChange={onGridDataChange} presetData={presetData} />
 
       <hr className="my-6 border-t-2 border-gray-300" />
 

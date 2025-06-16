@@ -219,6 +219,9 @@ export default function Tebnar2Main() {
         makeImagesResult={tbn2_makeImagesResult}
         loadingPreset={tbn2_loadingPreset}
         onPresetLoad={() => {}} // TODO: Implement preset loading
+        gridData={tbn2_gridData}
+        onGridDataChange={setTbn2GridData}
+        presetData={tbn2_presetData}
       />
 
       {/* Main Table - exact clone from tebnar1 */}
