@@ -159,7 +159,7 @@ const tbn2_tableCellPaddingSettings = {
 const tbn2_tableBorderSettings = {
   // Global border settings
   global: {
-    borderCollapse: 'collapse',
+    borderCollapse: 'collapse' as const,
     borderSpacing: '0px',
     borderStyle: 'solid',
     borderColor: '#c7cbd3',
