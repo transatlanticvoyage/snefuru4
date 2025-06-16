@@ -62,16 +62,20 @@ async function f23_previewDeletion(folders: string[], logs: string[], mode: stri
   let totalSize = 0;
 
   for (const folder of folders) {
-    const fullPath = f23_buildStoragePath(folder);
-    logs.push(`Previewing: ${fullPath}`);
+    const folderPrefix = f23_buildStoragePath(folder);
+    logs.push(`Previewing entire folder: ${folderPrefix}`);
 
     try {
-      const { data: files, error } = await supabase.storage
+      // Get ALL objects that start with this folder prefix
+      const { data: allObjects, error } = await supabase.storage
         .from(F23_BUCKET_NAME)
-        .list(fullPath, { limit: 1000 });
+        .list('', { 
+          limit: 1000,
+          prefix: folderPrefix
+        });
 
       if (error) {
-        logs.push(`❌ Error listing ${fullPath}: ${error.message}`);
+        logs.push(`❌ Error listing objects with prefix ${folderPrefix}: ${error.message}`);
         folderResults.push({
           folder,
           fileCount: 0,
@@ -82,35 +86,35 @@ async function f23_previewDeletion(folders: string[], logs: string[], mode: stri
         continue;
       }
 
-      if (!files || files.length === 0) {
-        logs.push(`⚠️ No files found in: ${fullPath}`);
+      if (!allObjects || allObjects.length === 0) {
+        logs.push(`⚠️ No objects found with prefix: ${folderPrefix}`);
         folderResults.push({
           folder,
           fileCount: 0,
           totalSize: 0,
           status: 'empty',
-          message: 'Folder is empty or does not exist'
+          message: 'Folder does not exist or is empty'
         });
         continue;
       }
 
-      const folderSize = files.reduce((sum, file) => sum + (file.metadata?.size || 0), 0);
-      totalFiles += files.length;
+      const folderSize = allObjects.reduce((sum, obj) => sum + (obj.metadata?.size || 0), 0);
+      totalFiles += allObjects.length;
       totalSize += folderSize;
 
-      logs.push(`✓ Found ${files.length} files (${f23_formatBytes(folderSize)}) in ${fullPath}`);
+      logs.push(`✓ Found ${allObjects.length} objects (${f23_formatBytes(folderSize)}) in folder ${folderPrefix}`);
       folderResults.push({
         folder,
-        fileCount: files.length,
+        fileCount: allObjects.length,
         totalSize: folderSize,
         status: 'success',
-        message: `Would ${mode === 'permanent' ? 'permanently delete' : 'move to trash'} ${files.length} files`,
-        filePaths: files.map(f => `${fullPath}/${f.name}`)
+        message: `Would ${mode === 'permanent' ? 'permanently delete entire folder' : 'move entire folder to trash'} with ${allObjects.length} objects`,
+        filePaths: allObjects.map(obj => obj.name)
       });
 
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-      logs.push(`❌ Exception processing ${fullPath}: ${errorMsg}`);
+      logs.push(`❌ Exception processing ${folderPrefix}: ${errorMsg}`);
       folderResults.push({
         folder,
         fileCount: 0,
@@ -122,7 +126,7 @@ async function f23_previewDeletion(folders: string[], logs: string[], mode: stri
   }
 
   logs.push('---');
-  logs.push(`Preview complete: ${totalFiles} files, ${f23_formatBytes(totalSize)} total`);
+  logs.push(`Preview complete: ${totalFiles} objects, ${f23_formatBytes(totalSize)} total`);
 
   return {
     mode: 'preview',
@@ -138,16 +142,20 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
   let totalSize = 0;
 
   for (const folder of folders) {
-    const fullPath = f23_buildStoragePath(folder);
-    logs.push(`Processing: ${fullPath} (${mode})`);
+    const folderPrefix = f23_buildStoragePath(folder);
+    logs.push(`Processing entire folder: ${folderPrefix} (${mode})`);
 
     try {
-      const { data: files, error: listError } = await supabase.storage
+      // Get ALL objects that start with this folder prefix
+      const { data: allObjects, error: listError } = await supabase.storage
         .from(F23_BUCKET_NAME)
-        .list(fullPath, { limit: 1000 });
+        .list('', { 
+          limit: 1000,
+          prefix: folderPrefix
+        });
 
       if (listError) {
-        logs.push(`❌ Error listing ${fullPath}: ${listError.message}`);
+        logs.push(`❌ Error listing objects with prefix ${folderPrefix}: ${listError.message}`);
         folderResults.push({
           folder,
           fileCount: 0,
@@ -158,29 +166,29 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
         continue;
       }
 
-      if (!files || files.length === 0) {
-        logs.push(`⚠️ No files found in: ${fullPath}`);
+      if (!allObjects || allObjects.length === 0) {
+        logs.push(`⚠️ No objects found with prefix: ${folderPrefix}`);
         folderResults.push({
           folder,
           fileCount: 0,
           totalSize: 0,
           status: 'empty',
-          message: 'Folder is empty or does not exist'
+          message: 'Folder does not exist or is empty'
         });
         continue;
       }
 
-      const filePaths = files.map(f => `${fullPath}/${f.name}`);
-      const folderSize = files.reduce((sum, file) => sum + (file.metadata?.size || 0), 0);
+      const objectPaths = allObjects.map(obj => obj.name);
+      const folderSize = allObjects.reduce((sum, obj) => sum + (obj.metadata?.size || 0), 0);
 
       if (mode === 'permanent') {
-        // Permanent deletion
+        // Permanent deletion of entire folder
         const { error: deleteErr } = await supabase.storage
           .from(F23_BUCKET_NAME)
-          .remove(filePaths);
+          .remove(objectPaths);
 
         if (deleteErr) {
-          logs.push(`❌ Failed to delete from ${fullPath}: ${deleteErr.message}`);
+          logs.push(`❌ Failed to delete folder ${folderPrefix}: ${deleteErr.message}`);
           folderResults.push({
             folder,
             fileCount: 0,
@@ -189,45 +197,46 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
             message: deleteErr.message
           });
         } else {
-          totalFiles += files.length;
+          totalFiles += allObjects.length;
           totalSize += folderSize;
-          logs.push(`✅ Permanently deleted ${files.length} files from ${fullPath}`);
+          logs.push(`✅ Permanently deleted entire folder ${folderPrefix} with ${allObjects.length} objects`);
           folderResults.push({
             folder,
-            fileCount: files.length,
+            fileCount: allObjects.length,
             totalSize: folderSize,
             status: 'success',
-            message: `Permanently deleted ${files.length} files`
+            message: `Permanently deleted entire folder with ${allObjects.length} objects`
           });
         }
       } else if (mode === 'trash') {
-        // Move to trash folder
-        const trashPath = `${F23_TRASH_PREFIX}/${new Date().toISOString().split('T')[0]}/${folder}`;
+        // Move entire folder to trash
+        const trashFolderPath = `${F23_TRASH_PREFIX}/${new Date().toISOString().split('T')[0]}/${folder}`;
         let moveSuccessCount = 0;
         let moveErrors: string[] = [];
 
-        for (const filePath of filePaths) {
-          const fileName = filePath.split('/').pop();
-          const newPath = `${trashPath}/${fileName}`;
+        for (const objectPath of objectPaths) {
+          // Preserve the folder structure in trash by keeping relative path
+          const relativePath = objectPath.replace(folderPrefix, '');
+          const newPath = `${trashFolderPath}${relativePath}`;
 
           try {
-            // Copy file to trash location
+            // Copy object to trash location
             const { error: copyError } = await supabase.storage
               .from(F23_BUCKET_NAME)
-              .copy(filePath, newPath);
+              .copy(objectPath, newPath);
 
             if (copyError) {
-              moveErrors.push(`Failed to copy ${fileName}: ${copyError.message}`);
+              moveErrors.push(`Failed to copy ${objectPath}: ${copyError.message}`);
               continue;
             }
 
-            // Remove original file
+            // Remove original object
             const { error: removeError } = await supabase.storage
               .from(F23_BUCKET_NAME)
-              .remove([filePath]);
+              .remove([objectPath]);
 
             if (removeError) {
-              moveErrors.push(`Failed to remove original ${fileName}: ${removeError.message}`);
+              moveErrors.push(`Failed to remove original ${objectPath}: ${removeError.message}`);
               // Try to clean up the copy
               await supabase.storage.from(F23_BUCKET_NAME).remove([newPath]);
               continue;
@@ -236,39 +245,39 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
             moveSuccessCount++;
           } catch (err) {
             const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-            moveErrors.push(`Exception moving ${fileName}: ${errorMsg}`);
+            moveErrors.push(`Exception moving ${objectPath}: ${errorMsg}`);
           }
         }
 
-        if (moveSuccessCount === files.length) {
-          totalFiles += files.length;
+        if (moveSuccessCount === allObjects.length) {
+          totalFiles += allObjects.length;
           totalSize += folderSize;
-          logs.push(`✅ Moved ${files.length} files from ${fullPath} to trash`);
+          logs.push(`✅ Moved entire folder ${folderPrefix} with ${allObjects.length} objects to trash`);
           folderResults.push({
             folder,
-            fileCount: files.length,
+            fileCount: allObjects.length,
             totalSize: folderSize,
             status: 'success',
-            message: `Moved ${files.length} files to trash at ${trashPath}`
+            message: `Moved entire folder to trash at ${trashFolderPath} with ${allObjects.length} objects`
           });
         } else {
-          logs.push(`⚠️ Partially moved ${moveSuccessCount}/${files.length} files from ${fullPath}`);
+          logs.push(`⚠️ Partially moved ${moveSuccessCount}/${allObjects.length} objects from folder ${folderPrefix}`);
           if (moveErrors.length > 0) {
             logs.push(`Errors: ${moveErrors.slice(0, 3).join(', ')}${moveErrors.length > 3 ? '...' : ''}`);
           }
           folderResults.push({
             folder,
             fileCount: moveSuccessCount,
-            totalSize: Math.round(folderSize * (moveSuccessCount / files.length)),
+            totalSize: Math.round(folderSize * (moveSuccessCount / allObjects.length)),
             status: moveSuccessCount > 0 ? 'success' : 'error',
-            message: `Moved ${moveSuccessCount}/${files.length} files to trash${moveErrors.length > 0 ? ' (some errors)' : ''}`
+            message: `Moved ${moveSuccessCount}/${allObjects.length} objects to trash${moveErrors.length > 0 ? ' (some errors)' : ''}`
           });
         }
       }
 
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-      logs.push(`❌ Exception processing ${fullPath}: ${errorMsg}`);
+      logs.push(`❌ Exception processing ${folderPrefix}: ${errorMsg}`);
       folderResults.push({
         folder,
         fileCount: 0,
@@ -280,7 +289,7 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
   }
 
   logs.push('---');
-  logs.push(`Operation complete: ${totalFiles} files processed, ${f23_formatBytes(totalSize)} total`);
+  logs.push(`Operation complete: ${totalFiles} objects processed, ${f23_formatBytes(totalSize)} total`);
 
   return {
     mode,
