@@ -41,212 +41,185 @@ export default function Tebnar2Actions({
 }: Tebnar2ActionsProps) {
 
   return (
-    <div className="w-full bg-gray-50 border-b border-gray-200 p-4">
-      <div className="flex flex-col space-y-4">
-        
-        {/* Header */}
-        <h3 className="text-lg font-medium text-gray-900">
-          Actions & Settings
-        </h3>
+    <div className="w-full px-4">
+      {/* Preset Data Button - positioned above kzelement6 - exact clone from tebnar1 */}
+      <div className="mb-4">
+        <button
+          onClick={onPresetLoad}
+          disabled={loadingPreset}
+          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+        >
+          {loadingPreset ? 'Loading...' : 'use dummy kregno xls info 1'}
+        </button>
+      </div>
 
-        {/* Settings Row 1 */}
-        <div className="flex flex-wrap gap-4 items-center">
-          
-          {/* Quantity Per Plan */}
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">
-              Qty per Plan:
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={qtyPerPlan}
-              onChange={(e) => onQtyPerPlanChange(parseInt(e.target.value) || 1)}
-              className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
-            />
-          </div>
+      {/* ExcelPasteGrid component would go here - for now just a placeholder */}
+      <div className="border border-gray-300 p-4 rounded mb-4">
+        <div className="text-gray-500 text-center py-8">
+          [ExcelPasteGrid component placeholder - exact clone from tebnar1 needed]
+        </div>
+      </div>
 
-          {/* AI Model Selection */}
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">
-              AI Model:
-            </label>
-            <select
-              value={aiModel}
-              onChange={(e) => onAiModelChange(e.target.value)}
-              className="px-3 py-1 border border-gray-300 rounded text-sm"
+      <hr className="my-6 border-t-2 border-gray-300" />
+
+      {/* OPTION 1: Submit func_create_plans_from_xls_1 button - exact clone from tebnar1 */}
+      <div className="my-4">
+        <div className="font-bold mb-1">Option 1</div>
+        <button
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          onClick={() => {}}
+          disabled={submitLoading}
+        >
+          {submitLoading ? 'Submitting...' : 'Submit func_create_plans_from_xls_1'}
+        </button>
+        {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
+      </div>
+
+      <hr className="my-6 border-t-2 border-gray-300" />
+
+      {/* OPTION 2: QTY selector and Submit func_create_plans_make_images_1 button - exact clone from tebnar1 */}
+      <div className="mb-4">
+        <div className="font-bold mb-2">Option 2</div>
+        <div className="font-bold mb-2">QTY Of Images Per Plan To Generate</div>
+        <div className="flex space-x-2 mb-2">
+          {[1, 2, 3, 4].map(opt => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => onQtyPerPlanChange(opt)}
+              className={`px-4 py-2 rounded-full border font-bold transition-colors duration-150 ${qtyPerPlan === opt ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-indigo-100'}`}
             >
-              <option value="openai">OpenAI</option>
-              <option value="claude">Claude</option>
-              <option value="replicate">Replicate</option>
-              <option value="stability">Stability AI</option>
-            </select>
-          </div>
-
-          {/* Generate ZIP */}
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="generate-zip"
-              checked={generateZip}
-              onChange={(e) => onGenerateZipChange(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="generate-zip" className="text-sm font-medium text-gray-700">
-              Generate ZIP
-            </label>
-          </div>
-
-          {/* Wipe Meta */}
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="wipe-meta"
-              checked={wipeMeta}
-              onChange={(e) => onWipeMetaChange(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="wipe-meta" className="text-sm font-medium text-gray-700">
-              Wipe Meta
-            </label>
-          </div>
+              {opt}
+            </button>
+          ))}
         </div>
 
-        {/* Throttle Settings */}
-        <div className="flex flex-wrap gap-4 items-center">
-          <span className="text-sm font-medium text-gray-700">Throttle:</span>
-          
-          <div className="flex items-center space-x-2">
-            <label className="text-xs text-gray-600">Delay Between Images:</label>
-            <input
-              type="number"
-              min="0"
-              max="10000"
-              value={throttle1.delayBetweenImages}
-              onChange={(e) => onThrottle1Change({
-                ...throttle1,
-                delayBetweenImages: parseInt(e.target.value) || 0
-              })}
-              className="w-20 px-2 py-1 border border-gray-300 rounded text-xs"
-            />
-          </div>
+        {/* AI Model Selector - exact clone from tebnar1 */}
+        <div className="font-bold mb-2">Select AI Model To Use</div>
+        <div className="flex space-x-2 mb-2">
+          {['openai', 'grok', 'gemini'].map(model => (
+            <button
+              key={model}
+              type="button"
+              onClick={() => onAiModelChange(model)}
+              className={`px-4 py-2 rounded-full border font-bold transition-colors duration-150 capitalize ${aiModel === model ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-teal-100'}`}
+            >
+              {model}
+            </button>
+          ))}
+        </div>
 
-          <div className="flex items-center space-x-2">
-            <label className="text-xs text-gray-600">Delay Between Plans:</label>
-            <input
-              type="number"
-              min="0"
-              max="10000"
-              value={throttle1.delayBetweenPlans}
-              onChange={(e) => onThrottle1Change({
-                ...throttle1,
-                delayBetweenPlans: parseInt(e.target.value) || 0
-              })}
-              className="w-20 px-2 py-1 border border-gray-300 rounded text-xs"
-            />
-          </div>
+        {/* Generate Zip Checkbox - exact clone from tebnar1 */}
+        <div className="flex items-center mb-2">
+          <input
+            id="generate-zip"
+            type="checkbox"
+            checked={generateZip}
+            onChange={e => onGenerateZipChange(e.target.checked)}
+            className="mr-2"
+          />
+          <label htmlFor="generate-zip" className="text-sm font-medium">Generate .zip file inside the main folder</label>
+        </div>
 
-          <div className="flex items-center space-x-2">
+        {/* Wipe Meta Checkbox - exact clone from tebnar1 */}
+        <div className="flex items-center mb-2">
+          <input
+            id="wipe-meta"
+            type="checkbox"
+            checked={wipeMeta}
+            onChange={e => onWipeMetaChange(e.target.checked)}
+            className="mr-2"
+          />
+          <label htmlFor="wipe-meta" className="text-sm font-medium">Wipe all meta data from images</label>
+        </div>
+        
+        {/* Throttle1 Controls - exact clone from tebnar1 */}
+        <div className="border-t border-gray-200 pt-4 mt-4">
+          <div className="flex items-center mb-3">
             <input
+              id="throttle1-enabled"
               type="checkbox"
-              id="throttle-enabled"
               checked={throttle1.enabled}
-              onChange={(e) => onThrottle1Change({
-                ...throttle1,
-                enabled: e.target.checked
-              })}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              onChange={e => onThrottle1Change({ ...throttle1, enabled: e.target.checked })}
+              className="mr-2"
             />
-            <label htmlFor="throttle-enabled" className="text-xs text-gray-600">
-              Enabled
+            <label htmlFor="throttle1-enabled" className="text-sm font-medium text-blue-700">
+              🐌 Enable Throttle1 (Slow down API requests to prevent timeouts)
             </label>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-3">
           
-          {/* Preset Load Button */}
-          <button
-            onClick={onPresetLoad}
-            disabled={loadingPreset}
-            className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
-              loadingPreset
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
-            }`}
-          >
-            {loadingPreset ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Loading...</span>
+          {throttle1.enabled && (
+            <div className="ml-6 space-y-3 bg-blue-50 p-3 rounded-lg">
+              <div className="flex items-center space-x-4">
+                <label className="text-sm font-medium text-gray-700 min-w-[140px]">
+                  Delay between images:
+                </label>
+                <input
+                  type="number"
+                  value={throttle1.delayBetweenImages}
+                  onChange={e => onThrottle1Change({ ...throttle1, delayBetweenImages: Number(e.target.value) })}
+                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                  min="1000"
+                  max="30000"
+                  step="500"
+                />
+                <span className="text-sm text-gray-500">ms ({(throttle1.delayBetweenImages / 1000).toFixed(1)}s)</span>
               </div>
-            ) : (
-              'Load Preset'
-            )}
-          </button>
-
-          {/* Submit/Process Button */}
-          <button
-            disabled={submitLoading}
-            className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
-              submitLoading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-green-600 hover:bg-green-700 text-white'
-            }`}
-          >
-            {submitLoading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Processing...</span>
+              
+              <div className="flex items-center space-x-4">
+                <label className="text-sm font-medium text-gray-700 min-w-[140px]">
+                  Delay between plans:
+                </label>
+                <input
+                  type="number"
+                  value={throttle1.delayBetweenPlans}
+                  onChange={e => onThrottle1Change({ ...throttle1, delayBetweenPlans: Number(e.target.value) })}
+                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                  min="500"
+                  max="10000"
+                  step="250"
+                />
+                <span className="text-sm text-gray-500">ms ({(throttle1.delayBetweenPlans / 1000).toFixed(1)}s)</span>
               </div>
-            ) : (
-              'Submit Plans'
-            )}
-          </button>
-
-          {/* Make Images Button */}
-          <button
-            disabled={makeImagesLoading}
-            className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
-              makeImagesLoading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
-          >
-            {makeImagesLoading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Generating...</span>
+              
+              <div className="text-xs text-gray-600 mt-2">
+                💡 Recommended: 3-5 seconds between images, 1-2 seconds between plans. Higher values reduce API timeouts but take longer.
               </div>
-            ) : (
-              'Make Images'
-            )}
-          </button>
+            </div>
+          )}
         </div>
 
-        {/* Result Messages */}
-        {submitResult && (
-          <div className={`p-3 rounded text-sm ${
-            submitResult.includes('success') || submitResult.includes('✅')
-              ? 'bg-green-100 text-green-800 border border-green-300'
-              : 'bg-red-100 text-red-800 border border-red-300'
-          }`}>
-            {submitResult}
-          </div>
-        )}
+        <button
+          className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
+          onClick={() => {}}
+          disabled={makeImagesLoading}
+        >
+          {makeImagesLoading ? 'Generating Images...' : 'Submit func_create_plans_make_images_1'}
+        </button>
 
         {makeImagesResult && (
-          <div className={`p-3 rounded text-sm ${
-            makeImagesResult.includes('success') || makeImagesResult.includes('✅')
-              ? 'bg-green-100 text-green-800 border border-green-300'
-              : 'bg-red-100 text-red-800 border border-red-300'
-          }`}>
-            {makeImagesResult}
+          <div className="mt-2 text-sm">
+            <div className={makeImagesResult.includes('🚀') ? 'text-blue-700' : 'text-gray-700'}>
+              {makeImagesResult}
+            </div>
+            {makeImagesLoading && (
+              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+                <div className="text-sm text-blue-800">
+                  <strong>💡 Debug Tips:</strong>
+                  <ul className="mt-1 ml-4 list-disc text-xs">
+                    <li>Go to <strong>bin35/statusbox1</strong> to see real-time logs</li>
+                    <li>Filter by "image_generation" or "throttle_system" category</li>
+                    <li>Watch for timeout errors or OpenAI API failures</li>
+                    <li>Each image generation step is logged with details</li>
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      <hr className="my-6 border-t-2 border-gray-300" />
     </div>
   );
 }

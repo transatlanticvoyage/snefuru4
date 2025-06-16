@@ -27,7 +27,7 @@ export interface Tebnar2Image {
   id: string;
   rel_users_id: string;
   created_at: string;
-  url?: string;
+  img_file_url1?: string;
   file_name?: string;
   file_size?: number;
   metadata?: any;

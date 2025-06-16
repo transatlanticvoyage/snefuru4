@@ -191,16 +191,17 @@ export default function Tebnar2Main() {
 
   return (
     <div className="w-full mx-auto">
-      {/* Filters and Controls */}
+      {/* Filters and Controls - exact clone from tebnar1 */}
       <Tebnar2Filters
         batches={tbn2_batches}
         selectedBatchId={tbn2_selectedBatchId}
         onBatchChange={setTbn2SelectedBatchId}
         error={tbn2_error}
         onRefresh={tbn2_fetchPlans}
+        onErrorDismiss={() => setTbn2Error(null)}
       />
 
-      {/* Actions and Settings */}
+      {/* Actions and Settings - exact clone from tebnar1 */}
       <Tebnar2Actions
         qtyPerPlan={tbn2_qtyPerPlan}
         onQtyPerPlanChange={setTbn2QtyPerPlan}
@@ -220,7 +221,7 @@ export default function Tebnar2Main() {
         onPresetLoad={() => {}} // TODO: Implement preset loading
       />
 
-      {/* Main Table */}
+      {/* Main Table - exact clone from tebnar1 */}
       <Tebnar2Table
         plans={tbn2_paginatedPlans}
         imagesById={tbn2_imagesById}

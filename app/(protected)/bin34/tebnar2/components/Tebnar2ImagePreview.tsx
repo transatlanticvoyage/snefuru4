@@ -3,7 +3,6 @@
 import { Tebnar2Image, Tebnar2ImagePlan } from '../types/tebnar2-types';
 import { TBN2_DEBOUNCE_MS } from '../constants/tebnar2-constants';
 import { tbn2_shouldShowFetchButton } from '../utils/tbn2-data-functions';
-import { tbn2_canPerformAction, tbn2_generateFetchKey } from '../utils/tbn2-utils';
 
 interface Tebnar2ImagePreviewProps {
   image: Tebnar2Image | null;
@@ -25,79 +24,80 @@ export default function Tebnar2ImagePreview({
   onRefreshImages
 }: Tebnar2ImagePreviewProps) {
   
-  const fetchKey = tbn2_generateFetchKey(plan.id, imageNumber);
+  const fetchKey = `${plan.id}-${imageNumber}`;
   const isFetching = fetchingImages.has(fetchKey);
-  
-  // Use centralized fetch button logic and debounce check
-  const canFetch = tbn2_canPerformAction(lastClickTime, fetchKey, TBN2_DEBOUNCE_MS);
-
-  // Handle fetch image button click with debouncing
-  const tbn2_handleFetchImage = () => {
-    if (!canFetch) {
-      return; // Debounce protection
-    }
-
-    // Update last click time
-    // Note: This would need to be passed up to parent component to update state
-    console.log(`Would fetch image ${imageNumber} for plan ${plan.id}`);
-    
-    // TODO: Implement actual image generation logic
-    // This would call the utility function to generate images
-    // Similar to the cfunc_create_plans_make_images_1 functionality
-  };
-
   const showFetchButton = tbn2_shouldShowFetchButton(plan, imageNumber);
 
-  return (
-    <div className="w-full h-20 flex items-center justify-center">
-      {image ? (
-        // Show actual image
-        <img
-          src={image.url || ''}
-          alt={`Image ${imageNumber} for plan ${plan.id}`}
-          className="max-w-full max-h-full object-contain border border-gray-200 rounded"
-          onError={(e) => {
-            // Handle broken image
-            (e.target as HTMLImageElement).style.display = 'none';
+  // Handle fetch image button click - exact clone from tebnar1
+  const tbn2_handleFetchImage = () => {
+    console.log(`Would fetch image ${imageNumber} for plan ${plan.id}`);
+    // TODO: Implement actual image generation logic
+  };
+
+  // Exact HTML structure from tebnar1
+  if (image) {
+    return (
+      <img
+        src={image.img_file_url1 || ''}
+        alt={`Image ${imageNumber}`}
+        style={{
+          width: '80px',
+          height: '80px',
+          objectFit: 'contain' as const,
+          borderRadius: '4px',
+          border: '1px solid #e0e0e0',
+        }}
+      />
+    );
+  } else if (isFetching) {
+    return (
+      <div 
+        className="flex items-center justify-center bg-gray-100 rounded"
+        style={{
+          width: '80px',
+          height: '80px',
+          backgroundColor: '#f3f4f6',
+        }}
+      >
+        <div 
+          className="animate-spin rounded-full border-b-2 border-blue-600"
+          style={{
+            width: '20px',
+            height: '20px',
+            borderColor: 'transparent transparent #2563eb transparent',
           }}
-        />
-      ) : imageId ? (
-        // Image ID exists but image not loaded
-        <div className="text-xs text-gray-500 text-center p-2">
-          <div>ID: {imageId.substring(0, 8)}...</div>
-          <button
-            onClick={onRefreshImages}
-            className="mt-1 text-blue-600 hover:text-blue-800 underline"
-          >
-            Refresh
-          </button>
-        </div>
-      ) : showFetchButton ? (
-        // Show fetch button for generating new image
-        <button
-          onClick={tbn2_handleFetchImage}
-          disabled={isFetching}
-          className={`px-2 py-1 text-xs rounded transition-colors ${
-            isFetching
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
-          }`}
-        >
-          {isFetching ? (
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Gen...</span>
-            </div>
-          ) : (
-            `Gen ${imageNumber}`
-          )}
-        </button>
-      ) : (
-        // Empty state
-        <div className="text-xs text-gray-400 text-center">
-          No image
-        </div>
-      )}
-    </div>
-  );
+        ></div>
+      </div>
+    );
+  } else if (showFetchButton) {
+    return (
+      <button
+        onClick={tbn2_handleFetchImage}
+        className="border border-blue-300 text-blue-700 hover:bg-blue-100 font-semibold rounded-lg transition-colors duration-200 ease-in-out"
+        style={{
+          width: '80px',
+          height: '32px',
+          borderRadius: '8px',
+          fontSize: '12px',
+          fontWeight: '600',
+          transition: 'background-color 200ms ease-in-out',
+          backgroundColor: 'transparent',
+          borderColor: '#93c5fd',
+          color: '#1d4ed8',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#dbeafe';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
+      >
+        Fetch Now
+      </button>
+    );
+  } else {
+    return (
+      <div className="text-gray-400 text-sm">No image</div>
+    );
+  }
 }
