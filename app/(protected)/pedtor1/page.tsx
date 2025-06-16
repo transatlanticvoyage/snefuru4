@@ -38,7 +38,7 @@ export default function Pedtor1Page() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const pieceId = searchParams.get('id');
+  const pieceId = searchParams?.get('id');
 
   const supabase = createClientComponentClient();
 
