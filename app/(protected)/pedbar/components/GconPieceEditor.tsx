@@ -15,6 +15,12 @@ interface GconPiece {
   asn_nwpi_posts_id: string | null;
   asn_imgplanbatch_id: string | null;
   image_pack1: any;
+  pelementor_cached: any;
+  pelementor_edits: any;
+  pub_status: string | null;
+  date_time_pub_carry: string | null;
+  pageslug: string | null;
+  pageurl: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -41,7 +47,13 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
     asn_sitespren_base: gconPiece.asn_sitespren_base || '',
     asn_nwpi_posts_id: gconPiece.asn_nwpi_posts_id || '',
     asn_imgplanbatch_id: gconPiece.asn_imgplanbatch_id || '',
-    image_pack1: gconPiece.image_pack1 ? JSON.stringify(gconPiece.image_pack1, null, 2) : ''
+    image_pack1: gconPiece.image_pack1 ? JSON.stringify(gconPiece.image_pack1, null, 2) : '',
+    pelementor_cached: gconPiece.pelementor_cached ? JSON.stringify(gconPiece.pelementor_cached, null, 2) : '',
+    pelementor_edits: gconPiece.pelementor_edits ? JSON.stringify(gconPiece.pelementor_edits, null, 2) : '',
+    pub_status: gconPiece.pub_status || '',
+    date_time_pub_carry: gconPiece.date_time_pub_carry ? gconPiece.date_time_pub_carry.split('T')[0] : '',
+    pageslug: gconPiece.pageslug || '',
+    pageurl: gconPiece.pageurl || ''
   });
   
   const [isSaving, setIsSaving] = useState(false);
@@ -99,7 +111,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
     setIsSaving(true);
     setNotification(null);
 
-    // Validate JSON field
+    // Validate JSON fields
     if (!validateJsonField(formData.image_pack1)) {
       setNotification({
         type: 'error',
@@ -109,11 +121,39 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
       return;
     }
 
+    if (!validateJsonField(formData.pelementor_cached)) {
+      setNotification({
+        type: 'error',
+        message: 'Invalid JSON format in pelementor_cached field'
+      });
+      setIsSaving(false);
+      return;
+    }
+
+    if (!validateJsonField(formData.pelementor_edits)) {
+      setNotification({
+        type: 'error',
+        message: 'Invalid JSON format in pelementor_edits field'
+      });
+      setIsSaving(false);
+      return;
+    }
+
     try {
-      // Parse image_pack1 JSON or set to null if empty
+      // Parse JSON fields or set to null if empty
       let parsedImagePack1 = null;
       if (formData.image_pack1.trim()) {
         parsedImagePack1 = JSON.parse(formData.image_pack1);
+      }
+
+      let parsedPelementorCached = null;
+      if (formData.pelementor_cached.trim()) {
+        parsedPelementorCached = JSON.parse(formData.pelementor_cached);
+      }
+
+      let parsedPelementorEdits = null;
+      if (formData.pelementor_edits.trim()) {
+        parsedPelementorEdits = JSON.parse(formData.pelementor_edits);
       }
 
       // Prepare update data
@@ -127,6 +167,12 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         asn_nwpi_posts_id: formData.asn_nwpi_posts_id || null,
         asn_imgplanbatch_id: formData.asn_imgplanbatch_id || null,
         image_pack1: parsedImagePack1,
+        pelementor_cached: parsedPelementorCached,
+        pelementor_edits: parsedPelementorEdits,
+        pub_status: formData.pub_status || null,
+        date_time_pub_carry: formData.date_time_pub_carry ? new Date(formData.date_time_pub_carry).toISOString() : null,
+        pageslug: formData.pageslug || null,
+        pageurl: formData.pageurl || null,
         updated_at: new Date().toISOString()
       };
 
@@ -177,7 +223,13 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
       asn_sitespren_base: gconPiece.asn_sitespren_base || '',
       asn_nwpi_posts_id: gconPiece.asn_nwpi_posts_id || '',
       asn_imgplanbatch_id: gconPiece.asn_imgplanbatch_id || '',
-      image_pack1: gconPiece.image_pack1 ? JSON.stringify(gconPiece.image_pack1, null, 2) : ''
+      image_pack1: gconPiece.image_pack1 ? JSON.stringify(gconPiece.image_pack1, null, 2) : '',
+      pelementor_cached: gconPiece.pelementor_cached ? JSON.stringify(gconPiece.pelementor_cached, null, 2) : '',
+      pelementor_edits: gconPiece.pelementor_edits ? JSON.stringify(gconPiece.pelementor_edits, null, 2) : '',
+      pub_status: gconPiece.pub_status || '',
+      date_time_pub_carry: gconPiece.date_time_pub_carry ? gconPiece.date_time_pub_carry.split('T')[0] : '',
+      pageslug: gconPiece.pageslug || '',
+      pageurl: gconPiece.pageurl || ''
     });
     setHasUnsavedChanges(false);
   };
@@ -372,6 +424,120 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
           <p className="mt-1 text-sm text-gray-500">
             Enter valid JSON or leave empty. Format will be validated before saving.
           </p>
+        </div>
+
+        {/* Pelementor Cached (JSON) */}
+        <div>
+          <label htmlFor="pelementor_cached" className="block text-sm font-medium text-gray-700 mb-2">
+            Pelementor Cached (JSON)
+          </label>
+          <textarea
+            id="pelementor_cached"
+            value={formData.pelementor_cached}
+            onChange={(e) => handleInputChange('pelementor_cached', e.target.value)}
+            rows={6}
+            className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm ${
+              !validateJsonField(formData.pelementor_cached) 
+                ? 'border-red-300 bg-red-50' 
+                : 'border-gray-300'
+            }`}
+            placeholder='{"key": "value"}'
+          />
+          {!validateJsonField(formData.pelementor_cached) && (
+            <p className="mt-1 text-sm text-red-600">Invalid JSON format</p>
+          )}
+          <p className="mt-1 text-sm text-gray-500">
+            Cached Elementor data. Enter valid JSON or leave empty.
+          </p>
+        </div>
+
+        {/* Pelementor Edits (JSON) */}
+        <div>
+          <label htmlFor="pelementor_edits" className="block text-sm font-medium text-gray-700 mb-2">
+            Pelementor Edits (JSON)
+          </label>
+          <textarea
+            id="pelementor_edits"
+            value={formData.pelementor_edits}
+            onChange={(e) => handleInputChange('pelementor_edits', e.target.value)}
+            rows={6}
+            className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm ${
+              !validateJsonField(formData.pelementor_edits) 
+                ? 'border-red-300 bg-red-50' 
+                : 'border-gray-300'
+            }`}
+            placeholder='{"key": "value"}'
+          />
+          {!validateJsonField(formData.pelementor_edits) && (
+            <p className="mt-1 text-sm text-red-600">Invalid JSON format</p>
+          )}
+          <p className="mt-1 text-sm text-gray-500">
+            Elementor edit data. Enter valid JSON or leave empty.
+          </p>
+        </div>
+
+        {/* Publishing and URL Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="pub_status" className="block text-sm font-medium text-gray-700 mb-2">
+              Publication Status
+            </label>
+            <select
+              id="pub_status"
+              value={formData.pub_status}
+              onChange={(e) => handleInputChange('pub_status', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select status...</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="imported_from_nwpi">Imported from NWPI</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="date_time_pub_carry" className="block text-sm font-medium text-gray-700 mb-2">
+              Publication Date
+            </label>
+            <input
+              type="date"
+              id="date_time_pub_carry"
+              value={formData.date_time_pub_carry}
+              onChange={(e) => handleInputChange('date_time_pub_carry', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Page Slug and URL */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="pageslug" className="block text-sm font-medium text-gray-700 mb-2">
+              Page Slug
+            </label>
+            <input
+              type="text"
+              id="pageslug"
+              value={formData.pageslug}
+              onChange={(e) => handleInputChange('pageslug', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g., my-page-slug"
+            />
+          </div>
+          <div>
+            <label htmlFor="pageurl" className="block text-sm font-medium text-gray-700 mb-2">
+              Page URL
+            </label>
+            <input
+              type="url"
+              id="pageurl"
+              value={formData.pageurl}
+              onChange={(e) => handleInputChange('pageurl', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="https://example.com/page"
+            />
+          </div>
         </div>
       </div>
 
