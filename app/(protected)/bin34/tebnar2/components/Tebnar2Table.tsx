@@ -9,10 +9,10 @@ import Tebnar2ImagePreview from './Tebnar2ImagePreview';
 const tbn2_tableStyleSettings = {
   // Table-level settings for strict layout control
   table: {
-    tableLayout: 'fixed' as 'auto' | 'fixed', // Forces columns to respect width settings
+    tableLayout: 'fixed',
     width: '100%',
     maxWidth: '100%',
-    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto',
+    overflow: 'hidden',
   },
   
   // Row styling
@@ -20,25 +20,25 @@ const tbn2_tableStyleSettings = {
     height: '80px',
     minHeight: '80px',
     maxHeight: '80px',
-    verticalAlign: 'middle' as 'top' | 'middle' | 'bottom',
+    verticalAlign: 'middle',
     backgroundColor: '#ffffff',
     hoverBackgroundColor: '#f9fafb',
     borderBottom: '1px solid #e5e7eb',
-    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto', // Prevent row overflow
+    overflow: 'hidden',
   },
   
   // Cell styling - Enhanced for strict overflow control
   cell: {
-    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto',
-    textOverflow: 'ellipsis' as 'clip' | 'ellipsis',
-    whiteSpace: 'nowrap' as 'normal' | 'nowrap' | 'pre' | 'pre-wrap' | 'pre-line',
-    wordBreak: 'break-word' as 'normal' | 'break-all' | 'keep-all' | 'break-word', // Better handling of long words
-    wordWrap: 'break-word' as 'normal' | 'break-word' | 'anywhere', // Additional word breaking
-    verticalAlign: 'top' as 'top' | 'middle' | 'bottom' | 'baseline', // Changed from 'middle' to 'top' for upper left justification
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    wordBreak: 'break-word',
+    wordWrap: 'break-word',
+    verticalAlign: 'top',
     padding: '8px 16px',
-    maxWidth: '100%', // Ensure cells don't exceed their allocated width
-    minWidth: '0', // Allow cells to shrink if needed
-    boxSizing: 'border-box' as 'content-box' | 'border-box', // Include padding in width calculations
+    maxWidth: '100%',
+    minWidth: '0',
+    boxSizing: 'border-box',
   },
   
   // Text cell specific styling (for data columns) - Enhanced overflow control
@@ -46,8 +46,8 @@ const tbn2_tableStyleSettings = {
     fontSize: '14px',
     lineHeight: '1.5',
     color: '#374151',
-    fontWeight: 'normal' as 'normal' | 'bold' | 'lighter' | 'bolder',
-    overflow: 'hidden', // Explicit overflow hidden for text cells
+    fontWeight: 'normal',
+    overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     maxWidth: '100%',
@@ -57,12 +57,12 @@ const tbn2_tableStyleSettings = {
   // Preview cell specific styling (for image columns) - Enhanced overflow control
   previewCell: {
     padding: '8px',
-    textAlign: 'center' as 'left' | 'center' | 'right',
+    textAlign: 'center',
     backgroundColor: '#fafafa',
-    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto', // Prevent image overflow
-    display: 'flex' as 'block' | 'flex' | 'inline-block',
-    alignItems: 'center' as 'flex-start' | 'center' | 'flex-end',
-    justifyContent: 'center' as 'flex-start' | 'center' | 'flex-end',
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     maxWidth: '100%',
     maxHeight: '100%',
   },
@@ -71,25 +71,25 @@ const tbn2_tableStyleSettings = {
   previewImage: {
     width: '64px',
     height: '64px',
-    maxWidth: '64px', // Explicit max-width
-    maxHeight: '64px', // Explicit max-height
-    objectFit: 'cover' as 'fill' | 'contain' | 'cover' | 'none' | 'scale-down',
+    maxWidth: '64px',
+    maxHeight: '64px',
+    objectFit: 'cover',
     borderRadius: '4px',
     border: '1px solid #e5e7eb',
-    flexShrink: 0, // Prevent image from shrinking
+    flexShrink: 0,
   },
   
   // Table header styling
   header: {
-    backgroundColor: '#f7ead4', // Exact color from tebnar1
+    backgroundColor: '#f7ead4',
     fontSize: '12px',
     fontWeight: '500',
     color: '#6b7280',
-    textTransform: 'uppercase' as 'none' | 'capitalize' | 'uppercase' | 'lowercase',
+    textTransform: 'uppercase',
     letterSpacing: '0.05em',
     padding: '12px 16px',
     borderBottom: '1px solid #e5e7eb',
-    overflow: 'hidden', // Prevent header text overflow
+    overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     maxWidth: '100%',
@@ -102,7 +102,7 @@ const tbn2_tableStyleSettings = {
     padding: '12px 24px',
     fontSize: '14px',
     color: '#374151',
-    overflow: 'hidden', // Prevent pagination overflow
+    overflow: 'hidden',
   }
 };
 
@@ -159,11 +159,11 @@ const tbn2_tableCellPaddingSettings = {
 const tbn2_tableBorderSettings = {
   // Global border settings
   global: {
-    borderCollapse: 'collapse' as 'separate' | 'collapse', // Border collapse model
-    borderSpacing: '0px',            // Border spacing when separate
-    borderStyle: 'solid',            // Global border style
-    borderColor: '#c7cbd3',          // Global border color - updated to requested color
-    borderWidth: '1px',              // Global border width
+    borderCollapse: 'collapse',
+    borderSpacing: '0px',
+    borderStyle: 'solid',
+    borderColor: '#c7cbd3',
+    borderWidth: '1px',
   },
   
   // Table outer borders
