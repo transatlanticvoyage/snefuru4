@@ -9,10 +9,10 @@ import Tebnar2ImagePreview from './Tebnar2ImagePreview';
 const tbn2_tableStyleSettings = {
   // Table-level settings for strict layout control
   table: {
-    tableLayout: 'fixed',
+    tableLayout: 'fixed' as const,
     width: '100%',
     maxWidth: '100%',
-    overflow: 'hidden',
+    overflow: 'hidden' as const,
   },
   
   // Row styling
@@ -20,25 +20,25 @@ const tbn2_tableStyleSettings = {
     height: '80px',
     minHeight: '80px',
     maxHeight: '80px',
-    verticalAlign: 'middle',
+    verticalAlign: 'middle' as const,
     backgroundColor: '#ffffff',
     hoverBackgroundColor: '#f9fafb',
     borderBottom: '1px solid #e5e7eb',
-    overflow: 'hidden',
+    overflow: 'hidden' as const,
   },
   
   // Cell styling - Enhanced for strict overflow control
   cell: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    wordBreak: 'break-word',
-    wordWrap: 'break-word',
-    verticalAlign: 'top',
+    overflow: 'hidden' as const,
+    textOverflow: 'ellipsis' as const,
+    whiteSpace: 'nowrap' as const,
+    wordBreak: 'break-word' as const,
+    wordWrap: 'break-word' as const,
+    verticalAlign: 'top' as const,
     padding: '8px 16px',
     maxWidth: '100%',
     minWidth: '0',
-    boxSizing: 'border-box',
+    boxSizing: 'border-box' as const,
   },
   
   // Text cell specific styling (for data columns) - Enhanced overflow control
@@ -46,23 +46,23 @@ const tbn2_tableStyleSettings = {
     fontSize: '14px',
     lineHeight: '1.5',
     color: '#374151',
-    fontWeight: 'normal',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    fontWeight: 'normal' as const,
+    overflow: 'hidden' as const,
+    textOverflow: 'ellipsis' as const,
+    whiteSpace: 'nowrap' as const,
     maxWidth: '100%',
-    wordBreak: 'break-word',
+    wordBreak: 'break-word' as const,
   },
   
   // Preview cell specific styling (for image columns) - Enhanced overflow control
   previewCell: {
     padding: '8px',
-    textAlign: 'center',
+    textAlign: 'center' as const,
     backgroundColor: '#fafafa',
-    overflow: 'hidden',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: 'hidden' as const,
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
     maxWidth: '100%',
     maxHeight: '100%',
   },
@@ -73,7 +73,7 @@ const tbn2_tableStyleSettings = {
     height: '64px',
     maxWidth: '64px',
     maxHeight: '64px',
-    objectFit: 'cover',
+    objectFit: 'cover' as const,
     borderRadius: '4px',
     border: '1px solid #e5e7eb',
     flexShrink: 0,
@@ -85,13 +85,13 @@ const tbn2_tableStyleSettings = {
     fontSize: '12px',
     fontWeight: '500',
     color: '#6b7280',
-    textTransform: 'uppercase',
+    textTransform: 'uppercase' as const,
     letterSpacing: '0.05em',
     padding: '12px 16px',
     borderBottom: '1px solid #e5e7eb',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    overflow: 'hidden' as const,
+    textOverflow: 'ellipsis' as const,
+    whiteSpace: 'nowrap' as const,
     maxWidth: '100%',
   },
   
@@ -102,7 +102,7 @@ const tbn2_tableStyleSettings = {
     padding: '12px 24px',
     fontSize: '14px',
     color: '#374151',
-    overflow: 'hidden',
+    overflow: 'hidden' as const,
   }
 };
 
