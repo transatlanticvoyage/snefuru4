@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { F23DeletionMode, F23OperationResult, F23ApiResponse } from '../types/f23-types';
-import { F23_DELETION_MODES } as MODES } from '../constants/f23-constants';
+import { F23_DELETION_MODES as MODES } from '../constants/f23-constants';
 
 export default function F23StorageCleanupForm() {
   const [f23_folderInput, setF23FolderInput] = useState('');
