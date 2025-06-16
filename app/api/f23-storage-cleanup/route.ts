@@ -261,16 +261,16 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
 
       if (mode === 'permanent') {
         // Permanent deletion of entire folder
-        logs.push(`🔍 DEBUG: Attempting to delete paths:`, objectPaths);
+        logs.push(`🔍 DEBUG: Attempting to delete paths: ${JSON.stringify(objectPaths)}`);
         
         const { data: deleteResult, error: deleteErr } = await supabase.storage
           .from(F23_BUCKET_NAME)
           .remove(objectPaths);
 
-        logs.push(`🔍 DEBUG: Delete operation result:`, { 
+        logs.push(`🔍 DEBUG: Delete operation result: ${JSON.stringify({ 
           error: deleteErr?.message || null, 
           result: deleteResult || 'no result data' 
-        });
+        })}`);
 
         if (deleteErr) {
           logs.push(`❌ Failed to delete folder ${folderPrefix}: ${deleteErr.message}`);
