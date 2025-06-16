@@ -41,7 +41,7 @@ export default async function NwividPage({ searchParams }: NwividPageProps) {
   const { data: contentData, error: contentError } = await supabase
     .from('nwpi_content')
     .select('*')
-    .eq('id', contentid)
+    .eq('internal_post_id', contentid)
     .eq('fk_users_id', userData.id) // Security: ensure user owns this content
     .single();
 

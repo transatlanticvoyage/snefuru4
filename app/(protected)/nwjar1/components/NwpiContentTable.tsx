@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
 interface NwpiContent {
-  id: string;
+  internal_post_id: string;
   fk_users_id: string;
   fk_sitespren_id: string;
   fk_sitespren_base: string;
@@ -51,6 +51,7 @@ type SortField = 'post_title' | 'fk_sitespren_base' | 'post_type' | 'post_status
 type SortOrder = 'asc' | 'desc';
 
 export default function NwpiContentTable({ data }: NwpiContentTableProps) {
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
@@ -343,10 +344,10 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <tr key={item.internal_post_id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Link
-                      href={`/nwivid?contentid=${encodeURIComponent(item.id)}`}
+                      href={`/nwivid?contentid=${encodeURIComponent(item.internal_post_id)}`}
                       className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Individual View

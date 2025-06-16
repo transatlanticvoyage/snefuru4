@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 interface NwpiContent {
-  id: string;
+  internal_post_id: string;
   fk_users_id: string;
   fk_sitespren_id: string;
   fk_sitespren_base: string;
@@ -388,7 +388,7 @@ export default function NwpiContentView({ content }: NwpiContentViewProps) {
             <dl className="space-y-3">
               <div>
                 <dt className="text-sm font-medium text-gray-500">Content ID</dt>
-                <dd className="text-sm text-gray-900 font-mono">{content.id}</dd>
+                <dd className="text-sm text-gray-900 font-mono">{content.internal_post_id}</dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-gray-500">Site ID</dt>
