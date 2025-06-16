@@ -66,12 +66,12 @@ async function f23_previewDeletion(folders: string[], logs: string[], mode: stri
     logs.push(`Previewing entire folder: ${folderPrefix}`);
 
     try {
-      // Get ALL objects that start with this folder prefix
+      // Get ALL objects in the folder (including subdirectories)
       const { data: allObjects, error } = await supabase.storage
         .from(F23_BUCKET_NAME)
-        .list('', { 
+        .list(folderPrefix, { 
           limit: 1000,
-          prefix: folderPrefix
+          sortBy: { column: 'name', order: 'asc' }
         });
 
       if (error) {
@@ -109,7 +109,7 @@ async function f23_previewDeletion(folders: string[], logs: string[], mode: stri
         totalSize: folderSize,
         status: 'success',
         message: `Would ${mode === 'permanent' ? 'permanently delete entire folder' : 'move entire folder to trash'} with ${allObjects.length} objects`,
-        filePaths: allObjects.map(obj => obj.name)
+        filePaths: allObjects.map(obj => `${folderPrefix}/${obj.name}`)
       });
 
     } catch (err) {
@@ -146,12 +146,12 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
     logs.push(`Processing entire folder: ${folderPrefix} (${mode})`);
 
     try {
-      // Get ALL objects that start with this folder prefix
+      // Get ALL objects in the folder (including subdirectories)
       const { data: allObjects, error: listError } = await supabase.storage
         .from(F23_BUCKET_NAME)
-        .list('', { 
+        .list(folderPrefix, { 
           limit: 1000,
-          prefix: folderPrefix
+          sortBy: { column: 'name', order: 'asc' }
         });
 
       if (listError) {
@@ -178,7 +178,7 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
         continue;
       }
 
-      const objectPaths = allObjects.map(obj => obj.name);
+      const objectPaths = allObjects.map(obj => `${folderPrefix}/${obj.name}`);
       const folderSize = allObjects.reduce((sum, obj) => sum + (obj.metadata?.size || 0), 0);
 
       if (mode === 'permanent') {
@@ -215,9 +215,9 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
         let moveErrors: string[] = [];
 
         for (const objectPath of objectPaths) {
-          // Preserve the folder structure in trash by keeping relative path
-          const relativePath = objectPath.replace(folderPrefix, '');
-          const newPath = `${trashFolderPath}${relativePath}`;
+          // Get just the filename from the object path
+          const fileName = objectPath.split('/').pop();
+          const newPath = `${trashFolderPath}/${fileName}`;
 
           try {
             // Copy object to trash location
