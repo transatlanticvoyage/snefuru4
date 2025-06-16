@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     let f23_results: F23OperationResult;
 
     if (f23_mode === 'preview') {
-      f23_results = await f23_previewDeletion(f23_folders, f23_logs);
+      f23_results = await f23_previewDeletion(f23_folders, f23_logs, f23_mode);
     } else {
       f23_results = await f23_executeDeletion(f23_folders, f23_mode, f23_logs);
     }
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function f23_previewDeletion(folders: string[], logs: string[]): Promise<F23OperationResult> {
+async function f23_previewDeletion(folders: string[], logs: string[], mode: string = 'preview'): Promise<F23OperationResult> {
   const folderResults: F23FolderResult[] = [];
   let totalFiles = 0;
   let totalSize = 0;
@@ -104,7 +104,7 @@ async function f23_previewDeletion(folders: string[], logs: string[]): Promise<F
         fileCount: files.length,
         totalSize: folderSize,
         status: 'success',
-        message: `Would ${f23_mode === 'permanent' ? 'permanently delete' : 'move to trash'} ${files.length} files`,
+        message: `Would ${mode === 'permanent' ? 'permanently delete' : 'move to trash'} ${files.length} files`,
         filePaths: files.map(f => `${fullPath}/${f.name}`)
       });
 
