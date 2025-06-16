@@ -5,13 +5,13 @@ import { notFound } from 'next/navigation';
 import NwpiContentView from './components/NwpiContentView';
 
 interface NwividPageProps {
-  searchParams: {
+  searchParams: Promise<{
     contentid?: string;
-  };
+  }>;
 }
 
 export default async function NwividPage({ searchParams }: NwividPageProps) {
-  const { contentid } = searchParams;
+  const { contentid } = await searchParams;
 
   if (!contentid) {
     notFound();
