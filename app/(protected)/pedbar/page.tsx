@@ -19,6 +19,12 @@ interface GconPiece {
   asn_nwpi_posts_id: string | null;
   asn_imgplanbatch_id: string | null;
   image_pack1: any;
+  pelementor_cached: any;
+  pelementor_edits: any;
+  pub_status: string | null;
+  date_time_pub_carry: string | null;
+  pageslug: string | null;
+  pageurl: string | null;
   created_at: string;
   updated_at: string;
 }
