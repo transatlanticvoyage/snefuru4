@@ -263,6 +263,12 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         >
           Reset
         </button>
+        <a
+          href={`/pedtor1?id=${gconPiece.id}`}
+          className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition-colors text-center"
+        >
+          pedtor1
+        </a>
         {hasUnsavedChanges && (
           <span className="text-orange-600 text-sm self-center">
             * You have unsaved changes
@@ -558,6 +564,12 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
           >
             Reset
           </button>
+          <a
+            href={`/pedtor1?id=${gconPiece.id}`}
+            className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition-colors text-center"
+          >
+            pedtor1
+          </a>
         </div>
       </div>
     </div>
