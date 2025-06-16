@@ -2,6 +2,7 @@
 
 import { Tebnar2ImagePlan, Tebnar2Image } from '../types/tebnar2-types';
 import { TBN2_COLUMNS, TBN2_COLUMN_SETTINGS, TBN2_PAGE_SIZE_OPTIONS } from '../constants/tebnar2-constants';
+import { tbn2_formatDate, tbn2_truncateText } from '../utils/tbn2-table-functions';
 import Tebnar2Columns from './Tebnar2Columns';
 import Tebnar2ImagePreview from './Tebnar2ImagePreview';
 
@@ -33,17 +34,7 @@ export default function Tebnar2Table({
   onRefreshImages
 }: Tebnar2TableProps) {
 
-  // Helper function to format date
-  const tbn2_formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  // Helper function to truncate text
-  const tbn2_truncateText = (text: string | null, maxLength: number = 30) => {
-    if (!text) return '';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-  };
+  // Using centralized table processing functions
 
   return (
     <div className="w-full">

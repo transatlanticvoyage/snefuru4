@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { 
   Tebnar2ImagePlan, 
   Tebnar2Image, 
@@ -18,6 +17,14 @@ import {
   TBN2_DEBOUNCE_MS,
   TBN2_MAIN_ELEMENT_STYLING
 } from '../constants/tebnar2-constants';
+import { 
+  tbn2_fetchImagePlansData,
+  tbn2_fetchImagesData,
+  tbn2_fetchBatchesData,
+  tbn2_refreshAllData,
+  tbn2_filterPlansByBatch
+} from '../utils/tbn2-data-functions';
+import { tbn2_log } from '../utils/tbn2-utils';
 import Tebnar2Table from './Tebnar2Table';
 import Tebnar2Filters from './Tebnar2Filters';
 import Tebnar2Actions from './Tebnar2Actions';
@@ -25,7 +32,6 @@ import Tebnar2Actions from './Tebnar2Actions';
 export default function Tebnar2Main() {
   const { user } = useAuth();
   const router = useRouter();
-  const supabase = createClientComponentClient();
 
   // Check if user is authenticated
   if (!user) {
@@ -96,88 +102,39 @@ export default function Tebnar2Main() {
     };
   }, []);
 
-  // Fetch all images for the user and map by id (cloned from tebnar1)
+  // Fetch all images for the user using centralized data layer
   const tbn2_fetchImages = async () => {
     if (!user?.id) {
       setTbn2ImagesById({});
       return;
     }
     
-    try {
-      // Get user's DB id from users table
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-        
-      if (userError || !userData) {
-        setTbn2ImagesById({});
-        return;
-      }
-      
-      // Fetch all images for this user
-      const { data, error } = await supabase
-        .from('images')
-        .select('*')
-        .eq('rel_users_id', userData.id);
-        
-      if (error) {
-        setTbn2ImagesById({});
-        return;
-      }
-      
-      const imageMap: Record<string, Tebnar2Image> = {};
-      (data || []).forEach(img => { 
-        if (img.id) imageMap[img.id] = img; 
-      });
-      setTbn2ImagesById(imageMap);
-    } catch (err) {
-      console.error('Error fetching images:', err);
+    const result = await tbn2_fetchImagesData(user.id);
+    if (result.success) {
+      setTbn2ImagesById(result.data);
+    } else {
+      tbn2_log(`Error fetching images: ${result.error}`, 'error');
       setTbn2ImagesById({});
     }
   };
 
-  // Fetch batches for dropdown (cloned from tebnar1)
+  // Fetch batches using centralized data layer
   const tbn2_fetchBatches = async () => {
     if (!user?.id) {
       setTbn2Batches([]);
       return;
     }
     
-    try {
-      // Get user's DB id from users table
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-        
-      if (userError || !userData) {
-        setTbn2Batches([]);
-        return;
-      }
-      
-      // Fetch images_plans_batches for this user
-      const { data, error } = await supabase
-        .from('images_plans_batches')
-        .select('*')
-        .eq('rel_users_id', userData.id)
-        .order('created_at', { ascending: false });
-        
-      if (error) {
-        setTbn2Batches([]);
-        return;
-      }
-      
-      setTbn2Batches(data || []);
-    } catch (err) {
-      console.error('Error fetching batches:', err);
+    const result = await tbn2_fetchBatchesData(user.id);
+    if (result.success) {
+      setTbn2Batches(result.data);
+    } else {
+      tbn2_log(`Error fetching batches: ${result.error}`, 'error');
       setTbn2Batches([]);
     }
   };
 
-  // Fetch plans data (cloned from tebnar1)
+  // Fetch plans using centralized data layer
   const tbn2_fetchPlans = async () => {
     if (!user?.id) {
       setTbn2Plans([]);
@@ -185,59 +142,35 @@ export default function Tebnar2Main() {
       return;
     }
 
-    try {
-      setTbn2Loading(true);
+    setTbn2Loading(true);
+    setTbn2Error(null);
+
+    const result = await tbn2_fetchImagePlansData(user.id);
+    if (result.success) {
+      setTbn2Plans(result.data);
       setTbn2Error(null);
-
-      // Get user's DB id from users table
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-        
-      if (userError || !userData) {
-        setTbn2Error('Could not find user record.');
-        setTbn2Plans([]);
-        setTbn2Loading(false);
-        return;
-      }
-
-      // Fetch images_plans for this user
-      const { data, error } = await supabase
-        .from('images_plans')
-        .select('*')
-        .eq('rel_users_id', userData.id)
-        .order('created_at', { ascending: false });
-        
-      if (error) throw error;
-      
-      setTbn2Plans(data || []);
-    } catch (err) {
-      setTbn2Error(err instanceof Error ? err.message : 'Failed to fetch plans');
+    } else {
+      setTbn2Error(result.error);
       setTbn2Plans([]);
-    } finally {
-      setTbn2Loading(false);
     }
+    setTbn2Loading(false);
   };
 
-  // Effect hooks for data fetching
+  // Effect hooks for data fetching using centralized functions
   useEffect(() => {
     tbn2_fetchImages();
-  }, [user, supabase]);
+  }, [user]);
 
   useEffect(() => {
     tbn2_fetchBatches();
-  }, [user, supabase]);
+  }, [user]);
 
   useEffect(() => {
     tbn2_fetchPlans();
-  }, [user, supabase]);
+  }, [user]);
 
-  // Filter plans by selected batch
-  const tbn2_filteredPlans = tbn2_selectedBatchId 
-    ? tbn2_plans.filter(plan => plan.rel_images_plans_batches_id === tbn2_selectedBatchId)
-    : tbn2_plans;
+  // Filter plans by selected batch using centralized function
+  const tbn2_filteredPlans = tbn2_filterPlansByBatch(tbn2_plans, tbn2_selectedBatchId || null);
 
   // Pagination logic
   const tbn2_totalPages = Math.ceil(tbn2_filteredPlans.length / tbn2_pageSize);

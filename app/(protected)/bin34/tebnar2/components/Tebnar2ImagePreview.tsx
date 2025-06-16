@@ -2,6 +2,8 @@
 
 import { Tebnar2Image, Tebnar2ImagePlan } from '../types/tebnar2-types';
 import { TBN2_DEBOUNCE_MS } from '../constants/tebnar2-constants';
+import { tbn2_shouldShowFetchButton } from '../utils/tbn2-data-functions';
+import { tbn2_canPerformAction, tbn2_generateFetchKey } from '../utils/tbn2-utils';
 
 interface Tebnar2ImagePreviewProps {
   image: Tebnar2Image | null;
@@ -23,22 +25,15 @@ export default function Tebnar2ImagePreview({
   onRefreshImages
 }: Tebnar2ImagePreviewProps) {
   
-  const fetchKey = `${plan.id}-${imageNumber}`;
+  const fetchKey = tbn2_generateFetchKey(plan.id, imageNumber);
   const isFetching = fetchingImages.has(fetchKey);
   
-  // Check if we should show fetch button (placeholder logic)
-  const tbn2_shouldShowFetchButton = (plan: Tebnar2ImagePlan, imgNum: number) => {
-    // This logic would be cloned from tebnar1's shouldShowFetchButton function
-    // For now, show if there's no image but there's content to generate from
-    return !imageId && (plan.e_prompt1 || plan.e_associated_content1);
-  };
+  // Use centralized fetch button logic and debounce check
+  const canFetch = tbn2_canPerformAction(lastClickTime, fetchKey, TBN2_DEBOUNCE_MS);
 
   // Handle fetch image button click with debouncing
   const tbn2_handleFetchImage = () => {
-    const now = Date.now();
-    const lastClick = lastClickTime[fetchKey] || 0;
-    
-    if (now - lastClick < TBN2_DEBOUNCE_MS) {
+    if (!canFetch) {
       return; // Debounce protection
     }
 

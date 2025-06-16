@@ -36,7 +36,7 @@ export interface Tebnar2Image {
 export interface Tebnar2Batch {
   id: string;
   rel_users_id: string;
-  name: string | null;
+  batch_name: string | null;
   note1: string | null;
   created_at: string;
 }
