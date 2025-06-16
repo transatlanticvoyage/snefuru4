@@ -66,13 +66,32 @@ async function f23_previewDeletion(folders: string[], logs: string[], mode: stri
     logs.push(`Previewing entire folder: ${folderPrefix}`);
 
     try {
-      // Get ALL objects in the folder (including subdirectories)
-      const { data: allObjects, error } = await supabase.storage
+      // Try to get objects in the folder - first attempt with folder path
+      let { data: allObjects, error } = await supabase.storage
         .from(F23_BUCKET_NAME)
         .list(folderPrefix, { 
           limit: 1000,
           sortBy: { column: 'name', order: 'asc' }
         });
+
+      // If that doesn't work, try listing the parent and filtering
+      if (!allObjects || allObjects.length === 0) {
+        logs.push(`🔍 DEBUG: No objects found with direct folder list, trying parent list and filter`);
+        const { data: parentObjects, error: parentError } = await supabase.storage
+          .from(F23_BUCKET_NAME)
+          .list(F23_PARENT_PREFIX, { 
+            limit: 1000,
+            sortBy: { column: 'name', order: 'asc' }
+          });
+        
+        if (parentError) {
+          error = parentError;
+        } else if (parentObjects) {
+          // Filter objects that start with our folder name
+          allObjects = parentObjects.filter(obj => obj.name.startsWith(folder));
+          logs.push(`🔍 DEBUG: Found ${allObjects.length} matching objects in parent directory`);
+        }
+      }
 
       if (error) {
         logs.push(`❌ Error listing objects with prefix ${folderPrefix}: ${error.message}`);
@@ -108,8 +127,16 @@ async function f23_previewDeletion(folders: string[], logs: string[], mode: stri
       totalFiles += allObjects.length;
       totalSize += folderSize;
 
-      // Construct proper file paths - obj.name should be just the filename when listing a folder
-      const actualFilePaths = allObjects.map(obj => `${folderPrefix}/${obj.name}`);
+      // Construct proper file paths - if we got objects from parent list, obj.name is already full path from parent
+      const actualFilePaths = allObjects.map(obj => {
+        // If obj.name already includes the folder structure, use as-is from parent prefix
+        // Otherwise, construct the full path
+        if (obj.name.includes('/')) {
+          return `${F23_PARENT_PREFIX}/${obj.name}`;
+        } else {
+          return `${folderPrefix}/${obj.name}`;
+        }
+      });
       logs.push(`🔍 DEBUG: Constructed file paths:`);
       actualFilePaths.forEach((path, index) => {
         logs.push(`   [${index}] "${path}"`);
@@ -159,13 +186,32 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
     logs.push(`Processing entire folder: ${folderPrefix} (${mode})`);
 
     try {
-      // Get ALL objects in the folder (including subdirectories)
-      const { data: allObjects, error: listError } = await supabase.storage
+      // Try to get objects in the folder - first attempt with folder path
+      let { data: allObjects, error: listError } = await supabase.storage
         .from(F23_BUCKET_NAME)
         .list(folderPrefix, { 
           limit: 1000,
           sortBy: { column: 'name', order: 'asc' }
         });
+
+      // If that doesn't work, try listing the parent and filtering
+      if (!allObjects || allObjects.length === 0) {
+        logs.push(`🔍 DEBUG: No objects found with direct folder list, trying parent list and filter`);
+        const { data: parentObjects, error: parentError } = await supabase.storage
+          .from(F23_BUCKET_NAME)
+          .list(F23_PARENT_PREFIX, { 
+            limit: 1000,
+            sortBy: { column: 'name', order: 'asc' }
+          });
+        
+        if (parentError) {
+          listError = parentError;
+        } else if (parentObjects) {
+          // Filter objects that start with our folder name
+          allObjects = parentObjects.filter(obj => obj.name.startsWith(folder));
+          logs.push(`🔍 DEBUG: Found ${allObjects.length} matching objects in parent directory`);
+        }
+      }
 
       if (listError) {
         logs.push(`❌ Error listing objects with prefix ${folderPrefix}: ${listError.message}`);
@@ -197,7 +243,15 @@ async function f23_executeDeletion(folders: string[], mode: string, logs: string
         logs.push(`   [${index}] obj.name: "${obj.name}" | size: ${obj.metadata?.size || 0}`);
       });
 
-      const objectPaths = allObjects.map(obj => `${folderPrefix}/${obj.name}`);
+      const objectPaths = allObjects.map(obj => {
+        // If obj.name already includes the folder structure, use as-is from parent prefix
+        // Otherwise, construct the full path
+        if (obj.name.includes('/')) {
+          return `${F23_PARENT_PREFIX}/${obj.name}`;
+        } else {
+          return `${folderPrefix}/${obj.name}`;
+        }
+      });
       logs.push(`🔍 DEBUG: Constructed object paths for operations:`);
       objectPaths.forEach((path, index) => {
         logs.push(`   [${index}] "${path}"`);
