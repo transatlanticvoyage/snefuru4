@@ -346,7 +346,7 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Link
-                      href={`/nwivid?contentid=${item.id}`}
+                      href={`/nwivid?contentid=${encodeURIComponent(item.id)}`}
                       className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Individual View
