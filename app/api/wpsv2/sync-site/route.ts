@@ -320,6 +320,8 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
             meta: post.meta || {},
           },
           
+          a_elementor_substance: post.elementor_data || null,
+          
           i_sync_method: 'plugin_api',
           i_sync_version: 2,
           i_sync_status: 'completed',
@@ -360,6 +362,8 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
             meta: {},
             link: post.link,
           },
+          
+          a_elementor_substance: null, // REST API doesn't provide Elementor data
           
           i_sync_method: 'rest_api',
           i_sync_version: 2,

@@ -38,6 +38,7 @@ interface NwpiContent {
   i_sync_completed_at: string | null;
   i_sync_attempt_count: number | null;
   i_sync_error_message: string | null;
+  a_elementor_substance: any;
   created_at: string;
   updated_at: string;
 }
@@ -48,7 +49,7 @@ interface NwpiContentViewProps {
 }
 
 export default function NwpiContentView({ content }: NwpiContentViewProps) {
-  const [activeTab, setActiveTab] = useState<'content' | 'metadata' | 'sync'>('content');
+  const [activeTab, setActiveTab] = useState<'content' | 'metadata' | 'elementor' | 'sync'>('content');
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
@@ -156,6 +157,19 @@ export default function NwpiContentView({ content }: NwpiContentViewProps) {
             }`}
           >
             Metadata
+          </button>
+          <button
+            onClick={() => setActiveTab('elementor')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'elementor'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Elementor Data
+            {content.a_elementor_substance && (
+              <span className="ml-1 px-1 text-xs bg-green-100 text-green-800 rounded">✓</span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab('sync')}
@@ -321,6 +335,78 @@ export default function NwpiContentView({ content }: NwpiContentViewProps) {
               </pre>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === 'elementor' && (
+        <div className="space-y-6">
+          {content.a_elementor_substance ? (
+            <div className="bg-white border border-gray-200 rounded-lg">
+              <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Elementor Data</h3>
+                <div className="flex items-center space-x-2">
+                  <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                    Elementor Content Available
+                  </span>
+                  <button
+                    onClick={() => copyToClipboard(JSON.stringify(content.a_elementor_substance, null, 2))}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    Copy JSON
+                  </button>
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="bg-gray-50 p-4 rounded-md">
+                  <pre className="text-xs text-gray-700 overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto">
+                    {JSON.stringify(content.a_elementor_substance, null, 2)}
+                  </pre>
+                </div>
+                
+                {/* Elementor Summary */}
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold text-blue-900 mb-2">Data Type</h4>
+                    <p className="text-sm text-blue-700">
+                      {Array.isArray(content.a_elementor_substance) ? 'Array of Elements' : 'Object Structure'}
+                    </p>
+                  </div>
+                  
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold text-green-900 mb-2">Elements Count</h4>
+                    <p className="text-sm text-green-700">
+                      {Array.isArray(content.a_elementor_substance) 
+                        ? `${content.a_elementor_substance.length} elements`
+                        : 'Complex structure'
+                      }
+                    </p>
+                  </div>
+                  
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <h4 className="text-sm font-semibold text-purple-900 mb-2">Data Size</h4>
+                    <p className="text-sm text-purple-700">
+                      {(JSON.stringify(content.a_elementor_substance).length / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+              <div className="text-gray-400 mb-4">
+                <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Elementor Data</h3>
+              <p className="text-gray-500">
+                This post/page does not contain Elementor content, or it was synced via REST API which doesn't include Elementor data.
+              </p>
+              <p className="text-sm text-gray-400 mt-2">
+                Try re-syncing using Plugin API to get Elementor content.
+              </p>
+            </div>
+          )}
         </div>
       )}
 

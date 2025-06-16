@@ -38,6 +38,7 @@ interface NwpiContent {
   i_sync_completed_at: string | null;
   i_sync_attempt_count: number | null;
   i_sync_error_message: string | null;
+  a_elementor_substance: any;
   created_at: string;
   updated_at: string;
 }
@@ -338,6 +339,9 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
                   Synced {sortField === 'i_sync_completed_at' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Elementor
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Post ID
                 </th>
               </tr>
@@ -379,6 +383,17 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">
                     {formatDate(item.i_sync_completed_at)}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-center">
+                    {item.a_elementor_substance ? (
+                      <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                        ✓ Elementor
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-500 rounded-full">
+                        No Data
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">
                     {item.post_id}
