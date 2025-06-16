@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const { f23_folders, f23_mode }: F23ApiRequest = await req.json();
     const f23_logs: string[] = [];
 
-    f23_logs.push(`F23 Storage Cleanup - Mode: ${f23_mode}`);
+    f23_logs.push(`F23 Storage Cleanup - Mode: ${f23_mode} - Processing`);
     f23_logs.push(`Processing ${f23_folders.length} folders`);
     f23_logs.push(`Bucket: ${F23_BUCKET_NAME}`);
     f23_logs.push(`Parent prefix: ${F23_PARENT_PREFIX}`);
