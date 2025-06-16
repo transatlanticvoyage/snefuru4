@@ -2,6 +2,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import NwpiContentTable from './components/NwpiContentTable';
+import NwpiPusherButton from './components/NwpiPusherButton';
 
 export default async function NwJar1Page() {
   const supabase = createServerComponentClient({ cookies });
@@ -38,13 +39,23 @@ export default async function NwJar1Page() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">WordPress Content (WPSv2)</h1>
-        <p className="mt-2 text-gray-600">
-          View and manage your synced WordPress content from the nwpi_content table
-        </p>
-        <p className="mt-1 text-sm text-gray-500">
-          db table: nwpi_content
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">WordPress Content (WPSv2)</h1>
+            <p className="mt-2 text-gray-600">
+              View and manage your synced WordPress content from the nwpi_content table
+            </p>
+            <p className="mt-1 text-sm text-gray-500">
+              db table: nwpi_content
+            </p>
+          </div>
+          <div className="flex-shrink-0 ml-6">
+            <NwpiPusherButton 
+              data={nwpiContent || []} 
+              userId={userData.id}
+            />
+          </div>
+        </div>
       </div>
 
       {nwpiContent && nwpiContent.length > 0 ? (
