@@ -5,6 +5,220 @@ import { TBN2_COLUMNS, TBN2_COLUMN_SETTINGS, TBN2_PAGE_SIZE_OPTIONS } from '../c
 import { tbn2_formatDate, tbn2_truncateText } from '../utils/tbn2-table-functions';
 import Tebnar2ImagePreview from './Tebnar2ImagePreview';
 
+// Enhanced table styling settings - exact clone from tebnar1
+const tbn2_tableStyleSettings = {
+  // Table-level settings for strict layout control
+  table: {
+    tableLayout: 'fixed' as 'auto' | 'fixed', // Forces columns to respect width settings
+    width: '100%',
+    maxWidth: '100%',
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto',
+  },
+  
+  // Row styling
+  row: {
+    height: '80px',
+    minHeight: '80px',
+    maxHeight: '80px',
+    verticalAlign: 'middle' as 'top' | 'middle' | 'bottom',
+    backgroundColor: '#ffffff',
+    hoverBackgroundColor: '#f9fafb',
+    borderBottom: '1px solid #e5e7eb',
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto', // Prevent row overflow
+  },
+  
+  // Cell styling - Enhanced for strict overflow control
+  cell: {
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto',
+    textOverflow: 'ellipsis' as 'clip' | 'ellipsis',
+    whiteSpace: 'nowrap' as 'normal' | 'nowrap' | 'pre' | 'pre-wrap' | 'pre-line',
+    wordBreak: 'break-word' as 'normal' | 'break-all' | 'keep-all' | 'break-word', // Better handling of long words
+    wordWrap: 'break-word' as 'normal' | 'break-word' | 'anywhere', // Additional word breaking
+    verticalAlign: 'top' as 'top' | 'middle' | 'bottom' | 'baseline', // Changed from 'middle' to 'top' for upper left justification
+    padding: '8px 16px',
+    maxWidth: '100%', // Ensure cells don't exceed their allocated width
+    minWidth: '0', // Allow cells to shrink if needed
+    boxSizing: 'border-box' as 'content-box' | 'border-box', // Include padding in width calculations
+  },
+  
+  // Text cell specific styling (for data columns) - Enhanced overflow control
+  textCell: {
+    fontSize: '14px',
+    lineHeight: '1.5',
+    color: '#374151',
+    fontWeight: 'normal' as 'normal' | 'bold' | 'lighter' | 'bolder',
+    overflow: 'hidden', // Explicit overflow hidden for text cells
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '100%',
+    wordBreak: 'break-word',
+  },
+  
+  // Preview cell specific styling (for image columns) - Enhanced overflow control
+  previewCell: {
+    padding: '8px',
+    textAlign: 'center' as 'left' | 'center' | 'right',
+    backgroundColor: '#fafafa',
+    overflow: 'hidden' as 'visible' | 'hidden' | 'scroll' | 'auto', // Prevent image overflow
+    display: 'flex' as 'block' | 'flex' | 'inline-block',
+    alignItems: 'center' as 'flex-start' | 'center' | 'flex-end',
+    justifyContent: 'center' as 'flex-start' | 'center' | 'flex-end',
+    maxWidth: '100%',
+    maxHeight: '100%',
+  },
+  
+  // Image styling within preview cells - Strict size control
+  previewImage: {
+    width: '64px',
+    height: '64px',
+    maxWidth: '64px', // Explicit max-width
+    maxHeight: '64px', // Explicit max-height
+    objectFit: 'cover' as 'fill' | 'contain' | 'cover' | 'none' | 'scale-down',
+    borderRadius: '4px',
+    border: '1px solid #e5e7eb',
+    flexShrink: 0, // Prevent image from shrinking
+  },
+  
+  // Table header styling
+  header: {
+    backgroundColor: '#f7ead4', // Exact color from tebnar1
+    fontSize: '12px',
+    fontWeight: '500',
+    color: '#6b7280',
+    textTransform: 'uppercase' as 'none' | 'capitalize' | 'uppercase' | 'lowercase',
+    letterSpacing: '0.05em',
+    padding: '12px 16px',
+    borderBottom: '1px solid #e5e7eb',
+    overflow: 'hidden', // Prevent header text overflow
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '100%',
+  },
+  
+  // Pagination styling
+  pagination: {
+    backgroundColor: '#ffffff',
+    borderTop: '1px solid #e5e7eb',
+    padding: '12px 24px',
+    fontSize: '14px',
+    color: '#374151',
+    overflow: 'hidden', // Prevent pagination overflow
+  }
+};
+
+// TABLE CELL PADDING - exact clone from tebnar1
+const tbn2_tableCellPaddingSettings = {
+  // Global default padding (applies to all cells unless overridden)
+  globalDefault: {
+    padding: '4px 4px',             // Default padding for all cells
+    paddingTop: '4px',               // Default top padding
+    paddingRight: '4px',            // Default right padding
+    paddingBottom: '4px',            // Default bottom padding
+    paddingLeft: '4px',             // Default left padding
+  },
+  
+  // Column-specific padding overrides - ALL SET TO 4px 4px
+  columnPadding: {
+    // Intent columns - 4px padding
+    'int1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'int2': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'int3': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'int4': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
+    // Image preview columns - 4px padding (ensuring these are set correctly)
+    'image1-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image2-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image3-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'image4-preview': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
+    // Image ID columns - 4px padding
+    'fk_image1_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'fk_image2_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'fk_image3_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'fk_image4_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
+    // Data columns - 4px padding
+    'id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'rel_users_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'rel_images_plans_batches_id': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'created_at': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
+    // Content columns - 4px padding
+    'e_zpf_img_code': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_width': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_height': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_associated_content1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_file_name1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_more_instructions1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_prompt1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    'e_ai_tool1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+  } as Record<string, { padding: string; paddingTop: string; paddingRight: string; paddingBottom: string; paddingLeft: string }>,
+};
+
+// TABLE BORDERS - exact clone from tebnar1
+const tbn2_tableBorderSettings = {
+  // Global border settings
+  global: {
+    borderCollapse: 'collapse' as 'separate' | 'collapse', // Border collapse model
+    borderSpacing: '0px',            // Border spacing when separate
+    borderStyle: 'solid',            // Global border style
+    borderColor: '#c7cbd3',          // Global border color - updated to requested color
+    borderWidth: '1px',              // Global border width
+  },
+  
+  // Table outer borders
+  tableBorders: {
+    enabled: true,                   // Enable table outer borders
+    top: '1px solid #c7cbd3',        // Top border of entire table
+    right: '1px solid #c7cbd3',      // Right border of entire table
+    bottom: '1px solid #c7cbd3',     // Bottom border of entire table
+    left: '1px solid #c7cbd3',       // Left border of entire table
+    borderRadius: '0px',             // Border radius for table corners
+  },
+  
+  // Row borders (horizontal lines)
+  rowBorders: {
+    enabled: true,                   // Enable row borders
+    headerBottom: '1px solid #c7cbd3', // Border below header row
+    dataRowBottom: '1px solid #c7cbd3', // Border below each data row
+    lastRowBottom: '1px solid #c7cbd3', // Border below last row
+    alternatingRows: {
+      enabled: false,                // Enable alternating row border styles
+      evenRowBorder: '1px solid #c7cbd3', // Even row border
+      oddRowBorder: '1px solid #c7cbd3',  // Odd row border
+    },
+    hoverBorder: '1px solid #c7cbd3', // Border color on row hover
+  },
+  
+  // Column borders (vertical lines)  
+  columnBorders: {
+    enabled: true,                   // Enable column borders
+    defaultRight: '1px solid #c7cbd3', // Default right border for columns
+    defaultLeft: '1px solid #c7cbd3', // Default left border for columns
+    firstColumnLeft: '1px solid #c7cbd3', // Left border of first column
+    lastColumnRight: '1px solid #c7cbd3', // Right border of last column
+  },
+  
+  // Cell border styles
+  cellBorders: {
+    defaultStyle: 'solid',           // Default border style for cells
+    defaultColor: '#c7cbd3',         // Default border color for cells - updated
+    defaultWidth: '1px',             // Default border width for cells
+    
+    // Special cell border styles
+    previewCells: {
+      style: 'solid',
+      color: '#c7cbd3',              // Updated to consistent color
+      width: '1px',
+    },
+    dataCells: {
+      style: 'solid',
+      color: '#c7cbd3',              // Updated to consistent color
+      width: '1px',
+    },
+  }
+};
+
 interface Tebnar2TableProps {
   plans: Tebnar2ImagePlan[];
   imagesById: Record<string, Tebnar2Image>;
@@ -90,11 +304,31 @@ export default function Tebnar2Table({
       </div>
       
       <div className="overflow-x-auto w-full">
-        <table className="w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
+        <table 
+          style={{
+            ...tbn2_tableStyleSettings.table,
+            borderCollapse: tbn2_tableBorderSettings.global.borderCollapse,
+            borderSpacing: tbn2_tableBorderSettings.global.borderSpacing,
+            border: tbn2_tableBorderSettings.tableBorders.enabled 
+              ? `${tbn2_tableBorderSettings.tableBorders.top}` 
+              : 'none'
+          }}
+          className="w-full"
+        >
+          <thead 
+            style={{
+              backgroundColor: tbn2_tableStyleSettings.header.backgroundColor,
+            }}
+          >
+            <tr 
+              style={{
+                borderBottom: tbn2_tableBorderSettings.rowBorders.headerBottom,
+              }}
+            >
               {tableColumns.map((col, index) => {
                 const settings = TBN2_COLUMN_SETTINGS[col] || { width: 'auto', minWidth: '100px', maxWidth: 'none' };
+                const paddingSettings = tbn2_tableCellPaddingSettings.columnPadding[col] || tbn2_tableCellPaddingSettings.globalDefault;
+                
                 return (
                   <th
                     key={col}
@@ -103,8 +337,16 @@ export default function Tebnar2Table({
                       minWidth: settings.minWidth,
                       maxWidth: settings.maxWidth,
                       textAlign: settings.textAlign || 'center',
+                      ...tbn2_tableStyleSettings.header,
+                      padding: paddingSettings.padding,
+                      paddingTop: paddingSettings.paddingTop,
+                      paddingRight: paddingSettings.paddingRight,
+                      paddingBottom: paddingSettings.paddingBottom,
+                      paddingLeft: paddingSettings.paddingLeft,
+                      border: `${tbn2_tableBorderSettings.cellBorders.defaultWidth} ${tbn2_tableBorderSettings.cellBorders.defaultStyle} ${tbn2_tableBorderSettings.cellBorders.defaultColor}`,
+                      borderRight: tbn2_tableBorderSettings.columnBorders.defaultRight,
+                      borderLeft: index === 0 ? tbn2_tableBorderSettings.columnBorders.firstColumnLeft : tbn2_tableBorderSettings.columnBorders.defaultLeft,
                     }}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {col.startsWith('image') ? 'Preview' : col}
                   </th>
@@ -112,11 +354,28 @@ export default function Tebnar2Table({
               })}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {plans.map(plan => (
-              <tr key={plan.id} className="hover:bg-gray-50">
-                {tableColumns.map(col => {
+          <tbody 
+            style={{
+              backgroundColor: tbn2_tableStyleSettings.row.backgroundColor,
+            }}
+          >
+            {plans.map((plan, rowIndex) => (
+              <tr 
+                key={plan.id} 
+                style={{
+                  ...tbn2_tableStyleSettings.row,
+                  borderBottom: tbn2_tableBorderSettings.rowBorders.dataRowBottom,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = tbn2_tableStyleSettings.row.hoverBackgroundColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = tbn2_tableStyleSettings.row.backgroundColor;
+                }}
+              >
+                {tableColumns.map((col, colIndex) => {
                   const settings = TBN2_COLUMN_SETTINGS[col] || { width: 'auto', minWidth: '100px', maxWidth: 'none', textAlign: 'left' };
+                  const paddingSettings = tbn2_tableCellPaddingSettings.columnPadding[col] || tbn2_tableCellPaddingSettings.globalDefault;
                   
                   // Handle image preview columns - exact clone from tebnar1
                   if (col === 'image1-preview') {
@@ -130,8 +389,16 @@ export default function Tebnar2Table({
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'center',
+                          ...tbn2_tableStyleSettings.previewCell,
+                          padding: paddingSettings.padding,
+                          paddingTop: paddingSettings.paddingTop,
+                          paddingRight: paddingSettings.paddingRight,
+                          paddingBottom: paddingSettings.paddingBottom,
+                          paddingLeft: paddingSettings.paddingLeft,
+                          border: `${tbn2_tableBorderSettings.cellBorders.previewCells.width} ${tbn2_tableBorderSettings.cellBorders.previewCells.style} ${tbn2_tableBorderSettings.cellBorders.previewCells.color}`,
+                          borderRight: tbn2_tableBorderSettings.columnBorders.defaultRight,
+                          borderLeft: colIndex === 0 ? tbn2_tableBorderSettings.columnBorders.firstColumnLeft : tbn2_tableBorderSettings.columnBorders.defaultLeft,
                         }}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                       >
                         <Tebnar2ImagePreview
                           image={img}
@@ -156,8 +423,16 @@ export default function Tebnar2Table({
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'center',
+                          ...tbn2_tableStyleSettings.previewCell,
+                          padding: paddingSettings.padding,
+                          paddingTop: paddingSettings.paddingTop,
+                          paddingRight: paddingSettings.paddingRight,
+                          paddingBottom: paddingSettings.paddingBottom,
+                          paddingLeft: paddingSettings.paddingLeft,
+                          border: `${tbn2_tableBorderSettings.cellBorders.previewCells.width} ${tbn2_tableBorderSettings.cellBorders.previewCells.style} ${tbn2_tableBorderSettings.cellBorders.previewCells.color}`,
+                          borderRight: tbn2_tableBorderSettings.columnBorders.defaultRight,
+                          borderLeft: tbn2_tableBorderSettings.columnBorders.defaultLeft,
                         }}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                       >
                         <Tebnar2ImagePreview
                           image={img}
@@ -182,8 +457,16 @@ export default function Tebnar2Table({
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'center',
+                          ...tbn2_tableStyleSettings.previewCell,
+                          padding: paddingSettings.padding,
+                          paddingTop: paddingSettings.paddingTop,
+                          paddingRight: paddingSettings.paddingRight,
+                          paddingBottom: paddingSettings.paddingBottom,
+                          paddingLeft: paddingSettings.paddingLeft,
+                          border: `${tbn2_tableBorderSettings.cellBorders.previewCells.width} ${tbn2_tableBorderSettings.cellBorders.previewCells.style} ${tbn2_tableBorderSettings.cellBorders.previewCells.color}`,
+                          borderRight: tbn2_tableBorderSettings.columnBorders.defaultRight,
+                          borderLeft: tbn2_tableBorderSettings.columnBorders.defaultLeft,
                         }}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                       >
                         <Tebnar2ImagePreview
                           image={img}
@@ -208,8 +491,16 @@ export default function Tebnar2Table({
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'center',
+                          ...tbn2_tableStyleSettings.previewCell,
+                          padding: paddingSettings.padding,
+                          paddingTop: paddingSettings.paddingTop,
+                          paddingRight: paddingSettings.paddingRight,
+                          paddingBottom: paddingSettings.paddingBottom,
+                          paddingLeft: paddingSettings.paddingLeft,
+                          border: `${tbn2_tableBorderSettings.cellBorders.previewCells.width} ${tbn2_tableBorderSettings.cellBorders.previewCells.style} ${tbn2_tableBorderSettings.cellBorders.previewCells.color}`,
+                          borderRight: tbn2_tableBorderSettings.columnBorders.defaultRight,
+                          borderLeft: tbn2_tableBorderSettings.columnBorders.defaultLeft,
                         }}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                       >
                         <Tebnar2ImagePreview
                           image={img}
@@ -232,8 +523,17 @@ export default function Tebnar2Table({
                           minWidth: settings.minWidth,
                           maxWidth: settings.maxWidth,
                           textAlign: settings.textAlign || 'left',
+                          ...tbn2_tableStyleSettings.cell,
+                          ...tbn2_tableStyleSettings.textCell,
+                          padding: paddingSettings.padding,
+                          paddingTop: paddingSettings.paddingTop,
+                          paddingRight: paddingSettings.paddingRight,
+                          paddingBottom: paddingSettings.paddingBottom,
+                          paddingLeft: paddingSettings.paddingLeft,
+                          border: `${tbn2_tableBorderSettings.cellBorders.dataCells.width} ${tbn2_tableBorderSettings.cellBorders.dataCells.style} ${tbn2_tableBorderSettings.cellBorders.dataCells.color}`,
+                          borderRight: tbn2_tableBorderSettings.columnBorders.defaultRight,
+                          borderLeft: colIndex === 0 ? tbn2_tableBorderSettings.columnBorders.firstColumnLeft : tbn2_tableBorderSettings.columnBorders.defaultLeft,
                         }}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                       >
                         {String(plan[col as keyof typeof plan] ?? '')}
                       </td>
@@ -246,7 +546,12 @@ export default function Tebnar2Table({
         </table>
         
         {/* Pagination - exact clone from tebnar1 */}
-        <div className="px-6 py-3 border-t border-gray-200 bg-white">
+        <div 
+          style={{
+            ...tbn2_tableStyleSettings.pagination,
+            borderTop: `1px solid ${tbn2_tableBorderSettings.cellBorders.defaultColor}`,
+          }}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <span className="text-sm text-gray-700">
