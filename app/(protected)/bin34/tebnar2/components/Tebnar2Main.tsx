@@ -25,6 +25,8 @@ import {
   tbn2_filterPlansByBatch
 } from '../utils/tbn2-data-functions';
 import { tbn2_log } from '../utils/tbn2-utils';
+import { tbn2_func_create_plans_from_xls_2 } from '../utils/tbn2_func_create_plans_from_xls_2';
+import { tbn2_func_create_plans_make_images_2 } from '../utils/tbn2_func_create_plans_make_images_2';
 import Tebnar2Table from './Tebnar2Table';
 import Tebnar2Filters from './Tebnar2Filters';
 import Tebnar2Actions from './Tebnar2Actions';
@@ -184,6 +186,62 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Function to submit create plans from XLS - independent tebnar2 version
+  const tbn2_handleSubmitCreatePlans = async () => {
+    setTbn2SubmitLoading(true);
+    setTbn2SubmitResult(null);
+    
+    try {
+      const result = await tbn2_func_create_plans_from_xls_2([], tbn2_gridData);
+      
+      if (result.success) {
+        setTbn2SubmitResult('✅ Plans created successfully!');
+        // Refresh the plans data to show new entries
+        tbn2_fetchPlans();
+      } else {
+        setTbn2SubmitResult(`❌ Failed to create plans: ${result.message}`);
+      }
+    } catch (err) {
+      console.error('Error creating plans:', err);
+      setTbn2SubmitResult(`❌ Error creating plans: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setTbn2SubmitLoading(false);
+    }
+  };
+
+  // Function to submit create plans and make images - independent tebnar2 version
+  const tbn2_handleSubmitMakeImages = async () => {
+    setTbn2MakeImagesLoading(true);
+    setTbn2MakeImagesResult(null);
+    
+    try {
+      const result = await tbn2_func_create_plans_make_images_2({
+        records: [],
+        qty: tbn2_qtyPerPlan,
+        aiModel: tbn2_aiModel,
+        generateZip: tbn2_generateZip,
+        wipeMeta: tbn2_wipeMeta,
+        throttle1: tbn2_throttle1,
+        gridData: tbn2_gridData
+      });
+      
+      if (result.success) {
+        setTbn2MakeImagesResult('🚀 Images generation started successfully!');
+        // Refresh the plans data to show updated entries
+        tbn2_fetchPlans();
+        // Also refresh images to show new ones
+        tbn2_fetchImages();
+      } else {
+        setTbn2MakeImagesResult(`❌ Failed to generate images: ${result.message}`);
+      }
+    } catch (err) {
+      console.error('Error generating images:', err);
+      setTbn2MakeImagesResult(`❌ Error generating images: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setTbn2MakeImagesLoading(false);
+    }
+  };
+
   // Effect hooks for data fetching using centralized functions
   useEffect(() => {
     tbn2_fetchImages();
@@ -250,6 +308,8 @@ export default function Tebnar2Main() {
         gridData={tbn2_gridData}
         onGridDataChange={setTbn2GridData}
         presetData={tbn2_presetData}
+        onSubmitCreatePlans={tbn2_handleSubmitCreatePlans}
+        onSubmitMakeImages={tbn2_handleSubmitMakeImages}
       />
 
       {/* Main Table - exact clone from tebnar1 */}

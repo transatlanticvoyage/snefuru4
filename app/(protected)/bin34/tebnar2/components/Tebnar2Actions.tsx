@@ -2,6 +2,8 @@
 
 import { Tebnar2ThrottleSettings } from '../types/tebnar2-types';
 import Tebnar2ExcelPasteGrid from './Tebnar2ExcelPasteGrid';
+import { tbn2_func_create_plans_from_xls_2 } from '../utils/tbn2_func_create_plans_from_xls_2';
+import { tbn2_func_create_plans_make_images_2 } from '../utils/tbn2_func_create_plans_make_images_2';
 
 interface Tebnar2ActionsProps {
   qtyPerPlan: number;
@@ -23,6 +25,8 @@ interface Tebnar2ActionsProps {
   gridData: string[][];
   onGridDataChange: (grid: string[][]) => void;
   presetData: string[][] | null;
+  onSubmitCreatePlans: () => void;
+  onSubmitMakeImages: () => void;
 }
 
 export default function Tebnar2Actions({
@@ -44,7 +48,9 @@ export default function Tebnar2Actions({
   onPresetLoad,
   gridData,
   onGridDataChange,
-  presetData
+  presetData,
+  onSubmitCreatePlans,
+  onSubmitMakeImages
 }: Tebnar2ActionsProps) {
 
   return (
@@ -70,10 +76,10 @@ export default function Tebnar2Actions({
         <div className="font-bold mb-1">Option 1</div>
         <button
           className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-          onClick={() => {}}
+          onClick={onSubmitCreatePlans}
           disabled={submitLoading}
         >
-          {submitLoading ? 'Submitting...' : 'Submit func_create_plans_from_xls_1'}
+          {submitLoading ? 'Submitting...' : 'Submit tbn2_func_create_plans_from_xls_2'}
         </button>
         {submitResult && <div className="mt-2 text-sm text-gray-700">{submitResult}</div>}
       </div>
@@ -194,10 +200,10 @@ export default function Tebnar2Actions({
 
         <button
           className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700"
-          onClick={() => {}}
+          onClick={onSubmitMakeImages}
           disabled={makeImagesLoading}
         >
-          {makeImagesLoading ? 'Generating Images...' : 'Submit func_create_plans_make_images_1'}
+          {makeImagesLoading ? 'Generating Images...' : 'Submit tbn2_func_create_plans_make_images_2'}
         </button>
 
         {makeImagesResult && (
