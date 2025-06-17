@@ -12,6 +12,7 @@ interface Tebnar2ImagePreviewProps {
   fetchingImages: Set<string>;
   lastClickTime: Record<string, number>;
   onRefreshImages: () => void;
+  onFetchSingleImage: (plan: Tebnar2ImagePlan, imageSlot: number) => void;
 }
 
 export default function Tebnar2ImagePreview({
@@ -21,17 +22,17 @@ export default function Tebnar2ImagePreview({
   imageNumber,
   fetchingImages,
   lastClickTime,
-  onRefreshImages
+  onRefreshImages,
+  onFetchSingleImage
 }: Tebnar2ImagePreviewProps) {
   
   const fetchKey = `${plan.id}-${imageNumber}`;
   const isFetching = fetchingImages.has(fetchKey);
   const showFetchButton = tbn2_shouldShowFetchButton(plan, imageNumber);
 
-  // Handle fetch image button click - exact clone from tebnar1
+  // Handle fetch image button click - call parent function
   const tbn2_handleFetchImage = () => {
-    console.log(`Would fetch image ${imageNumber} for plan ${plan.id}`);
-    // TODO: Implement actual image generation logic
+    onFetchSingleImage(plan, imageNumber);
   };
 
   // Exact HTML structure from tebnar1

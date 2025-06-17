@@ -388,6 +388,7 @@ interface Tebnar2TableProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
   onRefreshImages: () => void;
+  onFetchSingleImage: (plan: Tebnar2ImagePlan, imageSlot: number) => void;
 }
 
 export default function Tebnar2Table({
@@ -401,7 +402,8 @@ export default function Tebnar2Table({
   totalPlans,
   onPageChange,
   onPageSizeChange,
-  onRefreshImages
+  onRefreshImages,
+  onFetchSingleImage
 }: Tebnar2TableProps) {
 
   // For uitablegrid21, build columns with preview columns after each fk_imageX_id - exact clone from tebnar1
@@ -633,6 +635,7 @@ export default function Tebnar2Table({
                           fetchingImages={fetchingImages}
                           lastClickTime={lastClickTime}
                           onRefreshImages={onRefreshImages}
+                          onFetchSingleImage={onFetchSingleImage}
                         />
                       </td>
                     );
@@ -666,6 +669,7 @@ export default function Tebnar2Table({
                           fetchingImages={fetchingImages}
                           lastClickTime={lastClickTime}
                           onRefreshImages={onRefreshImages}
+                          onFetchSingleImage={onFetchSingleImage}
                         />
                       </td>
                     );
@@ -699,6 +703,7 @@ export default function Tebnar2Table({
                           fetchingImages={fetchingImages}
                           lastClickTime={lastClickTime}
                           onRefreshImages={onRefreshImages}
+                          onFetchSingleImage={onFetchSingleImage}
                         />
                       </td>
                     );
@@ -732,6 +737,7 @@ export default function Tebnar2Table({
                           fetchingImages={fetchingImages}
                           lastClickTime={lastClickTime}
                           onRefreshImages={onRefreshImages}
+                          onFetchSingleImage={onFetchSingleImage}
                         />
                       </td>
                     );

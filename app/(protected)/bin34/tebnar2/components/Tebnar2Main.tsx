@@ -27,6 +27,7 @@ import {
 import { tbn2_log } from '../utils/tbn2-utils';
 import { tbn2_func_create_plans_from_xls_2 } from '../utils/tbn2_func_create_plans_from_xls_2';
 import { tbn2_func_create_plans_make_images_2 } from '../utils/tbn2_func_create_plans_make_images_2';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Tebnar2Table from './Tebnar2Table';
 import Tebnar2Filters from './Tebnar2Filters';
 import Tebnar2Actions from './Tebnar2Actions';
@@ -282,6 +283,111 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Function to fetch a single image for a specific plan and slot - independent tebnar2 version
+  const tbn2_fetchSingleImage = async (plan: Tebnar2ImagePlan, imageSlot: number) => {
+    console.log('🚀 TBN2 FETCH SINGLE IMAGE FUNCTION CALLED!', { plan_id: plan.id, imageSlot });
+    
+    const fetchKey = `${plan.id}-${imageSlot}`;
+    const now = Date.now();
+    
+    // Debounce: prevent multiple clicks within TBN2_DEBOUNCE_MS (2 seconds)
+    if (tbn2_lastClickTime[fetchKey] && (now - tbn2_lastClickTime[fetchKey]) < TBN2_DEBOUNCE_MS) {
+      console.log('⏳ Request debounced - too soon since last click');
+      setTbn2Error(`⏳ Please wait ${Math.ceil((TBN2_DEBOUNCE_MS - (now - tbn2_lastClickTime[fetchKey])) / 1000)} seconds before trying again`);
+      return;
+    }
+    
+    // Check if already fetching this image
+    if (tbn2_fetchingImages.has(fetchKey)) {
+      console.log('⏳ Request already in progress for this image');
+      setTbn2Error('⏳ Image generation already in progress for this slot');
+      return;
+    }
+    
+    setTbn2LastClickTime(prev => ({ ...prev, [fetchKey]: now }));
+    
+    try {
+      setTbn2FetchingImages(prev => new Set([...prev, fetchKey]));
+      setTbn2Error(null);
+      
+      // Validate prompt data
+      const prompt = plan.e_prompt1 || plan.e_more_instructions1 || plan.e_file_name1;
+      if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+        throw new Error('No valid prompt found for this plan.');
+      }
+      
+      // Create request data
+      const imageData = {
+        plan_id: plan.id,
+        image_slot: imageSlot,
+        prompt: prompt.trim(),
+        aiModel: tbn2_aiModel,
+        wipeMeta: tbn2_wipeMeta
+      };
+      
+      // Make API call to tebnar2 endpoint
+      const response = await fetch('/api/tbn2_sfunc_fetch_single_image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(imageData)
+      });
+      
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 429) {
+          throw new Error('Please wait before generating another image (rate limited)');
+        } else if (response.status === 400) {
+          throw new Error('Invalid request - please check the plan data');
+        } else if (response.status === 500) {
+          throw new Error('Server error - please try again in a moment');
+        } else {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Refresh images and plans data using centralized functions
+        if (user?.id) {
+          const imagesResult = await tbn2_fetchImagesData(user.id);
+          if (imagesResult.success) {
+            setTbn2ImagesById(imagesResult.data);
+          }
+          
+          const plansResult = await tbn2_fetchImagePlansData(user.id);
+          if (plansResult.success) {
+            setTbn2Plans(plansResult.data);
+          }
+        }
+        
+        setTbn2Error(`✅ Image ${imageSlot} generated successfully for plan ${plan.id}`);
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setTbn2Error(null), 5000);
+        
+      } else {
+        setTbn2Error(`❌ Failed to generate image ${imageSlot}: ${result.message || 'Unknown error'}`);
+      }
+      
+    } catch (err) {
+      console.error('TBN2 Fetch single image error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setTbn2Error(`❌ Error fetching image: ${errorMessage}`);
+      
+      // Clear error message after 10 seconds
+      setTimeout(() => setTbn2Error(null), 10000);
+      
+    } finally {
+      setTbn2FetchingImages(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fetchKey);
+        return newSet;
+      });
+    }
+  };
+
   // Effect hooks for data fetching using centralized functions
   useEffect(() => {
     tbn2_fetchImages();
@@ -365,6 +471,7 @@ export default function Tebnar2Main() {
         onPageChange={setTbn2CurrentPage}
         onPageSizeChange={setTbn2PageSize}
         onRefreshImages={tbn2_fetchImages}
+        onFetchSingleImage={tbn2_fetchSingleImage}
       />
     </div>
   );
