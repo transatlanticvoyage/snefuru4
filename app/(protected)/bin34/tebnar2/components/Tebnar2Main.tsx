@@ -192,7 +192,27 @@ export default function Tebnar2Main() {
     setTbn2SubmitResult(null);
     
     try {
-      const result = await tbn2_func_create_plans_from_xls_2([], tbn2_gridData);
+      // Convert gridData to records - exact logic from tebnar1
+      if (!tbn2_gridData || tbn2_gridData.length === 0) {
+        throw new Error('Grid is empty. Please load data first.');
+      }
+      
+      const fieldNames = tbn2_gridData[0].map(f => f.trim()).filter(Boolean);
+      const rows = tbn2_gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+      
+      if (fieldNames.length === 0 || rows.length === 0) {
+        throw new Error('Grid is empty or missing headers');
+      }
+      
+      const records = rows.map(row => {
+        const obj: Record<string, string> = {};
+        fieldNames.forEach((field, idx) => {
+          if (field) obj[field] = row[idx] ?? '';
+        });
+        return obj;
+      });
+      
+      const result = await tbn2_func_create_plans_from_xls_2(records, tbn2_gridData);
       
       if (result.success) {
         setTbn2SubmitResult('✅ Plans created successfully!');
@@ -215,8 +235,28 @@ export default function Tebnar2Main() {
     setTbn2MakeImagesResult(null);
     
     try {
+      // Convert gridData to records - exact logic from tebnar1
+      if (!tbn2_gridData || tbn2_gridData.length === 0) {
+        throw new Error('Grid is empty. Please load data first.');
+      }
+      
+      const fieldNames = tbn2_gridData[0].map(f => f.trim()).filter(Boolean);
+      const rows = tbn2_gridData.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+      
+      if (fieldNames.length === 0 || rows.length === 0) {
+        throw new Error('Grid is empty or missing headers');
+      }
+      
+      const records = rows.map(row => {
+        const obj: Record<string, string> = {};
+        fieldNames.forEach((field, idx) => {
+          if (field) obj[field] = row[idx] ?? '';
+        });
+        return obj;
+      });
+      
       const result = await tbn2_func_create_plans_make_images_2({
-        records: [],
+        records: records,
         qty: tbn2_qtyPerPlan,
         aiModel: tbn2_aiModel,
         generateZip: tbn2_generateZip,
