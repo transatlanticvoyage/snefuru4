@@ -73,7 +73,7 @@ const tbn2_headerCustomizationSettings = {
     fontSize: '12px',
     fontWeight: '600',
     color: '#6b7280',
-    textTransform: 'uppercase' as const,
+    textTransform: 'lowercase' as const,
     letterSpacing: '0.05em',
     lineHeight: '1.2',
     fontFamily: 'inherit',
