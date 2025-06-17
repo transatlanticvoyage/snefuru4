@@ -105,7 +105,7 @@ const tbn2_headerCustomizationSettings = {
     e_more_instructions1: 'left' as const,
     e_prompt1: 'left' as const,
     e_ai_tool1: 'center' as const,
-  },
+  } as Record<string, 'left' | 'center' | 'right'>,
   
   headerBorders: {
     topBorder: '1px solid #c7cbd3',
