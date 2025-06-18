@@ -7,6 +7,7 @@ import { User } from '@supabase/supabase-js';
 type AuthContextType = {
   user: User | null;
   loading: boolean;
+  isAdmin: boolean;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -27,6 +29,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
+        
+        // Fetch is_admin status if user is logged in
+        if (session?.user) {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('is_admin')
+            .eq('auth_id', session.user.id)
+            .single();
+          
+          if (!error && userData) {
+            setIsAdmin(userData.is_admin || false);
+          } else {
+            setIsAdmin(false);
+          }
+        } else {
+          setIsAdmin(false);
+        }
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
@@ -37,8 +56,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
+      
+      // Fetch is_admin status when auth state changes
+      if (session?.user) {
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('is_admin')
+          .eq('auth_id', session.user.id)
+          .single();
+        
+        if (!error && userData) {
+          setIsAdmin(userData.is_admin || false);
+        } else {
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+      
       setLoading(false);
     });
 
@@ -62,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .insert({
           auth_id: data.user.id,
           email: data.user.email,
+          is_admin: false,
           created_at: new Date().toISOString(),
         });
       
@@ -73,16 +111,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     if (error) throw error;
+    
+    // Fetch is_admin status after successful sign in
+    if (data.user) {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('is_admin')
+        .eq('auth_id', data.user.id)
+        .single();
+      
+      if (!userError && userData) {
+        setIsAdmin(userData.is_admin || false);
+      }
+    }
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    setIsAdmin(false);
   };
 
   const resetPassword = async (email: string) => {
@@ -103,6 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={{
       user,
       loading,
+      isAdmin,
       signUp,
       signIn,
       signOut,
