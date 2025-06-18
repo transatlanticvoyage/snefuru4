@@ -280,14 +280,14 @@ export default function Clevnar1Page() {
 
   const getColumnDisplayName = (col: string) => {
     switch (col) {
-      case 'actions': return 'Actions';
-      case 'api_key_id': return 'ID';
-      case 'key_name': return 'Key Name';
-      case 'api_key_datum': return 'API Key';
-      case 'fk_provider_id': return 'Provider ID';
-      case 'is_active': return 'Status';
-      case 'created_at': return 'Created';
-      case 'updated_at': return 'Updated';
+      case 'actions': return 'actions';
+      case 'api_key_id': return 'api_key_id';
+      case 'key_name': return 'key_name';
+      case 'api_key_datum': return 'api_key_datum';
+      case 'fk_provider_id': return 'fk_provider_id';
+      case 'is_active': return 'is_active';
+      case 'created_at': return 'created_at';
+      case 'updated_at': return 'updated_at';
       default: return col;
     }
   };
@@ -340,7 +340,8 @@ export default function Clevnar1Page() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">API Key Management</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">API Key Management</h1>
+      <p className="text-sm text-gray-600 mb-6">db table: api_keys_t2</p>
       
       {/* Search and Filter Section */}
       <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
