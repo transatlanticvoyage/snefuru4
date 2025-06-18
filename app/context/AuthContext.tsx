@@ -32,15 +32,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Fetch is_admin status if user is logged in
         if (session?.user) {
-          const { data: userData, error } = await supabase
-            .from('users')
-            .select('is_admin')
-            .eq('auth_id', session.user.id)
-            .single();
-          
-          if (!error && userData) {
-            setIsAdmin(userData.is_admin || false);
-          } else {
+          try {
+            const { data: userData, error } = await supabase
+              .from('users')
+              .select('is_admin')
+              .eq('auth_id', session.user.id)
+              .single();
+            
+            if (!error && userData && userData.is_admin !== undefined) {
+              setIsAdmin(userData.is_admin || false);
+            } else {
+              // Column doesn't exist yet or user not found - default to false
+              setIsAdmin(false);
+            }
+          } catch (error) {
+            // If there's any error (like column not existing), default to false
+            console.warn('Could not fetch admin status (column may not exist yet):', error);
             setIsAdmin(false);
           }
         } else {
@@ -61,15 +68,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Fetch is_admin status when auth state changes
       if (session?.user) {
-        const { data: userData, error } = await supabase
-          .from('users')
-          .select('is_admin')
-          .eq('auth_id', session.user.id)
-          .single();
-        
-        if (!error && userData) {
-          setIsAdmin(userData.is_admin || false);
-        } else {
+        try {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('is_admin')
+            .eq('auth_id', session.user.id)
+            .single();
+          
+          if (!error && userData && userData.is_admin !== undefined) {
+            setIsAdmin(userData.is_admin || false);
+          } else {
+            // Column doesn't exist yet or user not found - default to false
+            setIsAdmin(false);
+          }
+        } catch (error) {
+          // If there's any error (like column not existing), default to false
+          console.warn('Could not fetch admin status (column may not exist yet):', error);
           setIsAdmin(false);
         }
       } else {
@@ -94,18 +108,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Create a record in the users table
     if (data.user) {
-      const { error: userError } = await supabase
-        .from('users')
-        .insert({
+      try {
+        const insertData: any = {
           auth_id: data.user.id,
           email: data.user.email,
-          is_admin: false,
           created_at: new Date().toISOString(),
-        });
-      
-      if (userError) {
-        console.error('Error creating user record:', userError);
-        throw new Error('Failed to create user record');
+        };
+        
+        // Only add is_admin if the column exists (after migration)
+        try {
+          // Test if is_admin column exists by trying to select it
+          await supabase
+            .from('users')
+            .select('is_admin')
+            .limit(1);
+          
+          // If no error, column exists, so include it
+          insertData.is_admin = false;
+        } catch (columnError) {
+          // Column doesn't exist yet, skip it
+          console.warn('is_admin column not yet available, skipping');
+        }
+        
+        const { error: userError } = await supabase
+          .from('users')
+          .insert(insertData);
+        
+        if (userError) {
+          console.error('Error creating user record:', userError);
+          throw new Error('Failed to create user record');
+        }
+      } catch (error) {
+        console.error('Error in user record creation:', error);
+        // Don't throw here as this might be due to the column not existing yet
       }
     }
   };
@@ -119,14 +154,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     // Fetch is_admin status after successful sign in
     if (data.user) {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('is_admin')
-        .eq('auth_id', data.user.id)
-        .single();
-      
-      if (!userError && userData) {
-        setIsAdmin(userData.is_admin || false);
+      try {
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('is_admin')
+          .eq('auth_id', data.user.id)
+          .single();
+        
+        if (!userError && userData && userData.is_admin !== undefined) {
+          setIsAdmin(userData.is_admin || false);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.warn('Could not fetch admin status on sign in:', error);
+        setIsAdmin(false);
       }
     }
   };
