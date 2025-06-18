@@ -10,10 +10,10 @@ interface NavItem {
 // Custom rule system for navigation grouping
 const NAVIGATION_GROUPS = {
   navgroup5: {
-    name: 'navgroup5',
-    displayName: 'API Keys', // You can customize this display name
+    name: 'c',
+    displayName: 'c', // Parent item for "c" dropdown
     children: [
-      { name: 'fapikeys1', path: '/fbin2/fapikeys1' }
+      { name: 'fapikeys1', path: '/fapikeys1' }
     ]
   },
   navgroup6: {
