@@ -26,6 +26,7 @@ interface EditingState {
 const columns = [
   'actions',
   'api_key_id',
+  'fk_user_id',
   'key_name',
   'api_key_datum',
   'fk_provider_id',
@@ -208,6 +209,8 @@ export default function Clevnar1Page() {
     switch (col) {
       case 'api_key_id':
         return value.substring(0, 8) + '...';
+      case 'fk_user_id':
+        return value.substring(0, 8) + '...';
       case 'key_name':
         if (isEditing) {
           return (
@@ -282,6 +285,7 @@ export default function Clevnar1Page() {
     switch (col) {
       case 'actions': return 'actions';
       case 'api_key_id': return 'api_key_id';
+      case 'fk_user_id': return 'fk_user_id';
       case 'key_name': return 'key_name';
       case 'api_key_datum': return 'api_key_datum';
       case 'fk_provider_id': return 'fk_provider_id';
