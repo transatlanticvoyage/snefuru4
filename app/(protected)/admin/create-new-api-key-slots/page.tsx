@@ -122,6 +122,26 @@ export default function CreateNewApiKeySlotsPage({
   const stickyColumns = activeStickyColumns > 0 ? allColumns.slice(0, activeStickyColumns) : [];
   const nonStickyTemplateColumns = templateColumns.filter(col => !stickyColumns.includes(col));
   const activeColumns = [...stickyColumns, ...nonStickyTemplateColumns];
+  
+  // Calculate cumulative left positions for sticky columns
+  const getColumnWidth = (col: string) => {
+    // Approximate column widths based on content
+    if (col === 'actions') return 120;
+    if (col === 'slot_id') return 150;
+    if (col === 'count_active_modules_on_slot') return 80;
+    if (col.includes('inuse')) return 100;
+    if (col.includes('date')) return 180;
+    return 150; // default width
+  };
+  
+  const stickyColumnPositions = stickyColumns.reduce((acc, col, index) => {
+    if (index === 0) {
+      acc[index] = 0;
+    } else {
+      acc[index] = acc[index - 1] + getColumnWidth(stickyColumns[index - 1]);
+    }
+    return acc;
+  }, {} as { [key: number]: number });
 
   // Load view options from URL params first, then localStorage as fallback
   useEffect(() => {
@@ -243,17 +263,22 @@ export default function CreateNewApiKeySlotsPage({
       
       .sticky-column {
         position: sticky !important;
-        left: 0 !important;
         background: white !important;
         z-index: 10 !important;
         border-right: 1px solid #e5e7eb !important;
       }
       
-      .sticky-column:nth-child(2) { left: 0px !important; }
-      .sticky-column:nth-child(3) { left: 150px !important; }
-      .sticky-column:nth-child(4) { left: 300px !important; }
-      .sticky-column:nth-child(5) { left: 450px !important; }
-      .sticky-column:nth-child(6) { left: 600px !important; }
+      /* Dynamic left positioning for sticky columns */
+      .sticky-column:nth-child(1) { left: 0px !important; }
+      .sticky-column:nth-child(2) { left: 150px !important; }
+      .sticky-column:nth-child(3) { left: 300px !important; }
+      .sticky-column:nth-child(4) { left: 450px !important; }
+      .sticky-column:nth-child(5) { left: 600px !important; }
+      
+      /* Ensure sticky columns in tbody rows have proper background */
+      tbody tr .sticky-column {
+        background: inherit !important;
+      }
       
       .sticky-separator {
         border-right: 4px solid #000000 !important;
@@ -1115,7 +1140,11 @@ export default function CreateNewApiKeySlotsPage({
                   } ${
                     index === activeStickyColumns - 1 && activeStickyColumns > 0 ? 'sticky-separator' : ''
                   }`}
-                  style={index < activeStickyColumns ? { left: `${index * 150}px` } : {}}
+                  style={index < activeStickyColumns ? { 
+                    left: `${stickyColumnPositions[index]}px`,
+                    position: 'sticky',
+                    zIndex: 10
+                  } : {}}
                 >
                   {getColumnDisplayName(col)}
                 </th>
@@ -1140,7 +1169,11 @@ export default function CreateNewApiKeySlotsPage({
                       } ${
                         colIndex === activeStickyColumns - 1 && activeStickyColumns > 0 ? 'sticky-separator' : ''
                       }`}
-                      style={colIndex < activeStickyColumns ? { left: `${colIndex * 150}px` } : {}}
+                      style={colIndex < activeStickyColumns ? { 
+                        left: `${stickyColumnPositions[colIndex]}px`,
+                        position: 'sticky',
+                        zIndex: 10
+                      } : {}}
                     >
                       {col === 'actions' ? (
                         <div className="flex space-x-2">
