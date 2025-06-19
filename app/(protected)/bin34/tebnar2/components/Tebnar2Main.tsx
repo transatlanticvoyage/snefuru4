@@ -68,6 +68,9 @@ export default function Tebnar2Main() {
   const [tbn2_urlBatchId, setTbn2UrlBatchId] = useState<string | null>(null);
   const [tbn2_selectedColTemplate, setTbn2SelectedColTemplate] = useState('option1');
   const [tbn2_stickyColCount, setTbn2StickyColCount] = useState(1);
+  const [tbn2_narpiPushLoading, setTbn2NarpiPushLoading] = useState(false);
+  const [tbn2_narpiPushProgress, setTbn2NarpiPushProgress] = useState(0);
+  const [tbn2_narpiPushStatus, setTbn2NarpiPushStatus] = useState<string | null>(null);
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {
@@ -283,6 +286,72 @@ export default function Tebnar2Main() {
       setTbn2MakeImagesResult(`❌ Error generating images: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setTbn2MakeImagesLoading(false);
+    }
+  };
+
+  // Function to create narpi push for current batch - tebnar2 specific
+  const tbn2_sfunc63_createNarpiPush = async () => {
+    if (!tbn2_selectedBatchId || tbn2_narpiPushLoading) return;
+    
+    setTbn2NarpiPushLoading(true);
+    setTbn2NarpiPushProgress(0);
+    setTbn2NarpiPushStatus('Initializing narpi push...');
+    setTbn2Error(null);
+    
+    try {
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setTbn2NarpiPushProgress(prev => {
+          if (prev >= 90) return prev;
+          return prev + Math.random() * 15;
+        });
+      }, 500);
+      
+      setTbn2NarpiPushStatus('Creating narpi push record...');
+      
+      // Call the sfunc_63_push_images API endpoint
+      const response = await fetch('/api/bin45/sfunc_63_push_images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          batch_id: tbn2_selectedBatchId,
+          push_method: 'tebnar2_batch_push'
+        })
+      });
+      
+      clearInterval(progressInterval);
+      setTbn2NarpiPushProgress(100);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      setTbn2NarpiPushStatus('✅ Narpi push created successfully!');
+      setTbn2Error(`🚀 Narpi push completed! Push ID: ${result.push_id}`);
+      
+      // Clear status after 5 seconds
+      setTimeout(() => {
+        setTbn2NarpiPushStatus(null);
+        setTbn2NarpiPushProgress(0);
+      }, 5000);
+      
+    } catch (err) {
+      console.error('TBN2 Narpi push error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setTbn2NarpiPushStatus('❌ Narpi push failed');
+      setTbn2Error(`❌ Failed to create narpi push: ${errorMessage}`);
+      
+      // Clear error and status after 10 seconds
+      setTimeout(() => {
+        setTbn2NarpiPushStatus(null);
+        setTbn2NarpiPushProgress(0);
+        setTbn2Error(null);
+      }, 10000);
+      
+    } finally {
+      setTbn2NarpiPushLoading(false);
     }
   };
 
@@ -778,6 +847,38 @@ export default function Tebnar2Main() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Narpi Push Button */}
+        <div className="bg-white border border-gray-300 rounded-lg p-2">
+          <div className="text-xs font-semibold text-gray-700 mb-2">WordPress Push</div>
+          <button
+            onClick={tbn2_sfunc63_createNarpiPush}
+            disabled={!tbn2_selectedBatchId || tbn2_narpiPushLoading}
+            className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
+              !tbn2_selectedBatchId || tbn2_narpiPushLoading
+                ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                : 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+            }`}
+            title={!tbn2_selectedBatchId ? 'Select a batch to enable narpi push' : 'Create narpi push for current batch'}
+          >
+            {tbn2_narpiPushLoading ? '...' : 'tbn2_sfunc63_createNarpiPush()'}
+          </button>
+          
+          {/* Progress Bar */}
+          {(tbn2_narpiPushLoading || tbn2_narpiPushStatus) && (
+            <div className="mt-2">
+              <div className="w-36 bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{width: `${tbn2_narpiPushProgress}%`}}
+                ></div>
+              </div>
+              {tbn2_narpiPushStatus && (
+                <div className="text-xs text-gray-600 mt-1">{tbn2_narpiPushStatus}</div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
