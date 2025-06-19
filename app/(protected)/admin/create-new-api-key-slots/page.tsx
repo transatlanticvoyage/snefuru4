@@ -137,7 +137,7 @@ export default function CreateNewApiKeySlotsPage() {
         left: 0 !important;
         background: white !important;
         z-index: 10 !important;
-        border-right: 2px solid #e5e7eb !important;
+        border-right: 1px solid #e5e7eb !important;
       }
       
       .sticky-column:nth-child(2) { left: 0px !important; }
@@ -145,6 +145,10 @@ export default function CreateNewApiKeySlotsPage() {
       .sticky-column:nth-child(4) { left: 300px !important; }
       .sticky-column:nth-child(5) { left: 450px !important; }
       .sticky-column:nth-child(6) { left: 600px !important; }
+      
+      .sticky-separator {
+        border-right: 4px solid #000000 !important;
+      }
     `;
     document.head.appendChild(style);
     
@@ -999,6 +1003,8 @@ export default function CreateNewApiKeySlotsPage() {
                   key={col} 
                   className={`px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider ${
                     index < activeStickyColumns ? 'sticky-column' : ''
+                  } ${
+                    index === activeStickyColumns - 1 && activeStickyColumns > 0 ? 'sticky-separator' : ''
                   }`}
                   style={index < activeStickyColumns ? { left: `${index * 150}px` } : {}}
                 >
@@ -1022,6 +1028,8 @@ export default function CreateNewApiKeySlotsPage() {
                       key={col} 
                       className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${
                         colIndex < activeStickyColumns ? 'sticky-column' : ''
+                      } ${
+                        colIndex === activeStickyColumns - 1 && activeStickyColumns > 0 ? 'sticky-separator' : ''
                       }`}
                       style={colIndex < activeStickyColumns ? { left: `${colIndex * 150}px` } : {}}
                     >
