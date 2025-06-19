@@ -21,6 +21,7 @@ export default function Narpo1Page() {
   const [pushes, setPushes] = useState<NarpiPush[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
