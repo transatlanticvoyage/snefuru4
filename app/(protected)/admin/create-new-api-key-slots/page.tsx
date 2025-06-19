@@ -70,6 +70,7 @@ export default function CreateNewApiKeySlotsPage() {
   const [newRow, setNewRow] = useState<Partial<ApiKeySlot> | null>(null);
   const [providers, setProviders] = useState<ServiceProvider[]>([]);
   const [aiModels, setAiModels] = useState<AiModel[]>([]);
+  const [updatingToggles, setUpdatingToggles] = useState<Set<string>>(new Set());
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user, isAdmin } = useAuth();
@@ -305,6 +306,47 @@ export default function CreateNewApiKeySlotsPage() {
     }
   };
 
+  const handleToggleAiModel = async (slotId: string, currentValue: boolean) => {
+    setUpdatingToggles(new Set([...updatingToggles, slotId]));
+    
+    try {
+      const { error } = await supabase
+        .from('api_key_slots')
+        .update({
+          is_ai_model: !currentValue,
+          updated_at: new Date().toISOString()
+        })
+        .eq('slot_id', slotId);
+
+      if (error) throw error;
+
+      // Update local data optimistically
+      setData(prevData => 
+        prevData.map(slot => 
+          slot.slot_id === slotId 
+            ? { ...slot, is_ai_model: !currentValue, updated_at: new Date().toISOString() }
+            : slot
+        )
+      );
+      
+      setFilteredData(prevData => 
+        prevData.map(slot => 
+          slot.slot_id === slotId 
+            ? { ...slot, is_ai_model: !currentValue, updated_at: new Date().toISOString() }
+            : slot
+        )
+      );
+      
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update AI model status');
+    } finally {
+      const newUpdatingToggles = new Set(updatingToggles);
+      newUpdatingToggles.delete(slotId);
+      setUpdatingToggles(newUpdatingToggles);
+    }
+  };
+
   const formatColumnData = (col: string, value: any, slot: ApiKeySlot) => {
     if (value === null || value === undefined) return '-';
     
@@ -416,10 +458,16 @@ export default function CreateNewApiKeySlotsPage() {
             </div>
           );
         }
+        
+        // For non-editing rows, make toggle functional with instant update
+        const isUpdating = updatingToggles.has(slot.slot_id);
         return (
           <div className="flex items-center">
-            <div
-              className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-not-allowed ${
+            <button
+              type="button"
+              onClick={() => !isUpdating && handleToggleAiModel(slot.slot_id, value)}
+              disabled={isUpdating}
+              className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed ${
                 value ? 'bg-green-600' : 'bg-gray-200'
               }`}
             >
@@ -428,7 +476,12 @@ export default function CreateNewApiKeySlotsPage() {
                   value ? 'translate-x-5' : 'translate-x-0'
                 }`}
               />
-            </div>
+              {isUpdating && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                </div>
+              )}
+            </button>
           </div>
         );
       
