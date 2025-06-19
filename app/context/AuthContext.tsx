@@ -28,6 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
+        setLoading(false);
         
         // Simple admin check - if user exists, check their admin status
         if (session?.user) {
@@ -38,20 +39,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .eq('auth_id', session.user.id)
               .single();
             
-            if (error) {
-              console.warn('Admin check error:', error);
-              // Don't throw - just continue without admin
-            } else if (userData && userData.is_admin === true) {
+            if (!error && userData && userData.is_admin === true) {
               setIsAdmin(true);
             }
           } catch (err) {
-            console.warn('Admin check failed:', err);
-            // Continue without admin status
+            // Silently fail admin check
           }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-      } finally {
         setLoading(false);
       }
     };
@@ -61,8 +57,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for changes on auth state
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
-      
-      // Reset admin status
       setIsAdmin(false);
       
       // Check admin status for new session
@@ -74,19 +68,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .eq('auth_id', session.user.id)
             .single();
           
-          if (error) {
-            console.warn('Admin check error in auth state change:', error);
-            // Don't throw - just continue without admin
-          } else if (userData && userData.is_admin === true) {
+          if (!error && userData && userData.is_admin === true) {
             setIsAdmin(true);
           }
         } catch (err) {
-          console.warn('Admin check failed in auth state change:', err);
-          // Continue without admin status
+          // Silently fail admin check
         }
       }
-      
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();

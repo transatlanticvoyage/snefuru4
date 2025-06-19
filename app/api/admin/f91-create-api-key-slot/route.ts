@@ -23,7 +23,16 @@ export async function POST(request: Request) {
       .eq('auth_id', session.user.id)
       .single();
     
-    if (userError || !userData?.is_admin) {
+    if (userError) {
+      console.error('Admin check error:', userError);
+      return NextResponse.json(
+        { error: 'Admin verification failed', details: userError.message },
+        { status: 500 }
+      );
+    }
+    
+    if (!userData?.is_admin) {
+      console.log('User is not admin:', session.user.email, userData);
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }
@@ -55,6 +64,8 @@ export async function POST(request: Request) {
       fk_ai_model_id: body.fk_ai_model_id || null,
       is_ai_model: body.is_ai_model || false
     };
+    
+    console.log('Attempting to insert API key slot:', insertData);
     
     // Insert new API key slot
     const { data, error } = await supabase
