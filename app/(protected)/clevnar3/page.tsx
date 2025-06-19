@@ -69,12 +69,7 @@ const columns = [
   'fk_user_id',
   'fk_slot_id',
   'key_created_at',
-  'key_updated_at',
-  'd_m1platcodehandle',
-  'd_m2platcodehandle',
-  'd_m3platcodehandle',
-  'd_slot_name',
-  'd_user_email'
+  'key_updated_at'
 ];
 
 export default function Clevnar3Page() {
