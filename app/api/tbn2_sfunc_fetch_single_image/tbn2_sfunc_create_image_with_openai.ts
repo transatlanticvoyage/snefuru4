@@ -60,9 +60,12 @@ export async function tbn2_sfunc_create_image_with_openai({
     }
     
     // Find the matching API key record
-    const matchingApiKey = apiKeyData.find(record => 
-      record.api_key_slots?.slot_name?.toLowerCase() === aiModel.toLowerCase()
-    );
+    const matchingApiKey = apiKeyData.find(record => {
+      const slots = record.api_key_slots;
+      // Handle both single object and array cases
+      const slotName = Array.isArray(slots) ? slots[0]?.slot_name : slots?.slot_name;
+      return slotName?.toLowerCase() === aiModel.toLowerCase();
+    });
     
     if (!matchingApiKey || !matchingApiKey.m1datum) {
       await logger.error({
@@ -71,7 +74,10 @@ export async function tbn2_sfunc_create_image_with_openai({
         details: {
           userId: userId,
           aiModel: aiModel,
-          availableSlots: apiKeyData.map(record => record.api_key_slots?.slot_name).filter(Boolean),
+          availableSlots: apiKeyData.map(record => {
+            const slots = record.api_key_slots;
+            return Array.isArray(slots) ? slots[0]?.slot_name : slots?.slot_name;
+          }).filter(Boolean),
           hasMatchingKey: !!matchingApiKey,
           hasM1Datum: !!(matchingApiKey?.m1datum)
         }
