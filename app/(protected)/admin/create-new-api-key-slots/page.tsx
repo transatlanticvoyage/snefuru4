@@ -73,7 +73,7 @@ export default function CreateNewApiKeySlotsPage() {
   const [updatingToggles, setUpdatingToggles] = useState<Set<string>>(new Set());
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -81,12 +81,12 @@ export default function CreateNewApiKeySlotsPage() {
   }, []);
 
   useEffect(() => {
-    if (isAdmin) {
+    if (user) {
       fetchApiKeySlots();
       fetchProviders();
       fetchAiModels();
     }
-  }, [isAdmin]);
+  }, [user]);
 
   useEffect(() => {
     // Filter data based on search term
