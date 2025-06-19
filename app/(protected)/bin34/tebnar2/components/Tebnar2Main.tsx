@@ -65,6 +65,7 @@ export default function Tebnar2Main() {
   const [tbn2_loadingPreset, setTbn2LoadingPreset] = useState(false);
   const [tbn2_presetData, setTbn2PresetData] = useState<string[][] | null>(null);
   const [tbn2_lastClickTime, setTbn2LastClickTime] = useState<Record<string, number>>({});
+  const [tbn2_urlBatchId, setTbn2UrlBatchId] = useState<string | null>(null);
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {

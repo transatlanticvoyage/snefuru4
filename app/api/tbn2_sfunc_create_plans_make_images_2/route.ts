@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { sfunc_create_image_with_openai } from '../sfunc_create_plans_make_images_1/sfunc_create_image_with_openai';
+import { tbn2_sfunc_create_image_with_openai } from '../tbn2_sfunc_fetch_single_image/tbn2_sfunc_create_image_with_openai';
 import { logger } from '@/lib/error-logger';
 
 export async function POST(request: Request) {
@@ -180,7 +180,7 @@ export async function POST(request: Request) {
         });
         
         try {
-          const imageResult = await sfunc_create_image_with_openai({ 
+          const imageResult = await tbn2_sfunc_create_image_with_openai({ 
             prompt, 
             userId: userData.id, 
             batchFolder: `${batchFolder}/${planFolder}`, 

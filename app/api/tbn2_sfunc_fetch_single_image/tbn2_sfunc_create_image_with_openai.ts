@@ -26,14 +26,34 @@ export async function tbn2_sfunc_create_image_with_openai({
 }: Tbn2ImageGenerationParams): Promise<Tbn2ImageGenerationResult> {
   
   try {
-    // Validate OpenAI API key
-    const openaiApiKey = process.env.OPENAI_API_KEY;
-    if (!openaiApiKey) {
+    // Get user's OpenAI API key from api_keys_t3 table
+    const supabase = createRouteHandlerClient({ cookies });
+    
+    const { data: apiKeyData, error: apiKeyError } = await supabase
+      .from('api_keys_t3')
+      .select('openai_api_key')
+      .eq('rel_users_id', userId)
+      .single();
+    
+    if (apiKeyError || !apiKeyData || !apiKeyData.openai_api_key) {
+      await logger.error({
+        category: 'tbn2_api_key_lookup',
+        message: 'Failed to retrieve user OpenAI API key from api_keys_t3',
+        details: {
+          userId: userId,
+          error: apiKeyError?.message || 'No API key found',
+          hasApiKeyData: !!apiKeyData,
+          hasOpenAIKey: !!(apiKeyData?.openai_api_key)
+        }
+      });
+      
       return {
         success: false,
-        error: 'OpenAI API key not configured'
+        error: 'OpenAI API key not configured for this user. Please configure your API key in settings.'
       };
     }
+    
+    const openaiApiKey = apiKeyData.openai_api_key;
 
     // Generate image with OpenAI DALL-E
     const openaiResponse = await fetch('https://api.openai.com/v1/images/generations', {
