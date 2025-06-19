@@ -95,7 +95,7 @@ export default function CreateNewApiKeySlotsPage() {
   const [aiModels, setAiModels] = useState<AiModel[]>([]);
   const [updatingToggles, setUpdatingToggles] = useState<Set<string>>(new Set());
   const [updatingFields, setUpdatingFields] = useState<Set<string>>(new Set());
-  const [activeColumnTemplate, setActiveColumnTemplate] = useState('OPTION 1');
+  const [activeColumnTemplate, setActiveColumnTemplate] = useState<keyof typeof columnTemplates>('OPTION 1');
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
