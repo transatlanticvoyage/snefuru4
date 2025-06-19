@@ -539,7 +539,14 @@ export default function Clevnar3Page() {
       
       await fetchJoinedData();
     } catch (err) {
-      console.error('Save label error:', err);
+      console.error('Save label error details:', {
+        error: err,
+        slotId,
+        moduleNumber,
+        labelValue,
+        fieldKey,
+        updateData
+      });
       setError(err instanceof Error ? err.message : 'Failed to save label');
     } finally {
       const newSavingFields = new Set(savingFields);
