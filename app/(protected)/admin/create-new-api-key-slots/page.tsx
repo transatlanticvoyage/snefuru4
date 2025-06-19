@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface ApiKeySlot {
   slot_id: string;
@@ -87,7 +88,11 @@ const stickyColumnOptions = [
   { label: 'OPTION 5', description: '5 left-most\ncolumns', count: 5 }
 ];
 
-export default function CreateNewApiKeySlotsPage() {
+export default function CreateNewApiKeySlotsPage({
+  searchParams
+}: {
+  searchParams: { coltemp?: string; stickycol?: string }
+}) {
   const [data, setData] = useState<ApiKeySlot[]>([]);
   const [filteredData, setFilteredData] = useState<ApiKeySlot[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,6 +114,8 @@ export default function CreateNewApiKeySlotsPage() {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
   const supabase = createClientComponentClient();
+  const router = useRouter();
+  const pathname = usePathname();
   
   // Get active columns based on selected template and sticky columns
   const templateColumns = columnTemplates[activeColumnTemplate].columns;
@@ -116,29 +123,104 @@ export default function CreateNewApiKeySlotsPage() {
   const nonStickyTemplateColumns = templateColumns.filter(col => !stickyColumns.includes(col));
   const activeColumns = [...stickyColumns, ...nonStickyTemplateColumns];
 
-  // Load saved view options from localStorage on component mount
+  // Load view options from URL params first, then localStorage as fallback
   useEffect(() => {
-    const savedColumnTemplate = localStorage.getItem('apiKeySlotsColumnTemplate');
-    const savedStickyColumns = localStorage.getItem('apiKeySlotsStickyColumns');
+    // Check URL parameters first
+    let columnTemplateSet = false;
+    let stickyColumnsSet = false;
     
-    if (savedColumnTemplate && savedColumnTemplate in columnTemplates) {
-      setActiveColumnTemplate(savedColumnTemplate as keyof typeof columnTemplates);
-    }
-    
-    if (savedStickyColumns) {
-      const stickyCount = parseInt(savedStickyColumns, 10);
-      if (!isNaN(stickyCount) && stickyCount >= 0 && stickyCount <= 5) {
-        setActiveStickyColumns(stickyCount);
+    // Handle column template from URL
+    if (searchParams.coltemp) {
+      const urlColTemp = searchParams.coltemp.toUpperCase();
+      // Map URL param values to template keys
+      const templateMap: { [key: string]: keyof typeof columnTemplates } = {
+        'OPTION1': 'OPTION 1',
+        'OPTION2': 'OPTION 2',
+        'OPTION3': 'OPTION 3',
+        'OPTION4': 'OPTION 4'
+      };
+      
+      if (templateMap[urlColTemp]) {
+        setActiveColumnTemplate(templateMap[urlColTemp]);
+        columnTemplateSet = true;
       }
     }
-  }, []);
+    
+    // Handle sticky columns from URL
+    if (searchParams.stickycol) {
+      const urlStickyCol = searchParams.stickycol.toUpperCase();
+      // Map URL param values to sticky column counts
+      const stickyMap: { [key: string]: number } = {
+        'OPTION1': 1,
+        'OPTION2': 2,
+        'OPTION3': 3,
+        'OPTION4': 4,
+        'OPTION5': 5
+      };
+      
+      if (stickyMap[urlStickyCol] !== undefined) {
+        setActiveStickyColumns(stickyMap[urlStickyCol]);
+        stickyColumnsSet = true;
+      }
+    }
+    
+    // Fall back to localStorage if URL params not provided
+    if (!columnTemplateSet) {
+      const savedColumnTemplate = localStorage.getItem('apiKeySlotsColumnTemplate');
+      if (savedColumnTemplate && savedColumnTemplate in columnTemplates) {
+        setActiveColumnTemplate(savedColumnTemplate as keyof typeof columnTemplates);
+      }
+    }
+    
+    if (!stickyColumnsSet) {
+      const savedStickyColumns = localStorage.getItem('apiKeySlotsStickyColumns');
+      if (savedStickyColumns) {
+        const stickyCount = parseInt(savedStickyColumns, 10);
+        if (!isNaN(stickyCount) && stickyCount >= 0 && stickyCount <= 5) {
+          setActiveStickyColumns(stickyCount);
+        }
+      }
+    }
+  }, [searchParams]);
 
-  // Save column template selection to localStorage whenever it changes
+  // Update URL with current view options
+  useEffect(() => {
+    // Skip URL update on initial load to prevent conflicts with URL params
+    const isInitialLoad = localStorage.getItem('apiKeySlotsInitialized') !== 'true';
+    if (isInitialLoad) {
+      localStorage.setItem('apiKeySlotsInitialized', 'true');
+      return;
+    }
+
+    const params = new URLSearchParams();
+    
+    // Map template keys to URL param values
+    const reverseTemplateMap: { [key: string]: string } = {
+      'OPTION 1': 'option1',
+      'OPTION 2': 'option2',
+      'OPTION 3': 'option3',
+      'OPTION 4': 'option4'
+    };
+    
+    if (reverseTemplateMap[activeColumnTemplate]) {
+      params.set('coltemp', reverseTemplateMap[activeColumnTemplate]);
+    }
+    
+    // Map sticky column counts to URL param values
+    if (activeStickyColumns > 0) {
+      params.set('stickycol', `option${activeStickyColumns}`);
+    }
+    
+    // Update URL without causing navigation
+    const newURL = `${pathname}${params.toString() ? '?' + params.toString() : ''}`;
+    router.replace(newURL, { scroll: false });
+  }, [activeColumnTemplate, activeStickyColumns, pathname, router]);
+
+  // Save to localStorage whenever values change
   useEffect(() => {
     localStorage.setItem('apiKeySlotsColumnTemplate', activeColumnTemplate);
   }, [activeColumnTemplate]);
 
-  // Save sticky columns selection to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('apiKeySlotsStickyColumns', activeStickyColumns.toString());
   }, [activeStickyColumns]);
