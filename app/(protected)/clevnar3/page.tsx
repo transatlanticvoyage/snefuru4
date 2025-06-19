@@ -481,6 +481,11 @@ export default function Clevnar3Page() {
     const fieldKey = `${slotId}_${moduleNumber}_ueplatlabel`;
     setSavingFields(new Set([...savingFields, fieldKey]));
     
+    const updateData = {
+      [`${moduleNumber}ueplatlabel`]: labelValue.trim() || null,
+      updated_at: new Date().toISOString()
+    };
+    
     try {
       // Get user's DB id from users table
       const { data: userData, error: userError } = await supabase
@@ -504,11 +509,6 @@ export default function Clevnar3Page() {
       if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
         throw checkError;
       }
-      
-      const updateData = {
-        [`${moduleNumber}ueplatlabel`]: labelValue.trim() || null,
-        updated_at: new Date().toISOString()
-      };
       
       if (existingKey) {
         // Update existing record
