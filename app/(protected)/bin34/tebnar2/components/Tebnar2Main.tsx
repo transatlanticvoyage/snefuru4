@@ -669,62 +669,6 @@ export default function Tebnar2Main() {
         onErrorDismiss={() => setTbn2Error(null)}
       />
 
-      {/* New Column Template System - tebnar2 specific */}
-      <div className="mb-4 flex items-center" style={{ maxHeight: '75px' }}>
-        {/* SQL View Info */}
-        <div style={{ width: '130px', maxHeight: '75px' }} className="mr-4 p-2 border border-gray-300 rounded">
-          <div className="font-bold text-xs">SQL View Info</div>
-          <div className="text-xs">view name: uitablegrid21</div>
-          <div className="text-xs"># columns: {tbn2_getAllTableColumns().length}</div>
-        </div>
-        
-        {/* Column Templates Section */}
-        <div className="mr-4">
-          <div className="font-bold text-sm mb-1">Column Templates (Show/Hide)</div>
-          <div className="flex border border-gray-300 rounded overflow-hidden" style={{ maxWidth: '600px' }}>
-            {Object.entries(TBN2_COLUMN_TEMPLATES).map(([key, template]) => (
-              <button
-                key={key}
-                onClick={() => tbn2_handleColumnTemplateChange(key)}
-                className={`px-2 py-1 text-xs border-r border-gray-300 last:border-r-0 transition-colors ${
-                  tbn2_selectedColTemplate === key 
-                    ? 'bg-blue-900 text-white' 
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-                style={{ width: '120px', minHeight: '60px' }}
-              >
-                <div className="font-semibold">{key.toUpperCase()}</div>
-                <div className="text-xs">{template.label}</div>
-                <div className="text-xs">{template.description}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        {/* Sticky Columns Section */}
-        <div>
-          <div className="font-bold text-sm mb-1">Sticky Columns At Left Side Of UI Grid Table</div>
-          <div className="flex border border-gray-300 rounded overflow-hidden">
-            {[1,2,3,4,5].map(count => (
-              <button
-                key={count}
-                onClick={() => tbn2_handleStickyColChange(count)}
-                className={`px-2 py-1 text-xs border-r border-gray-300 last:border-r-0 transition-colors ${
-                  tbn2_stickyColCount === count 
-                    ? 'bg-blue-900 text-white' 
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-                style={{ width: '80px', minHeight: '60px' }}
-              >
-                <div className="font-semibold">OPTION {count}</div>
-                <div className="text-xs">{count} left-most</div>
-                <div className="text-xs">{count === 1 ? 'column' : 'columns'}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Active Filter Indicator - tebnar2 specific */}
       {tbn2_selectedBatchId && (
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -775,6 +719,67 @@ export default function Tebnar2Main() {
         onSubmitCreatePlans={tbn2_handleSubmitCreatePlans}
         onSubmitMakeImages={tbn2_handleSubmitMakeImages}
       />
+
+      {/* Column Template Controls - positioned just above the main table */}
+      <div className="mb-6 flex items-stretch space-x-4">
+        {/* SQL View Info */}
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-xs" style={{maxWidth: '130px', maxHeight: '75px'}}>
+          <div className="font-semibold text-gray-700 mb-1">SQL View Info</div>
+          <div className="text-gray-600">view name: images_plans</div>
+          <div className="text-gray-600"># columns: {tbn2_getAllTableColumns().length}</div>
+        </div>
+
+        {/* Column Template Options */}
+        <div className="bg-white border border-gray-300 rounded-lg p-2" style={{maxWidth: '600px', maxHeight: '75px'}}>
+          <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
+          <div className="flex space-x-1">
+            {Object.entries(TBN2_COLUMN_TEMPLATES).map(([key, template]) => (
+              <button
+                key={key}
+                onClick={() => tbn2_handleColumnTemplateChange(key)}
+                className={`text-xs leading-tight p-2 rounded border text-center ${
+                  tbn2_selectedColTemplate === key
+                    ? 'bg-blue-900 text-white border-blue-900'
+                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                }`}
+                style={{width: '120px'}}
+              >
+                <div className="font-semibold">{template.label}</div>
+                <div>{template.description}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sticky Columns Control */}
+        <div className="bg-white border border-gray-300 rounded-lg p-2">
+          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
+          <div className="flex space-x-1">
+            {[
+              { id: 1, label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
+              { id: 2, label: 'OPTION 2', subtitle: '2 left-most', range: 'columns' },
+              { id: 3, label: 'OPTION 3', subtitle: '3 left-most', range: 'columns' },
+              { id: 4, label: 'OPTION 4', subtitle: '4 left-most', range: 'columns' },
+              { id: 5, label: 'OPTION 5', subtitle: '5 left-most', range: 'columns' }
+            ].map(option => (
+              <button
+                key={option.id}
+                onClick={() => tbn2_handleStickyColChange(option.id)}
+                className={`text-xs leading-tight p-1 rounded border text-center ${
+                  tbn2_stickyColCount === option.id
+                    ? 'bg-blue-900 text-white border-blue-900'
+                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                }`}
+                style={{width: '80px'}}
+              >
+                <div className="font-semibold">{option.label}</div>
+                <div>{option.subtitle}</div>
+                <div>{option.range}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Main Table - enhanced with column template system */}
       <Tebnar2Table

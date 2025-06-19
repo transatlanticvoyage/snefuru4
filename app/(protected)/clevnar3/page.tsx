@@ -759,6 +759,9 @@ export default function Clevnar3Page() {
             {value}
           </span>
         );
+      case 'slot_name':
+        if (value === null || value === undefined) return '-';
+        return <span className="font-bold">{String(value)}</span>;
       default:
         if (value === null || value === undefined) return '-';
         return String(value);
