@@ -639,11 +639,36 @@ export default function CreateNewApiKeySlotsPage() {
             </select>
           );
         }
-        if (value) {
-          const provider = providers.find(p => p.provider_id === value);
-          return provider?.provider_name || value.substring(0, 8) + '...';
-        }
-        return '-';
+        
+        // Always-editable text field for UUID input
+        const providerFieldKey = `${slot.slot_id}-fk_iservices_provider_id`;
+        const providerFieldIsUpdating = updatingFields.has(providerFieldKey);
+        return (
+          <div className="relative">
+            <input
+              type="text"
+              defaultValue={value || ''}
+              onBlur={(e) => {
+                if (e.target.value !== (value || '')) {
+                  handleTextFieldUpdate(slot.slot_id, 'fk_iservices_provider_id', e.target.value);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                }
+              }}
+              disabled={providerFieldIsUpdating}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              placeholder="Provider UUID (e.g. 79f1a2d4-ec7e-4f3a-a896-d2e4d0e2d3ba)"
+            />
+            {providerFieldIsUpdating && (
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></div>
+              </div>
+            )}
+          </div>
+        );
       
       case 'fk_ai_model_id':
         if (isEditing) {
@@ -662,11 +687,36 @@ export default function CreateNewApiKeySlotsPage() {
             </select>
           );
         }
-        if (value) {
-          const model = aiModels.find(m => m.model_id === value);
-          return model?.model_name || value.substring(0, 8) + '...';
-        }
-        return '-';
+        
+        // Always-editable text field for UUID input
+        const aiModelFieldKey = `${slot.slot_id}-fk_ai_model_id`;
+        const aiModelFieldIsUpdating = updatingFields.has(aiModelFieldKey);
+        return (
+          <div className="relative">
+            <input
+              type="text"
+              defaultValue={value || ''}
+              onBlur={(e) => {
+                if (e.target.value !== (value || '')) {
+                  handleTextFieldUpdate(slot.slot_id, 'fk_ai_model_id', e.target.value);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                }
+              }}
+              disabled={aiModelFieldIsUpdating}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              placeholder="AI Model UUID (e.g. 79f1a2d4-ec7e-4f3a-a896-d2e4d0e2d3ba)"
+            />
+            {aiModelFieldIsUpdating && (
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></div>
+              </div>
+            )}
+          </div>
+        );
       
       case 'created_at':
       case 'updated_at':
