@@ -88,6 +88,22 @@ export default function Narpo1Page() {
     return new Date(dateString).toLocaleString();
   };
 
+  const copyKareenchValue = async (pushId: string, kareenchValue: any) => {
+    try {
+      const valueToString = typeof kareenchValue === 'string' 
+        ? kareenchValue 
+        : JSON.stringify(kareenchValue, null, 2);
+      
+      await navigator.clipboard.writeText(valueToString);
+      setCopiedId(pushId);
+      
+      // Clear the copied indicator after 2 seconds
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy kareench1 value:', err);
+    }
+  };
+
   const getStatusBadgeColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'completed':
@@ -221,6 +237,9 @@ export default function Narpo1Page() {
                       Batch ID
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Kareench1 Data
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -278,6 +297,51 @@ export default function Narpo1Page() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-xs font-mono text-gray-600">
                           {push.fk_batch_id.substring(0, 8)}...
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-2">
+                          <div className="text-xs font-mono text-gray-600 max-w-xs">
+                            {push.kareench1 ? (
+                              <div className="truncate" title={typeof push.kareench1 === 'string' ? push.kareench1 : JSON.stringify(push.kareench1)}>
+                                {typeof push.kareench1 === 'string' 
+                                  ? (push.kareench1.length > 50 ? `${push.kareench1.substring(0, 50)}...` : push.kareench1)
+                                  : JSON.stringify(push.kareench1).length > 50 
+                                    ? `${JSON.stringify(push.kareench1).substring(0, 50)}...`
+                                    : JSON.stringify(push.kareench1)
+                                }
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 italic">No data</span>
+                            )}
+                          </div>
+                          {push.kareench1 && (
+                            <button
+                              onClick={() => copyKareenchValue(push.id, push.kareench1)}
+                              className={`inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded ${
+                                copiedId === push.id
+                                  ? 'text-green-800 bg-green-100'
+                                  : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors`}
+                              title="Copy kareench1 data"
+                            >
+                              {copiedId === push.id ? (
+                                <>
+                                  <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                  Copy
+                                </>
+                              )}
+                            </button>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
