@@ -116,6 +116,33 @@ export default function CreateNewApiKeySlotsPage() {
   const nonStickyTemplateColumns = templateColumns.filter(col => !stickyColumns.includes(col));
   const activeColumns = [...stickyColumns, ...nonStickyTemplateColumns];
 
+  // Load saved view options from localStorage on component mount
+  useEffect(() => {
+    const savedColumnTemplate = localStorage.getItem('apiKeySlotsColumnTemplate');
+    const savedStickyColumns = localStorage.getItem('apiKeySlotsStickyColumns');
+    
+    if (savedColumnTemplate && savedColumnTemplate in columnTemplates) {
+      setActiveColumnTemplate(savedColumnTemplate as keyof typeof columnTemplates);
+    }
+    
+    if (savedStickyColumns) {
+      const stickyCount = parseInt(savedStickyColumns, 10);
+      if (!isNaN(stickyCount) && stickyCount >= 0 && stickyCount <= 5) {
+        setActiveStickyColumns(stickyCount);
+      }
+    }
+  }, []);
+
+  // Save column template selection to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('apiKeySlotsColumnTemplate', activeColumnTemplate);
+  }, [activeColumnTemplate]);
+
+  // Save sticky columns selection to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('apiKeySlotsStickyColumns', activeStickyColumns.toString());
+  }, [activeStickyColumns]);
+
   useEffect(() => {
     document.title = 'API Key Slots Management - Admin - Snefuru';
     
