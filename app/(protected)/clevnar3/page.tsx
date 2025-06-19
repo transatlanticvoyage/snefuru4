@@ -79,6 +79,8 @@ export default function Clevnar3Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingFields, setEditingFields] = useState<{[key: string]: string}>({});
+  const [savingFields, setSavingFields] = useState<Set<string>>(new Set());
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
@@ -267,7 +269,79 @@ export default function Clevnar3Page() {
     setCurrentPage(1);
   };
 
-  const formatColumnData = (col: string, value: any) => {
+  const handleSaveApiKey = async (slotId: string, moduleNumber: string, apiKeyValue: string) => {
+    if (!user?.id || !apiKeyValue.trim()) return;
+    
+    const fieldKey = `${slotId}_${moduleNumber}`;
+    setSavingFields(new Set([...savingFields, fieldKey]));
+    
+    try {
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+        
+      if (userError || !userData) {
+        throw new Error('Could not find user record.');
+      }
+      
+      // Check if user already has an api_keys_t3 record for this slot
+      const { data: existingKey, error: checkError } = await supabase
+        .from('api_keys_t3')
+        .select('*')
+        .eq('fk_user_id', userData.id)
+        .eq('fk_slot_id', slotId)
+        .single();
+      
+      if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
+        throw checkError;
+      }
+      
+      const updateData = {
+        [`${moduleNumber}datum`]: apiKeyValue.trim(),
+        updated_at: new Date().toISOString()
+      };
+      
+      if (existingKey) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('api_keys_t3')
+          .update(updateData)
+          .eq('api_key_id', existingKey.api_key_id);
+          
+        if (updateError) throw updateError;
+      } else {
+        // Create new record
+        const { error: insertError } = await supabase
+          .from('api_keys_t3')
+          .insert({
+            fk_user_id: userData.id,
+            fk_slot_id: slotId,
+            ...updateData,
+            created_at: new Date().toISOString()
+          });
+          
+        if (insertError) throw insertError;
+      }
+      
+      // Clear the editing field and refresh data
+      const newEditingFields = { ...editingFields };
+      delete newEditingFields[fieldKey];
+      setEditingFields(newEditingFields);
+      
+      await fetchJoinedData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save API key');
+    } finally {
+      const newSavingFields = new Set(savingFields);
+      newSavingFields.delete(fieldKey);
+      setSavingFields(newSavingFields);
+    }
+  };
+
+  const formatColumnData = (col: string, value: any, item?: ApiKeySlotJoined) => {
     if (value === null || value === undefined) return '-';
     
     switch (col) {
@@ -286,11 +360,86 @@ export default function Clevnar3Page() {
       case 'm1datum':
       case 'm2datum':
       case 'm3datum':
-        if (value === null || value === undefined) return '-';
-        // Show masked API key similar to other API key fields
-        const keyLength = value.length;
-        if (keyLength <= 8) return '********';
-        return value.substring(0, 4) + '...' + value.substring(keyLength - 4);
+        if (!item || !user?.id) {
+          if (value === null || value === undefined) return '-';
+          // Show masked API key
+          const keyLength = value.length;
+          if (keyLength <= 8) return '********';
+          return value.substring(0, 4) + '...' + value.substring(keyLength - 4);
+        }
+        
+        // Check if corresponding module is in use
+        const moduleNumber = col.replace('datum', ''); // m1, m2, or m3
+        const inUseField = `${moduleNumber}inuse` as keyof ApiKeySlotJoined;
+        const isModuleInUse = item[inUseField] as boolean;
+        
+        if (!isModuleInUse) {
+          return '-'; // Module not in use, show dash
+        }
+        
+        const fieldKey = `${item.slot_id}_${moduleNumber}`;
+        const isEditing = editingFields.hasOwnProperty(fieldKey);
+        const isSaving = savingFields.has(fieldKey);
+        
+        if (isEditing) {
+          return (
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={editingFields[fieldKey] || ''}
+                onChange={(e) => setEditingFields({...editingFields, [fieldKey]: e.target.value})}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder={`Enter ${moduleNumber} API key`}
+                disabled={isSaving}
+              />
+              <button
+                onClick={() => handleSaveApiKey(item.slot_id, moduleNumber, editingFields[fieldKey] || '')}
+                disabled={isSaving || !editingFields[fieldKey]?.trim()}
+                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                onClick={() => {
+                  const newEditingFields = { ...editingFields };
+                  delete newEditingFields[fieldKey];
+                  setEditingFields(newEditingFields);
+                }}
+                disabled={isSaving}
+                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+            </div>
+          );
+        }
+        
+        // Not editing - show value with edit button or add button
+        if (value === null || value === undefined) {
+          return (
+            <button
+              onClick={() => setEditingFields({...editingFields, [fieldKey]: ''})}
+              className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Add API Key
+            </button>
+          );
+        } else {
+          return (
+            <div className="flex items-center space-x-2">
+              <span className="font-mono text-xs">
+                {value.length <= 8 ? '********' : value.substring(0, 4) + '...' + value.substring(value.length - 4)}
+              </span>
+              <button
+                onClick={() => setEditingFields({...editingFields, [fieldKey]: value})}
+                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Edit
+              </button>
+            </div>
+          );
+        }
+        
       case 'm1inuse':
       case 'm2inuse':
       case 'm3inuse':
@@ -467,7 +616,7 @@ export default function Clevnar3Page() {
                 {columns.map(col => (
                   <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <div className="max-w-xs">
-                      {formatColumnData(col, item[col as keyof ApiKeySlotJoined])}
+                      {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
                     </div>
                   </td>
                 ))}
