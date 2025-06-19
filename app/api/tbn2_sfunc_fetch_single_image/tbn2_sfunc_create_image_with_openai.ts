@@ -61,7 +61,7 @@ export async function tbn2_sfunc_create_image_with_openai({
     
     // Find the matching API key record
     const matchingApiKey = apiKeyData.find(record => {
-      const slots = record.api_key_slots;
+      const slots = record.api_key_slots as any;
       // Handle both single object and array cases
       const slotName = Array.isArray(slots) ? slots[0]?.slot_name : slots?.slot_name;
       return slotName?.toLowerCase() === aiModel.toLowerCase();
@@ -75,7 +75,7 @@ export async function tbn2_sfunc_create_image_with_openai({
           userId: userId,
           aiModel: aiModel,
           availableSlots: apiKeyData.map(record => {
-            const slots = record.api_key_slots;
+            const slots = record.api_key_slots as any;
             return Array.isArray(slots) ? slots[0]?.slot_name : slots?.slot_name;
           }).filter(Boolean),
           hasMatchingKey: !!matchingApiKey,
