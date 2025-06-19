@@ -7,14 +7,17 @@ interface ApiKeySlotJoined {
   // api_key_slots columns (left side - primary entity)
   slot_id: string;
   slot_name: string | null;
-  m1name: string | null;
+  m1platcodehandle: string | null;
   m1datum: string | null;
+  m1ueplatlabel: string | null;
   m1inuse: boolean;
-  m2name: string | null;
+  m2platcodehandle: string | null;
   m2datum: string | null;
+  m2ueplatlabel: string | null;
   m2inuse: boolean;
-  m3name: string | null;
+  m3platcodehandle: string | null;
   m3datum: string | null;
+  m3ueplatlabel: string | null;
   m3inuse: boolean;
   slot_created_at: string;
   slot_updated_at: string;
@@ -42,14 +45,17 @@ const columns = [
   'slot_id',
   'slot_name',
   'm1inuse',
-  'm1name',
+  'm1platcodehandle',
   'm1datum',
+  'm1ueplatlabel',
   'm2inuse',
-  'm2name',
-  'm2datum', 
+  'm2platcodehandle',
+  'm2datum',
+  'm2ueplatlabel', 
   'm3inuse',
-  'm3name',
+  'm3platcodehandle',
   'm3datum',
+  'm3ueplatlabel',
   'slot_created_at',
   'slot_updated_at',
   'fk_iservices_provider_id',
@@ -123,9 +129,12 @@ export default function Clevnar3Page() {
     if (searchTerm) {
       const filtered = data.filter(item => 
         item.slot_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.m1name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.m2name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.m3name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m1platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m2platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m3platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m1ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m2ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m3ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_m1name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_m2name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_m3name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -160,14 +169,17 @@ export default function Clevnar3Page() {
           // api_key_slots columns
           slot_id: slot.slot_id,
           slot_name: slot.slot_name,
-          m1name: slot.m1name,
+          m1platcodehandle: slot.m1platcodehandle,
           m1datum: null,
+          m1ueplatlabel: null,
           m1inuse: slot.m1inuse,
-          m2name: slot.m2name,
+          m2platcodehandle: slot.m2platcodehandle,
           m2datum: null,
+          m2ueplatlabel: null,
           m2inuse: slot.m2inuse,
-          m3name: slot.m3name,
+          m3platcodehandle: slot.m3platcodehandle,
           m3datum: null,
+          m3ueplatlabel: null,
           m3inuse: slot.m3inuse,
           slot_created_at: slot.created_at,
           slot_updated_at: slot.updated_at,
@@ -235,14 +247,17 @@ export default function Clevnar3Page() {
           // api_key_slots columns (rename to match view structure)
           slot_id: slot.slot_id,
           slot_name: slot.slot_name,
-          m1name: slot.m1name,
+          m1platcodehandle: slot.m1platcodehandle,
           m1datum: userKey?.m1datum || null,
+          m1ueplatlabel: userKey?.m1ueplatlabel || null,
           m1inuse: slot.m1inuse,
-          m2name: slot.m2name,
+          m2platcodehandle: slot.m2platcodehandle,
           m2datum: userKey?.m2datum || null,
+          m2ueplatlabel: userKey?.m2ueplatlabel || null,
           m2inuse: slot.m2inuse,
-          m3name: slot.m3name,
+          m3platcodehandle: slot.m3platcodehandle,
           m3datum: userKey?.m3datum || null,
+          m3ueplatlabel: userKey?.m3ueplatlabel || null,
           m3inuse: slot.m3inuse,
           slot_created_at: slot.created_at,
           slot_updated_at: slot.updated_at,
@@ -769,11 +784,11 @@ export default function Clevnar3Page() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th colSpan={Math.min(visibleColumns.length, 18)} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50">
+              <th colSpan={Math.min(visibleColumns.length, 21)} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50">
                 API Key Slots (Primary Entity)
               </th>
-              {visibleColumns.length > 18 && (
-                <th colSpan={Math.min(visibleColumns.length - 18, 10)} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-green-50">
+              {visibleColumns.length > 21 && (
+                <th colSpan={Math.min(visibleColumns.length - 21, 10)} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-green-50">
                   User API Keys (Joined Data)
                 </th>
               )}
@@ -786,10 +801,11 @@ export default function Clevnar3Page() {
                 if (col.startsWith('api_key_') || col.startsWith('fk_user_') || col.startsWith('fk_slot_') || 
                     col.startsWith('key_') || col.startsWith('d_')) {
                   bgColor = 'bg-green-50'; // api_keys_t3 columns
-                } else if (col === 'm1datum' || col === 'm2datum' || col === 'm3datum') {
-                  bgColor = 'bg-green-50'; // m*datum are from api_keys_t3 but positioned with slots
-                } else if (col.startsWith('m') && col.endsWith('inuse')) {
-                  bgColor = 'bg-blue-50'; // m*inuse are from api_key_slots
+                } else if (col === 'm1datum' || col === 'm2datum' || col === 'm3datum' || 
+                           col === 'm1ueplatlabel' || col === 'm2ueplatlabel' || col === 'm3ueplatlabel') {
+                  bgColor = 'bg-green-50'; // m*datum and m*ueplatlabel are from api_keys_t3 but positioned with slots
+                } else if (col.startsWith('m') && (col.endsWith('inuse') || col.endsWith('platcodehandle'))) {
+                  bgColor = 'bg-blue-50'; // m*inuse and m*platcodehandle are from api_key_slots
                 }
 
                 // Sticky logic: first N columns are always sticky
