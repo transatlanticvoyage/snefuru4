@@ -157,7 +157,6 @@ export async function tbn2_sfunc_create_image_with_openai({
     }
 
     // Upload to Supabase Storage
-    const supabase = createRouteHandlerClient({ cookies });
     const storagePath = `barge1/${batchFolder}/${fileName}`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
