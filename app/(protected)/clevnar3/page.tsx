@@ -91,6 +91,12 @@ export default function Clevnar3Page() {
   useEffect(() => {
     document.title = 'clevnar3 - Snefuru';
     
+    // Remove layout constraints for full width
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.className = 'w-full';
+    }
+    
     // Load state from URL parameters and localStorage
     const urlParams = new URLSearchParams(window.location.search);
     const colTempParam = urlParams.get('coltemp') || localStorage.getItem('clevnar3_coltemp') || 'option1';
@@ -98,6 +104,14 @@ export default function Clevnar3Page() {
     
     setSelectedColumnTemplate(colTempParam);
     setSelectedStickyColumns(stickyColParam);
+    
+    // Cleanup function to restore original layout when leaving page
+    return () => {
+      const mainElement = document.querySelector('main');
+      if (mainElement) {
+        mainElement.className = 'max-w-7xl mx-auto py-6 sm:px-6 lg:px-8';
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -617,8 +631,8 @@ export default function Clevnar3Page() {
   const visibleColumns = getVisibleColumns();
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
-      <div className="p-6">
+    <div className="w-full min-h-screen bg-gray-50 -m-6">
+      <div className="p-6 w-full max-w-none">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">API Key Slots Management</h1>
         <p className="text-sm text-gray-600 mb-6">SQL View: sqlview_apikeysjoined1 (api_key_slots LEFT JOIN api_keys_t3)</p>
       
