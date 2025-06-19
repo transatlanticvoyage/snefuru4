@@ -831,6 +831,7 @@ export default function Clevnar3Page() {
 
         {/* Column Template Options */}
         <div className="bg-white border border-gray-300 rounded-lg p-2" style={{maxWidth: '600px', maxHeight: '75px'}}>
+          <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
           <div className="flex space-x-1">
             {[
               { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-~' },
@@ -859,7 +860,7 @@ export default function Clevnar3Page() {
 
         {/* Sticky Columns Control */}
         <div className="bg-white border border-gray-300 rounded-lg p-2">
-          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns</div>
+          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
           <div className="flex space-x-1">
             {[
               { id: 'option1', label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
@@ -947,6 +948,9 @@ export default function Clevnar3Page() {
           </div>
         </div>
       </div>
+
+      {/* Table Grid Label */}
+      <div className="text-sm font-bold text-gray-900 mb-2">uitablegrid41</div>
 
       {/* Table */}
       <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">

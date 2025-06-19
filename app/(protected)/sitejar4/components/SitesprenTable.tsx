@@ -426,7 +426,7 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
 
         {/* Column Template Button Bar */}
         <div className="bg-white p-3 rounded-lg border shadow-sm" style={{width: '600px', maxHeight: '75px'}}>
-          <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates</div>
+          <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
           <div className="flex space-x-1">
             {[
               { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-19' },
@@ -455,7 +455,7 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
 
         {/* Sticky Columns Section */}
         <div className="bg-white p-3 rounded-lg border shadow-sm" style={{maxHeight: '75px'}}>
-          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns</div>
+          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
           <div className="flex space-x-1">
             {[
               { id: 'option1', label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
@@ -543,6 +543,9 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
           </button>
         </div>
       </div>
+
+      {/* Table Grid Label */}
+      <div className="text-sm font-bold text-gray-900 mb-2">uitablegrid31</div>
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
