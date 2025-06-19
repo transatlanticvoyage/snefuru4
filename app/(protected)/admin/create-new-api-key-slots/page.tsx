@@ -896,7 +896,7 @@ export default function CreateNewApiKeySlotsPage() {
           {Object.entries(columnTemplates).map(([optionKey, template]) => (
             <button
               key={optionKey}
-              onClick={() => setActiveColumnTemplate(optionKey)}
+              onClick={() => setActiveColumnTemplate(optionKey as keyof typeof columnTemplates)}
               className={`flex flex-col justify-center items-center text-xs leading-tight border rounded-lg transition-colors ${
                 activeColumnTemplate === optionKey
                   ? 'bg-blue-900 text-white border-blue-900'
