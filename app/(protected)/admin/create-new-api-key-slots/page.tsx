@@ -18,6 +18,7 @@ interface ApiKeySlot {
   fk_iservices_provider_id: string | null;
   slot_publicly_shown: boolean;
   fk_ai_model_id: string | null;
+  is_ai_model: boolean;
 }
 
 interface ServiceProvider {
@@ -40,6 +41,7 @@ const columns = [
   'actions',
   'slot_id',
   'slot_name',
+  'is_ai_model',
   'count_active_modules_on_slot',
   'm1name',
   'm1inuse',
@@ -183,6 +185,7 @@ export default function CreateNewApiKeySlotsPage() {
       fk_iservices_provider_id: null,
       slot_publicly_shown: false,
       fk_ai_model_id: null,
+      is_ai_model: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     });
@@ -391,6 +394,42 @@ export default function CreateNewApiKeySlotsPage() {
           }`}>
             {value ? 'Public' : 'Private'}
           </span>
+        );
+      
+      case 'is_ai_model':
+        if (isEditing) {
+          return (
+            <div className="flex items-center">
+              <button
+                type="button"
+                onClick={() => handleFieldChange(slot.slot_id, 'is_ai_model', !editData?.is_ai_model)}
+                className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  editData?.is_ai_model ? 'bg-green-600' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${
+                    editData?.is_ai_model ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          );
+        }
+        return (
+          <div className="flex items-center">
+            <div
+              className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-not-allowed ${
+                value ? 'bg-green-600' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${
+                  value ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </div>
+          </div>
         );
       
       case 'fk_iservices_provider_id':

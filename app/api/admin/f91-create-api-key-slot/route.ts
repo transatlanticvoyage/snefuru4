@@ -52,7 +52,8 @@ export async function POST(request: Request) {
       m3inuse: body.m3inuse || false,
       fk_iservices_provider_id: body.fk_iservices_provider_id || null,
       slot_publicly_shown: body.slot_publicly_shown || false,
-      fk_ai_model_id: body.fk_ai_model_id || null
+      fk_ai_model_id: body.fk_ai_model_id || null,
+      is_ai_model: body.is_ai_model || false
     };
     
     // Insert new API key slot
