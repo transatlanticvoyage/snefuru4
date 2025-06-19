@@ -372,6 +372,15 @@ export default function Clevnar3Page() {
     }
   };
 
+  const getColumnSeparators = (col: string) => {
+    // Left separators for m1inuse, m2inuse, m3inuse
+    const hasLeftSeparator = col === 'm1inuse' || col === 'm2inuse' || col === 'm3inuse';
+    // Right separator for m3datum
+    const hasRightSeparator = col === 'm3datum';
+    
+    return { hasLeftSeparator, hasRightSeparator };
+  };
+
   const updateUrlAndStorage = (colTemp: string, stickyCol: string) => {
     // Update URL
     const url = new URL(window.location.href);
@@ -973,13 +982,21 @@ export default function Clevnar3Page() {
                 // Check if this is the last sticky column
                 const isLastSticky = index === stickyColumnCount - 1;
                 
+                const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
+                
                 return (
                   <th 
                     key={col} 
-                    className={`px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider ${bgColor} ${stickyClass}`}
+                    className={`px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider ${bgColor} ${stickyClass} relative`}
                     style={isSticky ? { left: leftPosition } : {}}
                   >
+                    {hasLeftSeparator && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
+                    )}
                     {col}
+                    {hasRightSeparator && (
+                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                    )}
                     {isLastSticky && (
                       <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
                     )}
@@ -1001,15 +1018,23 @@ export default function Clevnar3Page() {
                   // Check if this is the last sticky column
                   const isLastSticky = colIndex === stickyColumnCount - 1;
                   
+                  const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
+                  
                   return (
                     <td 
                       key={col} 
                       className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative`}
                       style={isSticky ? { left: leftPosition } : {}}
                     >
+                      {hasLeftSeparator && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
                       <div className={col.includes('datum') || col.includes('ueplatlabel') ? 'min-w-48' : 'max-w-xs'}>
                         {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
                       </div>
+                      {hasRightSeparator && (
+                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
                       {isLastSticky && (
                         <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
                       )}

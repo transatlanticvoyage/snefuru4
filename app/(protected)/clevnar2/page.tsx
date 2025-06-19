@@ -149,6 +149,16 @@ export default function Clevnar2Page() {
     setCurrentPage(1);
   };
 
+  const getColumnSeparators = (col: string) => {
+    // In clevnar2, we don't have m*inuse columns, but we might have m*datum fields
+    // Right separator for m3datum
+    const hasRightSeparator = col === 'm3datum';
+    // No left separators needed in clevnar2 since we don't have the inuse columns
+    const hasLeftSeparator = false;
+    
+    return { hasLeftSeparator, hasRightSeparator };
+  };
+
   const handleSaveField = async (apiKeyId: string, fieldName: string, fieldValue: string) => {
     if (!user?.id) return;
     
@@ -460,26 +470,46 @@ export default function Clevnar2Page() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {columns.map(col => (
-                <th 
-                  key={col} 
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider"
-                >
-                  {col}
-                </th>
-              ))}
+              {columns.map(col => {
+                const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
+                
+                return (
+                  <th 
+                    key={col} 
+                    className="px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider relative"
+                  >
+                    {hasLeftSeparator && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
+                    )}
+                    {col}
+                    {hasRightSeparator && (
+                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentItems.map((apiKey, index) => (
               <tr key={apiKey.api_key_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                {columns.map(col => (
-                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="max-w-xs">
-                      {formatColumnData(col, apiKey[col as keyof ApiKeyT3], apiKey)}
-                    </div>
-                  </td>
-                ))}
+                {columns.map(col => {
+                  const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
+                  
+                  return (
+                    <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 relative">
+                      {hasLeftSeparator && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
+                      <div className="max-w-xs">
+                        {formatColumnData(col, apiKey[col as keyof ApiKeyT3], apiKey)}
+                      </div>
+                      {hasRightSeparator && (
+                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
