@@ -9,9 +9,9 @@ interface ApiKeyT3 {
   fk_slot_id: string | null;
   created_at: string;
   updated_at: string;
-  d_m1name: string | null;
-  d_m2name: string | null;
-  d_m3name: string | null;
+  d_m1platcodehandle: string | null;
+  d_m2platcodehandle: string | null;
+  d_m3platcodehandle: string | null;
   d_slot_name: string | null;
   d_user_email: string | null;
 }
@@ -22,9 +22,9 @@ const columns = [
   'fk_slot_id',
   'created_at',
   'updated_at',
-  'd_m1name',
-  'd_m2name',
-  'd_m3name',
+  'd_m1platcodehandle',
+  'd_m2platcodehandle',
+  'd_m3platcodehandle',
   'd_slot_name',
   'd_user_email'
 ];
@@ -54,9 +54,9 @@ export default function Clevnar2Page() {
     // Filter data based on search term
     if (searchTerm) {
       const filtered = data.filter(item => 
-        item.d_m1name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.d_m2name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.d_m3name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.d_m1platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.d_m2platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.d_m3platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_slot_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_user_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.api_key_id.toLowerCase().includes(searchTerm.toLowerCase()) ||

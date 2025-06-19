@@ -26,9 +26,9 @@ SELECT
     akt3.fk_slot_id,
     akt3.created_at as key_created_at,
     akt3.updated_at as key_updated_at,
-    akt3.d_m1name,
-    akt3.d_m2name,
-    akt3.d_m3name,
+    akt3.d_m1platcodehandle,
+    akt3.d_m2platcodehandle,
+    akt3.d_m3platcodehandle,
     akt3.d_slot_name,
     akt3.d_user_email
 

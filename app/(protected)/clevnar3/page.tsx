@@ -70,9 +70,9 @@ const columns = [
   'fk_slot_id',
   'key_created_at',
   'key_updated_at',
-  'd_m1name',
-  'd_m2name',
-  'd_m3name',
+  'd_m1platcodehandle',
+  'd_m2platcodehandle',
+  'd_m3platcodehandle',
   'd_slot_name',
   'd_user_email'
 ];
@@ -135,9 +135,9 @@ export default function Clevnar3Page() {
         item.m1ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.m2ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.m3ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.d_m1name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.d_m2name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.d_m3name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.d_m1platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.d_m2platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.d_m3platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_slot_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_user_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.slot_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -195,9 +195,9 @@ export default function Clevnar3Page() {
           fk_slot_id: null,
           key_created_at: null,
           key_updated_at: null,
-          d_m1name: null,
-          d_m2name: null,
-          d_m3name: null,
+          d_m1platcodehandle: null,
+          d_m2platcodehandle: null,
+          d_m3platcodehandle: null,
           d_slot_name: null,
           d_user_email: null
         }));
@@ -273,9 +273,9 @@ export default function Clevnar3Page() {
           fk_slot_id: userKey?.fk_slot_id || null,
           key_created_at: userKey?.created_at || null,
           key_updated_at: userKey?.updated_at || null,
-          d_m1name: userKey?.d_m1name || null,
-          d_m2name: userKey?.d_m2name || null,
-          d_m3name: userKey?.d_m3name || null,
+          d_m1platcodehandle: userKey?.d_m1platcodehandle || null,
+          d_m2platcodehandle: userKey?.d_m2platcodehandle || null,
+          d_m3platcodehandle: userKey?.d_m3platcodehandle || null,
           d_slot_name: userKey?.d_slot_name || null,
           d_user_email: userKey?.d_user_email || null
         };
