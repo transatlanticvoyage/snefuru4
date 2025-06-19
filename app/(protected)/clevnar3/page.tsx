@@ -8,10 +8,13 @@ interface ApiKeySlotJoined {
   slot_id: string;
   slot_name: string | null;
   m1name: string | null;
+  m1datum: string | null;
   m1inuse: boolean;
   m2name: string | null;
+  m2datum: string | null;
   m2inuse: boolean;
   m3name: string | null;
+  m3datum: string | null;
   m3inuse: boolean;
   slot_created_at: string;
   slot_updated_at: string;
@@ -39,10 +42,13 @@ const columns = [
   'slot_id',
   'slot_name',
   'm1name',
+  'm1datum',
   'm1inuse',
-  'm2name', 
+  'm2name',
+  'm2datum', 
   'm2inuse',
   'm3name',
+  'm3datum',
   'm3inuse',
   'slot_created_at',
   'slot_updated_at',
@@ -129,10 +135,13 @@ export default function Clevnar3Page() {
           slot_id: slot.slot_id,
           slot_name: slot.slot_name,
           m1name: slot.m1name,
+          m1datum: null,
           m1inuse: slot.m1inuse,
           m2name: slot.m2name,
+          m2datum: null,
           m2inuse: slot.m2inuse,
           m3name: slot.m3name,
+          m3datum: null,
           m3inuse: slot.m3inuse,
           slot_created_at: slot.created_at,
           slot_updated_at: slot.updated_at,
@@ -201,10 +210,13 @@ export default function Clevnar3Page() {
           slot_id: slot.slot_id,
           slot_name: slot.slot_name,
           m1name: slot.m1name,
+          m1datum: userKey?.m1datum || null,
           m1inuse: slot.m1inuse,
           m2name: slot.m2name,
+          m2datum: userKey?.m2datum || null,
           m2inuse: slot.m2inuse,
           m3name: slot.m3name,
+          m3datum: userKey?.m3datum || null,
           m3inuse: slot.m3inuse,
           slot_created_at: slot.created_at,
           slot_updated_at: slot.updated_at,
@@ -271,6 +283,14 @@ export default function Clevnar3Page() {
       case 'key_created_at':
       case 'key_updated_at':
         return new Date(value).toLocaleString();
+      case 'm1datum':
+      case 'm2datum':
+      case 'm3datum':
+        if (value === null || value === undefined) return '-';
+        // Show masked API key similar to other API key fields
+        const keyLength = value.length;
+        if (keyLength <= 8) return '********';
+        return value.substring(0, 4) + '...' + value.substring(keyLength - 4);
       case 'm1inuse':
       case 'm2inuse':
       case 'm3inuse':
@@ -411,7 +431,7 @@ export default function Clevnar3Page() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th colSpan={15} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50">
+              <th colSpan={18} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50">
                 API Key Slots (Primary Entity)
               </th>
               <th colSpan={10} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-green-50">
@@ -419,18 +439,26 @@ export default function Clevnar3Page() {
               </th>
             </tr>
             <tr>
-              {columns.map(col => (
-                <th 
-                  key={col} 
-                  className={`px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider ${
-                    col.startsWith('slot_') || col.startsWith('m') || col.startsWith('fk_') || col.startsWith('is_') || col.startsWith('count_') 
-                      ? 'bg-blue-50' 
-                      : 'bg-green-50'
-                  }`}
-                >
-                  {col}
-                </th>
-              ))}
+              {columns.map(col => {
+                // Determine background color based on column type
+                let bgColor = 'bg-blue-50'; // Default for api_key_slots columns
+                
+                if (col.startsWith('api_key_') || col.startsWith('fk_user_') || col.startsWith('fk_slot_') || 
+                    col.startsWith('key_') || col.startsWith('d_')) {
+                  bgColor = 'bg-green-50'; // api_keys_t3 columns
+                } else if (col === 'm1datum' || col === 'm2datum' || col === 'm3datum') {
+                  bgColor = 'bg-green-50'; // m*datum are from api_keys_t3 but positioned with slots
+                }
+                
+                return (
+                  <th 
+                    key={col} 
+                    className={`px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider ${bgColor}`}
+                  >
+                    {col}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
