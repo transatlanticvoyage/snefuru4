@@ -28,53 +28,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
-        setLoading(false);
-        
-        // Simple admin check - if user exists, check their admin status
-        if (session?.user) {
-          try {
-            const { data: userData, error } = await supabase
-              .from('users')
-              .select('is_admin')
-              .eq('auth_id', session.user.id)
-              .single();
-            
-            if (!error && userData && userData.is_admin === true) {
-              setIsAdmin(true);
-            }
-          } catch (err) {
-            // Silently fail admin check
-          }
-        }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('Error getting session:', error);
+        setUser(null);
+      } finally {
         setLoading(false);
       }
     };
 
     initializeAuth();
 
-    // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    // Listen for changes on auth state - NO DATABASE QUERIES HERE
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      setIsAdmin(false);
-      
-      // Check admin status for new session
-      if (session?.user) {
-        try {
-          const { data: userData, error } = await supabase
-            .from('users')
-            .select('is_admin')
-            .eq('auth_id', session.user.id)
-            .single();
-          
-          if (!error && userData && userData.is_admin === true) {
-            setIsAdmin(true);
-          }
-        } catch (err) {
-          // Silently fail admin check
-        }
-      }
+      setIsAdmin(false); // Reset admin status - will be checked separately
     });
 
     return () => subscription.unsubscribe();

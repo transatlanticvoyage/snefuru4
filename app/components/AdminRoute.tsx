@@ -2,24 +2,56 @@
 
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface AdminRouteProps {
   children: React.ReactNode;
 }
 
 export default function AdminRoute({ children }: AdminRouteProps) {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminLoading, setAdminLoading] = useState(true);
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
     if (!loading && !user) {
-      // Not logged in, redirect to login
       router.push('/login');
     }
   }, [user, loading, router]);
 
-  if (loading) {
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setAdminLoading(false);
+        return;
+      }
+
+      try {
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('is_admin')
+          .eq('auth_id', user.id)
+          .single();
+        
+        if (!error && userData && userData.is_admin === true) {
+          setIsAdmin(true);
+        }
+      } catch (err) {
+        // Silently fail
+      } finally {
+        setAdminLoading(false);
+      }
+    };
+
+    if (!loading && user) {
+      checkAdminStatus();
+    }
+  }, [user, loading, supabase]);
+
+  if (loading || adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
