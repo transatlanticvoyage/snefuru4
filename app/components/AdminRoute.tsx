@@ -2,17 +2,15 @@
 
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface AdminRouteProps {
   children: React.ReactNode;
 }
 
 export default function AdminRoute({ children }: AdminRouteProps) {
-  const { user, loading, checkAdminStatus } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
   const router = useRouter();
-  const [adminChecking, setAdminChecking] = useState(false);
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -21,18 +19,7 @@ export default function AdminRoute({ children }: AdminRouteProps) {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
-    // Check admin status when component mounts and user is loaded
-    if (user && !loading && isAdmin === null) {
-      setAdminChecking(true);
-      checkAdminStatus().then((adminStatus) => {
-        setIsAdmin(adminStatus);
-        setAdminChecking(false);
-      });
-    }
-  }, [user, loading, checkAdminStatus, isAdmin]);
-
-  if (loading || adminChecking) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -47,7 +34,7 @@ export default function AdminRoute({ children }: AdminRouteProps) {
     return null; // Will redirect in useEffect
   }
 
-  if (isAdmin === false) {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full space-y-8">

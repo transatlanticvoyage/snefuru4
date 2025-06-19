@@ -8,11 +8,11 @@ interface ApiKeySlot {
   slot_name: string;
   count_active_modules_on_slot: number;
   m1name: string | null;
-  m1isinuse: boolean;
+  m1inuse: boolean;
   m2name: string | null;
-  m2isinuse: boolean;
+  m2inuse: boolean;
   m3name: string | null;
-  m3isinuse: boolean;
+  m3inuse: boolean;
   created_at: string;
   updated_at: string;
   fk_iservices_provider_id: string | null;
@@ -42,11 +42,11 @@ const columns = [
   'slot_name',
   'count_active_modules_on_slot',
   'm1name',
-  'm1isinuse',
+  'm1inuse',
   'm2name',
-  'm2isinuse',
+  'm2inuse',
   'm3name',
-  'm3isinuse',
+  'm3inuse',
   'created_at',
   'updated_at',
   'fk_iservices_provider_id',
@@ -175,11 +175,11 @@ export default function CreateNewApiKeySlotsPage() {
       slot_id: 'new-' + Date.now(), // Temporary ID
       slot_name: '',
       m1name: '',
-      m1isinuse: false,
+      m1inuse: false,
       m2name: '',
-      m2isinuse: false,
+      m2inuse: false,
       m3name: '',
-      m3isinuse: false,
+      m3inuse: false,
       fk_iservices_provider_id: null,
       slot_publicly_shown: false,
       fk_ai_model_id: null,
@@ -330,9 +330,9 @@ export default function CreateNewApiKeySlotsPage() {
       case 'count_active_modules_on_slot':
         // Calculate based on current editing values if editing
         if (isEditing && editData) {
-          const count = (editData.m1isinuse ? 1 : 0) + 
-                       (editData.m2isinuse ? 1 : 0) + 
-                       (editData.m3isinuse ? 1 : 0);
+          const count = (editData.m1inuse ? 1 : 0) + 
+                       (editData.m2inuse ? 1 : 0) + 
+                       (editData.m3inuse ? 1 : 0);
           return count;
         }
         return value || 0;
@@ -353,9 +353,9 @@ export default function CreateNewApiKeySlotsPage() {
         }
         return value || '-';
       
-      case 'm1isinuse':
-      case 'm2isinuse':
-      case 'm3isinuse':
+      case 'm1inuse':
+      case 'm2inuse':
+      case 'm3inuse':
         if (isEditing) {
           return (
             <input

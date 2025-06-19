@@ -45,11 +45,11 @@ export async function POST(request: Request) {
     const insertData = {
       slot_name: body.slot_name,
       m1name: body.m1name || null,
-      m1isinuse: body.m1isinuse || false,
+      m1inuse: body.m1inuse || false,
       m2name: body.m2name || null,
-      m2isinuse: body.m2isinuse || false,
+      m2inuse: body.m2inuse || false,
       m3name: body.m3name || null,
-      m3isinuse: body.m3isinuse || false,
+      m3inuse: body.m3inuse || false,
       fk_iservices_provider_id: body.fk_iservices_provider_id || null,
       slot_publicly_shown: body.slot_publicly_shown || false,
       fk_ai_model_id: body.fk_ai_model_id || null

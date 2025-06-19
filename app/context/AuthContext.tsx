@@ -7,8 +7,7 @@ import { User } from '@supabase/supabase-js';
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  isAdmin: boolean | null;
-  checkAdminStatus: () => Promise<boolean>;
+  isAdmin: boolean;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -21,36 +20,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const supabase = createClientComponentClient();
 
-  // Function to check admin status on-demand
-  const checkAdminStatus = async (): Promise<boolean> => {
-    if (!user) return false;
-    
-    try {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('is_admin')
-        .eq('auth_id', user.id)
-        .single();
-      
-      const adminStatus = !error && userData?.is_admin === true;
-      setIsAdmin(adminStatus);
-      return adminStatus;
-    } catch (error) {
-      console.warn('Could not fetch admin status:', error);
-      setIsAdmin(false);
-      return false;
-    }
-  };
-
   useEffect(() => {
-    // Simple auth initialization - no database calls
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
+        
+        // Simple admin check - if user exists, check their admin status
+        if (session?.user) {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('is_admin')
+            .eq('auth_id', session.user.id)
+            .single();
+          
+          if (userData && userData.is_admin === true) {
+            setIsAdmin(true);
+          }
+        }
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
@@ -61,9 +51,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
-      setIsAdmin(null); // Reset admin status when auth changes
+      
+      // Reset admin status
+      setIsAdmin(false);
+      
+      // Check admin status for new session
+      if (session?.user) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('is_admin')
+          .eq('auth_id', session.user.id)
+          .single();
+        
+        if (userData && userData.is_admin === true) {
+          setIsAdmin(true);
+        }
+      }
+      
       setLoading(false);
     });
 
@@ -109,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    setIsAdmin(null); // Reset admin status on logout
+    setIsAdmin(false); // Reset admin status on logout
   };
 
   const resetPassword = async (email: string) => {
@@ -131,7 +137,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       loading,
       isAdmin,
-      checkAdminStatus,
       signUp,
       signIn,
       signOut,
