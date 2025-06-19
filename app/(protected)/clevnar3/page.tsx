@@ -33,9 +33,9 @@ interface ApiKeySlotJoined {
   fk_slot_id: string | null;
   key_created_at: string | null;
   key_updated_at: string | null;
-  d_m1name: string | null;
-  d_m2name: string | null;
-  d_m3name: string | null;
+  d_m1platcodehandle: string | null;
+  d_m2platcodehandle: string | null;
+  d_m3platcodehandle: string | null;
   d_slot_name: string | null;
   d_user_email: string | null;
 }
@@ -46,16 +46,16 @@ const columns = [
   'slot_name',
   'm1inuse',
   'm1platcodehandle',
-  'm1datum',
   'm1ueplatlabel',
+  'm1datum',
   'm2inuse',
   'm2platcodehandle',
-  'm2datum',
-  'm2ueplatlabel', 
+  'm2ueplatlabel',
+  'm2datum', 
   'm3inuse',
   'm3platcodehandle',
-  'm3datum',
   'm3ueplatlabel',
+  'm3datum',
   'slot_created_at',
   'slot_updated_at',
   'fk_iservices_provider_id',
@@ -170,16 +170,16 @@ export default function Clevnar3Page() {
           slot_id: slot.slot_id,
           slot_name: slot.slot_name,
           m1platcodehandle: slot.m1platcodehandle,
-          m1datum: null,
           m1ueplatlabel: null,
+          m1datum: null,
           m1inuse: slot.m1inuse,
           m2platcodehandle: slot.m2platcodehandle,
-          m2datum: null,
           m2ueplatlabel: null,
+          m2datum: null,
           m2inuse: slot.m2inuse,
           m3platcodehandle: slot.m3platcodehandle,
-          m3datum: null,
           m3ueplatlabel: null,
+          m3datum: null,
           m3inuse: slot.m3inuse,
           slot_created_at: slot.created_at,
           slot_updated_at: slot.updated_at,
@@ -248,16 +248,16 @@ export default function Clevnar3Page() {
           slot_id: slot.slot_id,
           slot_name: slot.slot_name,
           m1platcodehandle: slot.m1platcodehandle,
-          m1datum: userKey?.m1datum || null,
           m1ueplatlabel: userKey?.m1ueplatlabel || null,
+          m1datum: userKey?.m1datum || null,
           m1inuse: slot.m1inuse,
           m2platcodehandle: slot.m2platcodehandle,
-          m2datum: userKey?.m2datum || null,
           m2ueplatlabel: userKey?.m2ueplatlabel || null,
+          m2datum: userKey?.m2datum || null,
           m2inuse: slot.m2inuse,
           m3platcodehandle: slot.m3platcodehandle,
-          m3datum: userKey?.m3datum || null,
           m3ueplatlabel: userKey?.m3ueplatlabel || null,
+          m3datum: userKey?.m3datum || null,
           m3inuse: slot.m3inuse,
           slot_created_at: slot.created_at,
           slot_updated_at: slot.updated_at,
@@ -850,7 +850,7 @@ export default function Clevnar3Page() {
                       className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative`}
                       style={isSticky ? { left: leftPosition } : {}}
                     >
-                      <div className={col.includes('datum') ? 'min-w-48' : 'max-w-xs'}>
+                      <div className={col.includes('datum') || col.includes('ueplatlabel') ? 'min-w-48' : 'max-w-xs'}>
                         {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
                       </div>
                       {isLastSticky && (
