@@ -88,11 +88,13 @@ const stickyColumnOptions = [
   { label: 'OPTION 5', description: '5 left-most\ncolumns', count: 5 }
 ];
 
+interface PageProps {
+  searchParams: Promise<{ coltemp?: string; stickycol?: string }>
+}
+
 export default function CreateNewApiKeySlotsPage({
   searchParams
-}: {
-  searchParams: { coltemp?: string; stickycol?: string }
-}) {
+}: PageProps) {
   const [data, setData] = useState<ApiKeySlot[]>([]);
   const [filteredData, setFilteredData] = useState<ApiKeySlot[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,6 +112,7 @@ export default function CreateNewApiKeySlotsPage({
   const [updatingFields, setUpdatingFields] = useState<Set<string>>(new Set());
   const [activeColumnTemplate, setActiveColumnTemplate] = useState<keyof typeof columnTemplates>('OPTION 1');
   const [activeStickyColumns, setActiveStickyColumns] = useState<number>(0);
+  const [resolvedSearchParams, setResolvedSearchParams] = useState<{ coltemp?: string; stickycol?: string }>({});
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
@@ -143,6 +146,13 @@ export default function CreateNewApiKeySlotsPage({
     return acc;
   }, {} as { [key: number]: number });
 
+  // Resolve searchParams Promise
+  useEffect(() => {
+    searchParams.then(params => {
+      setResolvedSearchParams(params);
+    });
+  }, [searchParams]);
+
   // Load view options from URL params first, then localStorage as fallback
   useEffect(() => {
     // Check URL parameters first
@@ -150,8 +160,8 @@ export default function CreateNewApiKeySlotsPage({
     let stickyColumnsSet = false;
     
     // Handle column template from URL
-    if (searchParams.coltemp) {
-      const urlColTemp = searchParams.coltemp.toUpperCase();
+    if (resolvedSearchParams.coltemp) {
+      const urlColTemp = resolvedSearchParams.coltemp.toUpperCase();
       // Map URL param values to template keys
       const templateMap: { [key: string]: keyof typeof columnTemplates } = {
         'OPTION1': 'OPTION 1',
@@ -167,8 +177,8 @@ export default function CreateNewApiKeySlotsPage({
     }
     
     // Handle sticky columns from URL
-    if (searchParams.stickycol) {
-      const urlStickyCol = searchParams.stickycol.toUpperCase();
+    if (resolvedSearchParams.stickycol) {
+      const urlStickyCol = resolvedSearchParams.stickycol.toUpperCase();
       // Map URL param values to sticky column counts
       const stickyMap: { [key: string]: number } = {
         'OPTION1': 1,
@@ -201,7 +211,7 @@ export default function CreateNewApiKeySlotsPage({
         }
       }
     }
-  }, [searchParams]);
+  }, [resolvedSearchParams]);
 
   // Update URL with current view options
   useEffect(() => {
