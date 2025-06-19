@@ -1,0 +1,311 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+interface CustomColor {
+  color_id: string;
+  color_name: string;
+  color_code: string;
+  hex_value: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export default function Colors1Page() {
+  const [selectedColor, setSelectedColor] = useState('#3b82f6');
+  const [colorName, setColorName] = useState('');
+  const [colorCode, setColorCode] = useState('');
+  const [customColors, setCustomColors] = useState<CustomColor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const { user } = useAuth();
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    if (user) {
+      fetchCustomColors();
+    }
+  }, [user]);
+
+  const fetchCustomColors = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: colors, error: colorsError } = await supabase
+        .from('custom_colors')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (colorsError) throw colorsError;
+      setCustomColors(colors || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch custom colors');
+      setCustomColors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveColor = async () => {
+    if (!colorName.trim() || !colorCode.trim()) {
+      setError('Color name and code are required');
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const colorData = {
+        color_name: colorName.trim(),
+        color_code: colorCode.trim(),
+        hex_value: selectedColor,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: insertError } = await supabase
+        .from('custom_colors')
+        .insert([colorData]);
+
+      if (insertError) throw insertError;
+
+      // Reset form
+      setColorName('');
+      setColorCode('');
+      setSelectedColor('#3b82f6');
+      
+      // Refresh list
+      await fetchCustomColors();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save custom color');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteColor = async (colorId: string) => {
+    if (!confirm('Are you sure you want to delete this custom color?')) {
+      return;
+    }
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('custom_colors')
+        .delete()
+        .eq('color_id', colorId);
+
+      if (deleteError) throw deleteError;
+      
+      // Refresh list
+      await fetchCustomColors();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete custom color');
+    }
+  };
+
+  if (loading) return <div className="p-6">Loading custom colors...</div>;
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">Custom Color Management</h1>
+      <p className="text-sm text-gray-600 mb-6">
+        <span className="font-bold">Admin Custom Styling System</span> - Create custom colors and codes for app-wide styling
+      </p>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-4 rounded-md bg-red-50 p-4">
+          <div className="text-sm text-red-700">{error}</div>
+        </div>
+      )}
+
+      {/* Color Creation Form */}
+      <div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Create New Custom Color</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Color Picker */}
+          <div>
+            <label htmlFor="colorPicker" className="block text-sm font-medium text-gray-700 mb-2">
+              Select Color
+            </label>
+            <div className="flex items-center space-x-4">
+              <input
+                type="color"
+                id="colorPicker"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                className="h-12 w-20 rounded-md border border-gray-300 cursor-pointer"
+              />
+              <div 
+                className="h-12 w-32 rounded-md border border-gray-300 shadow-sm"
+                style={{ backgroundColor: selectedColor }}
+              ></div>
+              <input
+                type="text"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder="#3b82f6"
+              />
+            </div>
+          </div>
+
+          {/* Color Name */}
+          <div>
+            <label htmlFor="colorName" className="block text-sm font-medium text-gray-700 mb-2">
+              Color Name
+            </label>
+            <input
+              type="text"
+              id="colorName"
+              value={colorName}
+              onChange={(e) => setColorName(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="e.g. Primary Blue"
+              required
+            />
+          </div>
+
+          {/* Color Code */}
+          <div>
+            <label htmlFor="colorCode" className="block text-sm font-medium text-gray-700 mb-2">
+              Color Code
+            </label>
+            <input
+              type="text"
+              id="colorCode"
+              value={colorCode}
+              onChange={(e) => setColorCode(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="e.g. primary-blue"
+              required
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Use lowercase letters, numbers, and hyphens only
+            </p>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="mt-6">
+          <button
+            onClick={handleSaveColor}
+            disabled={saving || !colorName.trim() || !colorCode.trim()}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saving ? 'Saving...' : 'Save Custom Color'}
+          </button>
+        </div>
+      </div>
+
+      {/* Custom Colors List */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-800">Existing Custom Colors</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            {customColors.length} custom color{customColors.length !== 1 ? 's' : ''} defined
+          </p>
+        </div>
+
+        {customColors.length === 0 ? (
+          <div className="px-6 py-8 text-center">
+            <div className="text-gray-400">
+              <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-5L9 9a2 2 0 00-2 2v10z" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-medium text-gray-900 mb-1">No custom colors created</h3>
+            <p className="text-sm text-gray-500">Create your first custom color using the form above.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Color
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Code
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Hex Value
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {customColors.map((color, index) => (
+                  <tr key={color.color_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-3">
+                        <div 
+                          className="h-8 w-8 rounded-full border border-gray-300 shadow-sm"
+                          style={{ backgroundColor: color.hex_value }}
+                        ></div>
+                        <div 
+                          className="h-6 w-16 rounded border border-gray-300"
+                          style={{ backgroundColor: color.hex_value }}
+                        ></div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {color.color_name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                      {color.color_code}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                      {color.hex_value}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(color.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => handleDeleteColor(color.color_id)}
+                        className="text-red-600 hover:text-red-900 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Usage Instructions */}
+      <div className="mt-8 bg-blue-50 rounded-lg p-6">
+        <h3 className="text-sm font-semibold text-blue-800 mb-2">How to Use Custom Colors</h3>
+        <div className="text-sm text-blue-700">
+          <p className="mb-2">
+            Once you create custom colors, you can reference them when requesting styling changes:
+          </p>
+          <ul className="list-disc list-inside space-y-1 ml-4">
+            <li>Use the <strong>color code</strong> to reference colors in styling requests</li>
+            <li>Example: "Please style the header using color code <code>primary-blue</code>"</li>
+            <li>The system will automatically use the associated hex value for implementation</li>
+            <li>This ensures consistent colors across the entire application</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}

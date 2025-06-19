@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/app/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface NavItem {
   name: string;
@@ -16,6 +16,10 @@ interface NavItem {
 export default function Header() {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  
+  // kzstylerule - custom header bg color for /admin/ pages
+  const isAdminPage = pathname?.startsWith('/admin/');
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
@@ -158,7 +162,7 @@ export default function Header() {
   const { firstRow, secondRow } = splitNavItems();
 
   return (
-    <header className="bg-white shadow">
+    <header className={`bg-white shadow ${isAdminPage ? 'admin-header' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20"> {/* Increased height for 2 rows */}
           <div className="flex">
