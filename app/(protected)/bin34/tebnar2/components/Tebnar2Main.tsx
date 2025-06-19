@@ -389,6 +389,94 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Function to update URL with batch parameter - tebnar2 specific
+  const tbn2_updateUrlWithBatch = (batchId: string) => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
+    const url = new URL(window.location.href);
+    
+    if (batchId && batchId !== '') {
+      url.searchParams.set('batchid', batchId);
+    } else {
+      url.searchParams.delete('batchid');
+    }
+    
+    // Update URL without page reload
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  // Function to validate if batch ID exists in current batches
+  const tbn2_validateBatchId = (batchId: string): boolean => {
+    return tbn2_batches.some(batch => batch.id === batchId);
+  };
+
+  // Enhanced batch change handler that updates URL
+  const tbn2_handleBatchChange = (batchId: string) => {
+    setTbn2SelectedBatchId(batchId);
+    tbn2_updateUrlWithBatch(batchId);
+  };
+
+  // Function to read URL parameters on component mount
+  const tbn2_readUrlParameters = () => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const batchIdParam = urlParams.get('batchid');
+    
+    if (batchIdParam) {
+      setTbn2UrlBatchId(batchIdParam);
+    }
+  };
+
+  // Effect to read URL parameters on mount
+  useEffect(() => {
+    tbn2_readUrlParameters();
+  }, []);
+
+  // Effect to handle URL parameter validation after batches are loaded
+  useEffect(() => {
+    if (tbn2_urlBatchId && tbn2_batches.length > 0) {
+      if (tbn2_validateBatchId(tbn2_urlBatchId)) {
+        // Valid batch ID - apply the filter
+        setTbn2SelectedBatchId(tbn2_urlBatchId);
+        setTbn2UrlBatchId(null); // Clear the URL batch ID state
+      } else {
+        // Invalid batch ID - show error and clear URL param
+        setTbn2Error(`❌ Batch ID "${tbn2_urlBatchId}" not found or not accessible`);
+        tbn2_updateUrlWithBatch('');
+        setTbn2UrlBatchId(null);
+        
+        // Clear error message after 8 seconds
+        setTimeout(() => setTbn2Error(null), 8000);
+      }
+    }
+  }, [tbn2_urlBatchId, tbn2_batches]);
+
+  // Effect to handle browser back/forward navigation
+  useEffect(() => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const batchIdParam = urlParams.get('batchid');
+      
+      if (batchIdParam) {
+        if (tbn2_validateBatchId(batchIdParam)) {
+          setTbn2SelectedBatchId(batchIdParam);
+        } else {
+          setTbn2SelectedBatchId('');
+          setTbn2Error(`❌ Batch ID "${batchIdParam}" not found`);
+          setTimeout(() => setTbn2Error(null), 8000);
+        }
+      } else {
+        setTbn2SelectedBatchId('');
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [tbn2_batches]);
+
   // Effect hooks for data fetching using centralized functions
   useEffect(() => {
     tbn2_fetchImages();
@@ -424,15 +512,41 @@ export default function Tebnar2Main() {
 
   return (
     <div className="w-full mx-auto">
-      {/* Filters and Controls - exact clone from tebnar1 */}
+      {/* Filters and Controls - enhanced with URL parameter support */}
       <Tebnar2Filters
         batches={tbn2_batches}
         selectedBatchId={tbn2_selectedBatchId}
-        onBatchChange={setTbn2SelectedBatchId}
+        onBatchChange={tbn2_handleBatchChange}
         error={tbn2_error}
         onRefresh={tbn2_fetchPlans}
         onErrorDismiss={() => setTbn2Error(null)}
       />
+
+      {/* Active Filter Indicator - tebnar2 specific */}
+      {tbn2_selectedBatchId && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="text-blue-800 font-medium">
+                📌 Filtered by batch: 
+              </span>
+              <code className="ml-2 px-2 py-1 bg-blue-100 text-blue-900 rounded text-sm font-mono">
+                {tbn2_selectedBatchId}
+              </code>
+            </div>
+            <button 
+              onClick={() => tbn2_handleBatchChange('')}
+              className="text-red-600 hover:text-red-800 hover:underline text-sm font-medium transition-colors"
+              title="Clear batch filter"
+            >
+              Clear Filter
+            </button>
+          </div>
+          <div className="mt-2 text-sm text-blue-600">
+            Showing {tbn2_filteredPlans.length} plans from this batch
+          </div>
+        </div>
+      )}
 
       {/* Actions and Settings - exact clone from tebnar1 */}
       <Tebnar2Actions
