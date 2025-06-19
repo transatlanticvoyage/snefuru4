@@ -71,6 +71,7 @@ export default function CreateNewApiKeySlotsPage() {
   const [providers, setProviders] = useState<ServiceProvider[]>([]);
   const [aiModels, setAiModels] = useState<AiModel[]>([]);
   const [updatingToggles, setUpdatingToggles] = useState<Set<string>>(new Set());
+  const [updatingFields, setUpdatingFields] = useState<Set<string>>(new Set());
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
@@ -348,6 +349,48 @@ export default function CreateNewApiKeySlotsPage() {
     }
   };
 
+  const handleTextFieldUpdate = async (slotId: string, field: string, value: string) => {
+    const fieldKey = `${slotId}-${field}`;
+    setUpdatingFields(new Set([...updatingFields, fieldKey]));
+    
+    try {
+      const { error } = await supabase
+        .from('api_key_slots')
+        .update({
+          [field]: value || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('slot_id', slotId);
+
+      if (error) throw error;
+
+      // Update local data optimistically
+      setData(prevData => 
+        prevData.map(slot => 
+          slot.slot_id === slotId 
+            ? { ...slot, [field]: value || null, updated_at: new Date().toISOString() }
+            : slot
+        )
+      );
+      
+      setFilteredData(prevData => 
+        prevData.map(slot => 
+          slot.slot_id === slotId 
+            ? { ...slot, [field]: value || null, updated_at: new Date().toISOString() }
+            : slot
+        )
+      );
+      
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Failed to update ${field}`);
+    } finally {
+      const newUpdatingFields = new Set(updatingFields);
+      newUpdatingFields.delete(fieldKey);
+      setUpdatingFields(newUpdatingFields);
+    }
+  };
+
   const formatColumnData = (col: string, value: any, slot: ApiKeySlot) => {
     if (value === null || value === undefined) return '-';
     
@@ -397,7 +440,36 @@ export default function CreateNewApiKeySlotsPage() {
             />
           );
         }
-        return value || '-';
+        
+        // Always-editable text field
+        const fieldKey = `${slot.slot_id}-${col}`;
+        const fieldIsUpdating = updatingFields.has(fieldKey);
+        return (
+          <div className="relative">
+            <input
+              type="text"
+              defaultValue={value || ''}
+              onBlur={(e) => {
+                if (e.target.value !== (value || '')) {
+                  handleTextFieldUpdate(slot.slot_id, col, e.target.value);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                }
+              }}
+              disabled={fieldIsUpdating}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              placeholder={`Module ${col.charAt(1)} name`}
+            />
+            {fieldIsUpdating && (
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></div>
+              </div>
+            )}
+          </div>
+        );
       
       case 'm1inuse':
       case 'm2inuse':
@@ -452,20 +524,54 @@ export default function CreateNewApiKeySlotsPage() {
       case 'slot_publicly_shown':
         if (isEditing) {
           return (
-            <input
-              type="checkbox"
-              checked={editData?.slot_publicly_shown || false}
-              onChange={(e) => handleFieldChange(slot.slot_id, 'slot_publicly_shown', e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-            />
+            <div className="flex items-center">
+              <button
+                type="button"
+                onClick={() => handleFieldChange(slot.slot_id, 'slot_publicly_shown', !editData?.slot_publicly_shown)}
+                className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  editData?.slot_publicly_shown ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${
+                    editData?.slot_publicly_shown ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
           );
         }
+        
+        // Always clickable toggle for public/private
+        const publicToggleKey = `${slot.slot_id}-slot_publicly_shown`;
+        const publicIsUpdating = updatingToggles.has(publicToggleKey);
         return (
-          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            value ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-          }`}>
-            {value ? 'Public' : 'Private'}
-          </span>
+          <div className="flex items-center">
+            <button
+              type="button"
+              onClick={() => !publicIsUpdating && handleToggleField(slot.slot_id, 'slot_publicly_shown', value)}
+              disabled={publicIsUpdating}
+              className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed ${
+                value ? 'bg-blue-600' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${
+                  value ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+              {publicIsUpdating && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                </div>
+              )}
+            </button>
+            <span className={`ml-2 text-xs font-medium ${
+              value ? 'text-blue-800' : 'text-gray-600'
+            }`}>
+              {value ? 'Public' : 'Private'}
+            </span>
+          </div>
         );
       
       case 'is_ai_model':
