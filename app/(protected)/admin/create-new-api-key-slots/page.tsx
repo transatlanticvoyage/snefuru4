@@ -79,6 +79,21 @@ export default function CreateNewApiKeySlotsPage() {
 
   useEffect(() => {
     document.title = 'API Key Slots Management - Admin - Snefuru';
+    
+    // Add custom styles to override main element margins
+    const style = document.createElement('style');
+    style.textContent = `
+      body > div.min-h-screen.bg-gray-50 > main {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Cleanup function to remove the style when component unmounts
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   useEffect(() => {
@@ -438,7 +453,7 @@ export default function CreateNewApiKeySlotsPage() {
               value={editData?.[col] || ''}
               onChange={(e) => handleFieldChange(slot.slot_id, col, e.target.value)}
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              placeholder={`Module ${col.charAt(1)} name`}
+              placeholder={`module ${col.charAt(1)} name`}
             />
           );
         }
@@ -463,7 +478,7 @@ export default function CreateNewApiKeySlotsPage() {
               }}
               disabled={fieldIsUpdating}
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder={`Module ${col.charAt(1)} name`}
+              placeholder={`module ${col.charAt(1)} name`}
             />
             {fieldIsUpdating && (
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
