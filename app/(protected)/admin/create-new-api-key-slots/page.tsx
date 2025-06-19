@@ -37,7 +37,7 @@ interface EditingState {
   [key: string]: Partial<ApiKeySlot>;
 }
 
-const columns = [
+const allColumns = [
   'actions',
   'slot_id',
   'slot_name',
@@ -56,6 +56,29 @@ const columns = [
   'fk_ai_model_id'
 ];
 
+const columnTemplates = {
+  'OPTION 1': {
+    name: 'col temp all',
+    range: 'columns 1-~',
+    columns: allColumns
+  },
+  'OPTION 2': {
+    name: 'col temp a', 
+    range: 'columns 1-7',
+    columns: allColumns.slice(0, 7)
+  },
+  'OPTION 3': {
+    name: 'col temp b',
+    range: 'columns 8-14', 
+    columns: allColumns.slice(7, 14)
+  },
+  'OPTION 4': {
+    name: 'col temp c',
+    range: 'columns 15-21',
+    columns: allColumns.slice(14, 21)
+  }
+};
+
 export default function CreateNewApiKeySlotsPage() {
   const [data, setData] = useState<ApiKeySlot[]>([]);
   const [filteredData, setFilteredData] = useState<ApiKeySlot[]>([]);
@@ -72,10 +95,14 @@ export default function CreateNewApiKeySlotsPage() {
   const [aiModels, setAiModels] = useState<AiModel[]>([]);
   const [updatingToggles, setUpdatingToggles] = useState<Set<string>>(new Set());
   const [updatingFields, setUpdatingFields] = useState<Set<string>>(new Set());
+  const [activeColumnTemplate, setActiveColumnTemplate] = useState('OPTION 1');
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
   const supabase = createClientComponentClient();
+  
+  // Get active columns based on selected template
+  const activeColumns = columnTemplates[activeColumnTemplate].columns;
 
   useEffect(() => {
     document.title = 'API Key Slots Management - Admin - Snefuru';
@@ -854,6 +881,37 @@ export default function CreateNewApiKeySlotsPage() {
         </div>
       </div>
 
+      {/* Column Template System */}
+      <div className="mb-6 flex items-center space-x-4">
+        {/* SQL View Info Panel */}
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-3" style={{maxWidth: '130px', maxHeight: '75px'}}>
+          <div className="text-xs text-gray-600">
+            <div className="font-semibold">api_key_slots</div>
+            <div className="text-gray-500">{allColumns.length} total columns</div>
+          </div>
+        </div>
+
+        {/* Horizontal Button Bar */}
+        <div className="flex space-x-2" style={{maxWidth: '600px', height: '75px'}}>
+          {Object.entries(columnTemplates).map(([optionKey, template]) => (
+            <button
+              key={optionKey}
+              onClick={() => setActiveColumnTemplate(optionKey)}
+              className={`flex flex-col justify-center items-center text-xs leading-tight border rounded-lg transition-colors ${
+                activeColumnTemplate === optionKey
+                  ? 'bg-blue-900 text-white border-blue-900'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+              style={{width: '120px', height: '100%'}}
+            >
+              <div className="font-semibold">{optionKey}</div>
+              <div>{template.name}</div>
+              <div>{template.range}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Statistics Bar */}
       <div className="mb-4 p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center justify-between text-sm text-gray-600">
@@ -887,7 +945,7 @@ export default function CreateNewApiKeySlotsPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {columns.map(col => (
+              {activeColumns.map(col => (
                 <th 
                   key={col} 
                   className="px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider"
@@ -907,7 +965,7 @@ export default function CreateNewApiKeySlotsPage() {
                   key={slot.slot_id} 
                   className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} ${isNewRow ? 'bg-yellow-50' : ''}`}
                 >
-                  {columns.map(col => (
+                  {activeColumns.map(col => (
                     <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {col === 'actions' ? (
                         <div className="flex space-x-2">
