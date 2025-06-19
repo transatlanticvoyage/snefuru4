@@ -9,9 +9,10 @@ interface NarpiPush {
   push_desc: string;
   created_at: string;
   push_status1: string;
-  fk_user_id: string;
-  fk_domain_id: string;
   fk_batch_id: string;
+  images_plans_batches?: {
+    rel_users_id: string;
+  };
 }
 
 export default function Narpo1Page() {
@@ -48,18 +49,28 @@ export default function Narpo1Page() {
           throw new Error('Could not find user record');
         }
 
-        // Fetch narpi_pushes data for this user
+        // Fetch narpi_pushes data for this user via batch relationship
         const { data, error: pushesError } = await supabase
           .from('narpi_pushes')
-          .select('*')
-          .eq('fk_user_id', userData.id)
+          .select(`
+            *,
+            images_plans_batches!fk_batch_id(
+              rel_users_id
+            )
+          `)
           .order('created_at', { ascending: false });
 
         if (pushesError) {
           throw pushesError;
         }
 
-        setPushes(data || []);
+        // Filter pushes to only show those for batches owned by the current user
+        const userPushes = (data || []).filter(push => 
+          push.images_plans_batches && 
+          push.images_plans_batches.rel_users_id === userData.id
+        );
+
+        setPushes(userPushes);
       } catch (err) {
         console.error('Error fetching narpi pushes:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -205,9 +216,6 @@ export default function Narpo1Page() {
                       Created At
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Domain ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Batch ID
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -264,11 +272,6 @@ export default function Narpo1Page() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {formatDate(push.created_at)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-xs font-mono text-gray-600">
-                          {push.fk_domain_id.substring(0, 8)}...
-                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-xs font-mono text-gray-600">
