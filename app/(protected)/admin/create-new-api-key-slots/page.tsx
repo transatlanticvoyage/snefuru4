@@ -79,6 +79,14 @@ const columnTemplates = {
   }
 };
 
+const stickyColumnOptions = [
+  { label: 'OPTION 1', description: '1 left-most\ncolumn', count: 1 },
+  { label: 'OPTION 2', description: '2 left-most\ncolumns', count: 2 },
+  { label: 'OPTION 3', description: '3 left-most\ncolumns', count: 3 },
+  { label: 'OPTION 4', description: '4 left-most\ncolumns', count: 4 },
+  { label: 'OPTION 5', description: '5 left-most\ncolumns', count: 5 }
+];
+
 export default function CreateNewApiKeySlotsPage() {
   const [data, setData] = useState<ApiKeySlot[]>([]);
   const [filteredData, setFilteredData] = useState<ApiKeySlot[]>([]);
@@ -96,18 +104,22 @@ export default function CreateNewApiKeySlotsPage() {
   const [updatingToggles, setUpdatingToggles] = useState<Set<string>>(new Set());
   const [updatingFields, setUpdatingFields] = useState<Set<string>>(new Set());
   const [activeColumnTemplate, setActiveColumnTemplate] = useState<keyof typeof columnTemplates>('OPTION 1');
+  const [activeStickyColumns, setActiveStickyColumns] = useState<number>(0);
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   
-  // Get active columns based on selected template
-  const activeColumns = columnTemplates[activeColumnTemplate].columns;
+  // Get active columns based on selected template and sticky columns
+  const templateColumns = columnTemplates[activeColumnTemplate].columns;
+  const stickyColumns = activeStickyColumns > 0 ? allColumns.slice(0, activeStickyColumns) : [];
+  const nonStickyTemplateColumns = templateColumns.filter(col => !stickyColumns.includes(col));
+  const activeColumns = [...stickyColumns, ...nonStickyTemplateColumns];
 
   useEffect(() => {
     document.title = 'API Key Slots Management - Admin - Snefuru';
     
-    // Add custom styles to make main element full width
+    // Add custom styles to make main element full width and sticky columns
     const style = document.createElement('style');
     style.textContent = `
       body > div.min-h-screen.bg-gray-50 > main {
@@ -119,6 +131,20 @@ export default function CreateNewApiKeySlotsPage() {
         max-width: 100vw !important;
         box-sizing: border-box !important;
       }
+      
+      .sticky-column {
+        position: sticky !important;
+        left: 0 !important;
+        background: white !important;
+        z-index: 10 !important;
+        border-right: 2px solid #e5e7eb !important;
+      }
+      
+      .sticky-column:nth-child(2) { left: 0px !important; }
+      .sticky-column:nth-child(3) { left: 150px !important; }
+      .sticky-column:nth-child(4) { left: 300px !important; }
+      .sticky-column:nth-child(5) { left: 450px !important; }
+      .sticky-column:nth-child(6) { left: 600px !important; }
     `;
     document.head.appendChild(style);
     
@@ -886,8 +912,9 @@ export default function CreateNewApiKeySlotsPage() {
         {/* SQL View Info Panel */}
         <div className="bg-gray-100 border border-gray-300 rounded-lg p-3" style={{maxWidth: '130px', maxHeight: '75px'}}>
           <div className="text-xs text-gray-600">
-            <div className="font-semibold">api_key_slots</div>
-            <div className="text-gray-500">{allColumns.length} total columns</div>
+            <div className="font-semibold mb-1">SQL View Info</div>
+            <div className="text-gray-700">view name: api_key_slots</div>
+            <div className="text-gray-700"># columns: {allColumns.length}</div>
           </div>
         </div>
 
@@ -909,6 +936,28 @@ export default function CreateNewApiKeySlotsPage() {
               <div>{template.range}</div>
             </button>
           ))}
+        </div>
+
+        {/* Sticky Columns Section */}
+        <div className="flex flex-col">
+          <div className="text-sm font-semibold text-gray-700 mb-2">Sticky Columns</div>
+          <div className="flex space-x-1">
+            {stickyColumnOptions.map((option) => (
+              <button
+                key={option.label}
+                onClick={() => setActiveStickyColumns(option.count)}
+                className={`flex flex-col justify-center items-center text-xs leading-tight border rounded transition-colors ${
+                  activeStickyColumns === option.count
+                    ? 'bg-green-700 text-white border-green-700'
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                }`}
+                style={{width: '60px', height: '55px'}}
+              >
+                <div className="font-semibold">{option.label}</div>
+                <div className="text-center whitespace-pre-line">{option.description}</div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -945,10 +994,13 @@ export default function CreateNewApiKeySlotsPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {activeColumns.map(col => (
+              {activeColumns.map((col, index) => (
                 <th 
                   key={col} 
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider"
+                  className={`px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider ${
+                    index < activeStickyColumns ? 'sticky-column' : ''
+                  }`}
+                  style={index < activeStickyColumns ? { left: `${index * 150}px` } : {}}
                 >
                   {getColumnDisplayName(col)}
                 </th>
@@ -965,8 +1017,14 @@ export default function CreateNewApiKeySlotsPage() {
                   key={slot.slot_id} 
                   className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} ${isNewRow ? 'bg-yellow-50' : ''}`}
                 >
-                  {activeColumns.map(col => (
-                    <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {activeColumns.map((col, colIndex) => (
+                    <td 
+                      key={col} 
+                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${
+                        colIndex < activeStickyColumns ? 'sticky-column' : ''
+                      }`}
+                      style={colIndex < activeStickyColumns ? { left: `${colIndex * 150}px` } : {}}
+                    >
                       {col === 'actions' ? (
                         <div className="flex space-x-2">
                           {isEditing ? (
