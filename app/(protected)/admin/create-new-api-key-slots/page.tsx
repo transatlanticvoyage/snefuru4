@@ -392,7 +392,9 @@ export default function CreateNewApiKeySlotsPage() {
   };
 
   const formatColumnData = (col: string, value: any, slot: ApiKeySlot) => {
-    if (value === null || value === undefined) return '-';
+    // Don't return '-' early for fields that should always show text inputs
+    const alwaysEditableFields = ['m1name', 'm2name', 'm3name', 'fk_iservices_provider_id', 'fk_ai_model_id'];
+    if ((value === null || value === undefined) && !alwaysEditableFields.includes(col)) return '-';
     
     const isEditing = editingRows.has(slot.slot_id) || slot.slot_id.startsWith('new-');
     const editData = slot.slot_id.startsWith('new-') ? newRow : editingData[slot.slot_id];
