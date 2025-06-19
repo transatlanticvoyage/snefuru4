@@ -306,14 +306,15 @@ export default function CreateNewApiKeySlotsPage() {
     }
   };
 
-  const handleToggleAiModel = async (slotId: string, currentValue: boolean) => {
-    setUpdatingToggles(new Set([...updatingToggles, slotId]));
+  const handleToggleField = async (slotId: string, field: string, currentValue: boolean) => {
+    const toggleKey = `${slotId}-${field}`;
+    setUpdatingToggles(new Set([...updatingToggles, toggleKey]));
     
     try {
       const { error } = await supabase
         .from('api_key_slots')
         .update({
-          is_ai_model: !currentValue,
+          [field]: !currentValue,
           updated_at: new Date().toISOString()
         })
         .eq('slot_id', slotId);
@@ -324,7 +325,7 @@ export default function CreateNewApiKeySlotsPage() {
       setData(prevData => 
         prevData.map(slot => 
           slot.slot_id === slotId 
-            ? { ...slot, is_ai_model: !currentValue, updated_at: new Date().toISOString() }
+            ? { ...slot, [field]: !currentValue, updated_at: new Date().toISOString() }
             : slot
         )
       );
@@ -332,17 +333,17 @@ export default function CreateNewApiKeySlotsPage() {
       setFilteredData(prevData => 
         prevData.map(slot => 
           slot.slot_id === slotId 
-            ? { ...slot, is_ai_model: !currentValue, updated_at: new Date().toISOString() }
+            ? { ...slot, [field]: !currentValue, updated_at: new Date().toISOString() }
             : slot
         )
       );
       
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update AI model status');
+      setError(err instanceof Error ? err.message : `Failed to update ${field}`);
     } finally {
       const newUpdatingToggles = new Set(updatingToggles);
-      newUpdatingToggles.delete(slotId);
+      newUpdatingToggles.delete(toggleKey);
       setUpdatingToggles(newUpdatingToggles);
     }
   };
@@ -403,20 +404,49 @@ export default function CreateNewApiKeySlotsPage() {
       case 'm3inuse':
         if (isEditing) {
           return (
-            <input
-              type="checkbox"
-              checked={editData?.[col] || false}
-              onChange={(e) => handleFieldChange(slot.slot_id, col, e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-            />
+            <div className="flex items-center">
+              <button
+                type="button"
+                onClick={() => handleFieldChange(slot.slot_id, col, !editData?.[col])}
+                className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  editData?.[col] ? 'bg-green-600' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${
+                    editData?.[col] ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
           );
         }
+        
+        // For non-editing rows, make toggle functional with instant update
+        const toggleKey = `${slot.slot_id}-${col}`;
+        const isUpdating = updatingToggles.has(toggleKey);
         return (
-          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-          }`}>
-            {value ? 'Yes' : 'No'}
-          </span>
+          <div className="flex items-center">
+            <button
+              type="button"
+              onClick={() => !isUpdating && handleToggleField(slot.slot_id, col, value)}
+              disabled={isUpdating}
+              className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed ${
+                value ? 'bg-green-600' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${
+                  value ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+              {isUpdating && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                </div>
+              )}
+            </button>
+          </div>
         );
       
       case 'slot_publicly_shown':
@@ -460,12 +490,13 @@ export default function CreateNewApiKeySlotsPage() {
         }
         
         // For non-editing rows, make toggle functional with instant update
-        const isUpdating = updatingToggles.has(slot.slot_id);
+        const toggleKey = `${slot.slot_id}-is_ai_model`;
+        const isUpdating = updatingToggles.has(toggleKey);
         return (
           <div className="flex items-center">
             <button
               type="button"
-              onClick={() => !isUpdating && handleToggleAiModel(slot.slot_id, value)}
+              onClick={() => !isUpdating && handleToggleField(slot.slot_id, 'is_ai_model', value)}
               disabled={isUpdating}
               className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed ${
                 value ? 'bg-green-600' : 'bg-gray-200'
