@@ -21,6 +21,7 @@ export default function Colors1Page() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
   
   const { user } = useAuth();
   const supabase = createClientComponentClient();
@@ -78,6 +79,7 @@ export default function Colors1Page() {
       setColorName('');
       setColorCode('');
       setSelectedColor('#3b82f6');
+      setShowAddForm(false);
       
       // Refresh list
       await fetchCustomColors();
@@ -124,85 +126,123 @@ export default function Colors1Page() {
         </div>
       )}
 
-      {/* Color Creation Form */}
-      <div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Create New Custom Color</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Color Picker */}
-          <div>
-            <label htmlFor="colorPicker" className="block text-sm font-medium text-gray-700 mb-2">
-              Select Color
-            </label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="color"
-                id="colorPicker"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-                className="h-12 w-20 rounded-md border border-gray-300 cursor-pointer"
-              />
-              <div 
-                className="h-12 w-32 rounded-md border border-gray-300 shadow-sm"
-                style={{ backgroundColor: selectedColor }}
-              ></div>
+      {/* Add New Button */}
+      <div className="mb-6">
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add New
+        </button>
+      </div>
+
+      {/* Color Creation Form - Conditional */}
+      {showAddForm && (
+        <div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">Create New Custom Color</h2>
+            <button
+              onClick={() => setShowAddForm(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Color Picker */}
+            <div>
+              <label htmlFor="colorPicker" className="block text-sm font-medium text-gray-700 mb-2">
+                Select Color
+              </label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="color"
+                  id="colorPicker"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                  className="h-12 w-20 rounded-md border border-gray-300 cursor-pointer"
+                />
+                <div 
+                  className="h-12 w-32 rounded-md border border-gray-300 shadow-sm"
+                  style={{ backgroundColor: selectedColor }}
+                ></div>
+                <input
+                  type="text"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  placeholder="#3b82f6"
+                />
+              </div>
+            </div>
+
+            {/* Color Name */}
+            <div>
+              <label htmlFor="colorName" className="block text-sm font-medium text-gray-700 mb-2">
+                Color Name
+              </label>
               <input
                 type="text"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                placeholder="#3b82f6"
+                id="colorName"
+                value={colorName}
+                onChange={(e) => setColorName(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder="e.g. Primary Blue"
+                required
               />
+            </div>
+
+            {/* Color Code */}
+            <div>
+              <label htmlFor="colorCode" className="block text-sm font-medium text-gray-700 mb-2">
+                Color Code
+              </label>
+              <input
+                type="text"
+                id="colorCode"
+                value={colorCode}
+                onChange={(e) => setColorCode(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder="e.g. primary-blue"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Use lowercase letters, numbers, and hyphens only
+              </p>
             </div>
           </div>
 
-          {/* Color Name */}
-          <div>
-            <label htmlFor="colorName" className="block text-sm font-medium text-gray-700 mb-2">
-              Color Name
-            </label>
-            <input
-              type="text"
-              id="colorName"
-              value={colorName}
-              onChange={(e) => setColorName(e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              placeholder="e.g. Primary Blue"
-              required
-            />
-          </div>
-
-          {/* Color Code */}
-          <div>
-            <label htmlFor="colorCode" className="block text-sm font-medium text-gray-700 mb-2">
-              Color Code
-            </label>
-            <input
-              type="text"
-              id="colorCode"
-              value={colorCode}
-              onChange={(e) => setColorCode(e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              placeholder="e.g. primary-blue"
-              required
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Use lowercase letters, numbers, and hyphens only
-            </p>
+          {/* Save and Cancel Buttons */}
+          <div className="mt-6 flex space-x-3">
+            <button
+              onClick={handleSaveColor}
+              disabled={saving || !colorName.trim() || !colorCode.trim()}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? 'Saving...' : 'Save Custom Color'}
+            </button>
+            <button
+              onClick={() => {
+                setShowAddForm(false);
+                setColorName('');
+                setColorCode('');
+                setSelectedColor('#3b82f6');
+                setError(null);
+              }}
+              disabled={saving}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </button>
           </div>
         </div>
-
-        {/* Save Button */}
-        <div className="mt-6">
-          <button
-            onClick={handleSaveColor}
-            disabled={saving || !colorName.trim() || !colorCode.trim()}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? 'Saving...' : 'Save Custom Color'}
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* Custom Colors List */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
