@@ -736,10 +736,28 @@ export default function Clevnar3Page() {
                   bgColor = 'bg-blue-50'; // m*inuse are from api_key_slots
                 }
 
-                // Add sticky styling for left-most columns
-                const isSticky = index < stickyColumnCount;
+                // Sticky logic: based on original column position in full columns array, not visible columns
+                const originalColumnIndex = columns.indexOf(col);
+                const isSticky = originalColumnIndex < stickyColumnCount && originalColumnIndex !== -1;
                 const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                
+                // Calculate left position based on how many sticky columns appear before this one in visible columns
+                let stickyColumnsBeforeThis = 0;
+                for (let i = 0; i < index; i++) {
+                  const prevCol = visibleColumns[i];
+                  const prevColOriginalIndex = columns.indexOf(prevCol);
+                  if (prevColOriginalIndex < stickyColumnCount && prevColOriginalIndex !== -1) {
+                    stickyColumnsBeforeThis++;
+                  }
+                }
+                const leftPosition = isSticky ? `${stickyColumnsBeforeThis * 150}px` : 'auto';
+                
+                // Check if this is the last sticky column in the visible columns
+                const isLastStickyInVisible = isSticky && (index === visibleColumns.length - 1 || 
+                  visibleColumns.slice(index + 1).every(nextCol => {
+                    const nextColOriginalIndex = columns.indexOf(nextCol);
+                    return nextColOriginalIndex >= stickyColumnCount || nextColOriginalIndex === -1;
+                  }));
                 
                 return (
                   <th 
@@ -748,7 +766,7 @@ export default function Clevnar3Page() {
                     style={isSticky ? { left: leftPosition } : {}}
                   >
                     {col}
-                    {index === stickyColumnCount - 1 && (
+                    {isLastStickyInVisible && (
                       <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
                     )}
                   </th>
@@ -760,11 +778,29 @@ export default function Clevnar3Page() {
             {currentItems.map((item, index) => (
               <tr key={item.slot_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 {visibleColumns.map((col, colIndex) => {
-                  // Add sticky styling for left-most columns
-                  const isSticky = colIndex < stickyColumnCount;
+                  // Sticky logic: based on original column position in full columns array, not visible columns
+                  const originalColumnIndex = columns.indexOf(col);
+                  const isSticky = originalColumnIndex < stickyColumnCount && originalColumnIndex !== -1;
                   const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                  const leftPosition = isSticky ? `${colIndex * 150}px` : 'auto';
+                  
+                  // Calculate left position based on how many sticky columns appear before this one in visible columns
+                  let stickyColumnsBeforeThis = 0;
+                  for (let i = 0; i < colIndex; i++) {
+                    const prevCol = visibleColumns[i];
+                    const prevColOriginalIndex = columns.indexOf(prevCol);
+                    if (prevColOriginalIndex < stickyColumnCount && prevColOriginalIndex !== -1) {
+                      stickyColumnsBeforeThis++;
+                    }
+                  }
+                  const leftPosition = isSticky ? `${stickyColumnsBeforeThis * 150}px` : 'auto';
                   const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                  
+                  // Check if this is the last sticky column in the visible columns
+                  const isLastStickyInVisible = isSticky && (colIndex === visibleColumns.length - 1 || 
+                    visibleColumns.slice(colIndex + 1).every(nextCol => {
+                      const nextColOriginalIndex = columns.indexOf(nextCol);
+                      return nextColOriginalIndex >= stickyColumnCount || nextColOriginalIndex === -1;
+                    }));
                   
                   return (
                     <td 
@@ -775,7 +811,7 @@ export default function Clevnar3Page() {
                       <div className={col.includes('datum') ? 'min-w-48' : 'max-w-xs'}>
                         {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
                       </div>
-                      {colIndex === stickyColumnCount - 1 && (
+                      {isLastStickyInVisible && (
                         <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
                       )}
                     </td>
