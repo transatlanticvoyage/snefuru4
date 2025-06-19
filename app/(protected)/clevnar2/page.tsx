@@ -9,6 +9,12 @@ interface ApiKeyT3 {
   fk_slot_id: string | null;
   created_at: string;
   updated_at: string;
+  m1datum: string | null;
+  m1ueplatlabel: string | null;
+  m2datum: string | null;
+  m2ueplatlabel: string | null;
+  m3datum: string | null;
+  m3ueplatlabel: string | null;
   d_m1platcodehandle: string | null;
   d_m2platcodehandle: string | null;
   d_m3platcodehandle: string | null;
@@ -22,6 +28,12 @@ const columns = [
   'fk_slot_id',
   'created_at',
   'updated_at',
+  'm1datum',
+  'm1ueplatlabel',
+  'm2datum',
+  'm2ueplatlabel',
+  'm3datum',
+  'm3ueplatlabel',
   'd_m1platcodehandle',
   'd_m2platcodehandle',
   'd_m3platcodehandle',
@@ -37,6 +49,8 @@ export default function Clevnar2Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingFields, setEditingFields] = useState<{[key: string]: string}>({});
+  const [savingFields, setSavingFields] = useState<Set<string>>(new Set());
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
@@ -54,6 +68,12 @@ export default function Clevnar2Page() {
     // Filter data based on search term
     if (searchTerm) {
       const filtered = data.filter(item => 
+        item.m1datum?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m1ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m2datum?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m2ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m3datum?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.m3ueplatlabel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_m1platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_m2platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.d_m3platcodehandle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -129,18 +149,196 @@ export default function Clevnar2Page() {
     setCurrentPage(1);
   };
 
-  const formatColumnData = (col: string, value: any) => {
-    if (value === null || value === undefined) return '-';
+  const handleSaveField = async (apiKeyId: string, fieldName: string, fieldValue: string) => {
+    if (!user?.id) return;
     
+    const fieldKey = `${apiKeyId}_${fieldName}`;
+    setSavingFields(new Set([...savingFields, fieldKey]));
+    
+    try {
+      const updateData = {
+        [fieldName]: fieldValue.trim() || null,
+        updated_at: new Date().toISOString()
+      };
+      
+      const { error: updateError } = await supabase
+        .from('api_keys_t3')
+        .update(updateData)
+        .eq('api_key_id', apiKeyId);
+        
+      if (updateError) throw updateError;
+      
+      // Clear the editing field and refresh data
+      const newEditingFields = { ...editingFields };
+      delete newEditingFields[fieldKey];
+      setEditingFields(newEditingFields);
+      
+      await fetchApiKeys();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save field');
+    } finally {
+      const newSavingFields = new Set(savingFields);
+      newSavingFields.delete(fieldKey);
+      setSavingFields(newSavingFields);
+    }
+  };
+
+  const formatColumnData = (col: string, value: any, item?: ApiKeyT3) => {
     switch (col) {
       case 'api_key_id':
       case 'fk_user_id':
       case 'fk_slot_id':
+        if (value === null || value === undefined) return '-';
         return value.substring(0, 8) + '...';
       case 'created_at':
       case 'updated_at':
+        if (value === null || value === undefined) return '-';
         return new Date(value).toLocaleString();
+      case 'm1datum':
+      case 'm2datum':
+      case 'm3datum':
+        if (!item || !user?.id) {
+          if (value === null || value === undefined) return '-';
+          // Mask API key
+          const keyLength = value.length;
+          if (keyLength <= 8) return '********';
+          return value.substring(0, 4) + '...' + value.substring(keyLength - 4);
+        }
+        
+        const fieldKey = `${item.api_key_id}_${col}`;
+        const isEditing = editingFields.hasOwnProperty(fieldKey);
+        const isSaving = savingFields.has(fieldKey);
+        
+        if (isEditing) {
+          return (
+            <div className="flex space-x-2 min-w-0">
+              <input
+                type="text"
+                value={editingFields[fieldKey] || ''}
+                onChange={(e) => setEditingFields({...editingFields, [fieldKey]: e.target.value})}
+                className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder={`Enter ${col} value`}
+                disabled={isSaving}
+              />
+              <button
+                onClick={() => handleSaveField(item.api_key_id, col, editingFields[fieldKey] || '')}
+                disabled={isSaving}
+                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? '...' : 'Save'}
+              </button>
+              <button
+                onClick={() => {
+                  const newEditingFields = { ...editingFields };
+                  delete newEditingFields[fieldKey];
+                  setEditingFields(newEditingFields);
+                }}
+                disabled={isSaving}
+                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ✕
+              </button>
+            </div>
+          );
+        }
+        
+        if (value === null || value === undefined) {
+          return (
+            <button
+              onClick={() => setEditingFields({...editingFields, [fieldKey]: ''})}
+              className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              + Add
+            </button>
+          );
+        } else {
+          return (
+            <div className="flex items-center space-x-2">
+              <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                {value.length <= 8 ? '••••••••' : value.substring(0, 4) + '••••' + value.substring(value.length - 4)}
+              </span>
+              <button
+                onClick={() => setEditingFields({...editingFields, [fieldKey]: value || ''})}
+                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Edit
+              </button>
+            </div>
+          );
+        }
+        
+      case 'm1ueplatlabel':
+      case 'm2ueplatlabel':
+      case 'm3ueplatlabel':
+        if (!item || !user?.id) {
+          if (value === null || value === undefined) return '-';
+          return String(value);
+        }
+        
+        const labelFieldKey = `${item.api_key_id}_${col}`;
+        const isLabelEditing = editingFields.hasOwnProperty(labelFieldKey);
+        const isLabelSaving = savingFields.has(labelFieldKey);
+        
+        if (isLabelEditing) {
+          return (
+            <div className="flex space-x-2 min-w-0">
+              <input
+                type="text"
+                value={editingFields[labelFieldKey] || ''}
+                onChange={(e) => setEditingFields({...editingFields, [labelFieldKey]: e.target.value})}
+                className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder={`Enter ${col} label`}
+                disabled={isLabelSaving}
+              />
+              <button
+                onClick={() => handleSaveField(item.api_key_id, col, editingFields[labelFieldKey] || '')}
+                disabled={isLabelSaving}
+                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLabelSaving ? '...' : 'Save'}
+              </button>
+              <button
+                onClick={() => {
+                  const newEditingFields = { ...editingFields };
+                  delete newEditingFields[labelFieldKey];
+                  setEditingFields(newEditingFields);
+                }}
+                disabled={isLabelSaving}
+                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ✕
+              </button>
+            </div>
+          );
+        }
+        
+        if (value === null || value === undefined || value === '') {
+          return (
+            <button
+              onClick={() => setEditingFields({...editingFields, [labelFieldKey]: ''})}
+              className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-blue-600 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              + Add Label
+            </button>
+          );
+        } else {
+          return (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm bg-gray-100 px-2 py-1 rounded">
+                {value}
+              </span>
+              <button
+                onClick={() => setEditingFields({...editingFields, [labelFieldKey]: value || ''})}
+                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Edit
+              </button>
+            </div>
+          );
+        }
+        
       default:
+        if (value === null || value === undefined) return '-';
         return String(value);
     }
   };
@@ -278,7 +476,7 @@ export default function Clevnar2Page() {
                 {columns.map(col => (
                   <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <div className="max-w-xs">
-                      {formatColumnData(col, apiKey[col as keyof ApiKeyT3])}
+                      {formatColumnData(col, apiKey[col as keyof ApiKeyT3], apiKey)}
                     </div>
                   </td>
                 ))}

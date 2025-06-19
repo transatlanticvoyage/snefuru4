@@ -466,6 +466,78 @@ export default function Clevnar3Page() {
     }
   };
 
+  const handleSaveUeplatLabel = async (slotId: string, moduleNumber: string, labelValue: string) => {
+    if (!user?.id) return;
+    
+    const fieldKey = `${slotId}_${moduleNumber}_ueplatlabel`;
+    setSavingFields(new Set([...savingFields, fieldKey]));
+    
+    try {
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+        
+      if (userError || !userData) {
+        throw new Error('Could not find user record.');
+      }
+      
+      // Check if user already has an api_keys_t3 record for this slot
+      const { data: existingKey, error: checkError } = await supabase
+        .from('api_keys_t3')
+        .select('*')
+        .eq('fk_user_id', userData.id)
+        .eq('fk_slot_id', slotId)
+        .single();
+      
+      if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
+        throw checkError;
+      }
+      
+      const updateData = {
+        [`${moduleNumber}ueplatlabel`]: labelValue.trim() || null,
+        updated_at: new Date().toISOString()
+      };
+      
+      if (existingKey) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('api_keys_t3')
+          .update(updateData)
+          .eq('api_key_id', existingKey.api_key_id);
+          
+        if (updateError) throw updateError;
+      } else {
+        // Create new record
+        const { error: insertError } = await supabase
+          .from('api_keys_t3')
+          .insert({
+            fk_user_id: userData.id,
+            fk_slot_id: slotId,
+            ...updateData,
+            created_at: new Date().toISOString()
+          });
+          
+        if (insertError) throw insertError;
+      }
+      
+      // Clear the editing field and refresh data
+      const newEditingFields = { ...editingFields };
+      delete newEditingFields[fieldKey];
+      setEditingFields(newEditingFields);
+      
+      await fetchJoinedData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save label');
+    } finally {
+      const newSavingFields = new Set(savingFields);
+      newSavingFields.delete(fieldKey);
+      setSavingFields(newSavingFields);
+    }
+  };
+
   const formatColumnData = (col: string, value: any, item?: ApiKeySlotJoined) => {
     
     switch (col) {
@@ -563,6 +635,91 @@ export default function Clevnar3Page() {
               </span>
               <button
                 onClick={() => setEditingFields({...editingFields, [fieldKey]: value || ''})}
+                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Edit
+              </button>
+            </div>
+          );
+        }
+        
+      case 'm1ueplatlabel':
+      case 'm2ueplatlabel':
+      case 'm3ueplatlabel':
+        // Show editable ueplatlabel fields for logged-in users
+        if (!item || !user?.id) {
+          if (value === null || value === undefined) return '-';
+          return String(value);
+        }
+        
+        // Check if corresponding module is in use
+        const labelModuleNumber = col.replace('ueplatlabel', ''); // m1, m2, or m3
+        const labelInUseField = `${labelModuleNumber}inuse` as keyof ApiKeySlotJoined;
+        const isLabelModuleInUse = item[labelInUseField] as boolean;
+        
+        if (!isLabelModuleInUse) {
+          return (
+            <span className="text-gray-400 italic text-sm">
+              Module not active
+            </span>
+          );
+        }
+        
+        const labelFieldKey = `${item.slot_id}_${labelModuleNumber}_ueplatlabel`;
+        const isLabelEditing = editingFields.hasOwnProperty(labelFieldKey);
+        const isLabelSaving = savingFields.has(labelFieldKey);
+        
+        if (isLabelEditing) {
+          return (
+            <div className="flex space-x-2 min-w-0">
+              <input
+                type="text"
+                value={editingFields[labelFieldKey] || ''}
+                onChange={(e) => setEditingFields({...editingFields, [labelFieldKey]: e.target.value})}
+                className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder={`Enter ${labelModuleNumber} label`}
+                disabled={isLabelSaving}
+              />
+              <button
+                onClick={() => handleSaveUeplatLabel(item.slot_id, labelModuleNumber, editingFields[labelFieldKey] || '')}
+                disabled={isLabelSaving}
+                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLabelSaving ? '...' : 'Save'}
+              </button>
+              <button
+                onClick={() => {
+                  const newEditingFields = { ...editingFields };
+                  delete newEditingFields[labelFieldKey];
+                  setEditingFields(newEditingFields);
+                }}
+                disabled={isLabelSaving}
+                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ✕
+              </button>
+            </div>
+          );
+        }
+        
+        // Not editing - show value with edit button or add button
+        if (value === null || value === undefined || value === '') {
+          return (
+            <button
+              onClick={() => setEditingFields({...editingFields, [labelFieldKey]: ''})}
+              className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-blue-600 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              + Add Label
+            </button>
+          );
+        } else {
+          return (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm bg-gray-100 px-2 py-1 rounded">
+                {value}
+              </span>
+              <button
+                onClick={() => setEditingFields({...editingFields, [labelFieldKey]: value || ''})}
                 className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Edit
