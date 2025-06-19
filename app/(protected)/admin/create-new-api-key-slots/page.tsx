@@ -80,12 +80,17 @@ export default function CreateNewApiKeySlotsPage() {
   useEffect(() => {
     document.title = 'API Key Slots Management - Admin - Snefuru';
     
-    // Add custom styles to override main element margins
+    // Add custom styles to make main element full width
     const style = document.createElement('style');
     style.textContent = `
       body > div.min-h-screen.bg-gray-50 > main {
         margin-left: 0px !important;
         margin-right: 0px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
       }
     `;
     document.head.appendChild(style);
