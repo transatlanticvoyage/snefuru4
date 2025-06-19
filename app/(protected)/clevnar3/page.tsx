@@ -350,11 +350,13 @@ export default function Clevnar3Page() {
       case 'fk_slot_id':
       case 'fk_iservices_provider_id':
       case 'fk_ai_model_id':
+        if (value === null || value === undefined) return '-';
         return value.substring(0, 8) + '...';
       case 'slot_created_at':
       case 'slot_updated_at':
       case 'key_created_at':
       case 'key_updated_at':
+        if (value === null || value === undefined) return '-';
         return new Date(value).toLocaleString();
       case 'm1datum':
       case 'm2datum':
@@ -432,10 +434,10 @@ export default function Clevnar3Page() {
           return (
             <div className="flex items-center space-x-2">
               <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                {value.length <= 8 ? '••••••••' : value.substring(0, 4) + '••••' + value.substring(value.length - 4)}
+                {!value || value.length <= 8 ? '••••••••' : value.substring(0, 4) + '••••' + value.substring(value.length - 4)}
               </span>
               <button
-                onClick={() => setEditingFields({...editingFields, [fieldKey]: value})}
+                onClick={() => setEditingFields({...editingFields, [fieldKey]: value || ''})}
                 className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Edit
@@ -457,6 +459,7 @@ export default function Clevnar3Page() {
           </span>
         );
       case 'count_active_modules_on_slot':
+        if (value === null || value === undefined) return '-';
         return (
           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
             {value}
