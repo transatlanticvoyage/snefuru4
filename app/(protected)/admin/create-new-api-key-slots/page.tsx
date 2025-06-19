@@ -423,14 +423,14 @@ export default function CreateNewApiKeySlotsPage() {
         }
         
         // For non-editing rows, make toggle functional with instant update
-        const toggleKey = `${slot.slot_id}-${col}`;
-        const isUpdating = updatingToggles.has(toggleKey);
+        const moduleToggleKey = `${slot.slot_id}-${col}`;
+        const moduleIsUpdating = updatingToggles.has(moduleToggleKey);
         return (
           <div className="flex items-center">
             <button
               type="button"
-              onClick={() => !isUpdating && handleToggleField(slot.slot_id, col, value)}
-              disabled={isUpdating}
+              onClick={() => !moduleIsUpdating && handleToggleField(slot.slot_id, col, value)}
+              disabled={moduleIsUpdating}
               className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed ${
                 value ? 'bg-green-600' : 'bg-gray-200'
               }`}
@@ -440,7 +440,7 @@ export default function CreateNewApiKeySlotsPage() {
                   value ? 'translate-x-5' : 'translate-x-0'
                 }`}
               />
-              {isUpdating && (
+              {moduleIsUpdating && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                 </div>
@@ -490,14 +490,14 @@ export default function CreateNewApiKeySlotsPage() {
         }
         
         // For non-editing rows, make toggle functional with instant update
-        const toggleKey = `${slot.slot_id}-is_ai_model`;
-        const isUpdating = updatingToggles.has(toggleKey);
+        const aiModelToggleKey = `${slot.slot_id}-is_ai_model`;
+        const aiModelIsUpdating = updatingToggles.has(aiModelToggleKey);
         return (
           <div className="flex items-center">
             <button
               type="button"
-              onClick={() => !isUpdating && handleToggleField(slot.slot_id, 'is_ai_model', value)}
-              disabled={isUpdating}
+              onClick={() => !aiModelIsUpdating && handleToggleField(slot.slot_id, 'is_ai_model', value)}
+              disabled={aiModelIsUpdating}
               className={`relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed ${
                 value ? 'bg-green-600' : 'bg-gray-200'
               }`}
@@ -507,7 +507,7 @@ export default function CreateNewApiKeySlotsPage() {
                   value ? 'translate-x-5' : 'translate-x-0'
                 }`}
               />
-              {isUpdating && (
+              {aiModelIsUpdating && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                 </div>
