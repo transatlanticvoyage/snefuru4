@@ -66,6 +66,8 @@ export default function Tebnar2Main() {
   const [tbn2_presetData, setTbn2PresetData] = useState<string[][] | null>(null);
   const [tbn2_lastClickTime, setTbn2LastClickTime] = useState<Record<string, number>>({});
   const [tbn2_urlBatchId, setTbn2UrlBatchId] = useState<string | null>(null);
+  const [tbn2_selectedColTemplate, setTbn2SelectedColTemplate] = useState('option1');
+  const [tbn2_stickyColCount, setTbn2StickyColCount] = useState(1);
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {
@@ -389,6 +391,151 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Column Template System Constants - tebnar2 specific
+  const TBN2_COLUMN_TEMPLATES = {
+    option1: { range: [0, -1], label: 'col temp all', description: 'columns 1-~' },
+    option2: { range: [0, 6], label: 'col temp a', description: 'columns 1-7' },
+    option3: { range: [7, 13], label: 'col temp b', description: 'columns 8-14' },
+    option4: { range: [14, 20], label: 'col temp c', description: 'columns 15-21' },
+    option5: { range: [21, 27], label: 'col temp d', description: 'columns 22-28' }
+  };
+
+  // Get all table columns for template system
+  const tbn2_getAllTableColumns = () => {
+    return [
+      'int1', 'fk_image1_id', 'image1-preview',
+      'int2', 'fk_image2_id', 'image2-preview',
+      'int3', 'fk_image3_id', 'image3-preview',
+      'int4', 'fk_image4_id', 'image4-preview',
+      'id', 'rel_users_id', 'rel_images_plans_batches_id', 'created_at',
+      'e_zpf_img_code', 'e_width', 'e_height', 'e_associated_content1',
+      'e_file_name1', 'e_more_instructions1', 'e_prompt1', 'e_ai_tool1'
+    ];
+  };
+
+  // Function to determine visible columns based on template
+  const tbn2_getVisibleColumns = () => {
+    const template = TBN2_COLUMN_TEMPLATES[tbn2_selectedColTemplate as keyof typeof TBN2_COLUMN_TEMPLATES];
+    const allColumns = tbn2_getAllTableColumns();
+    
+    if (template.range[1] === -1) {
+      return allColumns; // Show all columns
+    }
+    
+    return allColumns.slice(template.range[0], template.range[1] + 1);
+  };
+
+  // Function to get sticky columns
+  const tbn2_getStickyColumns = () => {
+    return tbn2_getAllTableColumns().slice(0, tbn2_stickyColCount);
+  };
+
+  // Function to get non-sticky visible columns
+  const tbn2_getNonStickyVisibleColumns = () => {
+    const visibleColumns = tbn2_getVisibleColumns();
+    return visibleColumns.slice(tbn2_stickyColCount);
+  };
+
+  // Column width reference for sticky positioning
+  const tbn2_getColumnWidth = (col: string) => {
+    const widthMap: Record<string, string> = {
+      int1: '60px', int2: '60px', int3: '60px', int4: '60px',
+      fk_image1_id: '45px', fk_image2_id: '45px', fk_image3_id: '45px', fk_image4_id: '45px',
+      'image1-preview': '100px', 'image2-preview': '100px', 'image3-preview': '100px', 'image4-preview': '100px',
+      id: '200px', rel_users_id: '150px', rel_images_plans_batches_id: '150px', created_at: '160px',
+      e_zpf_img_code: '120px', e_width: '80px', e_height: '80px', e_associated_content1: '200px',
+      e_file_name1: '200px', e_more_instructions1: '250px', e_prompt1: '300px', e_ai_tool1: '120px'
+    };
+    return widthMap[col] || '100px';
+  };
+
+  // Function to calculate sticky left position
+  const tbn2_calculateStickyLeft = (index: number) => {
+    let leftPosition = 0;
+    const allColumns = tbn2_getAllTableColumns();
+    
+    for (let i = 0; i < index; i++) {
+      const col = allColumns[i];
+      const widthStr = tbn2_getColumnWidth(col);
+      leftPosition += parseInt(widthStr.replace('px', ''));
+    }
+    return `${leftPosition}px`;
+  };
+
+  // Handlers for column template system
+  const tbn2_handleColumnTemplateChange = (templateKey: string) => {
+    setTbn2SelectedColTemplate(templateKey);
+    tbn2_updateColumnTemplateUrl(templateKey, tbn2_stickyColCount);
+    tbn2_saveColumnTemplateState(templateKey, tbn2_stickyColCount);
+  };
+
+  const tbn2_handleStickyColChange = (count: number) => {
+    setTbn2StickyColCount(count);
+    tbn2_updateColumnTemplateUrl(tbn2_selectedColTemplate, count);
+    tbn2_saveColumnTemplateState(tbn2_selectedColTemplate, count);
+  };
+
+  // Function to update URL with column template parameters
+  const tbn2_updateColumnTemplateUrl = (colTemplate: string, stickyCount: number) => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
+    const url = new URL(window.location.href);
+    url.searchParams.set('coltemp', colTemplate);
+    url.searchParams.set('stickycol', `option${stickyCount}`);
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  // Function to save column template state to localStorage
+  const tbn2_saveColumnTemplateState = (colTemplate: string, stickyCount: number) => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
+    localStorage.setItem('tbn2_columnTemplate', colTemplate);
+    localStorage.setItem('tbn2_stickyColumns', stickyCount.toString());
+  };
+
+  // Function to load column template state from localStorage
+  const tbn2_loadColumnTemplateState = () => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
+    const savedTemplate = localStorage.getItem('tbn2_columnTemplate');
+    const savedSticky = localStorage.getItem('tbn2_stickyColumns');
+    
+    if (savedTemplate && TBN2_COLUMN_TEMPLATES[savedTemplate as keyof typeof TBN2_COLUMN_TEMPLATES]) {
+      setTbn2SelectedColTemplate(savedTemplate);
+    }
+    if (savedSticky) {
+      const count = parseInt(savedSticky);
+      if (count >= 1 && count <= 5) {
+        setTbn2StickyColCount(count);
+      }
+    }
+  };
+
+  // Function to read column template URL parameters
+  const tbn2_readColumnTemplateUrlParams = () => {
+    if (typeof window === 'undefined') return; // SSR safety
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const colTemp = urlParams.get('coltemp');
+    const stickyCol = urlParams.get('stickycol');
+    
+    if (colTemp && TBN2_COLUMN_TEMPLATES[colTemp as keyof typeof TBN2_COLUMN_TEMPLATES]) {
+      setTbn2SelectedColTemplate(colTemp);
+    }
+    if (stickyCol) {
+      const count = parseInt(stickyCol.replace('option', ''));
+      if (count >= 1 && count <= 5) {
+        setTbn2StickyColCount(count);
+      }
+    }
+  };
+
+  // Effect to load column template state and URL params on mount
+  useEffect(() => {
+    tbn2_loadColumnTemplateState();
+    tbn2_readColumnTemplateUrlParams();
+  }, []);
+
   // Function to update URL with batch parameter - tebnar2 specific
   const tbn2_updateUrlWithBatch = (batchId: string) => {
     if (typeof window === 'undefined') return; // SSR safety
@@ -522,6 +669,62 @@ export default function Tebnar2Main() {
         onErrorDismiss={() => setTbn2Error(null)}
       />
 
+      {/* New Column Template System - tebnar2 specific */}
+      <div className="mb-4 flex items-center" style={{ maxHeight: '75px' }}>
+        {/* SQL View Info */}
+        <div style={{ width: '130px', maxHeight: '75px' }} className="mr-4 p-2 border border-gray-300 rounded">
+          <div className="font-bold text-xs">SQL View Info</div>
+          <div className="text-xs">view name: uitablegrid21</div>
+          <div className="text-xs"># columns: {tbn2_getAllTableColumns().length}</div>
+        </div>
+        
+        {/* Column Templates Section */}
+        <div className="mr-4">
+          <div className="font-bold text-sm mb-1">Column Templates (Show/Hide)</div>
+          <div className="flex border border-gray-300 rounded overflow-hidden" style={{ maxWidth: '600px' }}>
+            {Object.entries(TBN2_COLUMN_TEMPLATES).map(([key, template]) => (
+              <button
+                key={key}
+                onClick={() => tbn2_handleColumnTemplateChange(key)}
+                className={`px-2 py-1 text-xs border-r border-gray-300 last:border-r-0 transition-colors ${
+                  tbn2_selectedColTemplate === key 
+                    ? 'bg-blue-900 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+                style={{ width: '120px', minHeight: '60px' }}
+              >
+                <div className="font-semibold">{key.toUpperCase()}</div>
+                <div className="text-xs">{template.label}</div>
+                <div className="text-xs">{template.description}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Sticky Columns Section */}
+        <div>
+          <div className="font-bold text-sm mb-1">Sticky Columns At Left Side Of UI Grid Table</div>
+          <div className="flex border border-gray-300 rounded overflow-hidden">
+            {[1,2,3,4,5].map(count => (
+              <button
+                key={count}
+                onClick={() => tbn2_handleStickyColChange(count)}
+                className={`px-2 py-1 text-xs border-r border-gray-300 last:border-r-0 transition-colors ${
+                  tbn2_stickyColCount === count 
+                    ? 'bg-blue-900 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+                style={{ width: '80px', minHeight: '60px' }}
+              >
+                <div className="font-semibold">OPTION {count}</div>
+                <div className="text-xs">{count} left-most</div>
+                <div className="text-xs">{count === 1 ? 'column' : 'columns'}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Active Filter Indicator - tebnar2 specific */}
       {tbn2_selectedBatchId && (
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -573,7 +776,7 @@ export default function Tebnar2Main() {
         onSubmitMakeImages={tbn2_handleSubmitMakeImages}
       />
 
-      {/* Main Table - exact clone from tebnar1 */}
+      {/* Main Table - enhanced with column template system */}
       <Tebnar2Table
         plans={tbn2_paginatedPlans}
         imagesById={tbn2_imagesById}
@@ -587,6 +790,10 @@ export default function Tebnar2Main() {
         onPageSizeChange={setTbn2PageSize}
         onRefreshImages={tbn2_fetchImages}
         onFetchSingleImage={tbn2_fetchSingleImage}
+        stickyColumns={tbn2_getStickyColumns()}
+        visibleColumns={tbn2_getVisibleColumns()}
+        calculateStickyLeft={tbn2_calculateStickyLeft}
+        getColumnWidth={tbn2_getColumnWidth}
       />
     </div>
   );

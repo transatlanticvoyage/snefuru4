@@ -1,8 +1,7 @@
 'use client';
 
 import { Tebnar2ImagePlan, Tebnar2Image } from '../types/tebnar2-types';
-import { TBN2_COLUMNS, TBN2_COLUMN_SETTINGS, TBN2_PAGE_SIZE_OPTIONS } from '../constants/tebnar2-constants';
-import { tbn2_formatDate, tbn2_truncateText } from '../utils/tbn2-table-functions';
+import { TBN2_PAGE_SIZE_OPTIONS } from '../constants/tebnar2-constants';
 import Tebnar2ImagePreview from './Tebnar2ImagePreview';
 
 // Complete column settings - exact clone from tebnar1
@@ -389,6 +388,10 @@ interface Tebnar2TableProps {
   onPageSizeChange: (size: number) => void;
   onRefreshImages: () => void;
   onFetchSingleImage: (plan: Tebnar2ImagePlan, imageSlot: number) => void;
+  stickyColumns: string[];
+  visibleColumns: string[];
+  calculateStickyLeft: (index: number) => string;
+  getColumnWidth: (col: string) => string;
 }
 
 export default function Tebnar2Table({
@@ -403,17 +406,15 @@ export default function Tebnar2Table({
   onPageChange,
   onPageSizeChange,
   onRefreshImages,
-  onFetchSingleImage
+  onFetchSingleImage,
+  stickyColumns,
+  visibleColumns,
+  calculateStickyLeft,
+  getColumnWidth
 }: Tebnar2TableProps) {
 
-  // For uitablegrid21, build columns with preview columns after each fk_imageX_id - exact clone from tebnar1
-  const tableColumns = [
-    'int1', 'fk_image1_id', 'image1-preview',
-    'int2', 'fk_image2_id', 'image2-preview',
-    'int3', 'fk_image3_id', 'image3-preview',
-    'int4', 'fk_image4_id', 'image4-preview',
-    ...TBN2_COLUMNS.slice(8), // Skip the first 8 columns (int1-4, fk_image1-4) since we've already included them above
-  ];
+  // Get non-sticky visible columns (sticky columns are handled separately)
+  const nonStickyColumns = visibleColumns.slice(stickyColumns.length);
 
   return (
     <div className="w-full px-4">
@@ -443,24 +444,6 @@ export default function Tebnar2Table({
         </button>
       </div>
       
-      {/* Column Templates Button Bar - exact clone from tebnar1 */}
-      <div className="mb-4 flex border border-gray-300 rounded overflow-hidden">
-        <div className="flex-shrink-0 bg-gray-100 border-r border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 flex items-center h-[34px]">
-          COLUMN TEMPLATES
-        </div>
-        <button className="flex-1 bg-white hover:bg-gray-50 border-r border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 flex items-center justify-center h-[34px] transition-colors">
-          All Columns
-        </button>
-        <button className="flex-1 bg-white hover:bg-gray-50 border-r border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 flex items-center justify-center h-[34px] transition-colors">
-          ColTemp1
-        </button>
-        <button className="flex-1 bg-white hover:bg-gray-50 border-r border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 flex items-center justify-center h-[34px] transition-colors">
-          ColTemp2
-        </button>
-        <button className="flex-1 bg-white hover:bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 flex items-center justify-center h-[34px] transition-colors">
-          ColTemp3
-        </button>
-      </div>
       
       <div className="overflow-x-auto w-full">
         <table 
@@ -488,56 +471,24 @@ export default function Tebnar2Table({
                 borderTop: tbn2_headerCustomizationSettings.headerBorders.topBorder,
               }}
             >
-              {tableColumns.map((col, index) => {
-                // Get width settings - headerCellWidths takes precedence over columnSettings
-                const widthSettings = tbn2_headerCustomizationSettings.headerCellWidths[col] || 
-                                    tbn2_columnSettings[col] || 
-                                    { width: 'auto', minWidth: '100px', maxWidth: 'none' };
-                
-                // Get text alignment - headerTextAlign takes precedence
-                const textAlign = tbn2_headerCustomizationSettings.headerTextAlign[col] || 
-                                tbn2_headerCustomizationSettings.headerCell.textAlign;
-                
-                // Get padding settings - tableCellPaddingSettings takes precedence
-                const paddingSettings = tbn2_tableCellPaddingSettings.rowTypePadding.headerRow;
-                
-                // Get border settings - tableBorderSettings takes precedence
-                const borderSettings = tbn2_tableBorderSettings.headerBorders.enabled ? {
-                  borderRight: index < tableColumns.length - 1 ? 
-                             tbn2_tableBorderSettings.headerBorders.cellBorderRight : 
-                             tbn2_tableBorderSettings.headerBorders.lastHeaderCellRight,
-                  borderLeft: tbn2_tableBorderSettings.headerBorders.cellBorderLeft,
-                  borderTop: tbn2_tableBorderSettings.headerBorders.cellBorderTop,
-                  borderBottom: tbn2_tableBorderSettings.headerBorders.cellBorderBottom,
-                } : {
-                  borderRight: tbn2_headerCustomizationSettings.headerBorders.cellBorderRight,
-                  borderLeft: tbn2_headerCustomizationSettings.headerBorders.cellBorderLeft,
-                  borderTop: tbn2_headerCustomizationSettings.headerBorders.topBorder,
-                  borderBottom: tbn2_headerCustomizationSettings.headerBorders.bottomBorder,
-                };
+              {/* Sticky Headers */}
+              {stickyColumns.map((col, index) => {
+                // Get width settings - use the new getColumnWidth function
+                const width = getColumnWidth(col);
+                const isLastSticky = index === stickyColumns.length - 1;
                 
                 return (
                   <th
                     key={col}
                     style={{
-                      // Width and sizing
-                      width: widthSettings.width,
-                      minWidth: widthSettings.minWidth,
-                      maxWidth: widthSettings.maxWidth,
-                      height: tbn2_headerCustomizationSettings.headerRow.height,
-                      
-                      // Cell styling
-                      padding: paddingSettings.padding,
-                      verticalAlign: tbn2_headerCustomizationSettings.headerCell.verticalAlign,
-                      textAlign: textAlign,
-                      backgroundColor: tbn2_headerCustomizationSettings.headerCell.backgroundColor,
-                      overflow: tbn2_headerCustomizationSettings.headerCell.overflow,
-                      textOverflow: tbn2_headerCustomizationSettings.headerCell.textOverflow,
-                      whiteSpace: tbn2_headerCustomizationSettings.headerCell.whiteSpace,
-                      wordBreak: tbn2_headerCustomizationSettings.headerCell.wordBreak,
-                      boxSizing: tbn2_headerCustomizationSettings.headerCell.boxSizing,
-                      
-                      // Text styling
+                      width: width,
+                      minWidth: width,
+                      maxWidth: width,
+                      position: 'sticky',
+                      left: calculateStickyLeft(index),
+                      zIndex: 20,
+                      backgroundColor: tbn2_headerCustomizationSettings.headerRow.backgroundColor,
+                      borderRight: isLastSticky ? '4px solid black' : '1px solid #c7cbd3',
                       fontSize: tbn2_headerCustomizationSettings.headerText.fontSize,
                       fontWeight: tbn2_headerCustomizationSettings.headerText.fontWeight,
                       color: tbn2_headerCustomizationSettings.headerText.color,
@@ -545,232 +496,144 @@ export default function Tebnar2Table({
                       letterSpacing: tbn2_headerCustomizationSettings.headerText.letterSpacing,
                       lineHeight: tbn2_headerCustomizationSettings.headerText.lineHeight,
                       fontFamily: tbn2_headerCustomizationSettings.headerText.fontFamily,
-                      
-                      // Borders
-                      borderRight: borderSettings.borderRight,
-                      borderLeft: borderSettings.borderLeft,
-                      borderTop: borderSettings.borderTop,
-                      borderBottom: borderSettings.borderBottom,
-                      borderRadius: tbn2_headerCustomizationSettings.headerBorders.borderRadius,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (tbn2_headerCustomizationSettings.headerHover.enabled) {
-                        e.currentTarget.style.backgroundColor = tbn2_headerCustomizationSettings.headerHover.backgroundColor;
-                        e.currentTarget.style.color = tbn2_headerCustomizationSettings.headerHover.color;
-                        e.currentTarget.style.borderColor = tbn2_headerCustomizationSettings.headerHover.borderColor;
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (tbn2_headerCustomizationSettings.headerHover.enabled) {
-                        e.currentTarget.style.backgroundColor = tbn2_headerCustomizationSettings.headerCell.backgroundColor;
-                        e.currentTarget.style.color = tbn2_headerCustomizationSettings.headerText.color;
-                        e.currentTarget.style.borderColor = tbn2_headerCustomizationSettings.headerBorders.cellBorderRight.split(' ')[2] || 'transparent';
-                      }
+                      padding: '4px 4px',
+                      textAlign: 'center'
                     }}
                   >
-                    {col.startsWith('image') ? 'Preview' : col}
+                    {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
+                  </th>
+                );
+              })}
+              
+              {/* Non-Sticky Headers */}
+              {nonStickyColumns.map((col) => {
+                const width = getColumnWidth(col);
+                
+                return (
+                  <th
+                    key={col}
+                    style={{
+                      width: width,
+                      minWidth: width,
+                      maxWidth: width,
+                      backgroundColor: tbn2_headerCustomizationSettings.headerRow.backgroundColor,
+                      borderRight: '1px solid #c7cbd3',
+                      fontSize: tbn2_headerCustomizationSettings.headerText.fontSize,
+                      fontWeight: tbn2_headerCustomizationSettings.headerText.fontWeight,
+                      color: tbn2_headerCustomizationSettings.headerText.color,
+                      textTransform: tbn2_headerCustomizationSettings.headerText.textTransform,
+                      letterSpacing: tbn2_headerCustomizationSettings.headerText.letterSpacing,
+                      lineHeight: tbn2_headerCustomizationSettings.headerText.lineHeight,
+                      fontFamily: tbn2_headerCustomizationSettings.headerText.fontFamily,
+                      padding: '4px 4px',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
                   </th>
                 );
               })}
             </tr>
           </thead>
-          <tbody 
-            style={{
-              backgroundColor: tbn2_tableStyleSettings.row.backgroundColor,
-            }}
-          >
-            {plans.map((plan, rowIndex) => (
-              <tr 
-                key={plan.id} 
-                style={{
-                  ...tbn2_tableStyleSettings.row,
-                  borderBottom: tbn2_tableBorderSettings.rowBorders.dataRowBottom,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = tbn2_tableStyleSettings.row.hoverBackgroundColor;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = tbn2_tableStyleSettings.row.backgroundColor;
-                }}
-              >
-                {tableColumns.map((col, colIndex) => {
-                  const settings = tbn2_columnSettings[col] || { width: 'auto', minWidth: '100px', maxWidth: 'none', textAlign: 'left' };
+          <tbody>
+            {plans.map((plan) => (
+              <tr key={plan.id}>
+                {/* Sticky Cells */}
+                {stickyColumns.map((col, index) => {
+                  const width = getColumnWidth(col);
+                  const isLastSticky = index === stickyColumns.length - 1;
                   
-                  // Get padding settings for this column
-                  const columnPadding = tbn2_tableCellPaddingSettings.columnPadding[col] || tbn2_tableCellPaddingSettings.globalDefault;
+                  return (
+                    <td
+                      key={col}
+                      style={{
+                        width: width,
+                        minWidth: width,
+                        maxWidth: width,
+                        position: 'sticky',
+                        left: calculateStickyLeft(index),
+                        zIndex: 10,
+                        backgroundColor: '#ffffff',
+                        borderRight: isLastSticky ? '4px solid black' : '1px solid #c7cbd3',
+                        padding: '4px 4px',
+                        verticalAlign: 'top',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {col.includes('preview') ? (
+                        <Tebnar2ImagePreview
+                          image={col === 'image1-preview' ? (plan['fk_image1_id'] ? imagesById[plan['fk_image1_id']] : null) :
+                                 col === 'image2-preview' ? (plan['fk_image2_id'] ? imagesById[plan['fk_image2_id']] : null) :
+                                 col === 'image3-preview' ? (plan['fk_image3_id'] ? imagesById[plan['fk_image3_id']] : null) :
+                                 col === 'image4-preview' ? (plan['fk_image4_id'] ? imagesById[plan['fk_image4_id']] : null) : null}
+                          imageId={col === 'image1-preview' ? plan['fk_image1_id'] :
+                                   col === 'image2-preview' ? plan['fk_image2_id'] :
+                                   col === 'image3-preview' ? plan['fk_image3_id'] :
+                                   col === 'image4-preview' ? plan['fk_image4_id'] : null}
+                          plan={plan}
+                          imageNumber={col === 'image1-preview' ? 1 :
+                                      col === 'image2-preview' ? 2 :
+                                      col === 'image3-preview' ? 3 :
+                                      col === 'image4-preview' ? 4 : 1}
+                          fetchingImages={fetchingImages}
+                          lastClickTime={lastClickTime}
+                          onRefreshImages={onRefreshImages}
+                          onFetchSingleImage={onFetchSingleImage}
+                        />
+                      ) : (
+                        String(plan[col as keyof typeof plan] ?? '')
+                      )}
+                    </td>
+                  );
+                })}
+                
+                {/* Non-Sticky Cells */}
+                {nonStickyColumns.map((col) => {
+                  const width = getColumnWidth(col);
                   
-                  // Get border settings for this column
-                  const columnBorder = tbn2_tableBorderSettings.columnBorders.enabled ? {
-                    right: tbn2_tableBorderSettings.columnBorders.defaultRight,
-                    left: tbn2_tableBorderSettings.columnBorders.defaultLeft,
-                  } : { right: '0px', left: '0px' };
-                  
-                  // Handle image preview columns - exact clone from tebnar1
-                  if (col === 'image1-preview') {
-                    const imgId = plan['fk_image1_id'];
-                    const img = imgId ? imagesById[imgId] : null;
-                    return (
-                      <td
-                        key={col}
-                        style={{
-                          width: settings.width,
-                          minWidth: settings.minWidth,
-                          maxWidth: settings.maxWidth,
-                          textAlign: (settings.textAlign || 'center') as 'left' | 'center' | 'right',
-                          height: tbn2_tableStyleSettings.row.height,
-                          padding: columnPadding.padding,
-                          backgroundColor: tbn2_tableStyleSettings.previewCell.backgroundColor,
-                          verticalAlign: tbn2_tableStyleSettings.cell.verticalAlign,
-                          overflow: tbn2_tableStyleSettings.cell.overflow,
-                          borderRight: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
-                          borderLeft: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
-                          borderBottom: tbn2_tableBorderSettings.rowBorders.enabled ? tbn2_tableBorderSettings.rowBorders.dataRowBottom : '0px',
-                        }}
-                      >
+                  return (
+                    <td
+                      key={col}
+                      style={{
+                        width: width,
+                        minWidth: width,
+                        maxWidth: width,
+                        backgroundColor: '#ffffff',
+                        borderRight: '1px solid #c7cbd3',
+                        padding: '4px 4px',
+                        verticalAlign: 'top',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {col.includes('preview') ? (
                         <Tebnar2ImagePreview
-                          image={img}
-                          imageId={imgId}
+                          image={col === 'image1-preview' ? (plan['fk_image1_id'] ? imagesById[plan['fk_image1_id']] : null) :
+                                 col === 'image2-preview' ? (plan['fk_image2_id'] ? imagesById[plan['fk_image2_id']] : null) :
+                                 col === 'image3-preview' ? (plan['fk_image3_id'] ? imagesById[plan['fk_image3_id']] : null) :
+                                 col === 'image4-preview' ? (plan['fk_image4_id'] ? imagesById[plan['fk_image4_id']] : null) : null}
+                          imageId={col === 'image1-preview' ? plan['fk_image1_id'] :
+                                   col === 'image2-preview' ? plan['fk_image2_id'] :
+                                   col === 'image3-preview' ? plan['fk_image3_id'] :
+                                   col === 'image4-preview' ? plan['fk_image4_id'] : null}
                           plan={plan}
-                          imageNumber={1}
+                          imageNumber={col === 'image1-preview' ? 1 :
+                                      col === 'image2-preview' ? 2 :
+                                      col === 'image3-preview' ? 3 :
+                                      col === 'image4-preview' ? 4 : 1}
                           fetchingImages={fetchingImages}
                           lastClickTime={lastClickTime}
                           onRefreshImages={onRefreshImages}
                           onFetchSingleImage={onFetchSingleImage}
                         />
-                      </td>
-                    );
-                  }
-                  if (col === 'image2-preview') {
-                    const imgId = plan['fk_image2_id'];
-                    const img = imgId ? imagesById[imgId] : null;
-                    return (
-                      <td
-                        key={col}
-                        style={{
-                          width: settings.width,
-                          minWidth: settings.minWidth,
-                          maxWidth: settings.maxWidth,
-                          textAlign: (settings.textAlign || 'center') as 'left' | 'center' | 'right',
-                          height: tbn2_tableStyleSettings.row.height,
-                          padding: columnPadding.padding,
-                          backgroundColor: tbn2_tableStyleSettings.previewCell.backgroundColor,
-                          verticalAlign: tbn2_tableStyleSettings.cell.verticalAlign,
-                          overflow: tbn2_tableStyleSettings.cell.overflow,
-                          borderRight: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
-                          borderLeft: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
-                          borderBottom: tbn2_tableBorderSettings.rowBorders.enabled ? tbn2_tableBorderSettings.rowBorders.dataRowBottom : '0px',
-                        }}
-                      >
-                        <Tebnar2ImagePreview
-                          image={img}
-                          imageId={imgId}
-                          plan={plan}
-                          imageNumber={2}
-                          fetchingImages={fetchingImages}
-                          lastClickTime={lastClickTime}
-                          onRefreshImages={onRefreshImages}
-                          onFetchSingleImage={onFetchSingleImage}
-                        />
-                      </td>
-                    );
-                  }
-                  if (col === 'image3-preview') {
-                    const imgId = plan['fk_image3_id'];
-                    const img = imgId ? imagesById[imgId] : null;
-                    return (
-                      <td
-                        key={col}
-                        style={{
-                          width: settings.width,
-                          minWidth: settings.minWidth,
-                          maxWidth: settings.maxWidth,
-                          textAlign: (settings.textAlign || 'center') as 'left' | 'center' | 'right',
-                          height: tbn2_tableStyleSettings.row.height,
-                          padding: columnPadding.padding,
-                          backgroundColor: tbn2_tableStyleSettings.previewCell.backgroundColor,
-                          verticalAlign: tbn2_tableStyleSettings.cell.verticalAlign,
-                          overflow: tbn2_tableStyleSettings.cell.overflow,
-                          borderRight: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
-                          borderLeft: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
-                          borderBottom: tbn2_tableBorderSettings.rowBorders.enabled ? tbn2_tableBorderSettings.rowBorders.dataRowBottom : '0px',
-                        }}
-                      >
-                        <Tebnar2ImagePreview
-                          image={img}
-                          imageId={imgId}
-                          plan={plan}
-                          imageNumber={3}
-                          fetchingImages={fetchingImages}
-                          lastClickTime={lastClickTime}
-                          onRefreshImages={onRefreshImages}
-                          onFetchSingleImage={onFetchSingleImage}
-                        />
-                      </td>
-                    );
-                  }
-                  if (col === 'image4-preview') {
-                    const imgId = plan['fk_image4_id'];
-                    const img = imgId ? imagesById[imgId] : null;
-                    return (
-                      <td
-                        key={col}
-                        style={{
-                          width: settings.width,
-                          minWidth: settings.minWidth,
-                          maxWidth: settings.maxWidth,
-                          textAlign: (settings.textAlign || 'center') as 'left' | 'center' | 'right',
-                          height: tbn2_tableStyleSettings.row.height,
-                          padding: columnPadding.padding,
-                          backgroundColor: tbn2_tableStyleSettings.previewCell.backgroundColor,
-                          verticalAlign: tbn2_tableStyleSettings.cell.verticalAlign,
-                          overflow: tbn2_tableStyleSettings.cell.overflow,
-                          borderRight: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
-                          borderLeft: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
-                          borderBottom: tbn2_tableBorderSettings.rowBorders.enabled ? tbn2_tableBorderSettings.rowBorders.dataRowBottom : '0px',
-                        }}
-                      >
-                        <Tebnar2ImagePreview
-                          image={img}
-                          imageId={imgId}
-                          plan={plan}
-                          imageNumber={4}
-                          fetchingImages={fetchingImages}
-                          lastClickTime={lastClickTime}
-                          onRefreshImages={onRefreshImages}
-                          onFetchSingleImage={onFetchSingleImage}
-                        />
-                      </td>
-                    );
-                  } else {
-                    // Regular data cell - exact clone from tebnar1
-                    return (
-                      <td
-                        key={col}
-                        style={{
-                          width: settings.width,
-                          minWidth: settings.minWidth,
-                          maxWidth: settings.maxWidth,
-                          textAlign: (settings.textAlign || 'left') as 'left' | 'center' | 'right',
-                          height: tbn2_tableStyleSettings.row.height,
-                          padding: columnPadding.padding,
-                          backgroundColor: tbn2_tableStyleSettings.row.backgroundColor,
-                          verticalAlign: tbn2_tableStyleSettings.cell.verticalAlign,
-                          overflow: tbn2_tableStyleSettings.cell.overflow,
-                          textOverflow: tbn2_tableStyleSettings.textCell.textOverflow,
-                          whiteSpace: tbn2_tableStyleSettings.textCell.whiteSpace,
-                          fontSize: tbn2_tableStyleSettings.textCell.fontSize,
-                          lineHeight: tbn2_tableStyleSettings.textCell.lineHeight,
-                          color: tbn2_tableStyleSettings.textCell.color,
-                          fontWeight: tbn2_tableStyleSettings.textCell.fontWeight,
-                          borderRight: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
-                          borderLeft: tbn2_tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
-                          borderBottom: tbn2_tableBorderSettings.rowBorders.enabled ? tbn2_tableBorderSettings.rowBorders.dataRowBottom : '0px',
-                        }}
-                      >
-                        {String(plan[col as keyof typeof plan] ?? '')}
-                      </td>
-                    );
-                  }
+                      ) : (
+                        String(plan[col as keyof typeof plan] ?? '')
+                      )}
+                    </td>
+                  );
                 })}
               </tr>
             ))}
