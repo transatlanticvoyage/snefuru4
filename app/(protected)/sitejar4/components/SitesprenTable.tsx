@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 
 interface SitesprenRecord {
@@ -31,6 +31,29 @@ interface SitesprenTableProps {
 type SortField = keyof SitesprenRecord;
 type SortOrder = 'asc' | 'desc';
 
+// Define all columns in order (including action columns)
+const allColumns = [
+  'checkbox',           // 1
+  'tool_buttons',       // 2  
+  'sync_actions',       // 3
+  'id',                // 4
+  'created_at',        // 5
+  'sitespren_base',    // 6
+  'true_root_domain',  // 7
+  'full_subdomain',    // 8
+  'webproperty_type',  // 9
+  'fk_users_id',       // 10
+  'updated_at',        // 11
+  'wpuser1',           // 12
+  'wppass1',           // 13
+  'ruplin_apikey',     // 14
+  'wp_rest_app_pass',  // 15
+  'wp_plugin_installed1', // 16
+  'wp_plugin_connected2', // 17
+  'fk_domreg_hostaccount', // 18
+  'is_wp_site'         // 19
+];
+
 export default function SitesprenTable({ data, onSelectionChange }: SitesprenTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,6 +64,112 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
   const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
   const [syncLoading, setSyncLoading] = useState<Set<string>>(new Set());
   const [syncResults, setSyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
+  
+  // Column template and sticky state
+  const [selectedColumnTemplate, setSelectedColumnTemplate] = useState('option1');
+  const [selectedStickyColumns, setSelectedStickyColumns] = useState('option1');
+
+  // Load state from URL parameters and localStorage on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const colTempParam = urlParams.get('coltemp') || localStorage.getItem('sitejar4_coltemp') || 'option1';
+    const stickyColParam = urlParams.get('stickycol') || localStorage.getItem('sitejar4_stickycol') || 'option1';
+    
+    setSelectedColumnTemplate(colTempParam);
+    setSelectedStickyColumns(stickyColParam);
+  }, []);
+
+  // Utility functions
+  const getStickyColumnCount = () => {
+    switch (selectedStickyColumns) {
+      case 'option1': return 1;
+      case 'option2': return 2;
+      case 'option3': return 3;
+      case 'option4': return 4;
+      case 'option5': return 5;
+      default: return 1;
+    }
+  };
+
+  const getVisibleColumns = () => {
+    const stickyColumnCount = getStickyColumnCount();
+    const stickyColumns = allColumns.slice(0, stickyColumnCount);
+    
+    switch (selectedColumnTemplate) {
+      case 'option1': 
+        return allColumns; // All columns (1-19)
+      case 'option2': {
+        const templateColumns = allColumns.slice(0, 7); // Columns 1-7
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option3': {
+        const templateColumns = allColumns.slice(7, 14); // Columns 8-14
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option4': {
+        const templateColumns = allColumns.slice(14, 19); // Columns 15-19
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option5': {
+        // Empty option for future expansion
+        return stickyColumns;
+      }
+      default: 
+        return allColumns;
+    }
+  };
+
+  const getColumnSeparators = (col: string) => {
+    // No specific left separators needed for sitespren table
+    const hasLeftSeparator = false;
+    // No specific right separators needed for sitespren table  
+    const hasRightSeparator = false;
+    
+    return { hasLeftSeparator, hasRightSeparator };
+  };
+
+  const updateUrlAndStorage = (colTemp: string, stickyCol: string) => {
+    // Update URL
+    const url = new URL(window.location.href);
+    url.searchParams.set('coltemp', colTemp);
+    url.searchParams.set('stickycol', stickyCol);
+    window.history.replaceState({}, '', url.toString());
+    
+    // Update localStorage
+    localStorage.setItem('sitejar4_coltemp', colTemp);
+    localStorage.setItem('sitejar4_stickycol', stickyCol);
+  };
+
+  const handleColumnTemplateChange = (option: string) => {
+    setSelectedColumnTemplate(option);
+    updateUrlAndStorage(option, selectedStickyColumns);
+  };
+
+  const handleStickyColumnsChange = (option: string) => {
+    setSelectedStickyColumns(option);
+    updateUrlAndStorage(selectedColumnTemplate, option);
+  };
+
+  const visibleColumns = getVisibleColumns();
+  const stickyColumnCount = getStickyColumnCount();
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -284,6 +413,76 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
 
   return (
     <div className="space-y-4">
+      {/* Column Template and View Control System */}
+      <div className="flex items-start space-x-4">
+        {/* SQL View Info */}
+        <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px', maxHeight: '75px'}}>
+          <div className="text-xs font-semibold text-gray-700 mb-1">SQL View Info</div>
+          <div className="text-xs text-gray-600">
+            <div>view name: sitespren</div>
+            <div># columns: {allColumns.length}</div>
+          </div>
+        </div>
+
+        {/* Column Template Button Bar */}
+        <div className="bg-white p-3 rounded-lg border shadow-sm" style={{width: '600px', maxHeight: '75px'}}>
+          <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates</div>
+          <div className="flex space-x-1">
+            {[
+              { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-19' },
+              { id: 'option2', label: 'OPTION 2', subtitle: 'col temp a', range: 'columns 1-7' },
+              { id: 'option3', label: 'OPTION 3', subtitle: 'col temp b', range: 'columns 8-14' },
+              { id: 'option4', label: 'OPTION 4', subtitle: 'col temp c', range: 'columns 15-19' },
+              { id: 'option5', label: 'OPTION 5', subtitle: 'col temp d', range: 'empty' }
+            ].map(option => (
+              <button
+                key={option.id}
+                onClick={() => handleColumnTemplateChange(option.id)}
+                className={`text-xs leading-tight p-1 rounded border text-center ${
+                  selectedColumnTemplate === option.id
+                    ? 'bg-blue-900 text-white border-blue-900'
+                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                }`}
+                style={{width: '120px'}}
+              >
+                <div className="font-semibold">{option.label}</div>
+                <div>{option.subtitle}</div>
+                <div>{option.range}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sticky Columns Section */}
+        <div className="bg-white p-3 rounded-lg border shadow-sm" style={{maxHeight: '75px'}}>
+          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns</div>
+          <div className="flex space-x-1">
+            {[
+              { id: 'option1', label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
+              { id: 'option2', label: 'OPTION 2', subtitle: '2 left-most', range: 'columns' },
+              { id: 'option3', label: 'OPTION 3', subtitle: '3 left-most', range: 'columns' },
+              { id: 'option4', label: 'OPTION 4', subtitle: '4 left-most', range: 'columns' },
+              { id: 'option5', label: 'OPTION 5', subtitle: '5 left-most', range: 'columns' }
+            ].map(option => (
+              <button
+                key={option.id}
+                onClick={() => handleStickyColumnsChange(option.id)}
+                className={`text-xs leading-tight p-1 rounded border text-center ${
+                  selectedStickyColumns === option.id
+                    ? 'bg-blue-900 text-white border-blue-900'
+                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                }`}
+                style={{width: '80px'}}
+              >
+                <div className="font-semibold">{option.label}</div>
+                <div>{option.subtitle}</div>
+                <div>{option.range}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      
       {/* Search and Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -351,189 +550,151 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <input
-                    type="checkbox"
-                    checked={isAllSelected}
-                    onChange={isAllSelected ? handleClearAll : handleSelectAll}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tool Buttons
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Sync Actions
-                </th>
-                <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('id')}
-                >
-                  id {sortField === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('created_at')}
-                >
-                  created_at {sortField === 'created_at' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('sitespren_base')}
-                >
-                  sitespren_base {sortField === 'sitespren_base' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('true_root_domain')}
-                >
-                  true_root_domain {sortField === 'true_root_domain' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  full_subdomain
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  webproperty_type
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  fk_users_id
-                </th>
-                <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort('updated_at')}
-                >
-                  updated_at {sortField === 'updated_at' && (sortOrder === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  wpuser1
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  wppass1
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ruplin_apikey
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  wp_rest_app_pass
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  wp_plugin_installed1
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  wp_plugin_connected2
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  fk_domreg_hostaccount
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  is_wp_site
-                </th>
+                {visibleColumns.map((col, index) => {
+                  const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
+                  const isSticky = index < stickyColumnCount;
+                  const stickyClass = isSticky ? 'sticky left-0 z-10 bg-gray-50' : '';
+                  const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                  const isLastSticky = index === stickyColumnCount - 1;
+
+                  return (
+                    <th
+                      key={col}
+                      className={`px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative ${stickyClass} ${
+                        ['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) 
+                          ? 'cursor-pointer hover:bg-gray-100' 
+                          : ''
+                      }`}
+                      style={isSticky ? { left: leftPosition } : {}}
+                      onClick={['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) ? () => handleSort(col as SortField) : undefined}
+                    >
+                      {hasLeftSeparator && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
+                      {col === 'checkbox' ? (
+                        <input
+                          type="checkbox"
+                          checked={isAllSelected}
+                          onChange={isAllSelected ? handleClearAll : handleSelectAll}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                      ) : col === 'tool_buttons' ? (
+                        'Tool Buttons'
+                      ) : col === 'sync_actions' ? (
+                        'Sync Actions'
+                      ) : (
+                        <>
+                          {col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </>
+                      )}
+                      {hasRightSeparator && (
+                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
+                      {isLastSticky && (
+                        <div className="absolute right-0 top-0 bottom-0 bg-black" style={{width: '4px'}}></div>
+                      )}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      checked={selectedSites.has(item.id)}
-                      onChange={(e) => handleSiteSelection(item.id, e.target.checked)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    <Link
-                      href={`/sitnivid?site=${encodeURIComponent(item.sitespren_base || '')}`}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Individual View
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex gap-2">
-                        <button
-                          className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-                          onClick={() => handleWpsv2Sync(item.id, 'plugin_api')}
-                          disabled={syncLoading.has(item.id)}
-                        >
-                          {syncLoading.has(item.id) ? 'Syncing...' : 'Plugin API'}
-                        </button>
-                        <button
-                          className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                          onClick={() => handleWpsv2Sync(item.id, 'rest_api')}
-                          disabled={syncLoading.has(item.id)}
-                        >
-                          {syncLoading.has(item.id) ? 'Syncing...' : 'Rest API'}
-                        </button>
-                        <button
-                          className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
-                          onClick={() => handleWpsv2TestPlugin(item.id)}
-                          disabled={syncLoading.has(`test_${item.id}`)}
-                        >
-                          {syncLoading.has(`test_${item.id}`) ? 'Testing...' : 'Test Plugin'}
-                        </button>
-                      </div>
-                      {/* Sync result display */}
-                      {(syncResults[item.id] || syncResults[`test_${item.id}`]) && (
-                        <div className={`text-xs p-2 rounded ${
-                          (syncResults[item.id]?.type === 'success' || syncResults[`test_${item.id}`]?.type === 'success') 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {syncResults[item.id]?.message || syncResults[`test_${item.id}`]?.message}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
-                    {truncateText(item.id, 8)}...
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-500">
-                    {formatDate(item.created_at)}
-                  </td>
-                  <td className="px-4 py-2 text-gray-900 font-medium">
-                    {item.sitespren_base || '-'}
-                  </td>
-                  <td className="px-4 py-2 text-gray-900">
-                    {item.true_root_domain || '-'}
-                  </td>
-                  <td className="px-4 py-2 text-gray-900">
-                    {item.full_subdomain || '-'}
-                  </td>
-                  <td className="px-4 py-2 text-gray-900">
-                    {item.webproperty_type || '-'}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
-                    {truncateText(item.fk_users_id, 8)}...
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-500">
-                    {formatDate(item.updated_at)}
-                  </td>
-                  <td className="px-4 py-2 text-gray-900">
-                    {item.wpuser1 || '-'}
-                  </td>
-                  <td className="px-4 py-2 text-gray-900">
-                    {item.wppass1 ? '***' : '-'}
-                  </td>
-                  <td className="px-4 py-2 text-gray-900">
-                    {item.ruplin_apikey ? truncateText(item.ruplin_apikey, 15) : '-'}
-                  </td>
-                  <td className="px-4 py-2 text-gray-900">
-                    {item.wp_rest_app_pass ? truncateText(item.wp_rest_app_pass, 15) : '-'}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {formatBoolean(item.wp_plugin_installed1)}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {formatBoolean(item.wp_plugin_connected2)}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-gray-500 text-xs">
-                    {item.fk_domreg_hostaccount ? truncateText(item.fk_domreg_hostaccount, 8) + '...' : '-'}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {formatBoolean(item.is_wp_site)}
-                  </td>
+                  {visibleColumns.map((col, colIndex) => {
+                    const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
+                    const isSticky = colIndex < stickyColumnCount;
+                    const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
+                    const leftPosition = isSticky ? `${colIndex * 150}px` : 'auto';
+                    const bgClass = 'bg-inherit';
+                    const isLastSticky = colIndex === stickyColumnCount - 1;
+
+                    return (
+                      <td
+                        key={col}
+                        className={`px-4 py-2 text-sm text-gray-900 relative ${stickyClass} ${bgClass} ${
+                          col === 'checkbox' || col === 'tool_buttons' || col === 'sync_actions' ? 'whitespace-nowrap' : ''
+                        }`}
+                        style={isSticky ? { left: leftPosition } : {}}
+                      >
+                        {hasLeftSeparator && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
+                        )}
+                        {col === 'checkbox' ? (
+                          <input
+                            type="checkbox"
+                            checked={selectedSites.has(item.id)}
+                            onChange={(e) => handleSiteSelection(item.id, e.target.checked)}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                        ) : col === 'tool_buttons' ? (
+                          <Link
+                            href={`/sitnivid?site=${encodeURIComponent(item.sitespren_base || '')}`}
+                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          >
+                            Individual View
+                          </Link>
+                        ) : col === 'sync_actions' ? (
+                          <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                              <button
+                                className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                                onClick={() => handleWpsv2Sync(item.id, 'plugin_api')}
+                                disabled={syncLoading.has(item.id)}
+                              >
+                                {syncLoading.has(item.id) ? 'Syncing...' : 'Plugin API'}
+                              </button>
+                              <button
+                                className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                                onClick={() => handleWpsv2Sync(item.id, 'rest_api')}
+                                disabled={syncLoading.has(item.id)}
+                              >
+                                {syncLoading.has(item.id) ? 'Syncing...' : 'Rest API'}
+                              </button>
+                              <button
+                                className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+                                onClick={() => handleWpsv2TestPlugin(item.id)}
+                                disabled={syncLoading.has(`test_${item.id}`)}
+                              >
+                                {syncLoading.has(`test_${item.id}`) ? 'Testing...' : 'Test Plugin'}
+                              </button>
+                            </div>
+                            {(syncResults[item.id] || syncResults[`test_${item.id}`]) && (
+                              <div className={`text-xs p-2 rounded ${
+                                (syncResults[item.id]?.type === 'success' || syncResults[`test_${item.id}`]?.type === 'success') 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {syncResults[item.id]?.message || syncResults[`test_${item.id}`]?.message}
+                              </div>
+                            )}
+                          </div>
+                        ) : col === 'id' ? (
+                          <span className="text-xs">{truncateText(item.id, 8)}...</span>
+                        ) : col === 'created_at' || col === 'updated_at' ? (
+                          formatDate(item[col as keyof SitesprenRecord] as string)
+                        ) : col === 'fk_users_id' || col === 'fk_domreg_hostaccount' ? (
+                          <span className="text-xs">{item[col as keyof SitesprenRecord] ? truncateText(item[col as keyof SitesprenRecord] as string, 8) + '...' : '-'}</span>
+                        ) : col === 'wppass1' ? (
+                          item.wppass1 ? '***' : '-'
+                        ) : col === 'ruplin_apikey' || col === 'wp_rest_app_pass' ? (
+                          item[col as keyof SitesprenRecord] ? truncateText(item[col as keyof SitesprenRecord] as string, 15) : '-'
+                        ) : col === 'wp_plugin_installed1' || col === 'wp_plugin_connected2' || col === 'is_wp_site' ? (
+                          <div className="text-center">{formatBoolean(item[col as keyof SitesprenRecord] as boolean | null)}</div>
+                        ) : col === 'sitespren_base' ? (
+                          <span className="font-medium">{item.sitespren_base || '-'}</span>
+                        ) : (
+                          item[col as keyof SitesprenRecord] || '-'
+                        )}
+                        {hasRightSeparator && (
+                          <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                        )}
+                        {isLastSticky && (
+                          <div className="absolute right-0 top-0 bottom-0 bg-black" style={{width: '4px'}}></div>
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
