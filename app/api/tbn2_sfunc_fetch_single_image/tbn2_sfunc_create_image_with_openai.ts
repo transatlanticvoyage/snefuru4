@@ -28,28 +28,53 @@ export async function tbn2_sfunc_create_image_with_openai({
 }: Tbn2ImageGenerationParams): Promise<Tbn2ImageGenerationResult> {
   
   try {
-    // Get user's API key from api_keys_t3 table using proper relationship lookup
+    // Get user's API key from api_keys_t3 table using correct field names and approach
     const supabase = createRouteHandlerClient({ cookies });
     
-    const { data: apiKeyData, error: apiKeyError } = await supabase
-      .from('api_keys_t3')
-      .select(`
-        m1datum,
-        api_key_slots!fk_api_key_slots_id(slot_name)
-      `)
-      .eq('rel_users_id', userId)
-      .ilike('api_key_slots.slot_name', aiModel);
+    // Step 1: Get matching slot for the AI model
+    const { data: slotData, error: slotError } = await supabase
+      .from('api_key_slots')
+      .select('slot_id, slot_name')
+      .ilike('slot_name', aiModel)
+      .single();
     
-    if (apiKeyError || !apiKeyData || apiKeyData.length === 0) {
+    if (slotError || !slotData) {
       await logger.error({
         category: 'tbn2_api_key_lookup',
-        message: `Failed to retrieve user API key for ${aiModel} from api_keys_t3`,
+        message: `No slot found for AI model: ${aiModel}`,
         details: {
           userId: userId,
           aiModel: aiModel,
+          error: slotError?.message || 'No matching slot found'
+        }
+      });
+      
+      return {
+        success: false,
+        error: `AI model "${aiModel}" is not supported. Please use a supported AI model.`
+      };
+    }
+    
+    // Step 2: Get user's API key for this slot
+    const { data: apiKeyData, error: apiKeyError } = await supabase
+      .from('api_keys_t3')
+      .select('m1datum')
+      .eq('fk_user_id', userId)
+      .eq('fk_slot_id', slotData.slot_id)
+      .single();
+    
+    if (apiKeyError || !apiKeyData || !apiKeyData.m1datum) {
+      await logger.error({
+        category: 'tbn2_api_key_lookup',
+        message: `No API key configured for ${aiModel} (slot: ${slotData.slot_name})`,
+        details: {
+          userId: userId,
+          aiModel: aiModel,
+          slotId: slotData.slot_id,
+          slotName: slotData.slot_name,
           error: apiKeyError?.message || 'No API key found',
           hasApiKeyData: !!apiKeyData,
-          dataLength: apiKeyData?.length || 0
+          hasM1Datum: !!(apiKeyData?.m1datum)
         }
       });
       
@@ -59,37 +84,18 @@ export async function tbn2_sfunc_create_image_with_openai({
       };
     }
     
-    // Find the matching API key record
-    const matchingApiKey = apiKeyData.find(record => {
-      const slots = record.api_key_slots as any;
-      // Handle both single object and array cases
-      const slotName = Array.isArray(slots) ? slots[0]?.slot_name : slots?.slot_name;
-      return slotName?.toLowerCase() === aiModel.toLowerCase();
+    const apiKey = apiKeyData.m1datum;
+    
+    await logger.info({
+      category: 'tbn2_api_key_lookup',
+      message: `Successfully retrieved API key for ${aiModel}`,
+      details: {
+        userId: userId,
+        aiModel: aiModel,
+        slotName: slotData.slot_name,
+        hasApiKey: !!apiKey
+      }
     });
-    
-    if (!matchingApiKey || !matchingApiKey.m1datum) {
-      await logger.error({
-        category: 'tbn2_api_key_lookup',
-        message: `No matching API key found for ${aiModel}`,
-        details: {
-          userId: userId,
-          aiModel: aiModel,
-          availableSlots: apiKeyData.map(record => {
-            const slots = record.api_key_slots as any;
-            return Array.isArray(slots) ? slots[0]?.slot_name : slots?.slot_name;
-          }).filter(Boolean),
-          hasMatchingKey: !!matchingApiKey,
-          hasM1Datum: !!(matchingApiKey?.m1datum)
-        }
-      });
-      
-      return {
-        success: false,
-        error: `${aiModel} API key not found in configured slots. Please configure your ${aiModel} API key.`
-      };
-    }
-    
-    const apiKey = matchingApiKey.m1datum;
 
     // Generate image with OpenAI DALL-E
     const openaiResponse = await fetch('https://api.openai.com/v1/images/generations', {
