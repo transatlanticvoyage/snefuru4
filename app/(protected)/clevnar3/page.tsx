@@ -81,6 +81,8 @@ export default function Clevnar3Page() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingFields, setEditingFields] = useState<{[key: string]: string}>({});
   const [savingFields, setSavingFields] = useState<Set<string>>(new Set());
+  const [selectedColumnTemplate, setSelectedColumnTemplate] = useState('option1');
+  const [selectedStickyColumns, setSelectedStickyColumns] = useState('option1');
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
@@ -88,6 +90,14 @@ export default function Clevnar3Page() {
 
   useEffect(() => {
     document.title = 'clevnar3 - Snefuru';
+    
+    // Load state from URL parameters and localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const colTempParam = urlParams.get('coltemp') || localStorage.getItem('clevnar3_coltemp') || 'option1';
+    const stickyColParam = urlParams.get('stickycol') || localStorage.getItem('clevnar3_stickycol') || 'option1';
+    
+    setSelectedColumnTemplate(colTempParam);
+    setSelectedStickyColumns(stickyColParam);
   }, []);
 
   useEffect(() => {
@@ -267,6 +277,51 @@ export default function Clevnar3Page() {
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
     setCurrentPage(1);
+  };
+
+  // Column template logic
+  const getVisibleColumns = () => {
+    switch (selectedColumnTemplate) {
+      case 'option1': return columns; // All columns
+      case 'option2': return columns.slice(0, 7); // Columns 1-7
+      case 'option3': return columns.slice(7, 14); // Columns 8-14
+      case 'option4': return columns.slice(14, 21); // Columns 15-21
+      case 'option5': return columns.slice(21, 28); // Columns 22-28
+      default: return columns;
+    }
+  };
+
+  const getStickyColumnCount = () => {
+    switch (selectedStickyColumns) {
+      case 'option1': return 1;
+      case 'option2': return 2;
+      case 'option3': return 3;
+      case 'option4': return 4;
+      case 'option5': return 5;
+      default: return 1;
+    }
+  };
+
+  const updateUrlAndStorage = (colTemp: string, stickyCol: string) => {
+    // Update URL
+    const url = new URL(window.location.href);
+    url.searchParams.set('coltemp', colTemp);
+    url.searchParams.set('stickycol', stickyCol);
+    window.history.replaceState({}, '', url.toString());
+    
+    // Update localStorage
+    localStorage.setItem('clevnar3_coltemp', colTemp);
+    localStorage.setItem('clevnar3_stickycol', stickyCol);
+  };
+
+  const handleColumnTemplateChange = (option: string) => {
+    setSelectedColumnTemplate(option);
+    updateUrlAndStorage(option, selectedStickyColumns);
+  };
+
+  const handleStickyColumnsChange = (option: string) => {
+    setSelectedStickyColumns(option);
+    updateUrlAndStorage(selectedColumnTemplate, option);
   };
 
   const handleSaveApiKey = async (slotId: string, moduleNumber: string, apiKeyValue: string) => {
@@ -517,10 +572,80 @@ export default function Clevnar3Page() {
   if (loading) return <div className="p-6">Loading API key slots...</div>;
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
 
+  const visibleColumns = getVisibleColumns();
+  const stickyColumnCount = getStickyColumnCount();
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-2">API Key Slots Management</h1>
       <p className="text-sm text-gray-600 mb-6">SQL View: sqlview_apikeysjoined1 (api_key_slots LEFT JOIN api_keys_t3)</p>
+      
+      {/* Column Template Control Bar */}
+      <div className="mb-6 flex items-stretch space-x-4">
+        {/* SQL View Info */}
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-xs" style={{maxWidth: '130px', maxHeight: '75px'}}>
+          <div className="font-semibold text-gray-700 mb-1">SQL View Info</div>
+          <div className="text-gray-600">view name: sqlview_apikeysjoined1</div>
+          <div className="text-gray-600"># columns: {columns.length}</div>
+        </div>
+
+        {/* Column Template Options */}
+        <div className="bg-white border border-gray-300 rounded-lg p-2" style={{maxWidth: '600px', maxHeight: '75px'}}>
+          <div className="flex space-x-1">
+            {[
+              { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-~' },
+              { id: 'option2', label: 'OPTION 2', subtitle: 'col temp a', range: 'columns 1-7' },
+              { id: 'option3', label: 'OPTION 3', subtitle: 'col temp b', range: 'columns 8-14' },
+              { id: 'option4', label: 'OPTION 4', subtitle: 'col temp c', range: 'columns 15-21' },
+              { id: 'option5', label: 'OPTION 5', subtitle: 'col temp d', range: 'columns 22-28' }
+            ].map(option => (
+              <button
+                key={option.id}
+                onClick={() => handleColumnTemplateChange(option.id)}
+                className={`text-xs leading-tight p-2 rounded border text-center ${
+                  selectedColumnTemplate === option.id
+                    ? 'bg-blue-900 text-white border-blue-900'
+                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                }`}
+                style={{width: '120px'}}
+              >
+                <div className="font-semibold">{option.label}</div>
+                <div>{option.subtitle}</div>
+                <div>{option.range}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sticky Columns Control */}
+        <div className="bg-white border border-gray-300 rounded-lg p-2">
+          <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns</div>
+          <div className="flex space-x-1">
+            {[
+              { id: 'option1', label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
+              { id: 'option2', label: 'OPTION 2', subtitle: '2 left-most', range: 'columns' },
+              { id: 'option3', label: 'OPTION 3', subtitle: '3 left-most', range: 'columns' },
+              { id: 'option4', label: 'OPTION 4', subtitle: '4 left-most', range: 'columns' },
+              { id: 'option5', label: 'OPTION 5', subtitle: '5 left-most', range: 'columns' }
+            ].map(option => (
+              <button
+                key={option.id}
+                onClick={() => handleStickyColumnsChange(option.id)}
+                className={`text-xs leading-tight p-1 rounded border text-center ${
+                  selectedStickyColumns === option.id
+                    ? 'bg-blue-900 text-white border-blue-900'
+                    : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                }`}
+                style={{width: '80px'}}
+              >
+                <div className="font-semibold">{option.label}</div>
+                <div>{option.subtitle}</div>
+                <div>{option.range}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
       
       {/* Search and Filter Section */}
       <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -588,15 +713,17 @@ export default function Clevnar3Page() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th colSpan={18} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50">
+              <th colSpan={Math.min(visibleColumns.length, 18)} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50">
                 API Key Slots (Primary Entity)
               </th>
-              <th colSpan={10} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-green-50">
-                User API Keys (Joined Data)
-              </th>
+              {visibleColumns.length > 18 && (
+                <th colSpan={Math.min(visibleColumns.length - 18, 10)} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-green-50">
+                  User API Keys (Joined Data)
+                </th>
+              )}
             </tr>
             <tr>
-              {columns.map(col => {
+              {visibleColumns.map((col, index) => {
                 // Determine background color based on column type
                 let bgColor = 'bg-blue-50'; // Default for api_key_slots columns
                 
@@ -608,13 +735,22 @@ export default function Clevnar3Page() {
                 } else if (col.startsWith('m') && col.endsWith('inuse')) {
                   bgColor = 'bg-blue-50'; // m*inuse are from api_key_slots
                 }
+
+                // Add sticky styling for left-most columns
+                const isSticky = index < stickyColumnCount;
+                const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
+                const leftPosition = isSticky ? `${index * 150}px` : 'auto';
                 
                 return (
                   <th 
                     key={col} 
-                    className={`px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider ${bgColor}`}
+                    className={`px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider ${bgColor} ${stickyClass}`}
+                    style={isSticky ? { left: leftPosition } : {}}
                   >
                     {col}
+                    {index === stickyColumnCount - 1 && (
+                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                    )}
                   </th>
                 );
               })}
@@ -623,13 +759,28 @@ export default function Clevnar3Page() {
           <tbody className="bg-white divide-y divide-gray-200">
             {currentItems.map((item, index) => (
               <tr key={item.slot_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                {columns.map(col => (
-                  <td key={col} className="px-6 py-4 text-sm text-gray-900">
-                    <div className={col.includes('datum') ? 'min-w-48' : 'max-w-xs'}>
-                      {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
-                    </div>
-                  </td>
-                ))}
+                {visibleColumns.map((col, colIndex) => {
+                  // Add sticky styling for left-most columns
+                  const isSticky = colIndex < stickyColumnCount;
+                  const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
+                  const leftPosition = isSticky ? `${colIndex * 150}px` : 'auto';
+                  const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                  
+                  return (
+                    <td 
+                      key={col} 
+                      className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative`}
+                      style={isSticky ? { left: leftPosition } : {}}
+                    >
+                      <div className={col.includes('datum') ? 'min-w-48' : 'max-w-xs'}>
+                        {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
+                      </div>
+                      {colIndex === stickyColumnCount - 1 && (
+                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
