@@ -160,12 +160,13 @@ export async function POST(request: Request) {
     }
 
     try {
-      // Generate image using OpenAI
+      // Generate image using the specified AI model
       const imageResult = await tbn2_sfunc_create_image_with_openai({
         prompt: prompt.trim(),
         userId: userData.id,
         batchFolder: `${batchFolder}/${planFolder}`,
         fileName: imageFileName,
+        aiModel: aiModel,
         wipeMeta: wipeMeta
       });
 

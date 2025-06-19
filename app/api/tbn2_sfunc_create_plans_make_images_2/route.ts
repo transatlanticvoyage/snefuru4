@@ -185,6 +185,7 @@ export async function POST(request: Request) {
             userId: userData.id, 
             batchFolder: `${batchFolder}/${planFolder}`, 
             fileName: imageFileName,
+            aiModel: aiModel,
             wipeMeta: wipeMeta || false
           });
           
