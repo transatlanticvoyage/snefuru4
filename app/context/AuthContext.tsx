@@ -7,7 +7,8 @@ import { User } from '@supabase/supabase-js';
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  isAdmin: boolean;
+  isAdmin: boolean | null;
+  checkAdminStatus: () => Promise<boolean>;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -20,39 +21,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const supabase = createClientComponentClient();
 
+  // Function to check admin status on-demand
+  const checkAdminStatus = async (): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('is_admin')
+        .eq('auth_id', user.id)
+        .single();
+      
+      const adminStatus = !error && userData?.is_admin === true;
+      setIsAdmin(adminStatus);
+      return adminStatus;
+    } catch (error) {
+      console.warn('Could not fetch admin status:', error);
+      setIsAdmin(false);
+      return false;
+    }
+  };
+
   useEffect(() => {
-    // Check active sessions and sets the user
+    // Simple auth initialization - no database calls
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
-        
-        // Fetch is_admin status if user is logged in
-        if (session?.user) {
-          try {
-            const { data: userData, error } = await supabase
-              .from('users')
-              .select('is_admin')
-              .eq('auth_id', session.user.id)
-              .single();
-            
-            if (!error && userData && userData.is_admin !== undefined) {
-              setIsAdmin(userData.is_admin || false);
-            } else {
-              // Column doesn't exist yet or user not found - default to false
-              setIsAdmin(false);
-            }
-          } catch (error) {
-            // If there's any error (like column not existing), default to false
-            console.warn('Could not fetch admin status (column may not exist yet):', error);
-            setIsAdmin(false);
-          }
-        } else {
-          setIsAdmin(false);
-        }
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
@@ -63,33 +61,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      
-      // Fetch is_admin status when auth state changes
-      if (session?.user) {
-        try {
-          const { data: userData, error } = await supabase
-            .from('users')
-            .select('is_admin')
-            .eq('auth_id', session.user.id)
-            .single();
-          
-          if (!error && userData && userData.is_admin !== undefined) {
-            setIsAdmin(userData.is_admin || false);
-          } else {
-            // Column doesn't exist yet or user not found - default to false
-            setIsAdmin(false);
-          }
-        } catch (error) {
-          // If there's any error (like column not existing), default to false
-          console.warn('Could not fetch admin status (column may not exist yet):', error);
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
-      }
-      
+      setIsAdmin(null); // Reset admin status when auth changes
       setLoading(false);
     });
 
@@ -108,39 +82,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Create a record in the users table
     if (data.user) {
-      try {
-        const insertData: any = {
+      const { error: userError } = await supabase
+        .from('users')
+        .insert({
           auth_id: data.user.id,
           email: data.user.email,
+          is_admin: false,
           created_at: new Date().toISOString(),
-        };
-        
-        // Only add is_admin if the column exists (after migration)
-        try {
-          // Test if is_admin column exists by trying to select it
-          await supabase
-            .from('users')
-            .select('is_admin')
-            .limit(1);
-          
-          // If no error, column exists, so include it
-          insertData.is_admin = false;
-        } catch (columnError) {
-          // Column doesn't exist yet, skip it
-          console.warn('is_admin column not yet available, skipping');
-        }
-        
-        const { error: userError } = await supabase
-          .from('users')
-          .insert(insertData);
-        
-        if (userError) {
-          console.error('Error creating user record:', userError);
-          throw new Error('Failed to create user record');
-        }
-      } catch (error) {
-        console.error('Error in user record creation:', error);
-        // Don't throw here as this might be due to the column not existing yet
+        });
+      
+      if (userError) {
+        console.error('Error creating user record:', userError);
+        throw new Error('Failed to create user record');
       }
     }
   };
@@ -151,32 +104,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
     });
     if (error) throw error;
-    
-    // Fetch is_admin status after successful sign in
-    if (data.user) {
-      try {
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('is_admin')
-          .eq('auth_id', data.user.id)
-          .single();
-        
-        if (!userError && userData && userData.is_admin !== undefined) {
-          setIsAdmin(userData.is_admin || false);
-        } else {
-          setIsAdmin(false);
-        }
-      } catch (error) {
-        console.warn('Could not fetch admin status on sign in:', error);
-        setIsAdmin(false);
-      }
-    }
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    setIsAdmin(false);
+    setIsAdmin(null); // Reset admin status on logout
   };
 
   const resetPassword = async (email: string) => {
@@ -198,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       loading,
       isAdmin,
+      checkAdminStatus,
       signUp,
       signIn,
       signOut,
