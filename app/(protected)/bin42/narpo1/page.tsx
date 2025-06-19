@@ -10,6 +10,7 @@ interface NarpiPush {
   created_at: string;
   push_status1: string;
   fk_batch_id: string;
+  kareench1: any;
   images_plans_batches?: {
     rel_users_id: string;
   };
