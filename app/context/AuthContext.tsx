@@ -31,14 +31,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Simple admin check - if user exists, check their admin status
         if (session?.user) {
-          const { data: userData } = await supabase
-            .from('users')
-            .select('is_admin')
-            .eq('auth_id', session.user.id)
-            .single();
-          
-          if (userData && userData.is_admin === true) {
-            setIsAdmin(true);
+          try {
+            const { data: userData, error } = await supabase
+              .from('users')
+              .select('is_admin')
+              .eq('auth_id', session.user.id)
+              .single();
+            
+            if (error) {
+              console.warn('Admin check error:', error);
+              // Don't throw - just continue without admin
+            } else if (userData && userData.is_admin === true) {
+              setIsAdmin(true);
+            }
+          } catch (err) {
+            console.warn('Admin check failed:', err);
+            // Continue without admin status
           }
         }
       } catch (error) {
@@ -59,14 +67,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Check admin status for new session
       if (session?.user) {
-        const { data: userData } = await supabase
-          .from('users')
-          .select('is_admin')
-          .eq('auth_id', session.user.id)
-          .single();
-        
-        if (userData && userData.is_admin === true) {
-          setIsAdmin(true);
+        try {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('is_admin')
+            .eq('auth_id', session.user.id)
+            .single();
+          
+          if (error) {
+            console.warn('Admin check error in auth state change:', error);
+            // Don't throw - just continue without admin
+          } else if (userData && userData.is_admin === true) {
+            setIsAdmin(true);
+          }
+        } catch (err) {
+          console.warn('Admin check failed in auth state change:', err);
+          // Continue without admin status
         }
       }
       
