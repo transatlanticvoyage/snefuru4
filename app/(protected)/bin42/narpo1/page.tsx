@@ -157,7 +157,7 @@ export default function Narpo1Page() {
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Narpi Image Pushes</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Narpi Image Pushes 383</h1>
               <p className="text-sm text-gray-500 mt-1">
                 Manage and track your WordPress content pushes
               </p>
