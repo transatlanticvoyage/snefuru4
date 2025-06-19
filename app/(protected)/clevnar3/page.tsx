@@ -342,7 +342,6 @@ export default function Clevnar3Page() {
   };
 
   const formatColumnData = (col: string, value: any, item?: ApiKeySlotJoined) => {
-    if (value === null || value === undefined) return '-';
     
     switch (col) {
       case 'slot_id':
@@ -360,9 +359,10 @@ export default function Clevnar3Page() {
       case 'm1datum':
       case 'm2datum':
       case 'm3datum':
+        // Always show interactive elements for datum fields when user is logged in
         if (!item || !user?.id) {
           if (value === null || value === undefined) return '-';
-          // Show masked API key
+          // Show masked API key for non-logged in users
           const keyLength = value.length;
           if (keyLength <= 8) return '********';
           return value.substring(0, 4) + '...' + value.substring(keyLength - 4);
@@ -374,7 +374,11 @@ export default function Clevnar3Page() {
         const isModuleInUse = item[inUseField] as boolean;
         
         if (!isModuleInUse) {
-          return '-'; // Module not in use, show dash
+          return (
+            <span className="text-gray-400 italic text-sm">
+              Module not active
+            </span>
+          );
         }
         
         const fieldKey = `${item.slot_id}_${moduleNumber}`;
@@ -383,21 +387,21 @@ export default function Clevnar3Page() {
         
         if (isEditing) {
           return (
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 min-w-0">
               <input
                 type="text"
                 value={editingFields[fieldKey] || ''}
                 onChange={(e) => setEditingFields({...editingFields, [fieldKey]: e.target.value})}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 placeholder={`Enter ${moduleNumber} API key`}
                 disabled={isSaving}
               />
               <button
                 onClick={() => handleSaveApiKey(item.slot_id, moduleNumber, editingFields[fieldKey] || '')}
                 disabled={isSaving || !editingFields[fieldKey]?.trim()}
-                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSaving ? 'Saving...' : 'Save'}
+                {isSaving ? '...' : 'Save'}
               </button>
               <button
                 onClick={() => {
@@ -406,9 +410,9 @@ export default function Clevnar3Page() {
                   setEditingFields(newEditingFields);
                 }}
                 disabled={isSaving}
-                className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                ✕
               </button>
             </div>
           );
@@ -419,20 +423,20 @@ export default function Clevnar3Page() {
           return (
             <button
               onClick={() => setEditingFields({...editingFields, [fieldKey]: ''})}
-              className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Add API Key
+              + Add Key
             </button>
           );
         } else {
           return (
             <div className="flex items-center space-x-2">
-              <span className="font-mono text-xs">
-                {value.length <= 8 ? '********' : value.substring(0, 4) + '...' + value.substring(value.length - 4)}
+              <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                {value.length <= 8 ? '••••••••' : value.substring(0, 4) + '••••' + value.substring(value.length - 4)}
               </span>
               <button
                 onClick={() => setEditingFields({...editingFields, [fieldKey]: value})}
-                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Edit
               </button>
@@ -459,6 +463,7 @@ export default function Clevnar3Page() {
           </span>
         );
       default:
+        if (value === null || value === undefined) return '-';
         return String(value);
     }
   };
@@ -614,8 +619,8 @@ export default function Clevnar3Page() {
             {currentItems.map((item, index) => (
               <tr key={item.slot_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 {columns.map(col => (
-                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="max-w-xs">
+                  <td key={col} className="px-6 py-4 text-sm text-gray-900">
+                    <div className={col.includes('datum') ? 'min-w-48' : 'max-w-xs'}>
                       {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
                     </div>
                   </td>
