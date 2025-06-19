@@ -116,14 +116,47 @@ export default function Clevnar3Page() {
       if (!user?.id) {
         // Even without user, we can show public slots
         const { data: publicSlots, error: slotsError } = await supabase
-          .from('sqlview_apikeysjoined1')
+          .from('api_key_slots')
           .select('*')
-          .is('fk_user_id', null) // Only slots without user keys
-          .order('slot_created_at', { ascending: false });
+          .eq('slot_publicly_shown', true)
+          .order('created_at', { ascending: false });
           
         if (slotsError) throw slotsError;
-        setData(publicSlots || []);
-        setFilteredData(publicSlots || []);
+        
+        // Transform to match expected structure
+        const transformedSlots = (publicSlots || []).map(slot => ({
+          // api_key_slots columns
+          slot_id: slot.slot_id,
+          slot_name: slot.slot_name,
+          m1name: slot.m1name,
+          m1inuse: slot.m1inuse,
+          m2name: slot.m2name,
+          m2inuse: slot.m2inuse,
+          m3name: slot.m3name,
+          m3inuse: slot.m3inuse,
+          slot_created_at: slot.created_at,
+          slot_updated_at: slot.updated_at,
+          fk_iservices_provider_id: slot.fk_iservices_provider_id,
+          slot_publicly_shown: slot.slot_publicly_shown,
+          fk_ai_model_id: slot.fk_ai_model_id,
+          count_active_modules_on_slot: slot.count_active_modules_on_slot,
+          is_ai_model: slot.is_ai_model,
+          
+          // api_keys_t3 columns (all null for no user)
+          api_key_id: null,
+          fk_user_id: null,
+          fk_slot_id: null,
+          key_created_at: null,
+          key_updated_at: null,
+          d_m1name: null,
+          d_m2name: null,
+          d_m3name: null,
+          d_slot_name: null,
+          d_user_email: null
+        }));
+        
+        setData(transformedSlots);
+        setFilteredData(transformedSlots);
         setLoading(false);
         return;
       }
@@ -142,37 +175,61 @@ export default function Clevnar3Page() {
         return;
       }
       
-      // Fetch all public slots with user's associated keys
-      const { data: joinedData, error: joinedError } = await supabase
-        .from('sqlview_apikeysjoined1')
+      // Fetch public slots first
+      const { data: slotsData, error: slotsError } = await supabase
+        .from('api_key_slots')
         .select('*')
-        .or(`fk_user_id.is.null,fk_user_id.eq.${userData.id}`)
-        .order('slot_created_at', { ascending: false });
+        .eq('slot_publicly_shown', true)
+        .order('created_at', { ascending: false });
         
-      if (joinedError) throw joinedError;
+      if (slotsError) throw slotsError;
       
-      // Group by slot_id to ensure one row per slot
-      const groupedData = new Map<string, ApiKeySlotJoined>();
-      
-      (joinedData || []).forEach(item => {
-        const slotId = item.slot_id;
+      // Fetch user's api keys
+      const { data: keysData, error: keysError } = await supabase
+        .from('api_keys_t3')
+        .select('*')
+        .eq('fk_user_id', userData.id);
         
-        if (!groupedData.has(slotId)) {
-          // First time seeing this slot
-          groupedData.set(slotId, item);
-        } else {
-          // Slot already exists, update with user data if this row has it
-          const existing = groupedData.get(slotId)!;
-          if (item.fk_user_id === userData.id && !existing.fk_user_id) {
-            // This row has user data and existing doesn't
-            groupedData.set(slotId, { ...existing, ...item });
-          }
-        }
+      if (keysError) throw keysError;
+      
+      // Manually join the data
+      const joinedData = (slotsData || []).map(slot => {
+        const userKey = (keysData || []).find(key => key.fk_slot_id === slot.slot_id);
+        
+        return {
+          // api_key_slots columns (rename to match view structure)
+          slot_id: slot.slot_id,
+          slot_name: slot.slot_name,
+          m1name: slot.m1name,
+          m1inuse: slot.m1inuse,
+          m2name: slot.m2name,
+          m2inuse: slot.m2inuse,
+          m3name: slot.m3name,
+          m3inuse: slot.m3inuse,
+          slot_created_at: slot.created_at,
+          slot_updated_at: slot.updated_at,
+          fk_iservices_provider_id: slot.fk_iservices_provider_id,
+          slot_publicly_shown: slot.slot_publicly_shown,
+          fk_ai_model_id: slot.fk_ai_model_id,
+          count_active_modules_on_slot: slot.count_active_modules_on_slot,
+          is_ai_model: slot.is_ai_model,
+          
+          // api_keys_t3 columns (can be null)
+          api_key_id: userKey?.api_key_id || null,
+          fk_user_id: userKey?.fk_user_id || null,
+          fk_slot_id: userKey?.fk_slot_id || null,
+          key_created_at: userKey?.created_at || null,
+          key_updated_at: userKey?.updated_at || null,
+          d_m1name: userKey?.d_m1name || null,
+          d_m2name: userKey?.d_m2name || null,
+          d_m3name: userKey?.d_m3name || null,
+          d_slot_name: userKey?.d_slot_name || null,
+          d_user_email: userKey?.d_user_email || null
+        };
       });
       
-      const finalData = Array.from(groupedData.values());
-      setData(finalData);
-      setFilteredData(finalData);
+      setData(joinedData);
+      setFilteredData(joinedData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch joined data');
       setData([]);
