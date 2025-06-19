@@ -281,14 +281,37 @@ export default function Clevnar3Page() {
 
   // Column template logic
   const getVisibleColumns = () => {
+    const stickyColumns = columns.slice(0, stickyColumnCount);
+    let templateColumns;
+    
     switch (selectedColumnTemplate) {
-      case 'option1': return columns; // All columns
-      case 'option2': return columns.slice(0, 7); // Columns 1-7
-      case 'option3': return columns.slice(7, 14); // Columns 8-14
-      case 'option4': return columns.slice(14, 21); // Columns 15-21
-      case 'option5': return columns.slice(21, 28); // Columns 22-28
-      default: return columns;
+      case 'option1': 
+        return columns; // All columns
+      case 'option2': 
+        templateColumns = columns.slice(0, 7); // Columns 1-7
+        break;
+      case 'option3': 
+        templateColumns = columns.slice(7, 14); // Columns 8-14
+        break;
+      case 'option4': 
+        templateColumns = columns.slice(14, 21); // Columns 15-21
+        break;
+      case 'option5': 
+        templateColumns = columns.slice(21, 28); // Columns 22-28
+        break;
+      default: 
+        return columns;
     }
+    
+    // Combine sticky columns with template columns, removing duplicates
+    const combinedColumns = [...stickyColumns];
+    templateColumns.forEach(col => {
+      if (!stickyColumns.includes(col)) {
+        combinedColumns.push(col);
+      }
+    });
+    
+    return combinedColumns;
   };
 
   const getStickyColumnCount = () => {
@@ -576,9 +599,10 @@ export default function Clevnar3Page() {
   const stickyColumnCount = getStickyColumnCount();
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">API Key Slots Management</h1>
-      <p className="text-sm text-gray-600 mb-6">SQL View: sqlview_apikeysjoined1 (api_key_slots LEFT JOIN api_keys_t3)</p>
+    <div className="w-full min-h-screen bg-gray-50">
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">API Key Slots Management</h1>
+        <p className="text-sm text-gray-600 mb-6">SQL View: sqlview_apikeysjoined1 (api_key_slots LEFT JOIN api_keys_t3)</p>
       
       {/* Column Template Control Bar */}
       <div className="mb-6 flex items-stretch space-x-4">
@@ -736,28 +760,13 @@ export default function Clevnar3Page() {
                   bgColor = 'bg-blue-50'; // m*inuse are from api_key_slots
                 }
 
-                // Sticky logic: based on original column position in full columns array, not visible columns
-                const originalColumnIndex = columns.indexOf(col);
-                const isSticky = originalColumnIndex < stickyColumnCount && originalColumnIndex !== -1;
+                // Sticky logic: first N columns are always sticky
+                const isSticky = index < stickyColumnCount;
                 const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
+                const leftPosition = isSticky ? `${index * 150}px` : 'auto';
                 
-                // Calculate left position based on how many sticky columns appear before this one in visible columns
-                let stickyColumnsBeforeThis = 0;
-                for (let i = 0; i < index; i++) {
-                  const prevCol = visibleColumns[i];
-                  const prevColOriginalIndex = columns.indexOf(prevCol);
-                  if (prevColOriginalIndex < stickyColumnCount && prevColOriginalIndex !== -1) {
-                    stickyColumnsBeforeThis++;
-                  }
-                }
-                const leftPosition = isSticky ? `${stickyColumnsBeforeThis * 150}px` : 'auto';
-                
-                // Check if this is the last sticky column in the visible columns
-                const isLastStickyInVisible = isSticky && (index === visibleColumns.length - 1 || 
-                  visibleColumns.slice(index + 1).every(nextCol => {
-                    const nextColOriginalIndex = columns.indexOf(nextCol);
-                    return nextColOriginalIndex >= stickyColumnCount || nextColOriginalIndex === -1;
-                  }));
+                // Check if this is the last sticky column
+                const isLastSticky = index === stickyColumnCount - 1;
                 
                 return (
                   <th 
@@ -766,7 +775,7 @@ export default function Clevnar3Page() {
                     style={isSticky ? { left: leftPosition } : {}}
                   >
                     {col}
-                    {isLastStickyInVisible && (
+                    {isLastSticky && (
                       <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
                     )}
                   </th>
@@ -778,29 +787,14 @@ export default function Clevnar3Page() {
             {currentItems.map((item, index) => (
               <tr key={item.slot_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 {visibleColumns.map((col, colIndex) => {
-                  // Sticky logic: based on original column position in full columns array, not visible columns
-                  const originalColumnIndex = columns.indexOf(col);
-                  const isSticky = originalColumnIndex < stickyColumnCount && originalColumnIndex !== -1;
+                  // Sticky logic: first N columns are always sticky
+                  const isSticky = colIndex < stickyColumnCount;
                   const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                  
-                  // Calculate left position based on how many sticky columns appear before this one in visible columns
-                  let stickyColumnsBeforeThis = 0;
-                  for (let i = 0; i < colIndex; i++) {
-                    const prevCol = visibleColumns[i];
-                    const prevColOriginalIndex = columns.indexOf(prevCol);
-                    if (prevColOriginalIndex < stickyColumnCount && prevColOriginalIndex !== -1) {
-                      stickyColumnsBeforeThis++;
-                    }
-                  }
-                  const leftPosition = isSticky ? `${stickyColumnsBeforeThis * 150}px` : 'auto';
+                  const leftPosition = isSticky ? `${colIndex * 150}px` : 'auto';
                   const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
                   
-                  // Check if this is the last sticky column in the visible columns
-                  const isLastStickyInVisible = isSticky && (colIndex === visibleColumns.length - 1 || 
-                    visibleColumns.slice(colIndex + 1).every(nextCol => {
-                      const nextColOriginalIndex = columns.indexOf(nextCol);
-                      return nextColOriginalIndex >= stickyColumnCount || nextColOriginalIndex === -1;
-                    }));
+                  // Check if this is the last sticky column
+                  const isLastSticky = colIndex === stickyColumnCount - 1;
                   
                   return (
                     <td 
@@ -811,7 +805,7 @@ export default function Clevnar3Page() {
                       <div className={col.includes('datum') ? 'min-w-48' : 'max-w-xs'}>
                         {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
                       </div>
-                      {isLastStickyInVisible && (
+                      {isLastSticky && (
                         <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
                       )}
                     </td>
@@ -916,6 +910,7 @@ export default function Clevnar3Page() {
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }
