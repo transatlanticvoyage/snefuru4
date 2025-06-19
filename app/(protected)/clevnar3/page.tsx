@@ -281,37 +281,55 @@ export default function Clevnar3Page() {
 
   // Column template logic
   const getVisibleColumns = () => {
+    const stickyColumnCount = getStickyColumnCount();
     const stickyColumns = columns.slice(0, stickyColumnCount);
-    let templateColumns;
     
     switch (selectedColumnTemplate) {
       case 'option1': 
         return columns; // All columns
-      case 'option2': 
-        templateColumns = columns.slice(0, 7); // Columns 1-7
-        break;
-      case 'option3': 
-        templateColumns = columns.slice(7, 14); // Columns 8-14
-        break;
-      case 'option4': 
-        templateColumns = columns.slice(14, 21); // Columns 15-21
-        break;
-      case 'option5': 
-        templateColumns = columns.slice(21, 28); // Columns 22-28
-        break;
+      case 'option2': {
+        const templateColumns = columns.slice(0, 7); // Columns 1-7
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option3': {
+        const templateColumns = columns.slice(7, 14); // Columns 8-14
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option4': {
+        const templateColumns = columns.slice(14, 21); // Columns 15-21
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option5': {
+        const templateColumns = columns.slice(21, 28); // Columns 22-28
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
       default: 
         return columns;
     }
-    
-    // Combine sticky columns with template columns, removing duplicates
-    const combinedColumns = [...stickyColumns];
-    templateColumns.forEach(col => {
-      if (!stickyColumns.includes(col)) {
-        combinedColumns.push(col);
-      }
-    });
-    
-    return combinedColumns;
   };
 
   const getStickyColumnCount = () => {
@@ -595,8 +613,8 @@ export default function Clevnar3Page() {
   if (loading) return <div className="p-6">Loading API key slots...</div>;
   if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
 
-  const visibleColumns = getVisibleColumns();
   const stickyColumnCount = getStickyColumnCount();
+  const visibleColumns = getVisibleColumns();
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
