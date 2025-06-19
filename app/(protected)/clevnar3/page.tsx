@@ -41,15 +41,15 @@ const columns = [
   // api_key_slots columns
   'slot_id',
   'slot_name',
+  'm1inuse',
   'm1name',
   'm1datum',
-  'm1inuse',
+  'm2inuse',
   'm2name',
   'm2datum', 
-  'm2inuse',
+  'm3inuse',
   'm3name',
   'm3datum',
-  'm3inuse',
   'slot_created_at',
   'slot_updated_at',
   'fk_iservices_provider_id',
@@ -605,6 +605,8 @@ export default function Clevnar3Page() {
                   bgColor = 'bg-green-50'; // api_keys_t3 columns
                 } else if (col === 'm1datum' || col === 'm2datum' || col === 'm3datum') {
                   bgColor = 'bg-green-50'; // m*datum are from api_keys_t3 but positioned with slots
+                } else if (col.startsWith('m') && col.endsWith('inuse')) {
+                  bgColor = 'bg-blue-50'; // m*inuse are from api_key_slots
                 }
                 
                 return (
