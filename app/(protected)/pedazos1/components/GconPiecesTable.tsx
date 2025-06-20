@@ -200,38 +200,38 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tool Buttons
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider">
+                  actions
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("meta_title")}
                 >
-                  Meta Title {sortField === "meta_title" && (sortOrder === "asc" ? "↑" : "↓")}
+                  meta_title {sortField === "meta_title" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  H1 Title
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider">
+                  h1title
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("asn_sitespren_base")}
                 >
-                  Site {sortField === "asn_sitespren_base" && (sortOrder === "asc" ? "↑" : "↓")}
+                  asn_sitespren_base {sortField === "asn_sitespren_base" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Page
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider">
+                  asn_nwpi_posts_id
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("created_at")}
                 >
-                  Created {sortField === "created_at" && (sortOrder === "asc" ? "↑" : "↓")}
+                  created_at {sortField === "created_at" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("updated_at")}
                 >
-                  Updated {sortField === "updated_at" && (sortOrder === "asc" ? "↑" : "↓")}
+                  updated_at {sortField === "updated_at" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
               </tr>
             </thead>
