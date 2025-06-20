@@ -24,6 +24,7 @@ export default function Narpo1Page() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState('option1');
   const [selectedStickyColumns, setSelectedStickyColumns] = useState('option1');
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -129,7 +130,26 @@ export default function Narpo1Page() {
   };
 
   // Column template system
-  const columns = ['view', 'push_name', 'push_desc', 'push_status1', 'created_at', 'fk_batch_id', 'kareench1', 'actions'];
+  const columns = ['select', 'view', 'push_name', 'push_desc', 'push_status1', 'created_at', 'fk_batch_id', 'kareench1', 'actions'];
+
+  // Row selection handlers
+  const handleSelectRow = (pushId: string) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(pushId)) {
+      newSelected.delete(pushId);
+    } else {
+      newSelected.add(pushId);
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRows.size === pushes.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(pushes.map(push => push.id)));
+    }
+  };
 
   const getVisibleColumns = () => {
     const stickyColumnCount = getStickyColumnCount();
@@ -407,7 +427,7 @@ export default function Narpo1Page() {
                       
                       // Determine background color
                       let bgColor = 'bg-blue-50'; // narpi_pushes table columns
-                      if (col === 'view' || col === 'actions') {
+                      if (col === 'select' || col === 'view' || col === 'actions') {
                         bgColor = 'bg-gray-100'; // UI action columns
                       }
                       
@@ -417,7 +437,17 @@ export default function Narpo1Page() {
                           className={`px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${bgColor} ${stickyClass} relative`}
                           style={isSticky ? { left: leftPosition } : {}}
                         >
-                          {col}
+                          {col === 'select' ? (
+                            <input
+                              type="checkbox"
+                              checked={selectedRows.size === pushes.length && pushes.length > 0}
+                              onChange={handleSelectAll}
+                              className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                              style={{width: '18px', height: '18px'}}
+                            />
+                          ) : (
+                            col
+                          )}
                           {isLastSticky && (
                             <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
                           )}
@@ -440,9 +470,19 @@ export default function Narpo1Page() {
                         return (
                           <td 
                             key={col} 
-                            className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative`}
+                            className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative ${col === 'select' ? 'cursor-pointer' : ''}`}
                             style={isSticky ? { left: leftPosition } : {}}
+                            onClick={col === 'select' ? () => handleSelectRow(push.id) : undefined}
                           >
+                            {col === 'select' && (
+                              <input
+                                type="checkbox"
+                                checked={selectedRows.has(push.id)}
+                                onChange={() => handleSelectRow(push.id)}
+                                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 pointer-events-none"
+                                style={{width: '18px', height: '18px'}}
+                              />
+                            )}
                             {col === 'view' && (
                               <button
                                 onClick={() => {
