@@ -16,6 +16,12 @@ interface GconPiece {
   asn_nwpi_posts_id: string | null;
   asn_imgplanbatch_id: string | null;
   image_pack1: any;
+  pub_status: string | null;
+  date_time_pub_carry: string | null;
+  pageslug: string | null;
+  pageurl: string | null;
+  pelementor_cached: any;
+  pelementor_edits: any;
   created_at: string;
   updated_at: string;
 }
@@ -25,17 +31,29 @@ interface GconPiecesTableProps {
   userId: string;
 }
 
-type SortField = "meta_title" | "asn_sitespren_base" | "created_at" | "updated_at";
+type SortField = "meta_title" | "asn_sitespren_base" | "pub_status" | "date_time_pub_carry" | "pageslug" | "created_at" | "updated_at";
 type SortOrder = "asc" | "desc";
 type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
 const allColumns = [
   'select',
   'actions',
+  'id',
   'meta_title', 
   'h1title',
+  'pgb_h1title',
+  'corpus1',
+  'corpus2',
   'asn_sitespren_base',
   'asn_nwpi_posts_id',
+  'asn_imgplanbatch_id',
+  'image_pack1',
+  'pub_status',
+  'date_time_pub_carry',
+  'pageslug',
+  'pageurl',
+  'pelementor_cached',
+  'pelementor_edits',
   'created_at',
   'updated_at'
 ];
@@ -43,7 +61,7 @@ const allColumns = [
 const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: string[] }> = {
   'option1': {
     name: 'col temp all',
-    range: 'columns 1-~',
+    range: 'columns 1-20',
     columns: allColumns
   },
   'option2': {
@@ -58,13 +76,13 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   },
   'option4': {
     name: 'col temp c',
-    range: 'columns 15-21',
-    columns: allColumns.slice(14, 21)
+    range: 'columns 15-20',
+    columns: allColumns.slice(14, 20)
   },
   'option5': {
     name: 'col temp d',
-    range: 'columns 22-28',
-    columns: allColumns.slice(21, 28)
+    range: 'empty',
+    columns: []
   }
 };
 
@@ -165,7 +183,10 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
         item.h1title?.toLowerCase().includes(searchLower) ||
         item.pgb_h1title?.toLowerCase().includes(searchLower) ||
         item.corpus1?.toLowerCase().includes(searchLower) ||
-        item.corpus2?.toLowerCase().includes(searchLower);
+        item.corpus2?.toLowerCase().includes(searchLower) ||
+        item.pageslug?.toLowerCase().includes(searchLower) ||
+        item.pageurl?.toLowerCase().includes(searchLower) ||
+        item.pub_status?.toLowerCase().includes(searchLower);
 
       // Site filter
       const matchesSite = !filterSite || item.asn_sitespren_base === filterSite;
@@ -389,7 +410,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
-                  const isSortable = ['meta_title', 'asn_sitespren_base', 'created_at', 'updated_at'].includes(col);
+                  const isSortable = ['meta_title', 'asn_sitespren_base', 'pub_status', 'date_time_pub_carry', 'pageslug', 'created_at', 'updated_at'].includes(col);
                   
                   return (
                     <th
@@ -477,15 +498,37 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                           >
                             Individual View
                           </Link>
-                        ) : col === 'created_at' || col === 'updated_at' ? (
+                        ) : col === 'created_at' || col === 'updated_at' || col === 'date_time_pub_carry' ? (
                           <span className="whitespace-nowrap text-gray-500">
-                            {formatDate(item[col])}
+                            {item[col] ? formatDate(item[col]) : '-'}
                           </span>
-                        ) : col === 'meta_title' || col === 'h1title' ? (
+                        ) : col === 'id' ? (
+                          <span className="whitespace-nowrap text-xs font-mono">
+                            {truncateText(item[col], 8)}
+                          </span>
+                        ) : col === 'meta_title' || col === 'h1title' || col === 'pgb_h1title' ? (
                           truncateText(item[col], 60)
-                        ) : col === 'asn_nwpi_posts_id' ? (
+                        ) : col === 'corpus1' || col === 'corpus2' ? (
+                          truncateText(item[col], 100)
+                        ) : col === 'asn_nwpi_posts_id' || col === 'asn_imgplanbatch_id' ? (
                           <span className="whitespace-nowrap">
                             {truncateText(item[col], 30)}
+                          </span>
+                        ) : col === 'pub_status' ? (
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            item[col] === 'published' ? 'bg-green-100 text-green-800' :
+                            item[col] === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {item[col] || 'draft'}
+                          </span>
+                        ) : col === 'pageslug' || col === 'pageurl' ? (
+                          <span className="whitespace-nowrap">
+                            {truncateText(item[col], 40)}
+                          </span>
+                        ) : col === 'image_pack1' || col === 'pelementor_cached' || col === 'pelementor_edits' ? (
+                          <span className="text-xs text-gray-500">
+                            {item[col] ? 'JSON data' : '-'}
                           </span>
                         ) : (
                           <span className="whitespace-nowrap">
