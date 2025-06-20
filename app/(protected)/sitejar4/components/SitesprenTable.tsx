@@ -416,7 +416,7 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
       {/* Column Template and View Control System */}
       <div className="flex items-start space-x-4">
         {/* SQL View Info */}
-        <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px', maxHeight: '75px'}}>
+        <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px'}}>
           <div className="text-xs font-semibold text-gray-700 mb-1">SQL View Info</div>
           <div className="text-xs text-gray-600">
             <div>view name: sitespren</div>
@@ -425,7 +425,7 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
         </div>
 
         {/* Column Template Button Bar */}
-        <div className="bg-white p-3 rounded-lg border shadow-sm" style={{width: '600px', maxHeight: '75px'}}>
+        <div className="bg-white p-3 rounded-lg border shadow-sm" style={{width: '600px'}}>
           <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
           <div className="flex space-x-1">
             {[
@@ -438,23 +438,23 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
               <button
                 key={option.id}
                 onClick={() => handleColumnTemplateChange(option.id)}
-                className={`text-xs leading-tight p-1 rounded border text-center ${
+                className={`text-xs leading-tight py-1 px-0.5 rounded border text-center ${
                   selectedColumnTemplate === option.id
                     ? 'bg-blue-900 text-white border-blue-900'
                     : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
                 }`}
-                style={{width: '120px'}}
+                style={{width: '115px', fontSize: '10px'}}
               >
-                <div className="font-semibold">{option.label}</div>
-                <div>{option.subtitle}</div>
-                <div>{option.range}</div>
+                <div className="font-semibold" style={{fontSize: '10px'}}>{option.label}</div>
+                <div style={{fontSize: '9px'}}>{option.subtitle}</div>
+                <div style={{fontSize: '9px'}}>{option.range}</div>
               </button>
             ))}
           </div>
         </div>
 
         {/* Sticky Columns Section */}
-        <div className="bg-white p-3 rounded-lg border shadow-sm" style={{maxHeight: '75px'}}>
+        <div className="bg-white p-3 rounded-lg border shadow-sm">
           <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
           <div className="flex space-x-1">
             {[
@@ -467,16 +467,16 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
               <button
                 key={option.id}
                 onClick={() => handleStickyColumnsChange(option.id)}
-                className={`text-xs leading-tight p-1 rounded border text-center ${
+                className={`text-xs leading-tight py-1 px-0.5 rounded border text-center ${
                   selectedStickyColumns === option.id
                     ? 'bg-blue-900 text-white border-blue-900'
                     : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
                 }`}
-                style={{width: '80px'}}
+                style={{width: '75px', fontSize: '10px'}}
               >
-                <div className="font-semibold">{option.label}</div>
-                <div>{option.subtitle}</div>
-                <div>{option.range}</div>
+                <div className="font-semibold" style={{fontSize: '10px'}}>{option.label}</div>
+                <div style={{fontSize: '9px'}}>{option.subtitle}</div>
+                <div style={{fontSize: '9px'}}>{option.range}</div>
               </button>
             ))}
           </div>
