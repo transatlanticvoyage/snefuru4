@@ -43,6 +43,10 @@ export default function Pedtor1Page() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
+    document.title = '/pedtor1 - Snefuru';
+  }, []);
+
+  useEffect(() => {
     if (!user) {
       router.push('/login');
       return;

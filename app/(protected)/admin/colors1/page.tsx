@@ -29,6 +29,10 @@ export default function Colors1Page() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
+    document.title = '/colors1 - Snefuru';
+  }, []);
+
+  useEffect(() => {
     if (user) {
       fetchCustomColors();
     }

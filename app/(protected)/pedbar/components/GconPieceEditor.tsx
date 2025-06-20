@@ -282,7 +282,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="asn_sitespren_base" className="block text-sm font-medium text-gray-700 mb-2">
-              Site Assignment (asn_sitespren_base)
+              Site Assignment - asn_sitespren_base
             </label>
             <input
               type="text"
@@ -295,7 +295,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
           </div>
           <div>
             <label htmlFor="asn_nwpi_posts_id" className="block text-sm font-medium text-gray-700 mb-2">
-              Page Assignment (asn_nwpi_posts_id)
+              Page Assignment - asn_nwpi_posts_id
             </label>
             <input
               type="text"
@@ -309,33 +309,35 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         </div>
 
         {/* Image Plan Batch Assignment */}
-        <div>
-          <label htmlFor="asn_imgplanbatch_id" className="block text-sm font-medium text-gray-700 mb-2">
-            Image Plan Batch Assignment (asn_imgplanbatch_id)
-          </label>
-          <select
-            id="asn_imgplanbatch_id"
-            value={formData.asn_imgplanbatch_id}
-            onChange={(e) => handleInputChange('asn_imgplanbatch_id', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            disabled={batchesLoading}
-          >
-            <option value="" disabled className="text-gray-500 font-medium">
-              id - name - note1
-            </option>
-            <option value="">Select a batch...</option>
-            {imagePlanBatches.map((batch) => (
-              <option key={batch.id} value={batch.id}>
-                {batch.id} - {batch.name || 'N/A'} - {batch.note1 || 'N/A'}
+        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+          <div>
+            <label htmlFor="asn_imgplanbatch_id" className="block text-sm font-medium text-gray-700 mb-2">
+              Image Plan Batch Assignment - asn_imgplanbatch_id
+            </label>
+            <select
+              id="asn_imgplanbatch_id"
+              value={formData.asn_imgplanbatch_id}
+              onChange={(e) => handleInputChange('asn_imgplanbatch_id', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={batchesLoading}
+            >
+              <option value="" disabled className="text-gray-500 font-medium">
+                id - name - note1
               </option>
-            ))}
-          </select>
+              <option value="">Select a batch...</option>
+              {imagePlanBatches.map((batch) => (
+                <option key={batch.id} value={batch.id}>
+                  {batch.id} - {batch.name || 'N/A'} - {batch.note1 || 'N/A'}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Meta Title */}
         <div>
           <label htmlFor="meta_title" className="block text-sm font-medium text-gray-700 mb-2">
-            Meta Title
+            Meta Title - meta_title
           </label>
           <input
             type="text"
@@ -350,7 +352,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         {/* H1 Title */}
         <div>
           <label htmlFor="h1title" className="block text-sm font-medium text-gray-700 mb-2">
-            H1 Title
+            H1 Title - h1title
           </label>
           <input
             type="text"
@@ -365,7 +367,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         {/* PGB H1 Title */}
         <div>
           <label htmlFor="pgb_h1title" className="block text-sm font-medium text-gray-700 mb-2">
-            PGB H1 Title
+            PGB H1 Title - pgb_h1title
           </label>
           <input
             type="text"
@@ -380,7 +382,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         {/* Corpus 1 */}
         <div>
           <label htmlFor="corpus1" className="block text-sm font-medium text-gray-700 mb-2">
-            Corpus 1
+            Corpus 1 - corpus1
           </label>
           <textarea
             id="corpus1"
@@ -395,7 +397,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         {/* Corpus 2 */}
         <div>
           <label htmlFor="corpus2" className="block text-sm font-medium text-gray-700 mb-2">
-            Corpus 2
+            Corpus 2 - corpus2
           </label>
           <textarea
             id="corpus2"
@@ -410,7 +412,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         {/* Image Pack 1 (JSON) */}
         <div>
           <label htmlFor="image_pack1" className="block text-sm font-medium text-gray-700 mb-2">
-            Image Pack 1 (JSON)
+            Image Pack 1 (JSON) - image_pack1
           </label>
           <textarea
             id="image_pack1"
@@ -435,7 +437,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         {/* Pelementor Cached (JSON) */}
         <div>
           <label htmlFor="pelementor_cached" className="block text-sm font-medium text-gray-700 mb-2">
-            Pelementor Cached (JSON)
+            Pelementor Cached (JSON) - pelementor_cached
           </label>
           <textarea
             id="pelementor_cached"
@@ -460,7 +462,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         {/* Pelementor Edits (JSON) */}
         <div>
           <label htmlFor="pelementor_edits" className="block text-sm font-medium text-gray-700 mb-2">
-            Pelementor Edits (JSON)
+            Pelementor Edits (JSON) - pelementor_edits
           </label>
           <textarea
             id="pelementor_edits"
@@ -486,7 +488,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="pub_status" className="block text-sm font-medium text-gray-700 mb-2">
-              Publication Status
+              Publication Status - pub_status
             </label>
             <select
               id="pub_status"
@@ -504,7 +506,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
           </div>
           <div>
             <label htmlFor="date_time_pub_carry" className="block text-sm font-medium text-gray-700 mb-2">
-              Publication Date
+              Publication Date - date_time_pub_carry
             </label>
             <input
               type="date"
@@ -520,7 +522,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="pageslug" className="block text-sm font-medium text-gray-700 mb-2">
-              Page Slug
+              Page Slug - pageslug
             </label>
             <input
               type="text"
@@ -533,7 +535,7 @@ export default function GconPieceEditor({ gconPiece, userInternalId, onUpdate }:
           </div>
           <div>
             <label htmlFor="pageurl" className="block text-sm font-medium text-gray-700 mb-2">
-              Page URL
+              Page URL - pageurl
             </label>
             <input
               type="url"
