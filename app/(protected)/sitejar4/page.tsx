@@ -20,6 +20,40 @@ export default function Sitejar4Page() {
 
   useEffect(() => {
     document.title = 'sitejar4 - Snefuru';
+    
+    // Add custom styles to make main element full width for this page only
+    const style = document.createElement('style');
+    style.textContent = `
+      body > div.min-h-screen.bg-gray-50 > main {
+        margin-left: 8px !important;
+        margin-right: 0px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        max-width: none !important;
+        width: calc(100vw - 8px) !important;
+        position: relative !important;
+      }
+      
+      /* Ensure content fills available width on all screen sizes */
+      @media (min-width: 1280px) {
+        body > div.min-h-screen.bg-gray-50 > main {
+          width: calc(100vw - 8px) !important;
+        }
+      }
+      
+      /* For ultra-wide monitors (27-inch and larger) */
+      @media (min-width: 1920px) {
+        body > div.min-h-screen.bg-gray-50 > main {
+          width: calc(100vw - 8px) !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Cleanup function to remove the style when component unmounts
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   useEffect(() => {
@@ -171,7 +205,7 @@ export default function Sitejar4Page() {
 
   if (!user) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="pr-4">
         <div className="text-center">
           <p>Please sign in to manage your sites.</p>
         </div>
@@ -181,7 +215,7 @@ export default function Sitejar4Page() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="pr-4">
         <div className="text-center">
           <p>Loading sites data...</p>
         </div>
@@ -191,7 +225,7 @@ export default function Sitejar4Page() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="pr-4">
         <div className="text-center text-red-600">
           <p>Error: {error}</p>
         </div>
@@ -200,7 +234,7 @@ export default function Sitejar4Page() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="pr-4">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Site Management</h1>
         <p className="text-gray-600">
