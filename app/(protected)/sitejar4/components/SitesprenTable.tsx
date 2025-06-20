@@ -563,7 +563,7 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                   return (
                     <th
                       key={col}
-                      className={`text-left text-xs font-bold text-gray-700 relative ${stickyClass} ${
+                      className={`${col === 'checkbox' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative ${stickyClass} ${
                         ['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) 
                           ? 'cursor-pointer hover:brightness-95' 
                           : ''
@@ -574,10 +574,12 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                           ? '#e5e7eb' // gray-200 for action columns
                           : '#dbeafe', // blue-100 for sitespren table columns
                         textTransform: 'none',
-                        paddingTop: col === 'checkbox' ? '6px' : '12px',
-                        paddingBottom: col === 'checkbox' ? '6px' : '12px',
-                        paddingLeft: col === 'checkbox' ? '10px' : '16px',
-                        paddingRight: col === 'checkbox' ? '10px' : '16px'
+                        ...(col === 'checkbox' ? {
+                          paddingTop: '6px',
+                          paddingBottom: '6px',
+                          paddingLeft: '10px',
+                          paddingRight: '10px'
+                        } : {})
                       }}
                       onClick={col === 'checkbox' ? (isAllSelected ? handleClearAll : handleSelectAll) : 
                               (['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) ? () => handleSort(col as SortField) : undefined)}
@@ -628,15 +630,17 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                     return (
                       <td
                         key={col}
-                        className={`text-sm text-gray-900 relative ${stickyClass} ${bgClass} ${
+                        className={`${col === 'checkbox' ? '' : 'px-4 py-2'} text-sm text-gray-900 relative ${stickyClass} ${bgClass} ${
                           col === 'checkbox' || col === 'tool_buttons' || col === 'sync_actions' ? 'whitespace-nowrap' : ''
                         } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
                         style={{
                           ...(isSticky ? { left: leftPosition } : {}),
-                          paddingTop: col === 'checkbox' ? '6px' : '8px',
-                          paddingBottom: col === 'checkbox' ? '6px' : '8px',
-                          paddingLeft: col === 'checkbox' ? '10px' : '16px',
-                          paddingRight: col === 'checkbox' ? '10px' : '16px'
+                          ...(col === 'checkbox' ? {
+                            paddingTop: '6px',
+                            paddingBottom: '6px',
+                            paddingLeft: '10px',
+                            paddingRight: '10px'
+                          } : {})
                         }}
                         onClick={col === 'checkbox' ? () => handleSiteSelection(item.id, !selectedSites.has(item.id)) : undefined}
                       >
