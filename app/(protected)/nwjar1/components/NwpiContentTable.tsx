@@ -384,7 +384,7 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
       {/* Column Template System */}
       <div className="flex items-center space-x-4">
         {/* SQL View Info */}
-        <div className="bg-gray-100 border border-gray-300 rounded-lg p-3" style={{maxWidth: '130px', maxHeight: '75px'}}>
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-2" style={{maxWidth: '130px', minHeight: '85px'}}>
           <div className="text-xs text-gray-600">
             <div className="font-semibold mb-1">SQL View Info</div>
             <div className="text-gray-700">view name: nwpi_content</div>
