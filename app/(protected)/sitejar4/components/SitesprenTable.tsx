@@ -551,25 +551,36 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead>
               <tr>
                 {visibleColumns.map((col, index) => {
                   const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                   const isSticky = index < stickyColumnCount;
-                  const stickyClass = isSticky ? 'sticky left-0 z-10 bg-gray-50' : '';
+                  const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
                   const leftPosition = isSticky ? `${index * 150}px` : 'auto';
                   const isLastSticky = index === stickyColumnCount - 1;
 
                   return (
                     <th
                       key={col}
-                      className={`px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative ${stickyClass} ${
+                      className={`text-left text-xs font-bold text-gray-700 relative ${stickyClass} ${
                         ['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) 
-                          ? 'cursor-pointer hover:bg-gray-100' 
+                          ? 'cursor-pointer hover:brightness-95' 
                           : ''
-                      }`}
-                      style={isSticky ? { left: leftPosition } : {}}
-                      onClick={['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) ? () => handleSort(col as SortField) : undefined}
+                      } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
+                      style={{
+                        ...(isSticky ? { left: leftPosition } : {}),
+                        backgroundColor: col === 'checkbox' || col === 'tool_buttons' || col === 'sync_actions' 
+                          ? '#e5e7eb' // gray-200 for action columns
+                          : '#dbeafe', // blue-100 for sitespren table columns
+                        textTransform: 'none',
+                        paddingTop: col === 'checkbox' ? '6px' : '12px',
+                        paddingBottom: col === 'checkbox' ? '6px' : '12px',
+                        paddingLeft: col === 'checkbox' ? '10px' : '16px',
+                        paddingRight: col === 'checkbox' ? '10px' : '16px'
+                      }}
+                      onClick={col === 'checkbox' ? (isAllSelected ? handleClearAll : handleSelectAll) : 
+                              (['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) ? () => handleSort(col as SortField) : undefined)}
                     >
                       {hasLeftSeparator && (
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
@@ -579,12 +590,14 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                           type="checkbox"
                           checked={isAllSelected}
                           onChange={isAllSelected ? handleClearAll : handleSelectAll}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                          style={{ width: '26px', height: '26px' }}
+                          onClick={(e) => e.stopPropagation()}
                         />
                       ) : col === 'tool_buttons' ? (
-                        'Tool Buttons'
+                        'tool_buttons'
                       ) : col === 'sync_actions' ? (
-                        'Sync Actions'
+                        'sync_actions'
                       ) : (
                         <>
                           {col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
@@ -615,10 +628,17 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                     return (
                       <td
                         key={col}
-                        className={`px-4 py-2 text-sm text-gray-900 relative ${stickyClass} ${bgClass} ${
+                        className={`text-sm text-gray-900 relative ${stickyClass} ${bgClass} ${
                           col === 'checkbox' || col === 'tool_buttons' || col === 'sync_actions' ? 'whitespace-nowrap' : ''
-                        }`}
-                        style={isSticky ? { left: leftPosition } : {}}
+                        } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
+                        style={{
+                          ...(isSticky ? { left: leftPosition } : {}),
+                          paddingTop: col === 'checkbox' ? '6px' : '8px',
+                          paddingBottom: col === 'checkbox' ? '6px' : '8px',
+                          paddingLeft: col === 'checkbox' ? '10px' : '16px',
+                          paddingRight: col === 'checkbox' ? '10px' : '16px'
+                        }}
+                        onClick={col === 'checkbox' ? () => handleSiteSelection(item.id, !selectedSites.has(item.id)) : undefined}
                       >
                         {hasLeftSeparator && (
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
@@ -628,7 +648,9 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                             type="checkbox"
                             checked={selectedSites.has(item.id)}
                             onChange={(e) => handleSiteSelection(item.id, e.target.checked)}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            className="text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                            style={{ width: '26px', height: '26px' }}
+                            onClick={(e) => e.stopPropagation()}
                           />
                         ) : col === 'tool_buttons' ? (
                           <Link
