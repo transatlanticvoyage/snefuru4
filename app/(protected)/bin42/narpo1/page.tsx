@@ -476,8 +476,16 @@ export default function Narpo1Page() {
                               className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 pointer-events-none"
                               style={{width: '18px', height: '18px'}}
                             />
+                          ) : col === 'view' || col === 'actions' ? (
+                            <div className="flex flex-col">
+                              <div className="text-gray-500 font-normal text-xs">{col}</div>
+                              <div className="font-bold">{col}</div>
+                            </div>
                           ) : (
-                            col
+                            <div className="flex flex-col">
+                              <div className="text-gray-500 font-normal text-xs">narpi_pushes</div>
+                              <div className="font-bold">{col}</div>
+                            </div>
                           )}
                           {isLastSticky && (
                             <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
