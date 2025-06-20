@@ -208,19 +208,33 @@ export default function Header() {
 
   // Split navigation items into 2 rows, with break after panjar3
   const splitNavItems = () => {
-    const panjar3Index = navItems.findIndex(item => item.name === 'panjar3');
+    // Create the special first item that always comes first
+    const specialFirstItem: NavItem = {
+      name: '$9,750/m profits w/ RNR',
+      children: [
+        {
+          name: 'pedazos1',
+          path: '/pedazos1'
+        }
+      ]
+    };
+
+    // Create the final nav items array with special item first
+    const finalNavItems = [specialFirstItem, ...navItems];
+
+    const panjar3Index = finalNavItems.findIndex(item => item.name === 'panjar3');
     if (panjar3Index === -1) {
       // If panjar3 not found, split roughly in half
-      const midPoint = Math.ceil(navItems.length / 2);
+      const midPoint = Math.ceil(finalNavItems.length / 2);
       return {
-        firstRow: navItems.slice(0, midPoint),
-        secondRow: navItems.slice(midPoint)
+        firstRow: finalNavItems.slice(0, midPoint),
+        secondRow: finalNavItems.slice(midPoint)
       };
     } else {
       // Split after panjar3 (include panjar3 in first row)
       return {
-        firstRow: navItems.slice(0, panjar3Index + 1),
-        secondRow: navItems.slice(panjar3Index + 1)
+        firstRow: finalNavItems.slice(0, panjar3Index + 1),
+        secondRow: finalNavItems.slice(panjar3Index + 1)
       };
     }
   };
