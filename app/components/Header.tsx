@@ -24,10 +24,13 @@ export default function Header() {
   const isAdminPage = pathname?.startsWith('/admin/');
   // kzstylerule - custom header bg color for /pedbar page
   const isPedbarPage = pathname === '/pedbar';
+  // kzstylerule - custom header bg color for /pedtor page
+  const isPedtorPage = pathname === '/pedtor' || pathname?.startsWith('/pedtor/');
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [pedbarHeaderColor, setPedbarHeaderColor] = useState<string | null>(null);
+  const [pedtorHeaderColor, setPedtorHeaderColor] = useState<string | null>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
 
@@ -99,6 +102,33 @@ export default function Header() {
 
     fetchPedbarHeaderColor();
   }, [isPedbarPage, supabase]);
+
+  useEffect(() => {
+    // Fetch pedtor header color when on /pedtor page
+    const fetchPedtorHeaderColor = async () => {
+      if (isPedtorPage) {
+        try {
+          const { data, error } = await supabase
+            .from('custom_colors')
+            .select('hex_value')
+            .eq('color_code', 'headerbg1_pedtor')
+            .single();
+          
+          if (error) {
+            console.error('Error fetching pedtor header color:', error);
+          } else {
+            setPedtorHeaderColor(data?.hex_value || null);
+          }
+        } catch (error) {
+          console.error('Error fetching pedtor header color:', error);
+        }
+      } else {
+        setPedtorHeaderColor(null);
+      }
+    };
+
+    fetchPedtorHeaderColor();
+  }, [isPedtorPage, supabase]);
 
   const handleLogout = async () => {
     try {
@@ -197,7 +227,9 @@ export default function Header() {
     <header 
       className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
       style={{ 
-        backgroundColor: isPedbarPage && pedbarHeaderColor ? pedbarHeaderColor : '#ffffff'
+        backgroundColor: isPedtorPage && pedtorHeaderColor ? pedtorHeaderColor : 
+                        isPedbarPage && pedbarHeaderColor ? pedbarHeaderColor : 
+                        '#ffffff'
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
