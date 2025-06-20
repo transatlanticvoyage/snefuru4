@@ -287,7 +287,8 @@ export default function Header() {
     <header 
       className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
       style={{ 
-        backgroundColor: isPedazosPage && pedazosHeaderColor ? pedazosHeaderColor :
+        backgroundColor: isNwjarPage && nwjarHeaderColor ? nwjarHeaderColor :
+                        isPedazosPage && pedazosHeaderColor ? pedazosHeaderColor :
                         isPedtorPage && pedtorHeaderColor ? pedtorHeaderColor : 
                         isPedbarPage && pedbarHeaderColor ? pedbarHeaderColor : 
                         '#ffffff'
