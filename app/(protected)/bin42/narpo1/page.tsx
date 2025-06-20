@@ -128,6 +128,94 @@ export default function Narpo1Page() {
     }
   };
 
+  // Column template system
+  const columns = ['view', 'push_name', 'push_desc', 'push_status1', 'created_at', 'fk_batch_id', 'kareench1', 'actions'];
+
+  const getVisibleColumns = () => {
+    const stickyColumnCount = getStickyColumnCount();
+    const stickyColumns = columns.slice(0, stickyColumnCount);
+    
+    switch (selectedColumnTemplate) {
+      case 'option1': 
+        return columns; // All columns
+      case 'option2': {
+        const templateColumns = columns.slice(0, 7); // Columns 1-7
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option3': {
+        const templateColumns = columns.slice(7, 14); // Columns 8-14
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option4': {
+        const templateColumns = columns.slice(14, 21); // Columns 15-21
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      case 'option5': {
+        const templateColumns = columns.slice(21, 28); // Columns 22-28
+        const combinedColumns = [...stickyColumns];
+        templateColumns.forEach(col => {
+          if (!stickyColumns.includes(col)) {
+            combinedColumns.push(col);
+          }
+        });
+        return combinedColumns;
+      }
+      default: 
+        return columns;
+    }
+  };
+
+  const getStickyColumnCount = () => {
+    switch (selectedStickyColumns) {
+      case 'option1': return 1;
+      case 'option2': return 2;
+      case 'option3': return 3;
+      case 'option4': return 4;
+      case 'option5': return 5;
+      default: return 1;
+    }
+  };
+
+  const updateUrlAndStorage = (colTemp: string, stickyCol: string) => {
+    // Update URL
+    const url = new URL(window.location.href);
+    url.searchParams.set('coltemp', colTemp);
+    url.searchParams.set('stickycol', stickyCol);
+    window.history.replaceState({}, '', url.toString());
+    
+    // Update localStorage
+    localStorage.setItem('narpo1_coltemp', colTemp);
+    localStorage.setItem('narpo1_stickycol', stickyCol);
+  };
+
+  const handleColumnTemplateChange = (option: string) => {
+    setSelectedColumnTemplate(option);
+    updateUrlAndStorage(option, selectedStickyColumns);
+  };
+
+  const handleStickyColumnsChange = (option: string) => {
+    setSelectedStickyColumns(option);
+    updateUrlAndStorage(selectedColumnTemplate, option);
+  };
+
   const getStatusBadgeColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'completed':
@@ -206,6 +294,74 @@ export default function Narpo1Page() {
           </div>
         </div>
 
+        {/* Column Template Control Bar */}
+        <div className="mb-6 flex items-stretch space-x-4">
+          {/* SQL View Info */}
+          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-xs" style={{maxWidth: '130px', maxHeight: '75px'}}>
+            <div className="font-semibold text-gray-700 mb-1">SQL View Info</div>
+            <div className="text-gray-600">view name: narpi_pushes</div>
+            <div className="text-gray-600"># columns: {columns.length}</div>
+          </div>
+
+          {/* Column Template Options */}
+          <div className="bg-white border border-gray-300 rounded-lg p-2" style={{maxWidth: '600px', maxHeight: '75px'}}>
+            <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
+            <div className="flex space-x-1">
+              {[
+                { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-~' },
+                { id: 'option2', label: 'OPTION 2', subtitle: 'col temp a', range: 'columns 1-7' },
+                { id: 'option3', label: 'OPTION 3', subtitle: 'col temp b', range: 'columns 8-14' },
+                { id: 'option4', label: 'OPTION 4', subtitle: 'col temp c', range: 'columns 15-21' },
+                { id: 'option5', label: 'OPTION 5', subtitle: 'col temp d', range: 'columns 22-28' }
+              ].map(option => (
+                <button
+                  key={option.id}
+                  onClick={() => handleColumnTemplateChange(option.id)}
+                  className={`text-xs leading-tight p-2 rounded border text-center ${
+                    selectedColumnTemplate === option.id
+                      ? 'bg-blue-900 text-white border-blue-900'
+                      : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                  }`}
+                  style={{width: '120px'}}
+                >
+                  <div className="font-semibold">{option.label}</div>
+                  <div>{option.subtitle}</div>
+                  <div>{option.range}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sticky Columns Control */}
+          <div className="bg-white border border-gray-300 rounded-lg p-2">
+            <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
+            <div className="flex space-x-1">
+              {[
+                { id: 'option1', label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
+                { id: 'option2', label: 'OPTION 2', subtitle: '2 left-most', range: 'columns' },
+                { id: 'option3', label: 'OPTION 3', subtitle: '3 left-most', range: 'columns' },
+                { id: 'option4', label: 'OPTION 4', subtitle: '4 left-most', range: 'columns' },
+                { id: 'option5', label: 'OPTION 5', subtitle: '5 left-most', range: 'columns' }
+              ].map(option => (
+                <button
+                  key={option.id}
+                  onClick={() => handleStickyColumnsChange(option.id)}
+                  className={`text-xs leading-tight p-1 rounded border text-center ${
+                    selectedStickyColumns === option.id
+                      ? 'bg-blue-900 text-white border-blue-900'
+                      : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                  }`}
+                  style={{width: '80px'}}
+                >
+                  <div className="font-semibold">{option.label}</div>
+                  <div>{option.subtitle}</div>
+                  <div>{option.range}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Main Content */}
         {pushes.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -242,162 +398,186 @@ export default function Narpo1Page() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
-                      view
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
-                      push_name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
-                      push_desc
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
-                      push_status1
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
-                      created_at
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
-                      fk_batch_id
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
-                      kareench1
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-gray-100">
-                      actions
-                    </th>
+                    {getVisibleColumns().map((col, index) => {
+                      const stickyColumnCount = getStickyColumnCount();
+                      const isSticky = index < stickyColumnCount;
+                      const isLastSticky = index === stickyColumnCount - 1;
+                      const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
+                      const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                      
+                      // Determine background color
+                      let bgColor = 'bg-blue-50'; // narpi_pushes table columns
+                      if (col === 'view' || col === 'actions') {
+                        bgColor = 'bg-gray-100'; // UI action columns
+                      }
+                      
+                      return (
+                        <th 
+                          key={col} 
+                          className={`px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${bgColor} ${stickyClass} relative`}
+                          style={isSticky ? { left: leftPosition } : {}}
+                        >
+                          {col}
+                          {isLastSticky && (
+                            <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                          )}
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {pushes.map((push) => (
                     <tr key={push.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => {
-                            window.open(`/bin43/narpivid?id=${push.id}`, '_blank');
-                          }}
-                          className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                          <svg className="-ml-1 mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          individual view
-                        </button>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {push.push_name}
-                            </div>
-                            <div className="text-xs text-gray-500 font-mono">
-                              ID: {push.id.substring(0, 8)}...
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-xs">
-                          {push.push_desc ? (
-                            <div className="truncate" title={push.push_desc}>
-                              {push.push_desc.length > 100
-                                ? `${push.push_desc.substring(0, 100)}...`
-                                : push.push_desc}
-                            </div>
-                          ) : (
-                            <span className="text-gray-400 italic">No description</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(push.push_status1)}`}>
-                          {push.push_status1}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatDate(push.created_at)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-xs font-mono text-gray-600">
-                          {push.fk_batch_id.substring(0, 8)}...
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-2">
-                          <div className="text-xs font-mono text-gray-600 max-w-xs">
-                            {push.kareench1 ? (
-                              <div className="truncate" title={typeof push.kareench1 === 'string' ? push.kareench1 : JSON.stringify(push.kareench1)}>
-                                {typeof push.kareench1 === 'string' 
-                                  ? (push.kareench1.length > 50 ? `${push.kareench1.substring(0, 50)}...` : push.kareench1)
-                                  : JSON.stringify(push.kareench1).length > 50 
-                                    ? `${JSON.stringify(push.kareench1).substring(0, 50)}...`
-                                    : JSON.stringify(push.kareench1)
-                                }
-                              </div>
-                            ) : (
-                              <span className="text-gray-400 italic">No data</span>
+                      {getVisibleColumns().map((col, index) => {
+                        const stickyColumnCount = getStickyColumnCount();
+                        const isSticky = index < stickyColumnCount;
+                        const isLastSticky = index === stickyColumnCount - 1;
+                        const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
+                        const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                        const bgClass = 'bg-white';
+                        
+                        return (
+                          <td 
+                            key={col} 
+                            className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative`}
+                            style={isSticky ? { left: leftPosition } : {}}
+                          >
+                            {col === 'view' && (
+                              <button
+                                onClick={() => {
+                                  window.open(`/bin43/narpivid?id=${push.id}`, '_blank');
+                                }}
+                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              >
+                                <svg className="-ml-1 mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                individual view
+                              </button>
                             )}
-                          </div>
-                          {push.kareench1 && (
-                            <button
-                              onClick={() => copyKareenchValue(push.id, push.kareench1)}
-                              className={`inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded ${
-                                copiedId === push.id
-                                  ? 'text-green-800 bg-green-100'
-                                  : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
-                              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors`}
-                              title="Copy kareench1 data"
-                            >
-                              {copiedId === push.id ? (
-                                <>
-                                  <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  Copied!
-                                </>
-                              ) : (
-                                <>
-                                  <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                  </svg>
-                                  Copy
-                                </>
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            className="text-indigo-600 hover:text-indigo-900"
-                            onClick={() => {
-                              alert(`View details for push: ${push.push_name}`);
-                            }}
-                          >
-                            View
-                          </button>
-                          <button
-                            className="text-green-600 hover:text-green-900"
-                            onClick={() => {
-                              alert(`Edit push: ${push.push_name}`);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="text-red-600 hover:text-red-900"
-                            onClick={() => {
-                              if (confirm(`Are you sure you want to delete push: ${push.push_name}?`)) {
-                                alert('Delete functionality coming soon!');
-                              }
-                            }}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
+                            {col === 'push_name' && (
+                              <div className="flex items-center">
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {push.push_name}
+                                  </div>
+                                  <div className="text-xs text-gray-500 font-mono">
+                                    ID: {push.id.substring(0, 8)}...
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {col === 'push_desc' && (
+                              <div className="text-sm text-gray-900 max-w-xs">
+                                {push.push_desc ? (
+                                  <div className="truncate" title={push.push_desc}>
+                                    {push.push_desc.length > 100
+                                      ? `${push.push_desc.substring(0, 100)}...`
+                                      : push.push_desc}
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-400 italic">No description</span>
+                                )}
+                              </div>
+                            )}
+                            {col === 'push_status1' && (
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(push.push_status1)}`}>
+                                {push.push_status1}
+                              </span>
+                            )}
+                            {col === 'created_at' && (
+                              <div className="whitespace-nowrap">
+                                {formatDate(push.created_at)}
+                              </div>
+                            )}
+                            {col === 'fk_batch_id' && (
+                              <div className="text-xs font-mono text-gray-600 whitespace-nowrap">
+                                {push.fk_batch_id.substring(0, 8)}...
+                              </div>
+                            )}
+                            {col === 'kareench1' && (
+                              <div className="flex items-center space-x-2">
+                                <div className="text-xs font-mono text-gray-600 max-w-xs">
+                                  {push.kareench1 ? (
+                                    <div className="truncate" title={typeof push.kareench1 === 'string' ? push.kareench1 : JSON.stringify(push.kareench1)}>
+                                      {typeof push.kareench1 === 'string' 
+                                        ? (push.kareench1.length > 50 ? `${push.kareench1.substring(0, 50)}...` : push.kareench1)
+                                        : JSON.stringify(push.kareench1).length > 50 
+                                          ? `${JSON.stringify(push.kareench1).substring(0, 50)}...`
+                                          : JSON.stringify(push.kareench1)
+                                      }
+                                    </div>
+                                  ) : (
+                                    <span className="text-gray-400 italic">No data</span>
+                                  )}
+                                </div>
+                                {push.kareench1 && (
+                                  <button
+                                    onClick={() => copyKareenchValue(push.id, push.kareench1)}
+                                    className={`inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded ${
+                                      copiedId === push.id
+                                        ? 'text-green-800 bg-green-100'
+                                        : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors`}
+                                    title="Copy kareench1 data"
+                                  >
+                                    {copiedId === push.id ? (
+                                      <>
+                                        <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Copied!
+                                      </>
+                                    ) : (
+                                      <>
+                                        <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        Copy
+                                      </>
+                                    )}
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                            {col === 'actions' && (
+                              <div className="flex items-center space-x-2 whitespace-nowrap">
+                                <button
+                                  className="text-indigo-600 hover:text-indigo-900"
+                                  onClick={() => {
+                                    alert(`View details for push: ${push.push_name}`);
+                                  }}
+                                >
+                                  View
+                                </button>
+                                <button
+                                  className="text-green-600 hover:text-green-900"
+                                  onClick={() => {
+                                    alert(`Edit push: ${push.push_name}`);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="text-red-600 hover:text-red-900"
+                                  onClick={() => {
+                                    if (confirm(`Are you sure you want to delete push: ${push.push_name}?`)) {
+                                      alert('Delete functionality coming soon!');
+                                    }
+                                  }}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                            {isLastSticky && (
+                              <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                            )}
+                          </td>
+                        );
+                      })}
                     </tr>
                   ))}
                 </tbody>
