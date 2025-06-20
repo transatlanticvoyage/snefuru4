@@ -232,29 +232,29 @@ export default function Narpo1Page() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      View
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                      view
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Push Name
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                      push_name
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Description
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                      push_desc
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                      push_status1
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created At
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                      created_at
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Batch ID
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                      fk_batch_id
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Kareench1 Data
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                      kareench1
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-gray-100">
+                      actions
                     </th>
                   </tr>
                 </thead>
