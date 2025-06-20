@@ -53,7 +53,7 @@ const menuItems = [
   },
   {
     name: '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data',
-    path: '/karfi'
+    path: 'https://snef.me/karfi1'
   },
   {
     name: '/narpo1 - Narpi Image Pushes',
