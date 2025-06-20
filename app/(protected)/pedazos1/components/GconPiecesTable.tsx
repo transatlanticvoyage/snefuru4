@@ -48,23 +48,23 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   },
   'option2': {
     name: 'col temp a',
-    range: 'columns 1-4',
-    columns: allColumns.slice(0, 4)
+    range: 'columns 1-7',
+    columns: allColumns.slice(0, 7)
   },
   'option3': {
     name: 'col temp b',
-    range: 'columns 5-6',
-    columns: allColumns.slice(4, 6)
+    range: 'columns 8-14',
+    columns: allColumns.slice(7, 14)
   },
   'option4': {
     name: 'col temp c',
-    range: 'columns 7-8',
-    columns: allColumns.slice(6, 8)
+    range: 'columns 15-21',
+    columns: allColumns.slice(14, 21)
   },
   'option5': {
     name: 'col temp d',
-    range: 'columns 1-5',
-    columns: allColumns.slice(0, 5)
+    range: 'columns 22-28',
+    columns: allColumns.slice(21, 28)
   }
 };
 
