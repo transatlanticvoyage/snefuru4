@@ -39,18 +39,18 @@ const allColumns = [
   'id',                // 4
   'created_at',        // 5
   'sitespren_base',    // 6
-  'true_root_domain',  // 7
-  'full_subdomain',    // 8
-  'webproperty_type',  // 9
-  'fk_users_id',       // 10
-  'updated_at',        // 11
-  'wpuser1',           // 12
-  'wppass1',           // 13
-  'ruplin_apikey',     // 14
-  'wp_rest_app_pass',  // 15
-  'wp_plugin_installed1', // 16
-  'wp_plugin_connected2', // 17
-  'fk_domreg_hostaccount', // 18
+  'fk_domreg_hostaccount', // 7 (moved from position 18)
+  'true_root_domain',  // 8
+  'full_subdomain',    // 9
+  'webproperty_type',  // 10
+  'fk_users_id',       // 11
+  'updated_at',        // 12
+  'wpuser1',           // 13
+  'wppass1',           // 14
+  'ruplin_apikey',     // 15
+  'wp_rest_app_pass',  // 16
+  'wp_plugin_installed1', // 17
+  'wp_plugin_connected2', // 18
   'is_wp_site'         // 19
 ];
 
