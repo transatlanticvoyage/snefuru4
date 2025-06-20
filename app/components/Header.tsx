@@ -214,7 +214,7 @@ export default function Header() {
       children: [
         {
           name: '/tebnar2 - Generate Images In A Batch',
-          path: '/tebnar2'
+          path: 'https://snef.me/bin34/tebnar2'
         },
         {
           name: '/nwjar1 - T.NWPI_CONTENT - UTG',

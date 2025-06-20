@@ -35,21 +35,7 @@ export default function Profile() {
       try {
         if (!user) return;
 
-        // Fetch profile data
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (profileError && profileError.code !== 'PGRST116') {
-          throw profileError;
-        }
-        
-        setProfile(profileData);
-        setFullName(profileData?.full_name || '');
-
-        // Fetch user settings from users table
+        // Only fetch user settings from users table (no profiles table)
         const { data: userData, error: userError } = await supabaseClient
           .from('users')
           .select('id, email, sidebar_menu_active')
@@ -60,6 +46,9 @@ export default function Profile() {
         
         setUserSettings(userData);
         setSidebarMenuActive(userData?.sidebar_menu_active || false);
+        
+        // Set email as full name since we don't have profiles
+        setFullName(userData?.email || '');
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -77,21 +66,13 @@ export default function Profile() {
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!userSettings) return;
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          full_name: fullName,
-          updated_at: new Date().toISOString(),
-        });
-
-      if (error) throw error;
-      
-      setProfile(prev => prev ? { ...prev, full_name: fullName } : null);
+      // Since we don't have a profiles table, we'll just show a message
+      // that profile updates aren't available
+      setError('Profile updates not available - using users table only');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -100,20 +81,33 @@ export default function Profile() {
   };
 
   const handleSidebarToggle = async (newValue: boolean) => {
-    if (!userSettings) return;
+    if (!userSettings) {
+      setError('User settings not loaded');
+      return;
+    }
 
+    console.log('Toggling sidebar from', sidebarMenuActive, 'to', newValue);
     setSidebarMenuActive(newValue);
     
     try {
+      console.log('Updating user ID:', userSettings.id, 'with value:', newValue);
       const { error } = await supabaseClient
         .from('users')
         .update({ sidebar_menu_active: newValue })
         .eq('id', userSettings.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       
+      console.log('Successfully updated sidebar setting');
       setUserSettings(prev => prev ? { ...prev, sidebar_menu_active: newValue } : null);
+      
+      // Clear any previous errors
+      setError(null);
     } catch (err) {
+      console.error('Error in handleSidebarToggle:', err);
       // Revert on error
       setSidebarMenuActive(!newValue);
       setError(err instanceof Error ? err.message : 'Failed to update sidebar setting');
@@ -166,28 +160,21 @@ export default function Profile() {
 
                 <div>
                   <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                    Full Name
+                    Email (from users table)
                   </label>
                   <div className="mt-1">
                     <input
                       type="text"
                       name="fullName"
                       id="fullName"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      value={userSettings?.email || ''}
+                      disabled
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-gray-50"
                     />
                   </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={isSaving}
-                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  >
-                    {isSaving ? 'Saving...' : 'Save Changes'}
-                  </button>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Profile editing not available - using users table only.
+                  </p>
                 </div>
               </div>
             </form>
