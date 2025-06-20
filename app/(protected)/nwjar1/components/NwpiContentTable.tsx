@@ -62,6 +62,7 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
   const [filterType, setFilterType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterSyncMethod, setFilterSyncMethod] = useState('');
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
   // Get unique values for filter dropdowns
   const uniqueSites = useMemo(() => {
@@ -211,6 +212,28 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
     }
   };
 
+  // Selection handlers
+  const handleRowSelect = (rowId: string) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(rowId)) {
+      newSelected.delete(rowId);
+    } else {
+      newSelected.add(rowId);
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRows.size === paginatedData.length) {
+      // Deselect all
+      setSelectedRows(new Set());
+    } else {
+      // Select all visible rows
+      const allRowIds = new Set(paginatedData.map(item => item.internal_post_id));
+      setSelectedRows(allRowIds);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Search and Filters */}
@@ -302,53 +325,81 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                <th className="px-[6px] py-[6px] text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                  <div 
+                    className="cursor-pointer flex items-center justify-center w-full h-full"
+                    onClick={handleSelectAll}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+                      onChange={() => {}} // Handled by div click
+                      className="w-[18px] h-[18px] cursor-pointer"
+                      style={{ width: '18px', height: '18px' }}
+                    />
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-blue-50">
+                  actions
                 </th>
                 <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-green-100 bg-green-50"
                   onClick={() => handleSort('post_title')}
                 >
-                  Title {sortField === 'post_title' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  post_title {sortField === 'post_title' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-blue-100 bg-blue-50"
                   onClick={() => handleSort('fk_sitespren_base')}
                 >
-                  Site {sortField === 'fk_sitespren_base' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  fk_sitespren_base {sortField === 'fk_sitespren_base' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-green-100 bg-green-50"
                   onClick={() => handleSort('post_type')}
                 >
-                  Type {sortField === 'post_type' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  post_type {sortField === 'post_type' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-green-100 bg-green-50"
                   onClick={() => handleSort('post_status')}
                 >
-                  Status {sortField === 'post_status' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  post_status {sortField === 'post_status' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Sync Method
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-yellow-50">
+                  i_sync_method
                 </th>
                 <th 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-yellow-100 bg-yellow-50"
                   onClick={() => handleSort('i_sync_completed_at')}
                 >
-                  Synced {sortField === 'i_sync_completed_at' && (sortOrder === 'asc' ? '↑' : '↓')}
+                  i_sync_completed_at {sortField === 'i_sync_completed_at' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Elementor
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-purple-50">
+                  a_elementor_substance
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Post ID
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider bg-green-50">
+                  post_id
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <tr key={item.internal_post_id} className="hover:bg-gray-50">
+                  <td className="px-[6px] py-[6px] whitespace-nowrap">
+                    <div 
+                      className="cursor-pointer flex items-center justify-center w-full h-full"
+                      onClick={() => handleRowSelect(item.internal_post_id)}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.has(item.internal_post_id)}
+                        onChange={() => {}} // Handled by div click
+                        className="w-[18px] h-[18px] cursor-pointer"
+                        style={{ width: '18px', height: '18px' }}
+                      />
+                    </div>
+                  </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Link
                       href={`/nwivid?contentid=${encodeURIComponent(item.internal_post_id)}`}
