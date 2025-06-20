@@ -22,6 +22,8 @@ export default function Colors1Page() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingColor, setEditingColor] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<{[key: string]: CustomColor}>({});
   
   const { user } = useAuth();
   const supabase = createClientComponentClient();
@@ -107,6 +109,69 @@ export default function Colors1Page() {
       await fetchCustomColors();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete custom color');
+    }
+  };
+
+  const handleEditStart = (color: CustomColor) => {
+    setEditingColor(color.color_id);
+    setEditValues({
+      ...editValues,
+      [color.color_id]: { ...color }
+    });
+  };
+
+  const handleEditCancel = (colorId: string) => {
+    setEditingColor(null);
+    const newEditValues = { ...editValues };
+    delete newEditValues[colorId];
+    setEditValues(newEditValues);
+  };
+
+  const handleEditChange = (colorId: string, field: keyof CustomColor, value: string) => {
+    setEditValues({
+      ...editValues,
+      [colorId]: {
+        ...editValues[colorId],
+        [field]: value
+      }
+    });
+  };
+
+  const handleEditSave = async (colorId: string) => {
+    const editedColor = editValues[colorId];
+    if (!editedColor || !editedColor.color_name.trim() || !editedColor.color_code.trim()) {
+      setError('Color name and code are required');
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const { error: updateError } = await supabase
+        .from('custom_colors')
+        .update({
+          color_name: editedColor.color_name.trim(),
+          color_code: editedColor.color_code.trim(),
+          hex_value: editedColor.hex_value,
+          updated_at: new Date().toISOString()
+        })
+        .eq('color_id', colorId);
+
+      if (updateError) throw updateError;
+
+      // Clear editing state
+      setEditingColor(null);
+      const newEditValues = { ...editValues };
+      delete newEditValues[colorId];
+      setEditValues(newEditValues);
+      
+      // Refresh list
+      await fetchCustomColors();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update custom color');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -289,42 +354,112 @@ export default function Colors1Page() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {customColors.map((color, index) => (
-                  <tr key={color.color_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-3">
-                        <div 
-                          className="h-8 w-8 rounded-full border border-gray-300 shadow-sm"
-                          style={{ backgroundColor: color.hex_value }}
-                        ></div>
-                        <div 
-                          className="h-6 w-16 rounded border border-gray-300"
-                          style={{ backgroundColor: color.hex_value }}
-                        ></div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {color.color_name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                      {color.color_code}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                      {color.hex_value}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(color.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleDeleteColor(color.color_id)}
-                        className="text-red-600 hover:text-red-900 transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {customColors.map((color, index) => {
+                  const isEditing = editingColor === color.color_id;
+                  const editValue = editValues[color.color_id] || color;
+                  
+                  return (
+                    <tr key={color.color_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center space-x-3">
+                          <div 
+                            className="h-8 w-8 rounded-full border border-gray-300 shadow-sm"
+                            style={{ backgroundColor: isEditing ? editValue.hex_value : color.hex_value }}
+                          ></div>
+                          <div 
+                            className="h-6 w-16 rounded border border-gray-300"
+                            style={{ backgroundColor: isEditing ? editValue.hex_value : color.hex_value }}
+                          ></div>
+                          {isEditing && (
+                            <input
+                              type="color"
+                              value={editValue.hex_value}
+                              onChange={(e) => handleEditChange(color.color_id, 'hex_value', e.target.value)}
+                              className="h-8 w-12 rounded border border-gray-300 cursor-pointer"
+                            />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editValue.color_name}
+                            onChange={(e) => handleEditChange(color.color_id, 'color_name', e.target.value)}
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          />
+                        ) : (
+                          color.color_name
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editValue.color_code}
+                            onChange={(e) => handleEditChange(color.color_id, 'color_code', e.target.value)}
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono"
+                          />
+                        ) : (
+                          color.color_code
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                        {isEditing ? (
+                          <input
+                            type="text"
+                            value={editValue.hex_value}
+                            onChange={(e) => handleEditChange(color.color_id, 'hex_value', e.target.value)}
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono"
+                            placeholder="#000000"
+                          />
+                        ) : (
+                          color.hex_value
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(color.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center space-x-2">
+                          {isEditing ? (
+                            <>
+                              <button
+                                onClick={() => handleEditSave(color.color_id)}
+                                disabled={saving}
+                                className="text-green-600 hover:text-green-900 transition-colors disabled:opacity-50"
+                              >
+                                {saving ? 'Saving...' : 'Save'}
+                              </button>
+                              <button
+                                onClick={() => handleEditCancel(color.color_id)}
+                                disabled={saving}
+                                className="text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-50"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleEditStart(color)}
+                                className="text-indigo-600 hover:text-indigo-900 transition-colors"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteColor(color.color_id)}
+                                className="text-red-600 hover:text-red-900 transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
