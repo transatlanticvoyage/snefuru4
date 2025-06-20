@@ -213,8 +213,52 @@ export default function Header() {
       name: '$9,750/m profits w/ RNR',
       children: [
         {
-          name: 'pedazos1',
+          name: '/tebnar2 - Generate Images In A Batch',
+          path: '/tebnar2'
+        },
+        {
+          name: '/nwjar1 - T.NWPI_CONTENT - UTG',
+          path: '/nwjar1'
+        },
+        {
+          name: '/nwivid - t.nwpi_content - item',
+          path: '/nwivid'
+        },
+        {
+          name: '/sitejar4 - T.SITESPREN - UTG',
+          path: '/sitejar4'
+        },
+        {
+          name: '/pedazos1 - T.GCON_PIECES - UTG',
           path: '/pedazos1'
+        },
+        {
+          name: '/pedbar - t.gcon_pieces - item',
+          path: '/pedbar'
+        },
+        {
+          name: '/pedtor - t.gcon_pieces - item',
+          path: '/pedtor'
+        },
+        {
+          name: '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item',
+          path: '/flatx1'
+        },
+        {
+          name: '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item',
+          path: '/slotx1'
+        },
+        {
+          name: '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item',
+          path: '/fanex1'
+        },
+        {
+          name: '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data',
+          path: '/karfi'
+        },
+        {
+          name: '/narpo1 - Narpi Image Pushes',
+          path: '/narpo1'
         }
       ]
     };
@@ -252,6 +296,18 @@ export default function Header() {
             onClick={() => toggleNavDropdown(item.name)}
             className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700 focus:outline-none"
           >
+            {item.name === '$9,750/m profits w/ RNR' && (
+              <svg 
+                className="w-4 h-4 mr-1 text-black" 
+                style={{ 
+                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+                }}
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            )}
             {item.name}
             <svg
               className={`ml-1 h-4 w-4 transition-transform ${
