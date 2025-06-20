@@ -297,10 +297,10 @@ export default function Narpo1Page() {
         {/* Column Template Control Bar */}
         <div className="mb-6 flex items-stretch space-x-4">
           {/* SQL View Info */}
-          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 text-xs" style={{maxWidth: '130px', maxHeight: '75px'}}>
-            <div className="font-semibold text-gray-700 mb-1">SQL View Info</div>
-            <div className="text-gray-600">view name: narpi_pushes</div>
-            <div className="text-gray-600"># columns: {columns.length}</div>
+          <div className="bg-gray-100 border border-gray-300 rounded-lg p-2 flex flex-col justify-between" style={{maxWidth: '130px', maxHeight: '75px'}}>
+            <div className="font-semibold text-gray-700 text-xs leading-tight">SQL View Info</div>
+            <div className="text-gray-600 text-xs leading-tight">view name: narpi_pushes</div>
+            <div className="text-gray-600 text-xs leading-tight"># columns: {columns.length}</div>
           </div>
 
           {/* Column Template Options */}
