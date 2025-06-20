@@ -573,9 +573,12 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
                           />
                         </div>
                       ) : (
-                        <>
-                          {col} {isSortable && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
-                        </>
+                        <div className="flex flex-col">
+                          <div className="text-gray-500 font-normal text-xs">nwpi_content</div>
+                          <div className="font-bold">
+                            {col} {isSortable && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
+                          </div>
+                        </div>
                       )}
                     </th>
                   );
