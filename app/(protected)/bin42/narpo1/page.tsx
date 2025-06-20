@@ -236,6 +236,33 @@ export default function Narpo1Page() {
     updateUrlAndStorage(selectedColumnTemplate, option);
   };
 
+  // Get actual column width for sticky positioning
+  const getColumnWidth = (col: string) => {
+    const widthMap: Record<string, number> = {
+      'select': 50, // Small width for checkbox column
+      'view': 120,
+      'push_name': 200,
+      'push_desc': 250,
+      'push_status1': 120,
+      'created_at': 160,
+      'fk_batch_id': 120,
+      'kareench1': 150,
+      'actions': 180
+    };
+    return widthMap[col] || 150;
+  };
+
+  // Calculate sticky left position based on actual column widths
+  const calculateStickyLeft = (index: number) => {
+    let leftPosition = 0;
+    const visibleColumns = getVisibleColumns();
+    
+    for (let i = 0; i < index; i++) {
+      leftPosition += getColumnWidth(visibleColumns[i]);
+    }
+    return `${leftPosition}px`;
+  };
+
   const getStatusBadgeColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'completed':
@@ -422,8 +449,8 @@ export default function Narpo1Page() {
                       const stickyColumnCount = getStickyColumnCount();
                       const isSticky = index < stickyColumnCount;
                       const isLastSticky = index === stickyColumnCount - 1;
-                      const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                      const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                      const stickyClass = isSticky ? 'sticky z-10' : '';
+                      const leftPosition = isSticky ? calculateStickyLeft(index) : 'auto';
                       
                       // Determine background color
                       let bgColor = 'bg-blue-50'; // narpi_pushes table columns
@@ -437,7 +464,7 @@ export default function Narpo1Page() {
                           className={`${col === 'select' ? 'px-1.5 py-0.5' : 'px-6 py-3'} text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${bgColor} ${stickyClass} relative ${col === 'select' ? 'cursor-pointer' : ''}`}
                           style={{
                             ...(isSticky ? { left: leftPosition } : {}),
-                            ...(col === 'select' ? { paddingTop: '2px !important', paddingBottom: '2px !important', paddingLeft: '6px !important', paddingRight: '6px !important' } : {})
+                            ...(col === 'select' ? { paddingTop: '6px !important', paddingBottom: '6px !important', paddingLeft: '6px !important', paddingRight: '6px !important' } : {})
                           }}
                           onClick={col === 'select' ? handleSelectAll : undefined}
                         >
@@ -467,8 +494,8 @@ export default function Narpo1Page() {
                         const stickyColumnCount = getStickyColumnCount();
                         const isSticky = index < stickyColumnCount;
                         const isLastSticky = index === stickyColumnCount - 1;
-                        const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                        const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                        const stickyClass = isSticky ? 'sticky z-10' : '';
+                        const leftPosition = isSticky ? calculateStickyLeft(index) : 'auto';
                         const bgClass = 'bg-white';
                         
                         return (
@@ -477,7 +504,7 @@ export default function Narpo1Page() {
                             className={`${col === 'select' ? 'px-1.5 py-0.5' : 'px-6 py-4'} text-sm text-gray-900 ${stickyClass} ${bgClass} relative ${col === 'select' ? 'cursor-pointer' : ''}`}
                             style={{
                               ...(isSticky ? { left: leftPosition } : {}),
-                              ...(col === 'select' ? { paddingTop: '2px !important', paddingBottom: '2px !important', paddingLeft: '6px !important', paddingRight: '6px !important' } : {})
+                              ...(col === 'select' ? { paddingTop: '6px !important', paddingBottom: '6px !important', paddingLeft: '6px !important', paddingRight: '6px !important' } : {})
                             }}
                             onClick={col === 'select' ? () => handleSelectRow(push.id) : undefined}
                           >
