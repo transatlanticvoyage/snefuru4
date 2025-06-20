@@ -22,6 +22,8 @@ export default function Narpo1Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedColumnTemplate, setSelectedColumnTemplate] = useState('option1');
+  const [selectedStickyColumns, setSelectedStickyColumns] = useState('option1');
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -33,6 +35,14 @@ export default function Narpo1Page() {
     if (mainElement) {
       mainElement.className = 'w-full';
     }
+    
+    // Load state from URL parameters and localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const colTempParam = urlParams.get('coltemp') || localStorage.getItem('narpo1_coltemp') || 'option1';
+    const stickyColParam = urlParams.get('stickycol') || localStorage.getItem('narpo1_stickycol') || 'option1';
+    
+    setSelectedColumnTemplate(colTempParam);
+    setSelectedStickyColumns(stickyColParam);
     
     // Cleanup function to restore original layout when leaving page
     return () => {
