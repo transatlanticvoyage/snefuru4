@@ -416,7 +416,11 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
           </div>
           <div>
             <select
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+                filterSite 
+                  ? 'bg-blue-900 text-white border-blue-900 font-bold' 
+                  : 'bg-white text-gray-900 border-gray-300'
+              }`}
               value={filterSite}
               onChange={(e) => handleFilterSite(e.target.value)}
             >
