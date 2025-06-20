@@ -41,7 +41,7 @@ export default function PedbarPage() {
   const id = searchParams?.get('id') || null;
 
   useEffect(() => {
-    document.title = 'Edit Content Piece - Snefuru';
+    document.title = '/pedbar - Snefuru';
   }, []);
 
   useEffect(() => {

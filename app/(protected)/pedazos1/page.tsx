@@ -16,7 +16,7 @@ export default function Pedazos1Page() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    document.title = 'Content Pieces - Snefuru';
+    document.title = '/pedazos1 - Snefuru';
   }, []);
 
   useEffect(() => {

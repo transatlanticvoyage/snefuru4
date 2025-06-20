@@ -4,6 +4,10 @@ import { redirect } from 'next/navigation';
 import NwpiContentTable from './components/NwpiContentTable';
 import NwpiPusherButton from './components/NwpiPusherButton';
 
+export const metadata = {
+  title: '/nwjar1 - Snefuru'
+};
+
 export default async function NwJar1Page() {
   const supabase = createServerComponentClient({ cookies });
 
