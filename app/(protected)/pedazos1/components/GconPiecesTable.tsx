@@ -418,10 +418,18 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                             style={{ width: '18px', height: '18px' }}
                           />
                         </div>
+                      ) : col === 'actions' ? (
+                        <div className="flex flex-col">
+                          <div className="text-gray-500 font-normal text-xs">actions</div>
+                          <div className="font-bold">actions</div>
+                        </div>
                       ) : (
-                        <>
-                          {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
-                        </>
+                        <div className="flex flex-col">
+                          <div className="text-gray-500 font-normal text-xs">gcon_pieces</div>
+                          <div className="font-bold">
+                            {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
+                          </div>
+                        </div>
                       )}
                     </th>
                   );
