@@ -27,6 +27,7 @@ interface GconPiecesTableProps {
 
 type SortField = "meta_title" | "asn_sitespren_base" | "created_at" | "updated_at";
 type SortOrder = "asc" | "desc";
+type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
 const allColumns = [
   'actions',
@@ -38,7 +39,7 @@ const allColumns = [
   'updated_at'
 ];
 
-const columnTemplates = {
+const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: string[] }> = {
   'option1': {
     name: 'col temp all',
     range: 'columns 1-~',
@@ -75,7 +76,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [filterSite, setFilterSite] = useState("");
   const [filterPage, setFilterPage] = useState("");
-  const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<string>('option1');
+  const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
   
   const router = useRouter();
@@ -88,12 +89,12 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
     const urlStickyCol = searchParams?.get('stickycol');
     
     if (urlColTemp && urlColTemp in columnTemplates) {
-      setSelectedColumnTemplate(urlColTemp);
+      setSelectedColumnTemplate(urlColTemp as ColumnTemplateKey);
     } else {
       // Fall back to localStorage
       const savedColTemp = localStorage.getItem('pedazos1_columnTemplate');
       if (savedColTemp && savedColTemp in columnTemplates) {
-        setSelectedColumnTemplate(savedColTemp);
+        setSelectedColumnTemplate(savedColTemp as ColumnTemplateKey);
       }
     }
     
@@ -270,7 +271,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
             {Object.entries(columnTemplates).map(([key, template]) => (
               <button
                 key={key}
-                onClick={() => setSelectedColumnTemplate(key)}
+                onClick={() => setSelectedColumnTemplate(key as ColumnTemplateKey)}
                 className={`flex flex-col justify-center items-center text-xs leading-tight border rounded-lg transition-colors ${
                   selectedColumnTemplate === key
                     ? 'bg-blue-900 text-white border-blue-900'
