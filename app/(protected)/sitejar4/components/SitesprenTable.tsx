@@ -43,19 +43,20 @@ const allColumns = [
   'sitespren_base',    // 6
   'ns_full',           // 7 (new field)
   'ip_address',        // 8 (new field)
-  'fk_domreg_hostaccount', // 9
-  'true_root_domain',  // 10
-  'full_subdomain',    // 11
-  'webproperty_type',  // 12
-  'fk_users_id',       // 13
-  'updated_at',        // 14
-  'wpuser1',           // 15
-  'wppass1',           // 16
-  'ruplin_apikey',     // 17
-  'wp_rest_app_pass',  // 18
-  'wp_plugin_installed1', // 19
-  'wp_plugin_connected2', // 20
-  'is_wp_site'         // 21
+  'domain_registrar_info', // 9 (new field)
+  'fk_domreg_hostaccount', // 10
+  'true_root_domain',  // 11
+  'full_subdomain',    // 12
+  'webproperty_type',  // 13
+  'fk_users_id',       // 14
+  'updated_at',        // 15
+  'wpuser1',           // 16
+  'wppass1',           // 17
+  'ruplin_apikey',     // 18
+  'wp_rest_app_pass',  // 19
+  'wp_plugin_installed1', // 20
+  'wp_plugin_connected2', // 21
+  'is_wp_site'         // 22
 ];
 
 export default function SitesprenTable({ data, onSelectionChange }: SitesprenTableProps) {
@@ -103,9 +104,9 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
     
     switch (selectedColumnTemplate) {
       case 'option1': 
-        return allColumns; // All columns (1-19)
+        return allColumns; // All columns (1-22)
       case 'option2': {
-        const templateColumns = allColumns.slice(0, 7); // Columns 1-7
+        const templateColumns = allColumns.slice(0, 8); // Columns 1-8
         const combinedColumns = [...stickyColumns];
         templateColumns.forEach(col => {
           if (!stickyColumns.includes(col)) {
@@ -115,7 +116,7 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
         return combinedColumns;
       }
       case 'option3': {
-        const templateColumns = allColumns.slice(7, 14); // Columns 8-14
+        const templateColumns = allColumns.slice(8, 15); // Columns 9-15
         const combinedColumns = [...stickyColumns];
         templateColumns.forEach(col => {
           if (!stickyColumns.includes(col)) {
@@ -125,7 +126,7 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
         return combinedColumns;
       }
       case 'option4': {
-        const templateColumns = allColumns.slice(14, 21); // Columns 15-21
+        const templateColumns = allColumns.slice(15, 22); // Columns 16-22
         const combinedColumns = [...stickyColumns];
         templateColumns.forEach(col => {
           if (!stickyColumns.includes(col)) {
@@ -518,10 +519,10 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
           <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
           <div className="flex space-x-1">
             {[
-              { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-21' },
-              { id: 'option2', label: 'OPTION 2', subtitle: 'col temp a', range: 'columns 1-7' },
-              { id: 'option3', label: 'OPTION 3', subtitle: 'col temp b', range: 'columns 8-14' },
-              { id: 'option4', label: 'OPTION 4', subtitle: 'col temp c', range: 'columns 15-21' },
+              { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-22' },
+              { id: 'option2', label: 'OPTION 2', subtitle: 'col temp a', range: 'columns 1-8' },
+              { id: 'option3', label: 'OPTION 3', subtitle: 'col temp b', range: 'columns 9-15' },
+              { id: 'option4', label: 'OPTION 4', subtitle: 'col temp c', range: 'columns 16-22' },
               { id: 'option5', label: 'OPTION 5', subtitle: 'col temp d', range: 'empty' }
             ].map(option => (
               <button
@@ -661,6 +662,8 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                         ...(isSticky ? { left: leftPosition } : {}),
                         backgroundColor: col === 'checkbox' || col === 'tool_buttons' || col === 'sync_actions' 
                           ? '#e5e7eb' // gray-200 for action columns
+                          : col === 'domain_registrar_info'
+                          ? '#fbbf24' // amber-400 for domain registrar info column
                           : '#dbeafe', // blue-100 for sitespren table columns
                         textTransform: 'none',
                         ...(col === 'checkbox' ? {
@@ -835,6 +838,8 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                               <span className="text-sm">{dnsData[item.id]?.ip_address || item.ip_address || '-'}</span>
                             )}
                           </div>
+                        ) : col === 'domain_registrar_info' ? (
+                          '-'
                         ) : (
                           item[col as keyof SitesprenRecord] || '-'
                         )}
