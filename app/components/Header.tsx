@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface NavItem {
   name: string;
@@ -17,12 +18,16 @@ export default function Header() {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const supabase = createClientComponentClient();
   
   // kzstylerule - custom header bg color for /admin/ pages
   const isAdminPage = pathname?.startsWith('/admin/');
+  // kzstylerule - custom header bg color for /pedbar page
+  const isPedbarPage = pathname === '/pedbar';
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
+  const [pedbarHeaderColor, setPedbarHeaderColor] = useState<string | null>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
 
@@ -67,6 +72,33 @@ export default function Header() {
 
     fetchNavItems();
   }, []);
+
+  useEffect(() => {
+    // Fetch pedbar header color when on /pedbar page
+    const fetchPedbarHeaderColor = async () => {
+      if (isPedbarPage) {
+        try {
+          const { data, error } = await supabase
+            .from('snef_colors')
+            .select('hex_value')
+            .eq('code', 'headerbg_pedbar')
+            .single();
+          
+          if (error) {
+            console.error('Error fetching pedbar header color:', error);
+          } else {
+            setPedbarHeaderColor(data?.hex_value || null);
+          }
+        } catch (error) {
+          console.error('Error fetching pedbar header color:', error);
+        }
+      } else {
+        setPedbarHeaderColor(null);
+      }
+    };
+
+    fetchPedbarHeaderColor();
+  }, [isPedbarPage, supabase]);
 
   const handleLogout = async () => {
     try {
@@ -162,7 +194,12 @@ export default function Header() {
   const { firstRow, secondRow } = splitNavItems();
 
   return (
-    <header className={`bg-white shadow ${isAdminPage ? 'admin-header' : ''}`}>
+    <header 
+      className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
+      style={{ 
+        backgroundColor: isPedbarPage && pedbarHeaderColor ? pedbarHeaderColor : '#ffffff'
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20"> {/* Increased height for 2 rows */}
           <div className="flex">
