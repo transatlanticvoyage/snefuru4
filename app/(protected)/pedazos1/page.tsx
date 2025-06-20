@@ -26,8 +26,23 @@ export default function Pedazos1Page() {
         margin-right: 0px !important;
         padding-left: 0px !important;
         padding-right: 0px !important;
-        max-width: 100% !important;
-        width: 100% !important;
+        max-width: none !important;
+        width: calc(100vw - 8px) !important;
+        position: relative !important;
+      }
+      
+      /* Ensure content fills available width on all screen sizes */
+      @media (min-width: 1280px) {
+        body > div.min-h-screen.bg-gray-50 > main {
+          width: calc(100vw - 8px) !important;
+        }
+      }
+      
+      /* For ultra-wide monitors (27-inch and larger) */
+      @media (min-width: 1920px) {
+        body > div.min-h-screen.bg-gray-50 > main {
+          width: calc(100vw - 8px) !important;
+        }
       }
     `;
     document.head.appendChild(style);
