@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface GconPiece {
   id: string;
@@ -22,6 +23,8 @@ interface GconPiece {
   pageurl: string | null;
   pelementor_cached: any;
   pelementor_edits: any;
+  is_starred1: string | null;
+  is_starred2: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +42,8 @@ const allColumns = [
   'select',
   'actions',
   'id',
+  'is_starred1',
+  'is_starred2',
   'meta_title', 
   'h1title',
   'pgb_h1title',
@@ -61,7 +66,7 @@ const allColumns = [
 const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: string[] }> = {
   'option1': {
     name: 'col temp all',
-    range: 'columns 1-20',
+    range: 'columns 1-22',
     columns: allColumns
   },
   'option2': {
@@ -71,13 +76,13 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   },
   'option3': {
     name: 'col temp b',
-    range: 'columns 8-14',
-    columns: allColumns.slice(7, 14)
+    range: 'columns 8-15',
+    columns: allColumns.slice(7, 15)
   },
   'option4': {
     name: 'col temp c',
-    range: 'columns 15-20',
-    columns: allColumns.slice(14, 20)
+    range: 'columns 16-22',
+    columns: allColumns.slice(15, 22)
   },
   'option5': {
     name: 'col temp d',
@@ -87,7 +92,7 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
 };
 
 export default function GconPiecesTable({ initialData, userId }: GconPiecesTableProps) {
-  const [data] = useState<GconPiece[]>(initialData);
+  const [data, setData] = useState<GconPiece[]>(initialData);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
@@ -98,8 +103,10 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [updatingStars, setUpdatingStars] = useState<Set<string>>(new Set());
   
   const router = useRouter();
+  const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
 
   // Load state from URL params and localStorage on mount
@@ -291,6 +298,44 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
       // Select all visible rows
       const allRowIds = new Set(paginatedData.map(item => item.id));
       setSelectedRows(allRowIds);
+    }
+  };
+
+  // Handle star click
+  const handleStarClick = async (itemId: string, starField: 'is_starred1' | 'is_starred2') => {
+    const updateKey = `${itemId}_${starField}`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const currentItem = data.find(item => item.id === itemId);
+      const newValue = currentItem?.[starField] === 'yes' ? null : 'yes';
+
+      // Update database
+      const { error } = await supabase
+        .from('gcon_pieces')
+        .update({ [starField]: newValue })
+        .eq('id', itemId);
+
+      if (error) {
+        console.error('Error updating star:', error);
+      } else {
+        // Update local state
+        setData(prevData => 
+          prevData.map(item => 
+            item.id === itemId 
+              ? { ...item, [starField]: newValue }
+              : item
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating star:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
     }
   };
 
@@ -506,6 +551,30 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                           <span className="whitespace-nowrap text-xs font-mono">
                             {truncateText(item[col], 8)}
                           </span>
+                        ) : col === 'is_starred1' || col === 'is_starred2' ? (
+                          <div 
+                            className="flex justify-center items-center cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
+                            onClick={() => handleStarClick(item.id, col as 'is_starred1' | 'is_starred2')}
+                          >
+                            {updatingStars.has(`${item.id}_${col}`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <svg 
+                                className={`h-5 w-5 transition-colors ${
+                                  item[col] === 'yes' ? 'text-blue-900 fill-current' : 'text-gray-300 hover:text-gray-400'
+                                }`}
+                                fill={item[col] === 'yes' ? 'currentColor' : 'none'}
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            )}
+                          </div>
                         ) : col === 'meta_title' || col === 'h1title' || col === 'pgb_h1title' ? (
                           truncateText(item[col], 60)
                         ) : col === 'corpus1' || col === 'corpus2' ? (
