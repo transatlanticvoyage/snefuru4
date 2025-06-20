@@ -45,7 +45,7 @@ export default async function NwJar1Page() {
       <div className="mb-8">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">WordPress Content (WPSv2)</h1>
+            <h1 className="text-3xl font-bold text-gray-900">/nwjar1 - sync table 1 - (WPSv2)</h1>
             <p className="mt-2 text-gray-600">
               View and manage your synced WordPress content from the nwpi_content table
             </p>

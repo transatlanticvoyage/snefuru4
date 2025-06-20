@@ -28,12 +28,15 @@ export default function Header() {
   const isPedtorPage = pathname === '/pedtor1';
   // kzstylerule - custom header bg color for /pedazos1 page
   const isPedazosPage = pathname === '/pedazos1';
+  // kzstylerule - custom header bg color for /nwjar1 page
+  const isNwjarPage = pathname === '/nwjar1';
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [pedbarHeaderColor, setPedbarHeaderColor] = useState<string | null>(null);
   const [pedtorHeaderColor, setPedtorHeaderColor] = useState<string | null>(null);
   const [pedazosHeaderColor, setPedazosHeaderColor] = useState<string | null>(null);
+  const [nwjarHeaderColor, setNwjarHeaderColor] = useState<string | null>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
 
@@ -159,6 +162,33 @@ export default function Header() {
 
     fetchPedazosHeaderColor();
   }, [isPedazosPage, supabase]);
+
+  useEffect(() => {
+    // Fetch nwjar1 header color when on /nwjar1 page
+    const fetchNwjarHeaderColor = async () => {
+      if (isNwjarPage) {
+        try {
+          const { data, error } = await supabase
+            .from('custom_colors')
+            .select('hex_value')
+            .eq('color_code', 'headerbg1_nwjar1')
+            .single();
+          
+          if (error) {
+            console.error('Error fetching nwjar1 header color:', error);
+          } else {
+            setNwjarHeaderColor(data?.hex_value || null);
+          }
+        } catch (error) {
+          console.error('Error fetching nwjar1 header color:', error);
+        }
+      } else {
+        setNwjarHeaderColor(null);
+      }
+    };
+
+    fetchNwjarHeaderColor();
+  }, [isNwjarPage, supabase]);
 
   const handleLogout = async () => {
     try {
