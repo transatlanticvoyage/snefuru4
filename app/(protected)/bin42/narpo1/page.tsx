@@ -434,15 +434,19 @@ export default function Narpo1Page() {
                       return (
                         <th 
                           key={col} 
-                          className={`px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${bgColor} ${stickyClass} relative`}
-                          style={isSticky ? { left: leftPosition } : {}}
+                          className={`${col === 'select' ? 'px-1.5 py-0.5' : 'px-6 py-3'} text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${bgColor} ${stickyClass} relative ${col === 'select' ? 'cursor-pointer' : ''}`}
+                          style={{
+                            ...(isSticky ? { left: leftPosition } : {}),
+                            ...(col === 'select' ? { paddingTop: '2px !important', paddingBottom: '2px !important', paddingLeft: '6px !important', paddingRight: '6px !important' } : {})
+                          }}
+                          onClick={col === 'select' ? handleSelectAll : undefined}
                         >
                           {col === 'select' ? (
                             <input
                               type="checkbox"
                               checked={selectedRows.size === pushes.length && pushes.length > 0}
                               onChange={handleSelectAll}
-                              className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                              className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 pointer-events-none"
                               style={{width: '18px', height: '18px'}}
                             />
                           ) : (
@@ -470,8 +474,11 @@ export default function Narpo1Page() {
                         return (
                           <td 
                             key={col} 
-                            className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative ${col === 'select' ? 'cursor-pointer' : ''}`}
-                            style={isSticky ? { left: leftPosition } : {}}
+                            className={`${col === 'select' ? 'px-1.5 py-0.5' : 'px-6 py-4'} text-sm text-gray-900 ${stickyClass} ${bgClass} relative ${col === 'select' ? 'cursor-pointer' : ''}`}
+                            style={{
+                              ...(isSticky ? { left: leftPosition } : {}),
+                              ...(col === 'select' ? { paddingTop: '2px !important', paddingBottom: '2px !important', paddingLeft: '6px !important', paddingRight: '6px !important' } : {})
+                            }}
                             onClick={col === 'select' ? () => handleSelectRow(push.id) : undefined}
                           >
                             {col === 'select' && (
