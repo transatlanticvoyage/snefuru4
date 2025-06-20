@@ -304,8 +304,8 @@ export default function Narpo1Page() {
           </div>
 
           {/* Column Template Options */}
-          <div className="bg-white border border-gray-300 rounded-lg p-2" style={{maxWidth: '600px', maxHeight: '75px'}}>
-            <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
+          <div className="bg-white border border-gray-300 rounded-lg p-2 flex flex-col justify-between" style={{maxWidth: '600px', maxHeight: '75px'}}>
+            <div className="text-xs font-semibold text-gray-700 mb-1">Column Templates (Show/Hide)</div>
             <div className="flex space-x-1">
               {[
                 { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-~' },
@@ -317,12 +317,12 @@ export default function Narpo1Page() {
                 <button
                   key={option.id}
                   onClick={() => handleColumnTemplateChange(option.id)}
-                  className={`text-xs leading-tight p-2 rounded border text-center ${
+                  className={`text-xs leading-none py-1 px-1 rounded border text-center ${
                     selectedColumnTemplate === option.id
                       ? 'bg-blue-900 text-white border-blue-900'
                       : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
                   }`}
-                  style={{width: '120px'}}
+                  style={{width: '118px', height: '45px', fontSize: '10px'}}
                 >
                   <div className="font-semibold">{option.label}</div>
                   <div>{option.subtitle}</div>
@@ -333,8 +333,8 @@ export default function Narpo1Page() {
           </div>
 
           {/* Sticky Columns Control */}
-          <div className="bg-white border border-gray-300 rounded-lg p-2">
-            <div className="text-xs font-semibold text-gray-700 mb-2">Sticky Columns At Left Side Of UI Grid Table</div>
+          <div className="bg-white border border-gray-300 rounded-lg p-2 flex flex-col justify-between" style={{maxHeight: '75px'}}>
+            <div className="text-xs font-semibold text-gray-700 mb-1">Sticky Columns At Left Side Of UI Grid Table</div>
             <div className="flex space-x-1">
               {[
                 { id: 'option1', label: 'OPTION 1', subtitle: '1 left-most', range: 'column' },
@@ -346,12 +346,12 @@ export default function Narpo1Page() {
                 <button
                   key={option.id}
                   onClick={() => handleStickyColumnsChange(option.id)}
-                  className={`text-xs leading-tight p-1 rounded border text-center ${
+                  className={`text-xs leading-none py-1 px-1 rounded border text-center ${
                     selectedStickyColumns === option.id
                       ? 'bg-blue-900 text-white border-blue-900'
                       : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
                   }`}
-                  style={{width: '80px'}}
+                  style={{width: '78px', height: '45px', fontSize: '10px'}}
                 >
                   <div className="font-semibold">{option.label}</div>
                   <div>{option.subtitle}</div>
