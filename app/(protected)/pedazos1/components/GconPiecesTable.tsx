@@ -30,6 +30,7 @@ type SortOrder = "asc" | "desc";
 type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
 const allColumns = [
+  'select',
   'actions',
   'meta_title', 
   'h1title',
@@ -47,23 +48,23 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   },
   'option2': {
     name: 'col temp a',
-    range: 'columns 1-3',
-    columns: allColumns.slice(0, 3)
+    range: 'columns 1-4',
+    columns: allColumns.slice(0, 4)
   },
   'option3': {
     name: 'col temp b',
-    range: 'columns 4-5',
-    columns: allColumns.slice(3, 5)
+    range: 'columns 5-6',
+    columns: allColumns.slice(4, 6)
   },
   'option4': {
     name: 'col temp c',
-    range: 'columns 6-7',
-    columns: allColumns.slice(5, 7)
+    range: 'columns 7-8',
+    columns: allColumns.slice(6, 8)
   },
   'option5': {
     name: 'col temp d',
-    range: 'columns 1-4',
-    columns: allColumns.slice(0, 4)
+    range: 'columns 1-5',
+    columns: allColumns.slice(0, 5)
   }
 };
 
@@ -78,6 +79,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   const [filterPage, setFilterPage] = useState("");
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -249,6 +251,28 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
   };
 
+  // Selection handlers
+  const handleRowSelect = (rowId: string) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(rowId)) {
+      newSelected.delete(rowId);
+    } else {
+      newSelected.add(rowId);
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRows.size === paginatedData.length) {
+      // Deselect all
+      setSelectedRows(new Set());
+    } else {
+      // Select all visible rows
+      const allRowIds = new Set(paginatedData.map(item => item.id));
+      setSelectedRows(allRowIds);
+    }
+  };
+
   const visibleColumns = getVisibleColumns();
 
   return (
@@ -370,15 +394,35 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                   return (
                     <th
                       key={col}
-                      className={`px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${
-                        isSortable ? 'cursor-pointer hover:bg-gray-100' : ''
-                      } ${isSticky ? 'sticky bg-gray-50 z-10' : ''} ${
-                        isSeparator ? 'border-r-4 border-black' : ''
-                      }`}
+                      className={`text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${
+                        col === 'select' ? 'px-[6px] py-[6px]' : 'px-6 py-3'
+                      } ${isSortable ? 'cursor-pointer hover:bg-gray-100' : ''} ${
+                        isSticky ? 'sticky bg-gray-50 z-10' : ''
+                      } ${isSeparator ? 'border-r-4 border-black' : ''}`}
                       style={isSticky ? { left: `${index * 150}px` } : {}}
                       onClick={isSortable ? () => handleSort(col as SortField) : undefined}
                     >
-                      {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
+                      {col === 'select' ? (
+                        <div 
+                          className="cursor-pointer flex items-center justify-center w-full h-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectAll();
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+                            onChange={() => {}} // Handled by div click
+                            className="w-[18px] h-[18px] cursor-pointer"
+                            style={{ width: '18px', height: '18px' }}
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
+                        </>
+                      )}
                     </th>
                   );
                 })}
@@ -394,14 +438,31 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                     return (
                       <td
                         key={col}
-                        className={`px-6 py-4 text-sm text-gray-900 ${
-                          isSticky ? 'sticky bg-white z-10' : ''
-                        } ${isSeparator ? 'border-r-4 border-black' : ''} ${
-                          col === 'actions' ? 'whitespace-nowrap' : ''
-                        }`}
+                        className={`text-sm text-gray-900 ${
+                          col === 'select' ? 'px-[6px] py-[6px]' : 'px-6 py-4'
+                        } ${isSticky ? 'sticky bg-white z-10' : ''} ${
+                          isSeparator ? 'border-r-4 border-black' : ''
+                        } ${col === 'actions' || col === 'select' ? 'whitespace-nowrap' : ''}`}
                         style={isSticky ? { left: `${index * 150}px` } : {}}
+                        onClick={col === 'select' ? () => handleRowSelect(item.id) : undefined}
                       >
-                        {col === 'actions' ? (
+                        {col === 'select' ? (
+                          <div 
+                            className="cursor-pointer flex items-center justify-center w-full h-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRowSelect(item.id);
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedRows.has(item.id)}
+                              onChange={() => {}} // Handled by div click
+                              className="w-[18px] h-[18px] cursor-pointer"
+                              style={{ width: '18px', height: '18px' }}
+                            />
+                          </div>
+                        ) : col === 'actions' ? (
                           <Link
                             href={`/pedbar?id=${item.id}`}
                             className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
