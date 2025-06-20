@@ -27,6 +27,20 @@ export default function Narpo1Page() {
   useEffect(() => {
     // Set document title
     document.title = 'narpo1 - Snefuru';
+    
+    // Remove layout constraints for full width
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.className = 'w-full';
+    }
+    
+    // Cleanup function to restore original layout when leaving page
+    return () => {
+      const mainElement = document.querySelector('main');
+      if (mainElement) {
+        mainElement.className = 'max-w-7xl mx-auto py-6 sm:px-6 lg:px-8';
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -151,8 +165,8 @@ export default function Narpo1Page() {
   }
 
   return (
-    <div className="p-6 min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 w-full -m-6 ml-2">
+      <div className="pl-2 pr-0 py-6 w-full max-w-none">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
