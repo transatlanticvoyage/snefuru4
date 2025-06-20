@@ -114,6 +114,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
     // Check URL params first
     const urlColTemp = searchParams?.get('coltemp');
     const urlStickyCol = searchParams?.get('stickycol');
+    const urlSiteBase = searchParams?.get('sitebase');
     
     if (urlColTemp && urlColTemp in columnTemplates) {
       setSelectedColumnTemplate(urlColTemp as ColumnTemplateKey);
@@ -140,6 +141,11 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
         }
       }
     }
+    
+    // Set site filter from URL parameter
+    if (urlSiteBase) {
+      setFilterSite(urlSiteBase);
+    }
   }, [searchParams]);
 
   // Update URL and localStorage when selections change
@@ -150,12 +156,15 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
     if (stickyColumnCount > 0) {
       params.set('stickycol', `option${stickyColumnCount}`);
     }
+    if (filterSite) {
+      params.set('sitebase', filterSite);
+    }
     router.replace(`/pedazos1?${params.toString()}`, { scroll: false });
     
     // Update localStorage
     localStorage.setItem('pedazos1_columnTemplate', selectedColumnTemplate);
     localStorage.setItem('pedazos1_stickyColumns', stickyColumnCount.toString());
-  }, [selectedColumnTemplate, stickyColumnCount, router]);
+  }, [selectedColumnTemplate, stickyColumnCount, filterSite, router]);
 
   // Get visible columns based on template and sticky columns
   const getVisibleColumns = () => {
@@ -409,7 +418,8 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
             <input
               type="text"
               placeholder="Search titles and content..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              style={{ width: '200px' }}
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
             />
