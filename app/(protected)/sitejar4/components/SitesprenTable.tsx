@@ -7,6 +7,8 @@ interface SitesprenRecord {
   id: string; // Changed from number to string for UUID
   created_at: string;
   sitespren_base: string | null;
+  ns_full: string | null;
+  ip_address: string | null;
   true_root_domain: string | null;
   full_subdomain: string | null;
   webproperty_type: string | null;
@@ -39,19 +41,21 @@ const allColumns = [
   'id',                // 4
   'created_at',        // 5
   'sitespren_base',    // 6
-  'fk_domreg_hostaccount', // 7 (moved from position 18)
-  'true_root_domain',  // 8
-  'full_subdomain',    // 9
-  'webproperty_type',  // 10
-  'fk_users_id',       // 11
-  'updated_at',        // 12
-  'wpuser1',           // 13
-  'wppass1',           // 14
-  'ruplin_apikey',     // 15
-  'wp_rest_app_pass',  // 16
-  'wp_plugin_installed1', // 17
-  'wp_plugin_connected2', // 18
-  'is_wp_site'         // 19
+  'ns_full',           // 7 (new field)
+  'ip_address',        // 8 (new field)
+  'fk_domreg_hostaccount', // 9
+  'true_root_domain',  // 10
+  'full_subdomain',    // 11
+  'webproperty_type',  // 12
+  'fk_users_id',       // 13
+  'updated_at',        // 14
+  'wpuser1',           // 15
+  'wppass1',           // 16
+  'ruplin_apikey',     // 17
+  'wp_rest_app_pass',  // 18
+  'wp_plugin_installed1', // 19
+  'wp_plugin_connected2', // 20
+  'is_wp_site'         // 21
 ];
 
 export default function SitesprenTable({ data, onSelectionChange }: SitesprenTableProps) {
@@ -119,7 +123,7 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
         return combinedColumns;
       }
       case 'option4': {
-        const templateColumns = allColumns.slice(14, 19); // Columns 15-19
+        const templateColumns = allColumns.slice(14, 21); // Columns 15-21
         const combinedColumns = [...stickyColumns];
         templateColumns.forEach(col => {
           if (!stickyColumns.includes(col)) {
@@ -429,10 +433,10 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
           <div className="text-xs font-semibold text-gray-700 mb-2">Column Templates (Show/Hide)</div>
           <div className="flex space-x-1">
             {[
-              { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-19' },
+              { id: 'option1', label: 'OPTION 1', subtitle: 'col temp all', range: 'columns 1-21' },
               { id: 'option2', label: 'OPTION 2', subtitle: 'col temp a', range: 'columns 1-7' },
               { id: 'option3', label: 'OPTION 3', subtitle: 'col temp b', range: 'columns 8-14' },
-              { id: 'option4', label: 'OPTION 4', subtitle: 'col temp c', range: 'columns 15-19' },
+              { id: 'option4', label: 'OPTION 4', subtitle: 'col temp c', range: 'columns 15-21' },
               { id: 'option5', label: 'OPTION 5', subtitle: 'col temp d', range: 'empty' }
             ].map(option => (
               <button
@@ -712,6 +716,8 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                           <div className="text-center">{formatBoolean(item[col as keyof SitesprenRecord] as boolean | null)}</div>
                         ) : col === 'sitespren_base' ? (
                           <span className="font-medium">{item.sitespren_base || '-'}</span>
+                        ) : col === 'ns_full' || col === 'ip_address' ? (
+                          <span className="text-sm">{item[col as keyof SitesprenRecord] || '-'}</span>
                         ) : (
                           item[col as keyof SitesprenRecord] || '-'
                         )}
