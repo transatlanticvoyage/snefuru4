@@ -79,9 +79,9 @@ export default function Header() {
       if (isPedbarPage) {
         try {
           const { data, error } = await supabase
-            .from('snef_colors')
+            .from('custom_colors')
             .select('hex_value')
-            .eq('code', 'headerbg_pedbar')
+            .eq('color_code', 'headerbg_pedbar')
             .single();
           
           if (error) {
