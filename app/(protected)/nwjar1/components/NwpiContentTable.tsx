@@ -51,7 +51,7 @@ interface NwpiContentTableProps {
 
 type SortField = 'post_title' | 'fk_sitespren_base' | 'post_type' | 'post_status' | 'i_sync_completed_at' | 'created_at';
 type SortOrder = 'asc' | 'desc';
-type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
+type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5' | 'option6' | 'option7';
 
 const allColumns = [
   'select',
@@ -120,6 +120,16 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
     name: 'col temp d',
     range: 'columns 22-28',
     columns: allColumns.slice(21, 28)
+  },
+  'option6': {
+    name: 'col temp e',
+    range: 'columns 29-35',
+    columns: allColumns.slice(28, 35)
+  },
+  'option7': {
+    name: 'col temp f',
+    range: 'columns 36-42',
+    columns: allColumns.slice(35, 42)
   }
 };
 
@@ -188,7 +198,7 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
     
     if (urlStickyCol) {
       const stickyCount = parseInt(urlStickyCol.replace('option', ''));
-      if (!isNaN(stickyCount) && stickyCount >= 0 && stickyCount <= 5) {
+      if (!isNaN(stickyCount) && stickyCount >= 0 && stickyCount <= 7) {
         setStickyColumnCount(stickyCount);
       }
     } else {
@@ -196,7 +206,7 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
       const savedStickyCount = localStorage.getItem('nwjar1_stickyColumns');
       if (savedStickyCount) {
         const count = parseInt(savedStickyCount);
-        if (!isNaN(count) && count >= 0 && count <= 5) {
+        if (!isNaN(count) && count >= 0 && count <= 7) {
           setStickyColumnCount(count);
         }
       }
@@ -385,7 +395,7 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
         {/* Column Templates */}
         <div className="flex flex-col space-y-2">
           <div className="text-sm font-bold text-gray-700">Column Templates (Show/Hide)</div>
-          <div className="flex space-x-2" style={{maxWidth: '600px', height: '75px'}}>
+          <div className="flex space-x-1" style={{maxWidth: '850px', height: '75px'}}>
             {Object.entries(columnTemplates).map(([key, template]) => (
               <button
                 key={key}
@@ -395,7 +405,7 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
                     ? 'bg-blue-900 text-white border-blue-900'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                 }`}
-                style={{width: '120px', height: '100%'}}
+                style={{width: '115px', height: '100%'}}
               >
                 <div className="font-semibold">{key.toUpperCase()}</div>
                 <div>{template.name}</div>
@@ -409,7 +419,7 @@ export default function NwpiContentTable({ data }: NwpiContentTableProps) {
         <div className="flex flex-col space-y-2">
           <div className="text-sm font-bold text-gray-700">Sticky Columns At Left Side Of UI Grid Table</div>
           <div className="flex space-x-1">
-            {[0, 1, 2, 3, 4, 5].map((count) => (
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((count) => (
               <button
                 key={count}
                 onClick={() => setStickyColumnCount(count)}
