@@ -26,11 +26,14 @@ export default function Header() {
   const isPedbarPage = pathname === '/pedbar';
   // kzstylerule - custom header bg color for /pedtor1 page
   const isPedtorPage = pathname === '/pedtor1';
+  // kzstylerule - custom header bg color for /pedazos1 page
+  const isPedazosPage = pathname === '/pedazos1';
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [pedbarHeaderColor, setPedbarHeaderColor] = useState<string | null>(null);
   const [pedtorHeaderColor, setPedtorHeaderColor] = useState<string | null>(null);
+  const [pedazosHeaderColor, setPedazosHeaderColor] = useState<string | null>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
 
@@ -130,6 +133,33 @@ export default function Header() {
     fetchPedtorHeaderColor();
   }, [isPedtorPage, supabase]);
 
+  useEffect(() => {
+    // Fetch pedazos1 header color when on /pedazos1 page
+    const fetchPedazosHeaderColor = async () => {
+      if (isPedazosPage) {
+        try {
+          const { data, error } = await supabase
+            .from('custom_colors')
+            .select('hex_value')
+            .eq('color_code', 'headerbg1_pedazos1')
+            .single();
+          
+          if (error) {
+            console.error('Error fetching pedazos1 header color:', error);
+          } else {
+            setPedazosHeaderColor(data?.hex_value || null);
+          }
+        } catch (error) {
+          console.error('Error fetching pedazos1 header color:', error);
+        }
+      } else {
+        setPedazosHeaderColor(null);
+      }
+    };
+
+    fetchPedazosHeaderColor();
+  }, [isPedazosPage, supabase]);
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -227,7 +257,8 @@ export default function Header() {
     <header 
       className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
       style={{ 
-        backgroundColor: isPedtorPage && pedtorHeaderColor ? pedtorHeaderColor : 
+        backgroundColor: isPedazosPage && pedazosHeaderColor ? pedazosHeaderColor :
+                        isPedtorPage && pedtorHeaderColor ? pedtorHeaderColor : 
                         isPedbarPage && pedbarHeaderColor ? pedbarHeaderColor : 
                         '#ffffff'
       }}
