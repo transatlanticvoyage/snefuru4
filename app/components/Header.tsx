@@ -322,12 +322,16 @@ export default function Header() {
           </button>
           
           {navDropdowns[item.name] && (
-            <div className="absolute left-0 mt-1 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
+            <div className={`absolute left-0 mt-1 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 ${
+              item.name === '$9,750/m profits w/ RNR' ? 'w-auto min-w-96' : 'w-48'
+            }`}>
               {item.children.map((child) => (
                 <Link
                   key={child.path}
                   href={child.path!}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
+                    item.name === '$9,750/m profits w/ RNR' ? 'whitespace-nowrap' : ''
+                  }`}
                   onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
                 >
                   {child.name}

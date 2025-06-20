@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 type Profile = {
   id: string;
@@ -11,30 +12,54 @@ type Profile = {
   updated_at: string;
 };
 
+type UserSettings = {
+  id: string;
+  email: string;
+  sidebar_menu_active: boolean;
+};
+
 export default function Profile() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
+  const [sidebarMenuActive, setSidebarMenuActive] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const supabaseClient = createClientComponentClient();
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       try {
         if (!user) return;
 
-        const { data, error } = await supabase
+        // Fetch profile data
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
 
-        if (error) throw error;
+        if (profileError && profileError.code !== 'PGRST116') {
+          throw profileError;
+        }
         
-        setProfile(data);
-        setFullName(data?.full_name || '');
+        setProfile(profileData);
+        setFullName(profileData?.full_name || '');
+
+        // Fetch user settings from users table
+        const { data: userData, error: userError } = await supabaseClient
+          .from('users')
+          .select('id, email, sidebar_menu_active')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (userError) throw userError;
+        
+        setUserSettings(userData);
+        setSidebarMenuActive(userData?.sidebar_menu_active || false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -42,8 +67,8 @@ export default function Profile() {
       }
     };
 
-    fetchProfile();
-  }, [user]);
+    fetchData();
+  }, [user, supabaseClient]);
 
   useEffect(() => {
     // Set document title
@@ -71,6 +96,27 @@ export default function Profile() {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSidebarToggle = async (newValue: boolean) => {
+    if (!userSettings) return;
+
+    setSidebarMenuActive(newValue);
+    
+    try {
+      const { error } = await supabaseClient
+        .from('users')
+        .update({ sidebar_menu_active: newValue })
+        .eq('id', userSettings.id);
+
+      if (error) throw error;
+      
+      setUserSettings(prev => prev ? { ...prev, sidebar_menu_active: newValue } : null);
+    } catch (err) {
+      // Revert on error
+      setSidebarMenuActive(!newValue);
+      setError(err instanceof Error ? err.message : 'Failed to update sidebar setting');
     }
   };
 
@@ -145,6 +191,44 @@ export default function Profile() {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+
+        {/* Sidebar Menu Settings */}
+        <div className="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Sidebar Menu Settings</h3>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex-grow">
+                <label htmlFor="sidebar-toggle" className="block text-sm font-medium text-gray-700">
+                  sidebar_menu_active
+                </label>
+                <p className="text-sm text-gray-500 mt-1">
+                  Toggle the sidebar menu on/off for all pages
+                </p>
+              </div>
+              
+              <div className="ml-4">
+                <button
+                  type="button"
+                  onClick={() => handleSidebarToggle(!sidebarMenuActive)}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                    sidebarMenuActive ? 'bg-green-600' : 'bg-gray-200'
+                  }`}
+                  role="switch"
+                  aria-checked={sidebarMenuActive}
+                  aria-labelledby="sidebar-toggle"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition duration-200 ease-in-out ${
+                      sidebarMenuActive ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
