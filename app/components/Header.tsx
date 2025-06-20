@@ -24,8 +24,8 @@ export default function Header() {
   const isAdminPage = pathname?.startsWith('/admin/');
   // kzstylerule - custom header bg color for /pedbar page
   const isPedbarPage = pathname === '/pedbar';
-  // kzstylerule - custom header bg color for /pedtor page
-  const isPedtorPage = pathname === '/pedtor' || pathname?.startsWith('/pedtor/');
+  // kzstylerule - custom header bg color for /pedtor1 page
+  const isPedtorPage = pathname === '/pedtor1';
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);

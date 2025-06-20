@@ -42,6 +42,7 @@ const allColumns = [
   'actions',
   'slot_id',
   'slot_name',
+  'slot_publicly_shown',
   'is_ai_model',
   'count_active_modules_on_slot',
   'm1name',
@@ -53,7 +54,6 @@ const allColumns = [
   'created_at',
   'updated_at',
   'fk_iservices_provider_id',
-  'slot_publicly_shown',
   'fk_ai_model_id'
 ];
 
@@ -612,7 +612,7 @@ export default function CreateNewApiKeySlotsPage({
             />
           );
         }
-        return value;
+        return <span className="font-bold">{value}</span>;
       
       case 'count_active_modules_on_slot':
         // Calculate based on current editing values if editing
