@@ -68,6 +68,8 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
   const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
   const [syncLoading, setSyncLoading] = useState<Set<string>>(new Set());
   const [syncResults, setSyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
+  const [refreshingCells, setRefreshingCells] = useState<Set<string>>(new Set());
+  const [dnsData, setDnsData] = useState<{[key: string]: {ns_full?: string, ip_address?: string}}>({});
   
   // Column template and sticky state
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState('option1');
@@ -415,6 +417,89 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
     }
   };
 
+  // DNS refresh handlers
+  const handleRefreshNS = async (siteId: string, sitesprenBase: string) => {
+    const cellKey = `${siteId}_ns`;
+    setRefreshingCells(prev => new Set([...prev, cellKey]));
+
+    try {
+      const response = await fetch('/api/sites/refresh-ns', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId,
+          domain: sitesprenBase
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state with new NS data
+        setDnsData(prev => ({
+          ...prev,
+          [siteId]: {
+            ...prev[siteId],
+            ns_full: result.data.ns_full
+          }
+        }));
+      } else {
+        console.error('Error refreshing NS:', result.error);
+      }
+    } catch (error) {
+      console.error('Error refreshing NS:', error);
+    } finally {
+      setRefreshingCells(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(cellKey);
+        return newSet;
+      });
+    }
+  };
+
+  const handleRefreshIP = async (siteId: string, sitesprenBase: string) => {
+    const cellKey = `${siteId}_ip`;
+    setRefreshingCells(prev => new Set([...prev, cellKey]));
+
+    try {
+      const response = await fetch('/api/sites/refresh-ip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId,
+          domain: sitesprenBase
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state with new IP data
+        setDnsData(prev => ({
+          ...prev,
+          [siteId]: {
+            ...prev[siteId],
+            ip_address: result.data.ip_address
+          }
+        }));
+      } else {
+        console.error('Error refreshing IP:', result.error);
+      }
+    } catch (error) {
+      console.error('Error refreshing IP:', error);
+    } finally {
+      setRefreshingCells(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(cellKey);
+        return newSet;
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Column Template and View Control System */}
@@ -716,8 +801,40 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
                           <div className="text-center">{formatBoolean(item[col as keyof SitesprenRecord] as boolean | null)}</div>
                         ) : col === 'sitespren_base' ? (
                           <span className="font-medium">{item.sitespren_base || '-'}</span>
-                        ) : col === 'ns_full' || col === 'ip_address' ? (
-                          <span className="text-sm">{item[col as keyof SitesprenRecord] || '-'}</span>
+                        ) : col === 'ns_full' ? (
+                          <div 
+                            className="cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
+                            onClick={() => handleRefreshNS(item.id, item.sitespren_base || '')}
+                            title="Click to refresh nameserver info"
+                          >
+                            {refreshingCells.has(`${item.id}_ns`) ? (
+                              <div className="flex justify-center items-center">
+                                <svg className="animate-spin h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                              </div>
+                            ) : (
+                              <span className="text-sm">{dnsData[item.id]?.ns_full || item.ns_full || '-'}</span>
+                            )}
+                          </div>
+                        ) : col === 'ip_address' ? (
+                          <div 
+                            className="cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
+                            onClick={() => handleRefreshIP(item.id, item.sitespren_base || '')}
+                            title="Click to refresh IP address info"
+                          >
+                            {refreshingCells.has(`${item.id}_ip`) ? (
+                              <div className="flex justify-center items-center">
+                                <svg className="animate-spin h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                              </div>
+                            ) : (
+                              <span className="text-sm">{dnsData[item.id]?.ip_address || item.ip_address || '-'}</span>
+                            )}
+                          </div>
                         ) : (
                           item[col as keyof SitesprenRecord] || '-'
                         )}
