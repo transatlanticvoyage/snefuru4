@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface GconPiece {
   id: string;
@@ -27,6 +28,44 @@ interface GconPiecesTableProps {
 type SortField = "meta_title" | "asn_sitespren_base" | "created_at" | "updated_at";
 type SortOrder = "asc" | "desc";
 
+const allColumns = [
+  'actions',
+  'meta_title', 
+  'h1title',
+  'asn_sitespren_base',
+  'asn_nwpi_posts_id',
+  'created_at',
+  'updated_at'
+];
+
+const columnTemplates = {
+  'option1': {
+    name: 'col temp all',
+    range: 'columns 1-~',
+    columns: allColumns
+  },
+  'option2': {
+    name: 'col temp a',
+    range: 'columns 1-3',
+    columns: allColumns.slice(0, 3)
+  },
+  'option3': {
+    name: 'col temp b',
+    range: 'columns 4-5',
+    columns: allColumns.slice(3, 5)
+  },
+  'option4': {
+    name: 'col temp c',
+    range: 'columns 6-7',
+    columns: allColumns.slice(5, 7)
+  },
+  'option5': {
+    name: 'col temp d',
+    range: 'columns 1-4',
+    columns: allColumns.slice(0, 4)
+  }
+};
+
 export default function GconPiecesTable({ initialData, userId }: GconPiecesTableProps) {
   const [data] = useState<GconPiece[]>(initialData);
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,6 +75,67 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [filterSite, setFilterSite] = useState("");
   const [filterPage, setFilterPage] = useState("");
+  const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<string>('option1');
+  const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
+  
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Load state from URL params and localStorage on mount
+  useEffect(() => {
+    // Check URL params first
+    const urlColTemp = searchParams?.get('coltemp');
+    const urlStickyCol = searchParams?.get('stickycol');
+    
+    if (urlColTemp && urlColTemp in columnTemplates) {
+      setSelectedColumnTemplate(urlColTemp);
+    } else {
+      // Fall back to localStorage
+      const savedColTemp = localStorage.getItem('pedazos1_columnTemplate');
+      if (savedColTemp && savedColTemp in columnTemplates) {
+        setSelectedColumnTemplate(savedColTemp);
+      }
+    }
+    
+    if (urlStickyCol) {
+      const stickyCount = parseInt(urlStickyCol.replace('option', ''));
+      if (!isNaN(stickyCount) && stickyCount >= 0 && stickyCount <= 5) {
+        setStickyColumnCount(stickyCount);
+      }
+    } else {
+      // Fall back to localStorage
+      const savedStickyCount = localStorage.getItem('pedazos1_stickyColumns');
+      if (savedStickyCount) {
+        const count = parseInt(savedStickyCount);
+        if (!isNaN(count) && count >= 0 && count <= 5) {
+          setStickyColumnCount(count);
+        }
+      }
+    }
+  }, [searchParams]);
+
+  // Update URL and localStorage when selections change
+  useEffect(() => {
+    // Update URL
+    const params = new URLSearchParams();
+    params.set('coltemp', selectedColumnTemplate);
+    if (stickyColumnCount > 0) {
+      params.set('stickycol', `option${stickyColumnCount}`);
+    }
+    router.replace(`/pedazos1?${params.toString()}`, { scroll: false });
+    
+    // Update localStorage
+    localStorage.setItem('pedazos1_columnTemplate', selectedColumnTemplate);
+    localStorage.setItem('pedazos1_stickyColumns', stickyColumnCount.toString());
+  }, [selectedColumnTemplate, stickyColumnCount, router]);
+
+  // Get visible columns based on template and sticky columns
+  const getVisibleColumns = () => {
+    const templateColumns = columnTemplates[selectedColumnTemplate].columns;
+    const stickyColumns = allColumns.slice(0, stickyColumnCount);
+    const nonStickyTemplateColumns = templateColumns.filter(col => !stickyColumns.includes(col));
+    return [...stickyColumns, ...nonStickyTemplateColumns];
+  };
 
   // Get unique sites and pages for filter dropdowns
   const uniqueSites = useMemo(() => {
@@ -148,8 +248,69 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
   };
 
+  const visibleColumns = getVisibleColumns();
+
   return (
     <div className="space-y-4">
+      {/* Column Template System */}
+      <div className="flex items-center space-x-4">
+        {/* SQL View Info */}
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-3" style={{maxWidth: '130px', maxHeight: '75px'}}>
+          <div className="text-xs text-gray-600">
+            <div className="font-semibold mb-1">SQL View Info</div>
+            <div className="text-gray-700">view name: gcon_pieces</div>
+            <div className="text-gray-700"># columns: {allColumns.length}</div>
+          </div>
+        </div>
+
+        {/* Column Templates */}
+        <div className="flex flex-col space-y-2">
+          <div className="text-sm font-bold text-gray-700">Column Templates (Show/Hide)</div>
+          <div className="flex space-x-2" style={{maxWidth: '600px', height: '75px'}}>
+            {Object.entries(columnTemplates).map(([key, template]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedColumnTemplate(key)}
+                className={`flex flex-col justify-center items-center text-xs leading-tight border rounded-lg transition-colors ${
+                  selectedColumnTemplate === key
+                    ? 'bg-blue-900 text-white border-blue-900'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+                style={{width: '120px', height: '100%'}}
+              >
+                <div className="font-semibold">{key.toUpperCase()}</div>
+                <div>{template.name}</div>
+                <div>{template.range}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sticky Columns */}
+        <div className="flex flex-col space-y-2">
+          <div className="text-sm font-bold text-gray-700">Sticky Columns At Left Side Of UI Grid Table</div>
+          <div className="flex space-x-1">
+            {[0, 1, 2, 3, 4, 5].map((count) => (
+              <button
+                key={count}
+                onClick={() => setStickyColumnCount(count)}
+                className={`flex flex-col justify-center items-center text-xs leading-tight border rounded transition-colors ${
+                  stickyColumnCount === count
+                    ? 'bg-green-700 text-white border-green-700'
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                }`}
+                style={{width: '60px', height: '55px'}}
+              >
+                <div className="font-semibold">OPTION {count === 0 ? 'OFF' : count}</div>
+                <div className="text-center whitespace-pre-line">
+                  {count === 0 ? 'none' : `${count} left-most\ncolumn${count > 1 ? 's' : ''}`}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Search and Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -200,70 +361,70 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider">
-                  actions
-                </th>
-                <th 
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("meta_title")}
-                >
-                  meta_title {sortField === "meta_title" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider">
-                  h1title
-                </th>
-                <th 
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("asn_sitespren_base")}
-                >
-                  asn_sitespren_base {sortField === "asn_sitespren_base" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider">
-                  asn_nwpi_posts_id
-                </th>
-                <th 
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("created_at")}
-                >
-                  created_at {sortField === "created_at" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th 
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  onClick={() => handleSort("updated_at")}
-                >
-                  updated_at {sortField === "updated_at" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
+                {visibleColumns.map((col, index) => {
+                  const isSticky = index < stickyColumnCount;
+                  const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
+                  const isSortable = ['meta_title', 'asn_sitespren_base', 'created_at', 'updated_at'].includes(col);
+                  
+                  return (
+                    <th
+                      key={col}
+                      className={`px-6 py-3 text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${
+                        isSortable ? 'cursor-pointer hover:bg-gray-100' : ''
+                      } ${isSticky ? 'sticky bg-gray-50 z-10' : ''} ${
+                        isSeparator ? 'border-r-4 border-black' : ''
+                      }`}
+                      style={isSticky ? { left: `${index * 150}px` } : {}}
+                      onClick={isSortable ? () => handleSort(col as SortField) : undefined}
+                    >
+                      {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link
-                      href={`/pedbar?id=${item.id}`}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Individual View
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {truncateText(item.meta_title, 60)}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {truncateText(item.h1title, 60)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {item.asn_sitespren_base || "-"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {truncateText(item.asn_nwpi_posts_id, 30)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(item.created_at)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(item.updated_at)}
-                  </td>
+                  {visibleColumns.map((col, index) => {
+                    const isSticky = index < stickyColumnCount;
+                    const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
+                    
+                    return (
+                      <td
+                        key={col}
+                        className={`px-6 py-4 text-sm text-gray-900 ${
+                          isSticky ? 'sticky bg-white z-10' : ''
+                        } ${isSeparator ? 'border-r-4 border-black' : ''} ${
+                          col === 'actions' ? 'whitespace-nowrap' : ''
+                        }`}
+                        style={isSticky ? { left: `${index * 150}px` } : {}}
+                      >
+                        {col === 'actions' ? (
+                          <Link
+                            href={`/pedbar?id=${item.id}`}
+                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          >
+                            Individual View
+                          </Link>
+                        ) : col === 'created_at' || col === 'updated_at' ? (
+                          <span className="whitespace-nowrap text-gray-500">
+                            {formatDate(item[col])}
+                          </span>
+                        ) : col === 'meta_title' || col === 'h1title' ? (
+                          truncateText(item[col], 60)
+                        ) : col === 'asn_nwpi_posts_id' ? (
+                          <span className="whitespace-nowrap">
+                            {truncateText(item[col], 30)}
+                          </span>
+                        ) : (
+                          <span className="whitespace-nowrap">
+                            {item[col as keyof GconPiece] || "-"}
+                          </span>
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
