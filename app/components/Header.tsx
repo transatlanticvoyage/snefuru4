@@ -208,6 +208,49 @@ export default function Header() {
 
   // Split navigation items into 2 rows, with break after panjar3
   const splitNavItems = () => {
+    // Filter out admin pages from regular navigation
+    const adminPages: NavItem[] = [];
+    const nonAdminItems: NavItem[] = [];
+    
+    navItems.forEach(item => {
+      if (item.path && item.path.includes('/admin/')) {
+        adminPages.push(item);
+      } else if (item.children) {
+        // Check children for admin pages
+        const adminChildren = item.children.filter(child => child.path && child.path.includes('/admin/'));
+        const nonAdminChildren = item.children.filter(child => !child.path || !child.path.includes('/admin/'));
+        
+        // Add admin children to adminPages
+        adminPages.push(...adminChildren);
+        
+        // Only add parent item if it has non-admin children
+        if (nonAdminChildren.length > 0) {
+          nonAdminItems.push({
+            ...item,
+            children: nonAdminChildren
+          });
+        }
+      } else {
+        nonAdminItems.push(item);
+      }
+    });
+
+    // Create the admin menu item with all admin pages
+    const adminMenuItem: NavItem = {
+      name: 'admin',
+      children: [
+        {
+          name: 'API Key Slots Management',
+          path: 'https://snef.me/admin/create-new-api-key-slots?coltemp=option1'
+        },
+        {
+          name: 'Custom Color Management',
+          path: 'https://snef.me/admin/colors1'
+        },
+        ...adminPages // Add any other admin pages found in navigation
+      ]
+    };
+
     // Create the special first item that always comes first
     const specialFirstItem: NavItem = {
       name: '$9,750/m profits w/ RNR',
@@ -263,8 +306,8 @@ export default function Header() {
       ]
     };
 
-    // Create the final nav items array with special item first
-    const finalNavItems = [specialFirstItem, ...navItems];
+    // Create the final nav items array with admin first, then special item, then the rest (non-admin items)
+    const finalNavItems = [adminMenuItem, specialFirstItem, ...nonAdminItems];
 
     const panjar3Index = finalNavItems.findIndex(item => item.name === 'panjar3');
     if (panjar3Index === -1) {
@@ -296,7 +339,7 @@ export default function Header() {
             onClick={() => toggleNavDropdown(item.name)}
             className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700 focus:outline-none"
           >
-            {item.name === '$9,750/m profits w/ RNR' && (
+            {(item.name === 'admin' || item.name === '$9,750/m profits w/ RNR') && (
               <svg 
                 className="w-4 h-4 mr-1 text-black" 
                 style={{ 
