@@ -190,17 +190,25 @@ export default function NwJar1Page() {
       {/* Popup Modal */}
       {isPopupOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative">
-            {/* Close button */}
+          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
+            {/* Blue header bar */}
+            <div 
+              className="bg-blue-600 text-white absolute top-0 left-0 right-0 flex items-center px-4"
+              style={{ height: '30px' }}
+            >
+              <span className="font-semibold">bar38</span>
+            </div>
+            
+            {/* Close button - adjusted position to account for header */}
             <button
               onClick={() => setIsPopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+              className="absolute top-10 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 z-10"
             >
               ×
             </button>
             
-            {/* Popup content - currently blank */}
-            <div className="p-8 h-full">
+            {/* Popup content - adjusted to start below header */}
+            <div className="p-8 h-full pt-16">
               {/* Content will be added here later */}
             </div>
           </div>
