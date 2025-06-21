@@ -440,14 +440,32 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                 <option key={site} value={site}>{site}</option>
               ))}
             </select>
-            {/* Black square element */}
+            {/* Colored squares */}
             <div 
               className="absolute bg-black"
               style={{
-                width: '10px',
-                height: '10px',
-                top: 'calc(100% + 2px)',
+                width: '14px',
+                height: '14px',
+                top: 'calc(100% + 3px)',
                 left: '0px'
+              }}
+            />
+            <div 
+              className="absolute bg-red-500"
+              style={{
+                width: '14px',
+                height: '14px',
+                top: 'calc(100% + 3px)',
+                left: '17px'
+              }}
+            />
+            <div 
+              className="absolute bg-blue-500"
+              style={{
+                width: '14px',
+                height: '14px',
+                top: 'calc(100% + 3px)',
+                left: '34px'
               }}
             />
           </div>
