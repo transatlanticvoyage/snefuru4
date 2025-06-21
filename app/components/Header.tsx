@@ -153,7 +153,7 @@ export default function Header() {
             setGconjarHeaderColor(data?.hex_value || null);
           }
         } catch (error) {
-          console.error('Error fetching pedazos1 header color:', error);
+          console.error('Error fetching gconjar1 header color:', error);
         }
       } else {
         setGconjarHeaderColor(null);
@@ -409,7 +409,7 @@ export default function Header() {
       className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
       style={{ 
         backgroundColor: isNwjarPage && nwjarHeaderColor ? nwjarHeaderColor :
-                        isPedazosPage && pedazosHeaderColor ? pedazosHeaderColor :
+                        isGconjarPage && gconjarHeaderColor ? gconjarHeaderColor :
                         isPedtorPage && pedtorHeaderColor ? pedtorHeaderColor : 
                         isPedbarPage && pedbarHeaderColor ? pedbarHeaderColor : 
                         '#ffffff'

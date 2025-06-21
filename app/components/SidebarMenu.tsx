@@ -28,8 +28,8 @@ const menuItems = [
     path: '/sitejar4'
   },
   {
-    name: '/pedazos1 - T.GCON_PIECES - UTG',
-    path: '/pedazos1'
+    name: '/gconjar1 - T.GCON_PIECES - UTG',
+    path: '/gconjar1'
   },
   {
     name: '/pedbar - t.gcon_pieces - item',

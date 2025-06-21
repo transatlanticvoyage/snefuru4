@@ -349,7 +349,7 @@ export default function NwJar1Page() {
         {/* Go Forward Button */}
         {hasSitebase && currentSitebase ? (
           <Link
-            href={`/pedazos1?coltemp=option1&sitebase=${encodeURIComponent(currentSitebase)}`}
+            href={`/gconjar1?coltemp=option1&sitebase=${encodeURIComponent(currentSitebase)}`}
             className="font-bold text-gray-600 rounded hover:bg-gray-300 transition-colors"
             style={{
               backgroundColor: '#e5e7eb', // light gray
@@ -361,7 +361,7 @@ export default function NwJar1Page() {
               textDecoration: 'none'
             }}
           >
-            &gt;&gt; Go Forward To /pedazos1
+            &gt;&gt; Go Forward To /gconjar1
           </Link>
         ) : (
           <button
@@ -376,7 +376,7 @@ export default function NwJar1Page() {
               paddingBottom: '10px'
             }}
           >
-            &gt;&gt; Go Forward To /pedazos1
+            &gt;&gt; Go Forward To /gconjar1
           </button>
         )}
       </div>

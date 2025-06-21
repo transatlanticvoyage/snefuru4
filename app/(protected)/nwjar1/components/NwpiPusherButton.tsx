@@ -166,7 +166,7 @@ export default function NwpiPusherButton({ data }: NwpiPusherButtonProps) {
                   <div className="bg-green-50 border border-green-200 rounded-md p-3">
                     <p className="text-sm text-green-700">
                       ✅ Successfully pushed {pushResult.results.succeeded} records to gcon_pieces. 
-                      You can view them on the <a href="/pedazos1" className="underline font-medium">pedazos1 page</a>.
+                      You can view them on the <a href="/gconjar1" className="underline font-medium">gconjar1 page</a>.
                     </p>
                   </div>
                 )}

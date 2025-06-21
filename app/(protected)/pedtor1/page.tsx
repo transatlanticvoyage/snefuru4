@@ -71,9 +71,9 @@ export default function Pedtor1Page() {
 
         setUserInternalId(userData.id);
 
-        // If no piece ID provided, redirect to pedazos1
+        // If no piece ID provided, redirect to gconjar1
         if (!pieceId) {
-          router.push('/pedazos1');
+          router.push('/gconjar1');
           return;
         }
 
@@ -122,7 +122,7 @@ export default function Pedtor1Page() {
           <p>{error}</p>
         </div>
         <Link 
-          href="/pedazos1" 
+          href="/gconjar1" 
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
         >
           ← Back to Content List
@@ -137,7 +137,7 @@ export default function Pedtor1Page() {
         <div className="text-center">
           <p className="text-gray-600">No content piece found.</p>
           <Link 
-            href="/pedazos1" 
+            href="/gconjar1" 
             className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
             ← Back to Content List
@@ -154,7 +154,7 @@ export default function Pedtor1Page() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <Link 
-              href="/pedazos1" 
+              href="/gconjar1" 
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
             >
               ← Back to Content List

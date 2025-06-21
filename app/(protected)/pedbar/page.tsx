@@ -116,7 +116,7 @@ export default function PedbarPage() {
           <h1 className="text-2xl font-bold mb-4 text-red-600">Invalid Request</h1>
           <p className="mb-4">No content piece ID provided.</p>
           <Link 
-            href="/pedazos1"
+            href="/gconjar1"
             className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Back to Content Pieces
@@ -143,7 +143,7 @@ export default function PedbarPage() {
           <h1 className="text-2xl font-bold mb-4 text-red-600">Error</h1>
           <p className="mb-4 text-red-600">{error}</p>
           <Link 
-            href="/pedazos1"
+            href="/gconjar1"
             className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Back to Content Pieces
@@ -160,7 +160,7 @@ export default function PedbarPage() {
           <h1 className="text-2xl font-bold mb-4 text-red-600">Not Found</h1>
           <p className="mb-4">Content piece not found.</p>
           <Link 
-            href="/pedazos1"
+            href="/gconjar1"
             className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Back to Content Pieces
@@ -207,7 +207,7 @@ export default function PedbarPage() {
             </div>
             
             <Link 
-              href="/pedazos1"
+              href="/gconjar1"
               className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
             >
               ← Back to List
