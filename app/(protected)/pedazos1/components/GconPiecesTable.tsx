@@ -104,6 +104,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [updatingStars, setUpdatingStars] = useState<Set<string>>(new Set());
+  const [nsFullData, setNsFullData] = useState<string>('');
   
   const router = useRouter();
   const supabase = createClientComponentClient();
@@ -165,6 +166,47 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
     localStorage.setItem('pedazos1_columnTemplate', selectedColumnTemplate);
     localStorage.setItem('pedazos1_stickyColumns', stickyColumnCount.toString());
   }, [selectedColumnTemplate, stickyColumnCount, filterSite, router]);
+
+  // Fetch ns_full data from sitespren table
+  useEffect(() => {
+    const fetchNsFullData = async () => {
+      try {
+        // Get the internal user ID first
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', userId)
+          .single();
+
+        if (userError || !userData) {
+          console.error('Error fetching user:', userError);
+          return;
+        }
+
+        // Fetch ns_full data from sitespren table for this user
+        const { data: sitesprenData, error: sitesprenError } = await supabase
+          .from('sitespren')
+          .select('ns_full')
+          .eq('fk_users_id', userData.id)
+          .limit(1)
+          .single();
+
+        if (sitesprenError) {
+          console.error('Error fetching ns_full:', sitesprenError);
+          setNsFullData('No data found');
+        } else {
+          setNsFullData(sitesprenData?.ns_full || 'No data found');
+        }
+      } catch (error) {
+        console.error('Error in fetchNsFullData:', error);
+        setNsFullData('Error loading data');
+      }
+    };
+
+    if (userId) {
+      fetchNsFullData();
+    }
+  }, [userId, supabase]);
 
   // Get visible columns based on template and sticky columns
   const getVisibleColumns = () => {
@@ -468,6 +510,34 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                 left: '34px'
               }}
             />
+            {/* NS label and data area */}
+            <div 
+              className="absolute bg-gray-200 border border-gray-300 flex items-center justify-center"
+              style={{
+                width: '34px',
+                height: '16px',
+                top: 'calc(100% + 17px)', // 3px + 14px squares = 17px below dropdown
+                left: '0px',
+                fontSize: '13px'
+              }}
+            >
+              NS
+            </div>
+            <div 
+              className="absolute bg-white border border-gray-300 flex items-center px-2"
+              style={{
+                width: '350px',
+                height: '16px',
+                top: 'calc(100% + 17px)', // Same level as NS label
+                left: '34px', // Immediately adjoining to the right
+                fontSize: '12px',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {nsFullData}
+            </div>
           </div>
           <div>
             <select
