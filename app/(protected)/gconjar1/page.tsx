@@ -8,7 +8,7 @@ import Link from 'next/link';
 import GconPiecesTable from "./components/GconPiecesTable";
 import { cfunc_215_createpiece } from "./utils/cfunc_215_createpiece";
 
-export default function Pedazos1Page() {
+export default function Gconjar1Page() {
   const [gconPieces, setGconPieces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export default function Pedazos1Page() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    document.title = '/pedazos1 - Snefuru';
+    document.title = '/gconjar1 - Snefuru';
     
     // Add custom styles to make main element full width for this page only
     const style = document.createElement('style');

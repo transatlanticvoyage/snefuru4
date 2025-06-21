@@ -137,7 +137,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
       setSelectedColumnTemplate(urlColTemp as ColumnTemplateKey);
     } else {
       // Fall back to localStorage
-      const savedColTemp = localStorage.getItem('pedazos1_columnTemplate');
+      const savedColTemp = localStorage.getItem('gconjar1_columnTemplate');
       if (savedColTemp && savedColTemp in columnTemplates) {
         setSelectedColumnTemplate(savedColTemp as ColumnTemplateKey);
       }
@@ -150,7 +150,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
       }
     } else {
       // Fall back to localStorage
-      const savedStickyCount = localStorage.getItem('pedazos1_stickyColumns');
+      const savedStickyCount = localStorage.getItem('gconjar1_stickyColumns');
       if (savedStickyCount) {
         const count = parseInt(savedStickyCount);
         if (!isNaN(count) && count >= 0 && count <= 5) {
@@ -176,11 +176,11 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
     if (filterSite) {
       params.set('sitebase', filterSite);
     }
-    router.replace(`/pedazos1?${params.toString()}`, { scroll: false });
+    router.replace(`/gconjar1?${params.toString()}`, { scroll: false });
     
     // Update localStorage
-    localStorage.setItem('pedazos1_columnTemplate', selectedColumnTemplate);
-    localStorage.setItem('pedazos1_stickyColumns', stickyColumnCount.toString());
+    localStorage.setItem('gconjar1_columnTemplate', selectedColumnTemplate);
+    localStorage.setItem('gconjar1_stickyColumns', stickyColumnCount.toString());
   }, [selectedColumnTemplate, stickyColumnCount, filterSite, router]);
 
   // Fetch ns_full data from sitespren table

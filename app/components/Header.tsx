@@ -26,8 +26,8 @@ export default function Header() {
   const isPedbarPage = pathname === '/pedbar';
   // kzstylerule - custom header bg color for /pedtor1 page
   const isPedtorPage = pathname === '/pedtor1';
-  // kzstylerule - custom header bg color for /pedazos1 page
-  const isPedazosPage = pathname === '/pedazos1';
+  // kzstylerule - custom header bg color for /gconjar1 page
+  const isGconjarPage = pathname === '/gconjar1';
   // kzstylerule - custom header bg color for /nwjar1 page
   const isNwjarPage = pathname === '/nwjar1';
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -35,7 +35,7 @@ export default function Header() {
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [pedbarHeaderColor, setPedbarHeaderColor] = useState<string | null>(null);
   const [pedtorHeaderColor, setPedtorHeaderColor] = useState<string | null>(null);
-  const [pedazosHeaderColor, setPedazosHeaderColor] = useState<string | null>(null);
+  const [gconjarHeaderColor, setGconjarHeaderColor] = useState<string | null>(null);
   const [nwjarHeaderColor, setNwjarHeaderColor] = useState<string | null>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
@@ -137,31 +137,31 @@ export default function Header() {
   }, [isPedtorPage, supabase]);
 
   useEffect(() => {
-    // Fetch pedazos1 header color when on /pedazos1 page
-    const fetchPedazosHeaderColor = async () => {
-      if (isPedazosPage) {
+    // Fetch gconjar1 header color when on /gconjar1 page
+    const fetchGconjarHeaderColor = async () => {
+      if (isGconjarPage) {
         try {
           const { data, error } = await supabase
             .from('custom_colors')
             .select('hex_value')
-            .eq('color_code', 'headerbg1_pedazos1')
+            .eq('color_code', 'headerbg1_gconjar1')
             .single();
           
           if (error) {
-            console.error('Error fetching pedazos1 header color:', error);
+            console.error('Error fetching gconjar1 header color:', error);
           } else {
-            setPedazosHeaderColor(data?.hex_value || null);
+            setGconjarHeaderColor(data?.hex_value || null);
           }
         } catch (error) {
           console.error('Error fetching pedazos1 header color:', error);
         }
       } else {
-        setPedazosHeaderColor(null);
+        setGconjarHeaderColor(null);
       }
     };
 
-    fetchPedazosHeaderColor();
-  }, [isPedazosPage, supabase]);
+    fetchGconjarHeaderColor();
+  }, [isGconjarPage, supabase]);
 
   useEffect(() => {
     // Fetch nwjar1 header color when on /nwjar1 page
@@ -276,8 +276,8 @@ export default function Header() {
           path: '/sitejar4'
         },
         {
-          name: '/pedazos1 - T.GCON_PIECES - UTG',
-          path: '/pedazos1'
+          name: '/gconjar1 - T.GCON_PIECES - UTG',
+          path: '/gconjar1'
         },
         {
           name: '/pedbar - t.gcon_pieces - item',
