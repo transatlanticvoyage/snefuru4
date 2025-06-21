@@ -198,13 +198,21 @@ export default function NwJar1Page() {
             >
               <span className="font-semibold">uel.bar38</span>
               <div 
-                className="text-white ml-4"
+                className="text-white ml-4 flex items-center"
                 style={{
                   padding: '8px',
                   border: '1px solid black',
                   fontSize: '16px'
                 }}
               >
+                <input
+                  type="checkbox"
+                  className="mr-2 cursor-pointer"
+                  style={{
+                    width: '18px',
+                    height: '18px'
+                  }}
+                />
                 Use Your Current Selection From Table
               </div>
             </div>
