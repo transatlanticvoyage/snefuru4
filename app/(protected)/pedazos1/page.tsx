@@ -12,6 +12,7 @@ export default function Pedazos1Page() {
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
 
@@ -205,20 +206,41 @@ export default function Pedazos1Page() {
       )}
 
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Content Pieces</h1>
-        <div className="flex justify-between items-center">
-          <p className="text-gray-600">
-            Manage your article content for future publishing
-          </p>
-          <button
-            onClick={handleCreateNewPiece}
-            disabled={isCreating}
-            className="px-4 py-2 bg-green-800 hover:bg-green-900 disabled:bg-green-600 text-white font-bold rounded-md transition-colors"
-          >
-            {isCreating ? 'Creating...' : 'func_215_createpiece'}
-          </button>
-        </div>
+        <button
+          onClick={() => setIsPopupOpen(true)}
+          className="font-bold text-white rounded"
+          style={{
+            backgroundColor: '#800000', // maroon color
+            fontSize: '20px',
+            paddingLeft: '14px',
+            paddingRight: '14px',
+            paddingTop: '10px',
+            paddingBottom: '10px'
+          }}
+        >
+          functions popup
+        </button>
       </div>
+
+      {/* Popup Modal */}
+      {isPopupOpen && (
+        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative">
+            {/* Close button */}
+            <button
+              onClick={() => setIsPopupOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+            >
+              ×
+            </button>
+            
+            {/* Popup content - currently blank */}
+            <div className="p-8 h-full">
+              {/* Content will be added here later */}
+            </div>
+          </div>
+        </div>
+      )}
 
       <GconPiecesTable 
         initialData={gconPieces} 
