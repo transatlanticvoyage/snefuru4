@@ -648,7 +648,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
               </tr>
               
               {/* Second row - Target (gcon_pieces) */}
-              <tr className="bg-gray-50">
+              <tr className="bg-blue-100">
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
@@ -659,8 +659,8 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                       key={`target-${col}`}
                       className={`text-left text-xs text-gray-700 lowercase tracking-wider ${
                         col === 'select' ? 'px-[6px] py-2' : 'px-6 py-2'
-                      } ${isSortable ? 'cursor-pointer hover:bg-gray-100' : ''} ${
-                        isSticky ? 'sticky bg-gray-50 z-10' : ''
+                      } ${isSortable ? 'cursor-pointer hover:bg-blue-200' : ''} ${
+                        isSticky ? 'sticky bg-blue-100 z-10' : ''
                       } ${isSeparator ? 'border-r-4 border-black' : ''}`}
                       style={isSticky ? { left: `${index * 150}px` } : {}}
                       onClick={isSortable ? () => handleSort(col as SortField) : undefined}
