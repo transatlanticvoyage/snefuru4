@@ -198,7 +198,7 @@ export default function NwJar1Page() {
             >
               <span className="font-semibold">uel.bar38</span>
               <div 
-                className="text-white ml-4 flex items-center"
+                className="text-white ml-4 flex items-center kz101"
                 style={{
                   padding: '8px',
                   border: '1px solid black',
