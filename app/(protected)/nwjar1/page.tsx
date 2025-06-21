@@ -215,7 +215,21 @@ export default function NwJar1Page() {
   // Handle popup open/close with URL updates
   const handlePopupOpen = () => {
     setIsPopupOpen(true);
-    updatePopupURL(true, activePopupTab);
+    
+    // Check if URL has specific tab parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasTabInUrl = ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7']
+      .some(tab => urlParams.get(tab) === 'active');
+    
+    if (!hasTabInUrl) {
+      // No tab specified in URL, use last remembered tab from localStorage
+      const lastTab = localStorage.getItem('nwjar1_lastActiveTab') || 'ptab1';
+      setActivePopupTab(lastTab as any);
+      updatePopupURL(true, lastTab);
+    } else {
+      // URL has tab specified, use current activePopupTab
+      updatePopupURL(true, activePopupTab);
+    }
   };
 
   const handlePopupClose = () => {
@@ -223,9 +237,10 @@ export default function NwJar1Page() {
     updatePopupURL(false);
   };
 
-  // Handle tab changes with URL updates
+  // Handle tab changes with URL updates and localStorage
   const handleTabChange = (tab: string) => {
     setActivePopupTab(tab as any);
+    localStorage.setItem('nwjar1_lastActiveTab', tab); // Remember this tab for next time
     updatePopupURL(true, tab);
   };
 
@@ -292,6 +307,7 @@ export default function NwJar1Page() {
               style={{ height: '50px' }}
             >
               <span className="font-semibold">uel.bar38</span>
+              <span className="font-bold ml-2">{window.location.pathname}</span>
               <div 
                 className="text-white ml-4 flex items-center kz101 cursor-pointer"
                 style={{
@@ -344,16 +360,21 @@ export default function NwJar1Page() {
                 />
                 Select All Items In Current Pagination | (DYNAMIC COUNT)
               </div>
+              
+              {/* Close button in header */}
+              <button
+                onClick={handlePopupClose}
+                className="absolute right-0 top-0 bg-gray-400 text-gray-800 font-bold flex items-center justify-center hover:bg-gray-500 transition-colors"
+                style={{
+                  width: '260px',
+                  height: '50px',
+                  border: '2px solid #4a4a4a',
+                  fontSize: '24px'
+                }}
+              >
+                ×
+              </button>
             </div>
-            
-            {/* Close button - adjusted position to account for header */}
-            <button
-              onClick={handlePopupClose}
-              className="absolute right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 z-10"
-              style={{ top: '60px' }}
-            >
-              ×
-            </button>
             
             {/* Popup content - adjusted to start below header */}
             <div className="h-full" style={{ paddingTop: '50px' }}>
