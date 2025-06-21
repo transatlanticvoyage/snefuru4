@@ -181,11 +181,59 @@ export default function NwJar1Page() {
     setKz101Checked(false);
   };
 
+  // Update URL parameters for popup state
+  const updatePopupURL = (fpopOpen: boolean, tabActive?: string) => {
+    const url = new URL(window.location.href);
+    
+    if (fpopOpen) {
+      url.searchParams.set('fpop', 'open');
+      
+      // Clear all tab parameters first
+      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+        url.searchParams.delete(tab);
+      });
+      
+      // Set the active tab parameter
+      if (tabActive) {
+        url.searchParams.set(tabActive, 'active');
+      } else {
+        // Default to ptab1 if no specific tab provided
+        url.searchParams.set('ptab1', 'active');
+      }
+    } else {
+      // Remove popup and all tab parameters when popup is closed
+      url.searchParams.delete('fpop');
+      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+        url.searchParams.delete(tab);
+      });
+    }
+    
+    // Update URL without triggering page reload
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  // Handle popup open/close with URL updates
+  const handlePopupOpen = () => {
+    setIsPopupOpen(true);
+    updatePopupURL(true, activePopupTab);
+  };
+
+  const handlePopupClose = () => {
+    setIsPopupOpen(false);
+    updatePopupURL(false);
+  };
+
+  // Handle tab changes with URL updates
+  const handleTabChange = (tab: string) => {
+    setActivePopupTab(tab as any);
+    updatePopupURL(true, tab);
+  };
+
   return (
     <div className="pr-4">
       <div className="mb-8 flex items-center" style={{ gap: '16px' }}>
         <button
-          onClick={() => setIsPopupOpen(true)}
+          onClick={handlePopupOpen}
           className="font-bold text-white rounded"
           style={{
             backgroundColor: '#800000', // maroon color
@@ -300,7 +348,7 @@ export default function NwJar1Page() {
             
             {/* Close button - adjusted position to account for header */}
             <button
-              onClick={() => setIsPopupOpen(false)}
+              onClick={handlePopupClose}
               className="absolute right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 z-10"
               style={{ top: '60px' }}
             >
@@ -315,7 +363,7 @@ export default function NwJar1Page() {
                   {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
                     <button
                       key={tab}
-                      onClick={() => setActivePopupTab(tab as any)}
+                      onClick={() => handleTabChange(tab)}
                       className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                         activePopupTab === tab
                           ? 'border-blue-500 text-blue-600 bg-white'
