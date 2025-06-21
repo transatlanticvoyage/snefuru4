@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import GconPiecesTable from "./components/GconPiecesTable";
 import { cfunc_215_createpiece } from "./utils/cfunc_215_createpiece";
 
@@ -15,6 +17,7 @@ export default function Pedazos1Page() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     document.title = '/pedazos1 - Snefuru';
@@ -192,6 +195,10 @@ export default function Pedazos1Page() {
     );
   }
 
+  // Get current sitebase from URL
+  const currentSitebase = searchParams?.get('sitebase');
+  const hasSitebase = Boolean(currentSitebase);
+
   return (
     <div className="pr-4">
       {/* Notification */}
@@ -205,7 +212,7 @@ export default function Pedazos1Page() {
         </div>
       )}
 
-      <div className="mb-6">
+      <div className="mb-6 flex items-center" style={{ gap: '16px' }}>
         <button
           onClick={() => setIsPopupOpen(true)}
           className="font-bold text-white rounded"
@@ -220,6 +227,40 @@ export default function Pedazos1Page() {
         >
           functions popup
         </button>
+        
+        {/* Go Back Button */}
+        {hasSitebase && currentSitebase ? (
+          <Link
+            href={`/nwjar1?coltemp=option1&sitebase=${encodeURIComponent(currentSitebase)}`}
+            className="font-bold text-gray-600 rounded hover:bg-gray-300 transition-colors"
+            style={{
+              backgroundColor: '#e5e7eb', // light gray
+              fontSize: '20px',
+              paddingLeft: '14px',
+              paddingRight: '14px',
+              paddingTop: '10px',
+              paddingBottom: '10px',
+              textDecoration: 'none'
+            }}
+          >
+            &lt;&lt; go back to /nwjar1
+          </Link>
+        ) : (
+          <button
+            disabled
+            className="font-bold text-gray-400 rounded cursor-not-allowed opacity-50"
+            style={{
+              backgroundColor: '#f3f4f6', // lighter gray for disabled
+              fontSize: '20px',
+              paddingLeft: '14px',
+              paddingRight: '14px',
+              paddingTop: '10px',
+              paddingBottom: '10px'
+            }}
+          >
+            &lt;&lt; go back to /nwjar1
+          </button>
+        )}
       </div>
 
       {/* Popup Modal */}
