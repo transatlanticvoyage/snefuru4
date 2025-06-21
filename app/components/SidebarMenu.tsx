@@ -1,5 +1,6 @@
 'use client';
 
+// Updated sidebar with dark mode WP-admin styling and full navigation
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
