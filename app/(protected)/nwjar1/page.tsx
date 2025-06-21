@@ -16,6 +16,8 @@ export default function NwJar1Page() {
   const [kz101Checked, setKz101Checked] = useState(false);
   const [kz103Checked, setKz103Checked] = useState(false);
   const [activePopupTab, setActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
+  const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
+  const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -135,6 +137,28 @@ export default function NwJar1Page() {
 
     fetchNwpiContent();
   }, [user?.id, supabase]);
+
+  // Fetch custom colors for uel.bar38
+  useEffect(() => {
+    const fetchUelBarColors = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('custom_colors')
+          .select('color_name, color_value')
+          .in('color_name', ['uelbar38_bgcolor1', 'uelbar38_textcolor1']);
+
+        if (!error && data) {
+          const bgColor = data.find(item => item.color_name === 'uelbar38_bgcolor1')?.color_value || '#2563eb';
+          const textColor = data.find(item => item.color_name === 'uelbar38_textcolor1')?.color_value || '#ffffff';
+          setUelBarColors({bg: bgColor, text: textColor});
+        }
+      } catch (err) {
+        console.error('Error fetching uel bar colors:', err);
+      }
+    };
+
+    fetchUelBarColors();
+  }, [supabase]);
 
   if (!user) {
     return (
@@ -303,14 +327,31 @@ export default function NwJar1Page() {
           <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
             {/* Blue header bar */}
             <div 
-              className="bg-blue-600 text-white absolute top-0 left-0 right-0 flex items-center px-4"
-              style={{ height: '50px' }}
+              className="absolute top-0 left-0 right-0 flex items-center px-4"
+              style={{ 
+                height: '50px',
+                backgroundColor: uelBarColors.bg,
+                color: uelBarColors.text
+              }}
             >
               <span className="font-semibold">uel.bar38</span>
-              <span className="font-bold ml-2">{window.location.pathname}</span>
+              
+              {/* Vertical separator */}
               <div 
-                className="text-white ml-4 flex items-center kz101 cursor-pointer"
+                className="bg-gray-600"
                 style={{
+                  width: '3px',
+                  height: '100%',
+                  marginLeft: '30px',
+                  marginRight: '30px'
+                }}
+              />
+              
+              <span className="font-bold">{window.location.pathname}</span>
+              <div 
+                className="ml-4 flex items-center kz101 cursor-pointer"
+                style={{
+                  color: uelBarColors.text,
                   padding: '8px',
                   border: '1px solid black',
                   fontSize: '16px'
@@ -330,8 +371,9 @@ export default function NwJar1Page() {
                 Use Your Current Selection From Table
               </div>
               <div 
-                className="text-white flex items-center kz102 font-bold"
+                className="flex items-center kz102 font-bold"
                 style={{
+                  color: uelBarColors.text,
                   padding: '8px',
                   border: '1px solid black',
                   fontSize: '16px'
@@ -340,8 +382,9 @@ export default function NwJar1Page() {
                 OR
               </div>
               <div 
-                className="text-white flex items-center kz103 cursor-pointer"
+                className="flex items-center kz103 cursor-pointer"
                 style={{
+                  color: uelBarColors.text,
                   padding: '8px',
                   border: '1px solid black',
                   fontSize: '16px'
