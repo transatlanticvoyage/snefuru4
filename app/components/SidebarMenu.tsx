@@ -251,6 +251,14 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
 
   return (
     <>
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={onToggle}
+        />
+      )}
+
       {/* Sidebar */}
       <div className={`fixed top-0 left-0 z-30 h-full w-64 bg-gray-900 shadow-xl transform transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
@@ -362,9 +370,7 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
       {/* Toggle Button */}
       <button
         onClick={onToggle}
-        className={`fixed top-4 z-40 p-2 bg-gray-800 rounded-md shadow-lg border border-gray-600 hover:bg-gray-700 transition-all duration-300 ease-in-out ${
-          isOpen ? 'left-72' : 'left-4'
-        }`}
+        className="fixed top-4 left-4 z-40 p-2 bg-gray-800 rounded-md shadow-lg border border-gray-600 hover:bg-gray-700 transition-colors"
         title="Toggle Navigation Menu"
       >
         <svg className="h-5 w-5 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
