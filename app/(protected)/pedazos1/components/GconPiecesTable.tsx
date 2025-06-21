@@ -462,7 +462,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
         >
           uielement308
         </div>
-        <div className="flex flex-wrap items-center" style={{ gap: '50px' }}>
+        <div className="flex flex-wrap items-start" style={{ gap: '50px' }}>
           <div>
             <input
               type="text"
@@ -473,88 +473,104 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
-          <div>
-            <select
-              className={`px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
-                filterSite 
-                  ? 'bg-blue-900 text-white border-blue-900 font-bold' 
-                  : 'bg-white text-gray-900 border-gray-300'
-              }`}
-              style={{ width: '350px' }}
-              value={filterSite}
-              onChange={(e) => handleFilterSite(e.target.value)}
-            >
-              <option value="">All Sites</option>
-              {uniqueSites.map(site => (
-                <option key={site} value={site}>{site}</option>
-              ))}
-            </select>
-            {/* Container for absolutely positioned elements */}
+          
+          {/* Site Widget Container */}
+          <div 
+            className="relative bg-white border border-gray-300 rounded p-3"
+            style={{ border: '1px solid black' }}
+          >
+            {/* Label in top left corner */}
             <div 
-              className="relative"
-              style={{ 
-                height: '33px', // 3px gap + 14px squares + 16px NS row
-                width: '384px' // 350px data box + 34px NS label
-              }}
+              className="absolute top-2 left-2 font-bold text-black"
+              style={{ fontSize: '14px' }}
             >
-              {/* Colored squares */}
+              uiel_sitewidget1
+            </div>
+            
+            <div style={{ marginTop: '20px' }}>
+              <select
+                className={`px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+                  filterSite 
+                    ? 'bg-blue-900 text-white border-blue-900 font-bold' 
+                    : 'bg-white text-gray-900 border-gray-300'
+                }`}
+                style={{ width: '350px' }}
+                value={filterSite}
+                onChange={(e) => handleFilterSite(e.target.value)}
+              >
+                <option value="">All Sites</option>
+                {uniqueSites.map(site => (
+                  <option key={site} value={site}>{site}</option>
+                ))}
+              </select>
+              {/* Container for absolutely positioned elements */}
               <div 
-                className="absolute bg-black"
-                style={{
-                  width: '14px',
-                  height: '14px',
-                  top: '3px',
-                  left: '0px'
-                }}
-              />
-              <div 
-                className="absolute bg-red-500"
-                style={{
-                  width: '14px',
-                  height: '14px',
-                  top: '3px',
-                  left: '17px'
-                }}
-              />
-              <div 
-                className="absolute bg-blue-500"
-                style={{
-                  width: '14px',
-                  height: '14px',
-                  top: '3px',
-                  left: '34px'
-                }}
-              />
-              {/* NS label and data area */}
-              <div 
-                className="absolute bg-gray-200 border border-gray-300 flex items-center justify-center"
-                style={{
-                  width: '34px',
-                  height: '16px',
-                  top: '17px', // 3px + 14px = 17px from top of container
-                  left: '0px',
-                  fontSize: '13px'
+                className="relative"
+                style={{ 
+                  height: '33px', // 3px gap + 14px squares + 16px NS row
+                  width: '384px' // 350px data box + 34px NS label
                 }}
               >
-                NS
-              </div>
-              <div 
-                className="absolute bg-white border border-gray-300 flex items-center px-2"
-                style={{
-                  width: '350px',
-                  height: '16px',
-                  top: '17px', // Same level as NS label
-                  left: '34px', // Immediately adjoining to the right
-                  fontSize: '12px',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis'
-                }}
-              >
-                {nsFullData}
+                {/* Colored squares */}
+                <div 
+                  className="absolute bg-black"
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    top: '3px',
+                    left: '0px'
+                  }}
+                />
+                <div 
+                  className="absolute bg-red-500"
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    top: '3px',
+                    left: '17px'
+                  }}
+                />
+                <div 
+                  className="absolute bg-blue-500"
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    top: '3px',
+                    left: '34px'
+                  }}
+                />
+                {/* NS label and data area */}
+                <div 
+                  className="absolute bg-gray-200 border border-gray-300 flex items-center justify-center"
+                  style={{
+                    width: '34px',
+                    height: '16px',
+                    top: '17px', // 3px + 14px = 17px from top of container
+                    left: '0px',
+                    fontSize: '13px'
+                  }}
+                >
+                  NS
+                </div>
+                <div 
+                  className="absolute bg-white border border-gray-300 flex items-center px-2"
+                  style={{
+                    width: '350px',
+                    height: '16px',
+                    top: '17px', // Same level as NS label
+                    left: '34px', // Immediately adjoining to the right
+                    fontSize: '12px',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {nsFullData}
+                </div>
               </div>
             </div>
           </div>
+          
           <div>
             <select
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
