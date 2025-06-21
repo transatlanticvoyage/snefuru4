@@ -194,21 +194,32 @@ export default function NwJar1Page() {
             {/* Blue header bar */}
             <div 
               className="bg-blue-600 text-white absolute top-0 left-0 right-0 flex items-center px-4"
-              style={{ height: '30px' }}
+              style={{ height: '50px' }}
             >
-              <span className="font-semibold">bar38</span>
+              <span className="font-semibold">uel.bar38</span>
+              <div 
+                className="text-white ml-4"
+                style={{
+                  padding: '8px',
+                  border: '1px solid black',
+                  fontSize: '16px'
+                }}
+              >
+                Use Your Current Selection From Table
+              </div>
             </div>
             
             {/* Close button - adjusted position to account for header */}
             <button
               onClick={() => setIsPopupOpen(false)}
-              className="absolute top-10 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 z-10"
+              className="absolute right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 z-10"
+              style={{ top: '60px' }}
             >
               ×
             </button>
             
             {/* Popup content - adjusted to start below header */}
-            <div className="p-8 h-full pt-16">
+            <div className="p-8 h-full" style={{ paddingTop: '80px' }}>
               {/* Content will be added here later */}
             </div>
           </div>
