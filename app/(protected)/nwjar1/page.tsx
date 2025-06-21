@@ -23,6 +23,39 @@ export default function NwJar1Page() {
   useEffect(() => {
     document.title = '/nwjar1 - Snefuru';
     
+    // Handle URL parameters for popup and tab state
+    const urlParams = new URLSearchParams(window.location.search);
+    const fpop = urlParams.get('fpop');
+    const ptab1 = urlParams.get('ptab1');
+    const ptab2 = urlParams.get('ptab2');
+    const ptab3 = urlParams.get('ptab3');
+    const ptab4 = urlParams.get('ptab4');
+    const ptab5 = urlParams.get('ptab5');
+    const ptab6 = urlParams.get('ptab6');
+    const ptab7 = urlParams.get('ptab7');
+    
+    // Auto-open popup if fpop=open is in URL
+    if (fpop === 'open') {
+      setIsPopupOpen(true);
+      
+      // Set active tab based on URL parameters
+      if (ptab1 === 'active') {
+        setActivePopupTab('ptab1');
+      } else if (ptab2 === 'active') {
+        setActivePopupTab('ptab2');
+      } else if (ptab3 === 'active') {
+        setActivePopupTab('ptab3');
+      } else if (ptab4 === 'active') {
+        setActivePopupTab('ptab4');
+      } else if (ptab5 === 'active') {
+        setActivePopupTab('ptab5');
+      } else if (ptab6 === 'active') {
+        setActivePopupTab('ptab6');
+      } else if (ptab7 === 'active') {
+        setActivePopupTab('ptab7');
+      }
+    }
+    
     // Add custom styles to make main element full width for this page only
     const style = document.createElement('style');
     style.textContent = `
