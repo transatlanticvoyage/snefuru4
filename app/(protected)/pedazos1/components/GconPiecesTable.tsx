@@ -63,6 +63,22 @@ const allColumns = [
   'updated_at'
 ];
 
+// Mapping from gcon_pieces fields to their nwpi_content source fields
+const sourceFieldMapping: Record<string, string> = {
+  'meta_title': 'post_title',
+  'h1title': 'post_title', 
+  'pgb_h1title': 'post_title',
+  'corpus1': 'post_content',
+  'corpus2': 'post_excerpt',
+  'asn_sitespren_base': 'fk_sitespren_base',
+  'asn_nwpi_posts_id': 'post_id', // computed field
+  'pageslug': 'post_name',
+  'pageurl': 'post_name', // computed field
+  'pelementor_cached': 'a_elementor_substance',
+  'pub_status': 'post_date', // computed field  
+  'date_time_pub_carry': 'post_date'
+};
+
 const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: string[] }> = {
   'option1': {
     name: 'col temp all',
@@ -595,8 +611,44 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
+            <thead>
+              {/* First row - Source (nwpi_content) */}
+              <tr className="bg-blue-100">
+                {visibleColumns.map((col, index) => {
+                  const isSticky = index < stickyColumnCount;
+                  const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
+                  const sourceField = sourceFieldMapping[col];
+                  
+                  return (
+                    <th
+                      key={`source-${col}`}
+                      className={`text-left text-xs text-gray-700 lowercase tracking-wider ${
+                        col === 'select' ? 'px-[6px] py-2' : 'px-6 py-2'
+                      } ${isSticky ? 'sticky bg-blue-100 z-10' : ''} ${
+                        isSeparator ? 'border-r-4 border-black' : ''
+                      }`}
+                      style={isSticky ? { left: `${index * 150}px` } : {}}
+                    >
+                      {col === 'select' || col === 'actions' ? (
+                        <div className="h-8"></div>
+                      ) : sourceField ? (
+                        <div className="flex flex-col">
+                          <div className="font-normal text-xs">nwpi_content</div>
+                          <div className="font-bold">{sourceField}</div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col">
+                          <div className="font-normal text-xs text-gray-400">-</div>
+                          <div className="font-bold text-gray-400">-</div>
+                        </div>
+                      )}
+                    </th>
+                  );
+                })}
+              </tr>
+              
+              {/* Second row - Target (gcon_pieces) */}
+              <tr className="bg-gray-50">
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
@@ -604,9 +656,9 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                   
                   return (
                     <th
-                      key={col}
-                      className={`text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${
-                        col === 'select' ? 'px-[6px] py-[6px]' : 'px-6 py-3'
+                      key={`target-${col}`}
+                      className={`text-left text-xs text-gray-700 lowercase tracking-wider ${
+                        col === 'select' ? 'px-[6px] py-2' : 'px-6 py-2'
                       } ${isSortable ? 'cursor-pointer hover:bg-gray-100' : ''} ${
                         isSticky ? 'sticky bg-gray-50 z-10' : ''
                       } ${isSeparator ? 'border-r-4 border-black' : ''}`}
@@ -631,12 +683,12 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                         </div>
                       ) : col === 'actions' ? (
                         <div className="flex flex-col">
-                          <div className="text-gray-500 font-normal text-xs">actions</div>
+                          <div className="font-normal text-xs">actions</div>
                           <div className="font-bold">actions</div>
                         </div>
                       ) : (
                         <div className="flex flex-col">
-                          <div className="text-gray-500 font-normal text-xs">gcon_pieces</div>
+                          <div className="font-normal text-xs">gcon_pieces</div>
                           <div className="font-bold">
                             {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
                           </div>
