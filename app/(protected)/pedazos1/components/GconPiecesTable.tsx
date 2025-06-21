@@ -424,13 +424,14 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
-          <div>
+          <div className="relative">
             <select
-              className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+              className={`px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
                 filterSite 
                   ? 'bg-blue-900 text-white border-blue-900 font-bold' 
                   : 'bg-white text-gray-900 border-gray-300'
               }`}
+              style={{ width: '350px' }}
               value={filterSite}
               onChange={(e) => handleFilterSite(e.target.value)}
             >
@@ -439,6 +440,16 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                 <option key={site} value={site}>{site}</option>
               ))}
             </select>
+            {/* Black square element */}
+            <div 
+              className="absolute bg-black"
+              style={{
+                width: '10px',
+                height: '10px',
+                top: 'calc(100% + 2px)',
+                left: '0px'
+              }}
+            />
           </div>
           <div>
             <select
