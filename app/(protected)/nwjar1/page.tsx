@@ -18,6 +18,7 @@ export default function NwJar1Page() {
   const [activePopupTab, setActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
   const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
+  const [currentUrl, setCurrentUrl] = useState<string>('');
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -138,19 +139,25 @@ export default function NwJar1Page() {
     fetchNwpiContent();
   }, [user?.id, supabase]);
 
-  // Fetch custom colors for uel.bar38
+  // Fetch custom colors for uelbar37 and uelbar38
   useEffect(() => {
     const fetchUelBarColors = async () => {
       try {
         const { data, error } = await supabase
           .from('custom_colors')
           .select('color_name, color_value')
-          .in('color_name', ['uelbar38_bgcolor1', 'uelbar38_textcolor1']);
+          .in('color_name', ['uelbar38_bgcolor1', 'uelbar38_textcolor1', 'uelbar37_bgcolor1', 'uelbar37_textcolor1']);
 
         if (!error && data) {
-          const bgColor = data.find(item => item.color_name === 'uelbar38_bgcolor1')?.color_value || '#2563eb';
-          const textColor = data.find(item => item.color_name === 'uelbar38_textcolor1')?.color_value || '#ffffff';
-          setUelBarColors({bg: bgColor, text: textColor});
+          // uelbar38 colors
+          const bgColor38 = data.find(item => item.color_name === 'uelbar38_bgcolor1')?.color_value || '#2563eb';
+          const textColor38 = data.find(item => item.color_name === 'uelbar38_textcolor1')?.color_value || '#ffffff';
+          setUelBarColors({bg: bgColor38, text: textColor38});
+
+          // uelbar37 colors
+          const bgColor37 = data.find(item => item.color_name === 'uelbar37_bgcolor1')?.color_value || '#1e40af';
+          const textColor37 = data.find(item => item.color_name === 'uelbar37_textcolor1')?.color_value || '#ffffff';
+          setUelBar37Colors({bg: bgColor37, text: textColor37});
         }
       } catch (err) {
         console.error('Error fetching uel bar colors:', err);
@@ -159,6 +166,42 @@ export default function NwJar1Page() {
 
     fetchUelBarColors();
   }, [supabase]);
+
+  // Track URL changes for uelbar37 display
+  useEffect(() => {
+    // Set initial URL
+    setCurrentUrl(window.location.href);
+    
+    // Listen for URL changes (for pushState/replaceState)
+    const handleUrlChange = () => {
+      setCurrentUrl(window.location.href);
+    };
+    
+    // Listen for popstate events (back/forward buttons)
+    window.addEventListener('popstate', handleUrlChange);
+    
+    // Create a MutationObserver to watch for URL changes via pushState/replaceState
+    const observer = new MutationObserver(() => {
+      if (window.location.href !== currentUrl) {
+        setCurrentUrl(window.location.href);
+      }
+    });
+    
+    // Watch for changes to the document that might indicate URL changes
+    observer.observe(document, { subtree: true, childList: true });
+    
+    // Custom event listener for our URL updates
+    const handleCustomUrlUpdate = () => {
+      setCurrentUrl(window.location.href);
+    };
+    window.addEventListener('urlchange', handleCustomUrlUpdate);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('urlchange', handleCustomUrlUpdate);
+      observer.disconnect();
+    };
+  }, [currentUrl]);
 
   if (!user) {
     return (
@@ -234,6 +277,9 @@ export default function NwJar1Page() {
     
     // Update URL without triggering page reload
     window.history.replaceState({}, '', url.toString());
+    
+    // Trigger custom event to update our URL display
+    window.dispatchEvent(new Event('urlchange'));
   };
 
   // Handle popup open/close with URL updates
@@ -325,16 +371,44 @@ export default function NwJar1Page() {
       {isPopupOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
-            {/* Blue header bar */}
+            {/* uelbar37 header bar */}
             <div 
               className="absolute top-0 left-0 right-0 flex items-center px-4"
               style={{ 
+                height: '50px',
+                backgroundColor: uelBar37Colors.bg,
+                color: uelBar37Colors.text
+              }}
+            >
+              <span className="font-semibold">BROWSER URL</span>
+              
+              {/* Vertical separator */}
+              <div 
+                className="bg-gray-600"
+                style={{
+                  width: '3px',
+                  height: '100%',
+                  marginLeft: '30px',
+                  marginRight: '30px'
+                }}
+              />
+              
+              <span className="font-mono text-sm overflow-hidden whitespace-nowrap text-ellipsis flex-1">
+                {currentUrl}
+              </span>
+            </div>
+            
+            {/* uelbar38 header bar */}
+            <div 
+              className="absolute left-0 right-0 flex items-center px-4"
+              style={{ 
+                top: '50px',
                 height: '50px',
                 backgroundColor: uelBarColors.bg,
                 color: uelBarColors.text
               }}
             >
-              <span className="font-semibold">uel.bar38</span>
+              <span className="font-semibold">uelbar38</span>
               
               {/* Vertical separator */}
               <div 
@@ -404,13 +478,13 @@ export default function NwJar1Page() {
                 Select All Items In Current Pagination | (DYNAMIC COUNT)
               </div>
               
-              {/* Close button in header */}
+              {/* Close button in header - spans both bars */}
               <button
                 onClick={handlePopupClose}
                 className="absolute right-0 top-0 bg-gray-400 text-gray-800 font-bold flex items-center justify-center hover:bg-gray-500 transition-colors"
                 style={{
                   width: '260px',
-                  height: '50px',
+                  height: '100px', // Spans both 50px bars
                   border: '2px solid #4a4a4a',
                   fontSize: '24px'
                 }}
@@ -419,8 +493,8 @@ export default function NwJar1Page() {
               </button>
             </div>
             
-            {/* Popup content - adjusted to start below header */}
-            <div className="h-full" style={{ paddingTop: '50px' }}>
+            {/* Popup content - adjusted to start below both headers */}
+            <div className="h-full" style={{ paddingTop: '100px' }}>
               {/* Tab Navigation */}
               <div className="border-b border-gray-200 bg-gray-50">
                 <nav className="flex">
