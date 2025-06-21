@@ -15,6 +15,7 @@ export default function NwJar1Page() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [kz101Checked, setKz101Checked] = useState(false);
   const [kz103Checked, setKz103Checked] = useState(false);
+  const [activePopupTab, setActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -274,8 +275,71 @@ export default function NwJar1Page() {
             </button>
             
             {/* Popup content - adjusted to start below header */}
-            <div className="p-8 h-full" style={{ paddingTop: '80px' }}>
-              {/* Content will be added here later */}
+            <div className="h-full" style={{ paddingTop: '50px' }}>
+              {/* Tab Navigation */}
+              <div className="border-b border-gray-200 bg-gray-50">
+                <nav className="flex">
+                  {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActivePopupTab(tab as any)}
+                      className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                        activePopupTab === tab
+                          ? 'border-blue-500 text-blue-600 bg-white'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+              
+              {/* Tab Content */}
+              <div className="p-8 h-full overflow-auto">
+                {activePopupTab === 'ptab1' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab1</h3>
+                    <p className="text-gray-600">This is the content area for ptab1.</p>
+                  </div>
+                )}
+                {activePopupTab === 'ptab2' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab2</h3>
+                    <p className="text-gray-600">This is the content area for ptab2.</p>
+                  </div>
+                )}
+                {activePopupTab === 'ptab3' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab3</h3>
+                    <p className="text-gray-600">This is the content area for ptab3.</p>
+                  </div>
+                )}
+                {activePopupTab === 'ptab4' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab4</h3>
+                    <p className="text-gray-600">This is the content area for ptab4.</p>
+                  </div>
+                )}
+                {activePopupTab === 'ptab5' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab5</h3>
+                    <p className="text-gray-600">This is the content area for ptab5.</p>
+                  </div>
+                )}
+                {activePopupTab === 'ptab6' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab6</h3>
+                    <p className="text-gray-600">This is the content area for ptab6.</p>
+                  </div>
+                )}
+                {activePopupTab === 'ptab7' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab7</h3>
+                    <p className="text-gray-600">This is the content area for ptab7.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
