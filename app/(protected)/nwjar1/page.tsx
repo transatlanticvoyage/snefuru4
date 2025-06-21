@@ -215,6 +215,16 @@ export default function NwJar1Page() {
                 />
                 Use Your Current Selection From Table
               </div>
+              <div 
+                className="text-white flex items-center kz102 font-bold"
+                style={{
+                  padding: '8px',
+                  border: '1px solid black',
+                  fontSize: '16px'
+                }}
+              >
+                OR
+              </div>
             </div>
             
             {/* Close button - adjusted position to account for header */}
