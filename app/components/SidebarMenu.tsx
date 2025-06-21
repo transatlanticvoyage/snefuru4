@@ -207,7 +207,7 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
           </button>
           {isExpanded && (
             <div className="bg-gray-900">
-              {item.children.map(child => renderNavItem(child, depth + 1))}
+              {item.children?.map(child => renderNavItem(child, depth + 1))}
             </div>
           )}
         </div>
