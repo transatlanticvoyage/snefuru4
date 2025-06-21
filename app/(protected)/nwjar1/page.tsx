@@ -13,6 +13,8 @@ export default function NwJar1Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [kz101Checked, setKz101Checked] = useState(false);
+  const [kz103Checked, setKz103Checked] = useState(false);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -134,6 +136,17 @@ export default function NwJar1Page() {
   const currentSitebase = searchParams?.get('sitebase');
   const hasSitebase = Boolean(currentSitebase);
 
+  // Handle checkbox clicks with mutual exclusivity
+  const handleKz101Click = () => {
+    setKz101Checked(true);
+    setKz103Checked(false);
+  };
+
+  const handleKz103Click = () => {
+    setKz103Checked(true);
+    setKz101Checked(false);
+  };
+
   return (
     <div className="pr-4">
       <div className="mb-8 flex items-center" style={{ gap: '16px' }}>
@@ -198,16 +211,19 @@ export default function NwJar1Page() {
             >
               <span className="font-semibold">uel.bar38</span>
               <div 
-                className="text-white ml-4 flex items-center kz101"
+                className="text-white ml-4 flex items-center kz101 cursor-pointer"
                 style={{
                   padding: '8px',
                   border: '1px solid black',
                   fontSize: '16px'
                 }}
+                onClick={handleKz101Click}
               >
                 <input
                   type="checkbox"
-                  className="mr-2 cursor-pointer"
+                  className="mr-2 pointer-events-none"
+                  checked={kz101Checked}
+                  readOnly
                   style={{
                     width: '18px',
                     height: '18px'
@@ -226,16 +242,19 @@ export default function NwJar1Page() {
                 OR
               </div>
               <div 
-                className="text-white flex items-center kz103"
+                className="text-white flex items-center kz103 cursor-pointer"
                 style={{
                   padding: '8px',
                   border: '1px solid black',
                   fontSize: '16px'
                 }}
+                onClick={handleKz103Click}
               >
                 <input
                   type="checkbox"
-                  className="mr-2 cursor-pointer"
+                  className="mr-2 pointer-events-none"
+                  checked={kz103Checked}
+                  readOnly
                   style={{
                     width: '18px',
                     height: '18px'
