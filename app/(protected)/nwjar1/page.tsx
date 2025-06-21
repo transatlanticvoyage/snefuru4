@@ -10,6 +10,7 @@ export default function NwJar1Page() {
   const [nwpiContent, setNwpiContent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
 
@@ -129,24 +130,41 @@ export default function NwJar1Page() {
   return (
     <div className="pr-4">
       <div className="mb-8">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">/nwjar1 - sync table 1 - (WPSv2)</h1>
-            <p className="mt-2 text-gray-600">
-              View and manage your synced WordPress content from the nwpi_content table
-            </p>
-            <p className="mt-1 text-sm text-gray-500">
-              db table: nwpi_content
-            </p>
-          </div>
-          <div className="flex-shrink-0 ml-6">
-            <NwpiPusherButton 
-              data={nwpiContent || []} 
-              userId={user.id}
-            />
+        <button
+          onClick={() => setIsPopupOpen(true)}
+          className="font-bold text-white rounded"
+          style={{
+            backgroundColor: '#800000', // maroon color
+            fontSize: '20px',
+            paddingLeft: '14px',
+            paddingRight: '14px',
+            paddingTop: '10px',
+            paddingBottom: '10px'
+          }}
+        >
+          functions popup
+        </button>
+      </div>
+
+      {/* Popup Modal */}
+      {isPopupOpen && (
+        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative">
+            {/* Close button */}
+            <button
+              onClick={() => setIsPopupOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+            >
+              ×
+            </button>
+            
+            {/* Popup content - currently blank */}
+            <div className="p-8 h-full">
+              {/* Content will be added here later */}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {nwpiContent && nwpiContent.length > 0 ? (
         <NwpiContentTable 
