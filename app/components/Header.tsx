@@ -247,6 +247,10 @@ export default function Header() {
           name: 'Custom Color Management',
           path: 'https://snef.me/admin/colors1'
         },
+        {
+          name: 'Download Plugin',
+          path: '/admin/downloadplugin'
+        },
         ...adminPages // Add any other admin pages found in navigation
       ]
     };
