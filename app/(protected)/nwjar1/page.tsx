@@ -153,7 +153,7 @@ export default function NwJar1Page() {
         </button>
         
         {/* Go Forward Button */}
-        {hasSitebase ? (
+        {hasSitebase && currentSitebase ? (
           <Link
             href={`/pedazos1?coltemp=option1&sitebase=${encodeURIComponent(currentSitebase)}`}
             className="font-bold text-gray-600 rounded hover:bg-gray-300 transition-colors"
