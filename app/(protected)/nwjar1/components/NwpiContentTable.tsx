@@ -689,24 +689,35 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
                   const isSortable = ['post_title', 'fk_sitespren_base', 'post_type', 'post_status', 'i_sync_completed_at', 'created_at'].includes(col);
                   
                   // Color coding based on column type
-                  let bgColor = 'bg-gray-50';
-                  let hoverColor = 'hover:bg-gray-100';
+                  let bgColor = '';
+                  let bgStyle = {};
+                  let hoverColor = '';
                   
-                  if (col === 'select' || col === 'actions') {
-                    bgColor = 'bg-blue-50';
-                    hoverColor = 'hover:bg-blue-100';
-                  } else if (['post_title', 'post_type', 'post_status', 'post_id', 'post_author', 'post_date', 'post_date_gmt', 'post_modified', 'post_content', 'post_content_filtered', 'post_excerpt', 'post_name', 'post_password', 'comment_status', 'ping_status', 'to_ping', 'pinged', 'guid', 'post_parent', 'menu_order', 'post_mime_type', 'comment_count'].includes(col)) {
-                    bgColor = 'bg-green-50';
-                    hoverColor = 'hover:bg-green-100';
-                  } else if (col.startsWith('i_')) {
-                    bgColor = 'bg-yellow-50';
+                  // Define all nwpi_content fields
+                  const nwpiContentFields = [
+                    'internal_post_id', 'fk_users_id', 'fk_sitespren_id', 'fk_sitespren_base',
+                    'post_id', 'post_author', 'post_date', 'post_date_gmt', 'post_modified',
+                    'post_content', 'post_content_filtered', 'post_title', 'post_excerpt',
+                    'post_status', 'post_type', 'post_name', 'post_password', 'comment_status',
+                    'ping_status', 'to_ping', 'pinged', 'guid', 'post_parent', 'menu_order',
+                    'post_mime_type', 'comment_count', 'i_raw_metadata', 'i_sync_method',
+                    'i_sync_version', 'i_sync_status', 'i_sync_started_at', 'i_sync_completed_at',
+                    'i_sync_attempt_count', 'i_sync_error_message', 'a_elementor_substance',
+                    'created_at', 'updated_at'
+                  ];
+                  
+                  if (nwpiContentFields.includes(col)) {
+                    // Use custom color #fefce3 for nwpi_content fields
+                    bgStyle = { backgroundColor: '#fefce3' };
                     hoverColor = 'hover:bg-yellow-100';
-                  } else if (col.startsWith('a_')) {
-                    bgColor = 'bg-purple-50';
-                    hoverColor = 'hover:bg-purple-100';
-                  } else if (col.startsWith('fk_') || col === 'internal_post_id' || col === 'created_at' || col === 'updated_at') {
-                    bgColor = 'bg-blue-50';
-                    hoverColor = 'hover:bg-blue-100';
+                  } else if (col === 'select' || col === 'actions') {
+                    // These are UI columns, not from any db table
+                    bgColor = 'bg-gray-100';
+                    hoverColor = 'hover:bg-gray-200';
+                  } else {
+                    // Any other fields from other tables
+                    bgColor = 'bg-blue-100';
+                    hoverColor = 'hover:bg-blue-200';
                   }
                   
                   return (
@@ -715,9 +726,12 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
                       className={`text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${
                         col === 'select' ? 'px-[6px] py-[6px]' : 'px-4 py-3'
                       } ${isSortable ? `cursor-pointer ${hoverColor}` : ''} ${
-                        isSticky ? `sticky ${bgColor} z-10` : bgColor
-                      } ${isSeparator ? 'border-r-4 border-black' : ''}`}
-                      style={isSticky ? { left: `${index * 150}px` } : {}}
+                        isSticky ? `sticky z-10` : ''
+                      } ${bgColor} ${isSeparator ? 'border-r-4 border-black' : ''}`}
+                      style={{
+                        ...(isSticky ? { left: `${index * 150}px` } : {}),
+                        ...bgStyle
+                      }}
                       onClick={isSortable ? () => handleSort(col as SortField) : undefined}
                     >
                       {col === 'select' ? (
