@@ -225,6 +225,24 @@ export default function NwJar1Page() {
               >
                 OR
               </div>
+              <div 
+                className="text-white flex items-center kz103"
+                style={{
+                  padding: '8px',
+                  border: '1px solid black',
+                  fontSize: '16px'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  className="mr-2 cursor-pointer"
+                  style={{
+                    width: '18px',
+                    height: '18px'
+                  }}
+                />
+                Select All Items In Current Pagination | (DYNAMIC COUNT)
+              </div>
             </div>
             
             {/* Close button - adjusted position to account for header */}
