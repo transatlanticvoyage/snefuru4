@@ -454,7 +454,14 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg shadow">
+      <div className="bg-white p-4 rounded-lg shadow relative" style={{ border: '1px solid black' }}>
+        {/* Label in top left corner */}
+        <div 
+          className="absolute top-2 left-2 font-bold text-black"
+          style={{ fontSize: '14px' }}
+        >
+          uielement308
+        </div>
         <div className="flex flex-wrap items-center" style={{ gap: '50px' }}>
           <div>
             <input
