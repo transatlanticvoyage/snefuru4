@@ -734,12 +734,44 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                             />
                           </div>
                         ) : col === 'actions' ? (
-                          <Link
-                            href={`/pedbar?id=${item.id}`}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                          >
-                            Individual View
-                          </Link>
+                          <div className="flex flex-wrap gap-1">
+                            <Link
+                              href={`/pedbar?id=${item.id}`}
+                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                              /pedbar
+                            </Link>
+                            <Link
+                              href={`/pedtor1?id=${item.id}`}
+                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                              /pedtor
+                            </Link>
+                            <Link
+                              href={`/flatx1?id=${item.id}`}
+                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                              /flatx1
+                            </Link>
+                            <Link
+                              href={`/slotx1?id=${item.id}`}
+                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                              /slotx1
+                            </Link>
+                            <Link
+                              href={`/fanex1?id=${item.id}`}
+                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                              /fanex1
+                            </Link>
+                            <Link
+                              href={`/karfi1?id=${item.id}`}
+                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                            >
+                              /karfi1
+                            </Link>
+                          </div>
                         ) : col === 'created_at' || col === 'updated_at' || col === 'date_time_pub_carry' ? (
                           <span className="whitespace-nowrap text-gray-500">
                             {item[col] ? formatDate(item[col]) : '-'}

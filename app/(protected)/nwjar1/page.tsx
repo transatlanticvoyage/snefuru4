@@ -379,42 +379,6 @@ export default function NwJar1Page() {
             &gt;&gt; Go Forward To /gconjar1
           </button>
         )}
-        
-        {/* Pedbar and Pedtor Links */}
-        {hasSitebase && currentSitebase && (
-          <>
-            <Link
-              href={`/pedbar?sitebase=${encodeURIComponent(currentSitebase)}`}
-              className="font-medium text-gray-600 rounded hover:bg-gray-300 transition-colors"
-              style={{
-                backgroundColor: '#e5e7eb',
-                fontSize: '14px',
-                paddingLeft: '10px',
-                paddingRight: '10px',
-                paddingTop: '6px',
-                paddingBottom: '6px',
-                textDecoration: 'none'
-              }}
-            >
-              pedbar
-            </Link>
-            <Link
-              href={`/pedtor1?sitebase=${encodeURIComponent(currentSitebase)}`}
-              className="font-medium text-gray-600 rounded hover:bg-gray-300 transition-colors"
-              style={{
-                backgroundColor: '#e5e7eb',
-                fontSize: '14px',
-                paddingLeft: '10px',
-                paddingRight: '10px',
-                paddingTop: '6px',
-                paddingBottom: '6px',
-                textDecoration: 'none'
-              }}
-            >
-              pedtor
-            </Link>
-          </>
-        )}
       </div>
 
       {/* Popup Modal */}
