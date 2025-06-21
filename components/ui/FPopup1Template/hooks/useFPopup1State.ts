@@ -62,8 +62,8 @@ export const useFPopup1State = ({ config, supabase }: UseFPopup1StateProps) => {
           const colors: Record<string, FPopup1ColorConfig> = {};
           
           colorSchemes.forEach(scheme => {
-            const bgItem = data.find(item => item.color_name === `${scheme}_bgcolor1`);
-            const textItem = data.find(item => item.color_name === `${scheme}_textcolor1`);
+            const bgItem = data.find((item: any) => item.color_name === `${scheme}_bgcolor1`);
+            const textItem = data.find((item: any) => item.color_name === `${scheme}_textcolor1`);
             
             colors[scheme] = {
               bg: bgItem?.color_value || '#2563eb',
