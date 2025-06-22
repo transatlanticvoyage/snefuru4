@@ -753,7 +753,9 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
                         </div>
                       ) : (
                         <div className="flex flex-col">
-                          <div className="text-gray-500 font-normal text-xs">nativetier</div>
+                          <div className="text-gray-500 font-normal text-xs">
+                            {col === 'actions' ? 'nativetier' : (nwpiContentFields.includes(col) ? 'nwpi_content' : '')}
+                          </div>
                           <div className="font-bold">
                             {col} {isSortable && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
                           </div>
