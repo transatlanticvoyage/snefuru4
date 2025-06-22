@@ -122,6 +122,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [updatingStars, setUpdatingStars] = useState<Set<string>>(new Set());
   const [nsFullData, setNsFullData] = useState<string>('');
+  const [nativeTierBgColor, setNativeTierBgColor] = useState<string>('#dbeafe');
   
   const router = useRouter();
   const supabase = createClientComponentClient();
@@ -224,6 +225,27 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
       fetchNsFullData();
     }
   }, [userId, supabase]);
+
+  // Fetch native tier background color
+  useEffect(() => {
+    const fetchNativeTierColor = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('custom_colors')
+          .select('hex_value')
+          .eq('color_ref_code', 'nativetier_gconjar_bgcolor1')
+          .single();
+
+        if (!error && data) {
+          setNativeTierBgColor(data.hex_value);
+        }
+      } catch (err) {
+        console.error('Error fetching native tier color:', err);
+      }
+    };
+
+    fetchNativeTierColor();
+  }, [supabase]);
 
   // Get visible columns based on template and sticky columns
   const getVisibleColumns = () => {
@@ -621,7 +643,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
               />
               
               {/* Native tier - Main gcon_pieces header row */}
-              <tr className="bg-blue-100">
+              <tr style={{ backgroundColor: nativeTierBgColor }}>
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
@@ -633,9 +655,11 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                       className={`text-left text-xs text-gray-700 lowercase tracking-wider ${
                         col === 'select' ? 'px-[6px] py-2' : 'px-6 py-2'
                       } ${isSortable ? 'cursor-pointer hover:bg-blue-200' : ''} ${
-                        isSticky ? 'sticky bg-blue-100 z-10' : ''
+                        isSticky ? 'sticky z-10' : ''
                       } ${isSeparator ? 'border-r-4 border-black' : ''}`}
-                      style={isSticky ? { left: `${index * 150}px` } : {}}
+                      style={{
+                        ...(isSticky ? { left: `${index * 150}px`, backgroundColor: nativeTierBgColor } : {}),
+                      }}
                       onClick={isSortable ? () => handleSort(col as SortField) : undefined}
                     >
                       {col === 'select' ? (

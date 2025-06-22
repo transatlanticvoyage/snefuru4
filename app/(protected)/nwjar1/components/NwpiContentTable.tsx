@@ -150,6 +150,7 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
   const [nsFullData, setNsFullData] = useState<string>('');
+  const [nativeTierBgColor, setNativeTierBgColor] = useState<string>('#dbeafe');
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -281,6 +282,27 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
       fetchNsFullData();
     }
   }, [userId, supabase]);
+
+  // Fetch native tier background color
+  useEffect(() => {
+    const fetchNativeTierColor = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('custom_colors')
+          .select('hex_value')
+          .eq('color_ref_code', 'nativetier_nwjar_bgcolor1')
+          .single();
+
+        if (!error && data) {
+          setNativeTierBgColor(data.hex_value);
+        }
+      } catch (err) {
+        console.error('Error fetching native tier color:', err);
+      }
+    };
+
+    fetchNativeTierColor();
+  }, [supabase]);
 
   // Get visible columns based on template and sticky columns
   const getVisibleColumns = () => {
@@ -692,7 +714,7 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
               />
               
               {/* Native Tier (blue header row) */}
-              <tr style={{ backgroundColor: '#dbeafe' }}>
+              <tr style={{ backgroundColor: nativeTierBgColor }}>
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
@@ -730,7 +752,7 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
                         isSticky ? `sticky z-10` : ''
                       } ${isSeparator ? 'border-r-4 border-black' : ''}`}
                       style={{
-                        backgroundColor: '#dbeafe',
+                        backgroundColor: nativeTierBgColor,
                         ...(isSticky ? { left: `${index * 150}px` } : {})
                       }}
                       onClick={isSortable ? () => handleSort(col as SortField) : undefined}
