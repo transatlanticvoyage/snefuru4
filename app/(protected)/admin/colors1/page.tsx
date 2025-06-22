@@ -7,7 +7,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 interface CustomColor {
   color_id: string;
   color_name: string;
-  color_code: string;
+  color_ref_code: string;
   hex_value: string;
   created_at: string;
   updated_at: string;
@@ -69,7 +69,7 @@ export default function Colors1Page() {
     try {
       const colorData = {
         color_name: colorName.trim(),
-        color_code: colorCode.trim(),
+        color_ref_code: colorCode.trim(),
         hex_value: selectedColor,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -143,7 +143,7 @@ export default function Colors1Page() {
 
   const handleEditSave = async (colorId: string) => {
     const editedColor = editValues[colorId];
-    if (!editedColor || !editedColor.color_name.trim() || !editedColor.color_code.trim()) {
+    if (!editedColor || !editedColor.color_name.trim() || !editedColor.color_ref_code.trim()) {
       setError('Color name and code are required');
       return;
     }
@@ -156,7 +156,7 @@ export default function Colors1Page() {
         .from('custom_colors')
         .update({
           color_name: editedColor.color_name.trim(),
-          color_code: editedColor.color_code.trim(),
+          color_ref_code: editedColor.color_ref_code.trim(),
           hex_value: editedColor.hex_value,
           updated_at: new Date().toISOString()
         })
@@ -400,12 +400,12 @@ export default function Colors1Page() {
                         {isEditing ? (
                           <input
                             type="text"
-                            value={editValue.color_code}
-                            onChange={(e) => handleEditChange(color.color_id, 'color_code', e.target.value)}
+                            value={editValue.color_ref_code}
+                            onChange={(e) => handleEditChange(color.color_id, 'color_ref_code', e.target.value)}
                             className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono"
                           />
                         ) : (
-                          color.color_code
+                          color.color_ref_code
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">

@@ -55,15 +55,15 @@ export const useFPopup1State = ({ config, supabase }: UseFPopup1StateProps) => {
 
         const { data, error } = await supabase
           .from('custom_colors')
-          .select('color_code, hex_value')
-          .in('color_code', colorCodes);
+          .select('color_ref_code, hex_value')
+          .in('color_ref_code', colorCodes);
 
         if (!error && data && data.length > 0) {
           const colors: Record<string, FPopup1ColorConfig> = {};
           
           colorSchemes.forEach(scheme => {
-            const bgItem = data.find((item: any) => item.color_code === `${scheme}_bgcolor1`);
-            const textItem = data.find((item: any) => item.color_code === `${scheme}_textcolor1`);
+            const bgItem = data.find((item: any) => item.color_ref_code === `${scheme}_bgcolor1`);
+            const textItem = data.find((item: any) => item.color_ref_code === `${scheme}_textcolor1`);
             
             colors[scheme] = {
               bg: bgItem?.hex_value || '#2563eb',

@@ -13,7 +13,7 @@ export default function SelectedRowStyles() {
         const { data, error } = await supabase
           .from('custom_colors')
           .select('hex_value')
-          .eq('color_code', 'activelyselectedrow1_bgcolor1')
+          .eq('color_ref_code', 'activelyselectedrow1_bgcolor1')
           .single();
         
         if (error) {

@@ -145,28 +145,28 @@ export default function NwJar1Page() {
       try {
         const { data, error } = await supabase
           .from('custom_colors')
-          .select('color_name, color_value')
-          .in('color_name', ['uelbar38_bgcolor1', 'uelbar38_textcolor1', 'uelbar37_bgcolor1', 'uelbar37_textcolor1']);
+          .select('color_ref_code, hex_value')
+          .in('color_ref_code', ['uelbar38_bgcolor1', 'uelbar38_textcolor1', 'uelbar37_bgcolor1', 'uelbar37_textcolor1']);
 
         console.log('Custom colors query result:', { data, error });
 
         if (!error && data && data.length > 0) {
           // uelbar38 colors
-          const bgColor38Item = data.find(item => item.color_name === 'uelbar38_bgcolor1');
-          const textColor38Item = data.find(item => item.color_name === 'uelbar38_textcolor1');
+          const bgColor38Item = data.find(item => item.color_ref_code === 'uelbar38_bgcolor1');
+          const textColor38Item = data.find(item => item.color_ref_code === 'uelbar38_textcolor1');
           
-          const bgColor38 = bgColor38Item?.color_value || '#2563eb';
-          const textColor38 = textColor38Item?.color_value || '#ffffff';
+          const bgColor38 = bgColor38Item?.hex_value || '#2563eb';
+          const textColor38 = textColor38Item?.hex_value || '#ffffff';
           
           console.log('uelbar38 colors:', { bgColor38, textColor38 });
           setUelBarColors({bg: bgColor38, text: textColor38});
 
           // uelbar37 colors
-          const bgColor37Item = data.find(item => item.color_name === 'uelbar37_bgcolor1');
-          const textColor37Item = data.find(item => item.color_name === 'uelbar37_textcolor1');
+          const bgColor37Item = data.find(item => item.color_ref_code === 'uelbar37_bgcolor1');
+          const textColor37Item = data.find(item => item.color_ref_code === 'uelbar37_textcolor1');
           
-          const bgColor37 = bgColor37Item?.color_value || '#1e40af';
-          const textColor37 = textColor37Item?.color_value || '#ffffff';
+          const bgColor37 = bgColor37Item?.hex_value || '#1e40af';
+          const textColor37 = textColor37Item?.hex_value || '#ffffff';
           
           console.log('uelbar37 colors:', { bgColor37, textColor37 });
           setUelBar37Colors({bg: bgColor37, text: textColor37});

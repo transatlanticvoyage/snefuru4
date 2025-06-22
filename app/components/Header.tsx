@@ -90,7 +90,7 @@ export default function Header() {
           const { data, error } = await supabase
             .from('custom_colors')
             .select('hex_value')
-            .eq('color_code', 'headerbg_pedbar')
+            .eq('color_ref_code', 'headerbg_pedbar')
             .single();
           
           if (error) {
@@ -117,7 +117,7 @@ export default function Header() {
           const { data, error } = await supabase
             .from('custom_colors')
             .select('hex_value')
-            .eq('color_code', 'headerbg1_pedtor')
+            .eq('color_ref_code', 'headerbg1_pedtor')
             .single();
           
           if (error) {
@@ -144,7 +144,7 @@ export default function Header() {
           const { data, error } = await supabase
             .from('custom_colors')
             .select('hex_value')
-            .eq('color_code', 'headerbg1_gconjar1')
+            .eq('color_ref_code', 'headerbg1_gconjar1')
             .single();
           
           if (error) {
@@ -171,7 +171,7 @@ export default function Header() {
           const { data, error } = await supabase
             .from('custom_colors')
             .select('hex_value')
-            .eq('color_code', 'headerbg1_nwjar1')
+            .eq('color_ref_code', 'headerbg1_nwjar1')
             .single();
           
           if (error) {
