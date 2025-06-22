@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import ContentDataLineageTableHeaderTierSystem1 from '@/app/components/ContentDataLineageTableHeaderTierSystem1';
 
 interface NwpiContent {
   internal_post_id: string;
@@ -682,15 +683,21 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
-              <tr>
+              {/* 4-Tier Header System */}
+              <ContentDataLineageTableHeaderTierSystem1
+                visibleColumns={visibleColumns}
+                stickyColumnCount={stickyColumnCount}
+                tier2Content={visibleColumns} // nwpi_content fields
+                pageType="nwjar1"
+              />
+              
+              {/* Native Tier (blue header row) */}
+              <tr style={{ backgroundColor: '#dbeafe' }}>
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
                   const isSortable = ['post_title', 'fk_sitespren_base', 'post_type', 'post_status', 'i_sync_completed_at', 'created_at'].includes(col);
                   
-                  // Color coding based on column type
-                  let bgColor = '';
-                  let bgStyle = {};
                   let hoverColor = '';
                   
                   // Define all nwpi_content fields
@@ -707,16 +714,10 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
                   ];
                   
                   if (nwpiContentFields.includes(col)) {
-                    // Use custom color #fefce3 for nwpi_content fields
-                    bgStyle = { backgroundColor: '#fefce3' };
                     hoverColor = 'hover:bg-yellow-100';
                   } else if (col === 'select' || col === 'actions') {
-                    // These are UI columns, not from any db table
-                    bgColor = 'bg-gray-100';
                     hoverColor = 'hover:bg-gray-200';
                   } else {
-                    // Any other fields from other tables
-                    bgColor = 'bg-blue-100';
                     hoverColor = 'hover:bg-blue-200';
                   }
                   
@@ -727,10 +728,10 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
                         col === 'select' ? 'px-[6px] py-[6px]' : 'px-4 py-3'
                       } ${isSortable ? `cursor-pointer ${hoverColor}` : ''} ${
                         isSticky ? `sticky z-10` : ''
-                      } ${bgColor} ${isSeparator ? 'border-r-4 border-black' : ''}`}
+                      } ${isSeparator ? 'border-r-4 border-black' : ''}`}
                       style={{
-                        ...(isSticky ? { left: `${index * 150}px` } : {}),
-                        ...bgStyle
+                        backgroundColor: '#dbeafe',
+                        ...(isSticky ? { left: `${index * 150}px` } : {})
                       }}
                       onClick={isSortable ? () => handleSort(col as SortField) : undefined}
                     >
@@ -752,7 +753,7 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
                         </div>
                       ) : (
                         <div className="flex flex-col">
-                          <div className="text-gray-500 font-normal text-xs">nwpi_content</div>
+                          <div className="text-gray-500 font-normal text-xs">nativetier</div>
                           <div className="font-bold">
                             {col} {isSortable && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
                           </div>
