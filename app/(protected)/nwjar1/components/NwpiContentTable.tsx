@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import ContentDataLineageTableHeaderTierSystem1 from '@/app/components/ContentDataLineageTableHeaderTierSystem1';
+import { useCustomColors } from '@/app/hooks/useCustomColors';
 
 interface NwpiContent {
   internal_post_id: string;
@@ -154,6 +155,9 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
+
+  // Fetch custom colors for native tier
+  const { colors } = useCustomColors(['nativetier_nwjar_bgcolor1']);
 
   // Get unique values for filter dropdowns
   const uniqueSites = useMemo(() => {
@@ -692,7 +696,7 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
               />
               
               {/* Native Tier (blue header row) */}
-              <tr style={{ backgroundColor: 'var(--color-nativetier-nwjar-bgcolor1, #dbeafe)' }}>
+              <tr style={{ backgroundColor: colors['nativetier_nwjar_bgcolor1'] || '#dbeafe' }}>
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
@@ -730,7 +734,7 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
                         isSticky ? `sticky z-10` : ''
                       } ${isSeparator ? 'border-r-4 border-black' : ''}`}
                       style={{
-                        backgroundColor: 'var(--color-nativetier-nwjar-bgcolor1, #dbeafe)',
+                        backgroundColor: colors['nativetier_nwjar_bgcolor1'] || '#dbeafe',
                         ...(isSticky ? { left: `${index * 150}px` } : {})
                       }}
                       onClick={isSortable ? () => handleSort(col as SortField) : undefined}

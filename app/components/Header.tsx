@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useCustomColors } from '@/app/hooks/useCustomColors';
 
 interface NavItem {
   name: string;
@@ -33,12 +34,16 @@ export default function Header() {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
-  const [pedbarHeaderColor, setPedbarHeaderColor] = useState<string | null>(null);
-  const [pedtorHeaderColor, setPedtorHeaderColor] = useState<string | null>(null);
-  const [gconjarHeaderColor, setGconjarHeaderColor] = useState<string | null>(null);
-  const [nwjarHeaderColor, setNwjarHeaderColor] = useState<string | null>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+
+  // Fetch custom colors for headers
+  const { colors } = useCustomColors([
+    'headerbg_pedbar',
+    'headerbg1_pedtor',
+    'headerbg1_gconjar1',
+    'headerbg1_nwjar1'
+  ]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -64,26 +69,6 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [navDropdowns]);
 
-  // Inject custom color CSS file
-  useEffect(() => {
-    const cssLink = document.createElement('link');
-    cssLink.rel = 'stylesheet';
-    cssLink.href = '/bapri-custom-color-code-system-1.css';
-    cssLink.id = 'bapri-color-system';
-    
-    // Check if already loaded
-    if (!document.getElementById('bapri-color-system')) {
-      document.head.appendChild(cssLink);
-    }
-    
-    return () => {
-      // Cleanup on unmount
-      const existingLink = document.getElementById('bapri-color-system');
-      if (existingLink) {
-        document.head.removeChild(existingLink);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     // Fetch navigation items when component mounts
@@ -103,113 +88,6 @@ export default function Header() {
     fetchNavItems();
   }, []);
 
-  useEffect(() => {
-    // Fetch pedbar header color when on /pedbar page
-    const fetchPedbarHeaderColor = async () => {
-      if (isPedbarPage) {
-        try {
-          const { data, error } = await supabase
-            .from('custom_colors')
-            .select('hex_value')
-            .eq('color_ref_code', 'headerbg_pedbar')
-            .single();
-          
-          if (error) {
-            console.error('Error fetching pedbar header color:', error);
-          } else {
-            setPedbarHeaderColor(data?.hex_value || null);
-          }
-        } catch (error) {
-          console.error('Error fetching pedbar header color:', error);
-        }
-      } else {
-        setPedbarHeaderColor(null);
-      }
-    };
-
-    fetchPedbarHeaderColor();
-  }, [isPedbarPage, supabase]);
-
-  useEffect(() => {
-    // Fetch pedtor header color when on /pedtor page
-    const fetchPedtorHeaderColor = async () => {
-      if (isPedtorPage) {
-        try {
-          const { data, error } = await supabase
-            .from('custom_colors')
-            .select('hex_value')
-            .eq('color_ref_code', 'headerbg1_pedtor')
-            .single();
-          
-          if (error) {
-            console.error('Error fetching pedtor header color:', error);
-          } else {
-            setPedtorHeaderColor(data?.hex_value || null);
-          }
-        } catch (error) {
-          console.error('Error fetching pedtor header color:', error);
-        }
-      } else {
-        setPedtorHeaderColor(null);
-      }
-    };
-
-    fetchPedtorHeaderColor();
-  }, [isPedtorPage, supabase]);
-
-  useEffect(() => {
-    // Fetch gconjar1 header color when on /gconjar1 page
-    const fetchGconjarHeaderColor = async () => {
-      if (isGconjarPage) {
-        try {
-          const { data, error } = await supabase
-            .from('custom_colors')
-            .select('hex_value')
-            .eq('color_ref_code', 'headerbg1_gconjar1')
-            .single();
-          
-          if (error) {
-            console.error('Error fetching gconjar1 header color:', error);
-          } else {
-            setGconjarHeaderColor(data?.hex_value || null);
-          }
-        } catch (error) {
-          console.error('Error fetching gconjar1 header color:', error);
-        }
-      } else {
-        setGconjarHeaderColor(null);
-      }
-    };
-
-    fetchGconjarHeaderColor();
-  }, [isGconjarPage, supabase]);
-
-  useEffect(() => {
-    // Fetch nwjar1 header color when on /nwjar1 page
-    const fetchNwjarHeaderColor = async () => {
-      if (isNwjarPage) {
-        try {
-          const { data, error } = await supabase
-            .from('custom_colors')
-            .select('hex_value')
-            .eq('color_ref_code', 'headerbg1_nwjar1')
-            .single();
-          
-          if (error) {
-            console.error('Error fetching nwjar1 header color:', error);
-          } else {
-            setNwjarHeaderColor(data?.hex_value || null);
-          }
-        } catch (error) {
-          console.error('Error fetching nwjar1 header color:', error);
-        }
-      } else {
-        setNwjarHeaderColor(null);
-      }
-    };
-
-    fetchNwjarHeaderColor();
-  }, [isNwjarPage, supabase]);
 
   const handleLogout = async () => {
     try {
@@ -429,10 +307,10 @@ export default function Header() {
     <header 
       className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
       style={{ 
-        backgroundColor: isNwjarPage && nwjarHeaderColor ? nwjarHeaderColor :
-                        isGconjarPage && gconjarHeaderColor ? gconjarHeaderColor :
-                        isPedtorPage && pedtorHeaderColor ? pedtorHeaderColor : 
-                        isPedbarPage && pedbarHeaderColor ? pedbarHeaderColor : 
+        backgroundColor: isNwjarPage ? (colors['headerbg1_nwjar1'] || '#ffffff') :
+                        isGconjarPage ? (colors['headerbg1_gconjar1'] || '#ffffff') :
+                        isPedtorPage ? (colors['headerbg1_pedtor'] || '#ffffff') : 
+                        isPedbarPage ? (colors['headerbg_pedbar'] || '#ffffff') : 
                         '#ffffff'
       }}
     >

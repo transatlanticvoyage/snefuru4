@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import ContentDataLineageTableHeaderTierSystem1 from '@/app/components/ContentDataLineageTableHeaderTierSystem1';
+import { useCustomColors } from '@/app/hooks/useCustomColors';
 
 interface GconPiece {
   id: string;
@@ -126,6 +127,9 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   const router = useRouter();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
+
+  // Fetch custom colors for native tier
+  const { colors } = useCustomColors(['nativetier_gconjar_bgcolor1']);
 
   // Load state from URL params and localStorage on mount
   useEffect(() => {
@@ -621,7 +625,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
               />
               
               {/* Native tier - Main gcon_pieces header row */}
-              <tr style={{ backgroundColor: 'var(--color-nativetier-gconjar-bgcolor1, #dbeafe)' }}>
+              <tr style={{ backgroundColor: colors['nativetier_gconjar_bgcolor1'] || '#dbeafe' }}>
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
@@ -636,7 +640,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                         isSticky ? 'sticky z-10' : ''
                       } ${isSeparator ? 'border-r-4 border-black' : ''}`}
                       style={{
-                        backgroundColor: 'var(--color-nativetier-gconjar-bgcolor1, #dbeafe)',
+                        backgroundColor: colors['nativetier_gconjar_bgcolor1'] || '#dbeafe',
                         ...(isSticky ? { left: `${index * 150}px` } : {}),
                       }}
                       onClick={isSortable ? () => handleSort(col as SortField) : undefined}

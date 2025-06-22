@@ -24,8 +24,6 @@ export default function Colors1Page() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingColor, setEditingColor] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<{[key: string]: CustomColor}>({});
-  const [regeneratingCSS, setRegeneratingCSS] = useState(false);
-  const [cssMessage, setCssMessage] = useState<string | null>(null);
   
   const { user } = useAuth();
   const supabase = createClientComponentClient();
@@ -178,39 +176,6 @@ export default function Colors1Page() {
     }
   };
 
-  const handleRegenerateCSS = async () => {
-    setRegeneratingCSS(true);
-    setCssMessage(null);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/generate-colors-css', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to regenerate CSS');
-      }
-
-      setCssMessage(`CSS file regenerated successfully! ${result.colorsCount} colors processed.`);
-      
-      // Force reload the CSS file by updating its href
-      const cssLink = document.getElementById('bapri-color-system') as HTMLLinkElement;
-      if (cssLink) {
-        cssLink.href = `/bapri-custom-color-code-system-1.css?v=${Date.now()}`;
-      }
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to regenerate CSS file');
-    } finally {
-      setRegeneratingCSS(false);
-    }
-  };
 
   if (loading) return <div className="p-6">Loading custom colors...</div>;
 
@@ -228,15 +193,9 @@ export default function Colors1Page() {
         </div>
       )}
 
-      {/* CSS Success Message */}
-      {cssMessage && (
-        <div className="mb-4 rounded-md bg-green-50 p-4">
-          <div className="text-sm text-green-700">{cssMessage}</div>
-        </div>
-      )}
 
-      {/* Add New Button and Regenerate CSS Button */}
-      <div className="mb-6 flex gap-4">
+      {/* Add New Button */}
+      <div className="mb-6">
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
@@ -245,17 +204,6 @@ export default function Colors1Page() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Add New
-        </button>
-        
-        <button
-          onClick={handleRegenerateCSS}
-          disabled={regeneratingCSS}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          {regeneratingCSS ? 'Regenerating...' : 'Regenerate CSS'}
         </button>
       </div>
 
@@ -526,13 +474,13 @@ export default function Colors1Page() {
         <h3 className="text-sm font-semibold text-blue-800 mb-2">How to Use Custom Colors</h3>
         <div className="text-sm text-blue-700">
           <p className="mb-2">
-            Once you create custom colors, you can reference them when requesting styling changes:
+            Colors are applied automatically when you create them with the correct reference codes:
           </p>
           <ul className="list-disc list-inside space-y-1 ml-4">
-            <li>Use the <strong>color code</strong> to reference colors in styling requests</li>
-            <li>Example: "Please style the header using color code <code>primary-blue</code>"</li>
-            <li>The system will automatically use the associated hex value for implementation</li>
-            <li>This ensures consistent colors across the entire application</li>
+            <li><strong>Native tier colors:</strong> <code>nativetier_nwjar_bgcolor1</code>, <code>nativetier_gconjar_bgcolor1</code></li>
+            <li><strong>Header colors:</strong> <code>headerbg1_nwjar1</code>, <code>headerbg1_gconjar1</code>, <code>headerbg_pedbar</code>, <code>headerbg1_pedtor</code></li>
+            <li><strong>Changes apply immediately</strong> - no regeneration needed</li>
+            <li>Colors are fetched directly from the database in real-time</li>
           </ul>
         </div>
       </div>
