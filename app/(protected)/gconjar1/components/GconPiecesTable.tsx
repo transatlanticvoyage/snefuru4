@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import ContentDataLineageTableHeaderTierSystem1 from '@/app/components/ContentDataLineageTableHeaderTierSystem1';
 
 interface GconPiece {
   id: string;
@@ -612,42 +613,14 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              {/* First row - Source (nwpi_content) */}
-              <tr className="bg-gray-50">
-                {visibleColumns.map((col, index) => {
-                  const isSticky = index < stickyColumnCount;
-                  const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
-                  const sourceField = sourceFieldMapping[col];
-                  
-                  return (
-                    <th
-                      key={`source-${col}`}
-                      className={`text-left text-xs text-gray-700 lowercase tracking-wider ${
-                        col === 'select' ? 'px-[6px] py-2' : 'px-6 py-2'
-                      } ${isSticky ? 'sticky bg-gray-50 z-10' : ''} ${
-                        isSeparator ? 'border-r-4 border-black' : ''
-                      }`}
-                      style={isSticky ? { left: `${index * 150}px` } : {}}
-                    >
-                      {col === 'select' || col === 'actions' ? (
-                        <div className="h-8"></div>
-                      ) : sourceField ? (
-                        <div className="flex flex-col">
-                          <div className="font-normal text-xs">nwpi_content</div>
-                          <div className="font-bold">{sourceField}</div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col">
-                          <div className="font-normal text-xs text-gray-400">-</div>
-                          <div className="font-bold text-gray-400">-</div>
-                        </div>
-                      )}
-                    </th>
-                  );
-                })}
-              </tr>
+              {/* CDLTHTS - 4-tier header system */}
+              <ContentDataLineageTableHeaderTierSystem1
+                visibleColumns={visibleColumns}
+                stickyColumnCount={stickyColumnCount}
+                pageType="gconjar1"
+              />
               
-              {/* Second row - Target (gcon_pieces) */}
+              {/* Native tier - Main gcon_pieces header row */}
               <tr className="bg-blue-100">
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
@@ -656,7 +629,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                   
                   return (
                     <th
-                      key={`target-${col}`}
+                      key={`native-${col}`}
                       className={`text-left text-xs text-gray-700 lowercase tracking-wider ${
                         col === 'select' ? 'px-[6px] py-2' : 'px-6 py-2'
                       } ${isSortable ? 'cursor-pointer hover:bg-blue-200' : ''} ${
@@ -683,7 +656,7 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
                         </div>
                       ) : col === 'actions' ? (
                         <div className="flex flex-col">
-                          <div className="font-normal text-xs">actions</div>
+                          <div className="font-normal text-xs">nativetier</div>
                           <div className="font-bold">actions</div>
                         </div>
                       ) : (
