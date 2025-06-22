@@ -456,7 +456,7 @@ export default function NwJar1Page() {
                     height: '18px'
                   }}
                 />
-                Use Your Current Selection From Table
+                Use Your Current Selection From Table | (Dynamic Count)
               </div>
               <div 
                 className="flex items-center kz102 font-bold"
