@@ -70,9 +70,7 @@ export default function Colors1Page() {
       const colorData = {
         color_name: colorName.trim(),
         color_ref_code: colorCode.trim(),
-        hex_value: selectedColor,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        hex_value: selectedColor
       };
 
       const { error: insertError } = await supabase
@@ -157,8 +155,7 @@ export default function Colors1Page() {
         .update({
           color_name: editedColor.color_name.trim(),
           color_ref_code: editedColor.color_ref_code.trim(),
-          hex_value: editedColor.hex_value,
-          updated_at: new Date().toISOString()
+          hex_value: editedColor.hex_value
         })
         .eq('color_id', colorId);
 
@@ -270,7 +267,7 @@ export default function Colors1Page() {
             {/* Color Code */}
             <div>
               <label htmlFor="colorCode" className="block text-sm font-medium text-gray-700 mb-2">
-                Color Code
+                color_ref_code
               </label>
               <input
                 type="text"
@@ -344,7 +341,7 @@ export default function Colors1Page() {
                     Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Code
+                    color_ref_code
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Hex Value
