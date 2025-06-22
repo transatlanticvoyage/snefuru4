@@ -64,6 +64,27 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [navDropdowns]);
 
+  // Inject custom color CSS file
+  useEffect(() => {
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = '/bapri-custom-color-code-system-1.css';
+    cssLink.id = 'bapri-color-system';
+    
+    // Check if already loaded
+    if (!document.getElementById('bapri-color-system')) {
+      document.head.appendChild(cssLink);
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      const existingLink = document.getElementById('bapri-color-system');
+      if (existingLink) {
+        document.head.removeChild(existingLink);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     // Fetch navigation items when component mounts
     const fetchNavItems = async () => {

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Generation System Test</title>
+    <link rel="stylesheet" href="/bapri-custom-color-code-system-1.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .color-box {
+            width: 100px;
+            height: 50px;
+            margin: 10px;
+            display: inline-block;
+            border: 1px solid #000;
+            text-align: center;
+            line-height: 50px;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bapri Custom Color Code System Test</h1>
+    
+    <div class="test-section">
+        <h2>1. CSS Variables Test</h2>
+        <div class="color-box" style="background-color: var(--color-nativetier-nwjar-bgcolor1, red);">
+            nwjar1
+        </div>
+        <div class="color-box" style="background-color: var(--color-nativetier-gconjar-bgcolor1, red);">
+            gconjar1
+        </div>
+        <div class="color-box" style="background-color: var(--color-dltier1-bgcolor, red);">
+            tier1
+        </div>
+        <div class="color-box" style="background-color: var(--color-dltier2-bgcolor, red);">
+            tier2
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. CSS Classes Test</h2>
+        <div class="color-box bg-nativetier-nwjar-bgcolor1">
+            .bg-nwjar1
+        </div>
+        <div class="color-box bg-nativetier-gconjar-bgcolor1">
+            .bg-gconjar1
+        </div>
+        <div class="color-box bg-dltier1-bgcolor">
+            .bg-tier1
+        </div>
+        <div class="color-box bg-dltier2-bgcolor">
+            .bg-tier2
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Text Color Classes Test</h2>
+        <p class="text-nativetier-nwjar-bgcolor1">This text uses nwjar1 color</p>
+        <p class="text-nativetier-gconjar-bgcolor1">This text uses gconjar1 color</p>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Hover Test</h2>
+        <div class="color-box hover:bg-nativetier-nwjar-bgcolor1" style="background-color: #ccc;">
+            Hover me
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Fallback Test</h2>
+        <div class="color-box" style="background-color: var(--color-nonexistent-color, orange);">
+            Fallback
+        </div>
+        <p><em>This box should be orange (fallback color) since the CSS variable doesn't exist.</em></p>
+    </div>
+
+    <script>
+        // Test CSS variable access via JavaScript
+        function testCSSVariables() {
+            const root = document.documentElement;
+            const nwjarColor = getComputedStyle(root).getPropertyValue('--color-nativetier-nwjar-bgcolor1');
+            const gconjarColor = getComputedStyle(root).getPropertyValue('--color-nativetier-gconjar-bgcolor1');
+            
+            console.log('CSS Variables Test:');
+            console.log('nwjar1 color:', nwjarColor);
+            console.log('gconjar1 color:', gconjarColor);
+            
+            // Display results
+            const results = document.createElement('div');
+            results.className = 'test-section';
+            results.innerHTML = `
+                <h2>6. JavaScript Access Test</h2>
+                <p><strong>nwjar1 color:</strong> ${nwjarColor || 'Not found'}</p>
+                <p><strong>gconjar1 color:</strong> ${gconjarColor || 'Not found'}</p>
+            `;
+            document.body.appendChild(results);
+        }
+        
+        // Run test when page loads
+        window.addEventListener('load', testCSSVariables);
+    </script>
+</body>
+</html>
