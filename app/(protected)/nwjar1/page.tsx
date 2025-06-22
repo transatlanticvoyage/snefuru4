@@ -528,7 +528,7 @@ export default function NwJar1Page() {
                     height: '18px'
                   }}
                 />
-                Use Your Current Selection From Table | (Dynamic Count)
+                SOPTION1 - Use Your Current Selection From Table | (Dynamic Count)
               </div>
               <div 
                 className="flex items-center kz102 font-bold"
@@ -561,7 +561,7 @@ export default function NwJar1Page() {
                     height: '18px'
                   }}
                 />
-                Select All Items In Current Pagination | (DYNAMIC COUNT)
+                SOPTION2 - Select All Items In Current Pagination | (DYNAMIC COUNT)
               </div>
               
               {/* Close button in header - spans both bars */}
