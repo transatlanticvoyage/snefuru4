@@ -48,26 +48,26 @@ export const useFPopup1State = ({ config, supabase }: UseFPopup1StateProps) => {
       try {
         // Extract unique color schemes from header configs
         const colorSchemes = [...new Set(config.headers.map(h => h.colorScheme))];
-        const colorNames = colorSchemes.flatMap(scheme => [
+        const colorCodes = colorSchemes.flatMap(scheme => [
           `${scheme}_bgcolor1`,
           `${scheme}_textcolor1`
         ]);
 
         const { data, error } = await supabase
           .from('custom_colors')
-          .select('color_name, color_value')
-          .in('color_name', colorNames);
+          .select('color_code, hex_value')
+          .in('color_code', colorCodes);
 
         if (!error && data && data.length > 0) {
           const colors: Record<string, FPopup1ColorConfig> = {};
           
           colorSchemes.forEach(scheme => {
-            const bgItem = data.find((item: any) => item.color_name === `${scheme}_bgcolor1`);
-            const textItem = data.find((item: any) => item.color_name === `${scheme}_textcolor1`);
+            const bgItem = data.find((item: any) => item.color_code === `${scheme}_bgcolor1`);
+            const textItem = data.find((item: any) => item.color_code === `${scheme}_textcolor1`);
             
             colors[scheme] = {
-              bg: bgItem?.color_value || '#2563eb',
-              text: textItem?.color_value || '#ffffff'
+              bg: bgItem?.hex_value || '#2563eb',
+              text: textItem?.hex_value || '#ffffff'
             };
           });
           

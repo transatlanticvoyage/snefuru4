@@ -24,8 +24,8 @@ export const useTierColors = () => {
         
         const { data, error } = await supabase
           .from('custom_colors')
-          .select('color_name, color_value')
-          .in('color_name', [
+          .select('color_code, hex_value')
+          .in('color_code', [
             'dltier1_bgcolor',
             'dltier2_bgcolor', 
             'dltier3_bgcolor',
@@ -36,8 +36,8 @@ export const useTierColors = () => {
           const colors: Partial<TierColors> = {};
           
           data.forEach(item => {
-            if (item.color_name in tierColors) {
-              colors[item.color_name as keyof TierColors] = item.color_value;
+            if (item.color_code in tierColors) {
+              colors[item.color_code as keyof TierColors] = item.hex_value;
             }
           });
           
