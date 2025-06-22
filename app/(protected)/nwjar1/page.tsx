@@ -410,6 +410,32 @@ export default function NwJar1Page() {
               <span className="font-mono text-sm overflow-hidden whitespace-nowrap text-ellipsis flex-1">
                 {currentUrl}
               </span>
+
+              {/* Copy buttons in uelbar37 - positioned to the left of close button */}
+              <button
+                className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
+                style={{
+                  width: '50px',
+                  height: '50px',
+                  marginRight: '0px',
+                  fontSize: '16px'
+                }}
+                title="Copy Button 1"
+              >
+                📋
+              </button>
+              <button
+                className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
+                style={{
+                  width: '50px',
+                  height: '50px',
+                  marginRight: '0px',
+                  fontSize: '16px'
+                }}
+                title="Copy Button 2"
+              >
+                📄
+              </button>
             </div>
             
             {/* uelbar38 header bar */}
