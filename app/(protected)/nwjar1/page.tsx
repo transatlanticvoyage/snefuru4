@@ -423,7 +423,7 @@ export default function NwJar1Page() {
                         return (
                           <>
                             {parts[0]}
-                            <span style={{ fontWeight: 'bold', color: '#c73f00' }}>
+                            <span style={{ fontWeight: 'bold', color: '#ff9e71' }}>
                               {sitebaseText}
                             </span>
                             {parts[1]}
@@ -441,28 +441,46 @@ export default function NwJar1Page() {
 
               {/* Copy buttons in uelbar37 - positioned to the left of close button */}
               <button
+                onClick={() => {
+                  navigator.clipboard.writeText(currentUrl);
+                }}
                 className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
                 style={{
-                  width: '50px',
+                  width: '80px',
                   height: '50px',
                   marginRight: '0px',
-                  fontSize: '16px'
+                  fontSize: '10px',
+                  flexDirection: 'column',
+                  gap: '2px'
                 }}
-                title="Copy Button 1"
+                title="Copy Full URL"
               >
-                📋
+                <div>COPY URL</div>
               </button>
               <button
+                onClick={() => {
+                  try {
+                    const url = new URL(currentUrl);
+                    const sitebaseParam = url.searchParams.get('sitebase');
+                    if (sitebaseParam) {
+                      navigator.clipboard.writeText(sitebaseParam);
+                    }
+                  } catch (error) {
+                    console.error('Error copying site:', error);
+                  }
+                }}
                 className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
                 style={{
-                  width: '50px',
+                  width: '60px',
                   height: '50px',
                   marginRight: '0px',
-                  fontSize: '16px'
+                  fontSize: '10px',
+                  flexDirection: 'column',
+                  gap: '2px'
                 }}
-                title="Copy Button 2"
+                title="Copy Site Domain"
               >
-                📄
+                <div>SITE</div>
               </button>
             </div>
             
@@ -554,10 +572,15 @@ export default function NwJar1Page() {
                   width: '260px',
                   height: '100px', // Spans both 50px bars
                   border: '2px solid #4a4a4a',
-                  fontSize: '24px'
+                  fontSize: '14px',
+                  flexDirection: 'column',
+                  gap: '4px'
                 }}
               >
-                ×
+                <div style={{ fontSize: '20px' }}>×</div>
+                <div style={{ fontSize: '12px', lineHeight: '12px', textAlign: 'center' }}>
+                  CLOSE<br/>POPUP
+                </div>
               </button>
             </div>
             
