@@ -408,7 +408,35 @@ export default function NwJar1Page() {
               />
               
               <span className="font-mono text-sm overflow-hidden whitespace-nowrap text-ellipsis flex-1">
-                {currentUrl}
+                {(() => {
+                  // Parse URL to highlight sitebase parameter
+                  try {
+                    const url = new URL(currentUrl);
+                    const sitebaseParam = url.searchParams.get('sitebase');
+                    
+                    if (sitebaseParam) {
+                      const fullUrl = currentUrl;
+                      const sitebaseText = `sitebase=${sitebaseParam}`;
+                      const parts = fullUrl.split(sitebaseText);
+                      
+                      if (parts.length === 2) {
+                        return (
+                          <>
+                            {parts[0]}
+                            <span style={{ fontWeight: 'bold', color: '#c73f00' }}>
+                              {sitebaseText}
+                            </span>
+                            {parts[1]}
+                          </>
+                        );
+                      }
+                    }
+                    
+                    return currentUrl;
+                  } catch (error) {
+                    return currentUrl;
+                  }
+                })()}
               </span>
 
               {/* Copy buttons in uelbar37 - positioned to the left of close button */}
