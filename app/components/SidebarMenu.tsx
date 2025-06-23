@@ -35,15 +35,7 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
     children: [
       {
         name: 'API Key Slots Management',
-        path: 'https://snef.me/admin/create-new-api-key-slots?coltemp=option1'
-      },
-      {
-        name: 'Custom Color Management',
-        path: 'https://snef.me/admin/colors1'
-      },
-      {
-        name: 'Download Plugin',
-        path: '/admin/downloadplugin'
+        path: 'https://snef.me/admin/create-new-api-key-slots'
       }
     ]
   };
