@@ -12,7 +12,7 @@ interface KPopup1Props {
 export default function KPopup1({ isOpen, onClose, sitebase }: KPopup1Props) {
   const [kz101Checked, setKz101Checked] = useState(false);
   const [kz103Checked, setKz103Checked] = useState(false);
-  const [activePopupTab, setActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
+  const [activePopupTab, setActivePopupTab] = useState<'kptab1' | 'kptab2' | 'kptab3' | 'kptab4' | 'kptab5' | 'kptab6' | 'kptab7'>('kptab1');
   const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [currentUrl, setCurrentUrl] = useState<string>('');
