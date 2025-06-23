@@ -40,6 +40,10 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
       {
         name: 'User Management',
         path: '/admin/usersp1'
+      },
+      {
+        name: 'Popup Development',
+        path: '/admin/popnow'
       }
     ]
   };

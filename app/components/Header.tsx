@@ -146,6 +146,10 @@ export default function Header() {
           name: 'User Management',
           path: '/admin/usersp1'
         },
+        {
+          name: 'Popup Development',
+          path: '/admin/popnow'
+        },
         ...adminPages // Add any other admin pages found in navigation
       ]
     };
