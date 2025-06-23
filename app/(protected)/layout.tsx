@@ -21,7 +21,7 @@ export default function ProtectedLayout({
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 flex">
         <SidebarMenu isOpen={sidebarOpen} onToggle={toggleSidebar} />
-        <div style={{flex: 1}}>
+        <div className="flex-1 flex flex-col">
           <Header onSidebarToggle={toggleSidebar} />
           <main className="py-6 px-4">
             {children}
