@@ -193,7 +193,7 @@ export default function XPagesManager1Page() {
     }
   };
 
-  const renderCell = (item: XPage, column: typeof columns[0]) => {
+  const renderCell = (item: XPage, column: { key: keyof XPage; type: string; width: string }) => {
     const value = item[column.key];
     const isEditing = editingCell?.id === item.xpage_id && editingCell?.field === column.key;
     const isReadOnly = column.key === 'xpage_id' || column.key === 'created_at' || column.key === 'updated_at';
