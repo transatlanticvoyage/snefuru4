@@ -52,7 +52,7 @@ export default function XPagesManager1Page() {
     { key: 'broad_parent_container', type: 'text', width: '180px' },
     { key: 'created_at', type: 'text', width: '200px' },
     { key: 'updated_at', type: 'text', width: '200px' }
-  ] as const;
+  ];
 
   useEffect(() => {
     fetchXPages();
