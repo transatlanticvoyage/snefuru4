@@ -54,7 +54,7 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
 
   // Special starred menu
   const specialFirstItem: NavItem = {
-    name: '$9,750/m profits w/ RNR',
+    name: 'navgroup1',
     children: [
       {
         name: '/tebnar2 - Generate Images In A Batch',
@@ -177,7 +177,7 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
   const renderNavItem = (item: NavItem, depth: number = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems[item.name];
-    const isStarred = item.name === 'admin' || item.name === '$9,750/m profits w/ RNR';
+    const isStarred = item.name === 'admin' || item.name === 'navgroup1';
 
     if (hasChildren) {
       return (
@@ -241,7 +241,7 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
       // Skip admin pages and items already in special menus
       if (!item.path?.includes('/admin/') && 
           item.name !== 'admin' && 
-          item.name !== '$9,750/m profits w/ RNR') {
+          item.name !== 'navgroup1') {
         items.push(item);
       }
     });

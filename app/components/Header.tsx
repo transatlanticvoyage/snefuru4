@@ -160,7 +160,7 @@ export default function Header() {
 
     // Create the special first item that always comes first
     const specialFirstItem: NavItem = {
-      name: '$9,750/m profits w/ RNR',
+      name: 'navgroup1',
       children: [
         {
           name: '/tebnar2 - Generate Images In A Batch',
@@ -246,7 +246,7 @@ export default function Header() {
             onClick={() => toggleNavDropdown(item.name)}
             className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700 focus:outline-none"
           >
-            {(item.name === 'admin' || item.name === '$9,750/m profits w/ RNR') && (
+            {(item.name === 'admin' || item.name === 'navgroup1') && (
               <svg 
                 className="w-4 h-4 mr-1 text-black" 
                 style={{ 
@@ -273,14 +273,14 @@ export default function Header() {
           
           {navDropdowns[item.name] && (
             <div className={`absolute left-0 mt-1 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 ${
-              item.name === '$9,750/m profits w/ RNR' ? 'w-auto min-w-96' : 'w-48'
+              item.name === 'navgroup1' ? 'w-auto min-w-96' : 'w-48'
             }`}>
               {item.children.map((child) => (
                 <Link
                   key={child.path}
                   href={child.path!}
                   className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
-                    item.name === '$9,750/m profits w/ RNR' ? 'whitespace-nowrap' : ''
+                    item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
                   }`}
                   onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
                 >
