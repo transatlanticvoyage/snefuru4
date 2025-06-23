@@ -79,6 +79,40 @@ export default function XPagesManager1Page() {
     }
   };
 
+  const createNewXPage = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('xpages')
+        .insert({
+          title1: null,
+          title2: null,
+          desc1: null,
+          caption: null,
+          pagepath_url: null,
+          pagepath_long: null,
+          pagepath_short: null,
+          position_marker: null,
+          show_in_all_pages_nav_area1: null,
+          broad_parent_container: null
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating new xpage:', error);
+        return;
+      }
+
+      // Add the new record to the local state
+      setXpages(prev => [data, ...prev]);
+      
+      // Reset to first page to show the new record
+      setCurrentPage(1);
+    } catch (error) {
+      console.error('Error creating new xpage:', error);
+    }
+  };
+
   const updateField = async (id: string, field: keyof XPage, value: any) => {
     try {
       const { error } = await supabase
@@ -274,8 +308,18 @@ export default function XPagesManager1Page() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">XPages Manager</h1>
-        <p className="text-gray-600">Manage internal application pages</p>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">XPages Manager</h1>
+            <p className="text-gray-600">Manage internal application pages</p>
+          </div>
+          <button
+            onClick={createNewXPage}
+            className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md transition-colors"
+          >
+            Create New XPage in DB
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}
