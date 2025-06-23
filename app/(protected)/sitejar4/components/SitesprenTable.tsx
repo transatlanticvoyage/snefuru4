@@ -221,6 +221,10 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
       if (sortField === 'created_at' || sortField === 'updated_at') {
         aVal = aVal ? new Date(aVal).getTime() : 0;
         bVal = bVal ? new Date(bVal).getTime() : 0;
+      } else if (sortField === 'is_starred1') {
+        // For starring: "yes" values should come first when descending, null/empty values last
+        aVal = aVal === 'yes' ? 1 : 0;
+        bVal = bVal === 'yes' ? 1 : 0;
       } else if (typeof aVal === 'string') {
         aVal = aVal.toLowerCase();
         bVal = bVal.toLowerCase();
@@ -708,7 +712,7 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
                     <th
                       key={col}
                       className={`${col === 'checkbox' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative ${stickyClass} ${
-                        ['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) 
+                        ['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) 
                           ? 'cursor-pointer hover:brightness-95' 
                           : ''
                       } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
@@ -728,7 +732,7 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
                         } : {})
                       }}
                       onClick={col === 'checkbox' ? (isAllSelected ? handleClearAll : handleSelectAll) : 
-                              (['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) ? () => handleSort(col as SortField) : undefined)}
+                              (['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) ? () => handleSort(col as SortField) : undefined)}
                     >
                       {hasLeftSeparator && (
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
@@ -748,7 +752,7 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
                         'sync_actions'
                       ) : (
                         <>
-                          {col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
+                          {col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
                         </>
                       )}
                       {hasRightSeparator && (
