@@ -178,6 +178,7 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems[item.name];
     const isStarred = item.name === 'admin' || item.name === 'navgroup1';
+    const isNavGroup91 = item.name === 'navgroup91 - all';
 
     if (hasChildren) {
       return (
@@ -196,6 +197,17 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
                   viewBox="0 0 20 20"
                 >
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              )}
+              {isNavGroup91 && (
+                <svg 
+                  className="w-4 h-4 mr-2 text-gray-400" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                  <path d="M10 4a2 2 0 100-4 2 2 0 000 4zM10 20a2 2 0 100-4 2 2 0 000 4zM4 10a2 2 0 11-4 0 2 2 0 014 0zM20 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                  <path d="M8 10H4M16 10h-4M10 8V4M10 16v-4" stroke="currentColor" strokeWidth="2" fill="none"/>
                 </svg>
               )}
               <span className="text-gray-200">{item.name}</span>
@@ -234,17 +246,42 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
 
   // Organize all navigation items
   const getAllNavItems = () => {
-    const items = [adminMenuItem, specialFirstItem];
+    // Filter out admin pages from regular navigation
+    const nonAdminItems: NavItem[] = [];
     
-    // Add other nav items from API
     navItems.forEach(item => {
-      // Skip admin pages and items already in special menus
-      if (!item.path?.includes('/admin/') && 
-          item.name !== 'admin' && 
-          item.name !== 'navgroup1') {
-        items.push(item);
+      if (item.path && item.path.includes('/admin/')) {
+        // Skip admin pages
+      } else if (item.children) {
+        // Check children for admin pages
+        const nonAdminChildren = item.children.filter(child => !child.path || !child.path.includes('/admin/'));
+        
+        // Only add parent item if it has non-admin children
+        if (nonAdminChildren.length > 0) {
+          nonAdminItems.push({
+            ...item,
+            children: nonAdminChildren
+          });
+        }
+      } else {
+        nonAdminItems.push(item);
       }
     });
+
+    // Create navgroup91 for all general pages
+    const navGroup91: NavItem = {
+      name: 'navgroup91 - all',
+      children: nonAdminItems.filter(item => !item.children || item.children.length === 0).map(item => ({
+        name: item.name,
+        path: item.path
+      }))
+    };
+
+    // Include parent items with children in the general navigation
+    const parentItemsWithChildren = nonAdminItems.filter(item => item.children && item.children.length > 0);
+
+    // Create the final nav items array with admin first, special items, then parent items, then navgroup91
+    const items = [adminMenuItem, specialFirstItem, ...parentItemsWithChildren, navGroup91];
 
     return items;
   };

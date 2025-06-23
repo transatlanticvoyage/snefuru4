@@ -213,8 +213,20 @@ export default function Header() {
       ]
     };
 
-    // Create the final nav items array with admin first, then special item, then the rest (non-admin items)
-    const finalNavItems = [adminMenuItem, specialFirstItem, ...nonAdminItems];
+    // Create navgroup91 for all general pages
+    const navGroup91: NavItem = {
+      name: 'navgroup91 - all',
+      children: nonAdminItems.filter(item => !item.children || item.children.length === 0).map(item => ({
+        name: item.name,
+        path: item.path
+      }))
+    };
+
+    // Include parent items with children in the general navigation
+    const parentItemsWithChildren = nonAdminItems.filter(item => item.children && item.children.length > 0);
+
+    // Create the final nav items array with admin first, special items, then parent items, then navgroup91
+    const finalNavItems = [adminMenuItem, specialFirstItem, ...parentItemsWithChildren, navGroup91];
 
     const panjar3Index = finalNavItems.findIndex(item => item.name === 'panjar3');
     if (panjar3Index === -1) {
@@ -256,6 +268,20 @@ export default function Header() {
                 viewBox="0 0 20 20"
               >
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            )}
+            {item.name === 'navgroup91 - all' && (
+              <svg 
+                className="w-4 h-4 mr-1 text-black" 
+                style={{ 
+                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+                }}
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                <path d="M10 4a2 2 0 100-4 2 2 0 000 4zM10 20a2 2 0 100-4 2 2 0 000 4zM4 10a2 2 0 11-4 0 2 2 0 014 0zM20 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                <path d="M8 10H4M16 10h-4M10 8V4M10 16v-4" stroke="currentColor" strokeWidth="2" fill="none"/>
               </svg>
             )}
             {item.name}
