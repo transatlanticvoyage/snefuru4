@@ -19,15 +19,13 @@ export default function ProtectedLayout({
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50">
+        <Header />
         <SidebarMenu isOpen={sidebarOpen} onToggle={toggleSidebar} />
-        <div className="flex-1">
-          <Header onSidebarToggle={toggleSidebar} />
-          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            {children}
-          </main>
-        </div>
         <SelectedRowStyles />
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          {children}
+        </main>
       </div>
     </ProtectedRoute>
   );
