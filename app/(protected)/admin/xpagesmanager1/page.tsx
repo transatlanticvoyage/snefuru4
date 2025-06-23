@@ -38,7 +38,7 @@ export default function XPagesManager1Page() {
   const supabase = createClientComponentClient();
 
   // Define column order and properties
-  const columns = [
+  const columns: Array<{ key: keyof XPage; type: string; width: string }> = [
     { key: 'xpage_id', type: 'text', width: '300px' },
     { key: 'title1', type: 'text', width: '200px' },
     { key: 'title2', type: 'text', width: '200px' },
@@ -193,7 +193,7 @@ export default function XPagesManager1Page() {
     }
   };
 
-  const renderCell = (item: XPage, column: { key: keyof XPage; type: string; width: string }) => {
+  const renderCell = (item: XPage, column: typeof columns[0]) => {
     const value = item[column.key];
     const isEditing = editingCell?.id === item.xpage_id && editingCell?.field === column.key;
     const isReadOnly = column.key === 'xpage_id' || column.key === 'created_at' || column.key === 'updated_at';
