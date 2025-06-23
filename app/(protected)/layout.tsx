@@ -19,13 +19,19 @@ export default function ProtectedLayout({
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <SidebarMenu isOpen={sidebarOpen} onToggle={toggleSidebar} />
+      <div className={`min-h-screen bg-gray-50 snefuru-app-container ${sidebarOpen ? 'sidebar-open' : ''}`}>
+        <div className="snefuru-sidebar-wrapper">
+          <SidebarMenu isOpen={sidebarOpen} onToggle={toggleSidebar} />
+        </div>
+        
+        <div className="snefuru-content-wrapper">
+          <Header />
+          <main className="py-6 px-4">
+            {children}
+          </main>
+        </div>
+        
         <SelectedRowStyles />
-        <main className="py-6 px-4">
-          {children}
-        </main>
       </div>
     </ProtectedRoute>
   );
