@@ -30,6 +30,7 @@ interface SitesprenTableProps {
   data: SitesprenRecord[];
   userId: string;
   onSelectionChange?: (selectedIds: string[]) => void;
+  onDataUpdate?: (updatedData: SitesprenRecord[]) => void;
 }
 
 type SortField = keyof SitesprenRecord;
@@ -62,7 +63,7 @@ const allColumns = [
   'is_wp_site'         // 23
 ];
 
-export default function SitesprenTable({ data, onSelectionChange }: SitesprenTableProps) {
+export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }: SitesprenTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
@@ -531,8 +532,17 @@ export default function SitesprenTable({ data, onSelectionChange }: SitesprenTab
         return;
       }
 
-      // Update local data - refresh the page data
-      window.location.reload();
+      // Update local data without page refresh
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_starred1: newValue }
+          : site
+      );
+      
+      // Call parent component to update the data
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
       
     } catch (error) {
       console.error('Error in star click handler:', error);

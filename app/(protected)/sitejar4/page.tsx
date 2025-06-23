@@ -315,6 +315,7 @@ export default function Sitejar4Page() {
         data={sitesprenData} 
         userId={user.id}
         onSelectionChange={handleSelectionChange}
+        onDataUpdate={setSitesprenData}
       />
     </div>
   );
