@@ -78,6 +78,7 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
   const [updatingStars, setUpdatingStars] = useState<Set<string>>(new Set());
   const [checkingPluginVersion, setCheckingPluginVersion] = useState<Set<string>>(new Set());
   const [updatingPlugin, setUpdatingPlugin] = useState<Set<string>>(new Set());
+  const [barkroPushing, setBarkroPushing] = useState<Set<string>>(new Set());
   
   const supabase = createClientComponentClient();
   
@@ -630,6 +631,64 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
     }
   };
 
+  // Barkro push handler
+  const handleBarkroPush = async (siteId: string) => {
+    setBarkroPushing(prev => new Set([...prev, siteId]));
+    
+    // Clear previous result for this site
+    setSyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[`barkro_${siteId}`];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/barkro/push-update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSyncResults(prev => ({
+          ...prev,
+          [`barkro_${siteId}`]: {
+            type: 'success',
+            message: `✅ ${data.message}`
+          }
+        }));
+      } else {
+        setSyncResults(prev => ({
+          ...prev,
+          [`barkro_${siteId}`]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setSyncResults(prev => ({
+        ...prev,
+        [`barkro_${siteId}`]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      setBarkroPushing(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
   // Star click handler
   const handleStarClick = async (siteId: string) => {
     const updateKey = `${siteId}_is_starred1`;
@@ -971,14 +1030,21 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
                               >
                                 {updatingPlugin.has(item.id) ? 'Updating...' : 'Update Plugin'}
                               </button>
+                              <button
+                                className="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                                onClick={() => handleBarkroPush(item.id)}
+                                disabled={barkroPushing.has(item.id)}
+                              >
+                                {barkroPushing.has(item.id) ? 'Pushing...' : 'Push updates with Barkro'}
+                              </button>
                             </div>
-                            {(syncResults[item.id] || syncResults[`test_${item.id}`] || syncResults[`version_${item.id}`] || syncResults[`update_${item.id}`]) && (
+                            {(syncResults[item.id] || syncResults[`test_${item.id}`] || syncResults[`version_${item.id}`] || syncResults[`update_${item.id}`] || syncResults[`barkro_${item.id}`]) && (
                               <div className={`text-xs p-2 rounded ${
-                                (syncResults[item.id]?.type === 'success' || syncResults[`test_${item.id}`]?.type === 'success' || syncResults[`version_${item.id}`]?.type === 'success' || syncResults[`update_${item.id}`]?.type === 'success') 
+                                (syncResults[item.id]?.type === 'success' || syncResults[`test_${item.id}`]?.type === 'success' || syncResults[`version_${item.id}`]?.type === 'success' || syncResults[`update_${item.id}`]?.type === 'success' || syncResults[`barkro_${item.id}`]?.type === 'success') 
                                   ? 'bg-green-100 text-green-800' 
                                   : 'bg-red-100 text-red-800'
                               }`}>
-                                {syncResults[item.id]?.message || syncResults[`test_${item.id}`]?.message || syncResults[`version_${item.id}`]?.message || syncResults[`update_${item.id}`]?.message}
+                                {syncResults[item.id]?.message || syncResults[`test_${item.id}`]?.message || syncResults[`version_${item.id}`]?.message || syncResults[`update_${item.id}`]?.message || syncResults[`barkro_${item.id}`]?.message}
                               </div>
                             )}
                           </div>
