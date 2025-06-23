@@ -76,6 +76,8 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
   const [refreshingCells, setRefreshingCells] = useState<Set<string>>(new Set());
   const [dnsData, setDnsData] = useState<{[key: string]: {ns_full?: string, ip_address?: string}}>({});
   const [updatingStars, setUpdatingStars] = useState<Set<string>>(new Set());
+  const [checkingPluginVersion, setCheckingPluginVersion] = useState<Set<string>>(new Set());
+  const [updatingPlugin, setUpdatingPlugin] = useState<Set<string>>(new Set());
   
   const supabase = createClientComponentClient();
   
@@ -512,6 +514,122 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
     }
   };
 
+  // Plugin version check handler
+  const handleCheckPluginVersion = async (siteId: string) => {
+    setCheckingPluginVersion(prev => new Set([...prev, siteId]));
+    
+    // Clear previous result for this site
+    setSyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[`version_${siteId}`];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/plugin/check-version', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSyncResults(prev => ({
+          ...prev,
+          [`version_${siteId}`]: {
+            type: 'success',
+            message: `✅ ${data.message} (Current: ${data.currentVersion || 'Unknown'}, Latest: ${data.latestVersion || 'Unknown'})`
+          }
+        }));
+      } else {
+        setSyncResults(prev => ({
+          ...prev,
+          [`version_${siteId}`]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setSyncResults(prev => ({
+        ...prev,
+        [`version_${siteId}`]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      setCheckingPluginVersion(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
+  // Plugin update handler
+  const handleUpdatePlugin = async (siteId: string) => {
+    setUpdatingPlugin(prev => new Set([...prev, siteId]));
+    
+    // Clear previous result for this site
+    setSyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[`update_${siteId}`];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/plugin/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSyncResults(prev => ({
+          ...prev,
+          [`update_${siteId}`]: {
+            type: 'success',
+            message: `✅ ${data.message} (Updated to version: ${data.newVersion || 'Unknown'})`
+          }
+        }));
+      } else {
+        setSyncResults(prev => ({
+          ...prev,
+          [`update_${siteId}`]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setSyncResults(prev => ({
+        ...prev,
+        [`update_${siteId}`]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      setUpdatingPlugin(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
   // Star click handler
   const handleStarClick = async (siteId: string) => {
     const updateKey = `${siteId}_is_starred1`;
@@ -838,13 +956,29 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
                                 {syncLoading.has(`test_${item.id}`) ? 'Testing...' : 'Test Plugin'}
                               </button>
                             </div>
-                            {(syncResults[item.id] || syncResults[`test_${item.id}`]) && (
+                            <div className="flex gap-2">
+                              <button
+                                className="px-2 py-1 text-xs font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50"
+                                onClick={() => handleCheckPluginVersion(item.id)}
+                                disabled={checkingPluginVersion.has(item.id)}
+                              >
+                                {checkingPluginVersion.has(item.id) ? 'Checking...' : 'Check WP Plugin Version'}
+                              </button>
+                              <button
+                                className="px-2 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                                onClick={() => handleUpdatePlugin(item.id)}
+                                disabled={updatingPlugin.has(item.id)}
+                              >
+                                {updatingPlugin.has(item.id) ? 'Updating...' : 'Update Plugin'}
+                              </button>
+                            </div>
+                            {(syncResults[item.id] || syncResults[`test_${item.id}`] || syncResults[`version_${item.id}`] || syncResults[`update_${item.id}`]) && (
                               <div className={`text-xs p-2 rounded ${
-                                (syncResults[item.id]?.type === 'success' || syncResults[`test_${item.id}`]?.type === 'success') 
+                                (syncResults[item.id]?.type === 'success' || syncResults[`test_${item.id}`]?.type === 'success' || syncResults[`version_${item.id}`]?.type === 'success' || syncResults[`update_${item.id}`]?.type === 'success') 
                                   ? 'bg-green-100 text-green-800' 
                                   : 'bg-red-100 text-red-800'
                               }`}>
-                                {syncResults[item.id]?.message || syncResults[`test_${item.id}`]?.message}
+                                {syncResults[item.id]?.message || syncResults[`test_${item.id}`]?.message || syncResults[`version_${item.id}`]?.message || syncResults[`update_${item.id}`]?.message}
                               </div>
                             )}
                           </div>
