@@ -48,10 +48,6 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
       {
         name: 'Download Plugin',
         path: '/admin/downloadplugin'
-      },
-      {
-        name: 'XPages Manager',
-        path: '/admin/xpagesmanager1'
       }
     ]
   };

@@ -154,10 +154,6 @@ export default function Header() {
           name: 'Download Plugin',
           path: '/admin/downloadplugin'
         },
-        {
-          name: 'XPages Manager',
-          path: '/admin/xpagesmanager1'
-        },
         ...adminPages // Add any other admin pages found in navigation
       ]
     };
