@@ -150,6 +150,10 @@ export default function Header() {
           name: 'Popup Development',
           path: '/admin/popnow'
         },
+        {
+          name: 'Download Plugin',
+          path: '/admin/downloadplugin'
+        },
         ...adminPages // Add any other admin pages found in navigation
       ]
     };

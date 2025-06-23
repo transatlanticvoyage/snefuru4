@@ -44,6 +44,10 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
       {
         name: 'Popup Development',
         path: '/admin/popnow'
+      },
+      {
+        name: 'Download Plugin',
+        path: '/admin/downloadplugin'
       }
     ]
   };
