@@ -36,6 +36,10 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
       {
         name: 'API Key Slots Management',
         path: 'https://snef.me/admin/create-new-api-key-slots'
+      },
+      {
+        name: 'User Management',
+        path: '/admin/usersp1'
       }
     ]
   };

@@ -142,6 +142,10 @@ export default function Header() {
           name: 'API Key Slots Management',
           path: 'https://snef.me/admin/create-new-api-key-slots'
         },
+        {
+          name: 'User Management',
+          path: '/admin/usersp1'
+        },
         ...adminPages // Add any other admin pages found in navigation
       ]
     };
