@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user record
+    // Get user record and API key
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('id')
+      .select('id, ruplin_api_key_1')
       .eq('auth_id', session.user.id)
       .single();
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     // Try Plugin API first
     if (method === 'plugin_api' || fallbackEnabled) {
       console.log(`🔄 WPSv2: Attempting Plugin API sync for ${siteData.sitespren_base}`);
-      syncResult = await wpsv2SyncViaPluginApi(siteData.sitespren_base, siteData.ruplin_apikey);
+      syncResult = await wpsv2SyncViaPluginApi(siteData.sitespren_base, userData.ruplin_api_key_1);
       
       if (syncResult.success) {
         console.log(`✅ WPSv2: Plugin API sync successful`);
