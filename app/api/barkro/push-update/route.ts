@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { NextRequest, NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import AdmZip from 'adm-zip';
 import fs from 'fs/promises';
 import path from 'path';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { siteId } = await request.json();
 
@@ -16,12 +17,12 @@ export async function POST(request: Request) {
     }
 
     // Create client with user authentication
-    const supabase = createClientComponentClient();
+    const supabase = createRouteHandlerClient({ cookies });
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Get authenticated user session
+    const { data: { session }, error: authError } = await supabase.auth.getSession();
     
-    if (authError || !user) {
+    if (authError || !session) {
       return NextResponse.json(
         { success: false, message: 'Authentication required' },
         { status: 401 }
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('id')
-      .eq('auth_id', user.id)
+      .eq('auth_id', session.user.id)
       .single();
 
     if (userError || !userData) {
