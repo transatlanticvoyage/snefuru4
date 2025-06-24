@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import F71CreateSiteForm from './components/F71CreateSiteForm';
@@ -15,12 +16,55 @@ export default function Sitejar4Page() {
   const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteNotification, setDeleteNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const { user } = useAuth();
   const supabase = createClientComponentClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     document.title = 'sitejar4 - Snefuru';
   }, []);
+
+  // Initialize search term from URL parameter
+  useEffect(() => {
+    const searchsite = searchParams.get('searchsite');
+    if (searchsite) {
+      setSearchTerm(searchsite);
+    }
+  }, [searchParams]);
+
+  // Update URL when search term changes
+  const updateSearchInURL = (newSearchTerm: string) => {
+    const url = new URL(window.location.href);
+    if (newSearchTerm.trim()) {
+      url.searchParams.set('searchsite', newSearchTerm.trim());
+    } else {
+      url.searchParams.delete('searchsite');
+    }
+    router.replace(url.pathname + url.search, { scroll: false });
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSearchTerm(newValue);
+    updateSearchInURL(newValue);
+  };
+
+  // Filter sitespren data based on search term
+  const filteredSitesprenData = sitesprenData.filter(site => {
+    if (!searchTerm.trim()) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      site.sitespren_base?.toLowerCase().includes(searchLower) ||
+      site.true_root_domain?.toLowerCase().includes(searchLower) ||
+      site.full_subdomain?.toLowerCase().includes(searchLower) ||
+      site.webproperty_type?.toLowerCase().includes(searchLower) ||
+      site.id?.toLowerCase().includes(searchLower)
+    );
+  });
 
   useEffect(() => {
     const fetchSitesprenData = async () => {
@@ -206,6 +250,28 @@ export default function Sitejar4Page() {
         <p className="text-gray-600">
           Manage your web properties and WordPress sites
         </p>
+        
+        {/* Search Box */}
+        <div className="mt-4">
+          <div className="max-w-md">
+            <label htmlFor="site-search" className="block text-sm font-medium text-gray-700 mb-2">
+              Search Sites
+            </label>
+            <input
+              id="site-search"
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Search by domain, type, or ID..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            {searchTerm && (
+              <p className="text-sm text-gray-500 mt-1">
+                Showing {filteredSitesprenData.length} of {sitesprenData.length} sites
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Delete notification */}
@@ -264,7 +330,9 @@ export default function Sitejar4Page() {
             <div className="space-y-1 text-sm">
               <p><strong>User ID:</strong> {user.id}</p>
               <p><strong>Internal User ID:</strong> {userInternalId}</p>
-              <p><strong>Data Count:</strong> {sitesprenData.length}</p>
+              <p><strong>Total Sites:</strong> {sitesprenData.length}</p>
+              <p><strong>Filtered Sites:</strong> {filteredSitesprenData.length}</p>
+              <p><strong>Search Term:</strong> {searchTerm || '(none)'}</p>
               <div>
                 <strong>Data:</strong>
                 <pre className="mt-1 text-xs bg-yellow-50 p-2 rounded border overflow-x-auto">
@@ -278,7 +346,7 @@ export default function Sitejar4Page() {
 
       {/* Sitespren Table */}
       <SitesprenTable 
-        data={sitesprenData} 
+        data={filteredSitesprenData} 
         userId={user.id}
         onSelectionChange={handleSelectionChange}
         onDataUpdate={setSitesprenData}
