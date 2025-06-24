@@ -1077,30 +1077,6 @@ export default function Tebnar2Main() {
         </div>
       )}
 
-      {/* Actions and Settings - exact clone from tebnar1 */}
-      <Tebnar2Actions
-        qtyPerPlan={tbn2_qtyPerPlan}
-        onQtyPerPlanChange={setTbn2QtyPerPlan}
-        aiModel={tbn2_aiModel}
-        onAiModelChange={setTbn2AiModel}
-        generateZip={tbn2_generateZip}
-        onGenerateZipChange={setTbn2GenerateZip}
-        wipeMeta={tbn2_wipeMeta}
-        onWipeMetaChange={setTbn2WipeMeta}
-        throttle1={tbn2_throttle1}
-        onThrottle1Change={setTbn2Throttle1}
-        submitLoading={tbn2_submitLoading}
-        submitResult={tbn2_submitResult}
-        makeImagesLoading={tbn2_makeImagesLoading}
-        makeImagesResult={tbn2_makeImagesResult}
-        loadingPreset={tbn2_loadingPreset}
-        onPresetLoad={tbn2_loadDummyData}
-        gridData={tbn2_gridData}
-        onGridDataChange={setTbn2GridData}
-        presetData={tbn2_presetData}
-        onSubmitCreatePlans={tbn2_handleSubmitCreatePlans}
-        onSubmitMakeImages={tbn2_handleSubmitMakeImages}
-      />
 
       {/* Functions Popup Button - positioned between Actions and SQL View Info */}
       <div className="mb-4">
@@ -1456,7 +1432,9 @@ export default function Tebnar2Main() {
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                       }`}
                     >
-                      {tab}
+                      {tab === 'ptab1' ? 'Functions' : 
+                       tab === 'ptab2' ? 'Create Plans' : 
+                       tab}
                     </button>
                   ))}
                 </nav>
@@ -1555,8 +1533,33 @@ export default function Tebnar2Main() {
                 )}
                 {tbn2_activePopupTab === 'ptab2' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab2</h3>
-                    <p className="text-gray-600">This is the content area for ptab2.</p>
+                    <h3 className="text-lg font-semibold mb-4">Create New Image Plans</h3>
+                    <p className="text-gray-600 mb-6">Use the tools below to create and submit new batches of image plans.</p>
+                    
+                    {/* Actions and Settings - moved from main page */}
+                    <Tebnar2Actions
+                      qtyPerPlan={tbn2_qtyPerPlan}
+                      onQtyPerPlanChange={setTbn2QtyPerPlan}
+                      aiModel={tbn2_aiModel}
+                      onAiModelChange={setTbn2AiModel}
+                      generateZip={tbn2_generateZip}
+                      onGenerateZipChange={setTbn2GenerateZip}
+                      wipeMeta={tbn2_wipeMeta}
+                      onWipeMetaChange={setTbn2WipeMeta}
+                      throttle1={tbn2_throttle1}
+                      onThrottle1Change={setTbn2Throttle1}
+                      submitLoading={tbn2_submitLoading}
+                      submitResult={tbn2_submitResult}
+                      makeImagesLoading={tbn2_makeImagesLoading}
+                      makeImagesResult={tbn2_makeImagesResult}
+                      loadingPreset={tbn2_loadingPreset}
+                      onPresetLoad={tbn2_loadDummyData}
+                      gridData={tbn2_gridData}
+                      onGridDataChange={setTbn2GridData}
+                      presetData={tbn2_presetData}
+                      onSubmitCreatePlans={tbn2_handleSubmitCreatePlans}
+                      onSubmitMakeImages={tbn2_handleSubmitMakeImages}
+                    />
                   </div>
                 )}
                 {tbn2_activePopupTab === 'ptab3' && (
