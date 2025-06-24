@@ -703,6 +703,44 @@ export default function Tebnar2Main() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [tbn2_batches]);
 
+  // Effect to handle popup URL parameters on mount - cloned from nwjar1
+  useEffect(() => {
+    document.title = '/tebnar2 - Snefuru';
+    
+    // Handle URL parameters for popup and tab state
+    const urlParams = new URLSearchParams(window.location.search);
+    const fpop = urlParams.get('fpop');
+    const ptab1 = urlParams.get('ptab1');
+    const ptab2 = urlParams.get('ptab2');
+    const ptab3 = urlParams.get('ptab3');
+    const ptab4 = urlParams.get('ptab4');
+    const ptab5 = urlParams.get('ptab5');
+    const ptab6 = urlParams.get('ptab6');
+    const ptab7 = urlParams.get('ptab7');
+    
+    // Auto-open popup if fpop=open is in URL
+    if (fpop === 'open') {
+      setTbn2IsPopupOpen(true);
+      
+      // Set active tab based on URL parameters
+      if (ptab1 === 'active') {
+        setTbn2ActivePopupTab('ptab1');
+      } else if (ptab2 === 'active') {
+        setTbn2ActivePopupTab('ptab2');
+      } else if (ptab3 === 'active') {
+        setTbn2ActivePopupTab('ptab3');
+      } else if (ptab4 === 'active') {
+        setTbn2ActivePopupTab('ptab4');
+      } else if (ptab5 === 'active') {
+        setTbn2ActivePopupTab('ptab5');
+      } else if (ptab6 === 'active') {
+        setTbn2ActivePopupTab('ptab6');
+      } else if (ptab7 === 'active') {
+        setTbn2ActivePopupTab('ptab7');
+      }
+    }
+  }, []);
+
   // Effect hooks for data fetching using centralized functions
   useEffect(() => {
     tbn2_fetchImages();
@@ -868,6 +906,65 @@ export default function Tebnar2Main() {
     setTbn2ActivePopupTab(tab as any);
     localStorage.setItem('tebnar2_lastActiveTab', tab); // Remember this tab for next time
     tbn2_updatePopupURL(true, tab);
+  };
+
+  // SOPTION1 and SOPTION2 handler - adapted for tebnar2
+  const [tbn2_functionLoading, setTbn2FunctionLoading] = useState(false);
+  
+  const tbn2_handleSelectedItemsFunction = async (functionName: string) => {
+    let itemsToProcess: string[] = [];
+    
+    if (tbn2_kz101Checked) {
+      // SOPTION1: Use selected items
+      if (tbn2_selectedRows.size === 0) {
+        alert('Please select at least one item from the table');
+        return;
+      }
+      itemsToProcess = Array.from(tbn2_selectedRows);
+    } else if (tbn2_kz103Checked) {
+      // SOPTION2: Use all items in current pagination
+      itemsToProcess = tbn2_paginatedPlans.map(plan => plan.id);
+    } else {
+      alert('Please select either SOPTION1 or SOPTION2');
+      return;
+    }
+
+    if (itemsToProcess.length === 0) {
+      alert('No items to process');
+      return;
+    }
+
+    setTbn2FunctionLoading(true);
+    try {
+      // Example API call structure - can be customized for different functions
+      const response = await fetch(`/api/${functionName}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          plan_ids: itemsToProcess,
+          batch_id: tbn2_selectedBatchId || null,
+          selection_type: tbn2_kz101Checked ? 'SOPTION1' : 'SOPTION2',
+          total_items: itemsToProcess.length
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(`Successfully processed ${itemsToProcess.length} items with ${functionName}`);
+        // Refresh the data
+        tbn2_fetchPlans();
+      } else {
+        alert(`Error: ${result.error || `Failed to execute ${functionName}`}`);
+      }
+    } catch (error) {
+      console.error(`Error calling ${functionName}:`, error);
+      alert(`An error occurred while executing ${functionName}`);
+    } finally {
+      setTbn2FunctionLoading(false);
+    }
   };
 
   // Filter plans by selected batch using centralized function
@@ -1085,6 +1182,363 @@ export default function Tebnar2Main() {
         selectedRows={tbn2_selectedRows}
         onSelectionChange={setTbn2SelectedRows}
       />
+
+      {/* Functions Popup Modal - cloned from nwjar1 */}
+      {tbn2_isPopupOpen && (
+        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
+            {/* uelbar37 header bar */}
+            <div 
+              className="absolute top-0 left-0 right-0 flex items-center px-4"
+              style={{ 
+                height: '50px',
+                backgroundColor: tbn2_uelBar37Colors.bg,
+                color: tbn2_uelBar37Colors.text
+              }}
+            >
+              <span className="font-semibold">BROWSER URL</span>
+              
+              {/* Vertical separator */}
+              <div 
+                className="bg-gray-600"
+                style={{
+                  width: '3px',
+                  height: '100%',
+                  marginLeft: '30px',
+                  marginRight: '30px'
+                }}
+              />
+              
+              <span className="font-mono text-sm overflow-hidden whitespace-nowrap text-ellipsis flex-1">
+                {(() => {
+                  // Parse URL to highlight batchid parameter for tebnar2
+                  try {
+                    const url = new URL(tbn2_currentUrl);
+                    const batchidParam = url.searchParams.get('batchid');
+                    
+                    if (batchidParam) {
+                      const fullUrl = tbn2_currentUrl;
+                      const batchidText = `batchid=${batchidParam}`;
+                      const parts = fullUrl.split(batchidText);
+                      
+                      if (parts.length === 2) {
+                        return (
+                          <>
+                            {parts[0]}
+                            <span style={{ fontWeight: 'bold', color: '#ff9e71' }}>
+                              {batchidText}
+                            </span>
+                            {parts[1]}
+                          </>
+                        );
+                      }
+                    }
+                    
+                    return tbn2_currentUrl;
+                  } catch (error) {
+                    return tbn2_currentUrl;
+                  }
+                })()}
+              </span>
+
+              {/* Copy buttons in uelbar37 - positioned to the left of close button */}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(tbn2_currentUrl);
+                }}
+                className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
+                style={{
+                  width: '80px',
+                  height: '50px',
+                  marginRight: '0px',
+                  fontSize: '10px',
+                  flexDirection: 'column',
+                  gap: '2px'
+                }}
+                title="Copy Full URL"
+              >
+                <div>COPY URL</div>
+              </button>
+              <button
+                onClick={() => {
+                  try {
+                    const url = new URL(tbn2_currentUrl);
+                    const batchidParam = url.searchParams.get('batchid');
+                    if (batchidParam) {
+                      navigator.clipboard.writeText(batchidParam);
+                    }
+                  } catch (error) {
+                    console.error('Error copying batch ID:', error);
+                  }
+                }}
+                className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
+                style={{
+                  width: '60px',
+                  height: '50px',
+                  marginRight: '0px',
+                  fontSize: '10px',
+                  flexDirection: 'column',
+                  gap: '2px'
+                }}
+                title="Copy Batch ID"
+              >
+                <div>BATCH</div>
+              </button>
+            </div>
+            
+            {/* uelbar38 header bar */}
+            <div 
+              className="absolute left-0 right-0 flex items-center px-4"
+              style={{ 
+                top: '50px',
+                height: '50px',
+                backgroundColor: tbn2_uelBarColors.bg,
+                color: tbn2_uelBarColors.text
+              }}
+            >
+              <span className="font-semibold">uelbar38</span>
+              
+              {/* Vertical separator */}
+              <div 
+                className="bg-gray-600"
+                style={{
+                  width: '3px',
+                  height: '100%',
+                  marginLeft: '30px',
+                  marginRight: '30px'
+                }}
+              />
+              
+              <span className="font-bold">{window.location.pathname}</span>
+              <div 
+                className="ml-4 flex items-center kz101 cursor-pointer"
+                style={{
+                  color: tbn2_uelBarColors.text,
+                  padding: '8px',
+                  border: '1px solid black',
+                  fontSize: '16px'
+                }}
+                onClick={tbn2_handleKz101Click}
+              >
+                <input
+                  type="checkbox"
+                  className="mr-2 pointer-events-none"
+                  checked={tbn2_kz101Checked}
+                  readOnly
+                  style={{
+                    width: '18px',
+                    height: '18px'
+                  }}
+                />
+                SOPTION1 - Use Your Current Selection From Table | {tbn2_selectedRows.size} rows
+              </div>
+              <div 
+                className="flex items-center kz102 font-bold"
+                style={{
+                  color: tbn2_uelBarColors.text,
+                  padding: '8px',
+                  border: '1px solid black',
+                  fontSize: '16px'
+                }}
+              >
+                OR
+              </div>
+              <div 
+                className="flex items-center kz103 cursor-pointer"
+                style={{
+                  color: tbn2_uelBarColors.text,
+                  padding: '8px',
+                  border: '1px solid black',
+                  fontSize: '16px'
+                }}
+                onClick={tbn2_handleKz103Click}
+              >
+                <input
+                  type="checkbox"
+                  className="mr-2 pointer-events-none"
+                  checked={tbn2_kz103Checked}
+                  readOnly
+                  style={{
+                    width: '18px',
+                    height: '18px'
+                  }}
+                />
+                SOPTION2 - Select All Items In Current Pagination | {tbn2_paginatedPlans.length} rows
+              </div>
+              
+              {/* Close button in header - spans both bars */}
+              <button
+                onClick={tbn2_handlePopupClose}
+                className="absolute right-0 top-0 bg-gray-400 text-gray-800 font-bold flex items-center justify-center hover:bg-gray-500 transition-colors"
+                style={{
+                  width: '260px',
+                  height: '100px', // Spans both 50px bars
+                  border: '2px solid #4a4a4a',
+                  fontSize: '14px',
+                  flexDirection: 'column',
+                  gap: '4px'
+                }}
+              >
+                <div style={{ fontSize: '20px' }}>×</div>
+                <div style={{ fontSize: '12px', lineHeight: '12px', textAlign: 'center' }}>
+                  CLOSE<br/>POPUP
+                </div>
+              </button>
+            </div>
+            
+            {/* Popup content - adjusted to start below both headers */}
+            <div className="h-full" style={{ paddingTop: '100px' }}>
+              {/* Tab Navigation */}
+              <div className="border-b border-gray-200 bg-gray-50">
+                <nav className="flex">
+                  {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => tbn2_handleTabChange(tab)}
+                      className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                        tbn2_activePopupTab === tab
+                          ? 'border-blue-500 text-blue-600 bg-white'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+              
+              {/* Tab Content */}
+              <div className="p-8 h-full overflow-auto">
+                {tbn2_activePopupTab === 'ptab1' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Functions</h3>
+                    <div className="space-y-4">
+                      
+                      {/* Function Buttons */}
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => tbn2_handleSelectedItemsFunction('tbn2_example_function_1')}
+                          disabled={tbn2_functionLoading || (!tbn2_kz101Checked && !tbn2_kz103Checked) || (tbn2_kz101Checked && tbn2_selectedRows.size === 0)}
+                          className={`px-4 py-2 rounded font-medium ${
+                            tbn2_functionLoading || (!tbn2_kz101Checked && !tbn2_kz103Checked) || (tbn2_kz101Checked && tbn2_selectedRows.size === 0)
+                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                          }`}
+                        >
+                          {tbn2_functionLoading ? 'Processing...' : 'Example Function 1 - Process Selected Plans'}
+                        </button>
+                        
+                        <button
+                          onClick={() => tbn2_handleSelectedItemsFunction('tbn2_example_function_2')}
+                          disabled={tbn2_functionLoading || (!tbn2_kz101Checked && !tbn2_kz103Checked) || (tbn2_kz101Checked && tbn2_selectedRows.size === 0)}
+                          className={`px-4 py-2 rounded font-medium ${
+                            tbn2_functionLoading || (!tbn2_kz101Checked && !tbn2_kz103Checked) || (tbn2_kz101Checked && tbn2_selectedRows.size === 0)
+                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : 'bg-green-600 text-white hover:bg-green-700'
+                          }`}
+                        >
+                          {tbn2_functionLoading ? 'Processing...' : 'Example Function 2 - Batch Operations'}
+                        </button>
+                        
+                        <button
+                          onClick={() => tbn2_handleSelectedItemsFunction('tbn2_regenerate_images')}
+                          disabled={tbn2_functionLoading || (!tbn2_kz101Checked && !tbn2_kz103Checked) || (tbn2_kz101Checked && tbn2_selectedRows.size === 0)}
+                          className={`px-4 py-2 rounded font-medium ${
+                            tbn2_functionLoading || (!tbn2_kz101Checked && !tbn2_kz103Checked) || (tbn2_kz101Checked && tbn2_selectedRows.size === 0)
+                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : 'bg-purple-600 text-white hover:bg-purple-700'
+                          }`}
+                        >
+                          {tbn2_functionLoading ? 'Processing...' : 'Regenerate Images for Selected Plans'}
+                        </button>
+                      </div>
+                      
+                      {/* Status Messages */}
+                      {!tbn2_kz101Checked && !tbn2_kz103Checked && (
+                        <p className="text-sm text-gray-500">
+                          Select either SOPTION1 or SOPTION2 to enable functions
+                        </p>
+                      )}
+                      {tbn2_kz101Checked && tbn2_selectedRows.size === 0 && (
+                        <p className="text-sm text-gray-500">
+                          SOPTION1 selected: Select items from the table to enable functions
+                        </p>
+                      )}
+                      {tbn2_kz101Checked && tbn2_selectedRows.size > 0 && (
+                        <p className="text-sm text-gray-600">
+                          SOPTION1 selected: {tbn2_selectedRows.size} item(s) will be processed
+                        </p>
+                      )}
+                      {tbn2_kz103Checked && (
+                        <p className="text-sm text-gray-600">
+                          SOPTION2 selected: All {tbn2_paginatedPlans.length} items will be processed
+                        </p>
+                      )}
+                      
+                      {/* Current Selection Info */}
+                      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                        <div className="text-sm text-gray-700">
+                          <strong>Current Selection Info:</strong>
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          • Selected Rows: {tbn2_selectedRows.size}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          • Current Page Items: {tbn2_paginatedPlans.length}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          • Total Filtered Plans: {tbn2_filteredPlans.length}
+                        </div>
+                        {tbn2_selectedBatchId && (
+                          <div className="text-xs text-gray-600">
+                            • Active Batch Filter: {tbn2_selectedBatchId}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {tbn2_activePopupTab === 'ptab2' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab2</h3>
+                    <p className="text-gray-600">This is the content area for ptab2.</p>
+                  </div>
+                )}
+                {tbn2_activePopupTab === 'ptab3' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab3</h3>
+                    <p className="text-gray-600">This is the content area for ptab3.</p>
+                  </div>
+                )}
+                {tbn2_activePopupTab === 'ptab4' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab4</h3>
+                    <p className="text-gray-600">This is the content area for ptab4.</p>
+                  </div>
+                )}
+                {tbn2_activePopupTab === 'ptab5' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab5</h3>
+                    <p className="text-gray-600">This is the content area for ptab5.</p>
+                  </div>
+                )}
+                {tbn2_activePopupTab === 'ptab6' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab6</h3>
+                    <p className="text-gray-600">This is the content area for ptab6.</p>
+                  </div>
+                )}
+                {tbn2_activePopupTab === 'ptab7' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Content for ptab7</h3>
+                    <p className="text-gray-600">This is the content area for ptab7.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
