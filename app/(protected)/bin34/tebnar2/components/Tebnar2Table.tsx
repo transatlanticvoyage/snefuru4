@@ -392,6 +392,8 @@ interface Tebnar2TableProps {
   visibleColumns: string[];
   calculateStickyLeft: (index: number) => string;
   getColumnWidth: (col: string) => string;
+  selectedRows: Set<string>;
+  onSelectionChange: (selectedRows: Set<string>) => void;
 }
 
 export default function Tebnar2Table({
@@ -410,11 +412,39 @@ export default function Tebnar2Table({
   stickyColumns,
   visibleColumns,
   calculateStickyLeft,
-  getColumnWidth
+  getColumnWidth,
+  selectedRows,
+  onSelectionChange
 }: Tebnar2TableProps) {
 
   // Get non-sticky visible columns (sticky columns are handled separately)
   const nonStickyColumns = visibleColumns.slice(stickyColumns.length);
+
+  // Checkbox selection handlers
+  const handleSelectRow = (planId: string) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(planId)) {
+      newSelected.delete(planId);
+    } else {
+      newSelected.add(planId);
+    }
+    onSelectionChange(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRows.size === plans.length && plans.length > 0) {
+      // Deselect all
+      onSelectionChange(new Set());
+    } else {
+      // Select all current page items
+      const allPlanIds = new Set(plans.map(plan => plan.id));
+      onSelectionChange(allPlanIds);
+    }
+  };
+
+  const handleCheckboxCellClick = (planId: string) => {
+    handleSelectRow(planId);
+  };
 
   return (
     <div className="w-full px-4">
@@ -471,6 +501,40 @@ export default function Tebnar2Table({
                 borderTop: tbn2_headerCustomizationSettings.headerBorders.topBorder,
               }}
             >
+              {/* Select Checkbox Header - always first column */}
+              <th
+                style={{
+                  width: '50px',
+                  minWidth: '50px',
+                  maxWidth: '50px',
+                  position: 'sticky',
+                  left: '0px',
+                  zIndex: 20,
+                  backgroundColor: tbn2_headerCustomizationSettings.headerRow.backgroundColor,
+                  borderRight: '1px solid #c7cbd3',
+                  padding: '6px 10px !important',
+                  paddingTop: '6px !important',
+                  paddingBottom: '6px !important',
+                  paddingLeft: '10px !important',
+                  paddingRight: '10px !important',
+                  textAlign: 'center',
+                  cursor: 'pointer'
+                }}
+                onClick={handleSelectAll}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedRows.size === plans.length && plans.length > 0}
+                  onChange={handleSelectAll}
+                  style={{
+                    width: '26px',
+                    height: '26px',
+                    cursor: 'pointer',
+                    pointerEvents: 'none'
+                  }}
+                />
+              </th>
+              
               {/* Sticky Headers */}
               {stickyColumns.map((col, index) => {
                 // Get width settings - use the new getColumnWidth function
@@ -485,7 +549,7 @@ export default function Tebnar2Table({
                       minWidth: width,
                       maxWidth: width,
                       position: 'sticky',
-                      left: calculateStickyLeft(index),
+                      left: `calc(50px + ${calculateStickyLeft(index)})`,
                       zIndex: 20,
                       backgroundColor: tbn2_headerCustomizationSettings.headerRow.backgroundColor,
                       borderRight: isLastSticky ? '4px solid black' : '1px solid #c7cbd3',
@@ -538,6 +602,40 @@ export default function Tebnar2Table({
           <tbody>
             {plans.map((plan) => (
               <tr key={plan.id}>
+                {/* Select Checkbox Cell - always first column */}
+                <td
+                  style={{
+                    width: '50px',
+                    minWidth: '50px',
+                    maxWidth: '50px',
+                    position: 'sticky',
+                    left: '0px',
+                    zIndex: 10,
+                    backgroundColor: '#ffffff',
+                    borderRight: '1px solid #c7cbd3',
+                    padding: '6px 10px !important',
+                    paddingTop: '6px !important',
+                    paddingBottom: '6px !important',
+                    paddingLeft: '10px !important',
+                    paddingRight: '10px !important',
+                    textAlign: 'center',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => handleCheckboxCellClick(plan.id)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.has(plan.id)}
+                    onChange={() => handleSelectRow(plan.id)}
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      cursor: 'pointer',
+                      pointerEvents: 'none'
+                    }}
+                  />
+                </td>
+                
                 {/* Sticky Cells */}
                 {stickyColumns.map((col, index) => {
                   const width = getColumnWidth(col);
@@ -551,7 +649,7 @@ export default function Tebnar2Table({
                         minWidth: width,
                         maxWidth: width,
                         position: 'sticky',
-                        left: calculateStickyLeft(index),
+                        left: `calc(50px + ${calculateStickyLeft(index)})`,
                         zIndex: 10,
                         backgroundColor: '#ffffff',
                         borderRight: isLastSticky ? '4px solid black' : '1px solid #c7cbd3',

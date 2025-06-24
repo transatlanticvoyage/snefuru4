@@ -71,6 +71,7 @@ export default function Tebnar2Main() {
   const [tbn2_narpiPushLoading, setTbn2NarpiPushLoading] = useState(false);
   const [tbn2_narpiPushProgress, setTbn2NarpiPushProgress] = useState(0);
   const [tbn2_narpiPushStatus, setTbn2NarpiPushStatus] = useState<string | null>(null);
+  const [tbn2_selectedRows, setTbn2SelectedRows] = useState<Set<string>>(new Set());
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {
@@ -900,6 +901,8 @@ export default function Tebnar2Main() {
         visibleColumns={tbn2_getVisibleColumns()}
         calculateStickyLeft={tbn2_calculateStickyLeft}
         getColumnWidth={tbn2_getColumnWidth}
+        selectedRows={tbn2_selectedRows}
+        onSelectionChange={setTbn2SelectedRows}
       />
     </div>
   );
