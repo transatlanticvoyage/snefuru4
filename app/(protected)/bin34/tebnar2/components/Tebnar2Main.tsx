@@ -72,6 +72,15 @@ export default function Tebnar2Main() {
   const [tbn2_narpiPushProgress, setTbn2NarpiPushProgress] = useState(0);
   const [tbn2_narpiPushStatus, setTbn2NarpiPushStatus] = useState<string | null>(null);
   const [tbn2_selectedRows, setTbn2SelectedRows] = useState<Set<string>>(new Set());
+  
+  // Functions popup state - cloned from nwjar1
+  const [tbn2_isPopupOpen, setTbn2IsPopupOpen] = useState(false);
+  const [tbn2_kz101Checked, setTbn2Kz101Checked] = useState(false);
+  const [tbn2_kz103Checked, setTbn2Kz103Checked] = useState(false);
+  const [tbn2_activePopupTab, setTbn2ActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
+  const [tbn2_uelBarColors, setTbn2UelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
+  const [tbn2_uelBar37Colors, setTbn2UelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
+  const [tbn2_currentUrl, setTbn2CurrentUrl] = useState<string>('');
 
   // Inject CSS styles for main element styling (cloned from tebnar1)
   useEffect(() => {
@@ -707,6 +716,160 @@ export default function Tebnar2Main() {
     tbn2_fetchPlans();
   }, [user]);
 
+  // Fetch custom colors for uelbar37 and uelbar38 - cloned from nwjar1
+  useEffect(() => {
+    const fetchTbn2UelBarColors = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('custom_colors')
+          .select('color_ref_code, hex_value')
+          .in('color_ref_code', ['uelbar38_bgcolor1', 'uelbar38_textcolor1', 'uelbar37_bgcolor1', 'uelbar37_textcolor1']);
+
+        if (!error && data && data.length > 0) {
+          // uelbar38 colors
+          const bgColor38Item = data.find(item => item.color_ref_code === 'uelbar38_bgcolor1');
+          const textColor38Item = data.find(item => item.color_ref_code === 'uelbar38_textcolor1');
+          
+          const bgColor38 = bgColor38Item?.hex_value || '#2563eb';
+          const textColor38 = textColor38Item?.hex_value || '#ffffff';
+          
+          setTbn2UelBarColors({bg: bgColor38, text: textColor38});
+
+          // uelbar37 colors
+          const bgColor37Item = data.find(item => item.color_ref_code === 'uelbar37_bgcolor1');
+          const textColor37Item = data.find(item => item.color_ref_code === 'uelbar37_textcolor1');
+          
+          const bgColor37 = bgColor37Item?.hex_value || '#1e40af';
+          const textColor37 = textColor37Item?.hex_value || '#ffffff';
+          
+          setTbn2UelBar37Colors({bg: bgColor37, text: textColor37});
+        }
+      } catch (err) {
+        console.error('Error fetching uel bar colors:', err);
+      }
+    };
+
+    fetchTbn2UelBarColors();
+  }, [supabase]);
+
+  // Track URL changes for uelbar37 display - cloned from nwjar1
+  useEffect(() => {
+    // Set initial URL
+    setTbn2CurrentUrl(window.location.href);
+    
+    // Listen for URL changes (for pushState/replaceState)
+    const handleUrlChange = () => {
+      setTbn2CurrentUrl(window.location.href);
+    };
+    
+    // Listen for popstate events (back/forward buttons)
+    window.addEventListener('popstate', handleUrlChange);
+    
+    // Create a MutationObserver to watch for URL changes via pushState/replaceState
+    const observer = new MutationObserver(() => {
+      if (window.location.href !== tbn2_currentUrl) {
+        setTbn2CurrentUrl(window.location.href);
+      }
+    });
+    
+    // Watch for changes to the document that might indicate URL changes
+    observer.observe(document, { subtree: true, childList: true });
+    
+    // Custom event listener for our URL updates
+    const handleCustomUrlUpdate = () => {
+      setTbn2CurrentUrl(window.location.href);
+    };
+    window.addEventListener('urlchange', handleCustomUrlUpdate);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('urlchange', handleCustomUrlUpdate);
+      observer.disconnect();
+    };
+  }, [tbn2_currentUrl]);
+
+  // Handle checkbox clicks with mutual exclusivity - cloned from nwjar1
+  const tbn2_handleKz101Click = () => {
+    setTbn2Kz101Checked(true);
+    setTbn2Kz103Checked(false);
+  };
+
+  const tbn2_handleKz103Click = () => {
+    setTbn2Kz103Checked(true);
+    setTbn2Kz101Checked(false);
+  };
+
+  // Update URL parameters for popup state - cloned from nwjar1
+  const tbn2_updatePopupURL = (fpopOpen: boolean, tabActive?: string) => {
+    const url = new URL(window.location.href);
+    
+    if (fpopOpen) {
+      url.searchParams.set('fpop', 'open');
+      
+      // Clear all tab parameters first
+      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+        url.searchParams.delete(tab);
+      });
+      
+      // Set the active tab parameter
+      if (tabActive) {
+        url.searchParams.set(tabActive, 'active');
+      } else {
+        // Default to ptab1 if no specific tab provided
+        url.searchParams.set('ptab1', 'active');
+      }
+    } else {
+      // Remove popup and all tab parameters when popup is closed
+      url.searchParams.delete('fpop');
+      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+        url.searchParams.delete(tab);
+      });
+    }
+    
+    // Update URL without triggering page reload
+    window.history.replaceState({}, '', url.toString());
+    
+    // Trigger custom event to update our URL display
+    window.dispatchEvent(new Event('urlchange'));
+  };
+
+  // Handle popup open/close with URL updates - cloned from nwjar1
+  const tbn2_handlePopupOpen = () => {
+    setTbn2IsPopupOpen(true);
+    
+    // Set default selection if neither option is selected
+    if (!tbn2_kz101Checked && !tbn2_kz103Checked) {
+      setTbn2Kz101Checked(true);
+    }
+    
+    // Check if URL has specific tab parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasTabInUrl = ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7']
+      .some(tab => urlParams.get(tab) === 'active');
+    
+    if (!hasTabInUrl) {
+      // No tab specified in URL, use last remembered tab from localStorage
+      const lastTab = localStorage.getItem('tebnar2_lastActiveTab') || 'ptab1';
+      setTbn2ActivePopupTab(lastTab as any);
+      tbn2_updatePopupURL(true, lastTab);
+    } else {
+      // URL has tab specified, use current activePopupTab
+      tbn2_updatePopupURL(true, tbn2_activePopupTab);
+    }
+  };
+
+  const tbn2_handlePopupClose = () => {
+    setTbn2IsPopupOpen(false);
+    tbn2_updatePopupURL(false);
+  };
+
+  // Handle tab changes with URL updates and localStorage - cloned from nwjar1
+  const tbn2_handleTabChange = (tab: string) => {
+    setTbn2ActivePopupTab(tab as any);
+    localStorage.setItem('tebnar2_lastActiveTab', tab); // Remember this tab for next time
+    tbn2_updatePopupURL(true, tab);
+  };
+
   // Filter plans by selected batch using centralized function
   const tbn2_filteredPlans = tbn2_filterPlansByBatch(tbn2_plans, tbn2_selectedBatchId || null);
 
@@ -789,6 +952,24 @@ export default function Tebnar2Main() {
         onSubmitCreatePlans={tbn2_handleSubmitCreatePlans}
         onSubmitMakeImages={tbn2_handleSubmitMakeImages}
       />
+
+      {/* Functions Popup Button - positioned between Actions and SQL View Info */}
+      <div className="mb-4">
+        <button
+          onClick={tbn2_handlePopupOpen}
+          className="font-bold text-white rounded"
+          style={{
+            backgroundColor: '#800000', // maroon color
+            fontSize: '20px',
+            paddingLeft: '14px',
+            paddingRight: '14px',
+            paddingTop: '10px',
+            paddingBottom: '10px'
+          }}
+        >
+          functions popup
+        </button>
+      </div>
 
       {/* Column Template Controls - positioned just above the main table */}
       <div className="mb-6 flex items-stretch space-x-4">
