@@ -378,6 +378,18 @@ export default function Header() {
                   >
                     Profile Settings
                   </Link>
+                  <Link
+                    href="/ruplin-api-keys-p1"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    API Keys - Ruplin WP Plugin
+                  </Link>
+                  <Link
+                    href="/clevnar3"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    API Keys - External
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
