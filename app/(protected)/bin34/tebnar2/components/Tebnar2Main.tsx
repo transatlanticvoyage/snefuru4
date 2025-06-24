@@ -483,6 +483,7 @@ export default function Tebnar2Main() {
   // Get all table columns for template system
   const tbn2_getAllTableColumns = () => {
     return [
+      'submission_order',
       'int1', 'fk_image1_id', 'image1-preview',
       'int2', 'fk_image2_id', 'image2-preview',
       'int3', 'fk_image3_id', 'image3-preview',
@@ -519,6 +520,7 @@ export default function Tebnar2Main() {
   // Column width reference for sticky positioning
   const tbn2_getColumnWidth = (col: string) => {
     const widthMap: Record<string, string> = {
+      submission_order: '80px',
       int1: '60px', int2: '60px', int3: '60px', int4: '60px',
       fk_image1_id: '45px', fk_image2_id: '45px', fk_image3_id: '45px', fk_image4_id: '45px',
       'image1-preview': '100px', 'image2-preview': '100px', 'image3-preview': '100px', 'image4-preview': '100px',

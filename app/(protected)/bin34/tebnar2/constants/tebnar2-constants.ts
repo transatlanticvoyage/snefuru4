@@ -4,6 +4,7 @@ import { Tebnar2ColumnSettings, Tebnar2HeaderCellSettings, Tebnar2RowSettings, T
 
 // Table columns based on schema
 export const TBN2_COLUMNS = [
+  'submission_order',
   'int1',
   'fk_image1_id',
   'int2',
@@ -28,6 +29,9 @@ export const TBN2_COLUMNS = [
 
 // Column width and styling settings
 export const TBN2_COLUMN_SETTINGS: Record<string, Tebnar2ColumnSettings> = {
+  // Submission order column
+  submission_order: { width: '80px', minWidth: '60px', maxWidth: '100px', textAlign: 'center' },
+  
   // Intent columns (new) - positioned before fk_ columns
   int1: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
   int2: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
@@ -159,6 +163,9 @@ export const TBN2_TABLE_STYLING: Tebnar2TableStyling = {
 
 // Header cell width overrides
 export const TBN2_HEADER_CELL_WIDTHS: Record<string, Tebnar2HeaderCellSettings> = {
+  // Submission order column
+  'submission_order': { width: '80px', minWidth: '60px', maxWidth: '100px' },
+  
   // Intent columns (new) - positioned before fk_ columns
   'int1': { width: '60px', minWidth: '60px', maxWidth: '60px' },
   'int2': { width: '60px', minWidth: '60px', maxWidth: '60px' },

@@ -6,6 +6,9 @@ import Tebnar2ImagePreview from './Tebnar2ImagePreview';
 
 // Complete column settings - exact clone from tebnar1
 const tbn2_columnSettings = {
+  // Submission order column
+  submission_order: { width: '80px', minWidth: '60px', maxWidth: '100px', textAlign: 'center' },
+  
   // Intent columns  
   int1: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
   int2: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
@@ -82,6 +85,7 @@ const tbn2_headerCustomizationSettings = {
   
   headerTextAlign: {
     // Column-specific text alignment overrides
+    submission_order: 'center' as const,
     int1: 'center' as const,
     int2: 'center' as const,
     int3: 'center' as const,
@@ -238,6 +242,9 @@ const tbn2_tableCellPaddingSettings = {
   
   // Column-specific padding overrides - ALL SET TO 4px 4px
   columnPadding: {
+    // Submission order column - 4px padding
+    'submission_order': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
+    
     // Intent columns - 4px padding
     'int1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     'int2': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },

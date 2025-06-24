@@ -5,6 +5,7 @@ export interface Tebnar2ImagePlan {
   rel_users_id: string;
   rel_images_plans_batches_id: string | null;
   created_at: string;
+  submission_order?: number | null;
   int1?: number | null;
   fk_image1_id: string | null;
   int2?: number | null;
