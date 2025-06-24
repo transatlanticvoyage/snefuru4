@@ -466,9 +466,20 @@ export default function Tebnar2Main() {
     }
   };
 
-  // Function to create narpi push for current batch - tebnar2 specific
+  // Function to create narpi push for selected images to sitespren site - tebnar2 specific
   const tbn2_sfunc63_createNarpiPush = async () => {
+    // Validation checks
     if (!tbn2_selectedBatchId || tbn2_narpiPushLoading) return;
+    
+    if (!tbn2_selectedSitesprenId) {
+      setTbn2Error('❌ Please select a sitespren site first');
+      return;
+    }
+    
+    if (tbn2_selectedRows.size === 0) {
+      setTbn2Error('❌ Please select at least one image plan from the table');
+      return;
+    }
     
     setTbn2NarpiPushLoading(true);
     setTbn2NarpiPushProgress(0);
@@ -486,13 +497,15 @@ export default function Tebnar2Main() {
       
       setTbn2NarpiPushStatus('Creating narpi push record...');
       
-      // Call the sfunc_63_push_images API endpoint
+      // Call the sfunc_63_push_images API endpoint with sitespren and selected plans
       const response = await fetch('/api/bin45/sfunc_63_push_images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           batch_id: tbn2_selectedBatchId,
-          push_method: 'tebnar2_batch_push'
+          sitespren_id: tbn2_selectedSitesprenId,
+          selected_plan_ids: Array.from(tbn2_selectedRows),
+          push_method: 'tebnar2_sitespren_push'
         })
       });
       
@@ -506,7 +519,7 @@ export default function Tebnar2Main() {
       
       const result = await response.json();
       setTbn2NarpiPushStatus('✅ Narpi push created successfully!');
-      setTbn2Error(`🚀 Narpi push completed! Push ID: ${result.push_id}`);
+      setTbn2Error(`🚀 Narpi push completed! Push ID: ${result.push_id} | Pushed ${tbn2_selectedRows.size} images to ${tbn2_currentSitesprenBase}`);
       
       // Clear status after 5 seconds
       setTimeout(() => {
@@ -2113,13 +2126,18 @@ export default function Tebnar2Main() {
           <div className="text-xs font-semibold text-gray-700 mb-2">WordPress Push</div>
           <button
             onClick={tbn2_sfunc63_createNarpiPush}
-            disabled={!tbn2_selectedBatchId || tbn2_narpiPushLoading}
+            disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_selectedRows.size === 0 || tbn2_narpiPushLoading}
             className={`px-3 py-2 text-sm font-medium rounded border transition-colors ${
-              !tbn2_selectedBatchId || tbn2_narpiPushLoading
+              !tbn2_selectedBatchId || !tbn2_selectedSitesprenId || tbn2_selectedRows.size === 0 || tbn2_narpiPushLoading
                 ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
                 : 'bg-green-600 text-white border-green-600 hover:bg-green-700'
             }`}
-            title={!tbn2_selectedBatchId ? 'Select a batch to enable narpi push' : 'Create narpi push for current batch'}
+            title={
+              !tbn2_selectedBatchId ? 'Select a batch first' :
+              !tbn2_selectedSitesprenId ? 'Select a sitespren site first' :
+              tbn2_selectedRows.size === 0 ? 'Select at least one image plan from the table' :
+              'Push selected images to sitespren site'
+            }
           >
             {tbn2_narpiPushLoading ? '...' : 'tbn2_sfunc63_createNarpiPush()'}
           </button>
