@@ -83,6 +83,12 @@ export default function Tebnar2Main() {
   const [tbn2_sitesprenOptions, setTbn2SitesprenOptions] = useState<Array<{id: string, sitespren_base: string}>>([]);
   const [tbn2_selectedSitesprenId, setTbn2SelectedSitesprenId] = useState<string>('');
   const [tbn2_sitesprenSaving, setTbn2SitesprenSaving] = useState(false);
+  
+  // Gcon piece state for asn_gcon_piece_id widget
+  const [tbn2_gconPieceOptions, setTbn2GconPieceOptions] = useState<Array<{id: string, meta_title: string}>>([]);
+  const [tbn2_selectedGconPieceId, setTbn2SelectedGconPieceId] = useState<string>('');
+  const [tbn2_gconPieceSaving, setTbn2GconPieceSaving] = useState(false);
+  const [tbn2_currentSitesprenBase, setTbn2CurrentSitesprenBase] = useState<string>('');
 
   // Functions popup state - cloned from nwjar1
   const [tbn2_isPopupOpen, setTbn2IsPopupOpen] = useState(false);
@@ -695,6 +701,8 @@ export default function Tebnar2Main() {
   const tbn2_fetchBatchSitespren = async (batchId: string) => {
     if (!batchId) {
       setTbn2SelectedSitesprenId('');
+      setTbn2CurrentSitesprenBase('');
+      setTbn2GconPieceOptions([]);
       return;
     }
 
@@ -707,12 +715,22 @@ export default function Tebnar2Main() {
 
       if (!error && data && data.asn_sitespren_id) {
         setTbn2SelectedSitesprenId(data.asn_sitespren_id);
+        // Find the sitespren_base for this ID
+        const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === data.asn_sitespren_id);
+        if (selectedSitespren) {
+          setTbn2CurrentSitesprenBase(selectedSitespren.sitespren_base);
+          tbn2_fetchGconPieces(selectedSitespren.sitespren_base);
+        }
       } else {
         setTbn2SelectedSitesprenId('');
+        setTbn2CurrentSitesprenBase('');
+        setTbn2GconPieceOptions([]);
       }
     } catch (err) {
       console.error('Error fetching batch sitespren:', err);
       setTbn2SelectedSitesprenId('');
+      setTbn2CurrentSitesprenBase('');
+      setTbn2GconPieceOptions([]);
     }
   };
 
@@ -721,6 +739,7 @@ export default function Tebnar2Main() {
     setTbn2SelectedBatchId(batchId);
     tbn2_updateUrlWithBatch(batchId);
     tbn2_fetchBatchSitespren(batchId);
+    tbn2_fetchBatchGconPiece(batchId);
   };
 
   // Function to read URL parameters on component mount
@@ -747,6 +766,7 @@ export default function Tebnar2Main() {
         // Valid batch ID - apply the filter
         setTbn2SelectedBatchId(tbn2_urlBatchId);
         tbn2_fetchBatchSitespren(tbn2_urlBatchId);
+        tbn2_fetchBatchGconPiece(tbn2_urlBatchId);
         setTbn2UrlBatchId(null); // Clear the URL batch ID state
       } else {
         // Invalid batch ID - show error and clear URL param
@@ -772,6 +792,7 @@ export default function Tebnar2Main() {
         if (tbn2_validateBatchId(batchIdParam)) {
           setTbn2SelectedBatchId(batchIdParam);
           tbn2_fetchBatchSitespren(batchIdParam);
+          tbn2_fetchBatchGconPiece(batchIdParam);
         } else {
           setTbn2SelectedBatchId('');
           setTbn2Error(`❌ Batch ID "${batchIdParam}" not found`);
@@ -838,6 +859,16 @@ export default function Tebnar2Main() {
     tbn2_fetchPlans();
     tbn2_fetchSitesprenOptions();
   }, [user]);
+
+  // Re-fetch gcon pieces when sitespren options are loaded and batch has sitespren
+  useEffect(() => {
+    if (tbn2_sitesprenOptions.length > 0 && tbn2_selectedBatchId && tbn2_selectedSitesprenId) {
+      const sitespren = tbn2_sitesprenOptions.find(s => s.id === tbn2_selectedSitesprenId);
+      if (sitespren) {
+        tbn2_fetchGconPieces(sitespren.sitespren_base);
+      }
+    }
+  }, [tbn2_sitesprenOptions]);
 
   // Fetch custom colors for uelbar37 and uelbar38 - cloned from nwjar1
   useEffect(() => {
@@ -1042,6 +1073,99 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Fetch gcon_pieces based on selected sitespren
+  const tbn2_fetchGconPieces = async (sitesprenBase: string) => {
+    if (!user?.id || !sitesprenBase) {
+      setTbn2GconPieceOptions([]);
+      return;
+    }
+    
+    try {
+      const userValidation = await tbn2_validateUserAccess(user.id);
+      if (!userValidation.success) return;
+
+      const { data, error } = await supabase
+        .from('gcon_pieces')
+        .select('id, meta_title')
+        .eq('fk_users_id', userValidation.internalUserId)
+        .eq('asn_sitespren_base', sitesprenBase)
+        .order('meta_title', { ascending: true });
+
+      if (!error && data) {
+        setTbn2GconPieceOptions(data);
+      } else {
+        setTbn2GconPieceOptions([]);
+      }
+    } catch (err) {
+      console.error('Error fetching gcon pieces:', err);
+      setTbn2GconPieceOptions([]);
+    }
+  };
+
+  // Fetch current batch's gcon_piece assignment
+  const tbn2_fetchBatchGconPiece = async (batchId: string) => {
+    if (!batchId) {
+      setTbn2SelectedGconPieceId('');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('images_plans_batches')
+        .select('asn_gcon_piece_id, asn_sitespren_id')
+        .eq('id', batchId)
+        .single();
+
+      if (!error && data) {
+        if (data.asn_gcon_piece_id) {
+          setTbn2SelectedGconPieceId(data.asn_gcon_piece_id);
+        } else {
+          setTbn2SelectedGconPieceId('');
+        }
+        
+        // Also ensure we have the right gcon pieces loaded if sitespren is set
+        if (data.asn_sitespren_id && tbn2_sitesprenOptions.length > 0) {
+          const sitespren = tbn2_sitesprenOptions.find(s => s.id === data.asn_sitespren_id);
+          if (sitespren) {
+            await tbn2_fetchGconPieces(sitespren.sitespren_base);
+          }
+        }
+      } else {
+        setTbn2SelectedGconPieceId('');
+      }
+    } catch (err) {
+      console.error('Error fetching batch gcon piece:', err);
+      setTbn2SelectedGconPieceId('');
+    }
+  };
+
+  // Save asn_gcon_piece_id to current batch
+  const tbn2_handleGconPieceSave = async () => {
+    if (!tbn2_selectedBatchId || !tbn2_selectedGconPieceId) {
+      alert('Please select both a batch and a gcon piece option');
+      return;
+    }
+
+    setTbn2GconPieceSaving(true);
+    try {
+      const { error } = await supabase
+        .from('images_plans_batches')
+        .update({ asn_gcon_piece_id: tbn2_selectedGconPieceId })
+        .eq('id', tbn2_selectedBatchId);
+
+      if (error) {
+        alert('Error saving gcon piece assignment: ' + error.message);
+      } else {
+        alert('Gcon piece assignment saved successfully');
+      }
+    } catch (err) {
+      console.error('Error saving gcon piece:', err);
+      alert('An error occurred while saving');
+    } finally {
+      setTbn2GconPieceSaving(false);
+    }
+  };
+
   // SOPTION1 and SOPTION2 handler - adapted for tebnar2
   const [tbn2_functionLoading, setTbn2FunctionLoading] = useState(false);
   
@@ -1190,7 +1314,17 @@ export default function Tebnar2Main() {
           <div className="flex items-center space-x-2">
             <select
               value={tbn2_selectedSitesprenId}
-              onChange={(e) => setTbn2SelectedSitesprenId(e.target.value)}
+              onChange={(e) => {
+                setTbn2SelectedSitesprenId(e.target.value);
+                const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === e.target.value);
+                if (selectedSitespren) {
+                  setTbn2CurrentSitesprenBase(selectedSitespren.sitespren_base);
+                  tbn2_fetchGconPieces(selectedSitespren.sitespren_base);
+                } else {
+                  setTbn2CurrentSitesprenBase('');
+                  setTbn2GconPieceOptions([]);
+                }
+              }}
               className="text-xs border border-gray-300 rounded px-1 py-1 flex-1"
               style={{ fontSize: '10px' }}
               disabled={!tbn2_selectedBatchId}
@@ -1212,6 +1346,45 @@ export default function Tebnar2Main() {
               title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save sitespren assignment'}
             >
               {tbn2_sitesprenSaving ? '...' : 'save'}
+            </button>
+          </div>
+        </div>
+
+        {/* Gcon Piece Assignment Widget */}
+        <div 
+          className="bg-white border border-gray-300 rounded-lg p-2"
+          style={{ maxHeight: '70px' }}
+        >
+          <div className="font-bold text-gray-700 text-xs mb-1">asn_gcon_piece_id</div>
+          <div className="flex items-center space-x-2">
+            <select
+              value={tbn2_selectedGconPieceId}
+              onChange={(e) => setTbn2SelectedGconPieceId(e.target.value)}
+              className="text-xs border border-gray-300 rounded px-1 py-1 flex-1"
+              style={{ fontSize: '10px' }}
+              disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
+            >
+              <option value="" disabled>
+                {!tbn2_selectedBatchId ? 'Select batch first' : 
+                 !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
+                 'id - meta_title'}
+              </option>
+              {tbn2_gconPieceOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.id} - {option.meta_title}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={tbn2_handleGconPieceSave}
+              disabled={!tbn2_selectedGconPieceId || !tbn2_selectedBatchId || tbn2_gconPieceSaving}
+              className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              style={{ fontSize: '10px' }}
+              title={!tbn2_selectedBatchId ? 'Select a batch first' : 
+                     !tbn2_selectedSitesprenId ? 'Select a sitespren first' :
+                     'Save gcon piece assignment'}
+            >
+              {tbn2_gconPieceSaving ? '...' : 'save'}
             </button>
           </div>
         </div>
