@@ -74,6 +74,10 @@ export default function Tebnar2Main() {
   const [tbn2_narpiPushStatus, setTbn2NarpiPushStatus] = useState<string | null>(null);
   const [tbn2_selectedRows, setTbn2SelectedRows] = useState<Set<string>>(new Set());
   
+  // Sorting state
+  const [tbn2_sortColumn, setTbn2SortColumn] = useState<string | null>(null);
+  const [tbn2_sortDirection, setTbn2SortDirection] = useState<'asc' | 'desc'>('asc');
+  
   // Functions popup state - cloned from nwjar1
   const [tbn2_isPopupOpen, setTbn2IsPopupOpen] = useState(false);
   const [tbn2_kz101Checked, setTbn2Kz101Checked] = useState(false);
@@ -515,6 +519,48 @@ export default function Tebnar2Main() {
   const tbn2_getNonStickyVisibleColumns = () => {
     const visibleColumns = tbn2_getVisibleColumns();
     return visibleColumns.slice(tbn2_stickyColCount);
+  };
+
+  // Sorting handler function
+  const tbn2_handleSort = (columnKey: string) => {
+    if (tbn2_sortColumn === columnKey) {
+      // Toggle direction if same column
+      setTbn2SortDirection(tbn2_sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New column, start with ascending
+      setTbn2SortColumn(columnKey);
+      setTbn2SortDirection('asc');
+    }
+  };
+
+  // Function to sort plans data
+  const tbn2_getSortedPlans = (plans: Tebnar2ImagePlan[]) => {
+    if (!tbn2_sortColumn) {
+      return plans; // No sorting applied
+    }
+
+    return [...plans].sort((a, b) => {
+      const aValue = a[tbn2_sortColumn as keyof Tebnar2ImagePlan];
+      const bValue = b[tbn2_sortColumn as keyof Tebnar2ImagePlan];
+
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return tbn2_sortDirection === 'asc' ? 1 : -1;
+      if (bValue == null) return tbn2_sortDirection === 'asc' ? -1 : 1;
+
+      // Handle different data types
+      let comparison = 0;
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        comparison = aValue - bValue;
+      } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+        comparison = aValue.localeCompare(bValue);
+      } else {
+        // Convert to string for comparison
+        comparison = String(aValue).localeCompare(String(bValue));
+      }
+
+      return tbn2_sortDirection === 'asc' ? comparison : -comparison;
+    });
   };
 
   // Column width reference for sticky positioning
@@ -973,11 +1019,14 @@ export default function Tebnar2Main() {
   // Filter plans by selected batch using centralized function
   const tbn2_filteredPlans = tbn2_filterPlansByBatch(tbn2_plans, tbn2_selectedBatchId || null);
 
+  // Apply sorting to filtered plans
+  const tbn2_sortedPlans = tbn2_getSortedPlans(tbn2_filteredPlans);
+
   // Pagination logic
-  const tbn2_totalPages = Math.ceil(tbn2_filteredPlans.length / tbn2_pageSize);
+  const tbn2_totalPages = Math.ceil(tbn2_sortedPlans.length / tbn2_pageSize);
   const tbn2_startIndex = (tbn2_currentPage - 1) * tbn2_pageSize;
   const tbn2_endIndex = tbn2_startIndex + tbn2_pageSize;
-  const tbn2_paginatedPlans = tbn2_filteredPlans.slice(tbn2_startIndex, tbn2_endIndex);
+  const tbn2_paginatedPlans = tbn2_sortedPlans.slice(tbn2_startIndex, tbn2_endIndex);
 
   if (tbn2_loading) {
     return (
@@ -1173,7 +1222,7 @@ export default function Tebnar2Main() {
         currentPage={tbn2_currentPage}
         pageSize={tbn2_pageSize}
         totalPages={tbn2_totalPages}
-        totalPlans={tbn2_filteredPlans.length}
+        totalPlans={tbn2_sortedPlans.length}
         onPageChange={setTbn2CurrentPage}
         onPageSizeChange={setTbn2PageSize}
         onRefreshImages={tbn2_fetchImages}
@@ -1184,6 +1233,9 @@ export default function Tebnar2Main() {
         getColumnWidth={tbn2_getColumnWidth}
         selectedRows={tbn2_selectedRows}
         onSelectionChange={setTbn2SelectedRows}
+        sortColumn={tbn2_sortColumn}
+        sortDirection={tbn2_sortDirection}
+        onSort={tbn2_handleSort}
       />
 
       {/* Functions Popup Modal - cloned from nwjar1 */}

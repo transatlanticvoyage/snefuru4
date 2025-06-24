@@ -403,6 +403,9 @@ interface Tebnar2TableProps {
   getColumnWidth: (col: string) => string;
   selectedRows: Set<string>;
   onSelectionChange: (selectedRows: Set<string>) => void;
+  sortColumn: string | null;
+  sortDirection: 'asc' | 'desc';
+  onSort: (columnKey: string) => void;
 }
 
 export default function Tebnar2Table({
@@ -423,7 +426,10 @@ export default function Tebnar2Table({
   calculateStickyLeft,
   getColumnWidth,
   selectedRows,
-  onSelectionChange
+  onSelectionChange,
+  sortColumn,
+  sortDirection,
+  onSort
 }: Tebnar2TableProps) {
 
   // Get non-sticky visible columns (sticky columns are handled separately)
@@ -453,6 +459,26 @@ export default function Tebnar2Table({
 
   const handleCheckboxCellClick = (planId: string) => {
     handleSelectRow(planId);
+  };
+
+  // Function to render sort indicator
+  const renderSortIndicator = (columnKey: string) => {
+    if (sortColumn !== columnKey) {
+      return <span className="text-gray-400 ml-1">↕</span>; // Neutral indicator
+    }
+    
+    return (
+      <span className="text-gray-700 ml-1">
+        {sortDirection === 'asc' ? '↑' : '↓'}
+      </span>
+    );
+  };
+
+  // Function to handle header click (only for submission_order column)
+  const handleHeaderClick = (columnKey: string) => {
+    if (columnKey === 'submission_order') {
+      onSort(columnKey);
+    }
   };
 
   return (
@@ -553,6 +579,7 @@ export default function Tebnar2Table({
                 return (
                   <th
                     key={col}
+                    onClick={() => handleHeaderClick(col)}
                     style={{
                       width: width,
                       minWidth: width,
@@ -577,10 +604,15 @@ export default function Tebnar2Table({
                       wordBreak: tbn2_headerCustomizationSettings.headerCell.wordBreak,
                       wordWrap: tbn2_headerCustomizationSettings.headerCell.wordWrap,
                       hyphens: tbn2_headerCustomizationSettings.headerCell.hyphens,
-                      boxSizing: tbn2_headerCustomizationSettings.headerCell.boxSizing
+                      boxSizing: tbn2_headerCustomizationSettings.headerCell.boxSizing,
+                      cursor: col === 'submission_order' ? 'pointer' : 'default',
+                      userSelect: 'none'
                     }}
                   >
-                    {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
+                      {col === 'submission_order' && renderSortIndicator(col)}
+                    </div>
                   </th>
                 );
               })}
@@ -592,6 +624,7 @@ export default function Tebnar2Table({
                 return (
                   <th
                     key={col}
+                    onClick={() => handleHeaderClick(col)}
                     style={{
                       width: width,
                       minWidth: width,
@@ -613,10 +646,15 @@ export default function Tebnar2Table({
                       wordBreak: tbn2_headerCustomizationSettings.headerCell.wordBreak,
                       wordWrap: tbn2_headerCustomizationSettings.headerCell.wordWrap,
                       hyphens: tbn2_headerCustomizationSettings.headerCell.hyphens,
-                      boxSizing: tbn2_headerCustomizationSettings.headerCell.boxSizing
+                      boxSizing: tbn2_headerCustomizationSettings.headerCell.boxSizing,
+                      cursor: col === 'submission_order' ? 'pointer' : 'default',
+                      userSelect: 'none'
                     }}
                   >
-                    {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
+                      {col === 'submission_order' && renderSortIndicator(col)}
+                    </div>
                   </th>
                 );
               })}
