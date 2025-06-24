@@ -35,6 +35,7 @@ import Tebnar2Actions from './Tebnar2Actions';
 export default function Tebnar2Main() {
   const { user } = useAuth();
   const router = useRouter();
+  const supabase = createClientComponentClient();
 
   // Check if user is authenticated
   if (!user) {
