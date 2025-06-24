@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import AdmZip from 'adm-zip';
 import fs from 'fs/promises';
 import path from 'path';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function POST(request: Request) {
   try {
@@ -20,11 +15,39 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get site information
+    // Create client with user authentication
+    const supabase = createClientComponentClient();
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json(
+        { success: false, message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Get internal user ID
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', user.id)
+      .single();
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { success: false, message: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // Get site information and verify ownership
     const { data: site, error: siteError } = await supabase
       .from('sitespren')
       .select('*')
       .eq('id', siteId)
+      .eq('fk_users_id', userData.id)
       .single();
 
     if (siteError || !site) {
@@ -64,7 +87,7 @@ export async function POST(request: Request) {
     const { data: pushRecord, error: pushError } = await supabase
       .from('barkro_update_pushes')
       .insert({
-        site_id: siteId,
+        fk_sitespren_id: siteId,
         version_id: currentVersion.version_id,
         push_status: 'pending',
         site_current_version: null // We'll get this from the site
@@ -128,7 +151,7 @@ export async function POST(request: Request) {
         await supabase
           .from('barkro_site_status')
           .upsert({
-            site_id: siteId,
+            fk_sitespren_id: siteId,
             current_plugin_version: result.current_version,
             last_check_date: new Date().toISOString()
           });
