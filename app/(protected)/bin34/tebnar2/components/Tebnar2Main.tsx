@@ -22,7 +22,8 @@ import {
   tbn2_fetchImagesData,
   tbn2_fetchBatchesData,
   tbn2_refreshAllData,
-  tbn2_filterPlansByBatch
+  tbn2_filterPlansByBatch,
+  tbn2_validateUserAccess
 } from '../utils/tbn2-data-functions';
 import { tbn2_log } from '../utils/tbn2-utils';
 import { tbn2_func_create_plans_from_xls_2 } from '../utils/tbn2_func_create_plans_from_xls_2';
@@ -74,10 +75,15 @@ export default function Tebnar2Main() {
   const [tbn2_narpiPushStatus, setTbn2NarpiPushStatus] = useState<string | null>(null);
   const [tbn2_selectedRows, setTbn2SelectedRows] = useState<Set<string>>(new Set());
   
-  // Sorting state
-  const [tbn2_sortColumn, setTbn2SortColumn] = useState<string | null>(null);
+  // Sorting state - default to submission_order ascending
+  const [tbn2_sortColumn, setTbn2SortColumn] = useState<string | null>('submission_order');
   const [tbn2_sortDirection, setTbn2SortDirection] = useState<'asc' | 'desc'>('asc');
   
+  // Sitespren state for asn_sitespren_id widget
+  const [tbn2_sitesprenOptions, setTbn2SitesprenOptions] = useState<Array<{id: string, sitespren_base: string}>>([]);
+  const [tbn2_selectedSitesprenId, setTbn2SelectedSitesprenId] = useState<string>('');
+  const [tbn2_sitesprenSaving, setTbn2SitesprenSaving] = useState(false);
+
   // Functions popup state - cloned from nwjar1
   const [tbn2_isPopupOpen, setTbn2IsPopupOpen] = useState(false);
   const [tbn2_kz101Checked, setTbn2Kz101Checked] = useState(false);
@@ -685,10 +691,36 @@ export default function Tebnar2Main() {
     return tbn2_batches.some(batch => batch.id === batchId);
   };
 
-  // Enhanced batch change handler that updates URL
+  // Fetch current batch's sitespren assignment
+  const tbn2_fetchBatchSitespren = async (batchId: string) => {
+    if (!batchId) {
+      setTbn2SelectedSitesprenId('');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('images_plans_batches')
+        .select('asn_sitespren_id')
+        .eq('id', batchId)
+        .single();
+
+      if (!error && data && data.asn_sitespren_id) {
+        setTbn2SelectedSitesprenId(data.asn_sitespren_id);
+      } else {
+        setTbn2SelectedSitesprenId('');
+      }
+    } catch (err) {
+      console.error('Error fetching batch sitespren:', err);
+      setTbn2SelectedSitesprenId('');
+    }
+  };
+
+  // Enhanced batch change handler that updates URL and loads sitespren
   const tbn2_handleBatchChange = (batchId: string) => {
     setTbn2SelectedBatchId(batchId);
     tbn2_updateUrlWithBatch(batchId);
+    tbn2_fetchBatchSitespren(batchId);
   };
 
   // Function to read URL parameters on component mount
@@ -801,6 +833,7 @@ export default function Tebnar2Main() {
 
   useEffect(() => {
     tbn2_fetchPlans();
+    tbn2_fetchSitesprenOptions();
   }, [user]);
 
   // Fetch custom colors for uelbar37 and uelbar38 - cloned from nwjar1
@@ -957,6 +990,55 @@ export default function Tebnar2Main() {
     tbn2_updatePopupURL(true, tab);
   };
 
+  // Fetch sitespren options for the logged in user
+  const tbn2_fetchSitesprenOptions = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const userValidation = await tbn2_validateUserAccess(user.id);
+      if (!userValidation.success) return;
+
+      const { data, error } = await supabase
+        .from('sitespren')
+        .select('id, sitespren_base')
+        .eq('fk_users_id', userValidation.internalUserId)
+        .order('sitespren_base', { ascending: true });
+
+      if (!error && data) {
+        setTbn2SitesprenOptions(data);
+      }
+    } catch (err) {
+      console.error('Error fetching sitespren options:', err);
+    }
+  };
+
+  // Save asn_sitespren_id to current batch
+  const tbn2_handleSitesprenSave = async () => {
+    if (!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) {
+      alert('Please select both a batch and a sitespren option');
+      return;
+    }
+
+    setTbn2SitesprenSaving(true);
+    try {
+      const { error } = await supabase
+        .from('images_plans_batches')
+        .update({ asn_sitespren_id: tbn2_selectedSitesprenId })
+        .eq('id', tbn2_selectedBatchId);
+
+      if (error) {
+        alert('Error saving sitespren assignment: ' + error.message);
+      } else {
+        alert('Sitespren assignment saved successfully');
+      }
+    } catch (err) {
+      console.error('Error saving sitespren:', err);
+      alert('An error occurred while saving');
+    } finally {
+      setTbn2SitesprenSaving(false);
+    }
+  };
+
   // SOPTION1 and SOPTION2 handler - adapted for tebnar2
   const [tbn2_functionLoading, setTbn2FunctionLoading] = useState(false);
   
@@ -1078,8 +1160,9 @@ export default function Tebnar2Main() {
       )}
 
 
-      {/* Functions Popup Button - positioned between Actions and SQL View Info */}
-      <div className="mb-4">
+      {/* Functions Popup Button and Sitespren Widget */}
+      <div className="mb-4 flex items-start space-x-4">
+        {/* Functions Popup Button */}
         <button
           onClick={tbn2_handlePopupOpen}
           className="font-bold text-white rounded"
@@ -1094,6 +1177,41 @@ export default function Tebnar2Main() {
         >
           functions popup
         </button>
+
+        {/* Sitespren Assignment Widget */}
+        <div 
+          className="bg-white border border-gray-300 rounded-lg p-2"
+          style={{ maxWidth: '300px', maxHeight: '70px' }}
+        >
+          <div className="font-bold text-gray-700 text-xs mb-1">asn_sitespren_id</div>
+          <div className="flex items-center space-x-2">
+            <select
+              value={tbn2_selectedSitesprenId}
+              onChange={(e) => setTbn2SelectedSitesprenId(e.target.value)}
+              className="text-xs border border-gray-300 rounded px-1 py-1 flex-1"
+              style={{ fontSize: '10px' }}
+              disabled={!tbn2_selectedBatchId}
+            >
+              <option value="" disabled>
+                {!tbn2_selectedBatchId ? 'Select batch first' : 'id - sitespren_base'}
+              </option>
+              {tbn2_sitesprenOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.id} - {option.sitespren_base}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={tbn2_handleSitesprenSave}
+              disabled={!tbn2_selectedSitesprenId || !tbn2_selectedBatchId || tbn2_sitesprenSaving}
+              className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              style={{ fontSize: '10px' }}
+              title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save sitespren assignment'}
+            >
+              {tbn2_sitesprenSaving ? '...' : 'save'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Column Template Controls - positioned just above the main table */}
