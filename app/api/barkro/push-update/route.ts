@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get internal user ID
+    // Get internal user ID and API key
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('id')
+      .select('id, ruplin_api_key_1')
       .eq('auth_id', session.user.id)
       .single();
 
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': site.ruplin_apikey || ''
+          'X-API-Key': userData.ruplin_api_key_1 || ''
         },
         body: JSON.stringify({
           action: 'update_available',
