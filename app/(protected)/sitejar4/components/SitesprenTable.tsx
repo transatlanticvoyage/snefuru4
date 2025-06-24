@@ -737,7 +737,70 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
   };
 
   return (
-    <div className="space-y-4">
+    <>
+      <style jsx>{`
+        .group {
+          position: relative;
+        }
+        
+        .info-icon {
+          font-size: 12px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          width: 16px;
+          height: 16px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: help;
+        }
+        
+        .tooltip-content {
+          position: absolute;
+          bottom: 100%;
+          left: 0;
+          margin-bottom: 8px;
+          background: #1a1a1a;
+          color: white;
+          padding: 12px;
+          border-radius: 6px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+          width: 320px;
+          z-index: 50;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.2s, visibility 0.2s;
+          pointer-events: none;
+        }
+        
+        .group:hover .tooltip-content {
+          opacity: 1;
+          visibility: visible;
+        }
+        
+        .tooltip-content::after {
+          content: '';
+          position: absolute;
+          top: 100%;
+          left: 20px;
+          border: 6px solid transparent;
+          border-top-color: #1a1a1a;
+        }
+        
+        .tooltip-content p {
+          margin: 4px 0;
+        }
+        
+        .tooltip-content strong {
+          color: #60a5fa;
+        }
+        
+        .tooltip-content ol,
+        .tooltip-content ul {
+          margin: 4px 0;
+        }
+      `}</style>
+      <div className="space-y-4">
       {/* Column Template and View Control System */}
       <div className="flex items-start space-x-4">
         {/* SQL View Info */}
@@ -994,48 +1057,151 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
                           <div className="flex flex-col gap-2">
                             <div className="flex gap-2">
                               <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                                className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 relative group flex items-center gap-1"
                                 onClick={() => handleWpsv2Sync(item.id, 'plugin_api')}
                                 disabled={syncLoading.has(item.id)}
                               >
+                                <span className="info-icon">ⓘ</span>
                                 {syncLoading.has(item.id) ? 'Syncing...' : 'Plugin API'}
+                                <div className="tooltip-content">
+                                  <div className="font-bold mb-2">Plugin API Sync</div>
+                                  <div className="text-xs space-y-1">
+                                    <p><strong>Function:</strong> wpsv2SyncViaPluginApi()</p>
+                                    <p><strong>Location:</strong> /app/api/wpsv2/sync-site/route.ts:138-187</p>
+                                    <p><strong>Flow:</strong></p>
+                                    <ol className="list-decimal list-inside ml-2">
+                                      <li>Fetches content from WP via custom plugin endpoint</li>
+                                      <li>Uses ruplin_api_key_1 for authentication</li>
+                                      <li>Calls wpsv2SaveContentToDatabase()</li>
+                                      <li>Saves to nwpi_content table</li>
+                                    </ol>
+                                    <p><strong>Endpoint:</strong> /wp-json/snefuru/v1/posts</p>
+                                    <p><strong>Auth:</strong> Bearer token in header</p>
+                                  </div>
+                                </div>
                               </button>
                               <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                                className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 relative group flex items-center gap-1"
                                 onClick={() => handleWpsv2Sync(item.id, 'rest_api')}
                                 disabled={syncLoading.has(item.id)}
                               >
+                                <span className="info-icon">ⓘ</span>
                                 {syncLoading.has(item.id) ? 'Syncing...' : 'Rest API'}
+                                <div className="tooltip-content">
+                                  <div className="font-bold mb-2">REST API Sync</div>
+                                  <div className="text-xs space-y-1">
+                                    <p><strong>Function:</strong> wpsv2SyncViaRestApi()</p>
+                                    <p><strong>Location:</strong> /app/api/wpsv2/sync-site/route.ts:190-274</p>
+                                    <p><strong>Flow:</strong></p>
+                                    <ol className="list-decimal list-inside ml-2">
+                                      <li>Uses standard WP REST API</li>
+                                      <li>Fetches posts & pages separately</li>
+                                      <li>Can work without auth (public posts only)</li>
+                                      <li>Saves to nwpi_content table</li>
+                                    </ol>
+                                    <p><strong>Endpoints:</strong> /wp-json/wp/v2/posts, /wp-json/wp/v2/pages</p>
+                                    <p><strong>Auth:</strong> Optional app password</p>
+                                  </div>
+                                </div>
                               </button>
                               <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+                                className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 relative group flex items-center gap-1"
                                 onClick={() => handleWpsv2TestPlugin(item.id)}
                                 disabled={syncLoading.has(`test_${item.id}`)}
                               >
+                                <span className="info-icon">ⓘ</span>
                                 {syncLoading.has(`test_${item.id}`) ? 'Testing...' : 'Test Plugin'}
+                                <div className="tooltip-content">
+                                  <div className="font-bold mb-2">Test Plugin Connection</div>
+                                  <div className="text-xs space-y-1">
+                                    <p><strong>Function:</strong> handleWpsv2TestPlugin()</p>
+                                    <p><strong>API Route:</strong> /api/test-plugin-connection</p>
+                                    <p><strong>Purpose:</strong> Verifies plugin is installed & API key is valid</p>
+                                    <p><strong>Tests:</strong></p>
+                                    <ul className="list-disc list-inside ml-2">
+                                      <li>Plugin presence check</li>
+                                      <li>API key authentication</li>
+                                      <li>Endpoint accessibility</li>
+                                      <li>Response format validation</li>
+                                    </ul>
+                                    <p><strong>Returns:</strong> Success/failure status</p>
+                                  </div>
+                                </div>
                               </button>
                             </div>
                             <div className="flex gap-2">
                               <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50"
+                                className="px-2 py-1 text-xs font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 relative group flex items-center gap-1"
                                 onClick={() => handleCheckPluginVersion(item.id)}
                                 disabled={checkingPluginVersion.has(item.id)}
                               >
+                                <span className="info-icon">ⓘ</span>
                                 {checkingPluginVersion.has(item.id) ? 'Checking...' : 'Check WP Plugin Version'}
+                                <div className="tooltip-content">
+                                  <div className="font-bold mb-2">Check Plugin Version</div>
+                                  <div className="text-xs space-y-1">
+                                    <p><strong>Function:</strong> handleCheckPluginVersion()</p>
+                                    <p><strong>API Route:</strong> /api/check-plugin-version</p>
+                                    <p><strong>Purpose:</strong> Gets installed plugin version from WP site</p>
+                                    <p><strong>Process:</strong></p>
+                                    <ol className="list-decimal list-inside ml-2">
+                                      <li>Queries WP plugin endpoint</li>
+                                      <li>Retrieves version number</li>
+                                      <li>Compares with latest available</li>
+                                      <li>Shows update availability</li>
+                                    </ol>
+                                    <p><strong>Uses:</strong> Plugin's version check endpoint</p>
+                                  </div>
+                                </div>
                               </button>
                               <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                                className="px-2 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 relative group flex items-center gap-1"
                                 onClick={() => handleUpdatePlugin(item.id)}
                                 disabled={updatingPlugin.has(item.id)}
                               >
+                                <span className="info-icon">ⓘ</span>
                                 {updatingPlugin.has(item.id) ? 'Updating...' : 'Update Plugin'}
+                                <div className="tooltip-content">
+                                  <div className="font-bold mb-2">Update Plugin</div>
+                                  <div className="text-xs space-y-1">
+                                    <p><strong>Function:</strong> handleUpdatePlugin()</p>
+                                    <p><strong>API Route:</strong> /api/update-plugin</p>
+                                    <p><strong>Purpose:</strong> Updates WP plugin to latest version</p>
+                                    <p><strong>Process:</strong></p>
+                                    <ol className="list-decimal list-inside ml-2">
+                                      <li>Downloads latest plugin ZIP</li>
+                                      <li>Uploads to WordPress</li>
+                                      <li>Deactivates old version</li>
+                                      <li>Installs & activates new version</li>
+                                    </ol>
+                                    <p><strong>Note:</strong> Requires WP admin credentials</p>
+                                  </div>
+                                </div>
                               </button>
                               <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                                className="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 relative group flex items-center gap-1"
                                 onClick={() => handleBarkroPush(item.id)}
                                 disabled={barkroPushing.has(item.id)}
                               >
+                                <span className="info-icon">ⓘ</span>
                                 {barkroPushing.has(item.id) ? 'Pushing...' : 'Push updates with Barkro'}
+                                <div className="tooltip-content">
+                                  <div className="font-bold mb-2">Barkro Push Updates</div>
+                                  <div className="text-xs space-y-1">
+                                    <p><strong>Function:</strong> handleBarkroPush()</p>
+                                    <p><strong>API Route:</strong> /api/barkro/push-update/route.ts</p>
+                                    <p><strong>Purpose:</strong> Push plugin updates via Barkro system</p>
+                                    <p><strong>Flow:</strong></p>
+                                    <ol className="list-decimal list-inside ml-2">
+                                      <li>Gets current plugin version from DB</li>
+                                      <li>Creates narpi_pushes record</li>
+                                      <li>Sends update notification to WP</li>
+                                      <li>WP checks & applies update</li>
+                                    </ol>
+                                    <p><strong>Endpoint:</strong> /wp-json/snefuru/v1/check-update</p>
+                                    <p><strong>Auth:</strong> Uses ruplin_api_key_1</p>
+                                  </div>
+                                </div>
                               </button>
                             </div>
                             {(syncResults[item.id] || syncResults[`test_${item.id}`] || syncResults[`version_${item.id}`] || syncResults[`update_${item.id}`] || syncResults[`barkro_${item.id}`]) && (
