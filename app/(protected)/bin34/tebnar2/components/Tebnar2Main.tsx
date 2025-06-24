@@ -746,6 +746,7 @@ export default function Tebnar2Main() {
       if (tbn2_validateBatchId(tbn2_urlBatchId)) {
         // Valid batch ID - apply the filter
         setTbn2SelectedBatchId(tbn2_urlBatchId);
+        tbn2_fetchBatchSitespren(tbn2_urlBatchId);
         setTbn2UrlBatchId(null); // Clear the URL batch ID state
       } else {
         // Invalid batch ID - show error and clear URL param
@@ -770,6 +771,7 @@ export default function Tebnar2Main() {
       if (batchIdParam) {
         if (tbn2_validateBatchId(batchIdParam)) {
           setTbn2SelectedBatchId(batchIdParam);
+          tbn2_fetchBatchSitespren(batchIdParam);
         } else {
           setTbn2SelectedBatchId('');
           setTbn2Error(`❌ Batch ID "${batchIdParam}" not found`);
@@ -777,6 +779,7 @@ export default function Tebnar2Main() {
         }
       } else {
         setTbn2SelectedBatchId('');
+        setTbn2SelectedSitesprenId('');
       }
     };
     
