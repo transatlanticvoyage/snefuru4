@@ -1361,5 +1361,6 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
         </div>
       </div>
     </div>
+    </>
   );
 }
