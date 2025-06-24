@@ -13,6 +13,7 @@
     "@supabase/supabase-js": "^2.49.8",
     "@types/archiver": "^6.0.3",
     "@types/node-fetch": "^2.6.12",
+    "adm-zip": "^0.5.16",
     "archiver": "^7.0.1",
     "jszip": "^3.10.1",
     "next": "15.3.2",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/adm-zip": "^0.5.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
