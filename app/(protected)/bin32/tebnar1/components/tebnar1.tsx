@@ -29,6 +29,9 @@ const columns = [
 
 // Column width and styling settings
 const columnSettings: Record<string, { width: string; minWidth: string; maxWidth: string; textAlign?: 'left' | 'center' | 'right' }> = {
+  // Select checkbox column (first column)
+  select: { width: '50px', minWidth: '50px', maxWidth: '50px', textAlign: 'center' },
+  
   // Intent columns (new) - positioned before fk_ columns
   int1: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
   int2: { width: '60px', minWidth: '60px', maxWidth: '60px', textAlign: 'center' },
@@ -206,6 +209,9 @@ const headerCustomizationSettings = {
   
   // Individual header cell width overrides (takes precedence over columnSettings)
   headerCellWidths: {
+    // Select checkbox column
+    'select': { width: '50px', minWidth: '50px', maxWidth: '50px' },
+    
     // Intent columns (new) - positioned before fk_ columns
     'int1': { width: '60px', minWidth: '60px', maxWidth: '60px' },
     'int2': { width: '60px', minWidth: '60px', maxWidth: '60px' },
@@ -288,6 +294,9 @@ const headerCustomizationSettings = {
   
   // Header column-specific text alignment overrides
   headerTextAlign: {
+    // Select checkbox column - center aligned
+    'select': 'center' as 'left' | 'center' | 'right',
+    
     // Intent columns - center aligned
     'int1': 'center' as 'left' | 'center' | 'right',
     'int2': 'center' as 'left' | 'center' | 'right',
@@ -487,8 +496,11 @@ const tableCellPaddingSettings = {
     paddingLeft: '4px',             // Default left padding
   },
   
-  // Column-specific padding overrides - ALL SET TO 4px 4px
+  // Column-specific padding overrides - ALL SET TO 4px 4px except select column
   columnPadding: {
+    // Select checkbox column - 6px top/bottom, 10px left/right for larger clickable area
+    'select': { padding: '6px 10px', paddingTop: '6px', paddingRight: '10px', paddingBottom: '6px', paddingLeft: '10px' },
+    
     // Intent columns - 4px padding
     'int1': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
     'int2': { padding: '4px 4px', paddingTop: '4px', paddingRight: '4px', paddingBottom: '4px', paddingLeft: '4px' },
@@ -610,6 +622,9 @@ const tableBorderSettings = {
     
     // Column-specific border overrides - all consistent now
     columnSpecific: {
+      // Select checkbox column
+      'select': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
+      
       // Intent columns
       'int1': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
       'int2': { right: '1px solid #c7cbd3', left: '1px solid #c7cbd3' },
@@ -859,10 +874,37 @@ export default function Tebnar1() {
   const [loadingPreset, setLoadingPreset] = useState(false); // Track loading state for preset button
   const [presetData, setPresetData] = useState<string[][] | null>(null);
   const [lastClickTime, setLastClickTime] = useState<Record<string, number>>({}); // Debounce tracking
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set()); // Row selection state
 
   // Debounce constants
   const DEBOUNCE_MS = 2000; // 2 seconds between clicks
   const RECENT_GENERATION_CHECK_MS = 30000; // 30 seconds for recent generation check
+
+  // Checkbox selection handlers
+  const handleSelectRow = (planId: string) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(planId)) {
+      newSelected.delete(planId);
+    } else {
+      newSelected.add(planId);
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRows.size === currentItems.length && currentItems.length > 0) {
+      // Deselect all
+      setSelectedRows(new Set());
+    } else {
+      // Select all current page items
+      const allPlanIds = new Set(currentItems.map(plan => plan.id));
+      setSelectedRows(allPlanIds);
+    }
+  };
+
+  const handleCheckboxCellClick = (planId: string) => {
+    handleSelectRow(planId);
+  };
 
   // Inject CSS styles for main element styling
   useEffect(() => {
@@ -1225,6 +1267,7 @@ export default function Tebnar1() {
 
   // For uitablegrid21, build columns with preview columns after each fk_imageX_id
   const tableColumns = [
+    'select', // Checkbox column as first column
     'int1', 'fk_image1_id', 'image1-preview',
     'int2', 'fk_image2_id', 'image2-preview',
     'int3', 'fk_image3_id', 'image3-preview',
@@ -1847,7 +1890,20 @@ export default function Tebnar1() {
                         }
                       }}
                     >
-                      {col.startsWith('image') ? 'Preview' : col}
+                      {col === 'select' ? (
+                        <input
+                          type="checkbox"
+                          checked={selectedRows.size === currentItems.length && currentItems.length > 0}
+                          onChange={handleSelectAll}
+                          style={{
+                            width: '26px',
+                            height: '26px',
+                            margin: '0',
+                            padding: '0',
+                            cursor: 'pointer'
+                          }}
+                        />
+                      ) : col.startsWith('image') ? 'Preview' : col}
                     </th>
                   );
                 })}
@@ -1886,7 +1942,46 @@ export default function Tebnar1() {
                       left: tableBorderSettings.columnBorders.defaultLeft,
                     };
                     
-                    if (col === 'image1-preview') {
+                    if (col === 'select') {
+                      return (
+                        <td
+                          key={col}
+                          style={{
+                            width: settings.width,
+                            minWidth: settings.minWidth,
+                            maxWidth: settings.maxWidth,
+                            textAlign: settings.textAlign || 'center',
+                            height: tableStyleSettings.row.height,
+                            padding: `${columnPadding.paddingTop} ${columnPadding.paddingRight} ${columnPadding.paddingBottom} ${columnPadding.paddingLeft} !important`,
+                            paddingTop: `${columnPadding.paddingTop} !important`,
+                            paddingRight: `${columnPadding.paddingRight} !important`,
+                            paddingBottom: `${columnPadding.paddingBottom} !important`, 
+                            paddingLeft: `${columnPadding.paddingLeft} !important`,
+                            backgroundColor: tableStyleSettings.cell.backgroundColor,
+                            verticalAlign: tableStyleSettings.cell.verticalAlign,
+                            overflow: tableStyleSettings.cell.overflow,
+                            borderRight: tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
+                            borderLeft: tableBorderSettings.columnBorders.enabled ? columnBorder.left : '0px',
+                            borderBottom: tableBorderSettings.rowBorders.enabled ? tableBorderSettings.rowBorders.dataRowBottom : '0px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => handleCheckboxCellClick(plan.id)}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedRows.has(plan.id)}
+                            onChange={() => handleSelectRow(plan.id)}
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              margin: '0',
+                              padding: '0',
+                              cursor: 'pointer'
+                            }}
+                          />
+                        </td>
+                      );
+                    } else if (col === 'image1-preview') {
                       const imgId = plan['fk_image1_id'];
                       const img = imgId ? imagesById[imgId] : null;
                       const fetchKey = `${plan.id}-1`;
