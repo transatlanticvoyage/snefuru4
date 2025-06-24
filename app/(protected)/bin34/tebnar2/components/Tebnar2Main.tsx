@@ -89,6 +89,13 @@ export default function Tebnar2Main() {
   const [tbn2_selectedGconPieceId, setTbn2SelectedGconPieceId] = useState<string>('');
   const [tbn2_gconPieceSaving, setTbn2GconPieceSaving] = useState(false);
   const [tbn2_currentSitesprenBase, setTbn2CurrentSitesprenBase] = useState<string>('');
+  
+  // Pushador actions state - sync actions from sitejar4
+  const [tbn2_syncLoading, setTbn2SyncLoading] = useState<Set<string>>(new Set());
+  const [tbn2_syncResults, setTbn2SyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
+  const [tbn2_checkingPluginVersion, setTbn2CheckingPluginVersion] = useState<Set<string>>(new Set());
+  const [tbn2_updatingPlugin, setTbn2UpdatingPlugin] = useState<Set<string>>(new Set());
+  const [tbn2_barkroPushing, setTbn2BarkroPushing] = useState<Set<string>>(new Set());
 
   // Functions popup state - cloned from nwjar1
   const [tbn2_isPopupOpen, setTbn2IsPopupOpen] = useState(false);
@@ -148,6 +155,32 @@ export default function Tebnar2Main() {
           color: #9ca3af !important;
         }
         
+        /* Specific widths for each dropdown */
+        .tbn2-sitespren-select {
+          width: 460px !important;
+          min-width: 460px !important;
+        }
+        
+        .tbn2-gcon-piece-select {
+          width: 400px !important;
+          min-width: 400px !important;
+        }
+        
+        /* Allow expansion when dropdown is opened (focused or size changed) */
+        .tbn2-sitespren-select:focus,
+        .tbn2-sitespren-select[size]:not([size="1"]) {
+          width: auto !important;
+          min-width: 460px !important;
+          max-width: none !important;
+        }
+        
+        .tbn2-gcon-piece-select:focus,
+        .tbn2-gcon-piece-select[size]:not([size="1"]) {
+          width: auto !important;
+          min-width: 400px !important;
+          max-width: none !important;
+        }
+        
         /* Custom display overlay for truncated text */
         .tbn2-select-overlay {
           position: absolute;
@@ -175,9 +208,68 @@ export default function Tebnar2Main() {
           position: relative;
         }
         
+        .tbn2-sitespren-container {
+          width: 460px;
+          min-width: 460px;
+        }
+        
+        .tbn2-gcon-piece-container {
+          width: 400px;
+          min-width: 400px;
+        }
+        
         .tbn2-custom-select:focus + .tbn2-select-overlay,
         .tbn2-custom-select[size]:not([size="1"]) + .tbn2-select-overlay {
           display: none;
+        }
+        
+        /* Tooltip styles for pushador actions - cloned from sitejar4 */
+        .group {
+          position: relative;
+        }
+        
+        .info-icon {
+          font-size: 12px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+        }
+        
+        .tooltip-content {
+          position: absolute;
+          bottom: 100%;
+          left: 0;
+          margin-bottom: 8px;
+          background: #1a1a1a;
+          color: white;
+          padding: 12px;
+          border-radius: 6px;
+          width: 320px;
+          z-index: 50;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.2s, visibility 0.2s;
+          transform: translateY(-5px);
+        }
+        
+        .group:hover .tooltip-content {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+        
+        .tooltip-content::after {
+          content: '';
+          position: absolute;
+          top: 100%;
+          left: 16px;
+          border: 6px solid transparent;
+          border-top-color: #1a1a1a;
         }
       `;
     };
@@ -1245,6 +1337,292 @@ export default function Tebnar2Main() {
     }
   };
 
+  // Pushador actions handlers - cloned from sitejar4
+  const tbn2_handleWpsv2Sync = async (siteId: string, method: 'plugin_api' | 'rest_api') => {
+    setTbn2SyncLoading(prev => new Set([...prev, siteId]));
+    
+    setTbn2SyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[siteId];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/wpsv2/sync-site', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId,
+          method: method,
+          fallbackEnabled: false
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [siteId]: {
+            type: 'success',
+            message: `✅ ${data.message} (${data.count} items)`
+          }
+        }));
+      } else {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [siteId]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setTbn2SyncResults(prev => ({
+        ...prev,
+        [siteId]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      setTbn2SyncLoading(prev => {
+        const newLoading = new Set(prev);
+        newLoading.delete(siteId);
+        return newLoading;
+      });
+    }
+  };
+
+  const tbn2_handleWpsv2TestPlugin = async (siteId: string) => {
+    setTbn2SyncLoading(prev => new Set([...prev, `test_${siteId}`]));
+    
+    setTbn2SyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[`test_${siteId}`];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/wpsv2/test-connection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const pluginStatus = data.results.plugin_api.success ? '✅' : '❌';
+        const restStatus = data.results.rest_api.success ? '✅' : '❌';
+        
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [`test_${siteId}`]: {
+            type: 'success',
+            message: `Plugin: ${pluginStatus} | REST: ${restStatus} | ${data.results.recommendations[0] || 'Test completed'}`
+          }
+        }));
+      } else {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [`test_${siteId}`]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setTbn2SyncResults(prev => ({
+        ...prev,
+        [`test_${siteId}`]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      setTbn2SyncLoading(prev => {
+        const newLoading = new Set(prev);
+        newLoading.delete(`test_${siteId}`);
+        return newLoading;
+      });
+    }
+  };
+
+  const tbn2_handleCheckPluginVersion = async (siteId: string) => {
+    setTbn2CheckingPluginVersion(prev => new Set([...prev, siteId]));
+    
+    setTbn2SyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[`version_${siteId}`];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/plugin/check-version', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [`version_${siteId}`]: {
+            type: 'success',
+            message: `✅ ${data.message} (Current: ${data.currentVersion || 'Unknown'}, Latest: ${data.latestVersion || 'Unknown'})`
+          }
+        }));
+      } else {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [`version_${siteId}`]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setTbn2SyncResults(prev => ({
+        ...prev,
+        [`version_${siteId}`]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      setTbn2CheckingPluginVersion(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
+  const tbn2_handleUpdatePlugin = async (siteId: string) => {
+    setTbn2UpdatingPlugin(prev => new Set([...prev, siteId]));
+    
+    setTbn2SyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[`update_${siteId}`];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/plugin/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [`update_${siteId}`]: {
+            type: 'success',
+            message: `✅ ${data.message} (Updated to version: ${data.newVersion || 'Unknown'})`
+          }
+        }));
+      } else {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [`update_${siteId}`]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setTbn2SyncResults(prev => ({
+        ...prev,
+        [`update_${siteId}`]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      setTbn2UpdatingPlugin(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
+  const tbn2_handleBarkroPush = async (siteId: string) => {
+    setTbn2BarkroPushing(prev => new Set([...prev, siteId]));
+    
+    setTbn2SyncResults(prev => {
+      const newResults = { ...prev };
+      delete newResults[`barkro_${siteId}`];
+      return newResults;
+    });
+
+    try {
+      const response = await fetch('/api/barkro/push-update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId: siteId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [`barkro_${siteId}`]: {
+            type: 'success',
+            message: `✅ ${data.message}`
+          }
+        }));
+      } else {
+        setTbn2SyncResults(prev => ({
+          ...prev,
+          [`barkro_${siteId}`]: {
+            type: 'error',
+            message: `❌ ${data.message}`
+          }
+        }));
+      }
+    } catch (error) {
+      setTbn2SyncResults(prev => ({
+        ...prev,
+        [`barkro_${siteId}`]: {
+          type: 'error',
+          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }
+      }));
+    } finally {
+      setTbn2BarkroPushing(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
   // SOPTION1 and SOPTION2 handler - adapted for tebnar2
   const [tbn2_functionLoading, setTbn2FunctionLoading] = useState(false);
   
@@ -1387,11 +1765,10 @@ export default function Tebnar2Main() {
         {/* Sitespren Assignment Widget */}
         <div 
           className="bg-white border border-gray-300 rounded-lg p-2"
-          style={{ maxHeight: '85px' }}
         >
           <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_sitespren_id</div>
           <div className="flex items-center space-x-2">
-            <div className="tbn2-select-container flex-1">
+            <div className="tbn2-select-container tbn2-sitespren-container">
               <select
                 value={tbn2_selectedSitesprenId}
                 onChange={(e) => {
@@ -1405,7 +1782,7 @@ export default function Tebnar2Main() {
                     setTbn2GconPieceOptions([]);
                   }
                 }}
-                className="tbn2-custom-select rounded px-2 py-1 w-full"
+                className="tbn2-custom-select tbn2-sitespren-select rounded px-2 py-1"
                 disabled={!tbn2_selectedBatchId}
                 style={{ color: 'transparent' }}
               >
@@ -1433,6 +1810,194 @@ export default function Tebnar2Main() {
               {tbn2_sitesprenSaving ? '...' : 'save'}
             </button>
           </div>
+
+          {/* Pushador Actions Section */}
+          {tbn2_selectedSitesprenId && (
+            <>
+              <hr className="my-3" />
+              <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>pushador_actions</div>
+              
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <button
+                    className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 relative group flex items-center gap-1"
+                    onClick={() => tbn2_handleWpsv2Sync(tbn2_selectedSitesprenId, 'plugin_api')}
+                    disabled={tbn2_syncLoading.has(tbn2_selectedSitesprenId)}
+                  >
+                    <span className="info-icon">ⓘ</span>
+                    {tbn2_syncLoading.has(tbn2_selectedSitesprenId) ? 'Syncing...' : 'Plugin API'}
+                    <div className="tooltip-content">
+                      <div className="font-bold mb-2">Plugin API Sync</div>
+                      <div className="text-xs space-y-1">
+                        <p><strong>Function:</strong> wpsv2SyncViaPluginApi()</p>
+                        <p><strong>Location:</strong> /app/api/wpsv2/sync-site/route.ts:138-187</p>
+                        <p><strong>Flow:</strong></p>
+                        <ol className="list-decimal list-inside ml-2">
+                          <li>Fetches content from WP via custom plugin endpoint</li>
+                          <li>Uses ruplin_api_key_1 for authentication</li>
+                          <li>Calls wpsv2SaveContentToDatabase()</li>
+                          <li>Saves to nwpi_content table</li>
+                        </ol>
+                        <p><strong>Endpoint:</strong> /wp-json/snefuru/v1/posts</p>
+                        <p><strong>Auth:</strong> Bearer token in header</p>
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 relative group flex items-center gap-1"
+                    onClick={() => tbn2_handleWpsv2Sync(tbn2_selectedSitesprenId, 'rest_api')}
+                    disabled={tbn2_syncLoading.has(tbn2_selectedSitesprenId)}
+                  >
+                    <span className="info-icon">ⓘ</span>
+                    {tbn2_syncLoading.has(tbn2_selectedSitesprenId) ? 'Syncing...' : 'Rest API'}
+                    <div className="tooltip-content">
+                      <div className="font-bold mb-2">REST API Sync</div>
+                      <div className="text-xs space-y-1">
+                        <p><strong>Function:</strong> wpsv2SyncViaRestApi()</p>
+                        <p><strong>Location:</strong> /app/api/wpsv2/sync-site/route.ts:190-274</p>
+                        <p><strong>Flow:</strong></p>
+                        <ol className="list-decimal list-inside ml-2">
+                          <li>Uses standard WP REST API</li>
+                          <li>Fetches posts & pages separately</li>
+                          <li>Can work without auth (public posts only)</li>
+                          <li>Saves to nwpi_content table</li>
+                        </ol>
+                        <p><strong>Endpoints:</strong> /wp-json/wp/v2/posts, /wp-json/wp/v2/pages</p>
+                        <p><strong>Auth:</strong> Optional app password</p>
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 relative group flex items-center gap-1"
+                    onClick={() => tbn2_handleWpsv2TestPlugin(tbn2_selectedSitesprenId)}
+                    disabled={tbn2_syncLoading.has(`test_${tbn2_selectedSitesprenId}`)}
+                  >
+                    <span className="info-icon">ⓘ</span>
+                    {tbn2_syncLoading.has(`test_${tbn2_selectedSitesprenId}`) ? 'Testing...' : 'Test Plugin'}
+                    <div className="tooltip-content">
+                      <div className="font-bold mb-2">Test Plugin Connection</div>
+                      <div className="text-xs space-y-1">
+                        <p><strong>Function:</strong> handleWpsv2TestPlugin()</p>
+                        <p><strong>API Route:</strong> /api/test-plugin-connection</p>
+                        <p><strong>Purpose:</strong> Verifies plugin is installed & API key is valid</p>
+                        <p><strong>Tests:</strong></p>
+                        <ul className="list-disc list-inside ml-2">
+                          <li>Plugin presence check</li>
+                          <li>API key authentication</li>
+                          <li>Endpoint accessibility</li>
+                          <li>Response format validation</li>
+                        </ul>
+                        <p><strong>Returns:</strong> Success/failure status</p>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="px-2 py-1 text-xs font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 relative group flex items-center gap-1"
+                    onClick={() => tbn2_handleCheckPluginVersion(tbn2_selectedSitesprenId)}
+                    disabled={tbn2_checkingPluginVersion.has(tbn2_selectedSitesprenId)}
+                  >
+                    <span className="info-icon">ⓘ</span>
+                    {tbn2_checkingPluginVersion.has(tbn2_selectedSitesprenId) ? 'Checking...' : 'Check WP Plugin Version'}
+                    <div className="tooltip-content">
+                      <div className="font-bold mb-2">Check Plugin Version</div>
+                      <div className="text-xs space-y-1">
+                        <p><strong>Function:</strong> handleCheckPluginVersion()</p>
+                        <p><strong>API Route:</strong> /api/check-plugin-version</p>
+                        <p><strong>Purpose:</strong> Gets installed plugin version from WP site</p>
+                        <p><strong>Process:</strong></p>
+                        <ol className="list-decimal list-inside ml-2">
+                          <li>Queries WP plugin endpoint</li>
+                          <li>Retrieves version number</li>
+                          <li>Compares with latest available</li>
+                          <li>Shows update availability</li>
+                        </ol>
+                        <p><strong>Uses:</strong> Plugin's version check endpoint</p>
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    className="px-2 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 relative group flex items-center gap-1"
+                    onClick={() => tbn2_handleUpdatePlugin(tbn2_selectedSitesprenId)}
+                    disabled={tbn2_updatingPlugin.has(tbn2_selectedSitesprenId)}
+                  >
+                    <span className="info-icon">ⓘ</span>
+                    {tbn2_updatingPlugin.has(tbn2_selectedSitesprenId) ? 'Updating...' : 'Update Plugin'}
+                    <div className="tooltip-content">
+                      <div className="font-bold mb-2">Update Plugin</div>
+                      <div className="text-xs space-y-1">
+                        <p><strong>Function:</strong> handleUpdatePlugin()</p>
+                        <p><strong>API Route:</strong> /api/update-plugin</p>
+                        <p><strong>Purpose:</strong> Updates WP plugin to latest version</p>
+                        <p><strong>Process:</strong></p>
+                        <ol className="list-decimal list-inside ml-2">
+                          <li>Downloads latest plugin ZIP</li>
+                          <li>Uploads to WordPress</li>
+                          <li>Deactivates old version</li>
+                          <li>Installs & activates new version</li>
+                        </ol>
+                        <p><strong>Note:</strong> Requires WP admin credentials</p>
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    className="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 relative group flex items-center gap-1"
+                    onClick={() => tbn2_handleBarkroPush(tbn2_selectedSitesprenId)}
+                    disabled={tbn2_barkroPushing.has(tbn2_selectedSitesprenId)}
+                  >
+                    <span className="info-icon">ⓘ</span>
+                    {tbn2_barkroPushing.has(tbn2_selectedSitesprenId) ? 'Pushing...' : 'Push updates with Barkro'}
+                    <div className="tooltip-content">
+                      <div className="font-bold mb-2">Barkro Push Updates</div>
+                      <div className="text-xs space-y-1">
+                        <p><strong>Function:</strong> handleBarkroPush()</p>
+                        <p><strong>API Route:</strong> /api/barkro/push-update/route.ts</p>
+                        <p><strong>Purpose:</strong> Push plugin updates via Barkro system</p>
+                        <p><strong>Flow:</strong></p>
+                        <ol className="list-decimal list-inside ml-2">
+                          <li>Gets current plugin version from DB</li>
+                          <li>Creates narpi_pushes record</li>
+                          <li>Sends update notification to WP</li>
+                          <li>WP checks & applies update</li>
+                        </ol>
+                        <p><strong>Endpoint:</strong> /wp-json/snefuru/v1/check-update</p>
+                        <p><strong>Auth:</strong> Uses ruplin_api_key_1</p>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <hr className="my-3" />
+              <div className="font-bold text-gray-700 mb-2" style={{ fontSize: '16px' }}>feedback message</div>
+              
+              {/* Feedback Messages Area */}
+              <div className="min-h-[40px]">
+                {(tbn2_syncResults[tbn2_selectedSitesprenId] || 
+                  tbn2_syncResults[`test_${tbn2_selectedSitesprenId}`] || 
+                  tbn2_syncResults[`version_${tbn2_selectedSitesprenId}`] || 
+                  tbn2_syncResults[`update_${tbn2_selectedSitesprenId}`] || 
+                  tbn2_syncResults[`barkro_${tbn2_selectedSitesprenId}`]) && (
+                  <div className={`text-xs p-2 rounded ${
+                    (tbn2_syncResults[tbn2_selectedSitesprenId]?.type === 'success' || 
+                     tbn2_syncResults[`test_${tbn2_selectedSitesprenId}`]?.type === 'success' || 
+                     tbn2_syncResults[`version_${tbn2_selectedSitesprenId}`]?.type === 'success' || 
+                     tbn2_syncResults[`update_${tbn2_selectedSitesprenId}`]?.type === 'success' || 
+                     tbn2_syncResults[`barkro_${tbn2_selectedSitesprenId}`]?.type === 'success') 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {tbn2_syncResults[tbn2_selectedSitesprenId]?.message || 
+                     tbn2_syncResults[`test_${tbn2_selectedSitesprenId}`]?.message || 
+                     tbn2_syncResults[`version_${tbn2_selectedSitesprenId}`]?.message || 
+                     tbn2_syncResults[`update_${tbn2_selectedSitesprenId}`]?.message || 
+                     tbn2_syncResults[`barkro_${tbn2_selectedSitesprenId}`]?.message}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Gcon Piece Assignment Widget */}
@@ -1442,11 +2007,11 @@ export default function Tebnar2Main() {
         >
           <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_gcon_piece_id</div>
           <div className="flex items-center space-x-2">
-            <div className="tbn2-select-container flex-1">
+            <div className="tbn2-select-container tbn2-gcon-piece-container">
               <select
                 value={tbn2_selectedGconPieceId}
                 onChange={(e) => setTbn2SelectedGconPieceId(e.target.value)}
-                className="tbn2-custom-select rounded px-2 py-1 w-full"
+                className="tbn2-custom-select tbn2-gcon-piece-select rounded px-2 py-1"
                 disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
                 style={{ color: 'transparent' }}
               >
