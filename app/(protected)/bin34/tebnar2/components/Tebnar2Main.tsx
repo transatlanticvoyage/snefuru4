@@ -121,6 +121,64 @@ export default function Tebnar2Main() {
           margin: ${TBN2_MAIN_ELEMENT_STYLING.margins.margin} !important;
           padding: ${TBN2_MAIN_ELEMENT_STYLING.padding.padding} !important;
         }
+        
+        /* Custom select styling for sitespren and gcon piece dropdowns */
+        .tbn2-custom-select {
+          background-color: #16267b !important;
+          color: #fff !important;
+          font-size: 16px !important;
+          padding: 4px 8px !important;
+          border: 1px solid #16267b !important;
+          position: relative;
+        }
+        
+        .tbn2-custom-select:disabled {
+          background-color: #e5e7eb !important;
+          color: #9ca3af !important;
+          border-color: #d1d5db !important;
+        }
+        
+        .tbn2-custom-select option {
+          background-color: white !important;
+          color: black !important;
+          font-size: 16px !important;
+        }
+        
+        .tbn2-custom-select option:disabled {
+          color: #9ca3af !important;
+        }
+        
+        /* Custom display overlay for truncated text */
+        .tbn2-select-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 20px;
+          bottom: 0;
+          background-color: #16267b;
+          color: white;
+          padding: 4px 8px;
+          font-size: 16px;
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          border-radius: 4px;
+          z-index: 1;
+        }
+        
+        .tbn2-select-overlay.disabled {
+          background-color: #e5e7eb;
+          color: #9ca3af;
+        }
+        
+        .tbn2-select-container {
+          position: relative;
+        }
+        
+        .tbn2-custom-select:focus + .tbn2-select-overlay,
+        .tbn2-custom-select[size]:not([size="1"]) + .tbn2-select-overlay {
+          display: none;
+        }
       `;
     };
 
@@ -485,6 +543,27 @@ export default function Tebnar2Main() {
         return newSet;
       });
     }
+  };
+
+  // Helper function to truncate UUID for display
+  const tbn2_truncateUUID = (uuid: string) => {
+    if (!uuid || uuid.length < 8) return uuid;
+    return uuid.substring(0, 4) + '...';
+  };
+
+  // Helper function to get display text for selected option
+  const tbn2_getSelectedSitesprenDisplay = () => {
+    if (!tbn2_selectedSitesprenId) return '';
+    const option = tbn2_sitesprenOptions.find(s => s.id === tbn2_selectedSitesprenId);
+    if (!option) return '';
+    return `${tbn2_truncateUUID(option.id)} - ${option.sitespren_base}`;
+  };
+
+  const tbn2_getSelectedGconPieceDisplay = () => {
+    if (!tbn2_selectedGconPieceId) return '';
+    const option = tbn2_gconPieceOptions.find(g => g.id === tbn2_selectedGconPieceId);
+    if (!option) return '';
+    return `${tbn2_truncateUUID(option.id)} - ${option.meta_title}`;
   };
 
   // Column Template System Constants - tebnar2 specific
@@ -1308,41 +1387,47 @@ export default function Tebnar2Main() {
         {/* Sitespren Assignment Widget */}
         <div 
           className="bg-white border border-gray-300 rounded-lg p-2"
-          style={{ maxHeight: '70px' }}
+          style={{ maxHeight: '85px' }}
         >
-          <div className="font-bold text-gray-700 text-xs mb-1">asn_sitespren_id</div>
+          <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_sitespren_id</div>
           <div className="flex items-center space-x-2">
-            <select
-              value={tbn2_selectedSitesprenId}
-              onChange={(e) => {
-                setTbn2SelectedSitesprenId(e.target.value);
-                const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === e.target.value);
-                if (selectedSitespren) {
-                  setTbn2CurrentSitesprenBase(selectedSitespren.sitespren_base);
-                  tbn2_fetchGconPieces(selectedSitespren.sitespren_base);
-                } else {
-                  setTbn2CurrentSitesprenBase('');
-                  setTbn2GconPieceOptions([]);
-                }
-              }}
-              className="text-xs border border-gray-300 rounded px-1 py-1 flex-1"
-              style={{ fontSize: '10px' }}
-              disabled={!tbn2_selectedBatchId}
-            >
-              <option value="" disabled>
-                {!tbn2_selectedBatchId ? 'Select batch first' : 'id - sitespren_base'}
-              </option>
-              {tbn2_sitesprenOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.id} - {option.sitespren_base}
+            <div className="tbn2-select-container flex-1">
+              <select
+                value={tbn2_selectedSitesprenId}
+                onChange={(e) => {
+                  setTbn2SelectedSitesprenId(e.target.value);
+                  const selectedSitespren = tbn2_sitesprenOptions.find(s => s.id === e.target.value);
+                  if (selectedSitespren) {
+                    setTbn2CurrentSitesprenBase(selectedSitespren.sitespren_base);
+                    tbn2_fetchGconPieces(selectedSitespren.sitespren_base);
+                  } else {
+                    setTbn2CurrentSitesprenBase('');
+                    setTbn2GconPieceOptions([]);
+                  }
+                }}
+                className="tbn2-custom-select rounded px-2 py-1 w-full"
+                disabled={!tbn2_selectedBatchId}
+                style={{ color: 'transparent' }}
+              >
+                <option value="" disabled>
+                  {!tbn2_selectedBatchId ? 'Select batch first' : 'id - sitespren_base'}
                 </option>
-              ))}
-            </select>
+                {tbn2_sitesprenOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.id} - {option.sitespren_base}
+                  </option>
+                ))}
+              </select>
+              <div className={`tbn2-select-overlay ${!tbn2_selectedBatchId ? 'disabled' : ''}`}>
+                {tbn2_selectedSitesprenId ? tbn2_getSelectedSitesprenDisplay() : 
+                 (!tbn2_selectedBatchId ? 'Select batch first' : 'id - sitespren_base')}
+              </div>
+            </div>
             <button
               onClick={tbn2_handleSitesprenSave}
               disabled={!tbn2_selectedSitesprenId || !tbn2_selectedBatchId || tbn2_sitesprenSaving}
-              className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              style={{ fontSize: '10px' }}
+              className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              style={{ fontSize: '16px' }}
               title={!tbn2_selectedBatchId ? 'Select a batch first' : 'Save sitespren assignment'}
             >
               {tbn2_sitesprenSaving ? '...' : 'save'}
@@ -1353,33 +1438,41 @@ export default function Tebnar2Main() {
         {/* Gcon Piece Assignment Widget */}
         <div 
           className="bg-white border border-gray-300 rounded-lg p-2"
-          style={{ maxHeight: '70px' }}
+          style={{ maxHeight: '85px' }}
         >
-          <div className="font-bold text-gray-700 text-xs mb-1">asn_gcon_piece_id</div>
+          <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_gcon_piece_id</div>
           <div className="flex items-center space-x-2">
-            <select
-              value={tbn2_selectedGconPieceId}
-              onChange={(e) => setTbn2SelectedGconPieceId(e.target.value)}
-              className="text-xs border border-gray-300 rounded px-1 py-1 flex-1"
-              style={{ fontSize: '10px' }}
-              disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
-            >
-              <option value="" disabled>
-                {!tbn2_selectedBatchId ? 'Select batch first' : 
-                 !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
-                 'id - meta_title'}
-              </option>
-              {tbn2_gconPieceOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.id} - {option.meta_title}
+            <div className="tbn2-select-container flex-1">
+              <select
+                value={tbn2_selectedGconPieceId}
+                onChange={(e) => setTbn2SelectedGconPieceId(e.target.value)}
+                className="tbn2-custom-select rounded px-2 py-1 w-full"
+                disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
+                style={{ color: 'transparent' }}
+              >
+                <option value="" disabled>
+                  {!tbn2_selectedBatchId ? 'Select batch first' : 
+                   !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
+                   'id - meta_title'}
                 </option>
-              ))}
-            </select>
+                {tbn2_gconPieceOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.id} - {option.meta_title}
+                  </option>
+                ))}
+              </select>
+              <div className={`tbn2-select-overlay ${(!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) ? 'disabled' : ''}`}>
+                {tbn2_selectedGconPieceId ? tbn2_getSelectedGconPieceDisplay() :
+                 (!tbn2_selectedBatchId ? 'Select batch first' : 
+                  !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
+                  'id - meta_title')}
+              </div>
+            </div>
             <button
               onClick={tbn2_handleGconPieceSave}
               disabled={!tbn2_selectedGconPieceId || !tbn2_selectedBatchId || tbn2_gconPieceSaving}
-              className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              style={{ fontSize: '10px' }}
+              className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              style={{ fontSize: '16px' }}
               title={!tbn2_selectedBatchId ? 'Select a batch first' : 
                      !tbn2_selectedSitesprenId ? 'Select a sitespren first' :
                      'Save gcon piece assignment'}
