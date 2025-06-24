@@ -1957,7 +1957,7 @@ export default function Tebnar1() {
                             paddingRight: `${columnPadding.paddingRight} !important`,
                             paddingBottom: `${columnPadding.paddingBottom} !important`, 
                             paddingLeft: `${columnPadding.paddingLeft} !important`,
-                            backgroundColor: tableStyleSettings.cell.backgroundColor,
+                            backgroundColor: '#ffffff',
                             verticalAlign: tableStyleSettings.cell.verticalAlign,
                             overflow: tableStyleSettings.cell.overflow,
                             borderRight: tableBorderSettings.columnBorders.enabled ? columnBorder.right : '0px',
