@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     // Step 2: Validate batch exists and user has access
     const { data: batchData, error: batchError } = await supabase
       .from('images_plans_batches')
-      .select('id, batch_name, rel_users_id')
+      .select('id, rel_users_id')
       .eq('id', batch_id)
       .eq('rel_users_id', dbUser.id)
       .single();
@@ -169,7 +169,6 @@ export async function POST(request: NextRequest) {
     // Debug logging to understand the data structure
     console.log('🔍 Debug - Push data structure:', {
       batch_id: batchData.id,
-      batch_name: batchData.batch_name,
       sitespren_id: sitesprenData.id,
       sitespren_base: sitesprenData.sitespren_base,
       true_root_domain: sitesprenData.true_root_domain,
