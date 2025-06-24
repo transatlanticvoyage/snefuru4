@@ -28,7 +28,7 @@ export default function Sitejar4Page() {
 
   // Initialize search term from URL parameter
   useEffect(() => {
-    const searchsite = searchParams.get('searchsite');
+    const searchsite = searchParams?.get('searchsite');
     if (searchsite) {
       setSearchTerm(searchsite);
     }
