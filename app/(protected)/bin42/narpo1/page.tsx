@@ -78,9 +78,9 @@ export default function Narpo1Page() {
     }
     
     // Load state from URL parameters and localStorage
-    const urlParams = new URLSearchParams(window.location.search);
-    const colTempParam = urlParams.get('coltemp') || localStorage.getItem('narpo1_coltemp') || 'option1';
-    const stickyColParam = urlParams.get('stickycol') || localStorage.getItem('narpo1_stickycol') || 'option1';
+    const urlParamsForLayout = new URLSearchParams(window.location.search);
+    const colTempParam = urlParamsForLayout.get('coltemp') || localStorage.getItem('narpo1_coltemp') || 'option1';
+    const stickyColParam = urlParamsForLayout.get('stickycol') || localStorage.getItem('narpo1_stickycol') || 'option1';
     
     setSelectedColumnTemplate(colTempParam);
     setSelectedStickyColumns(stickyColParam);
