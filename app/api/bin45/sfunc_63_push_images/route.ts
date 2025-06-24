@@ -374,6 +374,7 @@ async function uploadViaWordPressPlugin(
     const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
     formData.append('file', blob, fileName);
     formData.append('filename', fileName);
+    formData.append('api_key', apiKey); // Send API key as form parameter
     
     // Add metadata if available
     // These would come from the calling function's context
@@ -388,9 +389,9 @@ async function uploadViaWordPressPlugin(
       method: 'POST',
       body: formData,
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
         'User-Agent': 'Snefuru-NextJS-App/1.0'
         // Don't set Content-Type - let the browser set it with boundary for FormData
+        // Don't use Authorization header - send api_key as form parameter instead
       }
     });
 
