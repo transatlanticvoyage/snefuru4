@@ -1181,7 +1181,7 @@ export default function Tebnar2Main() {
         {/* Sitespren Assignment Widget */}
         <div 
           className="bg-white border border-gray-300 rounded-lg p-2"
-          style={{ maxWidth: '300px', maxHeight: '70px' }}
+          style={{ maxHeight: '70px' }}
         >
           <div className="font-bold text-gray-700 text-xs mb-1">asn_sitespren_id</div>
           <div className="flex items-center space-x-2">
