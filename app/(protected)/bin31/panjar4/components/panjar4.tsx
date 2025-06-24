@@ -12,6 +12,33 @@ export default function Panjar4UI({ images, onImagesRefresh }: Panjar4UIProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [debug, setDebug] = useState<any>(null);
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+
+  // Checkbox selection handlers
+  const handleSelectRow = (imageId: number) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(imageId)) {
+      newSelected.delete(imageId);
+    } else {
+      newSelected.add(imageId);
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRows.size === images.length && images.length > 0) {
+      // Deselect all
+      setSelectedRows(new Set());
+    } else {
+      // Select all
+      const allImageIds = new Set(images.map(image => image.id));
+      setSelectedRows(allImageIds);
+    }
+  };
+
+  const handleCheckboxCellClick = (imageId: number) => {
+    handleSelectRow(imageId);
+  };
 
   const handleGenerate = async () => {
     try {
@@ -88,6 +115,32 @@ export default function Panjar4UI({ images, onImagesRefresh }: Panjar4UIProps) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th 
+                className="text-center"
+                style={{
+                  width: '50px',
+                  minWidth: '50px',
+                  maxWidth: '50px',
+                  padding: '6px 10px !important',
+                  paddingTop: '6px !important',
+                  paddingBottom: '6px !important',
+                  paddingLeft: '10px !important',
+                  paddingRight: '10px !important'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedRows.size === images.length && images.length > 0}
+                  onChange={handleSelectAll}
+                  style={{
+                    width: '26px',
+                    height: '26px',
+                    margin: '0',
+                    padding: '0',
+                    cursor: 'pointer'
+                  }}
+                />
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image Preview</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
@@ -106,6 +159,33 @@ export default function Panjar4UI({ images, onImagesRefresh }: Panjar4UIProps) {
           <tbody className="bg-white divide-y divide-gray-200">
             {images.map((image) => (
               <tr key={image.id}>
+                <td 
+                  className="text-center cursor-pointer"
+                  style={{
+                    width: '50px',
+                    minWidth: '50px',
+                    maxWidth: '50px',
+                    padding: '6px 10px !important',
+                    paddingTop: '6px !important',
+                    paddingBottom: '6px !important',
+                    paddingLeft: '10px !important',
+                    paddingRight: '10px !important'
+                  }}
+                  onClick={() => handleCheckboxCellClick(image.id)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.has(image.id)}
+                    onChange={() => handleSelectRow(image.id)}
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      margin: '0',
+                      padding: '0',
+                      cursor: 'pointer'
+                    }}
+                  />
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {image.img_file_url1 && (
                     <img 
