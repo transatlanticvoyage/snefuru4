@@ -24,11 +24,18 @@ interface PlanRecord {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { batch_id, push_method } = body;
+    const { batch_id, sitespren_id, selected_plan_ids, push_method } = body;
 
-    if (!batch_id || !push_method) {
+    if (!batch_id || !sitespren_id || !selected_plan_ids || !push_method) {
       return NextResponse.json(
-        { error: 'Missing required fields: batch_id, push_method' },
+        { error: 'Missing required fields: batch_id, sitespren_id, selected_plan_ids, push_method' },
+        { status: 400 }
+      );
+    }
+
+    if (!Array.isArray(selected_plan_ids) || selected_plan_ids.length === 0) {
+      return NextResponse.json(
+        { error: 'selected_plan_ids must be a non-empty array' },
         { status: 400 }
       );
     }
@@ -47,10 +54,10 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 Debug - Authenticated user:', { id: user.id, email: user.email });
 
-    // Get the database user ID for the foreign key constraint
+    // Get the database user ID and API key for authentication
     const { data: dbUser, error: dbUserError } = await supabase
       .from('users')
-      .select('id')
+      .select('id, ruplin_api_key_1')
       .eq('auth_id', user.id)
       .single();
 
@@ -62,23 +69,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Debug - Database user:', { auth_id: user.id, db_id: dbUser.id });
+    if (!dbUser.ruplin_api_key_1) {
+      return NextResponse.json(
+        { error: 'User API key not configured' },
+        { status: 401 }
+      );
+    }
 
-    // Step 1: Get batch data with domain information
+    console.log('🔍 Debug - Database user:', { auth_id: user.id, db_id: dbUser.id, has_api_key: !!dbUser.ruplin_api_key_1 });
+
+    // Step 1: Get sitespren data for the target site
+    const { data: sitesprenData, error: sitesprenError } = await supabase
+      .from('sitespren')
+      .select('id, sitespren_base, true_root_domain')
+      .eq('id', sitespren_id)
+      .single();
+
+    if (sitesprenError || !sitesprenData) {
+      console.error('Supabase sitespren query error:', sitesprenError);
+      return NextResponse.json(
+        { error: `Sitespren site not found or access denied: ${sitesprenError?.message || 'Unknown error'}` },
+        { status: 404 }
+      );
+    }
+
+    // Step 2: Validate batch exists and user has access
     const { data: batchData, error: batchError } = await supabase
       .from('images_plans_batches')
-      .select(`
-        *,
-        domains1:fk_domains_id (
-          id,
-          domain_base,
-          wpuser1,
-          wppass1,
-          wp_plugin_installed1,
-          wp_plugin_connected2
-        )
-      `)
+      .select('id, batch_name, rel_users_id')
       .eq('id', batch_id)
+      .eq('rel_users_id', dbUser.id)
       .single();
 
     if (batchError || !batchData) {
@@ -89,11 +109,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Get all images_plans for this batch (image 1 only) 
+    // Step 3: Get selected images_plans (image 1 only) 
     const { data: plansData, error: plansError } = await supabase
       .from('images_plans')
       .select('id, fk_image1_id, e_file_name1')
       .eq('rel_images_plans_batches_id', batch_id)
+      .in('id', selected_plan_ids)
       .not('fk_image1_id', 'is', null);
 
     if (plansError) {
@@ -106,9 +127,13 @@ export async function POST(request: NextRequest) {
 
     if (!plansData || plansData.length === 0) {
       return NextResponse.json(
-        { error: 'No images found in this batch' },
+        { error: 'No images found for the selected plans' },
         { status: 404 }
       );
+    }
+
+    if (plansData.length !== selected_plan_ids.length) {
+      console.warn(`⚠️ Warning: Found ${plansData.length} plans but expected ${selected_plan_ids.length}`);
     }
 
     // Step 2b: Get the image details for each plan
@@ -141,30 +166,28 @@ export async function POST(request: NextRequest) {
 
     const typedPlansData = plansWithImages as unknown as PlanRecord[];
 
-    // Debug logging to understand the batch data structure
-    console.log('🔍 Debug - batchData structure:', {
-      id: batchData.id,
-      rel_users_id: batchData.rel_users_id,
-      domains1: batchData.domains1 ? 'present' : 'missing',
-      domain_details: batchData.domains1 ? {
-        domain_base: batchData.domains1.domain_base,
-        has_wpuser: !!batchData.domains1.wpuser1,
-        has_wppass: !!batchData.domains1.wppass1,
-        wp_plugin_installed: batchData.domains1.wp_plugin_installed1,
-        wp_plugin_connected: batchData.domains1.wp_plugin_connected2
-      } : null
+    // Debug logging to understand the data structure
+    console.log('🔍 Debug - Push data structure:', {
+      batch_id: batchData.id,
+      batch_name: batchData.batch_name,
+      sitespren_id: sitesprenData.id,
+      sitespren_base: sitesprenData.sitespren_base,
+      true_root_domain: sitesprenData.true_root_domain,
+      selected_plans_count: selected_plan_ids.length,
+      found_plans_count: plansData.length,
+      has_api_key: !!dbUser.ruplin_api_key_1
     });
 
-    // Step 3: Create narpi_pushes record (no user ID needed - relationship through batch)
+    // Step 4: Create narpi_pushes record
     const insertData = {
-      push_name: `Push ${new Date().toISOString().split('T')[0]} - Batch ${batch_id.substring(0, 8)}`,
-      push_desc: `Automated image push using ${push_method} method`,
+      push_name: `Push ${new Date().toISOString().split('T')[0]} - ${sitesprenData.sitespren_base}`,
+      push_desc: `Automated image push to ${sitesprenData.sitespren_base} using ${push_method} method (${selected_plan_ids.length} selected images)`,
       push_status1: 'processing',
       fk_batch_id: batch_id,
       kareench1: []
     };
 
-    console.log('🔍 Debug - narpi_pushes insert data (no user ID):', insertData);
+    console.log('🔍 Debug - narpi_pushes insert data:', insertData);
 
     const { data: newPush, error: pushError } = await supabase
       .from('narpi_pushes')
@@ -180,7 +203,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 4: Upload images to WordPress
+    // Step 5: Upload images to WordPress
     const uploadResults: ImageUploadResult[] = [];
     let successCount = 0;
     let failureCount = 0;
@@ -202,11 +225,12 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        // Upload image to WordPress
+        // Upload image to WordPress using sitespren data
         const uploadResult = await uploadImageToWordPress(
           image.image_url,
           image.file_name || `image-${i + 1}.jpg`,
-          batchData.domains1,
+          sitesprenData,
+          dbUser.ruplin_api_key_1,
           push_method
         );
 
@@ -250,7 +274,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Step 5: Update narpi_pushes record with results
+    // Step 6: Update narpi_pushes record with results
     const finalStatus = failureCount === 0 ? 'completed' : (successCount === 0 ? 'failed' : 'partial');
     
     const { error: updateError } = await supabase
@@ -265,7 +289,7 @@ export async function POST(request: NextRequest) {
       console.error('Failed to update push record:', updateError);
     }
 
-    // Step 6: Return results
+    // Step 7: Return results
     return NextResponse.json({
       success: true,
       message: `Image push completed: ${successCount} successful, ${failureCount} failed`,
@@ -292,36 +316,25 @@ export async function POST(request: NextRequest) {
 async function uploadImageToWordPress(
   imageUrl: string,
   fileName: string,
-  domainData: any,
+  sitesprenData: any,
+  apiKey: string,
   pushMethod: string
 ): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
   try {
-    if (!domainData || !domainData.domain_base) {
-      return { success: false, error: 'No domain configured for this batch' };
+    if (!sitesprenData || !sitesprenData.sitespren_base) {
+      return { success: false, error: 'No sitespren site configured' };
     }
 
-    const siteUrl = domainData.domain_base.startsWith('http') 
-      ? domainData.domain_base 
-      : `https://${domainData.domain_base}`;
+    const siteUrl = sitesprenData.sitespren_base.startsWith('http') 
+      ? sitesprenData.sitespren_base 
+      : `https://${sitesprenData.sitespren_base}`;
 
-    if (pushMethod === 'wp_login') {
-      // Use WordPress login credentials method
-      if (!domainData.wpuser1 || !domainData.wppass1) {
-        return { success: false, error: 'WordPress login credentials not configured' };
-      }
-
-      return await uploadViaWordPressLogin(imageUrl, fileName, siteUrl, domainData.wpuser1, domainData.wppass1);
-
-    } else if (pushMethod === 'wp_plugin') {
-      // Use WordPress plugin connection
-      if (!domainData.wp_plugin_installed1 || !domainData.wp_plugin_connected2) {
-        return { success: false, error: 'WordPress plugin not installed or connected' };
-      }
-
-      return await uploadViaWordPressPlugin(imageUrl, fileName, siteUrl);
+    if (pushMethod === 'wp_plugin' || pushMethod === 'tebnar2_sitespren_push') {
+      // Use WordPress plugin connection with user API key
+      return await uploadViaWordPressPlugin(imageUrl, fileName, siteUrl, apiKey);
 
     } else {
-      return { success: false, error: 'Invalid push method specified' };
+      return { success: false, error: 'Invalid push method specified. Only wp_plugin method is supported for sitespren pushes.' };
     }
 
   } catch (error) {
@@ -332,107 +345,12 @@ async function uploadImageToWordPress(
   }
 }
 
-// Upload via WordPress login credentials
-async function uploadViaWordPressLogin(
-  imageUrl: string,
-  fileName: string,
-  siteUrl: string,
-  username: string,
-  password: string
-): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
-  try {
-    console.log(`🔄 Starting WordPress REST API upload: ${fileName} to ${siteUrl}`);
-
-    // Step 1: Download the image from the URL
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      return { 
-        success: false, 
-        error: `Failed to download image: ${imageResponse.status} ${imageResponse.statusText}` 
-      };
-    }
-
-    const imageBuffer = await imageResponse.arrayBuffer();
-    console.log(`✅ Downloaded image: ${imageBuffer.byteLength} bytes`);
-
-    // Step 2: Prepare WordPress REST API endpoint
-    const wpApiUrl = `${siteUrl}/wp-json/wp/v2/media`;
-    
-    // Step 3: Create FormData for multipart upload
-    const formData = new FormData();
-    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
-    formData.append('file', blob, fileName);
-    formData.append('title', fileName.replace(/\.[^/.]+$/, "")); // Remove extension for title
-    formData.append('alt_text', fileName.replace(/\.[^/.]+$/, ""));
-
-    // Step 4: Create Basic Auth header
-    const authString = btoa(`${username}:${password}`);
-    
-    console.log(`🔄 Uploading to WordPress: ${wpApiUrl}`);
-
-    // Step 5: Upload to WordPress
-    const uploadResponse = await fetch(wpApiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${authString}`,
-        // Don't set Content-Type - let the browser set it with boundary for FormData
-      },
-      body: formData
-    });
-
-    const responseText = await uploadResponse.text();
-    console.log(`📝 WordPress API Response Status: ${uploadResponse.status}`);
-    console.log(`📝 WordPress API Response: ${responseText.substring(0, 500)}...`);
-
-    if (!uploadResponse.ok) {
-      let errorMessage = `WordPress API error: ${uploadResponse.status}`;
-      
-      try {
-        const errorData = JSON.parse(responseText);
-        errorMessage = errorData.message || errorData.code || errorMessage;
-      } catch (e) {
-        errorMessage = `${errorMessage} - ${responseText.substring(0, 200)}`;
-      }
-
-      return { 
-        success: false, 
-        error: errorMessage
-      };
-    }
-
-    // Step 6: Parse successful response
-    let responseData;
-    try {
-      responseData = JSON.parse(responseText);
-    } catch (e) {
-      return { 
-        success: false, 
-        error: 'Invalid JSON response from WordPress API' 
-      };
-    }
-
-    console.log(`✅ WordPress upload successful: ID ${responseData.id}`);
-
-    return {
-      success: true,
-      wp_url: responseData.source_url || responseData.guid?.rendered || `${siteUrl}/wp-content/uploads/${fileName}`,
-      wp_image_id: responseData.id
-    };
-
-  } catch (error) {
-    console.error('WordPress upload error:', error);
-    return {
-      success: false,
-      error: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-    };
-  }
-}
-
 // Upload via WordPress plugin connection
 async function uploadViaWordPressPlugin(
   imageUrl: string,
   fileName: string,
-  siteUrl: string
+  siteUrl: string,
+  apiKey: string
 ): Promise<{ success: boolean; wp_url?: string; wp_image_id?: number; error?: string }> {
   try {
     console.log(`🔄 Starting WordPress Plugin upload: ${fileName} to ${siteUrl}`);
@@ -449,23 +367,13 @@ async function uploadViaWordPressPlugin(
     const imageBuffer = await imageResponse.arrayBuffer();
     console.log(`✅ Downloaded image: ${imageBuffer.byteLength} bytes`);
 
-    // Step 2: Get WordPress plugin API key from environment
-    const pluginApiKey = process.env.WORDPRESS_UPLOAD_API_KEY;
-    if (!pluginApiKey) {
-      return {
-        success: false,
-        error: 'WordPress plugin API key not configured in environment variables'
-      };
-    }
-
-    // Step 3: Prepare WordPress plugin upload endpoint
+    // Step 2: Prepare WordPress plugin upload endpoint
     const wpPluginUrl = `${siteUrl}/wp-json/snefuru/v1/upload-image`;
     
-    // Step 4: Create FormData for multipart upload
+    // Step 3: Create FormData for multipart upload
     const formData = new FormData();
     const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
     formData.append('file', blob, fileName);
-    formData.append('api_key', pluginApiKey);
     formData.append('filename', fileName);
     
     // Add metadata if available
@@ -474,14 +382,16 @@ async function uploadViaWordPressPlugin(
     // formData.append('plan_id', planId);
 
     console.log(`🔄 Uploading to WordPress Plugin: ${wpPluginUrl}`);
+    console.log(`🔑 Using API key: ${apiKey?.substring(0, 8)}...`);
 
-    // Step 5: Upload to WordPress via plugin
+    // Step 4: Upload to WordPress via plugin
     const uploadResponse = await fetch(wpPluginUrl, {
       method: 'POST',
       body: formData,
       headers: {
-        // Don't set Content-Type - let the browser set it with boundary for FormData
+        'Authorization': `Bearer ${apiKey}`,
         'User-Agent': 'Snefuru-NextJS-App/1.0'
+        // Don't set Content-Type - let the browser set it with boundary for FormData
       }
     });
 
@@ -489,6 +399,7 @@ async function uploadViaWordPressPlugin(
     console.log(`📝 WordPress Plugin Response Status: ${uploadResponse.status}`);
     console.log(`📝 WordPress Plugin Response: ${responseText.substring(0, 500)}...`);
 
+    // Step 5: Handle response
     if (!uploadResponse.ok) {
       let errorMessage = `WordPress Plugin API error: ${uploadResponse.status}`;
       
