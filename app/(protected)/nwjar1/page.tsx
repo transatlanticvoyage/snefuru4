@@ -268,6 +268,11 @@ export default function NwJar1Page() {
   const handlePopupOpen = () => {
     setIsPopupOpen(true);
     
+    // Set default selection if neither option is selected
+    if (!kz101Checked && !kz103Checked) {
+      setKz101Checked(true);
+    }
+    
     // Check if URL has specific tab parameter
     const urlParams = new URLSearchParams(window.location.search);
     const hasTabInUrl = ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7']
@@ -298,8 +303,25 @@ export default function NwJar1Page() {
 
   // f47_generate_gcon_pieces handler
   const handleF47GenerateGconPieces = async () => {
-    if (selectedContentIds.size === 0) {
-      alert('Please select at least one item from the table');
+    let itemsToProcess: string[] = [];
+    
+    if (kz101Checked) {
+      // SOPTION1: Use selected items
+      if (selectedContentIds.size === 0) {
+        alert('Please select at least one item from the table');
+        return;
+      }
+      itemsToProcess = Array.from(selectedContentIds);
+    } else if (kz103Checked) {
+      // SOPTION2: Use all items in current filtered data
+      itemsToProcess = nwpiContent.map(item => item.internal_post_id);
+    } else {
+      alert('Please select either SOPTION1 or SOPTION2');
+      return;
+    }
+
+    if (itemsToProcess.length === 0) {
+      alert('No items to process');
       return;
     }
 
@@ -311,14 +333,14 @@ export default function NwJar1Page() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          internal_post_ids: Array.from(selectedContentIds)
+          internal_post_ids: itemsToProcess
         }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        alert(`Successfully generated ${result.data.created_count} GCon pieces`);
+        alert(`Successfully generated ${result.data.created_count} GCon pieces from ${itemsToProcess.length} items`);
         // Could refresh data or show more detailed results here
       } else {
         alert(`Error: ${result.error || 'Failed to generate GCon pieces'}`);
@@ -531,7 +553,7 @@ export default function NwJar1Page() {
                     height: '18px'
                   }}
                 />
-                SOPTION1 - Use Your Current Selection From Table | (Dynamic Count)
+                SOPTION1 - Use Your Current Selection From Table | {selectedContentIds.size} rows
               </div>
               <div 
                 className="flex items-center kz102 font-bold"
@@ -564,7 +586,7 @@ export default function NwJar1Page() {
                     height: '18px'
                   }}
                 />
-                SOPTION2 - Select All Items In Current Pagination | (DYNAMIC COUNT)
+                SOPTION2 - Select All Items In Current Pagination | {nwpiContent.length} rows
               </div>
               
               {/* Close button in header - spans both bars */}
@@ -616,23 +638,33 @@ export default function NwJar1Page() {
                     <div className="space-y-4">
                       <button
                         onClick={handleF47GenerateGconPieces}
-                        disabled={f47Loading || selectedContentIds.size === 0}
+                        disabled={f47Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)}
                         className={`px-4 py-2 rounded font-medium ${
-                          f47Loading || selectedContentIds.size === 0
+                          f47Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)
                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             : 'bg-blue-600 text-white hover:bg-blue-700'
                         }`}
                       >
                         {f47Loading ? 'Processing...' : 'f47_generate_gcon_pieces'}
                       </button>
-                      {selectedContentIds.size === 0 && (
+                      {!kz101Checked && !kz103Checked && (
                         <p className="text-sm text-gray-500">
-                          Select items from the table to enable this function
+                          Select either SOPTION1 or SOPTION2 to enable this function
                         </p>
                       )}
-                      {selectedContentIds.size > 0 && (
+                      {kz101Checked && selectedContentIds.size === 0 && (
+                        <p className="text-sm text-gray-500">
+                          SOPTION1 selected: Select items from the table to enable this function
+                        </p>
+                      )}
+                      {kz101Checked && selectedContentIds.size > 0 && (
                         <p className="text-sm text-gray-600">
-                          {selectedContentIds.size} item(s) selected
+                          SOPTION1 selected: {selectedContentIds.size} item(s) will be processed
+                        </p>
+                      )}
+                      {kz103Checked && (
+                        <p className="text-sm text-gray-600">
+                          SOPTION2 selected: All {nwpiContent.length} items will be processed
                         </p>
                       )}
                     </div>
