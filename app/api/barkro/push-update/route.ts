@@ -113,7 +113,8 @@ export async function POST(request: NextRequest) {
     };
 
     // Send update notification to the WordPress site
-    const wpApiUrl = `${site.sitespren_base}/wp-json/snefuru/v1/check-update`;
+    const siteBaseUrl = site.sitespren_base.startsWith('http') ? site.sitespren_base : `https://${site.sitespren_base}`;
+    const wpApiUrl = `${siteBaseUrl}/wp-json/snefuru/v1/check-update`;
     
     try {
       const response = await fetch(wpApiUrl, {
