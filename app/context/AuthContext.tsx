@@ -59,6 +59,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Create a record in the users table
     if (data.user) {
+      // Generate a unique API key with ruplin_ prefix
+      const generateApiKey = () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = 'ruplin_';
+        for (let i = 0; i < 32; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      };
+
+      const apiKey = generateApiKey();
+
       const { error: userError } = await supabase
         .from('users')
         .insert({
@@ -66,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: data.user.email,
           is_admin: false,
           created_at: new Date().toISOString(),
+          ruplin_api_key_1: apiKey,
         });
       
       if (userError) {
