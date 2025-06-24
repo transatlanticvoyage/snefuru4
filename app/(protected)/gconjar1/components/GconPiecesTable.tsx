@@ -34,6 +34,8 @@ interface GconPiece {
 interface GconPiecesTableProps {
   initialData: GconPiece[];
   userId: string;
+  selectedRows?: Set<string>;
+  onSelectionChange?: (selectedRows: Set<string>) => void;
 }
 
 type SortField = "meta_title" | "asn_sitespren_base" | "pub_status" | "date_time_pub_carry" | "pageslug" | "created_at" | "updated_at";
@@ -109,7 +111,7 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   }
 };
 
-export default function GconPiecesTable({ initialData, userId }: GconPiecesTableProps) {
+export default function GconPiecesTable({ initialData, userId, selectedRows: externalSelectedRows, onSelectionChange }: GconPiecesTableProps) {
   const [data, setData] = useState<GconPiece[]>(initialData);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -120,13 +122,17 @@ export default function GconPiecesTable({ initialData, userId }: GconPiecesTable
   const [filterPage, setFilterPage] = useState("");
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
   const [updatingStars, setUpdatingStars] = useState<Set<string>>(new Set());
   const [nsFullData, setNsFullData] = useState<string>('');
   
   const router = useRouter();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
+
+  // Use external selection state if provided, otherwise use internal state
+  const selectedRows = externalSelectedRows || internalSelectedRows;
+  const setSelectedRows = onSelectionChange || setInternalSelectedRows;
 
   // Fetch custom colors for native tier
   const { colors } = useCustomColors(['nativetier_gconjar_bgcolor1']);
