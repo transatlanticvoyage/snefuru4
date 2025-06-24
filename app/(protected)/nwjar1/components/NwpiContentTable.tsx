@@ -50,6 +50,8 @@ interface NwpiContent {
 interface NwpiContentTableProps {
   data: NwpiContent[];
   userId: string;
+  selectedRows?: Set<string>;
+  onSelectionChange?: (selectedRows: Set<string>) => void;
 }
 
 type SortField = 'post_title' | 'fk_sitespren_base' | 'post_type' | 'post_status' | 'i_sync_completed_at' | 'created_at';
@@ -136,7 +138,7 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   }
 };
 
-export default function NwpiContentTable({ data, userId }: NwpiContentTableProps) {
+export default function NwpiContentTable({ data, userId, selectedRows: externalSelectedRows, onSelectionChange }: NwpiContentTableProps) {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -147,7 +149,7 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
   const [filterType, setFilterType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterSyncMethod, setFilterSyncMethod] = useState('');
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
   const [nsFullData, setNsFullData] = useState<string>('');
@@ -155,6 +157,10 @@ export default function NwpiContentTable({ data, userId }: NwpiContentTableProps
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
+
+  // Use external selection state if provided, otherwise use internal state
+  const selectedRows = externalSelectedRows || internalSelectedRows;
+  const setSelectedRows = onSelectionChange || setInternalSelectedRows;
 
   // Fetch custom colors for native tier
   const { colors } = useCustomColors(['nativetier_nwjar_bgcolor1']);

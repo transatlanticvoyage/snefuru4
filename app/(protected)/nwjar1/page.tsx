@@ -19,6 +19,8 @@ export default function NwJar1Page() {
   const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [currentUrl, setCurrentUrl] = useState<string>('');
+  const [selectedContentIds, setSelectedContentIds] = useState<Set<string>>(new Set());
+  const [f47Loading, setF47Loading] = useState(false);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -292,6 +294,41 @@ export default function NwJar1Page() {
     setActivePopupTab(tab as any);
     localStorage.setItem('nwjar1_lastActiveTab', tab); // Remember this tab for next time
     updatePopupURL(true, tab);
+  };
+
+  // f47_generate_gcon_pieces handler
+  const handleF47GenerateGconPieces = async () => {
+    if (selectedContentIds.size === 0) {
+      alert('Please select at least one item from the table');
+      return;
+    }
+
+    setF47Loading(true);
+    try {
+      const response = await fetch('/api/f47_generate_gcon_pieces', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          internal_post_ids: Array.from(selectedContentIds)
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(`Successfully generated ${result.data.created_count} GCon pieces`);
+        // Could refresh data or show more detailed results here
+      } else {
+        alert(`Error: ${result.error || 'Failed to generate GCon pieces'}`);
+      }
+    } catch (error) {
+      console.error('Error calling f47_generate_gcon_pieces:', error);
+      alert('An error occurred while generating GCon pieces');
+    } finally {
+      setF47Loading(false);
+    }
   };
 
   return (
@@ -575,8 +612,30 @@ export default function NwJar1Page() {
               <div className="p-8 h-full overflow-auto">
                 {activePopupTab === 'ptab1' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab1</h3>
-                    <p className="text-gray-600">This is the content area for ptab1.</p>
+                    <h3 className="text-lg font-semibold mb-4">Functions</h3>
+                    <div className="space-y-4">
+                      <button
+                        onClick={handleF47GenerateGconPieces}
+                        disabled={f47Loading || selectedContentIds.size === 0}
+                        className={`px-4 py-2 rounded font-medium ${
+                          f47Loading || selectedContentIds.size === 0
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                      >
+                        {f47Loading ? 'Processing...' : 'f47_generate_gcon_pieces'}
+                      </button>
+                      {selectedContentIds.size === 0 && (
+                        <p className="text-sm text-gray-500">
+                          Select items from the table to enable this function
+                        </p>
+                      )}
+                      {selectedContentIds.size > 0 && (
+                        <p className="text-sm text-gray-600">
+                          {selectedContentIds.size} item(s) selected
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
                 {activePopupTab === 'ptab2' && (
@@ -625,6 +684,8 @@ export default function NwJar1Page() {
         <NwpiContentTable 
           data={nwpiContent} 
           userId={user.id}
+          selectedRows={selectedContentIds}
+          onSelectionChange={setSelectedContentIds}
         />
       ) : (
         <div className="bg-white rounded-lg shadow p-8 text-center">
