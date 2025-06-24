@@ -34,13 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if plugin is installed on the site
-    if (!site.wp_plugin_installed1) {
-      return NextResponse.json(
-        { success: false, message: 'WordPress plugin not installed on this site' },
-        { status: 400 }
-      );
-    }
+    // Removed: No longer checking wp_plugin_installed1 - will test connectivity directly
 
     // Get current plugin version from the database
     const { data: currentVersion, error: versionError } = await supabase
