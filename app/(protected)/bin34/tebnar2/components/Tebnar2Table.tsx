@@ -63,8 +63,10 @@ const tbn2_headerCustomizationSettings = {
     backgroundColor: '#f7ead4',
     overflow: 'hidden' as const,
     textOverflow: 'ellipsis' as const,
-    whiteSpace: 'nowrap' as const,
+    whiteSpace: 'normal' as const,
     wordBreak: 'break-word' as const,
+    wordWrap: 'break-word' as const,
+    hyphens: 'auto' as const,
     boxSizing: 'border-box' as const,
   },
   
@@ -561,7 +563,14 @@ export default function Tebnar2Table({
                       lineHeight: tbn2_headerCustomizationSettings.headerText.lineHeight,
                       fontFamily: tbn2_headerCustomizationSettings.headerText.fontFamily,
                       padding: '4px 4px',
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      overflow: tbn2_headerCustomizationSettings.headerCell.overflow,
+                      textOverflow: tbn2_headerCustomizationSettings.headerCell.textOverflow,
+                      whiteSpace: tbn2_headerCustomizationSettings.headerCell.whiteSpace,
+                      wordBreak: tbn2_headerCustomizationSettings.headerCell.wordBreak,
+                      wordWrap: tbn2_headerCustomizationSettings.headerCell.wordWrap,
+                      hyphens: tbn2_headerCustomizationSettings.headerCell.hyphens,
+                      boxSizing: tbn2_headerCustomizationSettings.headerCell.boxSizing
                     }}
                   >
                     {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
@@ -590,7 +599,14 @@ export default function Tebnar2Table({
                       lineHeight: tbn2_headerCustomizationSettings.headerText.lineHeight,
                       fontFamily: tbn2_headerCustomizationSettings.headerText.fontFamily,
                       padding: '4px 4px',
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      overflow: tbn2_headerCustomizationSettings.headerCell.overflow,
+                      textOverflow: tbn2_headerCustomizationSettings.headerCell.textOverflow,
+                      whiteSpace: tbn2_headerCustomizationSettings.headerCell.whiteSpace,
+                      wordBreak: tbn2_headerCustomizationSettings.headerCell.wordBreak,
+                      wordWrap: tbn2_headerCustomizationSettings.headerCell.wordWrap,
+                      hyphens: tbn2_headerCustomizationSettings.headerCell.hyphens,
+                      boxSizing: tbn2_headerCustomizationSettings.headerCell.boxSizing
                     }}
                   >
                     {col.startsWith('image') && col.includes('preview') ? 'Preview' : col}
