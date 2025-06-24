@@ -758,8 +758,38 @@ export default function Narpo1Page() {
                             )}
                             {col === 'kareench1' && (
                               <div className="flex items-center space-x-2">
-                                <div className="text-xs font-mono text-gray-600 max-w-xs">
-                                  {push.kareench1 ? (
+                                <div className="text-xs text-gray-600 max-w-xs">
+                                  {push.kareench1 && Array.isArray(push.kareench1) ? (
+                                    <div className="space-y-1">
+                                      {(() => {
+                                        const results = push.kareench1;
+                                        const total = results.length;
+                                        const success = results.filter((r: any) => r.nupload_status1 === 'success').length;
+                                        const failed = results.filter((r: any) => r.nupload_status1 === 'failed').length;
+                                        const errors = results.filter((r: any) => r.error_message).length;
+                                        
+                                        return (
+                                          <>
+                                            <div className="flex space-x-2 text-xs">
+                                              <span className="bg-blue-100 text-blue-800 px-1 rounded">Total: {total}</span>
+                                              <span className="bg-green-100 text-green-800 px-1 rounded">✓ {success}</span>
+                                              <span className="bg-red-100 text-red-800 px-1 rounded">✗ {failed}</span>
+                                            </div>
+                                            {errors > 0 && (
+                                              <div className="text-red-600 text-xs">
+                                                {errors} error{errors !== 1 ? 's' : ''} reported
+                                              </div>
+                                            )}
+                                            {failed > 0 && (
+                                              <div className="text-xs text-gray-500">
+                                                Click "individual view" for error details
+                                              </div>
+                                            )}
+                                          </>
+                                        );
+                                      })()}
+                                    </div>
+                                  ) : push.kareench1 ? (
                                     <div className="truncate" title={typeof push.kareench1 === 'string' ? push.kareench1 : JSON.stringify(push.kareench1)}>
                                       {typeof push.kareench1 === 'string' 
                                         ? (push.kareench1.length > 50 ? `${push.kareench1.substring(0, 50)}...` : push.kareench1)
@@ -780,7 +810,7 @@ export default function Narpo1Page() {
                                         ? 'text-green-800 bg-green-100'
                                         : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
                                     } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors`}
-                                    title="Copy kareench1 data"
+                                    title="Copy full kareench1 data"
                                   >
                                     {copiedId === push.id ? (
                                       <>
