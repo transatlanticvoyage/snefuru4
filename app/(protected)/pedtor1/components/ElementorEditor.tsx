@@ -41,7 +41,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
   const [isSaving, setIsSaving] = useState(false);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState<'cached' | 'edits' | 'updateEndSite' | 'comparison'>('cached');
+  const [activeTab, setActiveTab] = useState<'cached' | 'edits' | 'talkToAi1' | 'updateEndSite' | 'comparison'>('cached');
   
   const supabase = createClientComponentClient();
 
@@ -308,6 +308,16 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
             )}
           </button>
           <button
+            onClick={() => setActiveTab('talkToAi1')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'talkToAi1'
+                ? 'border-teal-500 text-teal-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            talk to ai - 1
+          </button>
+          <button
             onClick={() => setActiveTab('updateEndSite')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'updateEndSite'
@@ -434,6 +444,12 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
           <p className="text-sm text-gray-500">
             This field is for your custom modifications to the Elementor data.
           </p>
+        </div>
+      )}
+
+      {activeTab === 'talkToAi1' && (
+        <div className="space-y-4">
+          {/* Content will be added later based on further instructions */}
         </div>
       )}
 
