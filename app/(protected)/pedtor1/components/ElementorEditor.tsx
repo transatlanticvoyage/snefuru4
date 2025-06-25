@@ -658,10 +658,37 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
     }
   }, [userInternalId, supabase]);
 
+  // Function to construct the full prompt with pelementor_edits data
+  const constructFullPrompt = (userPrompt: string) => {
+    const baseTemplate = `
+
+
+==========================================================
+Here below is my elementor data for the page I'm working on:
+==========================================================
+${pelementorEditsLocal}`;
+
+    if (userPrompt.trim()) {
+      return `${userPrompt}${baseTemplate}`;
+    }
+    return baseTemplate;
+  };
+
   // Update local pelementor_edits when prop changes
   useEffect(() => {
     setPelementorEditsLocal(pelementorEdits);
   }, [pelementorEdits]);
+
+  // Update actual_prompt_submission when pelementorEditsLocal changes
+  useEffect(() => {
+    const currentUserPrompt = promptMode === 'utility' ? selectedPromptContent : manualPromptText;
+    setActualPromptSubmission(constructFullPrompt(currentUserPrompt));
+  }, [pelementorEditsLocal, promptMode, selectedPromptContent, manualPromptText, constructFullPrompt]);
+
+  // Initialize actual_prompt_submission on component mount
+  useEffect(() => {
+    setActualPromptSubmission(constructFullPrompt(''));
+  }, []);
 
   // Handle prompt selection
   const handlePromptSelection = (promptId: string) => {
@@ -669,11 +696,11 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
     const selectedPrompt = utilityPrompts.find(p => p.prompt_id === promptId);
     if (selectedPrompt) {
       setSelectedPromptContent(selectedPrompt.prompt_content || '');
-      // Automatically update actual_prompt_submission when prompt is selected
-      setActualPromptSubmission(selectedPrompt.prompt_content || '');
+      // Automatically update actual_prompt_submission with constructed prompt
+      setActualPromptSubmission(constructFullPrompt(selectedPrompt.prompt_content || ''));
     } else {
       setSelectedPromptContent('');
-      setActualPromptSubmission('');
+      setActualPromptSubmission(constructFullPrompt(''));
     }
   };
 
@@ -683,12 +710,12 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
     if (mode === 'utility') {
       // Clear manual input when switching to utility mode
       setManualPromptText('');
-      setActualPromptSubmission(selectedPromptContent);
+      setActualPromptSubmission(constructFullPrompt(selectedPromptContent));
     } else {
       // Clear utility selection when switching to manual mode
       setSelectedPromptId('');
       setSelectedPromptContent('');
-      setActualPromptSubmission(manualPromptText);
+      setActualPromptSubmission(constructFullPrompt(manualPromptText));
     }
   };
 
@@ -696,7 +723,7 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
   const handleManualPromptChange = (text: string) => {
     setManualPromptText(text);
     if (promptMode === 'manual') {
-      setActualPromptSubmission(text);
+      setActualPromptSubmission(constructFullPrompt(text));
     }
   };
 
@@ -912,7 +939,7 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
             setSelectedApiKeySlot('');
             setSelectedPromptId('');
             setSelectedPromptContent('');
-            setActualPromptSubmission('');
+            setActualPromptSubmission(constructFullPrompt(''));
             setResponse1Raw('');
             setResponse1MeatExtracted('');
             setManualPromptText('');
