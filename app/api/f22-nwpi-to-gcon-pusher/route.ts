@@ -118,32 +118,46 @@ export async function POST(request: NextRequest) {
         
         console.log(`🔄 Processing: ${nwpiRecord.post_title} (ID: ${nwpiRecord.internal_post_id})`);
 
-        // Check if record already exists (based on asn_nwpi_posts_id)
+        // Check if record already exists based on g_post_id, sitespren_base, and user
         const { data: existingRecord } = await supabase
           .from('gcon_pieces')
           .select('id')
           .eq('fk_users_id', userData.id)
-          .eq('asn_nwpi_posts_id', gconData.asn_nwpi_posts_id)
+          .eq('g_post_id', nwpiRecord.post_id)
+          .eq('asn_sitespren_base', nwpiRecord.fk_sitespren_base)
           .single();
 
         if (existingRecord) {
-          console.log(`⚠️ Skipping existing record: ${gconData.asn_nwpi_posts_id}`);
-          results.errors.push(`Skipped existing record: ${nwpiRecord.post_title}`);
-          continue;
-        }
+          // UPDATE existing record instead of skipping
+          console.log(`🔄 Updating existing record: post_id=${nwpiRecord.post_id}, sitespren=${nwpiRecord.fk_sitespren_base}`);
+          
+          const { error: updateError } = await supabase
+            .from('gcon_pieces')
+            .update(gconData)
+            .eq('id', existingRecord.id);
 
-        // Insert into gcon_pieces
-        const { error: insertError } = await supabase
-          .from('gcon_pieces')
-          .insert([gconData]);
-
-        if (insertError) {
-          console.error(`❌ Failed to insert record ${nwpiRecord.internal_post_id}:`, insertError);
-          results.failed++;
-          results.errors.push(`Failed to insert "${nwpiRecord.post_title}": ${insertError.message}`);
+          if (updateError) {
+            console.error(`❌ Failed to update record ${nwpiRecord.internal_post_id}:`, updateError);
+            results.failed++;
+            results.errors.push(`Failed to update "${nwpiRecord.post_title}": ${updateError.message}`);
+          } else {
+            console.log(`✅ Successfully updated: ${nwpiRecord.post_title}`);
+            results.succeeded++;
+          }
         } else {
-          console.log(`✅ Successfully inserted: ${nwpiRecord.post_title}`);
-          results.succeeded++;
+          // Insert new record
+          const { error: insertError } = await supabase
+            .from('gcon_pieces')
+            .insert([gconData]);
+
+          if (insertError) {
+            console.error(`❌ Failed to insert record ${nwpiRecord.internal_post_id}:`, insertError);
+            results.failed++;
+            results.errors.push(`Failed to insert "${nwpiRecord.post_title}": ${insertError.message}`);
+          } else {
+            console.log(`✅ Successfully inserted: ${nwpiRecord.post_title}`);
+            results.succeeded++;
+          }
         }
 
       } catch (recordError) {
