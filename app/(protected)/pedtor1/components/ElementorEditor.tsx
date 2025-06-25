@@ -36,6 +36,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
     pelementor_cached: gconPiece.pelementor_cached ? JSON.stringify(gconPiece.pelementor_cached, null, 2) : '',
     pelementor_edits: gconPiece.pelementor_edits ? JSON.stringify(gconPiece.pelementor_edits, null, 2) : ''
   });
+  const [imagePackInput, setImagePackInput] = useState('');
   
   const [isSaving, setIsSaving] = useState(false);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
@@ -196,6 +197,11 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
     return data ? `${(data.length / 1024).toFixed(1)} KB` : '0 KB';
   };
 
+  const handleF204TellAiToolToKarfi = () => {
+    // Placeholder function - no backend functionality yet
+    alert('f204_tell_ai_tool_to_karfi function called (not implemented yet)');
+  };
+
   const hasElementorData = formData.pelementor_cached.trim() || formData.pelementor_edits.trim();
 
   return (
@@ -350,7 +356,27 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
       )}
 
       {activeTab === 'edits' && (
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Image Pack Input Section */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">
+              paste your image pack here
+            </label>
+            <textarea
+              value={imagePackInput}
+              onChange={(e) => setImagePackInput(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              style={{ width: '500px', height: '200px' }}
+              placeholder="Paste your image pack data here..."
+            />
+            <button
+              onClick={handleF204TellAiToolToKarfi}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
+            >
+              f204_tell_ai_tool_to_karfi
+            </button>
+          </div>
+
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Pelementor Edits Data</h3>
             <div className="flex space-x-2">
