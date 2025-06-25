@@ -448,9 +448,11 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
       )}
 
       {activeTab === 'talkToAi1' && (
-        <div className="space-y-4">
-          {/* Content will be added later based on further instructions */}
-        </div>
+        <TalkToAiTab 
+          gconPiece={gconPiece}
+          userInternalId={userInternalId}
+          pelementorEdits={formData.pelementor_edits}
+        />
       )}
 
       {activeTab === 'updateEndSite' && (
@@ -538,6 +540,173 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
             Reset
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Talk to AI Tab Component
+interface TalkToAiTabProps {
+  gconPiece: GconPiece;
+  userInternalId: string;
+  pelementorEdits: string;
+}
+
+function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTabProps) {
+  const [selectedPromptId, setSelectedPromptId] = useState<string>('');
+  const [selectedPromptContent, setSelectedPromptContent] = useState<string>('');
+  const [pelementorEditsLocal, setPelementorEditsLocal] = useState<string>(pelementorEdits);
+  const [actualPromptSubmission, setActualPromptSubmission] = useState<string>('');
+  const [responseOutput, setResponseOutput] = useState<string>('');
+  const [utilityPrompts, setUtilityPrompts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const supabase = createClientComponentClient();
+
+  // Fetch utility prompts on component mount
+  useEffect(() => {
+    const fetchUtilityPrompts = async () => {
+      try {
+        // Get user's own prompts AND public prompts
+        const { data: promptsData, error } = await supabase
+          .from('utility_prompts')
+          .select('*')
+          .or(`fk_user_id.eq.${userInternalId},is_special_public_prompt.eq.true`)
+          .order('prompt_name', { ascending: true });
+
+        if (!error && promptsData) {
+          setUtilityPrompts(promptsData);
+        }
+      } catch (err) {
+        console.error('Error fetching utility prompts:', err);
+      }
+    };
+
+    if (userInternalId) {
+      fetchUtilityPrompts();
+    }
+  }, [userInternalId, supabase]);
+
+  // Update local pelementor_edits when prop changes
+  useEffect(() => {
+    setPelementorEditsLocal(pelementorEdits);
+  }, [pelementorEdits]);
+
+  // Handle prompt selection
+  const handlePromptSelection = (promptId: string) => {
+    setSelectedPromptId(promptId);
+    const selectedPrompt = utilityPrompts.find(p => p.prompt_id === promptId);
+    if (selectedPrompt) {
+      setSelectedPromptContent(selectedPrompt.prompt_content || '');
+      // Automatically update actual_prompt_submission when prompt is selected
+      setActualPromptSubmission(selectedPrompt.prompt_content || '');
+    } else {
+      setSelectedPromptContent('');
+      setActualPromptSubmission('');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Dropdown for utility prompt selection */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Select your utility prompt
+        </label>
+        <select
+          value={selectedPromptId}
+          onChange={(e) => handlePromptSelection(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="">-- Select a utility prompt --</option>
+          {utilityPrompts.map((prompt) => (
+            <option key={prompt.prompt_id} value={prompt.prompt_id}>
+              {prompt.prompt_name || `Prompt ${prompt.prompt_id.slice(0, 8)}`}
+              {prompt.is_special_public_prompt && prompt.fk_user_id !== userInternalId ? ' (Public)' : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Selected prompt content display */}
+      {selectedPromptContent && (
+        <div>
+          <textarea
+            value={selectedPromptContent}
+            readOnly
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-none"
+            style={{ height: '100px' }}
+            placeholder="Selected prompt content will appear here..."
+          />
+        </div>
+      )}
+
+      <hr className="border-gray-300" />
+
+      {/* pelementor_edits section */}
+      <div>
+        <div className="font-bold text-gray-900 mb-2">pelementor_edits</div>
+        <textarea
+          value={pelementorEditsLocal}
+          onChange={(e) => setPelementorEditsLocal(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+          style={{ height: '100px' }}
+          placeholder="Pelementor edits data..."
+        />
+      </div>
+
+      <hr className="border-gray-300" />
+
+      {/* actual_prompt_submission section */}
+      <div>
+        <div className="font-bold text-gray-900 mb-2">actual_prompt_submission</div>
+        <textarea
+          value={actualPromptSubmission}
+          onChange={(e) => setActualPromptSubmission(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+          style={{ height: '100px' }}
+          placeholder="The actual prompt that will be submitted to AI..."
+        />
+      </div>
+
+      <hr className="border-gray-300" />
+
+      {/* response_output section */}
+      <div>
+        <div className="font-bold text-gray-900 mb-2">response_output</div>
+        <textarea
+          value={responseOutput}
+          onChange={(e) => setResponseOutput(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+          style={{ height: '100px' }}
+          placeholder="AI response will appear here..."
+        />
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-4 pt-4">
+        <button
+          onClick={() => {
+            // TODO: Implement AI submission logic
+            console.log('Submit to AI:', actualPromptSubmission);
+          }}
+          disabled={!actualPromptSubmission.trim() || loading}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium rounded-md transition-colors"
+        >
+          {loading ? 'Submitting...' : 'Submit to AI'}
+        </button>
+        
+        <button
+          onClick={() => {
+            setSelectedPromptId('');
+            setSelectedPromptContent('');
+            setActualPromptSubmission('');
+            setResponseOutput('');
+          }}
+          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition-colors"
+        >
+          Clear All
+        </button>
       </div>
     </div>
   );
