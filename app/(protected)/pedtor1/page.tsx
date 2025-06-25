@@ -183,9 +183,30 @@ export default function Pedtor1Page() {
               Site: {gconPiece.asn_sitespren_base}
             </p>
           )}
-          <p className="mt-1 text-sm text-gray-500">
-            pageurl: {gconPiece.pageurl || 'Not set'}
-          </p>
+          <div className="mt-1 text-sm text-gray-500 flex items-center gap-2">
+            <span>pageurl:</span>
+            {gconPiece.pageurl && (
+              <>
+                <button
+                  onClick={() => window.open(gconPiece.pageurl, '_blank')}
+                  className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
+                  title="Open URL in new tab"
+                >
+                  Open
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(gconPiece.pageurl || '');
+                  }}
+                  className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors"
+                  title="Copy URL to clipboard"
+                >
+                  Copy
+                </button>
+              </>
+            )}
+            <span>{gconPiece.pageurl || 'Not set'}</span>
+          </div>
         </div>
       </div>
 
