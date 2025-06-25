@@ -21,6 +21,9 @@ interface GconPiece {
   date_time_pub_carry: string | null;
   pageslug: string | null;
   pageurl: string | null;
+  response1_model_used: string | null;
+  response1_raw: string | null;
+  response1_meat_extracted: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -315,7 +318,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            talk to ai - 1
+            talk1
           </button>
           <button
             onClick={() => setActiveTab('updateEndSite')}
@@ -557,7 +560,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
   const [selectedPromptContent, setSelectedPromptContent] = useState<string>('');
   const [pelementorEditsLocal, setPelementorEditsLocal] = useState<string>(pelementorEdits);
   const [actualPromptSubmission, setActualPromptSubmission] = useState<string>('');
-  const [responseOutput, setResponseOutput] = useState<string>('');
+  const [response1Raw, setResponse1Raw] = useState<string>(gconPiece.response1_raw || '');
+  const [response1MeatExtracted, setResponse1MeatExtracted] = useState<string>(gconPiece.response1_meat_extracted || '');
   const [utilityPrompts, setUtilityPrompts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -671,15 +675,43 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
 
       <hr className="border-gray-300" />
 
-      {/* response_output section */}
+      {/* response1_model_used section */}
       <div>
-        <div className="font-bold text-gray-900 mb-2">response_output</div>
+        <div className="font-bold text-gray-900 mb-2">response1_model_used</div>
+        <input
+          type="text"
+          value={gconPiece.response1_model_used || ''}
+          readOnly
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm"
+          placeholder="AI model name will appear here..."
+        />
+      </div>
+
+      <hr className="border-gray-300" />
+
+      {/* response1_raw section */}
+      <div>
+        <div className="font-bold text-gray-900 mb-2">response1_raw</div>
         <textarea
-          value={responseOutput}
-          onChange={(e) => setResponseOutput(e.target.value)}
+          value={response1Raw}
+          onChange={(e) => setResponse1Raw(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
           style={{ height: '100px' }}
-          placeholder="AI response will appear here..."
+          placeholder="Raw AI response will appear here..."
+        />
+      </div>
+
+      <hr className="border-gray-300" />
+
+      {/* response1_meat_extracted section */}
+      <div>
+        <div className="font-bold text-gray-900 mb-2">response1_meat_extracted</div>
+        <textarea
+          value={response1MeatExtracted}
+          onChange={(e) => setResponse1MeatExtracted(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+          style={{ height: '100px' }}
+          placeholder="Extracted meaningful content from AI response..."
         />
       </div>
 
@@ -701,7 +733,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
             setSelectedPromptId('');
             setSelectedPromptContent('');
             setActualPromptSubmission('');
-            setResponseOutput('');
+            setResponse1Raw('');
+            setResponse1MeatExtracted('');
           }}
           className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition-colors"
         >
