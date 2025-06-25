@@ -563,31 +563,44 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
   const [response1Raw, setResponse1Raw] = useState<string>(gconPiece.response1_raw || '');
   const [response1MeatExtracted, setResponse1MeatExtracted] = useState<string>(gconPiece.response1_meat_extracted || '');
   const [utilityPrompts, setUtilityPrompts] = useState<any[]>([]);
+  const [apiKeySlots, setApiKeySlots] = useState<any[]>([]);
+  const [selectedApiKeySlot, setSelectedApiKeySlot] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
   const supabase = createClientComponentClient();
 
-  // Fetch utility prompts on component mount
+  // Fetch utility prompts and API key slots on component mount
   useEffect(() => {
-    const fetchUtilityPrompts = async () => {
+    const fetchData = async () => {
       try {
         // Get user's own prompts AND public prompts
-        const { data: promptsData, error } = await supabase
+        const { data: promptsData, error: promptsError } = await supabase
           .from('utility_prompts')
           .select('*')
           .or(`fk_user_id.eq.${userInternalId},is_special_public_prompt.eq.true`)
           .order('prompt_name', { ascending: true });
 
-        if (!error && promptsData) {
+        if (!promptsError && promptsData) {
           setUtilityPrompts(promptsData);
         }
+
+        // Get publicly shown API key slots
+        const { data: apiKeysData, error: apiKeysError } = await supabase
+          .from('api_key_slots')
+          .select('*')
+          .eq('slot_publicly_shown', true)
+          .order('slot_name', { ascending: true });
+
+        if (!apiKeysError && apiKeysData) {
+          setApiKeySlots(apiKeysData);
+        }
       } catch (err) {
-        console.error('Error fetching utility prompts:', err);
+        console.error('Error fetching data:', err);
       }
     };
 
     if (userInternalId) {
-      fetchUtilityPrompts();
+      fetchData();
     }
   }, [userInternalId, supabase]);
 
@@ -612,6 +625,38 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
 
   return (
     <div className="space-y-6">
+      {/* AI Model Selection */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Select AI model to use
+        </label>
+        <select
+          value={selectedApiKeySlot}
+          onChange={(e) => setSelectedApiKeySlot(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          style={{ width: '700px' }}
+        >
+          <option value="">-- Select an AI model --</option>
+          {apiKeySlots.map((slot) => (
+            <option key={slot.slot_id} value={slot.slot_id}>
+              {slot.slot_name || `Slot ${slot.slot_id.slice(0, 8)}`}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* API Keys Management Link */}
+      <div>
+        <a
+          href="https://snef.me/clevnar3"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline text-sm"
+        >
+          Manage API Keys - https://snef.me/clevnar3
+        </a>
+      </div>
+
       {/* Dropdown for utility prompt selection */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -620,7 +665,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
         <select
           value={selectedPromptId}
           onChange={(e) => handlePromptSelection(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          style={{ width: '700px' }}
         >
           <option value="">-- Select a utility prompt --</option>
           {utilityPrompts.map((prompt) => (
@@ -638,8 +684,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
           <textarea
             value={selectedPromptContent}
             readOnly
-            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-none"
-            style={{ height: '100px' }}
+            className="px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-none"
+            style={{ width: '700px', height: '100px' }}
             placeholder="Selected prompt content will appear here..."
           />
         </div>
@@ -653,8 +699,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
         <textarea
           value={pelementorEditsLocal}
           onChange={(e) => setPelementorEditsLocal(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
-          style={{ height: '100px' }}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+          style={{ width: '700px', height: '100px' }}
           placeholder="Pelementor edits data..."
         />
       </div>
@@ -667,13 +713,13 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
         <textarea
           value={actualPromptSubmission}
           onChange={(e) => setActualPromptSubmission(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
-          style={{ height: '100px' }}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+          style={{ width: '700px', height: '100px' }}
           placeholder="The actual prompt that will be submitted to AI..."
         />
       </div>
 
-      <hr className="border-gray-300" />
+      <hr style={{ height: '10px', backgroundColor: 'black', border: 'none' }} />
 
       {/* response1_model_used section */}
       <div>
@@ -682,7 +728,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
           type="text"
           value={gconPiece.response1_model_used || ''}
           readOnly
-          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm"
+          className="px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm"
+          style={{ width: '700px' }}
           placeholder="AI model name will appear here..."
         />
       </div>
@@ -695,8 +742,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
         <textarea
           value={response1Raw}
           onChange={(e) => setResponse1Raw(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
-          style={{ height: '100px' }}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+          style={{ width: '700px', height: '100px' }}
           placeholder="Raw AI response will appear here..."
         />
       </div>
@@ -709,8 +756,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
         <textarea
           value={response1MeatExtracted}
           onChange={(e) => setResponse1MeatExtracted(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
-          style={{ height: '100px' }}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
+          style={{ width: '700px', height: '100px' }}
           placeholder="Extracted meaningful content from AI response..."
         />
       </div>
@@ -730,6 +777,7 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
         
         <button
           onClick={() => {
+            setSelectedApiKeySlot('');
             setSelectedPromptId('');
             setSelectedPromptContent('');
             setActualPromptSubmission('');
