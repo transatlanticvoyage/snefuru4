@@ -9,6 +9,8 @@ const NWPI_TO_GCON_MAPPING = {
     'fk_sitespren_base': 'asn_sitespren_base',
     'post_name': 'pageslug',
     'post_id': 'g_post_id',
+    'post_status': 'g_post_status',
+    'post_type': 'g_post_type',
   },
   
   // Transform mappings with functions
@@ -33,7 +35,6 @@ const NWPI_TO_GCON_MAPPING = {
   computed: {
     'asn_nwpi_posts_id': (data: any) => `${data.fk_sitespren_base}->postid${data.post_id}`,
     'pageurl': (data: any) => data.post_name ? `https://${data.fk_sitespren_base}/${data.post_name}` : null,
-    'pub_status': () => 'imported_from_nwpi',
     'date_time_pub_carry': (data: any) => data.post_date || new Date().toISOString(),
   }
 };
