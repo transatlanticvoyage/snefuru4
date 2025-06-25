@@ -270,18 +270,32 @@ async function makeProviderRequest(slotName: string, endpointUrl: string | null,
 
   console.log(`🌐 Making ${method} request to ${url} for ${slotName}`);
 
-  const response = await fetch(url, {
-    method: method.toUpperCase(),
-    headers,
-    body,
-    timeout: 10000 // 10 second timeout
-  });
+  // Create AbortController for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
+  try {
+    const response = await fetch(url, {
+      method: method.toUpperCase(),
+      headers,
+      body,
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Request timeout after 10 seconds');
+    }
+    throw error;
   }
-
-  const responseData = await response.json();
-  return responseData;
 }
