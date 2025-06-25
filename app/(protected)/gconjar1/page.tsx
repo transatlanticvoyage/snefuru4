@@ -401,7 +401,19 @@ export default function Gconjar1Page() {
         return;
       }
 
-      // Delete the selected records
+      // First, set any foreign key references to NULL (don't delete other table records)
+      const { error: updateError } = await supabase
+        .from('images_plans_batches')
+        .update({ asn_gcon_piece_id: null })
+        .in('asn_gcon_piece_id', itemsToDelete);
+
+      if (updateError) {
+        console.error('Error updating foreign key references:', updateError);
+        alert(`Error updating foreign key references: ${updateError.message}`);
+        return;
+      }
+
+      // Now delete the selected gcon_pieces records
       const { error } = await supabase
         .from('gcon_pieces')
         .delete()
