@@ -183,6 +183,9 @@ export default function Pedtor1Page() {
               Site: {gconPiece.asn_sitespren_base}
             </p>
           )}
+          <p className="mt-1 text-sm text-gray-500">
+            pageurl: {gconPiece.pageurl || 'Not set'}
+          </p>
         </div>
       </div>
 
