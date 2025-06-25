@@ -501,6 +501,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
           gconPiece={gconPiece}
           userInternalId={userInternalId}
           pelementorEdits={formData.pelementor_edits}
+          onUpdate={onUpdate}
         />
       )}
 
@@ -599,9 +600,10 @@ interface TalkToAiTabProps {
   gconPiece: GconPiece;
   userInternalId: string;
   pelementorEdits: string;
+  onUpdate: (updatedPiece: GconPiece) => void;
 }
 
-function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTabProps) {
+function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits, onUpdate }: TalkToAiTabProps) {
   const [selectedPromptId, setSelectedPromptId] = useState<string>('');
   const [selectedPromptContent, setSelectedPromptContent] = useState<string>('');
   const [pelementorEditsLocal, setPelementorEditsLocal] = useState<string>(pelementorEdits);
@@ -735,6 +737,87 @@ ${pelementorEditsLocal}`;
       localStorage.setItem('pedtor1_selected_api_key_slot', slotId);
     } else {
       localStorage.removeItem('pedtor1_selected_api_key_slot');
+    }
+  };
+
+  // Handle AI submission
+  const handleSubmitToAI = async () => {
+    if (!selectedApiKeySlot || !actualPromptSubmission.trim()) {
+      alert('Please select an AI model and enter a prompt.');
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      // Get the selected API key slot info for the model name
+      const selectedSlot = apiKeySlots.find(slot => slot.slot_id === selectedApiKeySlot);
+      const modelName = selectedSlot?.slot_name || 'Unknown Model';
+
+      console.log('🤖 Submitting to AI:', {
+        model: modelName,
+        prompt: actualPromptSubmission.substring(0, 100) + '...'
+      });
+
+      // Make API call to submit the prompt
+      const response = await fetch('/api/submit-to-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          slot_id: selectedApiKeySlot,
+          prompt: actualPromptSubmission,
+          gcon_piece_id: gconPiece.id
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update the response fields
+        setResponse1Raw(result.ai_response || '');
+        
+        // Update the gcon_piece with the new data in the database
+        const updateData = {
+          response1_model_used: modelName,
+          response1_raw: result.ai_response || '',
+          updated_at: new Date().toISOString()
+        };
+
+        const { error: updateError } = await supabase
+          .from('gcon_pieces')
+          .update(updateData)
+          .eq('id', gconPiece.id)
+          .eq('fk_users_id', userInternalId);
+
+        if (updateError) {
+          console.error('Error updating gcon_piece:', updateError);
+          alert('AI response received but failed to save to database.');
+        } else {
+          // Update the local gconPiece state
+          const updatedPiece = {
+            ...gconPiece,
+            ...updateData
+          };
+          onUpdate(updatedPiece);
+          
+          console.log('✅ AI response received and saved successfully');
+          alert('AI response received and saved successfully!');
+        }
+      } else {
+        throw new Error(result.error || 'AI submission failed');
+      }
+    } catch (error) {
+      console.error('❌ AI submission error:', error);
+      alert(`AI submission failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -924,11 +1007,8 @@ ${pelementorEditsLocal}`;
       {/* Action buttons */}
       <div className="flex gap-4 pt-4">
         <button
-          onClick={() => {
-            // TODO: Implement AI submission logic
-            console.log('Submit to AI:', actualPromptSubmission);
-          }}
-          disabled={!actualPromptSubmission.trim() || loading}
+          onClick={handleSubmitToAI}
+          disabled={!actualPromptSubmission.trim() || !selectedApiKeySlot || loading}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium rounded-md transition-colors"
         >
           {loading ? 'Submitting...' : 'Submit to AI'}
