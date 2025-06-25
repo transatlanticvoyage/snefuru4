@@ -8,6 +8,7 @@ const NWPI_TO_GCON_MAPPING = {
   direct: {
     'fk_sitespren_base': 'asn_sitespren_base',
     'post_name': 'pageslug',
+    'post_id': 'g_post_id',
   },
   
   // Transform mappings with functions

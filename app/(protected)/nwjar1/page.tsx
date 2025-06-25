@@ -21,6 +21,7 @@ export default function NwJar1Page() {
   const [currentUrl, setCurrentUrl] = useState<string>('');
   const [selectedContentIds, setSelectedContentIds] = useState<Set<string>>(new Set());
   const [f47Loading, setF47Loading] = useState(false);
+  const [f22Loading, setF22Loading] = useState(false);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -299,6 +300,53 @@ export default function NwJar1Page() {
     setActivePopupTab(tab as any);
     localStorage.setItem('nwjar1_lastActiveTab', tab); // Remember this tab for next time
     updatePopupURL(true, tab);
+  };
+
+  // f22_nwpi_to_gcon_pusher handler
+  const handleF22NwpiToGconPusher = async () => {
+    let itemsToProcess: string[] = [];
+    
+    if (kz101Checked) {
+      // SOPTION1: Use selected items
+      if (selectedContentIds.size === 0) {
+        alert('Please select at least one item from the table');
+        return;
+      }
+      itemsToProcess = Array.from(selectedContentIds);
+    } else if (kz103Checked) {
+      // SOPTION2: Push all items in current view
+      itemsToProcess = nwpiContent.map(item => item.internal_post_id);
+    } else {
+      alert('Please select SOPTION1 or SOPTION2 first');
+      return;
+    }
+
+    setF22Loading(true);
+    try {
+      const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recordIds: itemsToProcess
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(`Success: ${result.message}`);
+        // Could refresh data or show more detailed results here
+      } else {
+        alert(`Error: ${result.message || 'Failed to push to GCon pieces'}`);
+      }
+    } catch (error) {
+      console.error('Error calling f22_nwpi_to_gcon_pusher:', error);
+      alert('An error occurred while pushing to GCon pieces');
+    } finally {
+      setF22Loading(false);
+    }
   };
 
   // f47_generate_gcon_pieces handler
@@ -636,6 +684,17 @@ export default function NwJar1Page() {
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Functions</h3>
                     <div className="space-y-4">
+                      <button
+                        onClick={handleF22NwpiToGconPusher}
+                        disabled={f22Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)}
+                        className={`px-4 py-2 rounded font-medium ${
+                          f22Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-green-600 text-white hover:bg-green-700'
+                        }`}
+                      >
+                        {f22Loading ? 'Processing...' : 'f22_nwpi_to_gcon_pusher'}
+                      </button>
                       <button
                         onClick={handleF47GenerateGconPieces}
                         disabled={f47Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)}
