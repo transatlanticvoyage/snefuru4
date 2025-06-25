@@ -25,10 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user record
+    // Get user record with ruplin API key
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('id')
+      .select('id, ruplin_api_key_1')
       .eq('auth_id', session.user.id)
       .single();
 
@@ -36,6 +36,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'User record not found' },
         { status: 404 }
+      );
+    }
+
+    if (!userData.ruplin_api_key_1) {
+      return NextResponse.json(
+        { success: false, error: 'No ruplin API key found for user' },
+        { status: 400 }
       );
     }
 
@@ -92,7 +99,8 @@ export async function POST(request: NextRequest) {
     const wpUpdateResult = await updateWordPressPelementor(
       siteData,
       pieceData.asn_nwpi_posts_id,
-      pelementor_data
+      pelementor_data,
+      userData.ruplin_api_key_1
     );
 
     if (!wpUpdateResult.success) {
@@ -121,7 +129,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function updateWordPressPelementor(siteData: any, postId: string, pelementorData: any) {
+async function updateWordPressPelementor(siteData: any, postId: string, pelementorData: any, ruplinApiKey: string) {
   try {
     // Construct WordPress site URL
     const siteUrl = `https://${siteData.sitespren_base}`;
@@ -129,19 +137,17 @@ async function updateWordPressPelementor(siteData: any, postId: string, pelement
     // Prepare the elementor data as JSON string (WordPress stores it as serialized/JSON)
     const elementorDataString = JSON.stringify(pelementorData);
     
-    console.log(`🔧 Updating WordPress post ${postId} on ${siteUrl}`);
+    console.log(`🔧 Updating WordPress post ${postId} on ${siteUrl} using ruplin API key`);
 
-    // Call WordPress API through snefuruplin plugin
-    const wpResponse = await fetch(`${siteUrl}/wp-json/snefuruplin/v1/update-elementor`, {
+    // Call WordPress API through snefuruplin plugin using the correct endpoint and authentication
+    const wpResponse = await fetch(`${siteUrl}/wp-json/snefuru/v1/posts/${postId}/elementor`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-WP-API-KEY': siteData.wp_api_key || '', // If you have API keys stored
+        'Authorization': `Bearer ${ruplinApiKey}`, // Use ruplin_api_key_1 from users table
       },
       body: JSON.stringify({
-        post_id: postId,
-        elementor_data: elementorDataString,
-        action: 'update_elementor_meta'
+        elementor_data: elementorDataString
       }),
     });
 
