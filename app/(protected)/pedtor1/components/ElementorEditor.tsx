@@ -41,7 +41,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
   const [isSaving, setIsSaving] = useState(false);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState<'cached' | 'edits' | 'comparison'>('cached');
+  const [activeTab, setActiveTab] = useState<'cached' | 'edits' | 'updateEndSite' | 'comparison'>('cached');
   
   const supabase = createClientComponentClient();
 
@@ -202,6 +202,11 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
     alert('f204_tell_ai_tool_to_karfi function called (not implemented yet)');
   };
 
+  const handleF210UpdateEndSite = () => {
+    // Placeholder function - no backend functionality yet
+    alert('f210_update_end_site function called (not implemented yet)');
+  };
+
   const hasElementorData = formData.pelementor_cached.trim() || formData.pelementor_edits.trim();
 
   return (
@@ -301,6 +306,16 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
             {formData.pelementor_edits.trim() && (
               <span className="ml-1 px-1 text-xs bg-purple-100 text-purple-800 rounded">✓</span>
             )}
+          </button>
+          <button
+            onClick={() => setActiveTab('updateEndSite')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'updateEndSite'
+                ? 'border-orange-500 text-orange-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Update End Site
           </button>
           <button
             onClick={() => setActiveTab('comparison')}
@@ -419,6 +434,37 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
           <p className="text-sm text-gray-500">
             This field is for your custom modifications to the Elementor data.
           </p>
+        </div>
+      )}
+
+      {activeTab === 'updateEndSite' && (
+        <div className="space-y-4">
+          <button
+            onClick={handleF210UpdateEndSite}
+            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-md transition-colors"
+          >
+            f210_update_end_site
+          </button>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Pelementor Edits Data</h3>
+            <textarea
+              value={formData.pelementor_edits}
+              onChange={(e) => handleInputChange('pelementor_edits', e.target.value)}
+              rows={20}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-sm ${
+                !validateJsonField(formData.pelementor_edits) 
+                  ? 'border-red-300 bg-red-50' 
+                  : 'border-gray-300'
+              }`}
+              placeholder='{"modified_elementor_data": "your edits here"}'
+            />
+            {!validateJsonField(formData.pelementor_edits) && (
+              <p className="text-sm text-red-600">Invalid JSON format</p>
+            )}
+            <p className="text-sm text-gray-500">
+              Review and update your Elementor edits before pushing to the end site.
+            </p>
+          </div>
         </div>
       )}
 
