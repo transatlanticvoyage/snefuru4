@@ -256,6 +256,53 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
     alert('f210_update_end_site function called (not implemented yet)');
   };
 
+  const handleF211UpdateEndSiteWithPelementor = async () => {
+    if (!formData.pelementor_edits.trim()) {
+      alert('No pelementor edits data to push');
+      return;
+    }
+
+    try {
+      // Parse the JSON to validate it
+      const pelementorData = JSON.parse(formData.pelementor_edits);
+      
+      setIsSaving(true);
+      setNotification(null);
+
+      const response = await fetch('/api/f211-update-end-site-pelementor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gcon_piece_id: gconPiece.id,
+          pelementor_data: pelementorData
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setNotification({
+          type: 'success',
+          message: 'Successfully updated live site with pelementor data!'
+        });
+        console.log('✅ Live site updated:', result);
+      } else {
+        throw new Error(result.error || 'Failed to update live site');
+      }
+    } catch (error) {
+      console.error('❌ Error updating live site:', error);
+      setNotification({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to update live site'
+      });
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setNotification(null), 5000);
+    }
+  };
+
   const hasElementorData = formData.pelementor_cached.trim() || formData.pelementor_edits.trim();
 
   return (
@@ -507,12 +554,21 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
 
       {activeTab === 'updateEndSite' && (
         <div className="space-y-4">
-          <button
-            onClick={handleF210UpdateEndSite}
-            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-md transition-colors"
-          >
-            f210_update_end_site
-          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={handleF210UpdateEndSite}
+              className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-md transition-colors"
+            >
+              f210_update_end_site
+            </button>
+            <button
+              onClick={handleF211UpdateEndSiteWithPelementor}
+              disabled={isSaving || !formData.pelementor_edits.trim()}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white font-medium rounded-md transition-colors"
+            >
+              {isSaving ? 'Updating...' : 'f211_update_end_site_with_pelementor'}
+            </button>
+          </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Pelementor Edits Data</h3>
             <textarea
