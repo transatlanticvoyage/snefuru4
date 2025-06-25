@@ -362,13 +362,15 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
             <label className="block text-sm font-medium text-gray-700">
               paste your image pack here
             </label>
-            <textarea
-              value={imagePackInput}
-              onChange={(e) => setImagePackInput(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              style={{ width: '500px', height: '200px' }}
-              placeholder="Paste your image pack data here..."
-            />
+            <div>
+              <textarea
+                value={imagePackInput}
+                onChange={(e) => setImagePackInput(e.target.value)}
+                className="block px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                style={{ width: '500px', height: '200px' }}
+                placeholder="Paste your image pack data here..."
+              />
+            </div>
             <button
               onClick={handleF204TellAiToolToKarfi}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
