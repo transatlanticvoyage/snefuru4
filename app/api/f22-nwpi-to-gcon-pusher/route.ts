@@ -102,6 +102,21 @@ export async function POST(request: NextRequest) {
 
     console.log(`📊 Found ${nwpiRecords.length} nwpi_content records to process`);
 
+    // Debug: Check for duplicate post_ids in source data
+    const postIdCounts = new Map<string, number>();
+    nwpiRecords.forEach(record => {
+      const key = `${record.post_id}_${record.fk_sitespren_base}`;
+      postIdCounts.set(key, (postIdCounts.get(key) || 0) + 1);
+    });
+    
+    const duplicates = Array.from(postIdCounts.entries()).filter(([key, count]) => count > 1);
+    if (duplicates.length > 0) {
+      console.warn(`⚠️ WARNING: Found duplicate post_id/sitespren combinations in source nwpi_content data:`);
+      duplicates.forEach(([key, count]) => {
+        console.log(`  ${key}: ${count} occurrences`);
+      });
+    }
+
     // Process records in batches
     const results = {
       processed: 0,
@@ -118,15 +133,32 @@ export async function POST(request: NextRequest) {
         const gconData = transformNwpiToGcon(nwpiRecord, userData.id);
         
         console.log(`🔄 Processing: ${nwpiRecord.post_title} (ID: ${nwpiRecord.internal_post_id})`);
+        console.log(`📊 Debug - post_id: ${nwpiRecord.post_id}, sitespren: ${nwpiRecord.fk_sitespren_base}, user: ${userData.id}`);
 
         // Check if record already exists based on g_post_id, sitespren_base, and user
-        const { data: existingRecord } = await supabase
+        const { data: existingRecords, error: checkError } = await supabase
           .from('gcon_pieces')
-          .select('id')
+          .select('id, g_post_id, asn_sitespren_base')
           .eq('fk_users_id', userData.id)
           .eq('g_post_id', nwpiRecord.post_id)
-          .eq('asn_sitespren_base', nwpiRecord.fk_sitespren_base)
-          .single();
+          .eq('asn_sitespren_base', nwpiRecord.fk_sitespren_base);
+
+        if (checkError) {
+          console.error(`❌ Error checking for existing record:`, checkError);
+          results.failed++;
+          results.errors.push(`Failed to check existing record for "${nwpiRecord.post_title}": ${checkError.message}`);
+          continue;
+        }
+
+        console.log(`🔍 Found ${existingRecords?.length || 0} existing records with same post_id/sitespren combination`);
+        if (existingRecords && existingRecords.length > 1) {
+          console.warn(`⚠️ WARNING: Multiple existing records found for post_id=${nwpiRecord.post_id}, sitespren=${nwpiRecord.fk_sitespren_base}`);
+          existingRecords.forEach((rec, i) => {
+            console.log(`  Record ${i + 1}: id=${rec.id}, g_post_id=${rec.g_post_id}, sitespren=${rec.asn_sitespren_base}`);
+          });
+        }
+
+        const existingRecord = existingRecords && existingRecords.length > 0 ? existingRecords[0] : null;
 
         if (existingRecord) {
           // UPDATE existing record instead of skipping
