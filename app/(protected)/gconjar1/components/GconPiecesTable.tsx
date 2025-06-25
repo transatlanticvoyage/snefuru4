@@ -720,43 +720,49 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             />
                           </div>
                         ) : col === 'actions' ? (
-                          <div className="flex flex-wrap gap-1">
-                            <Link
-                              href={`/pedbar?id=${item.id}`}
-                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                            >
-                              /pedbar
-                            </Link>
-                            <Link
-                              href={`/pedtor1?id=${item.id}`}
-                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                            >
-                              /pedtor
-                            </Link>
-                            <Link
-                              href={`/flatx1?id=${item.id}`}
-                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                            >
-                              /flatx1
-                            </Link>
-                            <Link
-                              href={`/slotx1?id=${item.id}`}
-                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                            >
-                              /slotx1
-                            </Link>
-                            <Link
-                              href={`/fanex1?id=${item.id}`}
-                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                            >
-                              /fanex1
-                            </Link>
-                            <Link
-                              href={`/karfi1?id=${item.id}`}
-                              className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                            >
-                              /karfi1
-                            </Link>
+                          <div className="w-64 space-y-1">
+                            {/* First row - 3 buttons */}
+                            <div className="flex gap-1">
+                              <Link
+                                href={`/pedbar?id=${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                              >
+                                /pedbar
+                              </Link>
+                              <Link
+                                href={`/pedtor1?id=${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                              >
+                                /pedtor
+                              </Link>
+                              <Link
+                                href={`/flatx1?id=${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                              >
+                                /flatx1
+                              </Link>
+                            </div>
+                            {/* Second row - 3 buttons */}
+                            <div className="flex gap-1">
+                              <Link
+                                href={`/slotx1?id=${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                              >
+                                /slotx1
+                              </Link>
+                              <Link
+                                href={`/fanex1?id=${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                              >
+                                /fanex1
+                              </Link>
+                              <Link
+                                href={`/karfi1?id=${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                              >
+                                /karfi1
+                              </Link>
+                            </div>
                           </div>
                         ) : col === 'created_at' || col === 'updated_at' || col === 'date_time_pub_carry' ? (
                           <span className="whitespace-nowrap text-gray-500">
@@ -792,7 +798,13 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           </div>
                         ) : col === 'meta_title' || col === 'h1title' || col === 'pgb_h1title' ? (
                           truncateText(item[col], 60)
-                        ) : col === 'corpus1' || col === 'corpus2' ? (
+                        ) : col === 'corpus1' ? (
+                          (() => {
+                            const text = item[col];
+                            if (!text) return "-";
+                            return text.length > 10 ? text.substring(0, 10) + "..." : text;
+                          })()
+                        ) : col === 'corpus2' ? (
                           truncateText(item[col], 100)
                         ) : col === 'asn_nwpi_posts_id' || col === 'asn_imgplanbatch_id' ? (
                           <span className="whitespace-nowrap">
