@@ -191,7 +191,7 @@ export default function Pedtor1Page() {
             {gconPiece.pageurl && (
               <>
                 <button
-                  onClick={() => window.open(gconPiece.pageurl, '_blank')}
+                  onClick={() => gconPiece.pageurl && window.open(gconPiece.pageurl, '_blank')}
                   className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
                   title="Open URL in new tab"
                 >
