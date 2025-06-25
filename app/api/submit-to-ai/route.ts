@@ -146,7 +146,7 @@ async function makeAIRequest(slotName: string, apiKey: string, prompt: string) {
       'Content-Type': 'application/json'
     };
     body = JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 2000
     });
@@ -191,7 +191,7 @@ async function makeAIRequest(slotName: string, apiKey: string, prompt: string) {
       'Content-Type': 'application/json'
     };
     body = JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 2000
     });
