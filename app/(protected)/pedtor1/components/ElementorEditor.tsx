@@ -612,6 +612,8 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
   const [apiKeySlots, setApiKeySlots] = useState<any[]>([]);
   const [selectedApiKeySlot, setSelectedApiKeySlot] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [promptMode, setPromptMode] = useState<'utility' | 'manual'>('utility');
+  const [manualPromptText, setManualPromptText] = useState<string>('');
 
   const supabase = createClientComponentClient();
 
@@ -639,6 +641,12 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
 
         if (!apiKeysError && apiKeysData) {
           setApiKeySlots(apiKeysData);
+          
+          // Load saved API key slot from localStorage after slots are loaded
+          const savedApiKeySlot = localStorage.getItem('pedtor1_selected_api_key_slot');
+          if (savedApiKeySlot && apiKeysData.find(slot => slot.slot_id === savedApiKeySlot)) {
+            setSelectedApiKeySlot(savedApiKeySlot);
+          }
         }
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -669,6 +677,40 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
     }
   };
 
+  // Handle prompt mode change
+  const handlePromptModeChange = (mode: 'utility' | 'manual') => {
+    setPromptMode(mode);
+    if (mode === 'utility') {
+      // Clear manual input when switching to utility mode
+      setManualPromptText('');
+      setActualPromptSubmission(selectedPromptContent);
+    } else {
+      // Clear utility selection when switching to manual mode
+      setSelectedPromptId('');
+      setSelectedPromptContent('');
+      setActualPromptSubmission(manualPromptText);
+    }
+  };
+
+  // Handle manual prompt text change
+  const handleManualPromptChange = (text: string) => {
+    setManualPromptText(text);
+    if (promptMode === 'manual') {
+      setActualPromptSubmission(text);
+    }
+  };
+
+  // Handle API key slot selection and save to localStorage
+  const handleApiKeySlotChange = (slotId: string) => {
+    setSelectedApiKeySlot(slotId);
+    // Save to localStorage for persistence
+    if (slotId) {
+      localStorage.setItem('pedtor1_selected_api_key_slot', slotId);
+    } else {
+      localStorage.removeItem('pedtor1_selected_api_key_slot');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* AI Model Selection */}
@@ -678,7 +720,7 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
         </label>
         <select
           value={selectedApiKeySlot}
-          onChange={(e) => setSelectedApiKeySlot(e.target.value)}
+          onChange={(e) => handleApiKeySlotChange(e.target.value)}
           className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           style={{ width: '700px' }}
         >
@@ -703,36 +745,80 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
         </a>
       </div>
 
-      {/* Dropdown for utility prompt selection */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Select your utility prompt
-        </label>
-        <select
-          value={selectedPromptId}
-          onChange={(e) => handlePromptSelection(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          style={{ width: '700px' }}
+      {/* 10px black HR above utility prompt selection */}
+      <hr style={{ height: '10px', backgroundColor: 'black', border: 'none' }} />
+
+      {/* OR Button Selection */}
+      <div className="flex items-center space-x-4 mb-4">
+        <button
+          onClick={() => handlePromptModeChange('utility')}
+          className={`px-4 py-2 rounded-md font-medium transition-colors ${
+            promptMode === 'utility'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
         >
-          <option value="">-- Select a utility prompt --</option>
-          {utilityPrompts.map((prompt) => (
-            <option key={prompt.prompt_id} value={prompt.prompt_id}>
-              {prompt.prompt_name || `Prompt ${prompt.prompt_id.slice(0, 8)}`}
-              {prompt.is_special_public_prompt && prompt.fk_user_id !== userInternalId ? ' (Public)' : ''}
-            </option>
-          ))}
-        </select>
+          Select Utility Prompt
+        </button>
+        <span className="text-gray-500 font-medium">OR</span>
+        <button
+          onClick={() => handlePromptModeChange('manual')}
+          className={`px-4 py-2 rounded-md font-medium transition-colors ${
+            promptMode === 'manual'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          Manual Prompt Entry
+        </button>
       </div>
 
-      {/* Selected prompt content display */}
-      {selectedPromptContent && (
+      {/* Utility Prompt Selection (shown when promptMode is 'utility') */}
+      {promptMode === 'utility' && (
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Select your utility prompt
+          </label>
+          <select
+            value={selectedPromptId}
+            onChange={(e) => handlePromptSelection(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ width: '700px' }}
+          >
+            <option value="">-- Select a utility prompt --</option>
+            {utilityPrompts.map((prompt) => (
+              <option key={prompt.prompt_id} value={prompt.prompt_id}>
+                {prompt.prompt_name || `Prompt ${prompt.prompt_id.slice(0, 8)}`}
+                {prompt.is_special_public_prompt && prompt.fk_user_id !== userInternalId ? ' (Public)' : ''}
+              </option>
+            ))}
+          </select>
+
+          {/* Selected prompt content display */}
+          {selectedPromptContent && (
+            <div className="mt-4">
+              <textarea
+                value={selectedPromptContent}
+                readOnly
+                className="px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-none"
+                style={{ width: '700px', height: '100px' }}
+                placeholder="Selected prompt content will appear here..."
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Manual Prompt Entry (shown when promptMode is 'manual') */}
+      {promptMode === 'manual' && (
+        <div>
+          <div className="font-bold text-gray-900 mb-2">place your own manual prompt text</div>
           <textarea
-            value={selectedPromptContent}
-            readOnly
-            className="px-3 py-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-none"
+            value={manualPromptText}
+            onChange={(e) => handleManualPromptChange(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
             style={{ width: '700px', height: '100px' }}
-            placeholder="Selected prompt content will appear here..."
+            placeholder="Enter your manual prompt here..."
           />
         </div>
       )}
@@ -829,6 +915,10 @@ function TalkToAiTab({ gconPiece, userInternalId, pelementorEdits }: TalkToAiTab
             setActualPromptSubmission('');
             setResponse1Raw('');
             setResponse1MeatExtracted('');
+            setManualPromptText('');
+            setPromptMode('utility');
+            // Clear localStorage as well
+            localStorage.removeItem('pedtor1_selected_api_key_slot');
           }}
           className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition-colors"
         >
