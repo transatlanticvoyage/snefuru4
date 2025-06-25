@@ -20,6 +20,7 @@ interface UtilityPromptsTableProps {
   userId: string;
   userInternalId: string | null;
   onUpdate: () => void;
+  onEdit: (prompt: UtilityPrompt) => void;
 }
 
 type SortField = keyof UtilityPrompt;
@@ -37,7 +38,7 @@ const allColumns: (keyof UtilityPrompt)[] = [
   'updated_at'
 ];
 
-export default function UtilityPromptsTable({ data, userId, userInternalId, onUpdate }: UtilityPromptsTableProps) {
+export default function UtilityPromptsTable({ data, userId, userInternalId, onUpdate, onEdit }: UtilityPromptsTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -286,6 +287,10 @@ export default function UtilityPromptsTable({ data, userId, userInternalId, onUp
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left">
+                <span className="text-xs font-bold text-gray-900 lowercase">actions</span>
+              </th>
+              
+              <th className="px-4 py-3 text-left">
                 <input
                   type="checkbox"
                   checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
@@ -310,10 +315,6 @@ export default function UtilityPromptsTable({ data, userId, userInternalId, onUp
                   </div>
                 </th>
               ))}
-              
-              <th className="px-4 py-3 text-left">
-                <span className="text-xs font-bold text-gray-900 lowercase">actions</span>
-              </th>
             </tr>
           </thead>
           
@@ -325,33 +326,13 @@ export default function UtilityPromptsTable({ data, userId, userInternalId, onUp
                   selectedRows.has(item.prompt_id) ? 'bg-blue-50' : ''
                 }`}
               >
-                <td className="px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedRows.has(item.prompt_id)}
-                    onChange={() => handleRowSelect(item.prompt_id)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                </td>
-                
-                {allColumns.map((column) => (
-                  <td key={column} className="px-4 py-3 text-sm text-gray-900">
-                    <div className="max-w-xs truncate" title={formatCellValue(item[column], column)}>
-                      {formatCellValue(item[column], column)}
-                    </div>
-                  </td>
-                ))}
-                
                 <td className="px-4 py-3 text-sm">
                   <div className="flex items-center gap-2">
                     {isUserPrompt(item) && (
                       <>
                         <button
                           className="text-blue-600 hover:text-blue-800 font-medium"
-                          onClick={() => {
-                            // Edit functionality would go here
-                            console.log('Edit prompt:', item.prompt_id);
-                          }}
+                          onClick={() => onEdit(item)}
                         >
                           Edit
                         </button>
@@ -372,6 +353,23 @@ export default function UtilityPromptsTable({ data, userId, userInternalId, onUp
                     )}
                   </div>
                 </td>
+                
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.has(item.prompt_id)}
+                    onChange={() => handleRowSelect(item.prompt_id)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                </td>
+                
+                {allColumns.map((column) => (
+                  <td key={column} className="px-4 py-3 text-sm text-gray-900">
+                    <div className="max-w-xs truncate" title={formatCellValue(item[column], column)}>
+                      {formatCellValue(item[column], column)}
+                    </div>
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>
