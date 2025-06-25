@@ -22,6 +22,7 @@ export default function Gconjar1Page() {
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [currentUrl, setCurrentUrl] = useState<string>('');
   const [selectedGconIds, setSelectedGconIds] = useState<Set<string>>(new Set());
+  const [f127Loading, setF127Loading] = useState(false);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -358,6 +359,73 @@ export default function Gconjar1Page() {
     updatePopupURL(true, tab);
   };
 
+  // f127_wipegconpiecesdata handler - delete selected rows
+  const handleF127WipeGconPiecesData = async () => {
+    let itemsToDelete: string[] = [];
+    
+    if (kz101Checked) {
+      // SOPTION1: Use selected items
+      if (selectedGconIds.size === 0) {
+        alert('Please select at least one item from the table');
+        return;
+      }
+      itemsToDelete = Array.from(selectedGconIds);
+    } else if (kz103Checked) {
+      // SOPTION2: Delete all items in current view
+      itemsToDelete = gconPieces.map(item => item.id);
+    } else {
+      alert('Please select SOPTION1 or SOPTION2 first');
+      return;
+    }
+
+    // Confirmation dialog
+    const confirmMessage = kz101Checked 
+      ? `Are you sure you want to delete ${itemsToDelete.length} selected gcon_pieces records? This action cannot be undone.`
+      : `Are you sure you want to delete ALL ${itemsToDelete.length} gcon_pieces records from the current view? This action cannot be undone.`;
+    
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    setF127Loading(true);
+    try {
+      // Get user's database ID first
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (!userData) {
+        alert('Error: User not found');
+        return;
+      }
+
+      // Delete the selected records
+      const { error } = await supabase
+        .from('gcon_pieces')
+        .delete()
+        .eq('fk_users_id', userData.id)
+        .in('id', itemsToDelete);
+
+      if (error) {
+        console.error('Error deleting gcon_pieces records:', error);
+        alert(`Error deleting records: ${error.message}`);
+      } else {
+        alert(`Successfully deleted ${itemsToDelete.length} gcon_pieces records`);
+        
+        // Clear selection and refresh data
+        setSelectedGconIds(new Set());
+        await refetchGconPieces();
+      }
+    } catch (error) {
+      console.error('Error in f127_wipegconpiecesdata:', error);
+      alert('An error occurred while deleting the records');
+    } finally {
+      setF127Loading(false);
+    }
+  };
+
   return (
     <div className="pr-4">
       {/* Notification */}
@@ -652,7 +720,18 @@ export default function Gconjar1Page() {
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Functions</h3>
                     <div className="space-y-4">
-                      <p className="text-gray-600">Functions for gcon_pieces will be added here.</p>
+                      <button
+                        onClick={handleF127WipeGconPiecesData}
+                        disabled={f127Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedGconIds.size === 0)}
+                        className={`px-4 py-2 rounded font-medium ${
+                          f127Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedGconIds.size === 0)
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-red-600 text-white hover:bg-red-700'
+                        }`}
+                      >
+                        {f127Loading ? 'Deleting...' : 'f127_wipegconpiecesdata'}
+                      </button>
+                      
                       {!kz101Checked && !kz103Checked && (
                         <p className="text-sm text-gray-500">
                           Select either SOPTION1 or SOPTION2 to enable functions
@@ -665,12 +744,12 @@ export default function Gconjar1Page() {
                       )}
                       {kz101Checked && selectedGconIds.size > 0 && (
                         <p className="text-sm text-gray-600">
-                          SOPTION1 selected: {selectedGconIds.size} item(s) will be processed
+                          SOPTION1 selected: {selectedGconIds.size} item(s) will be deleted
                         </p>
                       )}
                       {kz103Checked && (
                         <p className="text-sm text-gray-600">
-                          SOPTION2 selected: All {gconPieces.length} items will be processed
+                          SOPTION2 selected: All {gconPieces.length} items will be deleted
                         </p>
                       )}
                     </div>
