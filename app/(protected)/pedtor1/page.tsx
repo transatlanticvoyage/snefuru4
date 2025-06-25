@@ -25,6 +25,9 @@ interface GconPiece {
   date_time_pub_carry: string | null;
   pageslug: string | null;
   pageurl: string | null;
+  response1_model_used: string | null;
+  response1_raw: string | null;
+  response1_meat_extracted: string | null;
   created_at: string;
   updated_at: string;
 }
