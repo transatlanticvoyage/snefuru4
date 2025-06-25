@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
@@ -38,12 +38,15 @@ interface ApiKeySlotJoined {
   d_m3platcodehandle: string | null;
   d_slot_name: string | null;
   d_user_email: string | null;
+  poke_response1: string | null;
 }
 
 const columns = [
   // api_key_slots columns
   'slot_id',
   'slot_name',
+  'poke',
+  'poke_response1',
   'm1inuse',
   'm1platcodehandle',
   'm1ueplatlabel',
@@ -84,6 +87,8 @@ export default function Clevnar3Page() {
   const [savingFields, setSavingFields] = useState<Set<string>>(new Set());
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState('option1');
   const [selectedStickyColumns, setSelectedStickyColumns] = useState('option1');
+  const [pokingSlots, setPokingSlots] = useState<Set<string>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const { user } = useAuth();
@@ -194,7 +199,8 @@ export default function Clevnar3Page() {
           d_m2platcodehandle: null,
           d_m3platcodehandle: null,
           d_slot_name: null,
-          d_user_email: null
+          d_user_email: null,
+          poke_response1: null
         }));
         
         setData(transformedSlots);
@@ -272,7 +278,8 @@ export default function Clevnar3Page() {
           d_m2platcodehandle: userKey?.d_m2platcodehandle || null,
           d_m3platcodehandle: userKey?.d_m3platcodehandle || null,
           d_slot_name: userKey?.d_slot_name || null,
-          d_user_email: userKey?.d_user_email || null
+          d_user_email: userKey?.d_user_email || null,
+          poke_response1: userKey?.poke_response1 || null
         };
       });
       
@@ -550,9 +557,165 @@ export default function Clevnar3Page() {
     }
   };
 
+  // Helper function to check if any m*datum field has a value
+  const hasAnyDatumValue = (item: ApiKeySlotJoined): boolean => {
+    return !!(item.m1datum || item.m2datum || item.m3datum);
+  };
+
+  // Handle poke API key functionality
+  const handlePokeApiKey = async (slotId: string) => {
+    if (!user?.id) return;
+    
+    setPokingSlots(new Set([...pokingSlots, slotId]));
+    
+    try {
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+        
+      if (userError || !userData) {
+        throw new Error('Could not find user record.');
+      }
+
+      // TODO: Create actual poke API endpoint
+      // For now, we'll simulate the poke response
+      const simulatedResponse = {
+        success: true,
+        timestamp: new Date().toISOString(),
+        message: "API key test successful",
+        model_info: "Simulated model response - replace with actual API call"
+      };
+
+      // Update the poke_response1 field in api_keys_t3
+      const { data: existingKey, error: checkError } = await supabase
+        .from('api_keys_t3')
+        .select('*')
+        .eq('fk_user_id', userData.id)
+        .eq('fk_slot_id', slotId)
+        .single();
+      
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+
+      const updateData = {
+        poke_response1: JSON.stringify(simulatedResponse),
+        updated_at: new Date().toISOString()
+      };
+
+      if (existingKey) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('api_keys_t3')
+          .update(updateData)
+          .eq('api_key_id', existingKey.api_key_id);
+          
+        if (updateError) throw updateError;
+      } else {
+        // Create new record
+        const { error: insertError } = await supabase
+          .from('api_keys_t3')
+          .insert({
+            fk_user_id: userData.id,
+            fk_slot_id: slotId,
+            ...updateData,
+            created_at: new Date().toISOString()
+          });
+          
+        if (insertError) throw insertError;
+      }
+
+      await fetchJoinedData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to poke API key');
+    } finally {
+      const newPokingSlots = new Set(pokingSlots);
+      newPokingSlots.delete(slotId);
+      setPokingSlots(newPokingSlots);
+    }
+  };
+
+  // Toggle expanded row
+  const toggleExpandedRow = (slotId: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(slotId)) {
+      newExpandedRows.delete(slotId);
+    } else {
+      newExpandedRows.add(slotId);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
   const formatColumnData = (col: string, value: any, item?: ApiKeySlotJoined) => {
     
     switch (col) {
+      case 'poke':
+        if (!item || !user?.id) {
+          return (
+            <span className="text-gray-400 italic text-sm">
+              Login required
+            </span>
+          );
+        }
+        
+        const hasData = hasAnyDatumValue(item);
+        const isPoking = pokingSlots.has(item.slot_id);
+        
+        return (
+          <button
+            onClick={() => handlePokeApiKey(item.slot_id)}
+            disabled={!hasData || isPoking}
+            className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+              !hasData 
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : isPoking
+                  ? 'bg-yellow-200 text-yellow-800 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+          >
+            {isPoking ? (
+              <div className="flex items-center space-x-1">
+                <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Poking...</span>
+              </div>
+            ) : (
+              'Poke'
+            )}
+          </button>
+        );
+        
+      case 'poke_response1':
+        if (!item || !user?.id) {
+          return (
+            <span className="text-gray-400 italic text-sm">
+              Login required
+            </span>
+          );
+        }
+        
+        if (!value) {
+          return (
+            <span className="text-gray-400 italic text-sm">
+              No response
+            </span>
+          );
+        }
+        
+        return (
+          <button
+            onClick={() => toggleExpandedRow(item.slot_id)}
+            className="px-2 py-1 text-xs bg-green-100 hover:bg-green-200 text-green-800 rounded transition-colors"
+          >
+            {expandedRows.has(item.slot_id) ? 'Hide Response' : 'View Response'}
+          </button>
+        );
+        
       case 'slot_id':
       case 'api_key_id':
       case 'fk_user_id':
@@ -1017,41 +1180,72 @@ export default function Clevnar3Page() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentItems.map((item, index) => (
-              <tr key={item.slot_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                {visibleColumns.map((col, colIndex) => {
-                  // Sticky logic: first N columns are always sticky
-                  const isSticky = colIndex < stickyColumnCount;
-                  const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                  const leftPosition = isSticky ? `${colIndex * 150}px` : 'auto';
-                  const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-                  
-                  // Check if this is the last sticky column
-                  const isLastSticky = colIndex === stickyColumnCount - 1;
-                  
-                  const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
-                  
-                  return (
-                    <td 
-                      key={col} 
-                      className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative`}
-                      style={isSticky ? { left: leftPosition } : {}}
-                    >
-                      {hasLeftSeparator && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
-                      )}
-                      <div className={col.includes('datum') || col.includes('ueplatlabel') ? 'min-w-48' : 'max-w-xs'}>
-                        {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
+              <React.Fragment key={item.slot_id}>
+                <tr className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  {visibleColumns.map((col, colIndex) => {
+                    // Sticky logic: first N columns are always sticky
+                    const isSticky = colIndex < stickyColumnCount;
+                    const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
+                    const leftPosition = isSticky ? `${colIndex * 150}px` : 'auto';
+                    const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                    
+                    // Check if this is the last sticky column
+                    const isLastSticky = colIndex === stickyColumnCount - 1;
+                    
+                    const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
+                    
+                    return (
+                      <td 
+                        key={col} 
+                        className={`px-6 py-4 text-sm text-gray-900 ${stickyClass} ${bgClass} relative`}
+                        style={isSticky ? { left: leftPosition } : {}}
+                      >
+                        {hasLeftSeparator && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
+                        )}
+                        <div className={col.includes('datum') || col.includes('ueplatlabel') ? 'min-w-48' : 'max-w-xs'}>
+                          {formatColumnData(col, item[col as keyof ApiKeySlotJoined], item)}
+                        </div>
+                        {hasRightSeparator && (
+                          <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                        )}
+                        {isLastSticky && (
+                          <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+                
+                {/* Expandable row for poke response */}
+                {expandedRows.has(item.slot_id) && item.poke_response1 && (
+                  <tr className="bg-yellow-50 border-t-2 border-yellow-200">
+                    <td colSpan={visibleColumns.length} className="px-6 py-4">
+                      <div className="bg-white border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-semibold text-gray-900">
+                            Poke Response for {item.slot_name || 'Slot'}
+                          </h4>
+                          <button
+                            onClick={() => toggleExpandedRow(item.slot_id)}
+                            className="text-gray-400 hover:text-gray-600"
+                          >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto max-h-64 overflow-y-auto whitespace-pre-wrap">
+                          {typeof item.poke_response1 === 'string' 
+                            ? JSON.stringify(JSON.parse(item.poke_response1), null, 2)
+                            : JSON.stringify(item.poke_response1, null, 2)
+                          }
+                        </pre>
                       </div>
-                      {hasRightSeparator && (
-                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
-                      )}
-                      {isLastSticky && (
-                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
-                      )}
                     </td>
-                  );
-                })}
-              </tr>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
