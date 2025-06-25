@@ -27,6 +27,8 @@ interface GconPiece {
   pelementor_edits: any;
   is_starred1: string | null;
   is_starred2: string | null;
+  g_post_type: string | null;
+  g_post_status: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -38,7 +40,7 @@ interface GconPiecesTableProps {
   onSelectionChange?: (selectedRows: Set<string>) => void;
 }
 
-type SortField = "meta_title" | "asn_sitespren_base" | "pub_status" | "date_time_pub_carry" | "pageslug" | "created_at" | "updated_at";
+type SortField = "meta_title" | "asn_sitespren_base" | "g_post_type" | "g_post_status" | "pub_status" | "date_time_pub_carry" | "pageslug" | "created_at" | "updated_at";
 type SortOrder = "asc" | "desc";
 type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
@@ -48,12 +50,14 @@ const allColumns = [
   'id',
   'is_starred1',
   'is_starred2',
-  'meta_title', 
+  'meta_title',
+  'asn_sitespren_base',
+  'g_post_type',
+  'g_post_status',
   'h1title',
   'pgb_h1title',
   'corpus1',
   'corpus2',
-  'asn_sitespren_base',
   'asn_nwpi_posts_id',
   'asn_imgplanbatch_id',
   'image_pack1',
@@ -419,6 +423,20 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
 
   const visibleColumns = getVisibleColumns();
 
+  // Status badge styling function (copied from nwjar1)
+  const getStatusBadge = (status: string | null) => {
+    switch (status) {
+      case 'publish':
+        return <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Published</span>;
+      case 'draft':
+        return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Draft</span>;
+      case 'private':
+        return <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Private</span>;
+      default:
+        return <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">{status || 'Unknown'}</span>;
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Column Template System */}
@@ -635,7 +653,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
-                  const isSortable = ['meta_title', 'asn_sitespren_base', 'pub_status', 'date_time_pub_carry', 'pageslug', 'created_at', 'updated_at'].includes(col);
+                  const isSortable = ['meta_title', 'asn_sitespren_base', 'g_post_type', 'g_post_status', 'pub_status', 'date_time_pub_carry', 'pageslug', 'created_at', 'updated_at'].includes(col);
                   
                   return (
                     <th
@@ -798,6 +816,12 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           </div>
                         ) : col === 'meta_title' || col === 'h1title' || col === 'pgb_h1title' ? (
                           truncateText(item[col], 60)
+                        ) : col === 'g_post_type' ? (
+                          <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full whitespace-nowrap">
+                            {item.g_post_type || 'unknown'}
+                          </span>
+                        ) : col === 'g_post_status' ? (
+                          getStatusBadge(item.g_post_status)
                         ) : col === 'corpus1' ? (
                           (() => {
                             const text = item[col];
