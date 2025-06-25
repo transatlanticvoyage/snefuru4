@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     // Make AI request based on provider
     let aiResponse;
     try {
-      aiResponse = await makeAIRequest(slotData.slot_name, slotData.test_endpoint_url, apiKey, prompt);
+      aiResponse = await makeAIRequest(slotData.slot_name, apiKey, prompt);
     } catch (error) {
       console.error(`❌ AI request failed for ${slotData.slot_name}:`, error);
       return NextResponse.json({
@@ -132,18 +132,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function makeAIRequest(slotName: string, endpointUrl: string | null, apiKey: string, prompt: string) {
-  if (!endpointUrl) {
-    throw new Error('No API endpoint configured for this provider');
-  }
-
+async function makeAIRequest(slotName: string, apiKey: string, prompt: string) {
   const lowerSlotName = slotName.toLowerCase();
-  let url = endpointUrl;
+  let url = '';
   let headers: Record<string, string> = {};
   let body: any = null;
 
-  // Configure request based on provider
+  // Configure request based on provider with correct endpoints
   if (lowerSlotName.includes('openai')) {
+    url = 'https://api.openai.com/v1/chat/completions';
     headers = {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json'
@@ -154,6 +151,7 @@ async function makeAIRequest(slotName: string, endpointUrl: string | null, apiKe
       max_tokens: 2000
     });
   } else if (lowerSlotName.includes('claude') || lowerSlotName.includes('anthropic')) {
+    url = 'https://api.anthropic.com/v1/messages';
     headers = {
       'x-api-key': apiKey,
       'Content-Type': 'application/json',
@@ -165,8 +163,7 @@ async function makeAIRequest(slotName: string, endpointUrl: string | null, apiKe
       messages: [{ role: 'user', content: prompt }]
     });
   } else if (lowerSlotName.includes('gemini') || lowerSlotName.includes('google')) {
-    // Google uses query parameter for API key
-    url = `${endpointUrl}?key=${apiKey}`;
+    url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
     headers = {
       'Content-Type': 'application/json'
     };
@@ -176,6 +173,7 @@ async function makeAIRequest(slotName: string, endpointUrl: string | null, apiKe
       }]
     });
   } else if (lowerSlotName.includes('perplexity')) {
+    url = 'https://api.perplexity.ai/chat/completions';
     headers = {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json'
@@ -187,6 +185,7 @@ async function makeAIRequest(slotName: string, endpointUrl: string | null, apiKe
     });
   } else {
     // Default to OpenAI-compatible format
+    url = 'https://api.openai.com/v1/chat/completions';
     headers = {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json'
