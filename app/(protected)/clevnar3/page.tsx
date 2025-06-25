@@ -39,6 +39,12 @@ interface ApiKeySlotJoined {
   d_slot_name: string | null;
   d_user_email: string | null;
   poke_response1: string | null;
+  test_endpoint_url: string | null;
+  test_method: string | null;
+  poke_last_attempted: string | null;
+  poke_success_count: number;
+  poke_failure_count: number;
+  poke_last_success: string | null;
 }
 
 const columns = [
@@ -200,7 +206,13 @@ export default function Clevnar3Page() {
           d_m3platcodehandle: null,
           d_slot_name: null,
           d_user_email: null,
-          poke_response1: null
+          poke_response1: null,
+          test_endpoint_url: slot.test_endpoint_url,
+          test_method: slot.test_method,
+          poke_last_attempted: null,
+          poke_success_count: 0,
+          poke_failure_count: 0,
+          poke_last_success: null
         }));
         
         setData(transformedSlots);
@@ -279,7 +291,13 @@ export default function Clevnar3Page() {
           d_m3platcodehandle: userKey?.d_m3platcodehandle || null,
           d_slot_name: userKey?.d_slot_name || null,
           d_user_email: userKey?.d_user_email || null,
-          poke_response1: userKey?.poke_response1 || null
+          poke_response1: userKey?.poke_response1 || null,
+          test_endpoint_url: slot.test_endpoint_url,
+          test_method: slot.test_method,
+          poke_last_attempted: userKey?.poke_last_attempted || null,
+          poke_success_count: userKey?.poke_success_count || 0,
+          poke_failure_count: userKey?.poke_failure_count || 0,
+          poke_last_success: userKey?.poke_last_success || null
         };
       });
       
@@ -569,68 +587,33 @@ export default function Clevnar3Page() {
     setPokingSlots(new Set([...pokingSlots, slotId]));
     
     try {
-      // Get user's DB id from users table
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-        
-      if (userError || !userData) {
-        throw new Error('Could not find user record.');
-      }
-
-      // TODO: Create actual poke API endpoint
-      // For now, we'll simulate the poke response
-      const simulatedResponse = {
-        success: true,
-        timestamp: new Date().toISOString(),
-        message: "API key test successful",
-        model_info: "Simulated model response - replace with actual API call"
-      };
-
-      // Update the poke_response1 field in api_keys_t3
-      const { data: existingKey, error: checkError } = await supabase
-        .from('api_keys_t3')
-        .select('*')
-        .eq('fk_user_id', userData.id)
-        .eq('fk_slot_id', slotId)
-        .single();
+      console.log(`🔄 Starting poke for slot: ${slotId}`);
       
-      if (checkError && checkError.code !== 'PGRST116') {
-        throw checkError;
+      const response = await fetch('/api/poke-api-key', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ slot_id: slotId }),
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to poke API key');
       }
 
-      const updateData = {
-        poke_response1: JSON.stringify(simulatedResponse),
-        updated_at: new Date().toISOString()
-      };
-
-      if (existingKey) {
-        // Update existing record
-        const { error: updateError } = await supabase
-          .from('api_keys_t3')
-          .update(updateData)
-          .eq('api_key_id', existingKey.api_key_id);
-          
-        if (updateError) throw updateError;
-      } else {
-        // Create new record
-        const { error: insertError } = await supabase
-          .from('api_keys_t3')
-          .insert({
-            fk_user_id: userData.id,
-            fk_slot_id: slotId,
-            ...updateData,
-            created_at: new Date().toISOString()
-          });
-          
-        if (insertError) throw insertError;
-      }
-
+      console.log(`✅ Poke completed for slot: ${slotId}`, result);
+      
+      // Refresh the data to show updated response
       await fetchJoinedData();
+      
     } catch (err) {
+      console.error('Poke error:', err);
       setError(err instanceof Error ? err.message : 'Failed to poke API key');
+      
+      // Clear error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     } finally {
       const newPokingSlots = new Set(pokingSlots);
       newPokingSlots.delete(slotId);
