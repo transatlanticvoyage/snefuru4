@@ -129,6 +129,14 @@ export async function POST(request: NextRequest) {
       try {
         results.processed++;
         
+        // Skip records with null/empty post_id as they cannot be properly deduplicated
+        if (!nwpiRecord.post_id || nwpiRecord.post_id === null || nwpiRecord.post_id === undefined) {
+          console.log(`⏭️ Skipping record with null/empty post_id: ${nwpiRecord.post_title} (ID: ${nwpiRecord.internal_post_id})`);
+          results.failed++;
+          results.errors.push(`Skipped "${nwpiRecord.post_title}": No valid post_id for deduplication`);
+          continue;
+        }
+        
         // Transform the record using the mapping configuration
         const gconData = transformNwpiToGcon(nwpiRecord, userData.id);
         
