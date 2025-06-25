@@ -22,6 +22,8 @@ export default function NwJar1Page() {
   const [selectedContentIds, setSelectedContentIds] = useState<Set<string>>(new Set());
   const [f47Loading, setF47Loading] = useState(false);
   const [f22Loading, setF22Loading] = useState(false);
+  const [f22Error, setF22Error] = useState<{message: string, details?: any} | null>(null);
+  const [f47Error, setF47Error] = useState<{message: string, details?: any} | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -322,6 +324,7 @@ export default function NwJar1Page() {
     }
 
     setF22Loading(true);
+    setF22Error(null); // Clear previous errors
     try {
       const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
         method: 'POST',
@@ -337,13 +340,28 @@ export default function NwJar1Page() {
 
       if (result.success) {
         alert(`Success: ${result.message}`);
+        setF22Error(null); // Clear any previous errors on success
         // Could refresh data or show more detailed results here
       } else {
-        alert(`Error: ${result.message || 'Failed to push to GCon pieces'}`);
+        const errorMessage = result.message || 'Failed to push to GCon pieces';
+        alert(`Error: ${errorMessage}`);
+        setF22Error({
+          message: errorMessage,
+          details: result.results || result
+        });
       }
     } catch (error) {
       console.error('Error calling f22_nwpi_to_gcon_pusher:', error);
-      alert('An error occurred while pushing to GCon pieces');
+      const errorMessage = 'An error occurred while pushing to GCon pieces';
+      alert(errorMessage);
+      setF22Error({
+        message: errorMessage,
+        details: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : error
+      });
     } finally {
       setF22Loading(false);
     }
@@ -374,6 +392,7 @@ export default function NwJar1Page() {
     }
 
     setF47Loading(true);
+    setF47Error(null); // Clear previous errors
     try {
       const response = await fetch('/api/f47_generate_gcon_pieces', {
         method: 'POST',
@@ -389,13 +408,28 @@ export default function NwJar1Page() {
 
       if (result.success) {
         alert(`Successfully generated ${result.data.created_count} GCon pieces from ${itemsToProcess.length} items`);
+        setF47Error(null); // Clear any previous errors on success
         // Could refresh data or show more detailed results here
       } else {
-        alert(`Error: ${result.error || 'Failed to generate GCon pieces'}`);
+        const errorMessage = result.error || 'Failed to generate GCon pieces';
+        alert(`Error: ${errorMessage}`);
+        setF47Error({
+          message: errorMessage,
+          details: result.data || result
+        });
       }
     } catch (error) {
       console.error('Error calling f47_generate_gcon_pieces:', error);
-      alert('An error occurred while generating GCon pieces');
+      const errorMessage = 'An error occurred while generating GCon pieces';
+      alert(errorMessage);
+      setF47Error({
+        message: errorMessage,
+        details: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : error
+      });
     } finally {
       setF47Loading(false);
     }
@@ -725,6 +759,89 @@ export default function NwJar1Page() {
                         <p className="text-sm text-gray-600">
                           SOPTION2 selected: All {nwpiContent.length} items will be processed
                         </p>
+                      )}
+
+                      {/* Error Display Area */}
+                      {(f22Error || f47Error) && (
+                        <div className="mt-6 space-y-4">
+                          <h4 className="text-md font-medium text-red-700">Error Details</h4>
+                          
+                          {f22Error && (
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                              <div className="flex">
+                                <div className="flex-shrink-0">
+                                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                                <div className="ml-3 flex-1">
+                                  <h5 className="text-sm font-medium text-red-800">f22_nwpi_to_gcon_pusher Error</h5>
+                                  <div className="mt-2 text-sm text-red-700">
+                                    <p className="font-medium">Error Message:</p>
+                                    <p className="mt-1 bg-white p-2 rounded border">{f22Error.message}</p>
+                                    
+                                    {f22Error.details && (
+                                      <div className="mt-3">
+                                        <p className="font-medium">Additional Details:</p>
+                                        <div className="mt-1 bg-white p-2 rounded border max-h-48 overflow-y-auto">
+                                          <pre className="text-xs whitespace-pre-wrap">
+                                            {JSON.stringify(f22Error.details, null, 2)}
+                                          </pre>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="mt-3">
+                                    <button
+                                      onClick={() => setF22Error(null)}
+                                      className="text-sm text-red-600 hover:text-red-800 underline"
+                                    >
+                                      Clear f22 Error
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {f47Error && (
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                              <div className="flex">
+                                <div className="flex-shrink-0">
+                                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                                <div className="ml-3 flex-1">
+                                  <h5 className="text-sm font-medium text-red-800">f47_generate_gcon_pieces Error</h5>
+                                  <div className="mt-2 text-sm text-red-700">
+                                    <p className="font-medium">Error Message:</p>
+                                    <p className="mt-1 bg-white p-2 rounded border">{f47Error.message}</p>
+                                    
+                                    {f47Error.details && (
+                                      <div className="mt-3">
+                                        <p className="font-medium">Additional Details:</p>
+                                        <div className="mt-1 bg-white p-2 rounded border max-h-48 overflow-y-auto">
+                                          <pre className="text-xs whitespace-pre-wrap">
+                                            {JSON.stringify(f47Error.details, null, 2)}
+                                          </pre>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="mt-3">
+                                    <button
+                                      onClick={() => setF47Error(null)}
+                                      className="text-sm text-red-600 hover:text-red-800 underline"
+                                    >
+                                      Clear f47 Error
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
