@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 interface GconPiece {
   id: string;
@@ -47,6 +48,51 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
   const [activeTab, setActiveTab] = useState<'cached' | 'edits' | 'talkToAi1' | 'updateEndSite' | 'comparison'>('cached');
   
   const supabase = createClientComponentClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Handle mtab URL parameter on component mount
+  useEffect(() => {
+    const mtab = searchParams?.get('mtab');
+    if (mtab) {
+      // Map URL mtab values to actual tab names
+      const tabMapping: Record<string, 'cached' | 'edits' | 'talkToAi1' | 'updateEndSite' | 'comparison'> = {
+        'cached': 'cached',
+        'edits': 'edits', 
+        'talk1': 'talkToAi1',
+        'talkToAi1': 'talkToAi1',
+        'updateEndSite': 'updateEndSite',
+        'comparison': 'comparison'
+      };
+      
+      const mappedTab = tabMapping[mtab];
+      if (mappedTab) {
+        setActiveTab(mappedTab);
+      }
+    }
+  }, [searchParams]);
+
+  // Helper function to update URL with mtab parameter
+  const updateTabInUrl = (tab: 'cached' | 'edits' | 'talkToAi1' | 'updateEndSite' | 'comparison') => {
+    const current = new URLSearchParams(Array.from(searchParams?.entries() || []));
+    
+    // Map internal tab names to URL-friendly names
+    const urlTabMapping: Record<string, string> = {
+      'cached': 'cached',
+      'edits': 'edits',
+      'talkToAi1': 'talk1',
+      'updateEndSite': 'updateEndSite', 
+      'comparison': 'comparison'
+    };
+
+    current.set('mtab', urlTabMapping[tab]);
+    const search = current.toString();
+    const query = search ? `?${search}` : '';
+    
+    // Update URL without triggering navigation
+    window.history.replaceState(null, '', `${window.location.pathname}${query}`);
+    setActiveTab(tab);
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -285,7 +331,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
       <div className="border-b border-gray-200 mb-6">
         <nav className="-mb-px flex space-x-8">
           <button
-            onClick={() => setActiveTab('cached')}
+            onClick={() => updateTabInUrl('cached')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'cached'
                 ? 'border-green-500 text-green-600'
@@ -298,7 +344,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
             )}
           </button>
           <button
-            onClick={() => setActiveTab('edits')}
+            onClick={() => updateTabInUrl('edits')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'edits'
                 ? 'border-purple-500 text-purple-600'
@@ -311,7 +357,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
             )}
           </button>
           <button
-            onClick={() => setActiveTab('talkToAi1')}
+            onClick={() => updateTabInUrl('talkToAi1')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'talkToAi1'
                 ? 'border-teal-500 text-teal-600'
@@ -321,7 +367,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
             talk1
           </button>
           <button
-            onClick={() => setActiveTab('updateEndSite')}
+            onClick={() => updateTabInUrl('updateEndSite')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'updateEndSite'
                 ? 'border-orange-500 text-orange-600'
@@ -331,7 +377,7 @@ export default function ElementorEditor({ gconPiece, userInternalId, onUpdate }:
             Update End Site
           </button>
           <button
-            onClick={() => setActiveTab('comparison')}
+            onClick={() => updateTabInUrl('comparison')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'comparison'
                 ? 'border-blue-500 text-blue-600'
