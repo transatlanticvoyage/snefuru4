@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     // Get gcon_piece with site information
     const { data: pieceData, error: pieceError } = await supabase
       .from('gcon_pieces')
-      .select('id, asn_sitespren_base, asn_nwpi_posts_id, meta_title')
+      .select('id, asn_sitespren_base, g_post_id, meta_title')
       .eq('id', gcon_piece_id)
       .eq('fk_users_id', userData.id)
       .single();
@@ -70,14 +70,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!pieceData.asn_nwpi_posts_id) {
+    if (!pieceData.g_post_id) {
       return NextResponse.json(
         { success: false, error: 'No WordPress post ID found for this content piece' },
         { status: 400 }
       );
     }
 
-    console.log(`📍 Found piece: ${pieceData.meta_title}, Site: ${pieceData.asn_sitespren_base}, Post ID: ${pieceData.asn_nwpi_posts_id}`);
+    console.log(`📍 Found piece: ${pieceData.meta_title}, Site: ${pieceData.asn_sitespren_base}, Post ID: ${pieceData.g_post_id}`);
 
     // Get site configuration from sitespren table
     const { data: siteData, error: siteError } = await supabase
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     // Update WordPress site with pelementor data
     const wpUpdateResult = await updateWordPressPelementor(
       siteData,
-      pieceData.asn_nwpi_posts_id,
+      pieceData.g_post_id,
       pelementor_data,
       userData.ruplin_api_key_1
     );
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Successfully updated live site with pelementor data',
       site: pieceData.asn_sitespren_base,
-      post_id: pieceData.asn_nwpi_posts_id,
+      post_id: pieceData.g_post_id,
       updated_at: new Date().toISOString()
     });
 
