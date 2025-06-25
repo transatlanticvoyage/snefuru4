@@ -22,6 +22,9 @@ export default function UtilPr1Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
 
   const { user } = useAuth();
   const supabase = createClientComponentClient();
@@ -100,6 +103,58 @@ export default function UtilPr1Page() {
     }
   };
 
+  // Handle create new prompt
+  const handleCreatePrompt = async (formData: {
+    prompt_name: string;
+    prompt_desc: string;
+    prompt_content: string;
+    main_model_intended: string;
+    is_special_public_prompt: boolean;
+  }) => {
+    if (!userInternalId) return;
+
+    setIsCreating(true);
+    setNotification(null);
+
+    try {
+      const { error } = await supabase
+        .from('utility_prompts')
+        .insert({
+          fk_user_id: userInternalId,
+          prompt_name: formData.prompt_name || null,
+          prompt_desc: formData.prompt_desc || null,
+          prompt_content: formData.prompt_content || null,
+          main_model_intended: formData.main_model_intended || null,
+          is_special_public_prompt: formData.is_special_public_prompt,
+        });
+
+      if (error) {
+        console.error('Error creating prompt:', error);
+        setNotification({
+          type: 'error',
+          message: 'Failed to create prompt'
+        });
+      } else {
+        setNotification({
+          type: 'success',
+          message: 'Prompt created successfully!'
+        });
+        setShowCreateModal(false);
+        await refetchUtilityPrompts();
+      }
+    } catch (error) {
+      console.error('Error creating prompt:', error);
+      setNotification({
+        type: 'error',
+        message: 'An error occurred while creating the prompt'
+      });
+    } finally {
+      setIsCreating(false);
+      // Clear notification after 5 seconds
+      setTimeout(() => setNotification(null), 5000);
+    }
+  };
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -134,15 +189,36 @@ export default function UtilPr1Page() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Notification */}
+      {notification && (
+        <div className={`mb-4 p-4 rounded-md ${
+          notification.type === 'success' 
+            ? 'bg-green-100 border border-green-400 text-green-700' 
+            : 'bg-red-100 border border-red-400 text-red-700'
+        }`}>
+          {notification.message}
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Utility Prompts</h1>
-        <p className="mt-2 text-gray-600">
-          Manage your utility prompts and view public prompts
-        </p>
-        <p className="mt-1 text-sm text-gray-500">
-          db table: utility_prompts
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Utility Prompts</h1>
+            <p className="mt-2 text-gray-600">
+              Manage your utility prompts and view public prompts
+            </p>
+            <p className="mt-1 text-sm text-gray-500">
+              db table: utility_prompts
+            </p>
+          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
+          >
+            Create New Prompt
+          </button>
+        </div>
       </div>
 
       {/* Table */}
@@ -152,6 +228,155 @@ export default function UtilPr1Page() {
         userInternalId={userInternalId}
         onUpdate={refetchUtilityPrompts}
       />
+
+      {/* Create Prompt Modal */}
+      {showCreateModal && (
+        <CreatePromptModal
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={handleCreatePrompt}
+          isLoading={isCreating}
+        />
+      )}
+    </div>
+  );
+}
+
+// Create Prompt Modal Component
+interface CreatePromptModalProps {
+  onClose: () => void;
+  onSubmit: (formData: {
+    prompt_name: string;
+    prompt_desc: string;
+    prompt_content: string;
+    main_model_intended: string;
+    is_special_public_prompt: boolean;
+  }) => void;
+  isLoading: boolean;
+}
+
+function CreatePromptModal({ onClose, onSubmit, isLoading }: CreatePromptModalProps) {
+  const [formData, setFormData] = useState({
+    prompt_name: '',
+    prompt_desc: '',
+    prompt_content: '',
+    main_model_intended: '',
+    is_special_public_prompt: false,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Create New Prompt</h2>
+          <button
+            onClick={onClose}
+            disabled={isLoading}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Prompt Name
+            </label>
+            <input
+              type="text"
+              value={formData.prompt_name}
+              onChange={(e) => handleInputChange('prompt_name', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter a name for your prompt..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Prompt Description
+            </label>
+            <textarea
+              value={formData.prompt_desc}
+              onChange={(e) => handleInputChange('prompt_desc', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Describe what this prompt does..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Main Model Intended
+            </label>
+            <input
+              type="text"
+              value={formData.main_model_intended}
+              onChange={(e) => handleInputChange('main_model_intended', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g., GPT-4, Claude, etc."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Prompt Content *
+            </label>
+            <textarea
+              value={formData.prompt_content}
+              onChange={(e) => handleInputChange('prompt_content', e.target.value)}
+              rows={8}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+              placeholder="Enter your prompt content here..."
+            />
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="is_public"
+              checked={formData.is_special_public_prompt}
+              onChange={(e) => handleInputChange('is_special_public_prompt', e.target.checked)}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="is_public" className="ml-2 block text-sm text-gray-700">
+              Make this prompt public (visible to all users)
+            </label>
+          </div>
+
+          <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isLoading}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading || !formData.prompt_content.trim()}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Creating...' : 'Create Prompt'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
