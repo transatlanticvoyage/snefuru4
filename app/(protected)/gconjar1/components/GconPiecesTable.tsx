@@ -29,6 +29,7 @@ interface GconPiece {
   is_starred2: string | null;
   g_post_type: string | null;
   g_post_status: string | null;
+  g_post_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -50,6 +51,7 @@ const allColumns = [
   'id',
   'is_starred1',
   'is_starred2',
+  'g_post_id',
   'meta_title',
   'asn_sitespren_base',
   'g_post_type',
@@ -789,6 +791,10 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                         ) : col === 'id' ? (
                           <span className="whitespace-nowrap text-xs font-mono">
                             {truncateText(item[col], 8)}
+                          </span>
+                        ) : col === 'g_post_id' ? (
+                          <span className="whitespace-nowrap text-xs font-mono text-gray-600">
+                            {item.g_post_id || '-'}
                           </span>
                         ) : col === 'is_starred1' || col === 'is_starred2' ? (
                           <div 

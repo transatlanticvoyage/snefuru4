@@ -61,6 +61,7 @@ type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option
 const allColumns = [
   'select',
   'actions',
+  'post_id',
   'post_title',
   'fk_sitespren_base',
   'post_type',
@@ -68,7 +69,6 @@ const allColumns = [
   'i_sync_method',
   'i_sync_completed_at',
   'a_elementor_substance',
-  'post_id',
   'internal_post_id',
   'fk_users_id',
   'fk_sitespren_id',
