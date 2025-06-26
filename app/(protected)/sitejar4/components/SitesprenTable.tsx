@@ -533,7 +533,8 @@ export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          siteId: siteId
+          siteId: siteId,
+          userId: userId
         })
       });
 

@@ -75,7 +75,7 @@ async function checkRemotePluginVersion(siteUrl: string, credentials: any): Prom
 
 export async function POST(request: NextRequest) {
   try {
-    const { siteId } = await request.json();
+    const { siteId, userId } = await request.json();
 
     if (!siteId) {
       return NextResponse.json(
@@ -87,13 +87,27 @@ export async function POST(request: NextRequest) {
     // Get site information from database
     const { data: siteData, error: siteError } = await supabase
       .from('sitespren')
-      .select('sitespren_base, ruplin_apikey, wp_rest_app_pass, wpuser1')
+      .select('sitespren_base, wp_rest_app_pass, wpuser1, fk_users_id')
       .eq('id', siteId)
       .single();
 
     if (siteError || !siteData) {
       return NextResponse.json(
         { success: false, message: 'Site not found in database' },
+        { status: 404 }
+      );
+    }
+
+    // Get user's ruplin API key
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('ruplin_api_key_1')
+      .eq('id', siteData.fk_users_id)
+      .single();
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { success: false, message: 'User not found' },
         { status: 404 }
       );
     }
@@ -105,7 +119,7 @@ export async function POST(request: NextRequest) {
     
     // Check remote plugin version
     const remoteCheck = await checkRemotePluginVersion(siteUrl, {
-      ruplin_apikey: siteData.ruplin_apikey,
+      ruplin_apikey: userData.ruplin_api_key_1,
       wp_rest_app_pass: siteData.wp_rest_app_pass,
       wpuser1: siteData.wpuser1
     });

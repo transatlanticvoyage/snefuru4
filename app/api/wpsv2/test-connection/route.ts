@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user record
+    // Get user record with ruplin API key
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('id')
+      .select('id, ruplin_api_key_1')
       .eq('auth_id', session.user.id)
       .single();
 
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     console.log(`🔍 WPSv2: Testing connection for ${siteData.sitespren_base}`);
 
     // Test plugin connection
-    const pluginTest = await wpsv2TestPluginConnection(siteData.sitespren_base, siteData.ruplin_apikey);
+    const pluginTest = await wpsv2TestPluginConnection(siteData.sitespren_base, userData.ruplin_api_key_1);
     
     // Test REST API connection
     const restTest = await wpsv2TestRestConnection(siteData.sitespren_base, siteData.wp_rest_app_pass);
