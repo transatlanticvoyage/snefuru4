@@ -31,6 +31,9 @@ interface SitesprenTableProps {
   userId: string;
   onSelectionChange?: (selectedIds: string[]) => void;
   onDataUpdate?: (updatedData: SitesprenRecord[]) => void;
+  searchTerm?: string;
+  onSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  totalUnfilteredCount?: number;
 }
 
 type SortField = keyof SitesprenRecord;
@@ -63,8 +66,7 @@ const allColumns = [
   'is_wp_site'         // 23
 ];
 
-export default function SitesprenTable({ data, userId, onSelectionChange, onDataUpdate }: SitesprenTableProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+export default function SitesprenTable({ data, userId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount }: SitesprenTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -188,27 +190,18 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
   const visibleColumns = getVisibleColumns();
   const stickyColumnCount = getStickyColumnCount();
 
-  // Filter and search logic
+  // Filter logic (only for WordPress site filter, search is handled by parent)
   const filteredData = useMemo(() => {
     return data.filter(item => {
-      // Search filter
-      const searchLower = searchTerm.toLowerCase();
-      const matchesSearch = !searchTerm || 
-        item.sitespren_base?.toLowerCase().includes(searchLower) ||
-        item.true_root_domain?.toLowerCase().includes(searchLower) ||
-        item.full_subdomain?.toLowerCase().includes(searchLower) ||
-        item.webproperty_type?.toLowerCase().includes(searchLower) ||
-        item.wpuser1?.toLowerCase().includes(searchLower);
-
       // WordPress site filter
       const matchesWpFilter = filterWpSite === '' || 
         (filterWpSite === 'true' && item.is_wp_site === true) ||
         (filterWpSite === 'false' && item.is_wp_site === false) ||
         (filterWpSite === 'null' && item.is_wp_site === null);
 
-      return matchesSearch && matchesWpFilter;
+      return matchesWpFilter;
     });
-  }, [data, searchTerm, filterWpSite]);
+  }, [data, filterWpSite]);
 
   // Sort logic
   const sortedData = useMemo(() => {
@@ -876,19 +869,34 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2">
+            <label htmlFor="site-search-table" className="block text-sm font-medium text-gray-700 mb-2">
+              Search Sites
+            </label>
             <input
+              id="site-search-table"
               type="text"
-              placeholder="Search sites..."
+              placeholder="Search by domain, type, or ID..."
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={searchTerm}
+              value={externalSearchTerm || ''}
               onChange={(e) => {
-                setSearchTerm(e.target.value);
+                if (externalOnSearchChange) {
+                  externalOnSearchChange(e);
+                }
                 setCurrentPage(1);
               }}
             />
+            {externalSearchTerm && totalUnfilteredCount !== undefined && (
+              <p className="text-sm text-gray-500 mt-1">
+                Showing {data.length} of {totalUnfilteredCount} sites
+              </p>
+            )}
           </div>
           <div>
+            <label htmlFor="wp-filter" className="block text-sm font-medium text-gray-700 mb-2">
+              Filter by Type
+            </label>
             <select
+              id="wp-filter"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
               value={filterWpSite}
               onChange={(e) => {

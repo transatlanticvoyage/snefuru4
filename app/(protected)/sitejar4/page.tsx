@@ -465,27 +465,6 @@ export default function Sitejar4Page() {
           Manage your web properties and WordPress sites
         </p>
         
-        {/* Search Box */}
-        <div className="mt-4">
-          <div className="max-w-md">
-            <label htmlFor="site-search" className="block text-sm font-medium text-gray-700 mb-2">
-              Search Sites
-            </label>
-            <input
-              id="site-search"
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              placeholder="Search by domain, type, or ID..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            {searchTerm && (
-              <p className="text-sm text-gray-500 mt-1">
-                Showing {filteredSitesprenData.length} of {sitesprenData.length} sites
-              </p>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Functions popup button */}
@@ -922,6 +901,9 @@ http://www.drogs.com`}
         userId={user.id}
         onSelectionChange={handleSelectionChange}
         onDataUpdate={setSitesprenData}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        totalUnfilteredCount={sitesprenData.length}
       />
     </div>
   );
