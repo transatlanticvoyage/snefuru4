@@ -928,6 +928,7 @@ http://www.drogs.com`}
       <SitesprenTable 
         data={filteredSitesprenData} 
         userId={user.id}
+        userInternalId={userInternalId!}
         onSelectionChange={handleSelectionChange}
         onDataUpdate={setSitesprenData}
         searchTerm={searchTerm}

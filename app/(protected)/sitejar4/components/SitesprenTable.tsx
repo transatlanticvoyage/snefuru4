@@ -34,6 +34,7 @@ interface SitesprenRecord {
 interface SitesprenTableProps {
   data: SitesprenRecord[];
   userId: string;
+  userInternalId: string;
   onSelectionChange?: (selectedIds: string[]) => void;
   onDataUpdate?: (updatedData: SitesprenRecord[]) => void;
   searchTerm?: string;
@@ -70,7 +71,7 @@ const allColumns = [
   'is_wp_site'         // 22
 ];
 
-export default function SitesprenTable({ data, userId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount }: SitesprenTableProps) {
+export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount }: SitesprenTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -268,11 +269,11 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
 
   // Fetch host accounts for the popup
   const fetchHostAccountsForPopup = async () => {
-    if (!userId || allHostAccounts.length > 0) return;
+    if (!userInternalId || allHostAccounts.length > 0) return;
 
     try {
       const params = new URLSearchParams({
-        user_internal_id: userId
+        user_internal_id: userInternalId
       });
 
       const response = await fetch(`/api/get_domain_registrar_info?${params}`);
@@ -865,7 +866,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
 
   // Update domain registrar for a site
   const updateDomainRegistrar = async (siteId: string, newHostAccountId: string | null) => {
-    if (!userId) return;
+    if (!userInternalId) return;
 
     try {
       const response = await fetch('/api/update_domain_registrar', {
@@ -876,7 +877,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
         body: JSON.stringify({
           sitespren_id: siteId,
           fk_domreg_hostaccount: newHostAccountId,
-          user_internal_id: userId
+          user_internal_id: userInternalId
         })
       });
 
