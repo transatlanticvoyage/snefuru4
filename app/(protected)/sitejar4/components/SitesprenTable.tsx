@@ -948,53 +948,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           throw new Error(`Unknown action: ${action}`);
       }
 
-      // Wait a moment for the sync result to be set, then check for it
-      setTimeout(() => {
-        let syncResultKey: string;
-        switch (action) {
-          case 'check_plugin_version':
-            syncResultKey = `version_${selectedSiteId}`;
-            break;
-          case 'update_plugin':
-            syncResultKey = `update_${selectedSiteId}`;
-            break;
-          case 'barkro_push':
-            syncResultKey = `barkro_${selectedSiteId}`;
-            break;
-          case 'wpsv2_sync':
-            syncResultKey = selectedSiteId; // sync stores just siteId
-            break;
-          case 'test_plugin':
-            syncResultKey = `test_${selectedSiteId}`;
-            break;
-          default:
-            syncResultKey = method ? `${action}_${method}_${selectedSiteId}` : `${action}_${selectedSiteId}`;
-        }
-        
-        console.log('Looking for sync result with key:', syncResultKey);
-        console.log('Available sync results:', Object.keys(syncResults));
-        console.log('Sync results state:', syncResults);
-        
-        const syncResult = syncResults[syncResultKey];
-        
-        if (syncResult) {
-          console.log('Found sync result:', syncResult);
-          setGadgetFeedback({
-            action: `${action}${method ? ` (${method})` : ''}`,
-            message: syncResult.message,
-            type: syncResult.type,
-            timestamp
-          });
-        } else {
-          console.log('No sync result found, using default message');
-          setGadgetFeedback({
-            action: `${action}${method ? ` (${method})` : ''}`,
-            message: 'Action completed',
-            type: 'success',
-            timestamp
-          });
-        }
-      }, 100); // Wait 100ms for the sync result to be set
+      // The individual handlers now set the gadget feedback directly,
+      // so we don't need to do anything else here
     } catch (error) {
       setGadgetFeedback({
         action: `${action}${method ? ` (${method})` : ''}`,
