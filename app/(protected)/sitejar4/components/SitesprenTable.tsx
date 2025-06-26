@@ -43,27 +43,26 @@ type SortOrder = 'asc' | 'desc';
 const allColumns = [
   'checkbox',           // 1
   'tool_buttons',       // 2  
-  'sync_actions',       // 3
-  'id',                // 4
-  'created_at',        // 5
-  'is_starred1',       // 6
-  'sitespren_base',    // 7
-  'ns_full',           // 8 (new field)
-  'ip_address',        // 9 (new field)
-  'domain_registrar_info', // 10 (new field)
-  'fk_domreg_hostaccount', // 11
-  'true_root_domain',  // 12
-  'full_subdomain',    // 13
-  'webproperty_type',  // 14
-  'fk_users_id',       // 15
-  'updated_at',        // 16
-  'wpuser1',           // 17
-  'wppass1',           // 18
-  'ruplin_apikey',     // 19
-  'wp_rest_app_pass',  // 20
-  'wp_plugin_installed1', // 21
-  'wp_plugin_connected2', // 22
-  'is_wp_site'         // 23
+  'id',                // 3
+  'created_at',        // 4
+  'is_starred1',       // 5
+  'sitespren_base',    // 6
+  'ns_full',           // 7 (new field)
+  'ip_address',        // 8 (new field)
+  'domain_registrar_info', // 9 (new field)
+  'fk_domreg_hostaccount', // 10
+  'true_root_domain',  // 11
+  'full_subdomain',    // 12
+  'webproperty_type',  // 13
+  'fk_users_id',       // 14
+  'updated_at',        // 15
+  'wpuser1',           // 16
+  'wppass1',           // 17
+  'ruplin_apikey',     // 18
+  'wp_rest_app_pass',  // 19
+  'wp_plugin_installed1', // 20
+  'wp_plugin_connected2', // 21
+  'is_wp_site'         // 22
 ];
 
 export default function SitesprenTable({ data, userId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount }: SitesprenTableProps) {
@@ -82,6 +81,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
   const [updatingPlugin, setUpdatingPlugin] = useState<Set<string>>(new Set());
   const [barkroPushing, setBarkroPushing] = useState<Set<string>>(new Set());
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [gadgetFeedback, setGadgetFeedback] = useState<{action: string, message: string, type: 'success' | 'error' | 'info', timestamp: string} | null>(null);
   
   const supabase = createClientComponentClient();
   
@@ -744,6 +744,97 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
     }
   };
 
+  // Single site action handler for the gadgets section
+  const handleSingleSiteAction = async (action: string, method?: string) => {
+    const selectedSiteId = Array.from(selectedSites)[0];
+    if (!selectedSiteId) return;
+
+    const timestamp = new Date().toISOString();
+    setGadgetFeedback({
+      action: `${action}${method ? ` (${method})` : ''}`,
+      message: 'Processing...',
+      type: 'info',
+      timestamp
+    });
+
+    try {
+      let result;
+      switch (action) {
+        case 'wpsv2_sync':
+          result = await handleWpsv2Sync(selectedSiteId, (method as 'plugin_api' | 'rest_api') || 'plugin_api');
+          break;
+        case 'test_plugin':
+          result = await handleWpsv2TestPlugin(selectedSiteId);
+          break;
+        case 'check_plugin_version':
+          result = await handleCheckPluginVersion(selectedSiteId);
+          break;
+        case 'update_plugin':
+          result = await handleUpdatePlugin(selectedSiteId);
+          break;
+        case 'barkro_push':
+          result = await handleBarkroPush(selectedSiteId);
+          break;
+        default:
+          throw new Error(`Unknown action: ${action}`);
+      }
+
+      // Check if we have a sync result for this action
+      const syncResultKey = method ? `${action}_${method}_${selectedSiteId}` : `${action}_${selectedSiteId}`;
+      const syncResult = syncResults[syncResultKey];
+      
+      if (syncResult) {
+        setGadgetFeedback({
+          action: `${action}${method ? ` (${method})` : ''}`,
+          message: syncResult.message,
+          type: syncResult.type,
+          timestamp
+        });
+      } else {
+        setGadgetFeedback({
+          action: `${action}${method ? ` (${method})` : ''}`,
+          message: 'Action completed',
+          type: 'success',
+          timestamp
+        });
+      }
+    } catch (error) {
+      setGadgetFeedback({
+        action: `${action}${method ? ` (${method})` : ''}`,
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        type: 'error',
+        timestamp
+      });
+    }
+  };
+
+  // Copy feedback message to clipboard
+  const copyFeedbackMessage = async () => {
+    if (!gadgetFeedback) return;
+    
+    const message = `Action: ${gadgetFeedback.action}\nMessage: ${gadgetFeedback.message}\nTime: ${new Date(gadgetFeedback.timestamp).toLocaleString()}`;
+    
+    try {
+      await navigator.clipboard.writeText(message);
+      // Briefly show success
+      const originalMessage = gadgetFeedback.message;
+      setGadgetFeedback({
+        ...gadgetFeedback,
+        message: 'Message copied to clipboard!'
+      });
+      setTimeout(() => {
+        setGadgetFeedback(prev => prev ? { ...prev, message: originalMessage } : null);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
+  };
+
+  // Clear feedback message
+  const clearFeedbackMessage = () => {
+    setGadgetFeedback(null);
+  };
+
   return (
     <>
       <style jsx>{`
@@ -927,6 +1018,129 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
         </div>
       </div>
 
+      {/* Site Gadgets Section */}
+      <div className="bg-white p-4 rounded-lg shadow border">
+        <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
+        
+        {/* Sync Actions Buttons */}
+        <div className="mb-4">
+          <div className="flex flex-wrap gap-2">
+            <button
+              className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              onClick={() => handleSingleSiteAction('wpsv2_sync', 'plugin_api')}
+              disabled={selectedSites.size !== 1}
+              title="Sync site using Plugin API"
+            >
+              <span className="info-icon group">ℹ</span>
+              Plugin API
+            </button>
+            
+            <button
+              className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              onClick={() => handleSingleSiteAction('wpsv2_sync', 'rest_api')}
+              disabled={selectedSites.size !== 1}
+              title="Sync site using REST API"
+            >
+              <span className="info-icon group">ℹ</span>
+              REST API
+            </button>
+            
+            <button
+              className="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              onClick={() => handleSingleSiteAction('test_plugin')}
+              disabled={selectedSites.size !== 1}
+              title="Test plugin connection"
+            >
+              <span className="info-icon group">ℹ</span>
+              Test Plugin
+            </button>
+            
+            <button
+              className="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              onClick={() => handleSingleSiteAction('check_plugin_version')}
+              disabled={selectedSites.size !== 1}
+              title="Check plugin version"
+            >
+              <span className="info-icon group">ℹ</span>
+              Check Version
+            </button>
+            
+            <button
+              className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              onClick={() => handleSingleSiteAction('update_plugin')}
+              disabled={selectedSites.size !== 1}
+              title="Update plugin"
+            >
+              <span className="info-icon group">ℹ</span>
+              Update Plugin
+            </button>
+            
+            <button
+              className="px-3 py-2 text-sm font-medium text-white bg-yellow-600 rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              onClick={() => handleSingleSiteAction('barkro_push')}
+              disabled={selectedSites.size !== 1}
+              title="Push Barkro update"
+            >
+              <span className="info-icon group">ℹ</span>
+              Barkro Push
+            </button>
+          </div>
+          
+          {selectedSites.size === 0 && (
+            <p className="text-sm text-gray-500 mt-2">Please select exactly 1 site to use these actions</p>
+          )}
+          {selectedSites.size > 1 && (
+            <p className="text-sm text-orange-600 mt-2">Please select only 1 site (currently {selectedSites.size} selected)</p>
+          )}
+        </div>
+        
+        <hr className="border-gray-200 mb-4" />
+        
+        {/* Feedback Message Area */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-gray-700">Action Feedback</h4>
+            <div className="flex gap-2">
+              <button
+                onClick={() => copyFeedbackMessage()}
+                disabled={!gadgetFeedback}
+                className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 text-gray-700 rounded border disabled:cursor-not-allowed"
+              >
+                Copy Message
+              </button>
+              <button
+                onClick={() => clearFeedbackMessage()}
+                disabled={!gadgetFeedback}
+                className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 disabled:bg-gray-50 disabled:text-gray-400 text-red-700 rounded border disabled:cursor-not-allowed"
+              >
+                Clear Message
+              </button>
+            </div>
+          </div>
+          
+          <div className="min-h-[80px] p-3 bg-gray-50 border rounded-md">
+            {gadgetFeedback ? (
+              <div className={`text-sm ${
+                gadgetFeedback.type === 'success' ? 'text-green-700' : 
+                gadgetFeedback.type === 'error' ? 'text-red-700' : 'text-gray-700'
+              }`}>
+                <div className="font-medium">{gadgetFeedback.action}</div>
+                <div className="mt-1">{gadgetFeedback.message}</div>
+                {gadgetFeedback.timestamp && (
+                  <div className="text-xs text-gray-500 mt-2">
+                    {new Date(gadgetFeedback.timestamp).toLocaleString()}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400 italic">
+                No feedback messages yet. Select a site and click an action button.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Selection controls and results count */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -964,7 +1178,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                       } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
                       style={{
                         ...(isSticky ? { left: leftPosition } : {}),
-                        backgroundColor: col === 'checkbox' || col === 'tool_buttons' || col === 'sync_actions' 
+                        backgroundColor: col === 'checkbox' || col === 'tool_buttons' 
                           ? '#e5e7eb' // gray-200 for action columns
                           : col === 'domain_registrar_info'
                           ? '#fbbf24' // amber-400 for domain registrar info column
@@ -994,8 +1208,6 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                         />
                       ) : col === 'tool_buttons' ? (
                         'tool_buttons'
-                      ) : col === 'sync_actions' ? (
-                        'sync_actions'
                       ) : (
                         <>
                           {col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
@@ -1028,7 +1240,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                       <td
                         key={col}
                         className={`${col === 'checkbox' ? '' : 'px-4 py-2'} text-sm text-gray-900 relative ${stickyClass} ${bgClass} ${
-                          col === 'checkbox' || col === 'tool_buttons' || col === 'sync_actions' ? 'whitespace-nowrap' : ''
+                          col === 'checkbox' || col === 'tool_buttons' ? 'whitespace-nowrap' : ''
                         } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
                         style={{
                           ...(isSticky ? { left: leftPosition } : {}),
@@ -1099,167 +1311,6 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                             >
                               👁
                             </button>
-                          </div>
-                        ) : col === 'sync_actions' ? (
-                          <div className="flex flex-col gap-2">
-                            <div className="flex gap-2">
-                              <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 relative group flex items-center gap-1"
-                                onClick={() => handleWpsv2Sync(item.id, 'plugin_api')}
-                                disabled={syncLoading.has(item.id)}
-                              >
-                                <span className="info-icon">ⓘ</span>
-                                {syncLoading.has(item.id) ? 'Syncing...' : 'Plugin API'}
-                                <div className="tooltip-content">
-                                  <div className="font-bold mb-2">Plugin API Sync</div>
-                                  <div className="text-xs space-y-1">
-                                    <p><strong>Function:</strong> wpsv2SyncViaPluginApi()</p>
-                                    <p><strong>Location:</strong> /app/api/wpsv2/sync-site/route.ts:138-187</p>
-                                    <p><strong>Flow:</strong></p>
-                                    <ol className="list-decimal list-inside ml-2">
-                                      <li>Fetches content from WP via custom plugin endpoint</li>
-                                      <li>Uses ruplin_api_key_1 for authentication</li>
-                                      <li>Calls wpsv2SaveContentToDatabase()</li>
-                                      <li>Saves to nwpi_content table</li>
-                                    </ol>
-                                    <p><strong>Endpoint:</strong> /wp-json/snefuru/v1/posts</p>
-                                    <p><strong>Auth:</strong> Bearer token in header</p>
-                                  </div>
-                                </div>
-                              </button>
-                              <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 relative group flex items-center gap-1"
-                                onClick={() => handleWpsv2Sync(item.id, 'rest_api')}
-                                disabled={syncLoading.has(item.id)}
-                              >
-                                <span className="info-icon">ⓘ</span>
-                                {syncLoading.has(item.id) ? 'Syncing...' : 'Rest API'}
-                                <div className="tooltip-content">
-                                  <div className="font-bold mb-2">REST API Sync</div>
-                                  <div className="text-xs space-y-1">
-                                    <p><strong>Function:</strong> wpsv2SyncViaRestApi()</p>
-                                    <p><strong>Location:</strong> /app/api/wpsv2/sync-site/route.ts:190-274</p>
-                                    <p><strong>Flow:</strong></p>
-                                    <ol className="list-decimal list-inside ml-2">
-                                      <li>Uses standard WP REST API</li>
-                                      <li>Fetches posts & pages separately</li>
-                                      <li>Can work without auth (public posts only)</li>
-                                      <li>Saves to nwpi_content table</li>
-                                    </ol>
-                                    <p><strong>Endpoints:</strong> /wp-json/wp/v2/posts, /wp-json/wp/v2/pages</p>
-                                    <p><strong>Auth:</strong> Optional app password</p>
-                                  </div>
-                                </div>
-                              </button>
-                              <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 relative group flex items-center gap-1"
-                                onClick={() => handleWpsv2TestPlugin(item.id)}
-                                disabled={syncLoading.has(`test_${item.id}`)}
-                              >
-                                <span className="info-icon">ⓘ</span>
-                                {syncLoading.has(`test_${item.id}`) ? 'Testing...' : 'Test Plugin'}
-                                <div className="tooltip-content">
-                                  <div className="font-bold mb-2">Test Plugin Connection</div>
-                                  <div className="text-xs space-y-1">
-                                    <p><strong>Function:</strong> handleWpsv2TestPlugin()</p>
-                                    <p><strong>API Route:</strong> /api/test-plugin-connection</p>
-                                    <p><strong>Purpose:</strong> Verifies plugin is installed & API key is valid</p>
-                                    <p><strong>Tests:</strong></p>
-                                    <ul className="list-disc list-inside ml-2">
-                                      <li>Plugin presence check</li>
-                                      <li>API key authentication</li>
-                                      <li>Endpoint accessibility</li>
-                                      <li>Response format validation</li>
-                                    </ul>
-                                    <p><strong>Returns:</strong> Success/failure status</p>
-                                  </div>
-                                </div>
-                              </button>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 relative group flex items-center gap-1"
-                                onClick={() => handleCheckPluginVersion(item.id)}
-                                disabled={checkingPluginVersion.has(item.id)}
-                              >
-                                <span className="info-icon">ⓘ</span>
-                                {checkingPluginVersion.has(item.id) ? 'Checking...' : 'Check WP Plugin Version'}
-                                <div className="tooltip-content">
-                                  <div className="font-bold mb-2">Check Plugin Version</div>
-                                  <div className="text-xs space-y-1">
-                                    <p><strong>Function:</strong> handleCheckPluginVersion()</p>
-                                    <p><strong>API Route:</strong> /api/check-plugin-version</p>
-                                    <p><strong>Purpose:</strong> Gets installed plugin version from WP site</p>
-                                    <p><strong>Process:</strong></p>
-                                    <ol className="list-decimal list-inside ml-2">
-                                      <li>Queries WP plugin endpoint</li>
-                                      <li>Retrieves version number</li>
-                                      <li>Compares with latest available</li>
-                                      <li>Shows update availability</li>
-                                    </ol>
-                                    <p><strong>Uses:</strong> Plugin's version check endpoint</p>
-                                  </div>
-                                </div>
-                              </button>
-                              <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 relative group flex items-center gap-1"
-                                onClick={() => handleUpdatePlugin(item.id)}
-                                disabled={updatingPlugin.has(item.id)}
-                              >
-                                <span className="info-icon">ⓘ</span>
-                                {updatingPlugin.has(item.id) ? 'Updating...' : 'Update Plugin'}
-                                <div className="tooltip-content">
-                                  <div className="font-bold mb-2">Update Plugin</div>
-                                  <div className="text-xs space-y-1">
-                                    <p><strong>Function:</strong> handleUpdatePlugin()</p>
-                                    <p><strong>API Route:</strong> /api/update-plugin</p>
-                                    <p><strong>Purpose:</strong> Updates WP plugin to latest version</p>
-                                    <p><strong>Process:</strong></p>
-                                    <ol className="list-decimal list-inside ml-2">
-                                      <li>Downloads latest plugin ZIP</li>
-                                      <li>Uploads to WordPress</li>
-                                      <li>Deactivates old version</li>
-                                      <li>Installs & activates new version</li>
-                                    </ol>
-                                    <p><strong>Note:</strong> Requires WP admin credentials</p>
-                                  </div>
-                                </div>
-                              </button>
-                              <button
-                                className="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 relative group flex items-center gap-1"
-                                onClick={() => handleBarkroPush(item.id)}
-                                disabled={barkroPushing.has(item.id)}
-                              >
-                                <span className="info-icon">ⓘ</span>
-                                {barkroPushing.has(item.id) ? 'Pushing...' : 'Push updates with Barkro'}
-                                <div className="tooltip-content">
-                                  <div className="font-bold mb-2">Barkro Push Updates</div>
-                                  <div className="text-xs space-y-1">
-                                    <p><strong>Function:</strong> handleBarkroPush()</p>
-                                    <p><strong>API Route:</strong> /api/barkro/push-update/route.ts</p>
-                                    <p><strong>Purpose:</strong> Push plugin updates via Barkro system</p>
-                                    <p><strong>Flow:</strong></p>
-                                    <ol className="list-decimal list-inside ml-2">
-                                      <li>Gets current plugin version from DB</li>
-                                      <li>Creates narpi_pushes record</li>
-                                      <li>Sends update notification to WP</li>
-                                      <li>WP checks & applies update</li>
-                                    </ol>
-                                    <p><strong>Endpoint:</strong> /wp-json/snefuru/v1/check-update</p>
-                                    <p><strong>Auth:</strong> Uses ruplin_api_key_1</p>
-                                  </div>
-                                </div>
-                              </button>
-                            </div>
-                            {(syncResults[item.id] || syncResults[`test_${item.id}`] || syncResults[`version_${item.id}`] || syncResults[`update_${item.id}`] || syncResults[`barkro_${item.id}`]) && (
-                              <div className={`text-xs p-2 rounded ${
-                                (syncResults[item.id]?.type === 'success' || syncResults[`test_${item.id}`]?.type === 'success' || syncResults[`version_${item.id}`]?.type === 'success' || syncResults[`update_${item.id}`]?.type === 'success' || syncResults[`barkro_${item.id}`]?.type === 'success') 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : 'bg-red-100 text-red-800'
-                              }`}>
-                                {syncResults[item.id]?.message || syncResults[`test_${item.id}`]?.message || syncResults[`version_${item.id}`]?.message || syncResults[`update_${item.id}`]?.message || syncResults[`barkro_${item.id}`]?.message}
-                              </div>
-                            )}
                           </div>
                         ) : col === 'id' ? (
                           <span className="text-xs">{truncateText(item.id, 8)}...</span>
