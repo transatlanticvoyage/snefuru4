@@ -82,6 +82,10 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
   const [barkroPushing, setBarkroPushing] = useState<Set<string>>(new Set());
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [gadgetFeedback, setGadgetFeedback] = useState<{action: string, message: string, type: 'success' | 'error' | 'info', timestamp: string} | null>(null);
+  const [domainRegistrarData, setDomainRegistrarData] = useState<{[key: string]: any}>({});
+  const [loadingRegistrarData, setLoadingRegistrarData] = useState<Set<string>>(new Set());
+  const [registrarPopupOpen, setRegistrarPopupOpen] = useState<string | null>(null);
+  const [allHostAccounts, setAllHostAccounts] = useState<any[]>([]);
   
   const supabase = createClientComponentClient();
   
@@ -258,6 +262,17 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
   }, [sortedData, currentPage, itemsPerPage]);
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+
+  // Fetch domain registrar info for visible sites
+  useEffect(() => {
+    if (userId && paginatedData.length > 0) {
+      paginatedData.forEach(item => {
+        if (item.fk_domreg_hostaccount && !domainRegistrarData[item.id] && !loadingRegistrarData.has(item.id)) {
+          fetchDomainRegistrarInfo(item.id, item.fk_domreg_hostaccount);
+        }
+      });
+    }
+  }, [userId, paginatedData, domainRegistrarData, loadingRegistrarData]);
 
   // Handle sort
   const handleSort = (field: SortField) => {
@@ -835,6 +850,92 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
     setGadgetFeedback(null);
   };
 
+  // Fetch domain registrar info for a specific site
+  const fetchDomainRegistrarInfo = async (siteId: string, fkDomregHostaccount: string | null) => {
+    if (!userId) return;
+
+    setLoadingRegistrarData(prev => new Set([...prev, siteId]));
+
+    try {
+      const params = new URLSearchParams({
+        user_internal_id: userId,
+        ...(fkDomregHostaccount && { fk_domreg_hostaccount: fkDomregHostaccount })
+      });
+
+      const response = await fetch(`/api/get_domain_registrar_info?${params}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setDomainRegistrarData(prev => ({
+          ...prev,
+          [siteId]: result.data.current_registrar_info
+        }));
+        
+        // Store all host accounts for the popup (only need to do this once)
+        if (result.data.all_host_accounts && allHostAccounts.length === 0) {
+          setAllHostAccounts(result.data.all_host_accounts);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching domain registrar info:', error);
+    } finally {
+      setLoadingRegistrarData(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
+  // Update domain registrar for a site
+  const updateDomainRegistrar = async (siteId: string, newHostAccountId: string | null) => {
+    if (!userId) return;
+
+    try {
+      const response = await fetch('/api/update_domain_registrar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sitespren_id: siteId,
+          fk_domreg_hostaccount: newHostAccountId,
+          user_internal_id: userId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local data
+        const newRegistrarInfo = newHostAccountId 
+          ? allHostAccounts.find(acc => acc.host_account_id === newHostAccountId)
+          : null;
+
+        setDomainRegistrarData(prev => ({
+          ...prev,
+          [siteId]: newRegistrarInfo
+        }));
+
+        // Update the main data as well
+        if (onDataUpdate) {
+          const updatedData = data.map(site => 
+            site.id === siteId 
+              ? { ...site, fk_domreg_hostaccount: newHostAccountId }
+              : site
+          );
+          onDataUpdate(updatedData);
+        }
+
+        setRegistrarPopupOpen(null);
+      } else {
+        console.error('Failed to update domain registrar:', result.error);
+      }
+    } catch (error) {
+      console.error('Error updating domain registrar:', error);
+    }
+  };
+
   return (
     <>
       <style jsx>{`
@@ -1361,7 +1462,67 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                             )}
                           </div>
                         ) : col === 'domain_registrar_info' ? (
-                          '-'
+                          <div className="flex items-center gap-2 min-w-[200px]">
+                            {loadingRegistrarData.has(item.id) ? (
+                              <div className="flex items-center gap-2">
+                                <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span className="text-sm text-gray-500">Loading...</span>
+                              </div>
+                            ) : domainRegistrarData[item.id] ? (
+                              <>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {domainRegistrarData[item.id].company_name}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {domainRegistrarData[item.id].username}
+                                  </span>
+                                </div>
+                                
+                                {/* Portal URL Button */}
+                                {domainRegistrarData[item.id].portal_url && (
+                                  <button
+                                    onClick={() => window.open(domainRegistrarData[item.id].portal_url, '_blank')}
+                                    className="inline-flex items-center justify-center w-8 h-8 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    title="Open portal URL"
+                                  >
+                                    🌐
+                                  </button>
+                                )}
+                                
+                                {/* Host Account Selection Button */}
+                                <button
+                                  onClick={() => {
+                                    setRegistrarPopupOpen(item.id);
+                                    if (allHostAccounts.length === 0) {
+                                      fetchDomainRegistrarInfo(item.id, item.fk_domreg_hostaccount);
+                                    }
+                                  }}
+                                  className="inline-flex items-center justify-center w-8 h-8 text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                  title="Change host account"
+                                >
+                                  ⚙️
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-sm text-gray-400">No registrar set</span>
+                                <button
+                                  onClick={() => {
+                                    setRegistrarPopupOpen(item.id);
+                                    fetchDomainRegistrarInfo(item.id, null);
+                                  }}
+                                  className="inline-flex items-center justify-center w-8 h-8 text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                  title="Set host account"
+                                >
+                                  ⚙️
+                                </button>
+                              </>
+                            )}
+                          </div>
                         ) : col === 'is_starred1' ? (
                           <div 
                             className="flex justify-center items-center cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
@@ -1469,6 +1630,95 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
         </div>
       </div>
     </div>
+
+    {/* Host Account Selection Popup */}
+    {registrarPopupOpen && (
+      <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl relative">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Select Domain Registrar Host Account
+            </h3>
+            <button
+              onClick={() => setRegistrarPopupOpen(null)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="p-4 max-h-96 overflow-y-auto">
+            {allHostAccounts.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">No host accounts found.</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Create host accounts first to assign them to domains.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {/* None/Clear option */}
+                <div
+                  className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => updateDomainRegistrar(registrarPopupOpen, null)}
+                >
+                  <div className="flex items-center flex-1">
+                    <div className="w-3 bg-gray-300"></div>
+                    <div className="flex-1 px-3">
+                      <span className="text-sm font-medium text-gray-500">No Registrar</span>
+                      <div className="text-xs text-gray-400">Clear current assignment</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Host account options */}
+                {allHostAccounts.map((account) => (
+                  <div
+                    key={account.host_account_id}
+                    className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => updateDomainRegistrar(registrarPopupOpen, account.host_account_id)}
+                  >
+                    <div className="flex items-center flex-1">
+                      {/* Company name */}
+                      <div className="w-24 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                        {account.company_name}
+                      </div>
+                      
+                      {/* Black vertical separator */}
+                      <div className="w-px h-8 bg-black mx-3"></div>
+                      
+                      {/* Username */}
+                      <div className="flex-1 px-3">
+                        <span className="text-sm font-medium text-gray-900">{account.username}</span>
+                        {account.portal_url && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            Portal: {account.portal_url}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end p-4 border-t border-gray-200 space-x-3">
+            <button
+              onClick={() => setRegistrarPopupOpen(null)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }
