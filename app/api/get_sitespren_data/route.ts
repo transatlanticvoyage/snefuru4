@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
 
     console.log('Fetching sitespren data for user:', userInternalId);
 
-    // Fetch sitespren data
+    // Fetch sitespren data from the large view that includes registrar joins
     const { data: sitespren, error } = await supabase
-      .from('sitespren')
+      .from('sitespren_large_view_1')
       .select('*')
       .eq('fk_users_id', userInternalId)
       .order('created_at', { ascending: false });

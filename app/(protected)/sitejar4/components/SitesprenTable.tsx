@@ -24,6 +24,11 @@ interface SitesprenRecord {
   fk_domreg_hostaccount: string | null;
   is_wp_site: boolean | null;
   is_starred1: string | null;
+  // New joined columns from sitespren_large_view_1
+  registrar_username: string | null;
+  registrar_company_id: string | null;
+  registrar_company_name: string | null;
+  registrar_portal_url: string | null;
 }
 
 interface SitesprenTableProps {
@@ -82,8 +87,6 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
   const [barkroPushing, setBarkroPushing] = useState<Set<string>>(new Set());
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [gadgetFeedback, setGadgetFeedback] = useState<{action: string, message: string, type: 'success' | 'error' | 'info', timestamp: string} | null>(null);
-  const [domainRegistrarData, setDomainRegistrarData] = useState<{[key: string]: any}>({});
-  const [loadingRegistrarData, setLoadingRegistrarData] = useState<Set<string>>(new Set());
   const [registrarPopupOpen, setRegistrarPopupOpen] = useState<string | null>(null);
   const [allHostAccounts, setAllHostAccounts] = useState<any[]>([]);
   
@@ -263,63 +266,26 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
-  // Fetch domain registrar info for a specific site
-  const fetchDomainRegistrarInfo = async (siteId: string, fkDomregHostaccount: string | null) => {
-    if (!userId) return;
-
-    setLoadingRegistrarData(prev => new Set([...prev, siteId]));
+  // Fetch host accounts for the popup
+  const fetchHostAccountsForPopup = async () => {
+    if (!userId || allHostAccounts.length > 0) return;
 
     try {
       const params = new URLSearchParams({
-        user_internal_id: userId,
-        ...(fkDomregHostaccount && { fk_domreg_hostaccount: fkDomregHostaccount })
+        user_internal_id: userId
       });
 
       const response = await fetch(`/api/get_domain_registrar_info?${params}`);
       const result = await response.json();
 
-      if (result.success) {
-        setDomainRegistrarData(prev => ({
-          ...prev,
-          [siteId]: result.data.current_registrar_info
-        }));
-        
-        // Store all host accounts for the popup (only need to do this once)
-        if (result.data.all_host_accounts && allHostAccounts.length === 0) {
-          setAllHostAccounts(result.data.all_host_accounts);
-        }
+      if (result.success && result.data.all_host_accounts) {
+        setAllHostAccounts(result.data.all_host_accounts);
       }
     } catch (error) {
-      console.error('Error fetching domain registrar info:', error);
-    } finally {
-      setLoadingRegistrarData(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(siteId);
-        return newSet;
-      });
+      console.error('Error fetching host accounts:', error);
     }
   };
 
-  // Fetch domain registrar info for visible sites
-  useEffect(() => {
-    console.log('DEBUG: useEffect triggered with userId:', userId, 'paginatedData.length:', paginatedData.length);
-    
-    if (userId && paginatedData.length > 0) {
-      console.log('DEBUG: Checking domain registrar info for sites:', paginatedData.map(item => ({
-        id: item.id,
-        fk_domreg_hostaccount: item.fk_domreg_hostaccount,
-        has_registrar_data: !!domainRegistrarData[item.id],
-        is_loading: loadingRegistrarData.has(item.id)
-      })));
-
-      paginatedData.forEach(item => {
-        if (item.fk_domreg_hostaccount && item.fk_domreg_hostaccount.trim() !== '' && !domainRegistrarData[item.id] && !loadingRegistrarData.has(item.id)) {
-          console.log('DEBUG: Fetching domain registrar info for site:', item.id, 'with hostaccount:', item.fk_domreg_hostaccount);
-          fetchDomainRegistrarInfo(item.id, item.fk_domreg_hostaccount);
-        }
-      });
-    }
-  }, [userId, paginatedData, domainRegistrarData, loadingRegistrarData]);
 
   // Handle sort
   const handleSort = (field: SortField) => {
@@ -917,21 +883,23 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
       const result = await response.json();
 
       if (result.success) {
-        // Update local data
+        // Find the new registrar info from allHostAccounts
         const newRegistrarInfo = newHostAccountId 
           ? allHostAccounts.find(acc => acc.host_account_id === newHostAccountId)
           : null;
 
-        setDomainRegistrarData(prev => ({
-          ...prev,
-          [siteId]: newRegistrarInfo
-        }));
-
-        // Update the main data as well
+        // Update the main data with both the fk_domreg_hostaccount and the joined registrar fields
         if (onDataUpdate) {
           const updatedData = data.map(site => 
             site.id === siteId 
-              ? { ...site, fk_domreg_hostaccount: newHostAccountId }
+              ? { 
+                  ...site, 
+                  fk_domreg_hostaccount: newHostAccountId,
+                  registrar_username: newRegistrarInfo?.username || null,
+                  registrar_company_id: newRegistrarInfo?.company_id || null,
+                  registrar_company_name: newRegistrarInfo?.company_name || null,
+                  registrar_portal_url: newRegistrarInfo?.portal_url || null
+                }
               : site
           );
           onDataUpdate(updatedData);
@@ -1017,7 +985,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
         <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px'}}>
           <div className="text-xs font-semibold text-gray-700 mb-1">SQL View Info</div>
           <div className="text-xs text-gray-600">
-            <div>view name: sitespren</div>
+            <div>view name: sitespren_large_view_1</div>
             <div># columns: {allColumns.length}</div>
           </div>
         </div>
@@ -1473,38 +1441,21 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                           </div>
                         ) : col === 'domain_registrar_info' ? (
                           <div className="flex items-center gap-2 min-w-[200px]">
-                            {(() => {
-                              console.log('DEBUG: Rendering domain registrar for site:', item.id, {
-                                fk_domreg_hostaccount: item.fk_domreg_hostaccount,
-                                has_registrar_data: !!domainRegistrarData[item.id],
-                                is_loading: loadingRegistrarData.has(item.id),
-                                registrar_data: domainRegistrarData[item.id]
-                              });
-                              return null;
-                            })()}
-                            {loadingRegistrarData.has(item.id) ? (
-                              <div className="flex items-center gap-2">
-                                <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span className="text-sm text-gray-500">Loading...</span>
-                              </div>
-                            ) : domainRegistrarData[item.id] ? (
+                            {item.registrar_company_name ? (
                               <>
                                 <div className="flex flex-col">
                                   <span className="text-sm font-medium text-gray-900">
-                                    {domainRegistrarData[item.id].company_name}
+                                    {item.registrar_company_name}
                                   </span>
                                   <span className="text-xs text-gray-500">
-                                    {domainRegistrarData[item.id].username}
+                                    {item.registrar_username}
                                   </span>
                                 </div>
                                 
                                 {/* Portal URL Button */}
-                                {domainRegistrarData[item.id].portal_url && (
+                                {item.registrar_portal_url && (
                                   <button
-                                    onClick={() => window.open(domainRegistrarData[item.id].portal_url, '_blank')}
+                                    onClick={() => window.open(item.registrar_portal_url!, '_blank')}
                                     className="inline-flex items-center justify-center w-8 h-8 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                     title="Open portal URL"
                                   >
@@ -1516,9 +1467,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                                 <button
                                   onClick={() => {
                                     setRegistrarPopupOpen(item.id);
-                                    if (allHostAccounts.length === 0) {
-                                      fetchDomainRegistrarInfo(item.id, item.fk_domreg_hostaccount);
-                                    }
+                                    fetchHostAccountsForPopup();
                                   }}
                                   className="inline-flex items-center justify-center w-8 h-8 text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                                   title="Change host account"
@@ -1532,7 +1481,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                                 <button
                                   onClick={() => {
                                     setRegistrarPopupOpen(item.id);
-                                    fetchDomainRegistrarInfo(item.id, null);
+                                    fetchHostAccountsForPopup();
                                   }}
                                   className="inline-flex items-center justify-center w-8 h-8 text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                                   title="Set host account"
