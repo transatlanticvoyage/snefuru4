@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`🔍 WPSv2: Testing connection for ${siteData.sitespren_base}`);
+    console.log(`🔑 API Key being used: ${userData.ruplin_api_key_1 ? userData.ruplin_api_key_1.substring(0, 8) + '...' : 'NO KEY'}`);
 
     // Test plugin connection
     const pluginTest = await wpsv2TestPluginConnection(siteData.sitespren_base, userData.ruplin_api_key_1);
@@ -104,6 +105,9 @@ async function wpsv2TestPluginConnection(siteUrl: string, apiKey: string) {
     const startTime = Date.now();
     const endpoint = `https://${siteUrl}/wp-json/snefuru/v1/posts`;
     
+    console.log(`🌐 Making request to: ${endpoint}`);
+    console.log(`🔑 Using API key: ${apiKey ? apiKey.substring(0, 8) + '...' : 'NO KEY'}`);
+    
     const response = await fetch(endpoint, {
       method: 'GET',
       headers: {
@@ -114,6 +118,8 @@ async function wpsv2TestPluginConnection(siteUrl: string, apiKey: string) {
       // Add timeout for testing
       signal: AbortSignal.timeout(10000) // 10 second timeout
     });
+    
+    console.log(`📡 Response status: ${response.status} ${response.statusText}`);
 
     const responseTime = Date.now() - startTime;
 

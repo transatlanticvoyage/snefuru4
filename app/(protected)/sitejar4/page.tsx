@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import F71CreateSiteForm from './components/F71CreateSiteForm';
 import SitesprenTable from './components/SitesprenTable';
+import { cfunc_f71_createsite } from './utils/cfunc_f71_createsite';
 
 export default function Sitejar4Page() {
   const [sitesprenData, setSitesprenData] = useState<any[]>([]);
@@ -24,6 +24,10 @@ export default function Sitejar4Page() {
   const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [currentUrl, setCurrentUrl] = useState<string>('');
+  // F71 Create Site Form state
+  const [sitesList, setSitesList] = useState('');
+  const [isSubmittingF71, setIsSubmittingF71] = useState(false);
+  const [f71Notification, setF71Notification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -221,6 +225,57 @@ export default function Sitejar4Page() {
   // Handle selection change from table
   const handleSelectionChange = (selectedIds: string[]) => {
     setSelectedSiteIds(selectedIds);
+  };
+
+  // f71_createsite function
+  const handleF71Submit = async () => {
+    if (!sitesList.trim()) {
+      setF71Notification({
+        type: 'error',
+        message: 'Please enter at least one site URL'
+      });
+      return;
+    }
+
+    if (!userInternalId) {
+      setF71Notification({
+        type: 'error',
+        message: 'User verification failed'
+      });
+      return;
+    }
+
+    setIsSubmittingF71(true);
+    setF71Notification(null);
+
+    try {
+      const result = await cfunc_f71_createsite(userInternalId, sitesList);
+      
+      if (result.success) {
+        console.log('Sites created successfully, calling refetchSitesprenData()');
+        setF71Notification({
+          type: 'success',
+          message: `Successfully created ${result.data?.sitesCreated} site(s)!`
+        });
+        setSitesList(''); // Clear the textarea
+        await refetchSitesprenData(); // Refresh the table
+      } else {
+        setF71Notification({
+          type: 'error',
+          message: result.error || 'Failed to create sites'
+        });
+      }
+    } catch (error) {
+      console.error('Error creating sites:', error);
+      setF71Notification({
+        type: 'error',
+        message: 'An error occurred while creating sites'
+      });
+    } finally {
+      setIsSubmittingF71(false);
+      // Clear notification after 5 seconds
+      setTimeout(() => setF71Notification(null), 5000);
+    }
   };
 
   // f18_deletesites function
@@ -462,11 +517,6 @@ export default function Sitejar4Page() {
         </div>
       )}
 
-      {/* F71 Create Site Form */}
-      <F71CreateSiteForm 
-        userInternalId={userInternalId!}
-        onSitesCreated={refetchSitesprenData}
-      />
 
       {/* Bulk Actions */}
       {selectedSiteIds.length > 0 && (
@@ -750,8 +800,57 @@ export default function Sitejar4Page() {
                 {activePopupTab === 'ptab1' && (
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Functions</h3>
+                    
+                    {/* F71 Create Site Form */}
+                    <div className="mb-8 bg-white p-6 rounded-lg shadow border">
+                      <h2 className="text-xl font-semibold mb-4">Add New Sites</h2>
+                      
+                      {/* F71 Notification */}
+                      {f71Notification && (
+                        <div className={`mb-4 p-4 rounded-md ${
+                          f71Notification.type === 'success' 
+                            ? 'bg-green-100 border border-green-400 text-green-700' 
+                            : 'bg-red-100 border border-red-400 text-red-700'
+                        }`}>
+                          {f71Notification.message}
+                        </div>
+                      )}
+
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="sites-list-popup" className="block text-sm font-medium text-gray-700 mb-2">
+                            Enter web properties (one per line)
+                          </label>
+                          <textarea
+                            id="sites-list-popup"
+                            value={sitesList}
+                            onChange={(e) => setSitesList(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            rows={6}
+                            placeholder={`dogs.com
+cats.com
+facebook.com/catsgroup
+https://linkedin.com/cats
+http://www.drogs.com`}
+                          />
+                          <p className="mt-1 text-sm text-gray-500">
+                            URLs will be automatically cleaned (https://, http://, and www. will be removed)
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={handleF71Submit}
+                          disabled={isSubmittingF71}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold rounded-md transition-colors"
+                        >
+                          {isSubmittingF71 ? 'Creating Sites...' : 'f71_createsite'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Other Functions */}
                     <div className="space-y-4">
-                      <p className="text-gray-600">Functions for sitespren will be added here.</p>
+                      <p className="text-gray-600">Other functions for sitespren will be added here.</p>
                       {!kz101Checked && !kz103Checked && (
                         <p className="text-sm text-gray-500">
                           Select either SOPTION1 or SOPTION2 to enable functions
