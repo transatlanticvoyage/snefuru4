@@ -63,7 +63,7 @@ const allColumns = [
   'is_wp_site'         // 23
 ];
 
-export default function SitesprenTable({ data, onSelectionChange, onDataUpdate }: SitesprenTableProps) {
+export default function SitesprenTable({ data, userId, onSelectionChange, onDataUpdate }: SitesprenTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
