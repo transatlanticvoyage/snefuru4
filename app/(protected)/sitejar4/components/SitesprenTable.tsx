@@ -377,30 +377,57 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       const data = await response.json();
 
       if (data.success) {
+        const message = `✅ ${data.message} (${data.count} items)`;
         setSyncResults(prev => ({
           ...prev,
           [siteId]: {
             type: 'success',
-            message: `✅ ${data.message} (${data.count} items)`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: `wpsv2_sync (${method})`,
+          message: message,
+          type: 'success',
+          timestamp: new Date().toISOString()
+        });
       } else {
+        const message = `❌ ${data.message}`;
         setSyncResults(prev => ({
           ...prev,
           [siteId]: {
             type: 'error',
-            message: `❌ ${data.message}`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: `wpsv2_sync (${method})`,
+          message: message,
+          type: 'error',
+          timestamp: new Date().toISOString()
+        });
       }
     } catch (error) {
+      const message = `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`;
       setSyncResults(prev => ({
         ...prev,
         [siteId]: {
           type: 'error',
-          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+          message: message
         }
       }));
+      
+      // Also set gadget feedback directly for immediate display
+      setGadgetFeedback({
+        action: `wpsv2_sync (${method})`,
+        message: message,
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
     } finally {
       // Remove from loading set
       setSyncLoading(prev => {
@@ -439,30 +466,57 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         const pluginStatus = data.results.plugin_api.success ? '✅' : '❌';
         const restStatus = data.results.rest_api.success ? '✅' : '❌';
         
+        const message = `Plugin: ${pluginStatus} | REST: ${restStatus} | ${data.results.recommendations[0] || 'Test completed'}`;
         setSyncResults(prev => ({
           ...prev,
           [`test_${siteId}`]: {
             type: 'success',
-            message: `Plugin: ${pluginStatus} | REST: ${restStatus} | ${data.results.recommendations[0] || 'Test completed'}`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: 'test_plugin',
+          message: message,
+          type: 'success',
+          timestamp: new Date().toISOString()
+        });
       } else {
+        const message = `❌ ${data.message}`;
         setSyncResults(prev => ({
           ...prev,
           [`test_${siteId}`]: {
             type: 'error',
-            message: `❌ ${data.message}`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: 'test_plugin',
+          message: message,
+          type: 'error',
+          timestamp: new Date().toISOString()
+        });
       }
     } catch (error) {
+      const message = `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`;
       setSyncResults(prev => ({
         ...prev,
         [`test_${siteId}`]: {
           type: 'error',
-          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+          message: message
         }
       }));
+      
+      // Also set gadget feedback directly for immediate display
+      setGadgetFeedback({
+        action: 'test_plugin',
+        message: message,
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
     } finally {
       // Remove from loading set
       setSyncLoading(prev => {
@@ -582,30 +636,57 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       const data = await response.json();
 
       if (data.success) {
+        const message = `✅ ${data.message} (Current: ${data.currentVersion || 'Unknown'}, Latest: ${data.latestVersion || 'Unknown'})`;
         setSyncResults(prev => ({
           ...prev,
           [`version_${siteId}`]: {
             type: 'success',
-            message: `✅ ${data.message} (Current: ${data.currentVersion || 'Unknown'}, Latest: ${data.latestVersion || 'Unknown'})`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: 'check_plugin_version',
+          message: message,
+          type: 'success',
+          timestamp: new Date().toISOString()
+        });
       } else {
+        const message = `❌ ${data.message}`;
         setSyncResults(prev => ({
           ...prev,
           [`version_${siteId}`]: {
             type: 'error',
-            message: `❌ ${data.message}`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: 'check_plugin_version',
+          message: message,
+          type: 'error',
+          timestamp: new Date().toISOString()
+        });
       }
     } catch (error) {
+      const message = `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`;
       setSyncResults(prev => ({
         ...prev,
         [`version_${siteId}`]: {
           type: 'error',
-          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+          message: message
         }
       }));
+      
+      // Also set gadget feedback directly for immediate display
+      setGadgetFeedback({
+        action: 'check_plugin_version',
+        message: message,
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
     } finally {
       setCheckingPluginVersion(prev => {
         const newSet = new Set(prev);
@@ -640,30 +721,57 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       const data = await response.json();
 
       if (data.success) {
+        const message = `✅ ${data.message} (Updated to version: ${data.newVersion || 'Unknown'})`;
         setSyncResults(prev => ({
           ...prev,
           [`update_${siteId}`]: {
             type: 'success',
-            message: `✅ ${data.message} (Updated to version: ${data.newVersion || 'Unknown'})`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: 'update_plugin',
+          message: message,
+          type: 'success',
+          timestamp: new Date().toISOString()
+        });
       } else {
+        const message = `❌ ${data.message}`;
         setSyncResults(prev => ({
           ...prev,
           [`update_${siteId}`]: {
             type: 'error',
-            message: `❌ ${data.message}`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: 'update_plugin',
+          message: message,
+          type: 'error',
+          timestamp: new Date().toISOString()
+        });
       }
     } catch (error) {
+      const message = `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`;
       setSyncResults(prev => ({
         ...prev,
         [`update_${siteId}`]: {
           type: 'error',
-          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+          message: message
         }
       }));
+      
+      // Also set gadget feedback directly for immediate display
+      setGadgetFeedback({
+        action: 'update_plugin',
+        message: message,
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
     } finally {
       setUpdatingPlugin(prev => {
         const newSet = new Set(prev);
@@ -698,30 +806,57 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       const data = await response.json();
 
       if (data.success) {
+        const message = `✅ ${data.message}`;
         setSyncResults(prev => ({
           ...prev,
           [`barkro_${siteId}`]: {
             type: 'success',
-            message: `✅ ${data.message}`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: 'barkro_push',
+          message: message,
+          type: 'success',
+          timestamp: new Date().toISOString()
+        });
       } else {
+        const message = `❌ ${data.message}`;
         setSyncResults(prev => ({
           ...prev,
           [`barkro_${siteId}`]: {
             type: 'error',
-            message: `❌ ${data.message}`
+            message: message
           }
         }));
+        
+        // Also set gadget feedback directly for immediate display
+        setGadgetFeedback({
+          action: 'barkro_push',
+          message: message,
+          type: 'error',
+          timestamp: new Date().toISOString()
+        });
       }
     } catch (error) {
+      const message = `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`;
       setSyncResults(prev => ({
         ...prev,
         [`barkro_${siteId}`]: {
           type: 'error',
-          message: `❌ Network error: ${error instanceof Error ? error.message : 'Unknown error'}`
+          message: message
         }
       }));
+      
+      // Also set gadget feedback directly for immediate display
+      setGadgetFeedback({
+        action: 'barkro_push',
+        message: message,
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
     } finally {
       setBarkroPushing(prev => {
         const newSet = new Set(prev);
@@ -813,44 +948,53 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           throw new Error(`Unknown action: ${action}`);
       }
 
-      // Check if we have a sync result for this action
-      let syncResultKey: string;
-      switch (action) {
-        case 'check_plugin_version':
-          syncResultKey = `version_${selectedSiteId}`;
-          break;
-        case 'update_plugin':
-          syncResultKey = `update_${selectedSiteId}`;
-          break;
-        case 'barkro_push':
-          syncResultKey = `barkro_${selectedSiteId}`;
-          break;
-        case 'wpsv2_sync':
-          syncResultKey = selectedSiteId; // sync stores just siteId
-          break;
-        case 'test_plugin':
-          syncResultKey = `test_${selectedSiteId}`;
-          break;
-        default:
-          syncResultKey = method ? `${action}_${method}_${selectedSiteId}` : `${action}_${selectedSiteId}`;
-      }
-      const syncResult = syncResults[syncResultKey];
-      
-      if (syncResult) {
-        setGadgetFeedback({
-          action: `${action}${method ? ` (${method})` : ''}`,
-          message: syncResult.message,
-          type: syncResult.type,
-          timestamp
-        });
-      } else {
-        setGadgetFeedback({
-          action: `${action}${method ? ` (${method})` : ''}`,
-          message: 'Action completed',
-          type: 'success',
-          timestamp
-        });
-      }
+      // Wait a moment for the sync result to be set, then check for it
+      setTimeout(() => {
+        let syncResultKey: string;
+        switch (action) {
+          case 'check_plugin_version':
+            syncResultKey = `version_${selectedSiteId}`;
+            break;
+          case 'update_plugin':
+            syncResultKey = `update_${selectedSiteId}`;
+            break;
+          case 'barkro_push':
+            syncResultKey = `barkro_${selectedSiteId}`;
+            break;
+          case 'wpsv2_sync':
+            syncResultKey = selectedSiteId; // sync stores just siteId
+            break;
+          case 'test_plugin':
+            syncResultKey = `test_${selectedSiteId}`;
+            break;
+          default:
+            syncResultKey = method ? `${action}_${method}_${selectedSiteId}` : `${action}_${selectedSiteId}`;
+        }
+        
+        console.log('Looking for sync result with key:', syncResultKey);
+        console.log('Available sync results:', Object.keys(syncResults));
+        console.log('Sync results state:', syncResults);
+        
+        const syncResult = syncResults[syncResultKey];
+        
+        if (syncResult) {
+          console.log('Found sync result:', syncResult);
+          setGadgetFeedback({
+            action: `${action}${method ? ` (${method})` : ''}`,
+            message: syncResult.message,
+            type: syncResult.type,
+            timestamp
+          });
+        } else {
+          console.log('No sync result found, using default message');
+          setGadgetFeedback({
+            action: `${action}${method ? ` (${method})` : ''}`,
+            message: 'Action completed',
+            type: 'success',
+            timestamp
+          });
+        }
+      }, 100); // Wait 100ms for the sync result to be set
     } catch (error) {
       setGadgetFeedback({
         action: `${action}${method ? ` (${method})` : ''}`,
