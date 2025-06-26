@@ -1014,7 +1014,8 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <React.Fragment key={item.id}>
+                  <tr className="hover:bg-gray-50">
                   {visibleColumns.map((col, colIndex) => {
                     const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                     const isSticky = colIndex < stickyColumnCount;
@@ -1346,7 +1347,17 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                       </td>
                     );
                   })}
-                </tr>
+                  </tr>
+                  {expandedRows.has(item.id) && (
+                    <tr>
+                      <td colSpan={visibleColumns.length} className="bg-gray-50 px-6 py-4">
+                        <div className="text-sm text-gray-700">
+                          <p>View your backlinks</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
