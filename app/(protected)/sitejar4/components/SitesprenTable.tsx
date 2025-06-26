@@ -2281,7 +2281,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           <div className="relative">
                             <button
                               onClick={(e) => handleCopyClick(item.sitespren_base || '', e)}
-                              className="absolute z-10 transition-colors duration-200"
+                              className="absolute z-10 transition-colors duration-200 cursor-pointer"
                               style={{
                                 top: '-8px',
                                 right: '-16px',
@@ -2290,7 +2290,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                                 backgroundColor: '#c0c0c0',
                                 borderColor: '#918f8f',
                                 borderWidth: '1px',
-                                borderStyle: 'solid'
+                                borderStyle: 'solid',
+                                cursor: 'pointer'
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = '#fee43b';
