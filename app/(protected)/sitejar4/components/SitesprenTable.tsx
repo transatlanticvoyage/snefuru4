@@ -303,8 +303,16 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
   // Fetch domain registrar info for visible sites
   useEffect(() => {
     if (userId && paginatedData.length > 0) {
+      console.log('DEBUG: Checking domain registrar info for sites:', paginatedData.map(item => ({
+        id: item.id,
+        fk_domreg_hostaccount: item.fk_domreg_hostaccount,
+        has_registrar_data: !!domainRegistrarData[item.id],
+        is_loading: loadingRegistrarData.has(item.id)
+      })));
+
       paginatedData.forEach(item => {
-        if (item.fk_domreg_hostaccount && !domainRegistrarData[item.id] && !loadingRegistrarData.has(item.id)) {
+        if (item.fk_domreg_hostaccount && item.fk_domreg_hostaccount.trim() !== '' && !domainRegistrarData[item.id] && !loadingRegistrarData.has(item.id)) {
+          console.log('DEBUG: Fetching domain registrar info for site:', item.id, 'with hostaccount:', item.fk_domreg_hostaccount);
           fetchDomainRegistrarInfo(item.id, item.fk_domreg_hostaccount);
         }
       });
@@ -1463,6 +1471,15 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                           </div>
                         ) : col === 'domain_registrar_info' ? (
                           <div className="flex items-center gap-2 min-w-[200px]">
+                            {(() => {
+                              console.log('DEBUG: Rendering domain registrar for site:', item.id, {
+                                fk_domreg_hostaccount: item.fk_domreg_hostaccount,
+                                has_registrar_data: !!domainRegistrarData[item.id],
+                                is_loading: loadingRegistrarData.has(item.id),
+                                registrar_data: domainRegistrarData[item.id]
+                              });
+                              return null;
+                            })()}
                             {loadingRegistrarData.has(item.id) ? (
                               <div className="flex items-center gap-2">
                                 <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
