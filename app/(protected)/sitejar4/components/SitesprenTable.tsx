@@ -925,24 +925,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
             </div>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={handleSelectAll}
-            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
-          >
-            Select All on Page
-          </button>
-          <button
-            onClick={handleClearAll}
-            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
-          >
-            Clear Selection
-          </button>
-        </div>
       </div>
-
-      {/* Table Grid Label */}
-      <div className="text-sm font-bold text-gray-900 mb-2">uitablegrid31</div>
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
