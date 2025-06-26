@@ -108,6 +108,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [filterWpSite, setFilterWpSite] = useState<string>('');
+  const [filterTag, setFilterTag] = useState<string>('');
+  const [tagFilteredSiteIds, setTagFilteredSiteIds] = useState<string[]>([]);
   const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
   const [syncLoading, setSyncLoading] = useState<Set<string>>(new Set());
   const [syncResults, setSyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
@@ -150,9 +152,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     const urlParams = new URLSearchParams(window.location.search);
     const colTempParam = urlParams.get('coltemp') || localStorage.getItem('sitejar4_coltemp') || 'option1';
     const stickyColParam = urlParams.get('stickycol') || localStorage.getItem('sitejar4_stickycol') || 'option1';
+    const stagParam = urlParams.get('stag') || '';
     
     setSelectedColumnTemplate(colTempParam);
     setSelectedStickyColumns(stickyColParam);
+    setFilterTag(stagParam);
   }, []);
 
   // Toggle expanded row
@@ -235,11 +239,18 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     return { hasLeftSeparator, hasRightSeparator };
   };
 
-  const updateUrlAndStorage = (colTemp: string, stickyCol: string) => {
+  const updateUrlAndStorage = (colTemp: string, stickyCol: string, stagFilter?: string) => {
     // Update URL
     const url = new URL(window.location.href);
     url.searchParams.set('coltemp', colTemp);
     url.searchParams.set('stickycol', stickyCol);
+    
+    if (stagFilter && stagFilter.trim()) {
+      url.searchParams.set('stag', stagFilter);
+    } else {
+      url.searchParams.delete('stag');
+    }
+    
     window.history.replaceState({}, '', url.toString());
     
     // Update localStorage
@@ -249,13 +260,51 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
 
   const handleColumnTemplateChange = (option: string) => {
     setSelectedColumnTemplate(option);
-    updateUrlAndStorage(option, selectedStickyColumns);
+    updateUrlAndStorage(option, selectedStickyColumns, filterTag);
   };
 
   const handleStickyColumnsChange = (option: string) => {
     setSelectedStickyColumns(option);
-    updateUrlAndStorage(selectedColumnTemplate, option);
+    updateUrlAndStorage(selectedColumnTemplate, option, filterTag);
   };
+
+  const handleTagFilterChange = (tagId: string) => {
+    setFilterTag(tagId);
+    updateUrlAndStorage(selectedColumnTemplate, selectedStickyColumns, tagId);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  // Fetch sites by tag when tag filter changes
+  const fetchSitesByTag = async (tagId: string) => {
+    if (!tagId || !userInternalId) {
+      setTagFilteredSiteIds([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/get_sites_by_tag?user_internal_id=${userInternalId}&tag_id=${tagId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setTagFilteredSiteIds(result.data.site_ids || []);
+      } else {
+        console.error('Error fetching sites by tag:', result.error);
+        setTagFilteredSiteIds([]);
+      }
+    } catch (error) {
+      console.error('Error fetching sites by tag:', error);
+      setTagFilteredSiteIds([]);
+    }
+  };
+
+  // Effect to fetch sites by tag when filter changes
+  useEffect(() => {
+    if (filterTag) {
+      fetchSitesByTag(filterTag);
+    } else {
+      setTagFilteredSiteIds([]);
+    }
+  }, [filterTag, userInternalId]);
 
   const visibleColumns = getVisibleColumns();
   const stickyColumnCount = getStickyColumnCount();
