@@ -90,6 +90,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [gadgetFeedback, setGadgetFeedback] = useState<{action: string, message: string, type: 'success' | 'error' | 'info', timestamp: string} | null>(null);
   const [registrarPopupOpen, setRegistrarPopupOpen] = useState<string | null>(null);
   const [allHostAccounts, setAllHostAccounts] = useState<any[]>([]);
+  const [editPopupOpen, setEditPopupOpen] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<SitesprenRecord | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [scrapingLinks, setScrapingLinks] = useState<Set<string>>(new Set());
+  const [linksharnData, setLinksharnData] = useState<{[key: string]: any[]}>({});
   
   const supabase = createClientComponentClient();
   
@@ -906,6 +911,18 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           onDataUpdate(updatedData);
         }
 
+        // Also update the edit form data if it's open for this site
+        if (editFormData && editFormData.id === siteId) {
+          setEditFormData({
+            ...editFormData,
+            fk_domreg_hostaccount: newHostAccountId,
+            registrar_username: newRegistrarInfo?.username || null,
+            registrar_company_id: newRegistrarInfo?.company_id || null,
+            registrar_company_name: newRegistrarInfo?.company_name || null,
+            registrar_portal_url: newRegistrarInfo?.portal_url || null
+          });
+        }
+
         setRegistrarPopupOpen(null);
       } else {
         console.error('Failed to update domain registrar:', result.error);
@@ -914,6 +931,171 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       console.error('Error updating domain registrar:', error);
     }
   };
+
+  // Handle saving changes from the edit popup
+  const handleSaveChanges = async () => {
+    if (!editFormData || !userInternalId) return;
+
+    setIsUpdating(true);
+
+    try {
+      // Prepare the update data (exclude read-only fields)
+      const updateData = {
+        sitespren_base: editFormData.sitespren_base,
+        ns_full: editFormData.ns_full,
+        ip_address: editFormData.ip_address,
+        true_root_domain: editFormData.true_root_domain,
+        full_subdomain: editFormData.full_subdomain,
+        webproperty_type: editFormData.webproperty_type,
+        wpuser1: editFormData.wpuser1,
+        wppass1: editFormData.wppass1,
+        ruplin_apikey: editFormData.ruplin_apikey,
+        wp_rest_app_pass: editFormData.wp_rest_app_pass,
+        wp_plugin_installed1: editFormData.wp_plugin_installed1,
+        wp_plugin_connected2: editFormData.wp_plugin_connected2,
+        fk_domreg_hostaccount: editFormData.fk_domreg_hostaccount,
+        is_wp_site: editFormData.is_wp_site,
+        is_starred1: editFormData.is_starred1,
+        updated_at: new Date().toISOString()
+      };
+
+      // Update the record in Supabase
+      const { error } = await supabase
+        .from('sitespren')
+        .update(updateData)
+        .eq('id', editFormData.id)
+        .eq('fk_users_id', userInternalId);
+
+      if (error) {
+        console.error('Error updating site record:', error);
+        return;
+      }
+
+      // Update local data
+      if (onDataUpdate) {
+        const updatedData = data.map(site => 
+          site.id === editFormData.id 
+            ? { ...editFormData }
+            : site
+        );
+        onDataUpdate(updatedData);
+      }
+
+      // Close the popup
+      setEditPopupOpen(null);
+      setEditFormData(null);
+
+    } catch (error) {
+      console.error('Error in handleSaveChanges:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Handle scraping links from homepage
+  const handleScrapeLinksFromHomepage = async (siteId: string, sitesprenBase: string | null) => {
+    if (!sitesprenBase || !userInternalId) return;
+
+    setScrapingLinks(prev => new Set([...prev, siteId]));
+
+    try {
+      const response = await fetch('/api/scrape_links_from_homepage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sitespren_id: siteId,
+          sitespren_base: sitesprenBase,
+          user_internal_id: userInternalId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('Link scraping completed:', result.data);
+        
+        // Fetch updated linksharn data for this site
+        await fetchLinksharnData(siteId, result.data.source_domain);
+
+        // Show feedback message
+        setGadgetFeedback({
+          action: `ScrapeLinksFromHomepage1`,
+          message: `Found ${result.data.total_found} outbound links (${result.data.new_links} new, ${result.data.existing_updated} updated)`,
+          type: 'success',
+          timestamp: new Date().toISOString()
+        });
+
+        // Clear feedback after 5 seconds
+        setTimeout(() => setGadgetFeedback(null), 5000);
+      } else {
+        console.error('Link scraping failed:', result.error);
+        setGadgetFeedback({
+          action: `ScrapeLinksFromHomepage1`,
+          message: `Failed: ${result.error}`,
+          type: 'error',
+          timestamp: new Date().toISOString()
+        });
+
+        // Clear feedback after 5 seconds
+        setTimeout(() => setGadgetFeedback(null), 5000);
+      }
+    } catch (error) {
+      console.error('Error scraping links:', error);
+      setGadgetFeedback({
+        action: `ScrapeLinksFromHomepage1`,
+        message: `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        type: 'error',
+        timestamp: new Date().toISOString()
+      });
+
+      // Clear feedback after 5 seconds
+      setTimeout(() => setGadgetFeedback(null), 5000);
+    } finally {
+      setScrapingLinks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
+  // Fetch linksharn data for a specific site
+  const fetchLinksharnData = async (siteId: string, sourceDomain: string) => {
+    if (!userInternalId) return;
+
+    try {
+      const { data: links, error } = await supabase
+        .from('linksharn')
+        .select('*')
+        .eq('source_domain', sourceDomain)
+        .eq('fk_user_id', userInternalId)
+        .order('first_seen', { ascending: false });
+
+      if (!error && links) {
+        setLinksharnData(prev => ({
+          ...prev,
+          [siteId]: links
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching linksharn data:', error);
+    }
+  };
+
+  // Auto-fetch linksharn data when rows are expanded
+  useEffect(() => {
+    expandedRows.forEach(siteId => {
+      if (!linksharnData[siteId]) {
+        const site = data.find(s => s.id === siteId);
+        if (site && site.sitespren_base) {
+          const sourceDomain = site.sitespren_base.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+          fetchLinksharnData(siteId, sourceDomain);
+        }
+      }
+    });
+  }, [expandedRows, userInternalId]);
 
   return (
     <>
@@ -1391,6 +1573,32 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                             >
                               👁
                             </button>
+                            <button
+                              onClick={() => {
+                                setEditFormData(item);
+                                setEditPopupOpen(item.id);
+                                fetchHostAccountsForPopup();
+                              }}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                              title="Edit row"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => handleScrapeLinksFromHomepage(item.id, item.sitespren_base)}
+                              disabled={scrapingLinks.has(item.id)}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              title="Scrape outbound links from homepage"
+                            >
+                              {scrapingLinks.has(item.id) ? (
+                                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                              ) : (
+                                'L'
+                              )}
+                            </button>
                           </div>
                         ) : col === 'id' ? (
                           <span className="text-xs">{truncateText(item.id, 8)}...</span>
@@ -1532,8 +1740,116 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   {expandedRows.has(item.id) && (
                     <tr>
                       <td colSpan={visibleColumns.length} className="bg-gray-50 px-6 py-4">
-                        <div className="text-sm text-gray-700">
-                          <p>View your backlinks</p>
+                        <div className="space-y-6">
+                          {/* Backlinks Section */}
+                          <div>
+                            <h4 className="text-lg font-semibold text-gray-900 mb-3">Backlinks</h4>
+                            <div className="text-sm text-gray-700 bg-white p-4 rounded-lg border">
+                              <p>View your backlinks (this section will be enhanced in the future)</p>
+                            </div>
+                          </div>
+
+                          {/* Outbound Links Section */}
+                          <div>
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="text-lg font-semibold text-gray-900">Outbound Links from Homepage</h4>
+                              <button
+                                onClick={() => {
+                                  handleScrapeLinksFromHomepage(item.id, item.sitespren_base);
+                                  if (!linksharnData[item.id] && item.sitespren_base) {
+                                    fetchLinksharnData(item.id, item.sitespren_base.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]);
+                                  }
+                                }}
+                                disabled={scrapingLinks.has(item.id)}
+                                className="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors"
+                              >
+                                {scrapingLinks.has(item.id) ? 'Scraping...' : 'Refresh Links'}
+                              </button>
+                            </div>
+                            
+                            {linksharnData[item.id] ? (
+                              <div className="bg-white rounded-lg border overflow-hidden">
+                                {linksharnData[item.id].length > 0 ? (
+                                  <>
+                                    <div className="px-4 py-2 bg-gray-100 border-b">
+                                      <p className="text-sm text-gray-600">
+                                        Found {linksharnData[item.id].length} outbound links
+                                      </p>
+                                    </div>
+                                    <div className="overflow-x-auto max-h-96">
+                                      <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                          <tr>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Target Domain</th>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Anchor Text</th>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Target URL</th>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">NoFollow</th>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">First Seen</th>
+                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Last Seen</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                          {linksharnData[item.id].map((link, index) => (
+                                            <tr key={link.backlink_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                              <td className="px-3 py-2 text-sm text-gray-900 font-medium">
+                                                {link.target_domain}
+                                              </td>
+                                              <td className="px-3 py-2 text-sm text-gray-600">
+                                                {link.backlink_anchor ? (
+                                                  <span className="inline-block max-w-xs truncate" title={link.backlink_anchor}>
+                                                    {link.backlink_anchor}
+                                                  </span>
+                                                ) : (
+                                                  <span className="text-gray-400 italic">No anchor text</span>
+                                                )}
+                                              </td>
+                                              <td className="px-3 py-2 text-sm">
+                                                <a
+                                                  href={link.target_url}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="text-blue-600 hover:text-blue-800 underline max-w-xs inline-block truncate"
+                                                  title={link.target_url}
+                                                >
+                                                  {link.target_url}
+                                                </a>
+                                              </td>
+                                              <td className="px-3 py-2 text-sm">
+                                                {link.is_nofollow ? (
+                                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    NoFollow
+                                                  </span>
+                                                ) : (
+                                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    Follow
+                                                  </span>
+                                                )}
+                                              </td>
+                                              <td className="px-3 py-2 text-sm text-gray-600">
+                                                {link.first_seen ? new Date(link.first_seen).toLocaleDateString() : '-'}
+                                              </td>
+                                              <td className="px-3 py-2 text-sm text-gray-600">
+                                                {link.last_seen ? new Date(link.last_seen).toLocaleDateString() : '-'}
+                                              </td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="px-4 py-8 text-center">
+                                    <p className="text-gray-500">No outbound links found</p>
+                                    <p className="text-sm text-gray-400 mt-1">Click "Refresh Links" to scrape the homepage</p>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="bg-white rounded-lg border p-4 text-center">
+                                <p className="text-gray-500">Click "Refresh Links" to scrape outbound links from the homepage</p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -1683,6 +1999,331 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             >
               Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Row Edit Popup */}
+    {editPopupOpen && editFormData && (
+      <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="bg-white w-full max-w-4xl rounded-lg shadow-xl relative max-h-[90vh] overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">Edit Site Record</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {editFormData.sitespren_base} • {editFormData.id}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setEditPopupOpen(null);
+                setEditFormData(null);
+              }}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Form Content */}
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Left Column - Basic Info */}
+              <div className="space-y-6">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h4>
+                  
+                  {/* Site Base */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Domain (sitespren_base)
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.sitespren_base || ''}
+                      onChange={(e) => setEditFormData({...editFormData, sitespren_base: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="example.com"
+                    />
+                  </div>
+
+                  {/* True Root Domain */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      True Root Domain
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.true_root_domain || ''}
+                      onChange={(e) => setEditFormData({...editFormData, true_root_domain: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="example.com"
+                    />
+                  </div>
+
+                  {/* Full Subdomain */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Subdomain
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.full_subdomain || ''}
+                      onChange={(e) => setEditFormData({...editFormData, full_subdomain: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="www.example.com"
+                    />
+                  </div>
+
+                  {/* Web Property Type */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Web Property Type
+                    </label>
+                    <select
+                      value={editFormData.webproperty_type || ''}
+                      onChange={(e) => setEditFormData({...editFormData, webproperty_type: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Select type...</option>
+                      <option value="WordPress Site">WordPress Site</option>
+                      <option value="Static Site">Static Site</option>
+                      <option value="E-commerce">E-commerce</option>
+                      <option value="Landing Page">Landing Page</option>
+                      <option value="Blog">Blog</option>
+                      <option value="Portfolio">Portfolio</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Network Info */}
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">Network Information</h4>
+                  
+                  {/* NS Full */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Name Servers (ns_full)
+                    </label>
+                    <textarea
+                      value={editFormData.ns_full || ''}
+                      onChange={(e) => setEditFormData({...editFormData, ns_full: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      rows={3}
+                      placeholder="ns1.example.com, ns2.example.com"
+                    />
+                  </div>
+
+                  {/* IP Address */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      IP Address
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.ip_address || ''}
+                      onChange={(e) => setEditFormData({...editFormData, ip_address: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="192.168.1.1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column - WordPress & Settings */}
+              <div className="space-y-6">
+                
+                {/* WordPress Settings */}
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">WordPress Settings</h4>
+                  
+                  {/* Is WordPress Site Toggle */}
+                  <div className="mb-4">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={editFormData.is_wp_site || false}
+                        onChange={(e) => setEditFormData({...editFormData, is_wp_site: e.target.checked})}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700">Is WordPress Site</span>
+                    </label>
+                  </div>
+
+                  {/* WP Username */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      WordPress Username
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.wpuser1 || ''}
+                      onChange={(e) => setEditFormData({...editFormData, wpuser1: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="admin"
+                    />
+                  </div>
+
+                  {/* WP Password */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      WordPress Password
+                    </label>
+                    <input
+                      type="password"
+                      value={editFormData.wppass1 || ''}
+                      onChange={(e) => setEditFormData({...editFormData, wppass1: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  {/* Plugin Toggles */}
+                  <div className="space-y-3">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={editFormData.wp_plugin_installed1 || false}
+                        onChange={(e) => setEditFormData({...editFormData, wp_plugin_installed1: e.target.checked})}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700">Plugin Installed</span>
+                    </label>
+
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={editFormData.wp_plugin_connected2 || false}
+                        onChange={(e) => setEditFormData({...editFormData, wp_plugin_connected2: e.target.checked})}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700">Plugin Connected</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* API Keys */}
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">API & Access</h4>
+                  
+                  {/* Ruplin API Key */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Ruplin API Key
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.ruplin_apikey || ''}
+                      onChange={(e) => setEditFormData({...editFormData, ruplin_apikey: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="API key..."
+                    />
+                  </div>
+
+                  {/* WP REST App Pass */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      WordPress REST App Password
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.wp_rest_app_pass || ''}
+                      onChange={(e) => setEditFormData({...editFormData, wp_rest_app_pass: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="App password..."
+                    />
+                  </div>
+
+                  {/* Starred */}
+                  <div className="mb-4">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={editFormData.is_starred1 === 'yes'}
+                        onChange={(e) => setEditFormData({...editFormData, is_starred1: e.target.checked ? 'yes' : null})}
+                        className="rounded border-gray-300 text-yellow-600 focus:ring-yellow-500"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700">Starred</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Domain Registrar Info */}
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">Domain Registrar</h4>
+                  
+                  {editFormData.registrar_company_name ? (
+                    <div className="bg-white p-3 border border-gray-200 rounded-md">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {editFormData.registrar_company_name}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {editFormData.registrar_username}
+                          </div>
+                          {editFormData.registrar_portal_url && (
+                            <div className="text-xs text-blue-600">
+                              Portal: {editFormData.registrar_portal_url}
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => {
+                            setRegistrarPopupOpen(editFormData.id);
+                            fetchHostAccountsForPopup();
+                          }}
+                          className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-white p-3 border border-gray-200 rounded-md">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-500">No registrar set</span>
+                        <button
+                          onClick={() => {
+                            setRegistrarPopupOpen(editFormData.id);
+                            fetchHostAccountsForPopup();
+                          }}
+                          className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
+                        >
+                          Set Registrar
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end p-6 border-t border-gray-200 bg-gray-50 space-x-3">
+            <button
+              onClick={() => {
+                setEditPopupOpen(null);
+                setEditFormData(null);
+              }}
+              className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => handleSaveChanges()}
+              disabled={isUpdating}
+              className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded-md transition-colors"
+            >
+              {isUpdating ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </div>
