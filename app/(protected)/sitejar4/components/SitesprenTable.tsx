@@ -81,6 +81,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
   const [checkingPluginVersion, setCheckingPluginVersion] = useState<Set<string>>(new Set());
   const [updatingPlugin, setUpdatingPlugin] = useState<Set<string>>(new Set());
   const [barkroPushing, setBarkroPushing] = useState<Set<string>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   
   const supabase = createClientComponentClient();
   
@@ -97,6 +98,19 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
     setSelectedColumnTemplate(colTempParam);
     setSelectedStickyColumns(stickyColParam);
   }, []);
+
+  // Toggle expanded row
+  const toggleExpandedRow = (rowId: string) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId);
+      } else {
+        newSet.add(rowId);
+      }
+      return newSet;
+    });
+  };
 
   // Utility functions
   const getStickyColumnCount = () => {
@@ -1039,12 +1053,52 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : col === 'tool_buttons' ? (
-                          <Link
-                            href={`/sitnivid?site=${encodeURIComponent(item.sitespren_base || '')}`}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                          >
-                            Individual View
-                          </Link>
+                          <div className="flex items-center gap-1">
+                            <Link
+                              href={`/sitnivid?site=${encodeURIComponent(item.sitespren_base || '')}`}
+                              className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                              Individual View
+                            </Link>
+                            <button
+                              onClick={() => window.open(`https://${item.sitespren_base}/wp-admin/`, '_blank')}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                              title="Open WP Admin"
+                            >
+                              WP
+                            </button>
+                            <button
+                              onClick={() => window.open(`https://${item.sitespren_base}`, '_blank')}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                              title="Open Site"
+                            >
+                              Site
+                            </button>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(item.sitespren_base || '');
+                                // Optional: You could add a toast notification here
+                              }}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                              title="Copy domain to clipboard"
+                            >
+                              📋
+                            </button>
+                            <button
+                              onClick={() => window.open(`https://www.google.com/search?q=site%3A${encodeURIComponent(item.sitespren_base || '')}`, '_blank')}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                              title="Google site: search"
+                            >
+                              G
+                            </button>
+                            <button
+                              onClick={() => toggleExpandedRow(item.id)}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                              title="View backlinks"
+                            >
+                              👁
+                            </button>
+                          </div>
                         ) : col === 'sync_actions' ? (
                           <div className="flex flex-col gap-2">
                             <div className="flex gap-2">
