@@ -825,10 +825,10 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         case 'barkro_push':
           syncResultKey = `barkro_${selectedSiteId}`;
           break;
-        case 'sync_wpsv2':
-          syncResultKey = method ? selectedSiteId : selectedSiteId; // sync stores just siteId
+        case 'wpsv2_sync':
+          syncResultKey = selectedSiteId; // sync stores just siteId
           break;
-        case 'test_wpsv2':
+        case 'test_plugin':
           syncResultKey = `test_${selectedSiteId}`;
           break;
         default:
