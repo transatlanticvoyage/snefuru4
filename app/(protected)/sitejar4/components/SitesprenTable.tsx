@@ -2281,14 +2281,22 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           <div className="relative">
                             <button
                               onClick={(e) => handleCopyClick(item.sitespren_base || '', e)}
-                              className="absolute -top-2 -left-4 w-5 h-2.5 bg-gray-300 border border-gray-400 hover:bg-yellow-300 transition-colors duration-200 z-10"
+                              className="absolute z-10 transition-colors duration-200"
                               style={{
+                                top: '-8px',
+                                right: '-16px',
                                 width: '20px',
                                 height: '9px',
                                 backgroundColor: '#c0c0c0',
                                 borderColor: '#918f8f',
                                 borderWidth: '1px',
                                 borderStyle: 'solid'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#fee43b';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#c0c0c0';
                               }}
                               title="Copy domain"
                             />
@@ -3014,12 +3022,16 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     {showCopyOverlay && (
       <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
         <div 
-          className="bg-white rounded-md shadow-lg flex items-center px-3 py-2 transition-opacity duration-500"
+          className="bg-white rounded-md shadow-lg flex items-center transition-opacity duration-500"
           style={{
-            width: '80px',
+            minWidth: '80px',
             height: '27px',
             backgroundColor: '#ffffff',
-            opacity: overlayOpacity
+            opacity: overlayOpacity,
+            paddingLeft: '8px',
+            paddingRight: '12px',
+            paddingTop: '4px',
+            paddingBottom: '4px'
           }}
         >
           {/* Blue checkmark circle */}
@@ -3043,7 +3055,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           </div>
           {/* Copied text */}
           <span 
-            className="text-blue-500 select-none"
+            className="text-blue-500 select-none whitespace-nowrap"
             style={{
               fontSize: '16px',
               color: '#2c79ff',
