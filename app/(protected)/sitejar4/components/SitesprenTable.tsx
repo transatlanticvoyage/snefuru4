@@ -1535,6 +1535,115 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
       </div>
 
+      {/* Pagination Controls Essex */}
+      <div className="bg-white rounded-lg shadow p-4">
+        <h3 className="text-sm font-bold text-gray-800 mb-3">pagination_controls_essex</h3>
+        
+        {/* Results info */}
+        <div className="mb-4 text-sm text-gray-600">
+          Showing {Math.min(itemsPerPage, sortedData.length)} of {sortedData.length} results
+        </div>
+        
+        {/* Results per page button group */}
+        <div className="mb-4">
+          <div className="inline-flex rounded-md shadow-sm" role="group">
+            {[10, 25, 50, 100, 200, 'All'].map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  if (value === 'All') {
+                    setItemsPerPage(sortedData.length || 1000);
+                  } else {
+                    setItemsPerPage(value as number);
+                  }
+                  setCurrentPage(1);
+                }}
+                className={`
+                  px-4 py-2 text-sm font-medium border
+                  ${value === 10 ? 'rounded-l-lg' : ''}
+                  ${value === 'All' ? 'rounded-r-lg' : ''}
+                  ${(value === 'All' && itemsPerPage >= sortedData.length) || itemsPerPage === value
+                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }
+                  focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600
+                `}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Page navigation */}
+        <div className="flex items-center justify-center">
+          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            {/* Previous button */}
+            <button
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className={`
+                relative inline-flex items-center rounded-l-md px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300
+                ${currentPage === 1 
+                  ? 'cursor-not-allowed bg-gray-50' 
+                  : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                }
+              `}
+            >
+              <span className="text-lg">«</span>
+            </button>
+            
+            {/* Page numbers */}
+            {(() => {
+              const pageNumbers = [];
+              const maxVisiblePages = 5;
+              let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+              
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+              }
+              
+              for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i)}
+                    className={`
+                      relative inline-flex items-center px-4 py-2 text-sm font-semibold
+                      ${currentPage === i
+                        ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                        : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                      }
+                    `}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              
+              return pageNumbers;
+            })()}
+            
+            {/* Next button */}
+            <button
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className={`
+                relative inline-flex items-center rounded-r-md px-3 py-2 text-gray-400 ring-1 ring-inset ring-gray-300
+                ${currentPage === totalPages 
+                  ? 'cursor-not-allowed bg-gray-50' 
+                  : 'hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                }
+              `}
+            >
+              <span className="text-lg">»</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
