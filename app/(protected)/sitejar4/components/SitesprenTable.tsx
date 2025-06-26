@@ -814,7 +814,26 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       }
 
       // Check if we have a sync result for this action
-      const syncResultKey = method ? `${action}_${method}_${selectedSiteId}` : `${action}_${selectedSiteId}`;
+      let syncResultKey: string;
+      switch (action) {
+        case 'check_plugin_version':
+          syncResultKey = `version_${selectedSiteId}`;
+          break;
+        case 'update_plugin':
+          syncResultKey = `update_${selectedSiteId}`;
+          break;
+        case 'barkro_push':
+          syncResultKey = `barkro_${selectedSiteId}`;
+          break;
+        case 'sync_wpsv2':
+          syncResultKey = method ? selectedSiteId : selectedSiteId; // sync stores just siteId
+          break;
+        case 'test_wpsv2':
+          syncResultKey = `test_${selectedSiteId}`;
+          break;
+        default:
+          syncResultKey = method ? `${action}_${method}_${selectedSiteId}` : `${action}_${selectedSiteId}`;
+      }
       const syncResult = syncResults[syncResultKey];
       
       if (syncResult) {
