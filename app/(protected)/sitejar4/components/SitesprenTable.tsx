@@ -40,6 +40,37 @@ interface SitesprenTableProps {
   searchTerm?: string;
   onSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   totalUnfilteredCount?: number;
+  onTagsUpdate?: (tagsData: {
+    tags: any[];
+    selectedTags: Set<string>;
+    tagsFeedback: {type: 'success' | 'error' | 'info', message: string} | null;
+    functions: {
+      handleCreateTag: () => Promise<void>;
+      handleUpdateTag: () => Promise<void>;
+      handleDeleteTag: (tagId: string) => Promise<void>;
+      handleAddSitesToTag: () => Promise<void>;
+      handleTagSelection: (tagId: string, isSelected: boolean) => void;
+      startEditingTag: (tag: any) => void;
+      cancelEditingTag: () => void;
+    };
+    formData: {
+      newTagName: string;
+      setNewTagName: (name: string) => void;
+      newTagOrder: number;
+      setNewTagOrder: (order: number) => void;
+      editingTagId: string | null;
+      editingTagName: string;
+      setEditingTagName: (name: string) => void;
+      editingTagOrder: number;
+      setEditingTagOrder: (order: number) => void;
+    };
+    loadingStates: {
+      isCreatingTag: boolean;
+      isUpdatingTag: boolean;
+      isDeletingTag: Set<string>;
+      isAddingSitesToTag: boolean;
+    };
+  }) => void;
 }
 
 type SortField = keyof SitesprenRecord;
@@ -71,7 +102,7 @@ const allColumns = [
   'is_wp_site'         // 22
 ];
 
-export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount }: SitesprenTableProps) {
+export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, onTagsUpdate }: SitesprenTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -95,6 +126,18 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [isUpdating, setIsUpdating] = useState(false);
   const [scrapingLinks, setScrapingLinks] = useState<Set<string>>(new Set());
   const [linksharnData, setLinksharnData] = useState<{[key: string]: any[]}>({});
+  const [tags, setTags] = useState<any[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const [newTagName, setNewTagName] = useState('');
+  const [newTagOrder, setNewTagOrder] = useState(0);
+  const [isCreatingTag, setIsCreatingTag] = useState(false);
+  const [editingTagId, setEditingTagId] = useState<string | null>(null);
+  const [editingTagName, setEditingTagName] = useState('');
+  const [editingTagOrder, setEditingTagOrder] = useState(0);
+  const [isUpdatingTag, setIsUpdatingTag] = useState(false);
+  const [isDeletingTag, setIsDeletingTag] = useState<Set<string>>(new Set());
+  const [isAddingSitesToTag, setIsAddingSitesToTag] = useState(false);
+  const [tagsFeedback, setTagsFeedback] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
   
   const supabase = createClientComponentClient();
   
@@ -1201,6 +1244,306 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       console.error('Error fetching linksharn data:', error);
     }
   };
+
+  // Tags management functions
+  const fetchTags = async () => {
+    if (!userInternalId) return;
+
+    try {
+      const response = await fetch(`/api/sitespren_tags?user_internal_id=${userInternalId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setTags(result.data || []);
+      } else {
+        console.error('Error fetching tags:', result.error);
+      }
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  };
+
+  const handleCreateTag = async () => {
+    if (!newTagName.trim() || !userInternalId) return;
+
+    setIsCreatingTag(true);
+    setTagsFeedback(null);
+
+    try {
+      const response = await fetch('/api/sitespren_tags', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tag_name: newTagName.trim(),
+          tag_order: newTagOrder,
+          user_internal_id: userInternalId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTagsFeedback({
+          type: 'success',
+          message: 'Tag created successfully'
+        });
+        setNewTagName('');
+        setNewTagOrder(0);
+        await fetchTags();
+      } else {
+        setTagsFeedback({
+          type: 'error',
+          message: result.error || 'Failed to create tag'
+        });
+      }
+    } catch (error) {
+      console.error('Error creating tag:', error);
+      setTagsFeedback({
+        type: 'error',
+        message: 'Network error occurred'
+      });
+    } finally {
+      setIsCreatingTag(false);
+      setTimeout(() => setTagsFeedback(null), 5000);
+    }
+  };
+
+  const handleUpdateTag = async () => {
+    if (!editingTagId || !editingTagName.trim() || !userInternalId) return;
+
+    setIsUpdatingTag(true);
+    setTagsFeedback(null);
+
+    try {
+      const response = await fetch('/api/sitespren_tags', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tag_id: editingTagId,
+          tag_name: editingTagName.trim(),
+          tag_order: editingTagOrder,
+          user_internal_id: userInternalId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTagsFeedback({
+          type: 'success',
+          message: 'Tag updated successfully'
+        });
+        setEditingTagId(null);
+        setEditingTagName('');
+        setEditingTagOrder(0);
+        await fetchTags();
+      } else {
+        setTagsFeedback({
+          type: 'error',
+          message: result.error || 'Failed to update tag'
+        });
+      }
+    } catch (error) {
+      console.error('Error updating tag:', error);
+      setTagsFeedback({
+        type: 'error',
+        message: 'Network error occurred'
+      });
+    } finally {
+      setIsUpdatingTag(false);
+      setTimeout(() => setTagsFeedback(null), 5000);
+    }
+  };
+
+  const handleDeleteTag = async (tagId: string) => {
+    if (!userInternalId) return;
+
+    const confirmed = window.confirm('Are you sure you want to delete this tag? This will also remove all site associations with this tag.');
+    if (!confirmed) return;
+
+    setIsDeletingTag(prev => new Set([...prev, tagId]));
+    setTagsFeedback(null);
+
+    try {
+      const response = await fetch('/api/sitespren_tags', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tag_id: tagId,
+          user_internal_id: userInternalId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTagsFeedback({
+          type: 'success',
+          message: 'Tag deleted successfully'
+        });
+        await fetchTags();
+      } else {
+        setTagsFeedback({
+          type: 'error',
+          message: result.error || 'Failed to delete tag'
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting tag:', error);
+      setTagsFeedback({
+        type: 'error',
+        message: 'Network error occurred'
+      });
+    } finally {
+      setIsDeletingTag(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(tagId);
+        return newSet;
+      });
+      setTimeout(() => setTagsFeedback(null), 5000);
+    }
+  };
+
+  const handleAddSitesToTag = async () => {
+    if (selectedTags.size === 0) {
+      setTagsFeedback({
+        type: 'error',
+        message: 'Please select a tag first'
+      });
+      setTimeout(() => setTagsFeedback(null), 5000);
+      return;
+    }
+
+    if (selectedSites.size === 0) {
+      setTagsFeedback({
+        type: 'error',
+        message: 'Please select sites from the main table first'
+      });
+      setTimeout(() => setTagsFeedback(null), 5000);
+      return;
+    }
+
+    if (!userInternalId) return;
+
+    setIsAddingSitesToTag(true);
+    setTagsFeedback(null);
+
+    try {
+      const tagId = Array.from(selectedTags)[0]; // Use first selected tag
+      const siteIds = Array.from(selectedSites);
+
+      const response = await fetch('/api/add_sites_to_tag', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_ids: siteIds,
+          tag_id: tagId,
+          user_internal_id: userInternalId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTagsFeedback({
+          type: 'success',
+          message: result.message
+        });
+        setSelectedTags(new Set()); // Clear tag selection
+      } else {
+        setTagsFeedback({
+          type: 'error',
+          message: result.error || 'Failed to add sites to tag'
+        });
+      }
+    } catch (error) {
+      console.error('Error adding sites to tag:', error);
+      setTagsFeedback({
+        type: 'error',
+        message: 'Network error occurred'
+      });
+    } finally {
+      setIsAddingSitesToTag(false);
+      setTimeout(() => setTagsFeedback(null), 5000);
+    }
+  };
+
+  const handleTagSelection = (tagId: string, isSelected: boolean) => {
+    setSelectedTags(prev => {
+      const newSet = new Set(prev);
+      if (isSelected) {
+        newSet.clear(); // Only allow one tag selection at a time
+        newSet.add(tagId);
+      } else {
+        newSet.delete(tagId);
+      }
+      return newSet;
+    });
+  };
+
+  const startEditingTag = (tag: any) => {
+    setEditingTagId(tag.tag_id);
+    setEditingTagName(tag.tag_name);
+    setEditingTagOrder(tag.tag_order);
+  };
+
+  const cancelEditingTag = () => {
+    setEditingTagId(null);
+    setEditingTagName('');
+    setEditingTagOrder(0);
+  };
+
+  // Fetch tags when component mounts or userInternalId changes
+  useEffect(() => {
+    if (userInternalId) {
+      fetchTags();
+    }
+  }, [userInternalId]);
+
+  // Update parent component with tags data whenever tags state changes
+  useEffect(() => {
+    if (onTagsUpdate) {
+      onTagsUpdate({
+        tags,
+        selectedTags,
+        tagsFeedback,
+        functions: {
+          handleCreateTag,
+          handleUpdateTag,
+          handleDeleteTag,
+          handleAddSitesToTag,
+          handleTagSelection,
+          startEditingTag,
+          cancelEditingTag
+        },
+        formData: {
+          newTagName,
+          setNewTagName,
+          newTagOrder,
+          setNewTagOrder,
+          editingTagId,
+          editingTagName,
+          setEditingTagName,
+          editingTagOrder,
+          setEditingTagOrder
+        },
+        loadingStates: {
+          isCreatingTag,
+          isUpdatingTag,
+          isDeletingTag,
+          isAddingSitesToTag
+        }
+      });
+    }
+  }, [tags, selectedTags, tagsFeedback, newTagName, newTagOrder, editingTagId, editingTagName, editingTagOrder, isCreatingTag, isUpdatingTag, isDeletingTag, isAddingSitesToTag, onTagsUpdate]);
 
   // Auto-fetch linksharn data when rows are expanded
   useEffect(() => {

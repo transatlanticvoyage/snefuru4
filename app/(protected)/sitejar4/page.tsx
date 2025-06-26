@@ -28,6 +28,7 @@ export default function Sitejar4Page() {
   const [sitesList, setSitesList] = useState('');
   const [isSubmittingF71, setIsSubmittingF71] = useState(false);
   const [f71Notification, setF71Notification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+  const [tagsData, setTagsData] = useState<any>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -359,6 +360,11 @@ export default function Sitejar4Page() {
     setActivePopupTab(tab as any);
     localStorage.setItem('sitejar4_lastActiveTab', tab); // Remember this tab for next time
     updatePopupURL(true, tab);
+  };
+
+  // Handle tags data from SitesprenTable
+  const handleTagsUpdate = (newTagsData: any) => {
+    setTagsData(newTagsData);
   };
 
   const f18_deletesites = async () => {
@@ -890,8 +896,205 @@ http://www.drogs.com`}
                 )}
                 {activePopupTab === 'ptab3' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab3</h3>
-                    <p className="text-gray-600">This is the content area for ptab3.</p>
+                    <h3 className="text-lg font-semibold mb-4">Tags Management</h3>
+                    
+                    {/* Tags Feedback */}
+                    {tagsData?.tagsFeedback && (
+                      <div className={`mb-4 p-4 rounded-md ${
+                        tagsData.tagsFeedback.type === 'success' 
+                          ? 'bg-green-100 border border-green-400 text-green-700' 
+                          : tagsData.tagsFeedback.type === 'error'
+                          ? 'bg-red-100 border border-red-400 text-red-700'
+                          : 'bg-blue-100 border border-blue-400 text-blue-700'
+                      }`}>
+                        {tagsData.tagsFeedback.message}
+                      </div>
+                    )}
+
+                    {/* Add Sites to Tag Button */}
+                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <button
+                        onClick={() => tagsData?.functions?.handleAddSitesToTag()}
+                        disabled={!tagsData?.functions?.handleAddSitesToTag || tagsData?.loadingStates?.isAddingSitesToTag}
+                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-bold rounded-md transition-colors text-lg"
+                      >
+                        {tagsData?.loadingStates?.isAddingSitesToTag ? 'Adding Sites...' : 'Add Selected Sites to Selected Tag'}
+                      </button>
+                      <div className="mt-2 text-sm text-blue-600">
+                        <p>• First select sites from the main table using checkboxes</p>
+                        <p>• Then select one tag from the table below using its checkbox</p>
+                        <p>• Finally click the button above to add selected sites to the selected tag</p>
+                        <p>• Currently selected: {selectedSiteIds.length} site(s), {tagsData?.selectedTags?.size || 0} tag(s)</p>
+                      </div>
+                    </div>
+
+                    {/* Create New Tag Form */}
+                    <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <h4 className="text-md font-semibold mb-3">Create New Tag</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Tag Name</label>
+                          <input
+                            type="text"
+                            value={tagsData?.formData?.newTagName || ''}
+                            onChange={(e) => tagsData?.formData?.setNewTagName(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter tag name"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                          <input
+                            type="number"
+                            value={tagsData?.formData?.newTagOrder || 0}
+                            onChange={(e) => tagsData?.formData?.setNewTagOrder(parseInt(e.target.value) || 0)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => tagsData?.functions?.handleCreateTag()}
+                        disabled={!tagsData?.functions?.handleCreateTag || tagsData?.loadingStates?.isCreatingTag || !tagsData?.formData?.newTagName?.trim()}
+                        className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed text-white font-medium rounded-md transition-colors"
+                      >
+                        {tagsData?.loadingStates?.isCreatingTag ? 'Creating...' : 'Create Tag'}
+                      </button>
+                    </div>
+
+                    {/* Tags Table */}
+                    <div className="bg-white rounded-lg shadow overflow-hidden">
+                      <div className="px-4 py-3 border-b border-gray-200">
+                        <h4 className="text-md font-semibold">sitespren_tags Table</h4>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Select
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                tag_id
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                tag_name
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                tag_order
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                created_at
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                updated_at
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                fk_user_id
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {tagsData?.tags?.length === 0 ? (
+                              <tr>
+                                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                                  No tags found. Create your first tag using the form above.
+                                </td>
+                              </tr>
+                            ) : (
+                              tagsData?.tags?.map((tag: any) => (
+                                <tr key={tag.tag_id} className="hover:bg-gray-50">
+                                  <td className="px-4 py-3">
+                                    <input
+                                      type="checkbox"
+                                      checked={tagsData?.selectedTags?.has(tag.tag_id) || false}
+                                      onChange={(e) => tagsData?.functions?.handleTagSelection(tag.tag_id, e.target.checked)}
+                                      className="text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
+                                  </td>
+                                  <td className="px-4 py-3 text-xs text-gray-900">
+                                    {tag.tag_id?.substring(0, 8)}...
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    {tagsData?.editingTagId === tag.tag_id ? (
+                                      <input
+                                        type="text"
+                                        value={tagsData?.formData?.editingTagName || ''}
+                                        onChange={(e) => tagsData?.formData?.setEditingTagName(e.target.value)}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                      />
+                                    ) : (
+                                      <span className="font-medium">{tag.tag_name}</span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    {tagsData?.editingTagId === tag.tag_id ? (
+                                      <input
+                                        type="number"
+                                        value={tagsData?.formData?.editingTagOrder || 0}
+                                        onChange={(e) => tagsData?.formData?.setEditingTagOrder(parseInt(e.target.value) || 0)}
+                                        className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                                      />
+                                    ) : (
+                                      tag.tag_order
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-500">
+                                    {tag.created_at ? new Date(tag.created_at).toLocaleDateString() : '-'}
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-500">
+                                    {tag.updated_at ? new Date(tag.updated_at).toLocaleDateString() : '-'}
+                                  </td>
+                                  <td className="px-4 py-3 text-xs text-gray-500">
+                                    {tag.fk_user_id?.substring(0, 8)}...
+                                  </td>
+                                  <td className="px-4 py-3 text-sm">
+                                    <div className="flex space-x-2">
+                                      {tagsData?.editingTagId === tag.tag_id ? (
+                                        <>
+                                          <button
+                                            onClick={() => tagsData?.functions?.handleUpdateTag()}
+                                            disabled={tagsData?.loadingStates?.isUpdatingTag}
+                                            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs rounded"
+                                          >
+                                            {tagsData?.loadingStates?.isUpdatingTag ? 'Saving...' : 'Save'}
+                                          </button>
+                                          <button
+                                            onClick={() => tagsData?.functions?.cancelEditingTag()}
+                                            className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded"
+                                          >
+                                            Cancel
+                                          </button>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <button
+                                            onClick={() => tagsData?.functions?.startEditingTag(tag)}
+                                            className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs rounded"
+                                          >
+                                            Edit
+                                          </button>
+                                          <button
+                                            onClick={() => tagsData?.functions?.handleDeleteTag(tag.tag_id)}
+                                            disabled={tagsData?.loadingStates?.isDeletingTag?.has(tag.tag_id)}
+                                            className="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white text-xs rounded"
+                                          >
+                                            {tagsData?.loadingStates?.isDeletingTag?.has(tag.tag_id) ? 'Deleting...' : 'Delete'}
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 )}
                 {activePopupTab === 'ptab4' && (
@@ -934,6 +1137,7 @@ http://www.drogs.com`}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
         totalUnfilteredCount={sitesprenData.length}
+        onTagsUpdate={handleTagsUpdate}
       />
     </div>
   );
