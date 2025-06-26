@@ -263,6 +263,43 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
+  // Fetch domain registrar info for a specific site
+  const fetchDomainRegistrarInfo = async (siteId: string, fkDomregHostaccount: string | null) => {
+    if (!userId) return;
+
+    setLoadingRegistrarData(prev => new Set([...prev, siteId]));
+
+    try {
+      const params = new URLSearchParams({
+        user_internal_id: userId,
+        ...(fkDomregHostaccount && { fk_domreg_hostaccount: fkDomregHostaccount })
+      });
+
+      const response = await fetch(`/api/get_domain_registrar_info?${params}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setDomainRegistrarData(prev => ({
+          ...prev,
+          [siteId]: result.data.current_registrar_info
+        }));
+        
+        // Store all host accounts for the popup (only need to do this once)
+        if (result.data.all_host_accounts && allHostAccounts.length === 0) {
+          setAllHostAccounts(result.data.all_host_accounts);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching domain registrar info:', error);
+    } finally {
+      setLoadingRegistrarData(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(siteId);
+        return newSet;
+      });
+    }
+  };
+
   // Fetch domain registrar info for visible sites
   useEffect(() => {
     if (userId && paginatedData.length > 0) {
@@ -272,7 +309,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
         }
       });
     }
-  }, [userId, paginatedData, domainRegistrarData, loadingRegistrarData]);
+  }, [userId, paginatedData]);
 
   // Handle sort
   const handleSort = (field: SortField) => {
@@ -848,43 +885,6 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
   // Clear feedback message
   const clearFeedbackMessage = () => {
     setGadgetFeedback(null);
-  };
-
-  // Fetch domain registrar info for a specific site
-  const fetchDomainRegistrarInfo = async (siteId: string, fkDomregHostaccount: string | null) => {
-    if (!userId) return;
-
-    setLoadingRegistrarData(prev => new Set([...prev, siteId]));
-
-    try {
-      const params = new URLSearchParams({
-        user_internal_id: userId,
-        ...(fkDomregHostaccount && { fk_domreg_hostaccount: fkDomregHostaccount })
-      });
-
-      const response = await fetch(`/api/get_domain_registrar_info?${params}`);
-      const result = await response.json();
-
-      if (result.success) {
-        setDomainRegistrarData(prev => ({
-          ...prev,
-          [siteId]: result.data.current_registrar_info
-        }));
-        
-        // Store all host accounts for the popup (only need to do this once)
-        if (result.data.all_host_accounts && allHostAccounts.length === 0) {
-          setAllHostAccounts(result.data.all_host_accounts);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching domain registrar info:', error);
-    } finally {
-      setLoadingRegistrarData(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(siteId);
-        return newSet;
-      });
-    }
   };
 
   // Update domain registrar for a site
