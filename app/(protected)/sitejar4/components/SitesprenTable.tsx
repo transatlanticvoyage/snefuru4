@@ -302,6 +302,8 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
 
   // Fetch domain registrar info for visible sites
   useEffect(() => {
+    console.log('DEBUG: useEffect triggered with userId:', userId, 'paginatedData.length:', paginatedData.length);
+    
     if (userId && paginatedData.length > 0) {
       console.log('DEBUG: Checking domain registrar info for sites:', paginatedData.map(item => ({
         id: item.id,
@@ -317,7 +319,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
         }
       });
     }
-  }, [userId, paginatedData]);
+  }, [userId, paginatedData, domainRegistrarData, loadingRegistrarData]);
 
   // Handle sort
   const handleSort = (field: SortField) => {
