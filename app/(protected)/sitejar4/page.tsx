@@ -459,13 +459,6 @@ export default function Sitejar4Page() {
 
   return (
     <div className="pr-4">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Site Management</h1>
-        <p className="text-gray-600">
-          Manage your web properties and WordPress sites
-        </p>
-        
-      </div>
 
       {/* Functions popup button */}
       <div className="mb-4">
@@ -497,28 +490,6 @@ export default function Sitejar4Page() {
       )}
 
 
-      {/* Bulk Actions */}
-      {selectedSiteIds.length > 0 && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-medium text-red-800">
-                {selectedSiteIds.length} site(s) selected
-              </h3>
-              <p className="text-sm text-red-600">
-                Choose an action to perform on the selected sites.
-              </p>
-            </div>
-            <button
-              onClick={f18_deletesites}
-              disabled={isDeleting}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium rounded-md transition-colors"
-            >
-              {isDeleting ? 'Deleting...' : 'f18_deletesites'}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Debug Info */}
       <div className="mb-4 bg-yellow-100 border border-yellow-400 rounded overflow-hidden">
@@ -855,8 +826,66 @@ http://www.drogs.com`}
                 )}
                 {activePopupTab === 'ptab2' && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab2</h3>
-                    <p className="text-gray-600">This is the content area for ptab2.</p>
+                    <h3 className="text-lg font-semibold mb-4">Delete Sites</h3>
+                    
+                    {/* Delete notification */}
+                    {deleteNotification && (
+                      <div className={`mb-4 p-4 rounded-md ${
+                        deleteNotification.type === 'success' 
+                          ? 'bg-green-100 border border-green-400 text-green-700' 
+                          : 'bg-red-100 border border-red-400 text-red-700'
+                      }`}>
+                        {deleteNotification.message}
+                      </div>
+                    )}
+                    
+                    {/* Bulk Delete Actions */}
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="mb-4">
+                        <h3 className="text-lg font-medium text-red-800">
+                          Delete Selected Sites
+                        </h3>
+                        <p className="text-sm text-red-600 mt-2">
+                          This action will permanently delete the selected sites. This cannot be undone.
+                        </p>
+                      </div>
+                      
+                      {/* Selection Info */}
+                      <div className="mb-4 p-3 bg-white rounded border border-red-300">
+                        <div className="text-sm">
+                          {kz101Checked && (
+                            <p className="font-medium">
+                              SOPTION1: {selectedSiteIds.length} site(s) selected from table
+                            </p>
+                          )}
+                          {kz103Checked && (
+                            <p className="font-medium">
+                              SOPTION2: All {filteredSitesprenData.length} sites in current view will be affected
+                            </p>
+                          )}
+                          {!kz101Checked && !kz103Checked && (
+                            <p className="text-gray-500">
+                              Please select either SOPTION1 or SOPTION2 above to choose which sites to delete
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Delete Button */}
+                      <button
+                        onClick={f18_deletesites}
+                        disabled={isDeleting || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedSiteIds.length === 0)}
+                        className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-bold rounded-md transition-colors"
+                      >
+                        {isDeleting ? 'Deleting...' : 'f18_deletesites'}
+                      </button>
+                      
+                      {kz101Checked && selectedSiteIds.length === 0 && (
+                        <p className="mt-2 text-sm text-red-600">
+                          Please select at least one site from the table to delete
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
                 {activePopupTab === 'ptab3' && (
