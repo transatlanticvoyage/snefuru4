@@ -59,22 +59,15 @@ export async function POST(request: Request) {
             
             // Add a filter to pre-populate the API key
             const apiKeyInjection = `
-// Auto-populate API key for this installation
-add_filter('pre_option_snefuru_upload_api_key', function() {
+// Auto-populate ruplin_api_key_1 for this installation
+add_filter('pre_option_snefuru_ruplin_api_key_1', function() {
     return '${apiKey}';
 });
 
-add_filter('pre_option_snefuru_ruplin_api_key', function() {
-    return '${apiKey}';
-});
-
-// Set default API key on plugin activation
+// Set default ruplin API key on plugin activation
 register_activation_hook(__FILE__, function() {
-    if (!get_option('snefuru_upload_api_key')) {
-        update_option('snefuru_upload_api_key', '${apiKey}');
-    }
-    if (!get_option('snefuru_ruplin_api_key')) {
-        update_option('snefuru_ruplin_api_key', '${apiKey}');
+    if (!get_option('snefuru_ruplin_api_key_1')) {
+        update_option('snefuru_ruplin_api_key_1', '${apiKey}');
     }
 });
 
