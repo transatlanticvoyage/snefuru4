@@ -49,13 +49,29 @@ export async function POST(request: NextRequest) {
       targetUrl = 'https://' + targetUrl;
     }
 
-    // Fetch the homepage
-    const response = await fetch(targetUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      },
-      timeout: 30000 // 30 second timeout
-    });
+    // Fetch the homepage with timeout using AbortController
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+    let response: Response;
+    try {
+      response = await fetch(targetUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        return NextResponse.json(
+          { success: false, error: 'Request timeout (30 seconds)' },
+          { status: 408 }
+        );
+      }
+      throw error;
+    }
 
     if (!response.ok) {
       return NextResponse.json(
