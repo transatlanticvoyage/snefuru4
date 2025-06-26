@@ -318,9 +318,12 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         (filterWpSite === 'false' && item.is_wp_site === false) ||
         (filterWpSite === 'null' && item.is_wp_site === null);
 
-      return matchesWpFilter;
+      // Tag filter
+      const matchesTagFilter = filterTag === '' || tagFilteredSiteIds.includes(item.id);
+
+      return matchesWpFilter && matchesTagFilter;
     });
-  }, [data, filterWpSite]);
+  }, [data, filterWpSite, filterTag, tagFilteredSiteIds]);
 
   // Sort logic
   const sortedData = useMemo(() => {
@@ -1744,7 +1747,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       
       {/* Search and Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2">
             <label htmlFor="site-search-table" className="block text-sm font-medium text-gray-700 mb-2">
               Search Sites
@@ -1767,6 +1770,24 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                 Showing {data.length} of {totalUnfilteredCount} sites
               </p>
             )}
+          </div>
+          <div>
+            <label htmlFor="tag-filter" className="block text-sm font-medium text-gray-700 mb-2">
+              Filter by Tag
+            </label>
+            <select
+              id="tag-filter"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              value={filterTag}
+              onChange={(e) => handleTagFilterChange(e.target.value)}
+            >
+              <option value="">All Tags</option>
+              {tags.map((tag) => (
+                <option key={tag.tag_id} value={tag.tag_id}>
+                  {tag.tag_name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label htmlFor="wp-filter" className="block text-sm font-medium text-gray-700 mb-2">
