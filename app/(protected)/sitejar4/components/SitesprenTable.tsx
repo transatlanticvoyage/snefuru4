@@ -140,6 +140,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [isDeletingTag, setIsDeletingTag] = useState<Set<string>>(new Set());
   const [isAddingSitesToTag, setIsAddingSitesToTag] = useState(false);
   const [tagsFeedback, setTagsFeedback] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
+  const [showCopyOverlay, setShowCopyOverlay] = useState(false);
+  const [overlayOpacity, setOverlayOpacity] = useState(0);
   
   const supabase = createClientComponentClient();
   
@@ -1597,6 +1599,29 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     }
   }, [tags, selectedTags, tagsFeedback, newTagName, newTagOrder, editingTagId, editingTagName, editingTagOrder, isCreatingTag, isUpdatingTag, isDeletingTag, isAddingSitesToTag, onTagsUpdate]);
 
+  // Copy button handler with overlay animation
+  const handleCopyClick = async (textToCopy: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent any parent click handlers
+    
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      
+      // Start the overlay animation sequence
+      setShowCopyOverlay(true);
+      
+      // Fade in over 0.5s
+      setTimeout(() => setOverlayOpacity(1), 10);
+      
+      // Start fade out after 1.5s (0.5s fade in + 1s visible)
+      setTimeout(() => setOverlayOpacity(0), 1500);
+      
+      // Hide overlay after 2.5s (0.5s fade in + 1s visible + 1s fade out)
+      setTimeout(() => setShowCopyOverlay(false), 2500);
+    } catch (error) {
+      console.error('Failed to copy text:', error);
+    }
+  };
+
   // Auto-fetch linksharn data when rows are expanded
   useEffect(() => {
     expandedRows.forEach(siteId => {
@@ -2253,7 +2278,22 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         ) : col === 'wp_plugin_installed1' || col === 'wp_plugin_connected2' || col === 'is_wp_site' ? (
                           <div className="text-center">{formatBoolean(item[col as keyof SitesprenRecord] as boolean | null)}</div>
                         ) : col === 'sitespren_base' ? (
-                          <span className="font-medium">{item.sitespren_base || '-'}</span>
+                          <div className="relative">
+                            <button
+                              onClick={(e) => handleCopyClick(item.sitespren_base || '', e)}
+                              className="absolute -top-2 -left-4 w-5 h-2.5 bg-gray-300 border border-gray-400 hover:bg-yellow-300 transition-colors duration-200 z-10"
+                              style={{
+                                width: '20px',
+                                height: '9px',
+                                backgroundColor: '#c0c0c0',
+                                borderColor: '#918f8f',
+                                borderWidth: '1px',
+                                borderStyle: 'solid'
+                              }}
+                              title="Copy domain"
+                            />
+                            <span className="font-medium">{item.sitespren_base || '-'}</span>
+                          </div>
                         ) : col === 'ns_full' ? (
                           <div 
                             className="cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
@@ -2966,6 +3006,52 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               {isUpdating ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
+        </div>
+      </div>
+    )}
+
+    {/* Copy Success Overlay */}
+    {showCopyOverlay && (
+      <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+        <div 
+          className="bg-white rounded-md shadow-lg flex items-center px-3 py-2 transition-opacity duration-500"
+          style={{
+            width: '80px',
+            height: '27px',
+            backgroundColor: '#ffffff',
+            opacity: overlayOpacity
+          }}
+        >
+          {/* Blue checkmark circle */}
+          <div className="mr-2 flex-shrink-0">
+            <svg 
+              width="14" 
+              height="14" 
+              viewBox="0 0 24 24" 
+              fill="none"
+              className="text-blue-500"
+            >
+              <circle cx="12" cy="12" r="12" fill="#2c79ff"/>
+              <path 
+                d="M9 12l2 2 4-4" 
+                stroke="white" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          {/* Copied text */}
+          <span 
+            className="text-blue-500 select-none"
+            style={{
+              fontSize: '16px',
+              color: '#2c79ff',
+              fontWeight: 'normal'
+            }}
+          >
+            Copied
+          </span>
         </div>
       </div>
     )}
