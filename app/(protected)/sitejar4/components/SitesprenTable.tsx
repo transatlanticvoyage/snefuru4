@@ -1158,7 +1158,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
             <thead>
               <tr>
                 {visibleColumns.map((col, index) => {
@@ -1171,7 +1171,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                   return (
                     <th
                       key={col}
-                      className={`${col === 'checkbox' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative ${stickyClass} ${
+                      className={`${col === 'checkbox' ? '' : 'px-4 py-3'} text-left text-xs font-bold text-gray-700 relative border-r border-gray-200 ${stickyClass} ${
                         ['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) 
                           ? 'cursor-pointer hover:brightness-95' 
                           : ''
@@ -1239,7 +1239,7 @@ export default function SitesprenTable({ data, userId, onSelectionChange, onData
                     return (
                       <td
                         key={col}
-                        className={`${col === 'checkbox' ? '' : 'px-4 py-2'} text-sm text-gray-900 relative ${stickyClass} ${bgClass} ${
+                        className={`${col === 'checkbox' ? '' : 'px-4 py-2'} text-sm text-gray-900 relative border-r border-gray-200 ${stickyClass} ${bgClass} ${
                           col === 'checkbox' || col === 'tool_buttons' ? 'whitespace-nowrap' : ''
                         } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
                         style={{
