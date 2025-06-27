@@ -2279,19 +2279,22 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           <div className="text-center">{formatBoolean(item[col as keyof SitesprenRecord] as boolean | null)}</div>
                         ) : col === 'sitespren_base' ? (
                           <div className="relative">
-                            <button
+                            <span 
+                              className="sitespren-base-content font-medium block p-2"
+                              style={{ paddingRight: '24px' }}
+                            >
+                              {item.sitespren_base || '-'}
+                            </span>
+                            <span
                               onClick={(e) => handleCopyClick(item.sitespren_base || '', e)}
-                              className="absolute z-10 transition-colors duration-200 cursor-pointer"
+                              className="sitespren-base-copy-btn absolute top-0 right-0 z-10 transition-colors duration-200 cursor-pointer"
                               style={{
-                                top: '-8px',
-                                right: '-16px',
                                 width: '20px',
-                                height: '9px',
+                                height: '11px',
                                 backgroundColor: '#c0c0c0',
                                 borderColor: '#918f8f',
                                 borderWidth: '1px',
-                                borderStyle: 'solid',
-                                cursor: 'pointer'
+                                borderStyle: 'solid'
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = '#fee43b';
@@ -2301,7 +2304,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                               }}
                               title="Copy domain"
                             />
-                            <span className="font-medium">{item.sitespren_base || '-'}</span>
                           </div>
                         ) : col === 'ns_full' ? (
                           <div 
