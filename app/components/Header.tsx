@@ -47,10 +47,18 @@ export default function Header() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      
+      // Don't close dropdown if clicking on a link or inside a link
+      const isLinkClick = target.tagName === 'A' || target.closest('a');
+      if (isLinkClick) {
+        return;
+      }
+      
       // Close user dropdown
       if (
         userDropdownRef.current &&
-        !userDropdownRef.current.contains(event.target as Node)
+        !userDropdownRef.current.contains(target)
       ) {
         setIsUserDropdownOpen(false);
       }
@@ -59,7 +67,7 @@ export default function Header() {
       Object.keys(navDropdowns).forEach(key => {
         if (
           navDropdownRefs.current[key] &&
-          !navDropdownRefs.current[key]?.contains(event.target as Node)
+          !navDropdownRefs.current[key]?.contains(target)
         ) {
           setNavDropdowns(prev => ({ ...prev, [key]: false }));
         }

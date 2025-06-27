@@ -158,7 +158,15 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+      const target = event.target as HTMLElement;
+      
+      // Don't close dropdown if clicking on a link or inside a link
+      const isLinkClick = target.tagName === 'A' || target.closest('a');
+      if (isLinkClick) {
+        return;
+      }
+      
+      if (userMenuRef.current && !userMenuRef.current.contains(target)) {
         setIsUserMenuOpen(false);
       }
     }
