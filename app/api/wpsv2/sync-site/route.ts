@@ -301,7 +301,11 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
           post_excerpt: post.post_excerpt,
           post_status: post.post_status,
           post_type: post.post_type,
-          post_name: post.post_name,
+          // For draft posts/pages, save preview URL format instead of slug
+          // This allows direct access to draft content via WordPress preview system
+          post_name: post.post_status === 'draft' 
+            ? `?page_id=${post.ID}&preview=true`
+            : post.post_name,
           post_password: post.post_password || null,
           comment_status: post.comment_status,
           ping_status: post.ping_status,
@@ -329,7 +333,7 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
           i_sync_completed_at: new Date().toISOString(),
           i_sync_attempt_count: 1
         };
-        console.log(`📝 WPSv2: Processing Plugin API post: ID=${post.ID}, title="${post.post_title}", type=${post.post_type}, status=${post.post_status}`);
+        console.log(`📝 WPSv2: Processing Plugin API post: ID=${post.ID}, title="${post.post_title}", type=${post.post_type}, status=${post.post_status}, post_name=${contentData.post_name}`);
       } else {
         // REST API format
         contentData = {
@@ -347,7 +351,11 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
           post_excerpt: post.excerpt?.rendered || post.excerpt || '',
           post_status: post.status,
           post_type: post.type,
-          post_name: post.slug,
+          // For draft posts/pages, save preview URL format instead of slug
+          // This allows direct access to draft content via WordPress preview system
+          post_name: post.status === 'draft' 
+            ? `?page_id=${post.id}&preview=true`
+            : post.slug,
           comment_status: 'open', // Default for REST API
           ping_status: 'open', // Default for REST API
           guid: post.guid?.rendered || post.guid || '',
@@ -372,7 +380,7 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
           i_sync_completed_at: new Date().toISOString(),
           i_sync_attempt_count: 1
         };
-        console.log(`📝 WPSv2: Processing REST API post: ID=${post.id}, title="${post.title?.rendered || post.title}", type=${post.type}, status=${post.status}`);
+        console.log(`📝 WPSv2: Processing REST API post: ID=${post.id}, title="${post.title?.rendered || post.title}", type=${post.type}, status=${post.status}, post_name=${contentData.post_name}`);
       }
 
       // Upsert content using the correct conflict resolution
