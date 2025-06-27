@@ -126,6 +126,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [filterSite, setFilterSite] = useState("");
   const [filterPage, setFilterPage] = useState("");
+  const [filterPostStatus, setFilterPostStatus] = useState("");
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [stickyColumnCount, setStickyColumnCount] = useState<number>(0);
   const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
@@ -149,6 +150,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     const urlColTemp = searchParams?.get('coltemp');
     const urlStickyCol = searchParams?.get('stickycol');
     const urlSiteBase = searchParams?.get('sitebase');
+    const urlPostStatus = searchParams?.get('g_post_status');
     
     if (urlColTemp && urlColTemp in columnTemplates) {
       setSelectedColumnTemplate(urlColTemp as ColumnTemplateKey);
@@ -180,6 +182,11 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     if (urlSiteBase) {
       setFilterSite(urlSiteBase);
     }
+    
+    // Set post status filter from URL parameter
+    if (urlPostStatus && (urlPostStatus === 'publish' || urlPostStatus === 'draft')) {
+      setFilterPostStatus(urlPostStatus);
+    }
   }, [searchParams]);
 
   // Update URL and localStorage when selections change
@@ -193,12 +200,15 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     if (filterSite) {
       params.set('sitebase', filterSite);
     }
+    if (filterPostStatus) {
+      params.set('g_post_status', filterPostStatus);
+    }
     router.replace(`/gconjar1?${params.toString()}`, { scroll: false });
     
     // Update localStorage
     localStorage.setItem('gconjar1_columnTemplate', selectedColumnTemplate);
     localStorage.setItem('gconjar1_stickyColumns', stickyColumnCount.toString());
-  }, [selectedColumnTemplate, stickyColumnCount, filterSite, router]);
+  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, router]);
 
   // Fetch ns_full data from sitespren table
   useEffect(() => {
@@ -285,9 +295,12 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
       // Page filter
       const matchesPage = !filterPage || item.asn_nwpi_posts_id === filterPage;
 
-      return matchesSearch && matchesSite && matchesPage;
+      // Post status filter
+      const matchesPostStatus = !filterPostStatus || item.g_post_status === filterPostStatus;
+
+      return matchesSearch && matchesSite && matchesPage && matchesPostStatus;
     });
-  }, [data, searchTerm, filterSite, filterPage]);
+  }, [data, searchTerm, filterSite, filterPage, filterPostStatus]);
 
   // Sort logic
   const sortedData = useMemo(() => {
@@ -345,6 +358,11 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
 
   const handleFilterPage = (page: string) => {
     setFilterPage(page);
+    setCurrentPage(1);
+  };
+
+  const handleFilterPostStatus = (status: string) => {
+    setFilterPostStatus(status);
     setCurrentPage(1);
   };
 
@@ -628,6 +646,19 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
               {uniquePages.map(page => (
                 <option key={page} value={page}>{page}</option>
               ))}
+            </select>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <span className="font-bold text-gray-700">g_post_status</span>
+            <select
+              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              value={filterPostStatus}
+              onChange={(e) => handleFilterPostStatus(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="publish">Published</option>
+              <option value="draft">Draft</option>
             </select>
           </div>
         </div>
