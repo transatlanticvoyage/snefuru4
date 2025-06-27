@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { formatDateForCreatedAt } from '@/app/utils/dateUtils';
 
 interface SitesprenRecord {
   id: string; // Changed from number to string for UUID
@@ -2302,7 +2303,39 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           </div>
                         ) : col === 'id' ? (
                           renderCopyableContent(`${item.id.substring(0, 3)}..`, col, '-', item.id)
-                        ) : col === 'created_at' || col === 'updated_at' ? (
+                        ) : col === 'created_at' ? (
+                          (() => {
+                            const formattedDate = formatDateForCreatedAt(item.created_at);
+                            const parts = formattedDate.split('_');
+                            const displayValue = parts.length >= 3 ? (
+                              <>
+                                {parts[0]}_{parts[1]}_<span style={{color: '#4f4f4f'}}>{parts[2]}</span>
+                              </>
+                            ) : formattedDate;
+                            return (
+                              <div className="relative">
+                                <span className="created_at-content font-medium block p-2" style={{ paddingRight: '24px' }}>
+                                  {displayValue}
+                                </span>
+                                <span
+                                  onClick={(e) => handleCopyClick(formattedDate, e)}
+                                  className="created_at-copy-btn absolute top-0 right-0 z-10 transition-colors duration-200 cursor-pointer"
+                                  style={{
+                                    width: '20px',
+                                    height: '11px',
+                                    backgroundColor: '#c0c0c0',
+                                    borderColor: '#918f8f',
+                                    borderWidth: '1px',
+                                    borderStyle: 'solid'
+                                  }}
+                                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fee43b'; }}
+                                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#c0c0c0'; }}
+                                  title="Copy created_at"
+                                />
+                              </div>
+                            );
+                          })()
+                        ) : col === 'updated_at' ? (
                           renderCopyableContent(formatDate(item[col as keyof SitesprenRecord] as string), col)
                         ) : col === 'fk_users_id' || col === 'fk_domreg_hostaccount' ? (
                           renderCopyableContent(
