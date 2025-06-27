@@ -660,7 +660,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                   return (
                     <th
                       key={`native-${col}`}
-                      className={`text-left text-xs text-gray-700 lowercase tracking-wider ${
+                      className={`kz_gconjar1_table_cell text-left text-xs text-gray-700 lowercase tracking-wider ${
                         col === 'select' ? 'px-[6px] py-2' : 'px-6 py-2'
                       } ${isSortable ? 'cursor-pointer hover:bg-blue-200' : ''} ${
                         isSticky ? 'sticky z-10' : ''
@@ -715,14 +715,15 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                     return (
                       <td
                         key={col}
-                        className={`text-sm text-gray-900 ${
-                          col === 'select' ? 'px-[6px] py-[6px]' : 'px-6 py-4'
-                        } ${isSticky ? 'sticky bg-white z-10' : ''} ${
+                        className={`kz_gconjar1_table_cell text-sm text-gray-900 ${
+                          isSticky ? 'sticky bg-white z-10' : ''
+                        } ${
                           isSeparator ? 'border-r-4 border-black' : ''
                         } ${col === 'actions' || col === 'select' ? 'whitespace-nowrap' : ''}`}
-                        style={isSticky ? { left: `${index * 150}px` } : {}}
+                        style={isSticky ? { left: `${index * 150}px`, padding: '0' } : { padding: '0' }}
                         onClick={col === 'select' ? () => handleRowSelect(item.id) : undefined}
                       >
+                        <div className="kz_rigid_div_inside_td_1">
                         {col === 'select' ? (
                           <div 
                             className="cursor-pointer flex items-center justify-center w-full h-full"
@@ -861,6 +862,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             {item[col as keyof GconPiece] || "-"}
                           </span>
                         )}
+                        </div>
                       </td>
                     );
                   })}

@@ -57,3 +57,21 @@ body {
 .kz_nwjar1_table_cell:last-child {
   border-right: none; /* remove border from last column */
 }
+
+/* kzstylerule - rigid row height system for /gconjar1 table */
+.kz_gconjar1_table_cell {
+  vertical-align: top;
+  border-right: 1px solid #e5e7eb; /* matches gray-200 */
+}
+
+.kz_gconjar1_table_cell:last-child {
+  border-right: none; /* remove border from last column */
+}
+
+/* kzstylerule - wrapper div styling for /gconjar1 table content */
+.kz_gconjar1_table_cell .kz_rigid_div_inside_td_1 {
+  height: 48px;
+  padding: 4px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
