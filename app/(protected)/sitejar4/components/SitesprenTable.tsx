@@ -2002,10 +2002,10 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   ${value === 10 ? 'rounded-l-lg' : ''}
                   ${value === 'All' ? 'rounded-r-lg' : ''}
                   ${(value === 'All' && itemsPerPage >= sortedData.length) || itemsPerPage === value
-                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 focus:bg-blue-700 focus:text-white'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                   }
-                  focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600
+                  focus:z-10 focus:ring-2 focus:ring-blue-500
                 `}
               >
                 {value}
@@ -2015,7 +2015,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
         
         {/* Page navigation */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-start">
           <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
             {/* Previous button */}
             <button
