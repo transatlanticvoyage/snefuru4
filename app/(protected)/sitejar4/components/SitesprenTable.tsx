@@ -2300,6 +2300,20 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                                 'L'
                               )}
                             </button>
+                            <Link
+                              href={`/nwjar1?coltemp=option1&sitebase=${encodeURIComponent(item.sitespren_base || '')}`}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              title="Open NW Jar"
+                            >
+                              NW
+                            </Link>
+                            <Link
+                              href={`/gconjar1?coltemp=option1&sitebase=${encodeURIComponent(item.sitespren_base || '')}`}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-teal-500 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                              title="Open GC Jar"
+                            >
+                              GC
+                            </Link>
                           </div>
                         ) : col === 'id' ? (
                           renderCopyableContent(`${item.id.substring(0, 3)}..`, col, '-', item.id)
