@@ -45,13 +45,12 @@ body {
 .kz_rigid_div_inside_td_1 {
   height: 48px !important;
   overflow: hidden !important;
-  display: flex;
-  align-items: center;
   box-sizing: border-box;
 }
 
-/* kzstylerule - vertical borders for /nwjar1 table columns */
+/* kzstylerule - vertical alignment and borders for /nwjar1 table cells */
 .kz_nwjar1_table_cell {
+  vertical-align: top;
   border-right: 1px solid #e5e7eb; /* matches gray-200 */
 }
 
