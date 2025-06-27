@@ -2209,10 +2209,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         } ${col === 'checkbox' ? 'cursor-pointer' : ''} ${col === 'checkbox' || col === 'tool_buttons' || col === 'is_starred1' || col === 'domain_registrar_info' ? '' : 'align-top'}`}
                         style={{
                           ...(isSticky ? { left: leftPosition } : {}),
-                          height: '48px',
-                          maxHeight: '48px',
-                          minHeight: '48px',
-                          overflow: 'hidden',
                           verticalAlign: 'top'
                         }}
                         onClick={col === 'checkbox' ? () => handleSiteSelection(item.id, !selectedSites.has(item.id)) : undefined}
@@ -2220,6 +2216,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         {hasLeftSeparator && (
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-black"></div>
                         )}
+                        <div style={{ height: '48px', maxHeight: '48px', minHeight: '48px', overflow: 'hidden' }}>
                         {col === 'checkbox' ? (
                           <input
                             type="checkbox"
@@ -2505,6 +2502,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         ) : (
                           renderCopyableContent(item[col as keyof SitesprenRecord] as string, col)
                         )}
+                        </div>
                         {hasRightSeparator && (
                           <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
                         )}
