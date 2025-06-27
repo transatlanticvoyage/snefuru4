@@ -734,7 +734,7 @@ export default function NwpiContentTable({ data, userId, selectedRows: externalS
                   return (
                     <th
                       key={col}
-                      className={`text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${
+                      className={`kz_nwjar1_table_cell text-left text-xs font-bold text-gray-700 lowercase tracking-wider ${
                         col === 'select' ? 'px-[6px] py-[6px]' : 'px-4 py-3'
                       } ${isSortable ? `cursor-pointer ${hoverColor}` : ''} ${
                         isSticky ? `sticky z-10` : ''
@@ -786,7 +786,7 @@ export default function NwpiContentTable({ data, userId, selectedRows: externalS
                     return (
                       <td
                         key={col}
-                        className={`text-sm text-gray-900 ${
+                        className={`kz_nwjar1_table_cell text-sm text-gray-900 ${
                           isSticky ? 'sticky bg-white z-10' : ''
                         } ${
                           isSeparator ? 'border-r-4 border-black' : ''

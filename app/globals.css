@@ -49,3 +49,12 @@ body {
   align-items: center;
   box-sizing: border-box;
 }
+
+/* kzstylerule - vertical borders for /nwjar1 table columns */
+.kz_nwjar1_table_cell {
+  border-right: 1px solid #e5e7eb; /* matches gray-200 */
+}
+
+.kz_nwjar1_table_cell:last-child {
+  border-right: none; /* remove border from last column */
+}
