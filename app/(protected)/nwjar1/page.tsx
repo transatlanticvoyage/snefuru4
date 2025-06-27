@@ -718,28 +718,30 @@ export default function NwJar1Page() {
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Functions</h3>
                     <div className="space-y-4">
-                      <button
-                        onClick={handleF22NwpiToGconPusher}
-                        disabled={f22Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)}
-                        className={`px-4 py-2 rounded font-medium ${
-                          f22Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-green-600 text-white hover:bg-green-700'
-                        }`}
-                      >
-                        {f22Loading ? 'Processing...' : 'f22_nwpi_to_gcon_pusher'}
-                      </button>
-                      <button
-                        onClick={handleF47GenerateGconPieces}
-                        disabled={f47Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)}
-                        className={`px-4 py-2 rounded font-medium ${
-                          f47Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                      >
-                        {f47Loading ? 'Processing...' : 'f47_generate_gcon_pieces'}
-                      </button>
+                      <div className="flex items-center" style={{ gap: '100px' }}>
+                        <button
+                          onClick={handleF22NwpiToGconPusher}
+                          disabled={f22Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)}
+                          className={`px-4 py-2 rounded font-medium ${
+                            f22Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)
+                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : 'bg-green-600 text-white hover:bg-green-700'
+                          }`}
+                        >
+                          {f22Loading ? 'Processing...' : 'f22_nwpi_to_gcon_pusher'}
+                        </button>
+                        <button
+                          onClick={handleF47GenerateGconPieces}
+                          disabled={f47Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)}
+                          className={`px-4 py-2 rounded font-medium ${
+                            f47Loading || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedContentIds.size === 0)
+                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                          }`}
+                        >
+                          {f47Loading ? 'Processing...' : 'f47_generate_gcon_pieces'}
+                        </button>
+                      </div>
                       {!kz101Checked && !kz103Checked && (
                         <p className="text-sm text-gray-500">
                           Select either SOPTION1 or SOPTION2 to enable this function
