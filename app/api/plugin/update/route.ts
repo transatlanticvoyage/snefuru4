@@ -58,7 +58,7 @@ async function createPluginZip(): Promise<Buffer> {
 async function updateRemotePlugin(siteUrl: string, pluginZipBuffer: Buffer, credentials: any): Promise<{ success: boolean; message: string; newVersion?: string }> {
   try {
     // First try to use plugin API for update
-    if (credentials.ruplin_apikey) {
+    if (credentials.ruplin_api_key_1) {
       const formData = new FormData();
       const blob = new Blob([pluginZipBuffer], { type: 'application/zip' });
       formData.append('plugin_zip', blob, 'snefuru-plugin.zip');
@@ -66,7 +66,7 @@ async function updateRemotePlugin(siteUrl: string, pluginZipBuffer: Buffer, cred
       const response = await fetch(`${siteUrl}/wp-json/snefuru/v1/update`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${credentials.ruplin_apikey}`,
+          'Authorization': `Bearer ${credentials.ruplin_api_key_1}`,
         },
         body: formData,
       });
@@ -127,13 +127,27 @@ export async function POST(request: NextRequest) {
     // Get site information from database
     const { data: siteData, error: siteError } = await supabase
       .from('sitespren')
-      .select('sitespren_base, ruplin_apikey, wp_rest_app_pass, wpuser1')
+      .select('id, sitespren_base, wp_rest_app_pass, wpuser1, fk_users_id')
       .eq('id', siteId)
       .single();
 
     if (siteError || !siteData) {
       return NextResponse.json(
         { success: false, message: 'Site not found in database' },
+        { status: 404 }
+      );
+    }
+
+    // Get user's ruplin API key
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('ruplin_api_key_1')
+      .eq('id', siteData.fk_users_id)
+      .single();
+
+    if (userError || !userData || !userData.ruplin_api_key_1) {
+      return NextResponse.json(
+        { success: false, message: 'User API key not found' },
         { status: 404 }
       );
     }
@@ -145,7 +159,7 @@ export async function POST(request: NextRequest) {
     
     // Attempt to update the remote plugin
     const updateResult = await updateRemotePlugin(siteUrl, pluginZipBuffer, {
-      ruplin_apikey: siteData.ruplin_apikey,
+      ruplin_api_key_1: userData.ruplin_api_key_1,
       wp_rest_app_pass: siteData.wp_rest_app_pass,
       wpuser1: siteData.wpuser1
     });

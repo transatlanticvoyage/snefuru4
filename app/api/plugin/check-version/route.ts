@@ -25,14 +25,14 @@ async function getLocalPluginVersion(): Promise<string> {
 }
 
 // Function to check remote plugin version
-async function checkRemotePluginVersion(siteUrl: string, credentials: any): Promise<{ success: boolean; currentVersion?: string; error?: string }> {
+async function checkRemotePluginVersion(siteUrl: string, apiKey: string | null, credentials: any): Promise<{ success: boolean; currentVersion?: string; error?: string }> {
   try {
     // First try plugin API if credentials are available
-    if (credentials.ruplin_apikey) {
+    if (apiKey) {
       const response = await fetch(`${siteUrl}/wp-json/snefuru/v1/version`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${credentials.ruplin_apikey}`,
+          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
       });
@@ -118,8 +118,7 @@ export async function POST(request: NextRequest) {
     const localVersion = await getLocalPluginVersion();
     
     // Check remote plugin version
-    const remoteCheck = await checkRemotePluginVersion(siteUrl, {
-      ruplin_apikey: userData.ruplin_api_key_1,
+    const remoteCheck = await checkRemotePluginVersion(siteUrl, userData.ruplin_api_key_1, {
       wp_rest_app_pass: siteData.wp_rest_app_pass,
       wpuser1: siteData.wpuser1
     });
