@@ -1636,8 +1636,9 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   }, [expandedRows, userInternalId]);
 
   // Helper function to render copyable content with copy button
-  const renderCopyableContent = (content: string | null | undefined, col: string, fallback: string = '-') => {
+  const renderCopyableContent = (content: string | null | undefined, col: string, fallback: string = '-', copyValue?: string | null | undefined) => {
     const displayValue = content || fallback;
+    const valueToCopy = copyValue !== undefined ? (copyValue || fallback) : displayValue;
     return (
       <div className="relative">
         <span 
@@ -1647,7 +1648,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           {displayValue}
         </span>
         <span
-          onClick={(e) => handleCopyClick(displayValue, e)}
+          onClick={(e) => handleCopyClick(valueToCopy, e)}
           className={`${col}-copy-btn absolute top-0 right-0 z-10 transition-colors duration-200 cursor-pointer`}
           style={{
             width: '20px',
@@ -2300,11 +2301,16 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                             </button>
                           </div>
                         ) : col === 'id' ? (
-                          renderCopyableContent(`${truncateText(item.id, 8)}...`, col)
+                          renderCopyableContent(`${item.id.substring(0, 3)}..`, col, '-', item.id)
                         ) : col === 'created_at' || col === 'updated_at' ? (
                           renderCopyableContent(formatDate(item[col as keyof SitesprenRecord] as string), col)
                         ) : col === 'fk_users_id' || col === 'fk_domreg_hostaccount' ? (
-                          renderCopyableContent(item[col as keyof SitesprenRecord] ? truncateText(item[col as keyof SitesprenRecord] as string, 8) + '...' : null, col)
+                          renderCopyableContent(
+                            item[col as keyof SitesprenRecord] ? `${(item[col as keyof SitesprenRecord] as string).substring(0, 3)}..` : null, 
+                            col, 
+                            '-', 
+                            item[col as keyof SitesprenRecord] as string
+                          )
                         ) : col === 'wppass1' ? (
                           renderCopyableContent(item.wppass1 ? '***' : null, col)
                         ) : col === 'ruplin_apikey' || col === 'wp_rest_app_pass' ? (
