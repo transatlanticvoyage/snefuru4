@@ -2168,7 +2168,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         key={col}
                         className={`${col === 'checkbox' || col === 'sitespren_base' ? '' : 'px-4 py-2'} text-sm text-gray-900 relative border-r border-gray-200 ${stickyClass} ${bgClass} ${
                           col === 'checkbox' || col === 'tool_buttons' ? 'whitespace-nowrap' : ''
-                        } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
+                        } ${col === 'checkbox' ? 'cursor-pointer' : ''} ${col === 'sitespren_base' ? 'align-top' : ''}`}
                         style={{
                           ...(isSticky ? { left: leftPosition } : {}),
                           ...(col === 'checkbox' ? {
