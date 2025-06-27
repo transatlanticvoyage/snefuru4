@@ -160,7 +160,7 @@ export default function Header() {
         },
         {
           name: 'Download Plugin',
-          path: '/admin/downloadplugin'
+          path: '/downloadplugin'
         },
         {
           name: 'XPages Manager',
