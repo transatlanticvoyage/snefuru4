@@ -2204,17 +2204,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                     return (
                       <td
                         key={col}
-                        className={`${col === 'checkbox' || col === 'tool_buttons' || col === 'is_starred1' || col === 'domain_registrar_info' || col === 'sitespren_base' ? '' : 'px-4 py-2'} text-sm text-gray-900 relative border-r border-gray-200 ${stickyClass} ${bgClass} ${
+                        className={`text-sm text-gray-900 relative border-r border-gray-200 ${stickyClass} ${bgClass} ${
                           col === 'checkbox' || col === 'tool_buttons' ? 'whitespace-nowrap' : ''
                         } ${col === 'checkbox' ? 'cursor-pointer' : ''} ${col === 'checkbox' || col === 'tool_buttons' || col === 'is_starred1' || col === 'domain_registrar_info' ? '' : 'align-top'}`}
                         style={{
-                          ...(isSticky ? { left: leftPosition } : {}),
-                          ...(col === 'checkbox' ? {
-                            paddingTop: '6px',
-                            paddingBottom: '6px',
-                            paddingLeft: '10px',
-                            paddingRight: '10px'
-                          } : {})
+                          ...(isSticky ? { left: leftPosition } : {})
                         }}
                         onClick={col === 'checkbox' ? () => handleSiteSelection(item.id, !selectedSites.has(item.id)) : undefined}
                       >
