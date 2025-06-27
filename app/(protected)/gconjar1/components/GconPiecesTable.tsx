@@ -53,9 +53,10 @@ const allColumns = [
   'is_starred2',
   'g_post_id',
   'meta_title',
-  'asn_sitespren_base',
   'g_post_type',
   'g_post_status',
+  'pageurl',
+  'asn_sitespren_base',
   'h1title',
   'pgb_h1title',
   'corpus1',
@@ -66,7 +67,6 @@ const allColumns = [
   'pub_status',
   'date_time_pub_carry',
   'pageslug',
-  'pageurl',
   'pelementor_cached',
   'pelementor_edits',
   'created_at',
@@ -772,9 +772,15 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             />
                           </div>
                         ) : col === 'actions' ? (
-                          <div className="w-64 space-y-1">
-                            {/* First row - 3 buttons */}
+                          <div className="w-80 space-y-1">
+                            {/* First row - 4 buttons (torlid first) */}
                             <div className="flex gap-1">
+                              <Link
+                                href={`/torlid?id=${item.id}&mtab=talk1`}
+                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                              >
+                                /torlid
+                              </Link>
                               <Link
                                 href={`/pedbar?id=${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
