@@ -2154,7 +2154,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <React.Fragment key={item.id}>
-                  <tr className="hover:bg-gray-50">
+                  <tr className="hover:bg-gray-50 border-b border-gray-200">
                   {visibleColumns.map((col, colIndex) => {
                     const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                     const isSticky = colIndex < stickyColumnCount;
