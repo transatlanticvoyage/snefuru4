@@ -2192,7 +2192,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <React.Fragment key={item.id}>
-                  <tr className="hover:bg-gray-50 border-b border-gray-200" style={{ height: '48px', maxHeight: '48px', minHeight: '48px' }}>
+                  <tr className="hover:bg-gray-50 border-b border-gray-200">
                   {visibleColumns.map((col, colIndex) => {
                     const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                     const isSticky = colIndex < stickyColumnCount;
@@ -2211,7 +2211,9 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           ...(isSticky ? { left: leftPosition } : {}),
                           height: '48px',
                           maxHeight: '48px',
-                          overflow: 'hidden'
+                          minHeight: '48px',
+                          overflow: 'hidden',
+                          verticalAlign: 'top'
                         }}
                         onClick={col === 'checkbox' ? () => handleSiteSelection(item.id, !selectedSites.has(item.id)) : undefined}
                       >
