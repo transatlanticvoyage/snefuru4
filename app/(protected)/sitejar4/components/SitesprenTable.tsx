@@ -2123,7 +2123,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm" style={{ borderCollapse: 'collapse', borderSpacing: 0, tableLayout: 'fixed' }}>
+          <table className="w-full text-sm" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
             <thead>
               <tr>
                 {visibleColumns.map((col, index) => {
