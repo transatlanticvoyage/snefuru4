@@ -2006,63 +2006,89 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         <div className="mb-4">
           <div className="flex flex-wrap gap-2">
             <button
-              className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              className="px-3 py-4 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               onClick={() => handleSingleSiteAction('wpsv2_sync', 'plugin_api')}
               disabled={selectedSites.size !== 1}
               title="Sync site using Plugin API"
             >
               <span className="info-icon group">ℹ</span>
-              Plugin API
+              <div className="text-center leading-tight">
+                chep11<br />
+                articles<br />
+                wp → nwpi<br />
+                xplugin<br />
+                Plugin API
+              </div>
             </button>
             
             <button
-              className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              className="px-3 py-4 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               onClick={() => handleSingleSiteAction('wpsv2_sync', 'rest_api')}
               disabled={selectedSites.size !== 1}
               title="Sync site using REST API"
             >
               <span className="info-icon group">ℹ</span>
-              REST API
+              <div className="text-center leading-tight">
+                chep21<br />
+                articles<br />
+                wp → nwpi<br />
+                xrest<br />
+                REST API
+              </div>
             </button>
             
             <button
-              className="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              className="px-3 py-4 text-sm font-medium text-white bg-purple-600 rounded hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               onClick={() => handleSingleSiteAction('test_plugin')}
               disabled={selectedSites.size !== 1}
               title="Test plugin connection"
             >
               <span className="info-icon group">ℹ</span>
-              Test Plugin
+              <div className="text-center leading-tight">
+                chep31<br />
+                Test Plugin
+              </div>
             </button>
             
             <button
-              className="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              className="px-3 py-4 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               onClick={() => handleSingleSiteAction('check_plugin_version')}
               disabled={selectedSites.size !== 1}
               title="Check plugin version"
             >
               <span className="info-icon group">ℹ</span>
-              Check Version
+              <div className="text-center leading-tight">
+                chep41<br />
+                Check Version
+              </div>
             </button>
             
             <button
-              className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              className="px-3 py-4 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               onClick={() => handleSingleSiteAction('update_plugin')}
               disabled={selectedSites.size !== 1}
               title="Update plugin"
             >
               <span className="info-icon group">ℹ</span>
-              Update Plugin
+              <div className="text-center leading-tight">
+                chep51<br />
+                xrest<br />
+                Update Plugin
+              </div>
             </button>
             
             <button
-              className="px-3 py-2 text-sm font-medium text-white bg-yellow-600 rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              className="px-3 py-4 text-sm font-medium text-white bg-yellow-600 rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               onClick={() => handleSingleSiteAction('barkro_push')}
               disabled={selectedSites.size !== 1}
               title="Push Barkro update"
             >
               <span className="info-icon group">ℹ</span>
-              Barkro Push
+              <div className="text-center leading-tight">
+                chep61<br />
+                xplugin<br />
+                Barkro Push
+              </div>
             </button>
           </div>
           
