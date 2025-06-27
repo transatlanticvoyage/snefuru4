@@ -2175,7 +2175,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         'tool_buttons'
                       ) : (
                         <>
-                          {col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
+                          {col === 'is_starred1' ? '•str1' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
                         </>
                       )}
                       {hasRightSeparator && (
