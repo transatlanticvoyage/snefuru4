@@ -1635,6 +1635,40 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     });
   }, [expandedRows, userInternalId]);
 
+  // Helper function to render copyable content with copy button
+  const renderCopyableContent = (content: string | null | undefined, col: string, fallback: string = '-') => {
+    const displayValue = content || fallback;
+    return (
+      <div className="relative">
+        <span 
+          className={`${col}-content font-medium block p-2`}
+          style={{ paddingRight: '24px' }}
+        >
+          {displayValue}
+        </span>
+        <span
+          onClick={(e) => handleCopyClick(displayValue, e)}
+          className={`${col}-copy-btn absolute top-0 right-0 z-10 transition-colors duration-200 cursor-pointer`}
+          style={{
+            width: '20px',
+            height: '11px',
+            backgroundColor: '#c0c0c0',
+            borderColor: '#918f8f',
+            borderWidth: '1px',
+            borderStyle: 'solid'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#fee43b';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#c0c0c0';
+          }}
+          title={`Copy ${col}`}
+        />
+      </div>
+    );
+  };
+
   return (
     <>
       <style jsx>{`
@@ -2170,9 +2204,9 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                     return (
                       <td
                         key={col}
-                        className={`${col === 'checkbox' || col === 'sitespren_base' ? '' : 'px-4 py-2'} text-sm text-gray-900 relative border-r border-gray-200 ${stickyClass} ${bgClass} ${
+                        className={`${col === 'checkbox' || col === 'tool_buttons' || col === 'is_starred1' || col === 'domain_registrar_info' || col === 'sitespren_base' ? '' : 'px-4 py-2'} text-sm text-gray-900 relative border-r border-gray-200 ${stickyClass} ${bgClass} ${
                           col === 'checkbox' || col === 'tool_buttons' ? 'whitespace-nowrap' : ''
-                        } ${col === 'checkbox' ? 'cursor-pointer' : ''} ${col === 'sitespren_base' ? 'align-top' : ''}`}
+                        } ${col === 'checkbox' ? 'cursor-pointer' : ''} ${col === 'checkbox' || col === 'tool_buttons' || col === 'is_starred1' || col === 'domain_registrar_info' ? '' : 'align-top'}`}
                         style={{
                           ...(isSticky ? { left: leftPosition } : {}),
                           ...(col === 'checkbox' ? {
@@ -2270,17 +2304,17 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                             </button>
                           </div>
                         ) : col === 'id' ? (
-                          <span className="text-xs">{truncateText(item.id, 8)}...</span>
+                          renderCopyableContent(`${truncateText(item.id, 8)}...`, col)
                         ) : col === 'created_at' || col === 'updated_at' ? (
-                          formatDate(item[col as keyof SitesprenRecord] as string)
+                          renderCopyableContent(formatDate(item[col as keyof SitesprenRecord] as string), col)
                         ) : col === 'fk_users_id' || col === 'fk_domreg_hostaccount' ? (
-                          <span className="text-xs">{item[col as keyof SitesprenRecord] ? truncateText(item[col as keyof SitesprenRecord] as string, 8) + '...' : '-'}</span>
+                          renderCopyableContent(item[col as keyof SitesprenRecord] ? truncateText(item[col as keyof SitesprenRecord] as string, 8) + '...' : null, col)
                         ) : col === 'wppass1' ? (
-                          item.wppass1 ? '***' : '-'
+                          renderCopyableContent(item.wppass1 ? '***' : null, col)
                         ) : col === 'ruplin_apikey' || col === 'wp_rest_app_pass' ? (
-                          item[col as keyof SitesprenRecord] ? truncateText(item[col as keyof SitesprenRecord] as string, 15) : '-'
+                          renderCopyableContent(item[col as keyof SitesprenRecord] ? truncateText(item[col as keyof SitesprenRecord] as string, 15) : null, col)
                         ) : col === 'wp_plugin_installed1' || col === 'wp_plugin_connected2' || col === 'is_wp_site' ? (
-                          <div className="text-center">{formatBoolean(item[col as keyof SitesprenRecord] as boolean | null)}</div>
+                          renderCopyableContent(formatBoolean(item[col as keyof SitesprenRecord] as boolean | null), col)
                         ) : col === 'sitespren_base' ? (
                           <div className="relative">
                             <span 
@@ -2310,38 +2344,88 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                             />
                           </div>
                         ) : col === 'ns_full' ? (
-                          <div 
-                            className="cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
-                            onClick={() => handleRefreshNS(item.id, item.sitespren_base || '')}
-                            title="Click to refresh nameserver info"
-                          >
-                            {refreshingCells.has(`${item.id}_ns`) ? (
-                              <div className="flex justify-center items-center">
-                                <svg className="animate-spin h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                              </div>
-                            ) : (
-                              <span className="text-sm">{dnsData[item.id]?.ns_full || item.ns_full || '-'}</span>
-                            )}
+                          <div className="relative">
+                            <div 
+                              className="cursor-pointer hover:bg-gray-100 rounded transition-colors p-2"
+                              style={{ paddingRight: '24px' }}
+                              onClick={() => handleRefreshNS(item.id, item.sitespren_base || '')}
+                              title="Click to refresh nameserver info"
+                            >
+                              {refreshingCells.has(`${item.id}_ns`) ? (
+                                <div className="flex justify-center items-center">
+                                  <svg className="animate-spin h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                </div>
+                              ) : (
+                                <span className="text-sm font-medium">{dnsData[item.id]?.ns_full || item.ns_full || '-'}</span>
+                              )}
+                            </div>
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyClick(dnsData[item.id]?.ns_full || item.ns_full || '', e);
+                              }}
+                              className="ns-full-copy-btn absolute top-0 right-0 z-10 transition-colors duration-200 cursor-pointer"
+                              style={{
+                                width: '20px',
+                                height: '11px',
+                                backgroundColor: '#c0c0c0',
+                                borderColor: '#918f8f',
+                                borderWidth: '1px',
+                                borderStyle: 'solid'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#fee43b';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#c0c0c0';
+                              }}
+                              title="Copy nameserver"
+                            />
                           </div>
                         ) : col === 'ip_address' ? (
-                          <div 
-                            className="cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
-                            onClick={() => handleRefreshIP(item.id, item.sitespren_base || '')}
-                            title="Click to refresh IP address info"
-                          >
-                            {refreshingCells.has(`${item.id}_ip`) ? (
-                              <div className="flex justify-center items-center">
-                                <svg className="animate-spin h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                              </div>
-                            ) : (
-                              <span className="text-sm">{dnsData[item.id]?.ip_address || item.ip_address || '-'}</span>
-                            )}
+                          <div className="relative">
+                            <div 
+                              className="cursor-pointer hover:bg-gray-100 rounded transition-colors p-2"
+                              style={{ paddingRight: '24px' }}
+                              onClick={() => handleRefreshIP(item.id, item.sitespren_base || '')}
+                              title="Click to refresh IP address info"
+                            >
+                              {refreshingCells.has(`${item.id}_ip`) ? (
+                                <div className="flex justify-center items-center">
+                                  <svg className="animate-spin h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                </div>
+                              ) : (
+                                <span className="text-sm font-medium">{dnsData[item.id]?.ip_address || item.ip_address || '-'}</span>
+                              )}
+                            </div>
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyClick(dnsData[item.id]?.ip_address || item.ip_address || '', e);
+                              }}
+                              className="ip-address-copy-btn absolute top-0 right-0 z-10 transition-colors duration-200 cursor-pointer"
+                              style={{
+                                width: '20px',
+                                height: '11px',
+                                backgroundColor: '#c0c0c0',
+                                borderColor: '#918f8f',
+                                borderWidth: '1px',
+                                borderStyle: 'solid'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#fee43b';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#c0c0c0';
+                              }}
+                              title="Copy IP address"
+                            />
                           </div>
                         ) : col === 'domain_registrar_info' ? (
                           <div className="flex items-center gap-2 min-w-[200px]">
@@ -2420,7 +2504,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                             )}
                           </div>
                         ) : (
-                          item[col as keyof SitesprenRecord] || '-'
+                          renderCopyableContent(item[col as keyof SitesprenRecord] as string, col)
                         )}
                         {hasRightSeparator && (
                           <div className="absolute right-0 top-0 bottom-0 w-1 bg-black"></div>
