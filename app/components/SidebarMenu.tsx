@@ -340,6 +340,16 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
                   Profile Settings
                 </Link>
                 <Link
+                  href="/downloadplugin"
+                  className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    onToggle();
+                  }}
+                >
+                  Download Snefuruplin WP Plugin
+                </Link>
+                <Link
                   href="/ruplin-api-keys-p1"
                   className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
                   onClick={() => {

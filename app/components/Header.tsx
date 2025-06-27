@@ -379,6 +379,12 @@ export default function Header() {
                     Profile Settings
                   </Link>
                   <Link
+                    href="/downloadplugin"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Download Snefuruplin WP Plugin
+                  </Link>
+                  <Link
                     href="/ruplin-api-keys-p1"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
