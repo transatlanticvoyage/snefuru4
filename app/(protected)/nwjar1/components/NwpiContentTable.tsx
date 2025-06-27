@@ -787,12 +787,18 @@ export default function NwpiContentTable({ data, userId, selectedRows: externalS
                       <td
                         key={col}
                         className={`text-sm text-gray-900 ${
-                          col === 'select' ? 'px-[6px] py-[6px]' : 'px-4 py-3'
-                        } ${isSticky ? 'sticky bg-white z-10' : ''} ${
+                          isSticky ? 'sticky bg-white z-10' : ''
+                        } ${
                           isSeparator ? 'border-r-4 border-black' : ''
                         } ${col === 'actions' || col === 'select' ? 'whitespace-nowrap' : ''}`}
-                        style={isSticky ? { left: `${index * 150}px` } : {}}
+                        style={isSticky ? { left: `${index * 150}px`, padding: '0' } : { padding: '0' }}
                       >
+                        <div 
+                          className={`kz_rigid_div_inside_td_1 ${
+                            col === 'select' ? 'px-[6px] py-[6px]' : 'px-4 py-3'
+                          }`}
+                          style={{ padding: '4px' }}
+                        >
                         {col === 'select' ? (
                           <div 
                             className="cursor-pointer flex items-center justify-center w-full h-full"
@@ -867,6 +873,7 @@ export default function NwpiContentTable({ data, userId, selectedRows: externalS
                             {truncateText(String(item[col as keyof NwpiContent] || '-'), 30)}
                           </span>
                         )}
+                        </div>
                       </td>
                     );
                   })}
