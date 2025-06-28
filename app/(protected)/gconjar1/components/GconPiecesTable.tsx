@@ -154,6 +154,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     const urlSortField = searchParams?.get('sortField');
     const urlSortOrder = searchParams?.get('sortOrder');
     const urlSearch = searchParams?.get('search');
+    const urlFilterPage = searchParams?.get('filterPage');
     
     if (urlColTemp && urlColTemp in columnTemplates) {
       setSelectedColumnTemplate(urlColTemp as ColumnTemplateKey);
@@ -183,7 +184,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     
     // Set site filter from URL parameter
     if (urlSiteBase) {
-      setFilterSite(urlSiteBase);
+      setFilterSite(decodeURIComponent(urlSiteBase));
     }
     
     // Set post status filter from URL parameter
@@ -207,6 +208,11 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     if (urlSearch) {
       setSearchTerm(decodeURIComponent(urlSearch));
     }
+    
+    // Set page filter from URL parameter
+    if (urlFilterPage) {
+      setFilterPage(decodeURIComponent(urlFilterPage));
+    }
   }, [searchParams]);
 
   // Update URL and localStorage when selections change
@@ -218,7 +224,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
       params.set('stickycol', `option${stickyColumnCount}`);
     }
     if (filterSite) {
-      params.set('sitebase', filterSite);
+      params.set('sitebase', encodeURIComponent(filterSite));
     }
     if (filterPostStatus) {
       params.set('g_post_status', filterPostStatus);
@@ -230,12 +236,17 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     if (searchTerm) {
       params.set('search', encodeURIComponent(searchTerm));
     }
+    if (filterPage) {
+      params.set('filterPage', encodeURIComponent(filterPage));
+    }
+    // Use replace for real-time updates to avoid cluttering browser history
+    // Browser back/forward will still work due to different filter combinations
     router.replace(`/gconjar1?${params.toString()}`, { scroll: false });
     
     // Update localStorage
     localStorage.setItem('gconjar1_columnTemplate', selectedColumnTemplate);
     localStorage.setItem('gconjar1_stickyColumns', stickyColumnCount.toString());
-  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, sortField, sortOrder, searchTerm, router]);
+  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, filterPage, sortField, sortOrder, searchTerm, router]);
 
   // Fetch ns_full data from sitespren table
   useEffect(() => {
@@ -375,6 +386,11 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
   // Reset to first page when filters change
   const handleSearch = (term: string) => {
     setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
     setCurrentPage(1);
   };
 
@@ -555,15 +571,29 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
           uielement308
         </div>
         <div className="flex flex-wrap items-start" style={{ gap: '50px' }}>
-          <div>
+          <div className="flex">
             <input
               type="text"
               placeholder="Search titles and content..."
-              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               style={{ width: '200px' }}
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
             />
+            <button
+              onClick={handleClearSearch}
+              className="px-2 py-2 bg-yellow-200 border border-l-0 border-gray-300 rounded-r-md hover:bg-yellow-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs font-bold"
+              style={{ 
+                minWidth: '40px',
+                height: '42px', // Same as input height (py-2 + border)
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title="Clear search"
+            >
+              CL
+            </button>
           </div>
           
           {/* Site Widget Container */}
