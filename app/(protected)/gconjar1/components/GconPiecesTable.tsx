@@ -144,9 +144,9 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
   // Fetch custom colors for native tier
   const { colors } = useCustomColors(['nativetier_gconjar_bgcolor1']);
 
-  // Load state from URL params and localStorage on mount
+  // Load state from URL params and localStorage on mount with site-specific persistence
   useEffect(() => {
-    // Check URL params first
+    // Extract URL parameters
     const urlColTemp = searchParams?.get('coltemp');
     const urlStickyCol = searchParams?.get('stickycol');
     const urlSiteBase = searchParams?.get('sitebase');
@@ -156,14 +156,46 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     const urlSearch = searchParams?.get('search');
     const urlFilterPage = searchParams?.get('filterPage');
     
+    // Determine if we have a complete URL or just sitebase
+    const hasOnlySiteBase = urlSiteBase && !urlColTemp && !urlPostStatus && !urlSortField && !urlSearch;
+    
+    if (hasOnlySiteBase) {
+      // User visited with just sitebase - restore last state for this site
+      const siteKey = decodeURIComponent(urlSiteBase);
+      const savedState = localStorage.getItem(`gconjar1_state_${siteKey}`);
+      
+      if (savedState) {
+        try {
+          const state = JSON.parse(savedState);
+          
+          // Restore all state from localStorage for this site
+          setFilterSite(siteKey);
+          setSelectedColumnTemplate(state.selectedColumnTemplate || 'option1');
+          setStickyColumnCount(state.stickyColumnCount || 0);
+          setFilterPostStatus(state.filterPostStatus || '');
+          setFilterPage(state.filterPage || '');
+          setSortField(state.sortField || 'created_at');
+          setSortOrder(state.sortOrder || 'desc');
+          setSearchTerm(state.searchTerm || '');
+          
+          return; // Exit early, the URL will be updated by the other useEffect
+        } catch (e) {
+          console.warn('Failed to parse saved state for site:', siteKey);
+        }
+      }
+      
+      // No saved state for this site, just set the site filter
+      setFilterSite(siteKey);
+      return;
+    }
+    
+    // Full URL with parameters - load from URL (priority over localStorage)
+    if (urlSiteBase) {
+      setFilterSite(decodeURIComponent(urlSiteBase));
+    }
+    
     if (urlColTemp && urlColTemp in columnTemplates) {
       setSelectedColumnTemplate(urlColTemp as ColumnTemplateKey);
-    } else {
-      // Fall back to localStorage
-      const savedColTemp = localStorage.getItem('gconjar1_columnTemplate');
-      if (savedColTemp && savedColTemp in columnTemplates) {
-        setSelectedColumnTemplate(savedColTemp as ColumnTemplateKey);
-      }
     }
     
     if (urlStickyCol) {
@@ -171,28 +203,12 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
       if (!isNaN(stickyCount) && stickyCount >= 0 && stickyCount <= 5) {
         setStickyColumnCount(stickyCount);
       }
-    } else {
-      // Fall back to localStorage
-      const savedStickyCount = localStorage.getItem('gconjar1_stickyColumns');
-      if (savedStickyCount) {
-        const count = parseInt(savedStickyCount);
-        if (!isNaN(count) && count >= 0 && count <= 5) {
-          setStickyColumnCount(count);
-        }
-      }
     }
     
-    // Set site filter from URL parameter
-    if (urlSiteBase) {
-      setFilterSite(decodeURIComponent(urlSiteBase));
-    }
-    
-    // Set post status filter from URL parameter
     if (urlPostStatus && (urlPostStatus === 'publish' || urlPostStatus === 'draft')) {
       setFilterPostStatus(urlPostStatus);
     }
     
-    // Set sort field and order from URL parameters
     if (urlSortField) {
       const validSortFields: SortField[] = ["meta_title", "asn_sitespren_base", "g_post_type", "g_post_status", "pub_status", "date_time_pub_carry", "pageslug", "created_at", "updated_at", "is_starred1", "is_starred2"];
       if (validSortFields.includes(urlSortField as SortField)) {
@@ -204,12 +220,10 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
       setSortOrder(urlSortOrder as SortOrder);
     }
     
-    // Set search term from URL parameter
     if (urlSearch) {
       setSearchTerm(decodeURIComponent(urlSearch));
     }
     
-    // Set page filter from URL parameter
     if (urlFilterPage) {
       setFilterPage(decodeURIComponent(urlFilterPage));
     }
@@ -217,35 +231,54 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
 
   // Update URL and localStorage when selections change
   useEffect(() => {
-    // Update URL
+    // Update URL - sitebase must come first
     const params = new URLSearchParams();
+    
+    // 1. sitebase comes first (most important for site-specific state)
+    if (filterSite) {
+      params.set('sitebase', encodeURIComponent(filterSite));
+    }
+    
+    // 2. Column and display settings
     params.set('coltemp', selectedColumnTemplate);
     if (stickyColumnCount > 0) {
       params.set('stickycol', `option${stickyColumnCount}`);
     }
-    if (filterSite) {
-      params.set('sitebase', encodeURIComponent(filterSite));
-    }
+    
+    // 3. Content filters
     if (filterPostStatus) {
       params.set('g_post_status', filterPostStatus);
     }
+    if (filterPage) {
+      params.set('filterPage', encodeURIComponent(filterPage));
+    }
+    
+    // 4. Sorting
     if (sortField !== 'created_at' || sortOrder !== 'desc') {
       params.set('sortField', sortField);
       params.set('sortOrder', sortOrder);
     }
+    
+    // 5. Search (last, most likely to change frequently)
     if (searchTerm) {
       params.set('search', encodeURIComponent(searchTerm));
-    }
-    if (filterPage) {
-      params.set('filterPage', encodeURIComponent(filterPage));
     }
     // Use replace for real-time updates to avoid cluttering browser history
     // Browser back/forward will still work due to different filter combinations
     router.replace(`/gconjar1?${params.toString()}`, { scroll: false });
     
-    // Update localStorage
-    localStorage.setItem('gconjar1_columnTemplate', selectedColumnTemplate);
-    localStorage.setItem('gconjar1_stickyColumns', stickyColumnCount.toString());
+    // Update localStorage with site-specific keys
+    const siteKey = filterSite || 'default';
+    const stateToSave = {
+      selectedColumnTemplate,
+      stickyColumnCount,
+      filterPostStatus,
+      filterPage,
+      sortField,
+      sortOrder,
+      searchTerm
+    };
+    localStorage.setItem(`gconjar1_state_${siteKey}`, JSON.stringify(stateToSave));
   }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, filterPage, sortField, sortOrder, searchTerm, router]);
 
   // Fetch ns_full data from sitespren table
