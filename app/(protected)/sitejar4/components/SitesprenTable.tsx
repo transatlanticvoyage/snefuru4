@@ -2326,6 +2326,13 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                                 'L'
                               )}
                             </button>
+                            <button
+                              onClick={() => window.open(`https://${item.sitespren_base}/wp-json/`, '_blank')}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-purple-500 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                              title="Open WP JSON API"
+                            >
+                              JS
+                            </button>
                             <Link
                               href={`/nwjar1?coltemp=option1&sitebase=${encodeURIComponent(item.sitespren_base || '')}`}
                               className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
