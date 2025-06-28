@@ -617,42 +617,43 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
           uielement308
         </div>
         <div className="flex flex-wrap items-start" style={{ gap: '50px', paddingTop: '24px' }}>
-          <div className="flex">
-            <input
-              type="text"
-              placeholder="Search titles and content..."
-              className="px-4 py-2 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              style={{ width: '200px' }}
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
-            <button
-              onClick={handleClearSearch}
-              className="px-2 py-2 bg-yellow-200 border border-l-0 border-gray-300 rounded-r-md hover:bg-yellow-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs font-bold"
-              style={{ 
-                minWidth: '40px',
-                height: '42px', // Same as input height (py-2 + border)
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              title="Clear search"
-            >
-              CL
-            </button>
-          </div>
-          
-          {/* Clear All Filters Button */}
           <div>
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="Search titles and content..."
+                className="px-4 py-2 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                style={{ width: '200px' }}
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+              <button
+                onClick={handleClearSearch}
+                className="px-2 py-2 bg-yellow-200 border border-l-0 border-gray-300 rounded-r-md hover:bg-yellow-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs font-bold"
+                style={{ 
+                  minWidth: '40px',
+                  height: '42px', // Same as input height (py-2 + border)
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                title="Clear search"
+              >
+                CL
+              </button>
+            </div>
+            
+            {/* Clear All Filters Button - directly below search box */}
             <button
               onClick={handleClearAllFiltersExceptSite}
-              className="px-3 py-2 border border-gray-300 rounded-md hover:opacity-80 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-md hover:opacity-80 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
               style={{ 
                 backgroundColor: '#f5deb3', // beige with hint of orange
                 color: '#2d2d2d', // dark gray, almost black
                 fontSize: '10px',
                 lineHeight: '1.2',
-                marginTop: '8px'
+                marginTop: '12px',
+                cursor: 'pointer'
               }}
               title="Reset all filters and parameters except site selection"
             >
