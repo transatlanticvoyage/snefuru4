@@ -826,17 +826,17 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                 className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               >
                 <option value="">Default (no secondary sort)</option>
-                <option value="meta_title">meta_title</option>
-                <option value="asn_sitespren_base">asn_sitespren_base</option>
-                <option value="g_post_type">g_post_type</option>
-                <option value="g_post_status">g_post_status</option>
-                <option value="pub_status">pub_status</option>
-                <option value="date_time_pub_carry">date_time_pub_carry</option>
-                <option value="pageslug">pageslug</option>
-                <option value="created_at">created_at</option>
-                <option value="updated_at">updated_at</option>
-                <option value="is_starred1">is_starred1</option>
-                <option value="is_starred2">is_starred2</option>
+                <option value="meta_title" disabled={sortField === "meta_title"} className={sortField === "meta_title" ? "text-gray-400" : ""}>meta_title</option>
+                <option value="asn_sitespren_base" disabled={sortField === "asn_sitespren_base"} className={sortField === "asn_sitespren_base" ? "text-gray-400" : ""}>asn_sitespren_base</option>
+                <option value="g_post_type" disabled={sortField === "g_post_type"} className={sortField === "g_post_type" ? "text-gray-400" : ""}>g_post_type</option>
+                <option value="g_post_status" disabled={sortField === "g_post_status"} className={sortField === "g_post_status" ? "text-gray-400" : ""}>g_post_status</option>
+                <option value="pub_status" disabled={sortField === "pub_status"} className={sortField === "pub_status" ? "text-gray-400" : ""}>pub_status</option>
+                <option value="date_time_pub_carry" disabled={sortField === "date_time_pub_carry"} className={sortField === "date_time_pub_carry" ? "text-gray-400" : ""}>date_time_pub_carry</option>
+                <option value="pageslug" disabled={sortField === "pageslug"} className={sortField === "pageslug" ? "text-gray-400" : ""}>pageslug</option>
+                <option value="created_at" disabled={sortField === "created_at"} className={sortField === "created_at" ? "text-gray-400" : ""}>created_at</option>
+                <option value="updated_at" disabled={sortField === "updated_at"} className={sortField === "updated_at" ? "text-gray-400" : ""}>updated_at</option>
+                <option value="is_starred1" disabled={sortField === "is_starred1"} className={sortField === "is_starred1" ? "text-gray-400" : ""}>is_starred1</option>
+                <option value="is_starred2" disabled={sortField === "is_starred2"} className={sortField === "is_starred2" ? "text-gray-400" : ""}>is_starred2</option>
               </select>
               {secondarySortField && (
                 <select
@@ -931,7 +931,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           <div className="font-bold flex items-center gap-1">
                             {/* Primary sort indicator - red star with white "1" */}
                             {isSortable && sortField === col && (
-                              <span className="relative inline-flex items-center justify-center text-red-600 text-lg leading-none">
+                              <span className="relative inline-flex items-center justify-center text-red-600 leading-none" style={{ fontSize: '1.17em' }}>
                                 ★
                                 <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold" style={{ fontSize: '10px' }}>
                                   1
@@ -940,7 +940,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             )}
                             {/* Secondary sort indicator - maroon star with white "2" */}
                             {isSortable && secondarySortField === col && (
-                              <span className="relative inline-flex items-center justify-center text-amber-800 text-lg leading-none">
+                              <span className="relative inline-flex items-center justify-center text-amber-800 leading-none" style={{ fontSize: '1.17em' }}>
                                 ★
                                 <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold" style={{ fontSize: '10px' }}>
                                   2
