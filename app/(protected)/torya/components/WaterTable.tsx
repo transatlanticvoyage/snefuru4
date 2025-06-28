@@ -98,6 +98,9 @@ export default function WaterTable() {
   const [sortField, setSortField] = useState<keyof WaterRecord | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
+  // Selection state
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  
   // Column template and sticky column state
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [selectedStickyOption, setSelectedStickyOption] = useState<StickyColumnKey>('option1');
@@ -142,8 +145,8 @@ export default function WaterTable() {
 
   // Get sticky columns
   const stickyColumnCount = stickyOptions[selectedStickyOption];
-  const allColumns: (keyof WaterRecord)[] = ['water1', 'water2', 'water3', 'water4', 'water5', 'water6', 'water7', 'water8', 'water9', 'water10', 'water11', 'water12', 'water13', 'water14', 'water15'];
-  const stickyColumns = allColumns.slice(0, stickyColumnCount);
+  const allColumns: (keyof WaterRecord | 'select')[] = ['select', 'water1', 'water2', 'water3', 'water4', 'water5', 'water6', 'water7', 'water8', 'water9', 'water10', 'water11', 'water12', 'water13', 'water14', 'water15'];
+  const stickyColumns = allColumns.slice(0, stickyColumnCount + 1); // +1 to include select column
   const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
 
   // Filter data based on search term
@@ -198,6 +201,29 @@ export default function WaterTable() {
     setCurrentPage(1);
   };
 
+  // Handle row selection
+  const handleRowSelect = (rowId: string) => {
+    const newSelection = new Set(selectedRows);
+    if (newSelection.has(rowId)) {
+      newSelection.delete(rowId);
+    } else {
+      newSelection.add(rowId);
+    }
+    setSelectedRows(newSelection);
+  };
+
+  // Handle select all
+  const handleSelectAll = () => {
+    if (selectedRows.size === paginatedData.length && paginatedData.length > 0) {
+      // Deselect all
+      setSelectedRows(new Set());
+    } else {
+      // Select all visible rows
+      const allRowIds = new Set(paginatedData.map(row => row.id));
+      setSelectedRows(allRowIds);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Column Template Controls */}
@@ -207,7 +233,7 @@ export default function WaterTable() {
           <div className="text-xs">
             <div className="font-bold">SQL View Info</div>
             <div>view name: water_view</div>
-            <div># columns: 15</div>
+            <div># columns: 16</div>
           </div>
         </div>
 
@@ -290,25 +316,65 @@ export default function WaterTable() {
           <thead className="bg-gray-50">
             <tr>
               {/* Sticky columns */}
-              {stickyColumns.map((col, index) => (
-                <th
-                  key={col}
-                  onClick={() => handleSort(col)}
-                  className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 sticky bg-gray-50 z-10 ${
-                    index === stickyColumns.length - 1 ? 'border-r-4 border-black' : ''
-                  }`}
-                  style={{ left: `${index * 150}px` }}
-                >
-                  <div className="flex items-center gap-1">
-                    <span>{col}</span>
-                    {sortField === col && (
-                      <span className="text-blue-600">
-                        {sortOrder === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </div>
-                </th>
-              ))}
+              {stickyColumns.map((col, index) => {
+                const isLastStickyCol = index === stickyColumns.length - 1;
+                const isSelectCol = col === 'select';
+                
+                if (isSelectCol) {
+                  return (
+                    <th
+                      key={col}
+                      className={`text-left sticky bg-gray-50 z-10 ${
+                        isLastStickyCol ? 'border-r-4 border-black' : ''
+                      }`}
+                      style={{ 
+                        left: `${index * 150}px`,
+                        padding: '6px 10px !important',
+                        paddingTop: '6px !important',
+                        paddingBottom: '6px !important',
+                        paddingLeft: '10px !important',
+                        paddingRight: '10px !important'
+                      }}
+                    >
+                      <div 
+                        className="cursor-pointer flex items-center justify-center w-full h-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectAll();
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+                          onChange={() => {}} // Handled by div click
+                          className="cursor-pointer"
+                          style={{ width: '26px', height: '26px' }}
+                        />
+                      </div>
+                    </th>
+                  );
+                }
+                
+                return (
+                  <th
+                    key={col}
+                    onClick={() => handleSort(col as keyof WaterRecord)}
+                    className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 sticky bg-gray-50 z-10 ${
+                      isLastStickyCol ? 'border-r-4 border-black' : ''
+                    }`}
+                    style={{ left: `${index * 150}px` }}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>{col}</span>
+                      {sortField === col && (
+                        <span className="text-blue-600">
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                );
+              })}
               {/* Non-sticky visible columns */}
               {nonStickyVisibleColumns.map((col) => (
                 <th
@@ -332,17 +398,58 @@ export default function WaterTable() {
             {paginatedData.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50">
                 {/* Sticky columns */}
-                {stickyColumns.map((col, index) => (
-                  <td 
-                    key={col} 
-                    className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white ${
-                      index === stickyColumns.length - 1 ? 'border-r-4 border-black' : ''
-                    }`}
-                    style={{ left: `${index * 150}px` }}
-                  >
-                    {row[col]}
-                  </td>
-                ))}
+                {stickyColumns.map((col, index) => {
+                  const isLastStickyCol = index === stickyColumns.length - 1;
+                  const isSelectCol = col === 'select';
+                  
+                  if (isSelectCol) {
+                    return (
+                      <td 
+                        key={col} 
+                        className={`whitespace-nowrap text-sm text-gray-900 sticky bg-white ${
+                          isLastStickyCol ? 'border-r-4 border-black' : ''
+                        }`}
+                        style={{ 
+                          left: `${index * 150}px`,
+                          padding: '6px 10px !important',
+                          paddingTop: '6px !important',
+                          paddingBottom: '6px !important',
+                          paddingLeft: '10px !important',
+                          paddingRight: '10px !important'
+                        }}
+                        onClick={() => handleRowSelect(row.id)}
+                      >
+                        <div 
+                          className="cursor-pointer flex items-center justify-center w-full h-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRowSelect(row.id);
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedRows.has(row.id)}
+                            onChange={() => {}} // Handled by div click
+                            className="cursor-pointer"
+                            style={{ width: '26px', height: '26px' }}
+                          />
+                        </div>
+                      </td>
+                    );
+                  }
+                  
+                  return (
+                    <td 
+                      key={col} 
+                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white ${
+                        isLastStickyCol ? 'border-r-4 border-black' : ''
+                      }`}
+                      style={{ left: `${index * 150}px` }}
+                    >
+                      {row[col as keyof WaterRecord]}
+                    </td>
+                  );
+                })}
                 {/* Non-sticky visible columns */}
                 {nonStickyVisibleColumns.map((col) => (
                   <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
