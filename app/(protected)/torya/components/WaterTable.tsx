@@ -104,6 +104,8 @@ export default function WaterTable() {
 
   // Initialize from URL parameters
   useEffect(() => {
+    if (!searchParams) return;
+    
     const coltemp = searchParams.get('coltemp') as ColumnTemplateKey;
     const stickycol = searchParams.get('stickycol') as StickyColumnKey;
     
@@ -117,7 +119,7 @@ export default function WaterTable() {
 
   // Update URL when selections change
   const updateUrl = (colTemplate: ColumnTemplateKey, stickyCol: StickyColumnKey) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('coltemp', colTemplate);
     params.set('stickycol', stickyCol);
     router.push(`?${params.toString()}`);
