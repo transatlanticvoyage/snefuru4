@@ -796,6 +796,43 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
             </select>
           </div>
           
+          {/* Secondary Sort Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Secondary Sort
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={secondarySortField || ""}
+                onChange={(e) => setSecondarySortField(e.target.value || null)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              >
+                <option value="">Default (no secondary sort)</option>
+                <option value="meta_title">meta_title</option>
+                <option value="asn_sitespren_base">asn_sitespren_base</option>
+                <option value="g_post_type">g_post_type</option>
+                <option value="g_post_status">g_post_status</option>
+                <option value="pub_status">pub_status</option>
+                <option value="date_time_pub_carry">date_time_pub_carry</option>
+                <option value="pageslug">pageslug</option>
+                <option value="created_at">created_at</option>
+                <option value="updated_at">updated_at</option>
+                <option value="is_starred1">is_starred1</option>
+                <option value="is_starred2">is_starred2</option>
+              </select>
+              {secondarySortField && (
+                <select
+                  value={secondarySortOrder}
+                  onChange={(e) => setSecondarySortOrder(e.target.value as SortOrder)}
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="asc">↑ Asc</option>
+                  <option value="desc">↓ Desc</option>
+                </select>
+              )}
+            </div>
+          </div>
+
           <div className="flex items-center space-x-2">
             <span className="font-bold text-gray-700">g_post_status</span>
             <select
