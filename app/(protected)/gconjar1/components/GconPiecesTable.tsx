@@ -804,7 +804,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
             <div className="flex gap-2">
               <select
                 value={secondarySortField || ""}
-                onChange={(e) => setSecondarySortField(e.target.value || null)}
+                onChange={(e) => setSecondarySortField(e.target.value ? e.target.value as SortField : null)}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               >
                 <option value="">Default (no secondary sort)</option>
