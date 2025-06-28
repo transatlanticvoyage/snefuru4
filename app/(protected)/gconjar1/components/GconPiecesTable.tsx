@@ -997,8 +997,14 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           </div>
                         ) : col === 'actions' ? (
                           <div className="w-80 space-y-1">
-                            {/* First row - 4 buttons (torlid first) */}
+                            {/* First row - 4 buttons (torya first) */}
                             <div className="flex gap-1">
+                              <Link
+                                href={`/torya?id=${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                              >
+                                /torya
+                              </Link>
                               <Link
                                 href={`/torlid1?id=${item.id}&mtab=talk1`}
                                 className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
@@ -1017,15 +1023,15 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                               >
                                 /pedtor
                               </Link>
+                            </div>
+                            {/* Second row - 4 buttons */}
+                            <div className="flex gap-1">
                               <Link
                                 href={`/flatx1?id=${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                               >
                                 /flatx1
                               </Link>
-                            </div>
-                            {/* Second row - 3 buttons */}
-                            <div className="flex gap-1">
                               <Link
                                 href={`/slotx1?id=${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
