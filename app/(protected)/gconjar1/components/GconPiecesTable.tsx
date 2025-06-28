@@ -124,6 +124,8 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>("created_at");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [secondarySortField, setSecondarySortField] = useState<SortField | null>(null);
+  const [secondarySortOrder, setSecondarySortOrder] = useState<SortOrder>("asc");
   const [filterSite, setFilterSite] = useState("");
   const [filterPage, setFilterPage] = useState("");
   const [filterPostStatus, setFilterPostStatus] = useState("");
@@ -153,6 +155,8 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     const urlPostStatus = searchParams?.get('g_post_status');
     const urlSortField = searchParams?.get('sortField');
     const urlSortOrder = searchParams?.get('sortOrder');
+    const urlSecondarySortField = searchParams?.get('secondarySort');
+    const urlSecondarySortOrder = searchParams?.get('secondaryOrder');
     const urlSearch = searchParams?.get('search');
     const urlFilterPage = searchParams?.get('filterPage');
     
@@ -176,6 +180,8 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
           setFilterPage(state.filterPage || '');
           setSortField(state.sortField || 'created_at');
           setSortOrder(state.sortOrder || 'desc');
+          setSecondarySortField(state.secondarySortField || null);
+          setSecondarySortOrder(state.secondarySortOrder || 'asc');
           setSearchTerm(state.searchTerm || '');
           
           return; // Exit early, the URL will be updated by the other useEffect
@@ -220,6 +226,17 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
       setSortOrder(urlSortOrder as SortOrder);
     }
     
+    if (urlSecondarySortField) {
+      const validSortFields: SortField[] = ["meta_title", "asn_sitespren_base", "g_post_type", "g_post_status", "pub_status", "date_time_pub_carry", "pageslug", "created_at", "updated_at", "is_starred1", "is_starred2"];
+      if (validSortFields.includes(urlSecondarySortField as SortField)) {
+        setSecondarySortField(urlSecondarySortField as SortField);
+      }
+    }
+    
+    if (urlSecondarySortOrder && (urlSecondarySortOrder === 'asc' || urlSecondarySortOrder === 'desc')) {
+      setSecondarySortOrder(urlSecondarySortOrder as SortOrder);
+    }
+    
     if (urlSearch) {
       setSearchTerm(decodeURIComponent(urlSearch));
     }
@@ -258,6 +275,10 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
       params.set('sortField', sortField);
       params.set('sortOrder', sortOrder);
     }
+    if (secondarySortField) {
+      params.set('secondarySort', secondarySortField);
+      params.set('secondaryOrder', secondarySortOrder);
+    }
     
     // 5. Search (last, most likely to change frequently)
     if (searchTerm) {
@@ -276,10 +297,12 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
       filterPage,
       sortField,
       sortOrder,
+      secondarySortField,
+      secondarySortOrder,
       searchTerm
     };
     localStorage.setItem(`gconjar1_state_${siteKey}`, JSON.stringify(stateToSave));
-  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, filterPage, sortField, sortOrder, searchTerm, router]);
+  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, filterPage, sortField, sortOrder, secondarySortField, secondarySortOrder, searchTerm, router]);
 
   // Fetch ns_full data from sitespren table
   useEffect(() => {
@@ -434,6 +457,8 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     setFilterPage("");
     setSortField("created_at");
     setSortOrder("desc");
+    setSecondarySortField(null);
+    setSecondarySortOrder("asc");
     setSelectedColumnTemplate('option1');
     setStickyColumnCount(0);
     setCurrentPage(1);
