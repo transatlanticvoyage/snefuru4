@@ -2158,7 +2158,22 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                   const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                   const isSticky = index < stickyColumnCount;
                   const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                  const leftPosition = isSticky ? `${index * 150}px` : 'auto';
+                  // Calculate dynamic left position based on column widths
+                  const getColumnWidth = (colName: string, idx: number) => {
+                    if (colName === 'checkbox') return 60;
+                    if (colName === 'tool_buttons') return 420; // Increased width for 11 buttons
+                    return 150; // Default width for other columns
+                  };
+                  
+                  const calculateLeftPosition = (currentIndex: number) => {
+                    let totalWidth = 0;
+                    for (let i = 0; i < currentIndex; i++) {
+                      totalWidth += getColumnWidth(visibleColumns[i], i);
+                    }
+                    return totalWidth;
+                  };
+                  
+                  const leftPosition = isSticky ? `${calculateLeftPosition(index)}px` : 'auto';
                   const isLastSticky = index === stickyColumnCount - 1;
 
                   return (
@@ -2171,6 +2186,9 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                       } ${col === 'checkbox' ? 'cursor-pointer' : ''}`}
                       style={{
                         ...(isSticky ? { left: leftPosition } : {}),
+                        width: `${getColumnWidth(col, index)}px`,
+                        minWidth: `${getColumnWidth(col, index)}px`,
+                        maxWidth: `${getColumnWidth(col, index)}px`,
                         backgroundColor: col === 'checkbox' || col === 'tool_buttons' 
                           ? '#e5e7eb' // gray-200 for action columns
                           : col === 'domain_registrar_info'
@@ -2225,7 +2243,22 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                     const { hasLeftSeparator, hasRightSeparator } = getColumnSeparators(col);
                     const isSticky = colIndex < stickyColumnCount;
                     const stickyClass = isSticky ? 'sticky left-0 z-10' : '';
-                    const leftPosition = isSticky ? `${colIndex * 150}px` : 'auto';
+                    // Calculate dynamic left position based on column widths (same logic as header)
+                    const getColumnWidth = (colName: string, idx: number) => {
+                      if (colName === 'checkbox') return 60;
+                      if (colName === 'tool_buttons') return 420; // Increased width for 11 buttons
+                      return 150; // Default width for other columns
+                    };
+                    
+                    const calculateLeftPosition = (currentIndex: number) => {
+                      let totalWidth = 0;
+                      for (let i = 0; i < currentIndex; i++) {
+                        totalWidth += getColumnWidth(visibleColumns[i], i);
+                      }
+                      return totalWidth;
+                    };
+                    
+                    const leftPosition = isSticky ? `${calculateLeftPosition(colIndex)}px` : 'auto';
                     const bgClass = 'bg-inherit';
                     const isLastSticky = colIndex === stickyColumnCount - 1;
 
@@ -2237,6 +2270,9 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         } ${col === 'checkbox' ? 'cursor-pointer' : ''} ${col === 'checkbox' || col === 'tool_buttons' || col === 'is_starred1' || col === 'domain_registrar_info' ? '' : 'align-top'}`}
                         style={{
                           ...(isSticky ? { left: leftPosition } : {}),
+                          width: `${getColumnWidth(col, colIndex)}px`,
+                          minWidth: `${getColumnWidth(col, colIndex)}px`,
+                          maxWidth: `${getColumnWidth(col, colIndex)}px`,
                           verticalAlign: 'top'
                         }}
                         onClick={col === 'checkbox' ? () => handleSiteSelection(item.id, !selectedSites.has(item.id)) : undefined}
