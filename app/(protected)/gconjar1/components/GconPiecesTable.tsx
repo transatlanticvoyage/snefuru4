@@ -41,7 +41,7 @@ interface GconPiecesTableProps {
   onSelectionChange?: (selectedRows: Set<string>) => void;
 }
 
-type SortField = "meta_title" | "asn_sitespren_base" | "g_post_type" | "g_post_status" | "pub_status" | "date_time_pub_carry" | "pageslug" | "created_at" | "updated_at";
+type SortField = "meta_title" | "asn_sitespren_base" | "g_post_type" | "g_post_status" | "pub_status" | "date_time_pub_carry" | "pageslug" | "created_at" | "updated_at" | "is_starred1" | "is_starred2";
 type SortOrder = "asc" | "desc";
 type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
@@ -151,6 +151,8 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     const urlStickyCol = searchParams?.get('stickycol');
     const urlSiteBase = searchParams?.get('sitebase');
     const urlPostStatus = searchParams?.get('g_post_status');
+    const urlSortField = searchParams?.get('sortField');
+    const urlSortOrder = searchParams?.get('sortOrder');
     
     if (urlColTemp && urlColTemp in columnTemplates) {
       setSelectedColumnTemplate(urlColTemp as ColumnTemplateKey);
@@ -187,6 +189,18 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     if (urlPostStatus && (urlPostStatus === 'publish' || urlPostStatus === 'draft')) {
       setFilterPostStatus(urlPostStatus);
     }
+    
+    // Set sort field and order from URL parameters
+    if (urlSortField) {
+      const validSortFields: SortField[] = ["meta_title", "asn_sitespren_base", "g_post_type", "g_post_status", "pub_status", "date_time_pub_carry", "pageslug", "created_at", "updated_at", "is_starred1", "is_starred2"];
+      if (validSortFields.includes(urlSortField as SortField)) {
+        setSortField(urlSortField as SortField);
+      }
+    }
+    
+    if (urlSortOrder && (urlSortOrder === 'asc' || urlSortOrder === 'desc')) {
+      setSortOrder(urlSortOrder as SortOrder);
+    }
   }, [searchParams]);
 
   // Update URL and localStorage when selections change
@@ -203,12 +217,16 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     if (filterPostStatus) {
       params.set('g_post_status', filterPostStatus);
     }
+    if (sortField !== 'created_at' || sortOrder !== 'desc') {
+      params.set('sortField', sortField);
+      params.set('sortOrder', sortOrder);
+    }
     router.replace(`/gconjar1?${params.toString()}`, { scroll: false });
     
     // Update localStorage
     localStorage.setItem('gconjar1_columnTemplate', selectedColumnTemplate);
     localStorage.setItem('gconjar1_stickyColumns', stickyColumnCount.toString());
-  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, router]);
+  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, sortField, sortOrder, router]);
 
   // Fetch ns_full data from sitespren table
   useEffect(() => {
@@ -686,7 +704,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                 {visibleColumns.map((col, index) => {
                   const isSticky = index < stickyColumnCount;
                   const isSeparator = index === stickyColumnCount - 1 && stickyColumnCount > 0;
-                  const isSortable = ['meta_title', 'asn_sitespren_base', 'g_post_type', 'g_post_status', 'pub_status', 'date_time_pub_carry', 'pageslug', 'created_at', 'updated_at'].includes(col);
+                  const isSortable = ['meta_title', 'asn_sitespren_base', 'g_post_type', 'g_post_status', 'pub_status', 'date_time_pub_carry', 'pageslug', 'created_at', 'updated_at', 'is_starred1', 'is_starred2'].includes(col);
                   
                   return (
                     <th
@@ -727,6 +745,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                         <div className="flex flex-col">
                           <div className="font-normal text-xs">gcon_pieces</div>
                           <div className="font-bold">
+                            {isSortable && sortField === col && <span className="text-red-500">⭐</span>}
                             {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
                           </div>
                         </div>
