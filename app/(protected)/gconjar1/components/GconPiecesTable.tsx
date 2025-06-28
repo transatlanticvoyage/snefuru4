@@ -153,6 +153,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     const urlPostStatus = searchParams?.get('g_post_status');
     const urlSortField = searchParams?.get('sortField');
     const urlSortOrder = searchParams?.get('sortOrder');
+    const urlSearch = searchParams?.get('search');
     
     if (urlColTemp && urlColTemp in columnTemplates) {
       setSelectedColumnTemplate(urlColTemp as ColumnTemplateKey);
@@ -201,6 +202,11 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     if (urlSortOrder && (urlSortOrder === 'asc' || urlSortOrder === 'desc')) {
       setSortOrder(urlSortOrder as SortOrder);
     }
+    
+    // Set search term from URL parameter
+    if (urlSearch) {
+      setSearchTerm(decodeURIComponent(urlSearch));
+    }
   }, [searchParams]);
 
   // Update URL and localStorage when selections change
@@ -221,12 +227,15 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
       params.set('sortField', sortField);
       params.set('sortOrder', sortOrder);
     }
+    if (searchTerm) {
+      params.set('search', encodeURIComponent(searchTerm));
+    }
     router.replace(`/gconjar1?${params.toString()}`, { scroll: false });
     
     // Update localStorage
     localStorage.setItem('gconjar1_columnTemplate', selectedColumnTemplate);
     localStorage.setItem('gconjar1_stickyColumns', stickyColumnCount.toString());
-  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, sortField, sortOrder, router]);
+  }, [selectedColumnTemplate, stickyColumnCount, filterSite, filterPostStatus, sortField, sortOrder, searchTerm, router]);
 
   // Fetch ns_full data from sitespren table
   useEffect(() => {
