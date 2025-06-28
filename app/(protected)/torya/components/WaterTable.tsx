@@ -328,7 +328,8 @@ export default function WaterTable() {
                         isLastStickyCol ? 'border-r-4 border-black' : ''
                       }`}
                       style={{ 
-                        left: `${index * 150}px`,
+                        left: index === 0 ? '0px' : `${(index - 1) * 150 + 60}px`,
+                        width: '60px',
                         padding: '6px 10px !important',
                         paddingTop: '6px !important',
                         paddingBottom: '6px !important',
@@ -362,7 +363,7 @@ export default function WaterTable() {
                     className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 sticky bg-gray-50 z-10 ${
                       isLastStickyCol ? 'border-r-4 border-black' : ''
                     }`}
-                    style={{ left: `${index * 150}px` }}
+                    style={{ left: index === 0 ? '60px' : `${(index - 1) * 150 + 60}px` }}
                   >
                     <div className="flex items-center gap-1">
                       <span>{col}</span>
@@ -410,7 +411,8 @@ export default function WaterTable() {
                           isLastStickyCol ? 'border-r-4 border-black' : ''
                         }`}
                         style={{ 
-                          left: `${index * 150}px`,
+                          left: index === 0 ? '0px' : `${(index - 1) * 150 + 60}px`,
+                          width: '60px',
                           padding: '6px 10px !important',
                           paddingTop: '6px !important',
                           paddingBottom: '6px !important',
@@ -444,7 +446,7 @@ export default function WaterTable() {
                       className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white ${
                         isLastStickyCol ? 'border-r-4 border-black' : ''
                       }`}
-                      style={{ left: `${index * 150}px` }}
+                      style={{ left: index === 0 ? '60px' : `${(index - 1) * 150 + 60}px` }}
                     >
                       {row[col as keyof WaterRecord]}
                     </td>
