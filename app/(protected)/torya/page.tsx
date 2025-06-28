@@ -5,6 +5,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import WaterTable from './components/WaterTable';
 
 export default function ToryaPage() {
   const { user } = useAuth();
@@ -55,8 +56,8 @@ export default function ToryaPage() {
             ← Back to Dashboard
           </Link>
         </div>
-        <h1 className="text-2xl font-bold mb-4">Torya</h1>
-        {/* Page content will be added later */}
+        <h1 className="text-2xl font-bold mb-6">Torya</h1>
+        <WaterTable />
       </div>
     </div>
   );
