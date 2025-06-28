@@ -399,26 +399,44 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
   // Sort logic
   const sortedData = useMemo(() => {
     const sorted = [...filteredData].sort((a, b) => {
-      let aVal: string | number = a[sortField] || "";
-      let bVal: string | number = b[sortField] || "";
+      // Helper function to process field values for comparison
+      const processValue = (item: any, field: SortField): string | number => {
+        let val = item[field] || "";
+        if (field === "created_at" || field === "updated_at") {
+          return new Date(val).getTime();
+        } else {
+          return val.toString().toLowerCase();
+        }
+      };
 
-      if (sortField === "created_at" || sortField === "updated_at") {
-        aVal = new Date(aVal).getTime();
-        bVal = new Date(bVal).getTime();
-      } else {
-        aVal = aVal.toString().toLowerCase();
-        bVal = bVal.toString().toLowerCase();
-      }
+      // Primary sort comparison
+      let aVal = processValue(a, sortField);
+      let bVal = processValue(b, sortField);
 
+      let primaryResult = 0;
       if (sortOrder === "asc") {
-        return aVal > bVal ? 1 : -1;
+        primaryResult = aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
       } else {
-        return aVal < bVal ? 1 : -1;
+        primaryResult = aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
       }
+
+      // If primary values are equal and we have a secondary sort field, use it for tie-breaking
+      if (primaryResult === 0 && secondarySortField) {
+        let aSecondaryVal = processValue(a, secondarySortField);
+        let bSecondaryVal = processValue(b, secondarySortField);
+
+        if (secondarySortOrder === "asc") {
+          return aSecondaryVal > bSecondaryVal ? 1 : aSecondaryVal < bSecondaryVal ? -1 : 0;
+        } else {
+          return aSecondaryVal < bSecondaryVal ? 1 : aSecondaryVal > bSecondaryVal ? -1 : 0;
+        }
+      }
+
+      return primaryResult;
     });
 
     return sorted;
-  }, [filteredData, sortField, sortOrder]);
+  }, [filteredData, sortField, sortOrder, secondarySortField, secondarySortOrder]);
 
   // Pagination logic
   const paginatedData = useMemo(() => {
@@ -910,8 +928,25 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                       ) : (
                         <div className="flex flex-col">
                           <div className="font-normal text-xs">gcon_pieces</div>
-                          <div className="font-bold">
-                            {isSortable && sortField === col && <span className="text-red-500">★</span>}
+                          <div className="font-bold flex items-center gap-1">
+                            {/* Primary sort indicator - red star with white "1" */}
+                            {isSortable && sortField === col && (
+                              <span className="relative inline-flex items-center justify-center text-red-600 text-lg leading-none">
+                                ★
+                                <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold" style={{ fontSize: '10px' }}>
+                                  1
+                                </span>
+                              </span>
+                            )}
+                            {/* Secondary sort indicator - maroon star with white "2" */}
+                            {isSortable && secondarySortField === col && (
+                              <span className="relative inline-flex items-center justify-center text-amber-800 text-lg leading-none">
+                                ★
+                                <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold" style={{ fontSize: '10px' }}>
+                                  2
+                                </span>
+                              </span>
+                            )}
                             {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
                           </div>
                         </div>
