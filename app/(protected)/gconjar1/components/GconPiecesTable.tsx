@@ -823,7 +823,11 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
               <select
                 value={secondarySortField || ""}
                 onChange={(e) => setSecondarySortField(e.target.value ? e.target.value as SortField : null)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className={`px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                  secondarySortField 
+                    ? 'bg-amber-800 text-white border-amber-800' 
+                    : 'bg-white text-gray-900 border-gray-300'
+                }`}
               >
                 <option value="">Default (no secondary sort)</option>
                 <option value="meta_title" disabled={sortField === "meta_title"} className={sortField === "meta_title" ? "text-gray-400" : ""}>meta_title</option>
@@ -842,7 +846,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                 <select
                   value={secondarySortOrder}
                   onChange={(e) => setSecondarySortOrder(e.target.value as SortOrder)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="px-3 py-2 border border-amber-800 bg-amber-800 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   <option value="asc">↑ Asc</option>
                   <option value="desc">↓ Desc</option>
@@ -931,7 +935,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           <div className="font-bold flex items-center gap-1">
                             {/* Primary sort indicator - red star with white "1" */}
                             {isSortable && sortField === col && (
-                              <span className="relative inline-flex items-center justify-center text-red-600 leading-none" style={{ fontSize: '1.17em' }}>
+                              <span className="relative inline-flex items-center justify-center text-red-600 leading-none" style={{ fontSize: '1.5em' }}>
                                 ★
                                 <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold" style={{ fontSize: '10px' }}>
                                   1
@@ -940,7 +944,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             )}
                             {/* Secondary sort indicator - maroon star with white "2" */}
                             {isSortable && secondarySortField === col && (
-                              <span className="relative inline-flex items-center justify-center text-amber-800 leading-none" style={{ fontSize: '1.17em' }}>
+                              <span className="relative inline-flex items-center justify-center text-amber-800 leading-none" style={{ fontSize: '1.5em' }}>
                                 ★
                                 <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold" style={{ fontSize: '10px' }}>
                                   2
