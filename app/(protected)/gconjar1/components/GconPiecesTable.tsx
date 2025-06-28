@@ -997,8 +997,14 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           </div>
                         ) : col === 'actions' ? (
                           <div className="w-80 space-y-1">
-                            {/* First row - 4 buttons (torya first) */}
+                            {/* First row - 4 buttons (valan first) */}
                             <div className="flex gap-1">
+                              <Link
+                                href={`/valan?id=${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-green-300 text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                              >
+                                /valan
+                              </Link>
                               <Link
                                 href={`/torya?id=${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
@@ -1017,15 +1023,15 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                               >
                                 /pedbar
                               </Link>
+                            </div>
+                            {/* Second row - 4 buttons */}
+                            <div className="flex gap-1">
                               <Link
                                 href={`/pedtor1?id=${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                               >
                                 /pedtor
                               </Link>
-                            </div>
-                            {/* Second row - 4 buttons */}
-                            <div className="flex gap-1">
                               <Link
                                 href={`/flatx1?id=${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
@@ -1044,6 +1050,9 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                               >
                                 /fanex1
                               </Link>
+                            </div>
+                            {/* Third row - 1 button */}
+                            <div className="flex gap-1">
                               <Link
                                 href={`/karfi1?id=${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
