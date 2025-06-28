@@ -935,7 +935,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           <div className="font-bold flex items-center gap-1">
                             {/* Primary sort indicator - red star with white "1" */}
                             {isSortable && sortField === col && (
-                              <span className="relative inline-flex items-center justify-center text-red-600 leading-none" style={{ fontSize: '1.29em' }}>
+                              <span className="relative inline-flex items-center justify-center text-red-600 leading-none" style={{ fontSize: '1.81em' }}>
                                 ★
                                 <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold" style={{ fontSize: '10px' }}>
                                   1
@@ -944,7 +944,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             )}
                             {/* Secondary sort indicator - maroon star with white "2" */}
                             {isSortable && secondarySortField === col && (
-                              <span className="relative inline-flex items-center justify-center text-amber-800 leading-none" style={{ fontSize: '1.29em' }}>
+                              <span className="relative inline-flex items-center justify-center text-amber-800 leading-none" style={{ fontSize: '1.81em' }}>
                                 ★
                                 <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold" style={{ fontSize: '10px' }}>
                                   2
