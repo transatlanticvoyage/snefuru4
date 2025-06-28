@@ -784,7 +784,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                         <div className="flex flex-col">
                           <div className="font-normal text-xs">gcon_pieces</div>
                           <div className="font-bold">
-                            {isSortable && sortField === col && <span className="text-red-500">⭐</span>}
+                            {isSortable && sortField === col && <span className="text-red-500">★</span>}
                             {col} {isSortable && sortField === col && (sortOrder === "asc" ? "↑" : "↓")}
                           </div>
                         </div>
