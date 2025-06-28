@@ -25,7 +25,7 @@ interface UseAvalancheContentResult {
   error: string | null;
 }
 
-export function useAvalancheContent(pieceId: string | null): UseAvalancheContentResult {
+export function useAvalancheContent(pieceId: string | null | undefined): UseAvalancheContentResult {
   const [gconPiece, setGconPiece] = useState<GconPiece | null>(null);
   const [avalUnits, setAvalUnits] = useState<AvalUnit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ export function useAvalancheContent(pieceId: string | null): UseAvalancheContent
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    if (!pieceId) {
+    if (!pieceId || pieceId === undefined) {
       setLoading(false);
       setError('No piece ID provided');
       return;
