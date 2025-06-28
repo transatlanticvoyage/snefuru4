@@ -427,6 +427,19 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
     setCurrentPage(1);
   };
 
+  const handleClearAllFiltersExceptSite = () => {
+    // Reset all filters to defaults while keeping the site filter
+    setSearchTerm("");
+    setFilterPostStatus("");
+    setFilterPage("");
+    setSortField("created_at");
+    setSortOrder("desc");
+    setSelectedColumnTemplate('option1');
+    setStickyColumnCount(0);
+    setCurrentPage(1);
+    // filterSite is preserved
+  };
+
   const handleFilterSite = (site: string) => {
     setFilterSite(site);
     setCurrentPage(1);
@@ -603,7 +616,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
         >
           uielement308
         </div>
-        <div className="flex flex-wrap items-start" style={{ gap: '50px' }}>
+        <div className="flex flex-wrap items-start" style={{ gap: '50px', paddingTop: '24px' }}>
           <div className="flex">
             <input
               type="text"
@@ -626,6 +639,24 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
               title="Clear search"
             >
               CL
+            </button>
+          </div>
+          
+          {/* Clear All Filters Button */}
+          <div>
+            <button
+              onClick={handleClearAllFiltersExceptSite}
+              className="px-3 py-2 border border-gray-300 rounded-md hover:opacity-80 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              style={{ 
+                backgroundColor: '#f5deb3', // beige with hint of orange
+                color: '#2d2d2d', // dark gray, almost black
+                fontSize: '10px',
+                lineHeight: '1.2',
+                marginTop: '8px'
+              }}
+              title="Reset all filters and parameters except site selection"
+            >
+              clear browser url<br />parameters except sitebase
             </button>
           </div>
           
