@@ -776,10 +776,10 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             {/* First row - 4 buttons (torlid first) */}
                             <div className="flex gap-1">
                               <Link
-                                href={`/torlid?id=${item.id}&mtab=talk1`}
+                                href={`/torlid1?id=${item.id}&mtab=talk1`}
                                 className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
                               >
-                                /torlid
+                                /torlid1
                               </Link>
                               <Link
                                 href={`/pedbar?id=${item.id}`}
