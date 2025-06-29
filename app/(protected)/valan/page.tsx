@@ -117,6 +117,19 @@ export default function ValanPage() {
           </div>
         </div>
 
+        {/* Featured Image Selector */}
+        <div className="mb-4 max-w-7xl">
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            aval_fk_featured_image_plan_id
+          </label>
+          <button
+            type="button"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Select
+          </button>
+        </div>
+
         {/* Title Editor */}
         <div className="mb-4 max-w-7xl">
           <label className="block text-sm font-bold text-gray-700 mb-2">
