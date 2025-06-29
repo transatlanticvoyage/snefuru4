@@ -143,6 +143,7 @@ export default function EdablePage() {
           <EdableTableEditor 
             initialContent={gconPiece.aval_content || '<p>Start editing your content...</p>'}
             onContentChange={handleContentChange}
+            gconPieceId={id}
           />
         </div>
 

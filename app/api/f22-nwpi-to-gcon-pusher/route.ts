@@ -26,10 +26,14 @@ const NWPI_TO_GCON_MAPPING = {
       'pgb_h1title': data.post_title,
       'aval_title': data.post_title
     }),
-    'post_content': (data: any) => ({
-      'corpus1': data.post_content || '',
-      'aval_content': bozoHTMLNormalizationProcess1(data.post_content || '')
-    }),
+    'post_content': (data: any) => {
+      const result = bozoHTMLNormalizationProcess1(data.post_content || '');
+      return {
+        'corpus1': data.post_content || '',
+        'aval_content': result.normalizedContent,
+        '_dorli_blocks': result.dorliBlocks // Store for later processing
+      };
+    },
     'post_excerpt': (data: any) => ({
       'corpus2': data.post_excerpt || ''
     }),
@@ -46,35 +50,76 @@ const NWPI_TO_GCON_MAPPING = {
   }
 };
 
+// Interface for extracted dorli blocks
+interface DorliBlock {
+  tag: string;
+  placeholder: string;
+  raw: string;
+  line_count: number;
+}
+
 // BozoHTMLNormalizationProcess1
-function bozoHTMLNormalizationProcess1(html: string): string {
+function bozoHTMLNormalizationProcess1(html: string, gconPieceId?: string): { normalizedContent: string; dorliBlocks: DorliBlock[] } {
   if (!html || html.trim() === '') {
-    return '';
+    return { normalizedContent: '', dorliBlocks: [] };
   }
 
   try {
-    // Create a temporary DOM element to parse HTML
     let cleanHtml = html;
+    const dorliBlocks: DorliBlock[] = [];
     
     // Remove script and style elements completely
     cleanHtml = cleanHtml.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
     cleanHtml = cleanHtml.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
     
-    // Convert block-level elements to text + newline
+    // Whitelist of block-level tags that should be extracted as dorli blocks
+    const dorliTags = ['table', 'div', 'form', 'label', 'section', 'article', 'aside', 'main', 'header', 'footer', 'nav'];
+    
+    // Extract dorli blocks - complex multi-line structures
+    dorliTags.forEach(tag => {
+      // Create regex pattern to match opening and closing tags (with attributes and nested content)
+      const dorliPattern = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`, 'gi');
+      const tagCounters: { [key: string]: number } = {};
+      
+      cleanHtml = cleanHtml.replace(dorliPattern, (match) => {
+        // Count lines in the matched block
+        const lineCount = (match.match(/\r?\n/g) || []).length + 1;
+        
+        // Generate unique placeholder
+        if (!tagCounters[tag.toUpperCase()]) {
+          tagCounters[tag.toUpperCase()] = 0;
+        }
+        const placeholder = `{{DORLI:${tag.toUpperCase()}:${tagCounters[tag.toUpperCase()]}}}`;
+        tagCounters[tag.toUpperCase()]++;
+        
+        // Store the dorli block
+        dorliBlocks.push({
+          tag: tag,
+          placeholder: placeholder,
+          raw: match,
+          line_count: lineCount
+        });
+        
+        console.log(`🔄 Extracted dorli block: ${placeholder} (${lineCount} lines, ${match.length} chars)`);
+        
+        // Replace with placeholder
+        return placeholder;
+      });
+    });
+    
+    // Now process remaining content with normal normalization
+    // Convert remaining block-level elements to text + newline
     // Handle headings (h1-h6)
     cleanHtml = cleanHtml.replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi, '$1\n');
     
     // Handle paragraphs
     cleanHtml = cleanHtml.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n');
     
-    // Handle divs
-    cleanHtml = cleanHtml.replace(/<div[^>]*>(.*?)<\/div>/gi, '$1\n');
-    
     // Handle list items
     cleanHtml = cleanHtml.replace(/<li[^>]*>(.*?)<\/li>/gi, '$1\n');
     
-    // Handle other block elements
-    cleanHtml = cleanHtml.replace(/<(blockquote|article|section|header|footer|main|aside)[^>]*>(.*?)<\/\1>/gi, '$2\n');
+    // Handle other block elements (that weren't extracted as dorlis)
+    cleanHtml = cleanHtml.replace(/<(blockquote|ul|ol)[^>]*>(.*?)<\/\1>/gi, '$2\n');
     
     // Handle line breaks and horizontal rules
     cleanHtml = cleanHtml.replace(/<br[^>]*>/gi, '\n');
@@ -99,16 +144,19 @@ function bozoHTMLNormalizationProcess1(html: string): string {
       .filter(line => line.length > 0); // Remove empty lines
     
     // Join with single newlines
-    const result = normalizedLines.join('\n');
+    const normalizedContent = normalizedLines.join('\n');
     
-    console.log(`🔄 BozoHTMLNormalizationProcess1: Converted ${html.length} chars HTML to ${result.length} chars plaintext with ${normalizedLines.length} lines`);
+    console.log(`🔄 BozoHTMLNormalizationProcess1: Converted ${html.length} chars HTML to ${normalizedContent.length} chars plaintext with ${normalizedLines.length} lines, extracted ${dorliBlocks.length} dorli blocks`);
     
-    return result;
+    return { normalizedContent, dorliBlocks };
     
   } catch (error) {
     console.error('❌ BozoHTMLNormalizationProcess1 error:', error);
     // Fallback: return the original content with basic cleanup
-    return html.replace(/<[^>]+>/g, '').trim();
+    return { 
+      normalizedContent: html.replace(/<[^>]+>/g, '').trim(),
+      dorliBlocks: []
+    };
   }
 }
 
@@ -213,6 +261,10 @@ export async function POST(request: NextRequest) {
         // Transform the record using the mapping configuration
         const gconData = transformNwpiToGcon(nwpiRecord, userData.id);
         
+        // Extract dorli blocks from the transformed data
+        const dorliBlocks = gconData._dorli_blocks || [];
+        delete gconData._dorli_blocks; // Remove from data to be inserted
+        
         console.log(`🔄 Processing: ${nwpiRecord.post_title} (ID: ${nwpiRecord.internal_post_id})`);
         console.log(`📊 Debug - post_id: ${nwpiRecord.post_id}, sitespren: ${nwpiRecord.fk_sitespren_base}, user: ${userData.id}`);
 
@@ -255,22 +307,40 @@ export async function POST(request: NextRequest) {
             results.failed++;
             results.errors.push(`Failed to update "${nwpiRecord.post_title}": ${updateError.message}`);
           } else {
-            console.log(`✅ Successfully updated: ${nwpiRecord.post_title}`);
-            results.succeeded++;
+            // Process dorli blocks for updated record
+            try {
+              await processDorliBlocks(dorliBlocks, existingRecord.id, supabase);
+              console.log(`✅ Successfully updated: ${nwpiRecord.post_title}`);
+              results.succeeded++;
+            } catch (dorliError) {
+              console.error(`❌ Failed to process dorli blocks for updated record:`, dorliError);
+              results.failed++;
+              results.errors.push(`Failed to process dorli blocks for "${nwpiRecord.post_title}": ${dorliError instanceof Error ? dorliError.message : 'Unknown error'}`);
+            }
           }
         } else {
           // Insert new record
-          const { error: insertError } = await supabase
+          const { data: insertedData, error: insertError } = await supabase
             .from('gcon_pieces')
-            .insert([gconData]);
+            .insert([gconData])
+            .select('id')
+            .single();
 
           if (insertError) {
             console.error(`❌ Failed to insert record ${nwpiRecord.internal_post_id}:`, insertError);
             results.failed++;
             results.errors.push(`Failed to insert "${nwpiRecord.post_title}": ${insertError.message}`);
           } else {
-            console.log(`✅ Successfully inserted: ${nwpiRecord.post_title}`);
-            results.succeeded++;
+            // Process dorli blocks for new record
+            try {
+              await processDorliBlocks(dorliBlocks, insertedData.id, supabase);
+              console.log(`✅ Successfully inserted: ${nwpiRecord.post_title}`);
+              results.succeeded++;
+            } catch (dorliError) {
+              console.error(`❌ Failed to process dorli blocks for new record:`, dorliError);
+              results.failed++;
+              results.errors.push(`Failed to process dorli blocks for "${nwpiRecord.post_title}": ${dorliError instanceof Error ? dorliError.message : 'Unknown error'}`);
+            }
           }
         }
 
@@ -340,6 +410,46 @@ function transformNwpiToGcon(nwpiRecord: any, userId: string) {
   }
 
   return gconData;
+}
+
+// Process dorli blocks by inserting them into aval_dorlis table
+async function processDorliBlocks(dorliBlocks: DorliBlock[], gconPieceId: string, supabase: any) {
+  if (!dorliBlocks || dorliBlocks.length === 0) {
+    return;
+  }
+
+  console.log(`🔄 Processing ${dorliBlocks.length} dorli blocks for gcon_piece: ${gconPieceId}`);
+
+  // Clear existing dorli blocks for this gcon_piece (in case of updates)
+  const { error: deleteError } = await supabase
+    .from('aval_dorlis')
+    .delete()
+    .eq('fk_gcon_piece_id', gconPieceId);
+
+  if (deleteError) {
+    console.error('❌ Error clearing existing dorli blocks:', deleteError);
+    throw new Error(`Failed to clear existing dorli blocks: ${deleteError.message}`);
+  }
+
+  // Insert new dorli blocks
+  const dorliInserts = dorliBlocks.map(block => ({
+    fk_gcon_piece_id: gconPieceId,
+    tag: block.tag,
+    placeholder: block.placeholder,
+    raw: block.raw,
+    line_count: block.line_count
+  }));
+
+  const { error: insertError } = await supabase
+    .from('aval_dorlis')
+    .insert(dorliInserts);
+
+  if (insertError) {
+    console.error('❌ Error inserting dorli blocks:', insertError);
+    throw new Error(`Failed to insert dorli blocks: ${insertError.message}`);
+  }
+
+  console.log(`✅ Successfully inserted ${dorliBlocks.length} dorli blocks`);
 }
 
 // Generate slug from title if needed
