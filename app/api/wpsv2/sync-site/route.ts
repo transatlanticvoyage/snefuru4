@@ -280,6 +280,14 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
 
   for (const post of posts) {
     try {
+      // DEBUG: Log the raw post data from WordPress
+      console.log(`🔍 RAW POST DATA:`, JSON.stringify({
+        ID: post.ID || post.id,
+        post_name: post.post_name || post.slug,
+        post_title: post.post_title || post.title?.rendered || post.title,
+        post_status: post.post_status || post.status
+      }));
+      
       let contentData;
       
       if (syncMethod === 'plugin_api') {
@@ -304,6 +312,8 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
           // Always store the actual WordPress post_name (slug)
           // This preserves the real slug for both draft and published content
           post_name: post.post_name,
+          // TEMP DEBUG: Store raw post_name in i_sync_error_message for debugging
+          i_sync_error_message: `DEBUG: WP post_name="${post.post_name}" status="${post.post_status}" title="${post.post_title}"`,
           post_password: post.post_password || null,
           comment_status: post.comment_status,
           ping_status: post.ping_status,
