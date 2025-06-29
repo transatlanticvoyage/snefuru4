@@ -143,6 +143,11 @@ export default function ValanPage() {
 
           {/* TipTap Editor - 50% width */}
           <div className="w-1/2">
+            <div className="p-2 bg-gray-100 border-b border-gray-300">
+              <label className="text-sm font-bold text-gray-700">
+                aval_content
+              </label>
+            </div>
             <TipTapEditor 
               initialContent={'<p>Loading content...</p>'}
               content={gconPiece.aval_content || '<p>Start editing your Avalanche content...</p>'}
