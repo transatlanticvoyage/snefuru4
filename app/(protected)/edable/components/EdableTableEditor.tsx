@@ -38,17 +38,18 @@ function BlockEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Disable some features for block-level editing
+        // Configure for block-level editing
         heading: { levels: [2, 3] },
         paragraph: {
           HTMLAttributes: {
             class: 'block-paragraph',
           },
         },
-        // Disable document-level features
-        document: false,
-        // We'll handle enter/breaks manually
+        // Keep document but disable some document-level features
         hardBreak: false,
+        // Disable horizontal rule and code block for simplicity
+        horizontalRule: false,
+        codeBlock: false,
       }),
       Link.configure({
         openOnClick: false,
@@ -64,6 +65,7 @@ function BlockEditor({
       Underline,
     ],
     content: block.htmlContent || '<p></p>',
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       onUpdate(block.id, html);
@@ -108,7 +110,11 @@ function BlockEditor({
   }, [focused, editor]);
 
   if (!editor) {
-    return <div className="p-2 text-gray-400">Loading...</div>;
+    return (
+      <div className="p-2 text-gray-400 border border-gray-200 rounded min-h-[2rem] flex items-center">
+        Loading editor...
+      </div>
+    );
   }
 
   return (
@@ -130,31 +136,54 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
   }, [initialContent]);
 
   const parseContentIntoBlocks = (html: string) => {
-    // Create a temporary editor to parse the HTML into JSON
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    
     const parsedBlocks: EditorBlock[] = [];
-    const elements = tempDiv.children;
     
-    // If no block elements found, create a single paragraph
-    if (elements.length === 0) {
+    try {
+      // Create a temporary div to parse the HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html || '<p>Start typing...</p>';
+      
+      const elements = tempDiv.children;
+      
+      // If no block elements found, create a single paragraph
+      if (elements.length === 0 || tempDiv.textContent?.trim() === '') {
+        parsedBlocks.push({
+          id: generateId(),
+          type: 'paragraph',
+          htmlContent: '<p>Start typing...</p>'
+        });
+      } else {
+        // Convert each block element to an editor block
+        Array.from(elements).forEach((element) => {
+          const blockHtml = element.outerHTML;
+          const blockType = element.tagName.toLowerCase();
+          
+          // Ensure we have valid content
+          if (blockHtml && blockHtml.trim() !== '') {
+            parsedBlocks.push({
+              id: generateId(),
+              type: blockType === 'p' ? 'paragraph' : blockType,
+              htmlContent: blockHtml
+            });
+          }
+        });
+        
+        // If no valid blocks were created, add a default paragraph
+        if (parsedBlocks.length === 0) {
+          parsedBlocks.push({
+            id: generateId(),
+            type: 'paragraph',
+            htmlContent: '<p>Start typing...</p>'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing content into blocks:', error);
+      // Fallback to a single paragraph
       parsedBlocks.push({
         id: generateId(),
         type: 'paragraph',
         htmlContent: '<p>Start typing...</p>'
-      });
-    } else {
-      // Convert each block element to an editor block
-      Array.from(elements).forEach((element, index) => {
-        const blockHtml = element.outerHTML;
-        const blockType = element.tagName.toLowerCase();
-        
-        parsedBlocks.push({
-          id: generateId(),
-          type: blockType === 'p' ? 'paragraph' : blockType,
-          htmlContent: blockHtml
-        });
       });
     }
     
@@ -162,7 +191,9 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
     
     // Focus the first block
     if (parsedBlocks.length > 0) {
-      setFocusedBlock(parsedBlocks[0].id);
+      setTimeout(() => {
+        setFocusedBlock(parsedBlocks[0].id);
+      }, 100);
     }
   };
 
