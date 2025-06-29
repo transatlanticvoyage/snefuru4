@@ -196,6 +196,37 @@ export default function ValanPage() {
                 </div>
               </div>
 
+              {/* Post Name */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  post_name
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => {
+                      if (gconPiece.asn_sitespren_base && gconPiece.post_name) {
+                        window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.post_name}`, '_blank');
+                      }
+                    }}
+                    disabled={!gconPiece.post_name || !gconPiece.asn_sitespren_base}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece.post_name || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece.post_name || 'Not set'}
+                  </span>
+                </div>
+              </div>
+
               {/* Page Slug */}
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700 mb-2">
