@@ -357,7 +357,7 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
 
       {/* Editor Area with Line Numbers and Sidebar */}
       <div className="flex">
-        {/* Line Numbers */}
+        {/* Left Line Numbers */}
         <div 
           ref={lineNumbersRef}
           className="bg-gray-50 border-r border-gray-200 px-2 py-4 text-right select-none relative"
@@ -365,7 +365,7 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
         >
           {linePositions.map((linePos) => (
             <div 
-              key={linePos.lineNumber}
+              key={`left-${linePos.lineNumber}`}
               className="absolute right-0"
               style={{ 
                 top: `${linePos.top + 16}px`, // +16px for padding offset
@@ -397,7 +397,6 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
             </div>
           ))}
         </div>
-
 
         {/* Main Editor */}
         <div className="flex-1" ref={editorRef}>
@@ -432,6 +431,46 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
               />
             </div>
           )}
+        </div>
+
+        {/* Right Line Numbers */}
+        <div 
+          className="bg-gray-50 border-l border-gray-200 px-2 py-4 text-left select-none relative"
+          style={{ minWidth: '60px' }}
+        >
+          {linePositions.map((linePos) => (
+            <div 
+              key={`right-${linePos.lineNumber}`}
+              className="absolute left-0"
+              style={{ 
+                top: `${linePos.top + 16}px`, // +16px for padding offset
+                width: '100%',
+                height: '1.5rem'
+              }}
+            >
+              {/* Horizontal line above the line number */}
+              <div 
+                className="border-t border-gray-400"
+                style={{
+                  width: '100%',
+                  marginBottom: '2px'
+                }}
+              />
+              {/* Line number */}
+              <div
+                className="text-xs text-gray-500 text-left pl-2"
+                style={{
+                  height: 'calc(1.5rem - 3px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start'
+                }}
+                title={`Line ${linePos.lineNumber}: ${linePos.content.substring(0, 50)}${linePos.content.length > 50 ? '...' : ''}`}
+              >
+                {linePos.lineNumber}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
