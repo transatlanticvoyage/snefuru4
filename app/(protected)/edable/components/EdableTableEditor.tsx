@@ -332,6 +332,41 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
     });
   }, [blocks, onContentChange, getDorliByPlaceholder, updateDorliBlock, extractDorliPlaceholder]);
 
+  const handleAddRowBelow = useCallback((rowIndex: number) => {
+    // Create new blank block
+    const newBlock: EditorBlock = {
+      id: generateId(),
+      type: 'paragraph',
+      htmlContent: '<p></p>'
+    };
+    
+    // Insert the new block at the specified position
+    setBlocks(prevBlocks => {
+      const newBlocks = [...prevBlocks];
+      newBlocks.splice(rowIndex + 1, 0, newBlock);
+      
+      // Update aval_content to maintain line-by-line sync
+      const combinedHtml = newBlocks
+        .map(block => {
+          // Extract content from paragraph tags for line-based storage
+          if (block.htmlContent.startsWith('<p>') && block.htmlContent.endsWith('</p>')) {
+            return block.htmlContent.slice(3, -4); // Remove <p> and </p>
+          }
+          return block.htmlContent;
+        })
+        .join('\n'); // Join with linebreaks
+      
+      onContentChange?.(combinedHtml);
+      
+      return newBlocks;
+    });
+    
+    // Focus the new block after a short delay
+    setTimeout(() => {
+      setFocusedBlock(newBlock.id);
+    }, 50);
+  }, [blocks, onContentChange]);
+
   const handleEnterPressed = useCallback((blockId: string) => {
     const blockIndex = blocks.findIndex(b => b.id === blockId);
     if (blockIndex === -1) return;
@@ -888,17 +923,23 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   })()}
                 </td>
                 
-                {/* Column 8 - Thing6 */}
+                {/* Column 8 - Add Row Button */}
+                <td className="border border-gray-300 p-2 text-center">
+                  <button
+                    onClick={() => handleAddRowBelow(index)}
+                    className="w-4 h-4 bg-purple-700 hover:bg-purple-800 text-white rounded flex items-center justify-center text-xs font-bold transition-colors"
+                    title="Add new row below"
+                  >
+                    +
+                  </button>
+                </td>
+                
+                {/* Column 9 - Thing6 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 9 - Thing7 */}
-                <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
-                  -
-                </td>
-                
-                {/* Column 10 - Thing8 */}
+                {/* Column 10 - Thing7 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
