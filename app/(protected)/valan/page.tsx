@@ -203,7 +203,11 @@ export default function ValanPage() {
                 </label>
                 <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
                   <button
-                    onClick={() => window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.pageslug}`, '_blank')}
+                    onClick={() => {
+                      if (gconPiece.asn_sitespren_base && gconPiece.pageslug) {
+                        window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.pageslug}`, '_blank');
+                      }
+                    }}
                     disabled={!gconPiece.pageslug || !gconPiece.asn_sitespren_base}
                     className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
                     title="Open in new tab"
@@ -230,7 +234,11 @@ export default function ValanPage() {
                 </label>
                 <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
                   <button
-                    onClick={() => window.open(gconPiece.pageurl, '_blank')}
+                    onClick={() => {
+                      if (gconPiece.pageurl) {
+                        window.open(gconPiece.pageurl, '_blank');
+                      }
+                    }}
                     disabled={!gconPiece.pageurl}
                     className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
                     title="Open in new tab"
