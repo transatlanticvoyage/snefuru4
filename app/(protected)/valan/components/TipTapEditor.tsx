@@ -5,7 +5,13 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Underline from '@tiptap/extension-underline';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+interface LinePosition {
+  lineNumber: number;
+  top: number;
+  content: string;
+}
 
 interface TipTapEditorProps {
   initialContent?: string;
@@ -18,6 +24,9 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
   const [isCodeView, setIsCodeView] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
   const [lines, setLines] = useState<string[]>([]);
+  const [linePositions, setLinePositions] = useState<LinePosition[]>([]);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const lineNumbersRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     extensions: [
@@ -53,8 +62,47 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
     },
   });
 
+  // Get document lines from TipTap editor structure
+  const getDocumentLines = useCallback(() => {
+    if (!editor) return [];
+    
+    const doc = editor.view.state.doc;
+    const editorElement = editor.view.dom;
+    const editorRect = editorElement.getBoundingClientRect();
+    const lines: LinePosition[] = [];
+    let lineNumber = 1;
+    
+    try {
+      doc.descendants((node, pos) => {
+        // Only process block-level nodes (paragraphs, headings, etc.)
+        if (node.isBlock && node.type.name !== 'doc') {
+          try {
+            // Get the DOM coordinates for this position
+            const coords = editor.view.coordsAtPos(pos + 1); // +1 to get inside the node
+            const relativeTop = coords.top - editorRect.top;
+            
+            lines.push({
+              lineNumber,
+              top: relativeTop,
+              content: node.textContent || ''
+            });
+            lineNumber++;
+          } catch (e) {
+            // Skip nodes that can't be positioned
+            console.warn('Could not get position for node:', node.type.name);
+          }
+        }
+        return true; // Continue traversing
+      });
+    } catch (e) {
+      console.warn('Error parsing document structure:', e);
+    }
+    
+    return lines;
+  }, [editor]);
+
   const updateLines = useCallback((html: string) => {
-    // Parse HTML to extract line content
+    // Parse HTML to extract line content for backward compatibility
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const elements = doc.body.children;
@@ -66,7 +114,16 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
     
     setLines(newLines);
     onLinesChange?.(newLines);
-  }, [onLinesChange]);
+    
+    // Update line positions
+    if (editor) {
+      // Use setTimeout to ensure DOM is updated
+      setTimeout(() => {
+        const positions = getDocumentLines();
+        setLinePositions(positions);
+      }, 10);
+    }
+  }, [onLinesChange, editor, getDocumentLines]);
 
   useEffect(() => {
     if (editor) {
@@ -82,6 +139,40 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
       editor.commands.setContent(content);
     }
   }, [editor, content]);
+
+  // Add scroll and resize listeners for real-time position updates
+  useEffect(() => {
+    if (!editor) return;
+
+    const updatePositions = () => {
+      const positions = getDocumentLines();
+      setLinePositions(positions);
+    };
+
+    // Update positions when editor content changes or scrolls
+    const editorElement = editor.view.dom;
+    
+    const handleScroll = () => updatePositions();
+    const handleResize = () => updatePositions();
+    
+    editorElement.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+    
+    // Also update on editor focus/blur events
+    const handleFocus = () => setTimeout(updatePositions, 10);
+    editor.on('focus', handleFocus);
+    editor.on('blur', handleFocus);
+    
+    // Initial position update
+    setTimeout(updatePositions, 100);
+
+    return () => {
+      editorElement.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+      editor.off('focus', handleFocus);
+      editor.off('blur', handleFocus);
+    };
+  }, [editor, getDocumentLines]);
 
   const handleCodeViewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHtmlContent(e.target.value);
@@ -227,21 +318,32 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
       {/* Editor Area with Line Numbers and Sidebar */}
       <div className="flex">
         {/* Line Numbers */}
-        <div className="bg-gray-50 border-r border-gray-200 px-2 py-4 text-right select-none">
-          {lines.map((_, index) => (
+        <div 
+          ref={lineNumbersRef}
+          className="bg-gray-50 border-r border-gray-200 px-2 py-4 text-right select-none relative"
+          style={{ minWidth: '60px' }}
+        >
+          {linePositions.map((linePos) => (
             <div 
-              key={index} 
-              className="text-xs text-gray-500 leading-6"
-              style={{ minHeight: '1.5rem' }}
+              key={linePos.lineNumber}
+              className="text-xs text-gray-500 absolute right-2"
+              style={{ 
+                top: `${linePos.top + 16}px`, // +16px for padding offset
+                height: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end'
+              }}
+              title={`Line ${linePos.lineNumber}: ${linePos.content.substring(0, 50)}${linePos.content.length > 50 ? '...' : ''}`}
             >
-              {index + 1}
+              {linePos.lineNumber}
             </div>
           ))}
         </div>
 
 
         {/* Main Editor */}
-        <div className="flex-1">
+        <div className="flex-1" ref={editorRef}>
           {isCodeView ? (
             <div className="p-4">
               <textarea
@@ -271,16 +373,6 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
                 editor={editor} 
                 className="min-h-[400px]"
               />
-              {/* Line tracking overlay */}
-              <div className="absolute inset-0 pointer-events-none">
-                {editor.view.state.doc.content.content.map((node, index) => (
-                  <div
-                    key={index}
-                    data-line-id={`line-${index + 1}`}
-                    className="invisible"
-                  />
-                ))}
-              </div>
             </div>
           )}
         </div>
