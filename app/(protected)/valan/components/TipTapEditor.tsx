@@ -101,6 +101,19 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
     return lines;
   }, [editor]);
 
+  // Get line positions for HTML view (based on textarea lines)
+  const getHtmlViewLines = useCallback(() => {
+    const textareaLines = htmlContent.split('\n');
+    const lineHeight = 20; // Approximate line height for textarea
+    const startOffset = 32; // Padding offset for textarea
+    
+    return textareaLines.map((line, index) => ({
+      lineNumber: index + 1,
+      top: index * lineHeight + startOffset,
+      content: line.trim()
+    }));
+  }, [htmlContent]);
+
   const updateLines = useCallback((html: string) => {
     // Parse HTML to extract line content for backward compatibility
     const parser = new DOMParser();
@@ -115,15 +128,19 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
     setLines(newLines);
     onLinesChange?.(newLines);
     
-    // Update line positions
-    if (editor) {
-      // Use setTimeout to ensure DOM is updated
+    // Update line positions based on current view
+    if (isCodeView) {
+      // For HTML view, use line-based positioning
+      const htmlLines = getHtmlViewLines();
+      setLinePositions(htmlLines);
+    } else if (editor) {
+      // For visual view, use TipTap positioning
       setTimeout(() => {
         const positions = getDocumentLines();
         setLinePositions(positions);
       }, 10);
     }
-  }, [onLinesChange, editor, getDocumentLines]);
+  }, [onLinesChange, editor, getDocumentLines, isCodeView, getHtmlViewLines]);
 
   useEffect(() => {
     if (editor) {
@@ -145,8 +162,13 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
     if (!editor) return;
 
     const updatePositions = () => {
-      const positions = getDocumentLines();
-      setLinePositions(positions);
+      if (isCodeView) {
+        const htmlLines = getHtmlViewLines();
+        setLinePositions(htmlLines);
+      } else {
+        const positions = getDocumentLines();
+        setLinePositions(positions);
+      }
     };
 
     // Update positions when editor content changes or scrolls
@@ -172,10 +194,28 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
       editor.off('focus', handleFocus);
       editor.off('blur', handleFocus);
     };
-  }, [editor, getDocumentLines]);
+  }, [editor, getDocumentLines, isCodeView, getHtmlViewLines]);
+
+  // Update line positions when switching between views
+  useEffect(() => {
+    if (isCodeView) {
+      const htmlLines = getHtmlViewLines();
+      setLinePositions(htmlLines);
+    } else if (editor) {
+      setTimeout(() => {
+        const positions = getDocumentLines();
+        setLinePositions(positions);
+      }, 10);
+    }
+  }, [isCodeView, getHtmlViewLines, getDocumentLines, editor]);
 
   const handleCodeViewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHtmlContent(e.target.value);
+    // Update line positions for HTML view when content changes
+    setTimeout(() => {
+      const htmlLines = getHtmlViewLines();
+      setLinePositions(htmlLines);
+    }, 10);
   };
 
   const applyHtmlChanges = () => {
@@ -326,17 +366,34 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
           {linePositions.map((linePos) => (
             <div 
               key={linePos.lineNumber}
-              className="text-xs text-gray-500 absolute right-2"
+              className="absolute right-0"
               style={{ 
                 top: `${linePos.top + 16}px`, // +16px for padding offset
-                height: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end'
+                width: '100%',
+                height: '1.5rem'
               }}
-              title={`Line ${linePos.lineNumber}: ${linePos.content.substring(0, 50)}${linePos.content.length > 50 ? '...' : ''}`}
             >
-              {linePos.lineNumber}
+              {/* Horizontal line above the line number */}
+              <div 
+                className="border-t border-gray-400"
+                style={{
+                  width: '100%',
+                  marginBottom: '2px'
+                }}
+              />
+              {/* Line number */}
+              <div
+                className="text-xs text-gray-500 text-right pr-2"
+                style={{
+                  height: 'calc(1.5rem - 3px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end'
+                }}
+                title={`Line ${linePos.lineNumber}: ${linePos.content.substring(0, 50)}${linePos.content.length > 50 ? '...' : ''}`}
+              >
+                {linePos.lineNumber}
+              </div>
             </div>
           ))}
         </div>
