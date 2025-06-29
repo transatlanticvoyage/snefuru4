@@ -6,6 +6,7 @@ interface GconPiece {
   aval_content: string | null;
   aval_title: string | null;
   aval_metadata_mode: string | null;
+  aval_fk_imgplan_batch_id: string | null;
   meta_title: string | null;
   asn_sitespren_base: string | null;
 }
@@ -50,7 +51,7 @@ export function useAvalancheContent(pieceId: string | null | undefined): UseAval
         // Fetch gcon_piece
         const { data: pieceData, error: pieceError } = await supabase
           .from('gcon_pieces')
-          .select('id, aval_content, aval_title, aval_metadata_mode, meta_title, asn_sitespren_base')
+          .select('id, aval_content, aval_title, aval_metadata_mode, aval_fk_imgplan_batch_id, meta_title, asn_sitespren_base')
           .eq('id', pieceId)
           .single();
 

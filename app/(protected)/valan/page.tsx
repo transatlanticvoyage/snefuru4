@@ -49,11 +49,20 @@ export default function ValanPage() {
     }
     if (gconPiece?.aval_title) {
       setAvalTitle(gconPiece.aval_title);
+      // Update browser title when data loads
+      document.title = `/valan - ${gconPiece.aval_title} - Snefuru`;
     }
     if (gconPiece?.aval_metadata_mode) {
       setAvalMetadataMode(gconPiece.aval_metadata_mode);
     }
   }, [gconPiece?.aval_content, gconPiece?.aval_title, gconPiece?.aval_metadata_mode]);
+
+  // Set initial title when page loads (fallback)
+  useEffect(() => {
+    if (!avalTitle) {
+      document.title = '/valan - Snefuru';
+    }
+  }, []);
 
   // Save function
   const handleSave = async () => {
@@ -203,6 +212,16 @@ export default function ValanPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter metadata mode..."
                 />
+              </div>
+
+              {/* Image Plan Batch ID */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  aval_fk_imgplan_batch_id
+                </label>
+                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm">
+                  {gconPiece.aval_fk_imgplan_batch_id || 'Not set'}
+                </div>
               </div>
 
               {/* Featured Image Selector */}
