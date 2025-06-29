@@ -7,10 +7,15 @@ const NWPI_TO_GCON_MAPPING = {
   // Direct field mappings
   direct: {
     'fk_sitespren_base': 'asn_sitespren_base',
-    'post_name': 'pageslug',
+    'post_name': 'pageslug', // Legacy field - keep for compatibility
     'post_id': 'g_post_id',
     'post_status': 'g_post_status',
     'post_type': 'g_post_type',
+  },
+
+  // Additional direct mappings for new fields
+  additional_direct: {
+    'post_name': 'post_name', // New field - stores actual WordPress slug
   },
   
   // Transform mappings with functions
@@ -240,6 +245,13 @@ function transformNwpiToGcon(nwpiRecord: any, userId: string) {
 
   // Apply direct mappings
   for (const [nwpiField, gconField] of Object.entries(NWPI_TO_GCON_MAPPING.direct)) {
+    if (nwpiRecord[nwpiField] !== null && nwpiRecord[nwpiField] !== undefined) {
+      gconData[gconField] = nwpiRecord[nwpiField];
+    }
+  }
+
+  // Apply additional direct mappings
+  for (const [nwpiField, gconField] of Object.entries(NWPI_TO_GCON_MAPPING.additional_direct)) {
     if (nwpiRecord[nwpiField] !== null && nwpiRecord[nwpiField] !== undefined) {
       gconData[gconField] = nwpiRecord[nwpiField];
     }
