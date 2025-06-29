@@ -28,7 +28,7 @@ const NWPI_TO_GCON_MAPPING = {
     }),
     'post_content': (data: any) => ({
       'corpus1': data.post_content || '',
-      'aval_content': data.post_content || ''
+      'aval_content': bozoHTMLNormalizationProcess1(data.post_content || '')
     }),
     'post_excerpt': (data: any) => ({
       'corpus2': data.post_excerpt || ''
@@ -45,6 +45,72 @@ const NWPI_TO_GCON_MAPPING = {
     'date_time_pub_carry': (data: any) => data.post_date || new Date().toISOString(),
   }
 };
+
+// BozoHTMLNormalizationProcess1
+function bozoHTMLNormalizationProcess1(html: string): string {
+  if (!html || html.trim() === '') {
+    return '';
+  }
+
+  try {
+    // Create a temporary DOM element to parse HTML
+    let cleanHtml = html;
+    
+    // Remove script and style elements completely
+    cleanHtml = cleanHtml.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+    cleanHtml = cleanHtml.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+    
+    // Convert block-level elements to text + newline
+    // Handle headings (h1-h6)
+    cleanHtml = cleanHtml.replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi, '$1\n');
+    
+    // Handle paragraphs
+    cleanHtml = cleanHtml.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n');
+    
+    // Handle divs
+    cleanHtml = cleanHtml.replace(/<div[^>]*>(.*?)<\/div>/gi, '$1\n');
+    
+    // Handle list items
+    cleanHtml = cleanHtml.replace(/<li[^>]*>(.*?)<\/li>/gi, '$1\n');
+    
+    // Handle other block elements
+    cleanHtml = cleanHtml.replace(/<(blockquote|article|section|header|footer|main|aside)[^>]*>(.*?)<\/\1>/gi, '$2\n');
+    
+    // Handle line breaks and horizontal rules
+    cleanHtml = cleanHtml.replace(/<br[^>]*>/gi, '\n');
+    cleanHtml = cleanHtml.replace(/<hr[^>]*>/gi, '\n');
+    
+    // Remove remaining HTML tags (keeping inline content)
+    cleanHtml = cleanHtml.replace(/<[^>]+>/g, '');
+    
+    // Decode HTML entities
+    cleanHtml = cleanHtml
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&nbsp;/g, ' ');
+    
+    // Clean up whitespace and normalize line breaks
+    const lines = cleanHtml.split(/\r?\n/);
+    const normalizedLines = lines
+      .map(line => line.trim()) // Trim whitespace from each line
+      .filter(line => line.length > 0); // Remove empty lines
+    
+    // Join with single newlines
+    const result = normalizedLines.join('\n');
+    
+    console.log(`🔄 BozoHTMLNormalizationProcess1: Converted ${html.length} chars HTML to ${result.length} chars plaintext with ${normalizedLines.length} lines`);
+    
+    return result;
+    
+  } catch (error) {
+    console.error('❌ BozoHTMLNormalizationProcess1 error:', error);
+    // Fallback: return the original content with basic cleanup
+    return html.replace(/<[^>]+>/g, '').trim();
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {

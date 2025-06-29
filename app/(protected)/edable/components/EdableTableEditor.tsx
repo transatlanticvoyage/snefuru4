@@ -347,9 +347,9 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
       {/* Header */}
       <div className="bg-purple-100 border-b border-purple-200 p-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-purple-800">7-Column Table Editor</h3>
+          <h3 className="text-lg font-semibold text-purple-800">8-Column Table Editor</h3>
           <div className="text-sm text-purple-600">
-            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 7 columns | 
+            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 8 columns | 
             <span className={`ml-2 font-medium ${viewMode === 'visual' ? 'text-green-600' : 'text-orange-600'}`}>
               {viewMode === 'visual' ? '📝 Visual Mode' : '💻 HTML Mode'}
             </span>
@@ -364,6 +364,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
           <thead>
             {/* Header Row 1 - Blank placeholders */}
             <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
@@ -382,12 +383,16 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
             </tr>
             
             {/* Header Row 3 - Content label */}
             <tr className="bg-purple-50">
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
+                lineyoshi
+              </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 Content
@@ -540,6 +545,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
             </tr>
           </thead>
           
@@ -557,12 +563,17 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   -
                 </td>
                 
-                {/* Column 3 - Thing3 */}
+                {/* Column 3 - lineyoshi */}
+                <td className="border border-gray-300 p-2 text-center text-gray-700 text-sm font-medium">
+                  {index + 1}
+                </td>
+                
+                {/* Column 4 - Thing4 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 4 - Content (TipTap Editor or HTML View) */}
+                {/* Column 5 - Content (TipTap Editor or HTML View) */}
                 <td className="border border-gray-300 p-1" style={{ width: '600px' }}>
                   {viewMode === 'html' ? (
                     <div className="p-2 bg-gray-100 rounded border min-h-[2rem] font-mono text-xs">
@@ -582,17 +593,17 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   )}
                 </td>
                 
-                {/* Column 5 - Thing5 */}
-                <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
-                  -
-                </td>
-                
                 {/* Column 6 - Thing6 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
                 {/* Column 7 - Thing7 */}
+                <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
+                  -
+                </td>
+                
+                {/* Column 8 - Thing8 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
@@ -666,28 +677,28 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
           min-width: 1000px; /* Minimum table width to accommodate all columns */
         }
         
-        /* Content column specific styling */
-        td:nth-child(4) {
+        /* Content column specific styling (now column 5) */
+        td:nth-child(5) {
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
         }
         
         /* Other columns styling */
-        td:not(:nth-child(4)) {
+        td:not(:nth-child(5)) {
           width: 80px;
           max-width: 120px;
           min-width: 60px;
         }
         
-        /* Header column styling */
-        th:nth-child(4) {
+        /* Header column styling (Content column is now 5) */
+        th:nth-child(5) {
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
         }
         
-        th:not(:nth-child(4)) {
+        th:not(:nth-child(5)) {
           width: 80px;
           max-width: 120px;
           min-width: 60px;
