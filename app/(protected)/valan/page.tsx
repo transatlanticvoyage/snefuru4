@@ -186,6 +186,16 @@ export default function ValanPage() {
           <div className="w-1/2">
             {/* Controls Area - Above Editor */}
             <div className="p-4 bg-gray-50 border-b border-gray-300">
+              {/* Site Spren Base */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  asn_sitespren_base
+                </label>
+                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm">
+                  {gconPiece.asn_sitespren_base || 'Not set'}
+                </div>
+              </div>
+
               {/* Save Button */}
               <div className="mb-4">
                 <button
