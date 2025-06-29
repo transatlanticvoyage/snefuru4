@@ -6,7 +6,6 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Underline from '@tiptap/extension-underline';
-import DorliEditor from './DorliEditor';
 import { useDorliBlocks } from '../hooks/useDorliBlocks';
 
 interface EditorBlock {
@@ -251,13 +250,47 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
     return match ? match[0] : null;
   };
 
+  // Replace Dorli placeholders with raw HTML content
+  const resolveDorliContent = (content: string): string => {
+    // Check if the content is a Dorli placeholder
+    const placeholder = extractDorliPlaceholder(content);
+    if (placeholder) {
+      const dorliBlock = getDorliByPlaceholder(placeholder);
+      if (dorliBlock) {
+        console.log(`🔄 Resolving Dorli placeholder ${placeholder} with ${dorliBlock.raw.length} chars of HTML`);
+        return dorliBlock.raw;
+      } else {
+        console.warn(`⚠️ Dorli block not found for placeholder: ${placeholder}`);
+        return content; // Return original content if not found
+      }
+    }
+    return content; // Return original content if not a placeholder
+  };
+
   const handleBlockUpdate = useCallback((blockId: string, content: string) => {
     setBlocks(prevBlocks => {
-      const updatedBlocks = prevBlocks.map(block => 
-        block.id === blockId 
-          ? { ...block, htmlContent: content }
-          : block
-      );
+      const updatedBlocks = prevBlocks.map(block => {
+        if (block.id === blockId) {
+          // Check if the original block content was a Dorli placeholder
+          const originalContent = block.htmlContent;
+          const placeholder = extractDorliPlaceholder(originalContent);
+          
+          if (placeholder) {
+            // This is a Dorli block - update the dorli table directly
+            const dorliBlock = getDorliByPlaceholder(placeholder);
+            if (dorliBlock) {
+              console.log(`🔄 Updating Dorli block ${placeholder} with new content`);
+              updateDorliBlock(dorliBlock.dorli_id, content);
+            }
+            // Keep the original placeholder in the block content for storage
+            return { ...block, htmlContent: originalContent };
+          } else {
+            // Regular block - update normally
+            return { ...block, htmlContent: content };
+          }
+        }
+        return block;
+      });
       
       // Combine all blocks into final HTML with linebreaks preserved
       const combinedHtml = updatedBlocks
@@ -274,7 +307,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
       
       return updatedBlocks;
     });
-  }, [onContentChange]);
+  }, [onContentChange, getDorliByPlaceholder, updateDorliBlock, extractDorliPlaceholder]);
 
   const handleEnterPressed = useCallback((blockId: string) => {
     const blockIndex = blocks.findIndex(b => b.id === blockId);
@@ -741,50 +774,32 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                 <td className="border border-gray-300 p-1" style={{ width: '600px' }}>
                   {(() => {
                     const blockContent = getBlockHtml(block.id);
-                    const isDorli = isDorliPlaceholder(blockContent);
-                    const dorliPlaceholder = isDorli ? extractDorliPlaceholder(blockContent) : null;
-                    const dorliBlock = dorliPlaceholder ? getDorliByPlaceholder(dorliPlaceholder) : null;
+                    
+                    // Resolve Dorli placeholders to their raw HTML content
+                    const resolvedContent = resolveDorliContent(blockContent);
+                    
+                    // Create a resolved block for the editor
+                    const resolvedBlock = {
+                      ...block,
+                      htmlContent: resolvedContent
+                    };
 
-                    if (isDorli && dorliBlock) {
-                      // Render DorliEditor for dorli blocks
-                      return (
-                        <DorliEditor
-                          dorliBlock={dorliBlock}
-                          onUpdate={updateDorliBlock}
-                          focused={focusedBlock === block.id}
-                          onFocus={() => handleBlockFocus(block.id)}
-                        />
-                      );
-                    } else if (isDorli && !dorliBlock) {
-                      // Dorli placeholder but no dorli block found
-                      return (
-                        <div className="p-2 bg-red-50 border border-red-200 rounded">
-                          <div className="text-red-600 text-sm">
-                            ⚠️ Dorli block not found: {dorliPlaceholder}
-                          </div>
-                          <div className="text-red-500 text-xs mt-1">
-                            This may indicate a missing or deleted dorli block.
-                          </div>
-                        </div>
-                      );
-                    } else {
-                      // Regular content - render normal editor or HTML view
-                      return viewMode === 'html' ? (
-                        <div className="p-2 bg-gray-100 rounded border min-h-[2rem] font-mono text-xs">
-                          <pre className="whitespace-pre-wrap">{blockContent}</pre>
-                        </div>
-                      ) : (
-                        <BlockEditor
-                          block={block}
-                          onUpdate={handleBlockUpdate}
-                          onEnterPressed={handleEnterPressed}
-                          onBackspacePressed={handleBackspacePressed}
-                          onFocus={handleBlockFocus}
-                          focused={focusedBlock === block.id}
-                          onEditorReady={handleEditorReady}
-                        />
-                      );
-                    }
+                    // Regular content - render normal editor or HTML view
+                    return viewMode === 'html' ? (
+                      <div className="p-2 bg-gray-100 rounded border min-h-[2rem] font-mono text-xs">
+                        <pre className="whitespace-pre-wrap">{resolvedContent}</pre>
+                      </div>
+                    ) : (
+                      <BlockEditor
+                        block={resolvedBlock}
+                        onUpdate={handleBlockUpdate}
+                        onEnterPressed={handleEnterPressed}
+                        onBackspacePressed={handleBackspacePressed}
+                        onFocus={handleBlockFocus}
+                        focused={focusedBlock === block.id}
+                        onEditorReady={handleEditorReady}
+                      />
+                    );
                   })()}
                 </td>
                 
