@@ -9,11 +9,12 @@ import { useState, useEffect, useCallback } from 'react';
 
 interface TipTapEditorProps {
   initialContent?: string;
+  content?: string;
   onChange?: (content: string) => void;
   onLinesChange?: (lines: string[]) => void;
 }
 
-export default function TipTapEditor({ initialContent = '', onChange, onLinesChange }: TipTapEditorProps) {
+export default function TipTapEditor({ initialContent = '', content, onChange, onLinesChange }: TipTapEditorProps) {
   const [isCodeView, setIsCodeView] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
   const [lines, setLines] = useState<string[]>([]);
@@ -74,6 +75,13 @@ export default function TipTapEditor({ initialContent = '', onChange, onLinesCha
       updateLines(html);
     }
   }, [editor, updateLines]);
+
+  // Update editor content when content prop changes
+  useEffect(() => {
+    if (editor && content && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [editor, content]);
 
   const handleCodeViewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setHtmlContent(e.target.value);

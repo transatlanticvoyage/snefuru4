@@ -41,10 +41,10 @@ export default function ValanPage() {
 
   // Set initial content when data loads
   useEffect(() => {
-    if (gconPiece?.aval_content && !editorContent) {
+    if (gconPiece?.aval_content) {
       setEditorContent(gconPiece.aval_content);
     }
-  }, [gconPiece?.aval_content, editorContent]);
+  }, [gconPiece?.aval_content]);
 
   if (!user) {
     return (
@@ -124,7 +124,8 @@ export default function ValanPage() {
           {/* TipTap Editor */}
           <div className="flex-1">
             <TipTapEditor 
-              initialContent={gconPiece.aval_content || '<p>Start editing your Avalanche content...</p>'}
+              initialContent={'<p>Loading content...</p>'}
+              content={gconPiece.aval_content || '<p>Start editing your Avalanche content...</p>'}
               onChange={handleEditorChange}
               onLinesChange={handleLinesChange}
             />
