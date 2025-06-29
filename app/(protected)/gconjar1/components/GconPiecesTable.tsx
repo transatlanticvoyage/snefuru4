@@ -41,7 +41,7 @@ interface GconPiecesTableProps {
   onSelectionChange?: (selectedRows: Set<string>) => void;
 }
 
-type SortField = "meta_title" | "asn_sitespren_base" | "g_post_type" | "g_post_status" | "pub_status" | "date_time_pub_carry" | "pageslug" | "created_at" | "updated_at" | "is_starred1" | "is_starred2";
+type SortField = "meta_title" | "post_name" | "asn_sitespren_base" | "g_post_type" | "g_post_status" | "pub_status" | "date_time_pub_carry" | "pageslug" | "created_at" | "updated_at" | "is_starred1" | "is_starred2";
 type SortOrder = "asc" | "desc";
 type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
@@ -53,6 +53,7 @@ const allColumns = [
   'is_starred2',
   'g_post_id',
   'meta_title',
+  'post_name',
   'g_post_type',
   'g_post_status',
   'pageurl',
@@ -76,6 +77,7 @@ const allColumns = [
 // Mapping from gcon_pieces fields to their nwpi_content source fields
 const sourceFieldMapping: Record<string, string> = {
   'meta_title': 'post_title',
+  'post_name': 'post_name',
   'h1title': 'post_title', 
   'pgb_h1title': 'post_title',
   'corpus1': 'post_content',
