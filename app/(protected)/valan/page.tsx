@@ -166,61 +166,6 @@ export default function ValanPage() {
           </div>
         </div>
 
-        {/* Save Button */}
-        <div className="mb-4 max-w-7xl">
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 transition-colors font-medium"
-          >
-            {isSaving ? 'Saving...' : 'Save Avalanche Content'}
-          </button>
-          {saveMessage && (
-            <span className="ml-3 text-sm">{saveMessage}</span>
-          )}
-        </div>
-
-        {/* Metadata Mode */}
-        <div className="mb-4 max-w-7xl">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            aval_metadata_mode
-          </label>
-          <input
-            type="text"
-            value={avalMetadataMode}
-            onChange={(e) => setAvalMetadataMode(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter metadata mode..."
-          />
-        </div>
-
-        {/* Featured Image Selector */}
-        <div className="mb-4 max-w-7xl">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            aval_fk_featured_image_plan_id
-          </label>
-          <button
-            type="button"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          >
-            Select
-          </button>
-        </div>
-
-        {/* Title Editor */}
-        <div className="mb-4 max-w-7xl">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            aval_title
-          </label>
-          <input
-            type="text"
-            value={avalTitle}
-            onChange={(e) => setAvalTitle(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-            placeholder="Enter avalanche title..."
-          />
-        </div>
-
         {/* Main Editor Layout */}
         <div className="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-7xl">
           {/* Avalanche Sidebar - 50% width */}
@@ -233,11 +178,72 @@ export default function ValanPage() {
 
           {/* TipTap Editor - 50% width */}
           <div className="w-1/2">
+            {/* Controls Area - Above Editor */}
+            <div className="p-4 bg-gray-50 border-b border-gray-300">
+              {/* Save Button */}
+              <div className="mb-4">
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 transition-colors font-medium"
+                >
+                  {isSaving ? 'Saving...' : 'Save Avalanche Content'}
+                </button>
+                {saveMessage && (
+                  <span className="ml-3 text-sm">{saveMessage}</span>
+                )}
+              </div>
+
+              {/* Metadata Mode */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  aval_metadata_mode
+                </label>
+                <input
+                  type="text"
+                  value={avalMetadataMode}
+                  onChange={(e) => setAvalMetadataMode(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter metadata mode..."
+                />
+              </div>
+
+              {/* Featured Image Selector */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  aval_fk_featured_image_plan_id
+                </label>
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                >
+                  Select
+                </button>
+              </div>
+
+              {/* Title Editor */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  aval_title
+                </label>
+                <input
+                  type="text"
+                  value={avalTitle}
+                  onChange={(e) => setAvalTitle(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                  placeholder="Enter avalanche title..."
+                />
+              </div>
+            </div>
+
+            {/* aval_content Label */}
             <div className="p-2 bg-gray-100 border-b border-gray-300">
               <label className="text-sm font-bold text-gray-700">
                 aval_content
               </label>
             </div>
+
+            {/* TipTap Editor */}
             <TipTapEditor 
               initialContent={'<p>Loading content...</p>'}
               content={gconPiece.aval_content || '<p>Start editing your Avalanche content...</p>'}
