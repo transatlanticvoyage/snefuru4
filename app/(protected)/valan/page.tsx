@@ -5,7 +5,6 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import Head from 'next/head';
 import { useAvalancheContent } from './hooks/useAvalancheContent';
 
 // Dynamically import components to avoid SSR issues
@@ -82,6 +81,8 @@ export default function ValanPage() {
 
       if (result.success) {
         setSaveMessage('✅ Saved successfully');
+        // Update browser tab title
+        document.title = avalTitle ? `/valan - ${avalTitle} - Snefuru` : '/valan - Snefuru';
         // Clear message after 3 seconds
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
@@ -141,11 +142,7 @@ export default function ValanPage() {
   }
 
   return (
-    <>
-      <Head>
-        <title>{avalTitle ? `/valan - ${avalTitle} - Snefuru` : '/valan - Snefuru'}</title>
-      </Head>
-      <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
         <div className="p-4">
         <div className="mb-4">
           <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
@@ -277,6 +274,5 @@ export default function ValanPage() {
         </div>
       </div>
     </div>
-    </>
   );
 }
