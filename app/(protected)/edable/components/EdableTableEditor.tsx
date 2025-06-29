@@ -20,6 +20,8 @@ interface EdableTableEditorProps {
   initialContent?: string;
   onContentChange?: (content: string) => void;
   gconPieceId?: string;
+  initialTitle?: string;
+  onTitleChange?: (title: string) => void;
 }
 
 // Individual block editor component
@@ -132,7 +134,7 @@ function BlockEditor({
 
 type ViewMode = 'visual' | 'html';
 
-export default function EdableTableEditor({ initialContent = '<p>Start typing...</p>', onContentChange, gconPieceId }: EdableTableEditorProps) {
+export default function EdableTableEditor({ initialContent = '<p>Start typing...</p>', onContentChange, gconPieceId, initialTitle = '', onTitleChange }: EdableTableEditorProps) {
   const [blocks, setBlocks] = useState<EditorBlock[]>([]);
   const [focusedBlock, setFocusedBlock] = useState<string | null>(null);
   const [activeEditor, setActiveEditor] = useState<any>(null);
@@ -623,13 +625,76 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
             </tr>
+            
+            {/* Header Row 5 - aval_title row */}
+            <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600">5</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      <span className="font-bold">prisomi column</span>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2">
+                <div className="space-y-2">
+                  <div className="font-bold text-sm text-purple-700">aval_title</div>
+                  <input
+                    type="text"
+                    value={initialTitle}
+                    onChange={(e) => onTitleChange?.(e.target.value)}
+                    className="w-full px-3 py-2 text-lg font-bold border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Enter title..."
+                  />
+                </div>
+              </th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+            </tr>
+            
+            {/* Header Row 6 - aval_content label row */}
+            <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600">6</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      <span className="font-bold">prisomi column</span>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2">
+                <div className="font-bold text-sm text-purple-700">aval_content</div>
+              </th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+            </tr>
           </thead>
           
           {/* Table Body - Each block is a row */}
           <tbody>
             {blocks.map((block, index) => {
-              const rowNumber = index + 5; // Start at 5 since we have 4 header rows
-              const showTooltip = rowNumber <= 5; // Only show tooltip for row 5
+              const rowNumber = index + 7; // Start at 7 since we have 6 header rows
+              const showTooltip = rowNumber <= 5; // Only show tooltip for rows 1-5
               
               return (
                 <tr key={block.id} className="hover:bg-purple-25">

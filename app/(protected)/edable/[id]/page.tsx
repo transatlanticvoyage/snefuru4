@@ -124,26 +124,14 @@ export default function EdablePage() {
           </div>
         </div>
 
-        {/* Title Editor */}
-        <div className="mb-4 bg-white rounded-lg shadow p-4">
-          <label className="block text-sm font-bold text-purple-700 mb-2">
-            Title (aval_title)
-          </label>
-          <input
-            type="text"
-            value={avalTitle}
-            onChange={(e) => handleTitleChange(e.target.value)}
-            className="w-full px-4 py-3 text-xl font-bold border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            placeholder="Enter title..."
-          />
-        </div>
-
         {/* Main Table Editor */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <EdableTableEditor 
             initialContent={gconPiece.aval_content || '<p>Start editing your content...</p>'}
             onContentChange={handleContentChange}
             gconPieceId={id}
+            initialTitle={avalTitle}
+            onTitleChange={handleTitleChange}
           />
         </div>
 
