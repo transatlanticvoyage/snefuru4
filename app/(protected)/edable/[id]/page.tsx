@@ -112,7 +112,7 @@ export default function EdablePage() {
         </div>
         
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-purple-800">Edable - Table Editor</h1>
+          <h1 className="text-2xl font-bold text-purple-800">Edable - Advanced Table Editor</h1>
           <div className="text-sm text-gray-600 mt-1">
             <span>Editing: {gconPiece.meta_title || 'Untitled'}</span>
             {gconPiece.asn_sitespren_base && (

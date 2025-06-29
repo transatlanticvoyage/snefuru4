@@ -26,7 +26,8 @@ function BlockEditor({
   onEnterPressed, 
   onBackspacePressed,
   onFocus,
-  focused 
+  focused,
+  onEditorReady
 }: {
   block: EditorBlock;
   onUpdate: (id: string, content: string) => void;
@@ -34,6 +35,7 @@ function BlockEditor({
   onBackspacePressed: (id: string) => void;
   onFocus: (id: string) => void;
   focused: boolean;
+  onEditorReady?: (editor: any) => void;
 }) {
   const editor = useEditor({
     extensions: [
@@ -106,8 +108,9 @@ function BlockEditor({
   useEffect(() => {
     if (focused && editor) {
       editor.commands.focus();
+      onEditorReady?.(editor);
     }
-  }, [focused, editor]);
+  }, [focused, editor, onEditorReady]);
 
   if (!editor) {
     return (
@@ -127,6 +130,8 @@ function BlockEditor({
 export default function EdableTableEditor({ initialContent = '<p>Start typing...</p>', onContentChange }: EdableTableEditorProps) {
   const [blocks, setBlocks] = useState<EditorBlock[]>([]);
   const [focusedBlock, setFocusedBlock] = useState<string | null>(null);
+  const [activeEditor, setActiveEditor] = useState<any>(null);
+  const [showHtmlView, setShowHtmlView] = useState<boolean>(false);
 
   // Parse initial content into blocks
   useEffect(() => {
@@ -267,7 +272,40 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
 
   const handleBlockFocus = useCallback((blockId: string) => {
     setFocusedBlock(blockId);
+    setShowHtmlView(false); // Reset HTML view when switching blocks
   }, []);
+
+  const handleEditorReady = useCallback((editor: any) => {
+    setActiveEditor(editor);
+  }, []);
+
+  // Toolbar action handlers
+  const insertLink = () => {
+    if (!activeEditor) return;
+    const url = window.prompt('Enter URL:');
+    if (url) {
+      activeEditor.chain().focus().setLink({ href: url }).run();
+    }
+  };
+
+  const insertImage = () => {
+    if (!activeEditor) return;
+    const url = window.prompt('Enter image URL:');
+    if (url) {
+      activeEditor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const toggleHtmlView = () => {
+    setShowHtmlView(!showHtmlView);
+  };
+
+  // Get current block's HTML content for HTML view
+  const getCurrentBlockHtml = () => {
+    if (!focusedBlock || !activeEditor) return '';
+    const currentBlock = blocks.find(b => b.id === focusedBlock);
+    return currentBlock?.htmlContent || '';
+  };
 
   return (
     <div className="w-full">
@@ -281,33 +319,178 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
         </div>
       </div>
 
-      {/* 7-Column Table Structure */}
+      {/* 7-Column Table Structure with 4-Row Header */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse table-fixed">
-          {/* Table Header */}
+          {/* Table Header - 4 Rows */}
           <thead>
+            {/* Header Row 1 - Blank placeholders */}
             <tr className="bg-purple-50">
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-purple-700 w-20">
-                Thing1
-              </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-purple-700 w-20">
-                Thing2
-              </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-purple-700 w-20">
-                Thing3
-              </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-medium text-purple-700" style={{ width: '600px' }}>
+              <th className="border border-gray-300 p-2 w-20"></th>
+              <th className="border border-gray-300 p-2 w-20"></th>
+              <th className="border border-gray-300 p-2 w-20"></th>
+              <th className="border border-gray-300 p-2" style={{ width: '600px' }}></th>
+              <th className="border border-gray-300 p-2 w-20"></th>
+              <th className="border border-gray-300 p-2 w-20"></th>
+              <th className="border border-gray-300 p-2 w-20"></th>
+            </tr>
+            
+            {/* Header Row 2 - Blank placeholders */}
+            <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+            </tr>
+            
+            {/* Header Row 3 - Content label */}
+            <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 Content
               </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-purple-700 w-20">
-                Thing5
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+            </tr>
+            
+            {/* Header Row 4 - TipTap Toolbar */}
+            <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-1">
+                {/* TipTap Toolbar */}
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {/* Text formatting */}
+                  <button
+                    onClick={() => activeEditor?.chain().focus().toggleBold().run()}
+                    className={`px-2 py-1 rounded text-sm font-bold border ${
+                      activeEditor?.isActive('bold') 
+                        ? 'bg-purple-700 text-white border-purple-700' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    disabled={!activeEditor}
+                  >
+                    B
+                  </button>
+                  <button
+                    onClick={() => activeEditor?.chain().focus().toggleItalic().run()}
+                    className={`px-2 py-1 rounded text-sm italic border ${
+                      activeEditor?.isActive('italic') 
+                        ? 'bg-purple-700 text-white border-purple-700' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    disabled={!activeEditor}
+                  >
+                    I
+                  </button>
+                  <button
+                    onClick={() => activeEditor?.chain().focus().toggleUnderline().run()}
+                    className={`px-2 py-1 rounded text-sm underline border ${
+                      activeEditor?.isActive('underline') 
+                        ? 'bg-purple-700 text-white border-purple-700' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    disabled={!activeEditor}
+                  >
+                    U
+                  </button>
+
+                  <div className="w-px h-6 bg-gray-300 mx-1" />
+
+                  {/* Headings */}
+                  <button
+                    onClick={() => activeEditor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                    className={`px-2 py-1 rounded text-sm font-medium border ${
+                      activeEditor?.isActive('heading', { level: 2 }) 
+                        ? 'bg-purple-700 text-white border-purple-700' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    disabled={!activeEditor}
+                  >
+                    H2
+                  </button>
+                  <button
+                    onClick={() => activeEditor?.chain().focus().toggleHeading({ level: 3 }).run()}
+                    className={`px-2 py-1 rounded text-sm font-medium border ${
+                      activeEditor?.isActive('heading', { level: 3 }) 
+                        ? 'bg-purple-700 text-white border-purple-700' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    disabled={!activeEditor}
+                  >
+                    H3
+                  </button>
+
+                  <div className="w-px h-6 bg-gray-300 mx-1" />
+
+                  {/* Links and Images */}
+                  <button
+                    onClick={insertLink}
+                    className="px-2 py-1 rounded text-sm bg-white border border-gray-300 hover:bg-gray-100"
+                    disabled={!activeEditor}
+                  >
+                    🔗 Link
+                  </button>
+                  <button
+                    onClick={insertImage}
+                    className="px-2 py-1 rounded text-sm bg-white border border-gray-300 hover:bg-gray-100"
+                    disabled={!activeEditor}
+                  >
+                    🖼️ Image
+                  </button>
+
+                  <div className="w-px h-6 bg-gray-300 mx-1" />
+
+                  {/* Lists */}
+                  <button
+                    onClick={() => activeEditor?.chain().focus().toggleBulletList().run()}
+                    className={`px-2 py-1 rounded text-sm border ${
+                      activeEditor?.isActive('bulletList') 
+                        ? 'bg-purple-700 text-white border-purple-700' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    disabled={!activeEditor}
+                  >
+                    • List
+                  </button>
+                  <button
+                    onClick={() => activeEditor?.chain().focus().toggleOrderedList().run()}
+                    className={`px-2 py-1 rounded text-sm border ${
+                      activeEditor?.isActive('orderedList') 
+                        ? 'bg-purple-700 text-white border-purple-700' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    disabled={!activeEditor}
+                  >
+                    1. List
+                  </button>
+
+                  <div className="w-px h-6 bg-gray-300 mx-1" />
+
+                  {/* HTML View Toggle */}
+                  <button
+                    onClick={toggleHtmlView}
+                    className={`px-2 py-1 rounded text-xs border ${
+                      showHtmlView 
+                        ? 'bg-purple-700 text-white border-purple-700' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                    disabled={!activeEditor}
+                  >
+                    HTML View
+                  </button>
+                </div>
               </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-purple-700 w-20">
-                Thing6
-              </th>
-              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-purple-700 w-20">
-                Thing7
-              </th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
             </tr>
           </thead>
           
@@ -330,16 +513,24 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   -
                 </td>
                 
-                {/* Column 4 - Content (TipTap Editor) */}
+                {/* Column 4 - Content (TipTap Editor or HTML View) */}
                 <td className="border border-gray-300 p-1" style={{ width: '600px' }}>
-                  <BlockEditor
-                    block={block}
-                    onUpdate={handleBlockUpdate}
-                    onEnterPressed={handleEnterPressed}
-                    onBackspacePressed={handleBackspacePressed}
-                    onFocus={handleBlockFocus}
-                    focused={focusedBlock === block.id}
-                  />
+                  {showHtmlView && focusedBlock === block.id ? (
+                    <div className="p-2 bg-gray-100 rounded border min-h-[2rem] font-mono text-xs">
+                      <div className="text-gray-600 mb-1 text-xs">Raw HTML:</div>
+                      <pre className="whitespace-pre-wrap">{getCurrentBlockHtml()}</pre>
+                    </div>
+                  ) : (
+                    <BlockEditor
+                      block={block}
+                      onUpdate={handleBlockUpdate}
+                      onEnterPressed={handleEnterPressed}
+                      onBackspacePressed={handleBackspacePressed}
+                      onFocus={handleBlockFocus}
+                      focused={focusedBlock === block.id}
+                      onEditorReady={handleEditorReady}
+                    />
+                  )}
                 </td>
                 
                 {/* Column 5 - Thing5 */}
