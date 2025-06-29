@@ -54,9 +54,15 @@ export function useDorliBlocks(gconPieceId: string | null) {
 
   const updateDorliBlock = async (dorliId: string, newRaw: string) => {
     try {
+      // Calculate line count for the new content
+      const lineCount = newRaw.split(/\r?\n/).length;
+      
       const { error: updateError } = await supabase
         .from('aval_dorlis')
-        .update({ raw: newRaw })
+        .update({ 
+          raw: newRaw,
+          line_count: lineCount
+        })
         .eq('dorli_id', dorliId);
 
       if (updateError) {
@@ -67,7 +73,7 @@ export function useDorliBlocks(gconPieceId: string | null) {
       setDorliBlocks(prev => 
         prev.map(block => 
           block.dorli_id === dorliId 
-            ? { ...block, raw: newRaw }
+            ? { ...block, raw: newRaw, line_count: lineCount }
             : block
         )
       );

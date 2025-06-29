@@ -31,7 +31,8 @@ function BlockEditor({
   onBackspacePressed,
   onFocus,
   focused,
-  onEditorReady
+  onEditorReady,
+  isDorliBlock = false
 }: {
   block: EditorBlock;
   onUpdate: (id: string, content: string) => void;
@@ -40,6 +41,7 @@ function BlockEditor({
   onFocus: (id: string) => void;
   focused: boolean;
   onEditorReady?: (editor: any) => void;
+  isDorliBlock?: boolean;
 }) {
   const editor = useEditor({
     extensions: [
@@ -125,7 +127,16 @@ function BlockEditor({
   }
 
   return (
-    <div className={`border border-gray-200 rounded ${focused ? 'ring-2 ring-purple-500 border-purple-300' : ''}`}>
+    <div className={`border rounded ${focused ? 'ring-2 ring-purple-500 border-purple-300' : ''} ${
+      isDorliBlock 
+        ? 'border-orange-400 bg-orange-50' 
+        : 'border-gray-200'
+    }`}>
+      {isDorliBlock && (
+        <div className="bg-orange-100 border-b border-orange-200 px-2 py-1">
+          <span className="text-xs font-semibold text-orange-800">🧩 DORLI BLOCK</span>
+        </div>
+      )}
       <EditorContent editor={editor} />
     </div>
   );
@@ -268,23 +279,34 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
     return content; // Return original content if not a placeholder
   };
 
-  const handleBlockUpdate = useCallback((blockId: string, content: string) => {
+  const handleBlockUpdate = useCallback(async (blockId: string, content: string) => {
     setBlocks(prevBlocks => {
       const updatedBlocks = prevBlocks.map(block => {
         if (block.id === blockId) {
+          // Find the original block content from the initial parsing
+          const originalBlock = blocks.find(b => b.id === blockId);
+          if (!originalBlock) return block;
+          
           // Check if the original block content was a Dorli placeholder
-          const originalContent = block.htmlContent;
-          const placeholder = extractDorliPlaceholder(originalContent);
+          const placeholder = extractDorliPlaceholder(originalBlock.htmlContent);
           
           if (placeholder) {
             // This is a Dorli block - update the dorli table directly
             const dorliBlock = getDorliByPlaceholder(placeholder);
             if (dorliBlock) {
-              console.log(`🔄 Updating Dorli block ${placeholder} with new content`);
-              updateDorliBlock(dorliBlock.dorli_id, content);
+              console.log(`🔄 Updating Dorli block ${placeholder} with new content (${content.length} chars)`);
+              
+              // Update the dorli block in the database
+              updateDorliBlock(dorliBlock.dorli_id, content).then((success) => {
+                if (success) {
+                  console.log(`✅ Successfully updated Dorli block ${placeholder}`);
+                } else {
+                  console.error(`❌ Failed to update Dorli block ${placeholder}`);
+                }
+              });
             }
-            // Keep the original placeholder in the block content for storage
-            return { ...block, htmlContent: originalContent };
+            // Keep the original placeholder in the block content for aval_content storage
+            return { ...block, htmlContent: originalBlock.htmlContent };
           } else {
             // Regular block - update normally
             return { ...block, htmlContent: content };
@@ -308,7 +330,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
       
       return updatedBlocks;
     });
-  }, [onContentChange, getDorliByPlaceholder, updateDorliBlock, extractDorliPlaceholder]);
+  }, [blocks, onContentChange, getDorliByPlaceholder, updateDorliBlock, extractDorliPlaceholder]);
 
   const handleEnterPressed = useCallback((blockId: string) => {
     const blockIndex = blocks.findIndex(b => b.id === blockId);
@@ -826,7 +848,11 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   {(() => {
                     const blockContent = getBlockHtml(block.id);
                     
-                    // Resolve Dorli placeholders to their raw HTML content
+                    // Check if this is a Dorli placeholder
+                    const placeholder = extractDorliPlaceholder(blockContent);
+                    const isDorli = !!placeholder;
+                    
+                    // Resolve Dorli placeholders to their raw HTML content for editing
                     const resolvedContent = resolveDorliContent(blockContent);
                     
                     // Create a resolved block for the editor
@@ -835,9 +861,16 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                       htmlContent: resolvedContent
                     };
 
-                    // Regular content - render normal editor or HTML view
+                    // Render editor or HTML view based on mode
                     return viewMode === 'html' ? (
-                      <div className="p-2 bg-gray-100 rounded border min-h-[2rem] font-mono text-xs">
+                      <div className={`p-2 rounded border min-h-[2rem] font-mono text-xs ${
+                        isDorli ? 'bg-orange-100 border-orange-200' : 'bg-gray-100'
+                      }`}>
+                        {isDorli && (
+                          <div className="mb-2 text-xs font-semibold text-orange-800">
+                            🧩 DORLI: {placeholder}
+                          </div>
+                        )}
                         <pre className="whitespace-pre-wrap">{resolvedContent}</pre>
                       </div>
                     ) : (
@@ -849,6 +882,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                         onFocus={handleBlockFocus}
                         focused={focusedBlock === block.id}
                         onEditorReady={handleEditorReady}
+                        isDorliBlock={isDorli}
                       />
                     );
                   })()}
