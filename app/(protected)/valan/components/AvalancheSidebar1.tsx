@@ -74,8 +74,17 @@ export default function AvalancheSidebar1({ units, lines }: AvalancheSidebar1Pro
       
       <div className="flex-1 overflow-y-auto">
         <table className="w-full">
+          <thead className="sticky top-0 bg-gray-100">
+            <tr>
+              <th className="text-left p-2 text-xs font-bold text-gray-700 border-r border-gray-300 w-1/5">fire1</th>
+              <th className="text-left p-2 text-xs font-bold text-gray-700 border-r border-gray-300 w-1/5">fire2</th>
+              <th className="text-left p-2 text-xs font-bold text-gray-700 border-r border-gray-300 w-1/5">fire3</th>
+              <th className="text-left p-2 text-xs font-bold text-gray-700 border-r border-gray-300 w-1/5">fire4</th>
+              <th className="text-left p-2 text-xs font-bold text-gray-700 w-1/5">fire5</th>
+            </tr>
+          </thead>
           <tbody>
-            {lines.map((_, index) => {
+            {Array.from({ length: 20 }, (_, index) => {
               const lineKey = `line-${index + 1}`;
               const lineUnits = unitsByLine[lineKey] || [];
               
@@ -85,42 +94,20 @@ export default function AvalancheSidebar1({ units, lines }: AvalancheSidebar1Pro
                   data-line-id={lineKey}
                   className="border-b border-gray-200"
                 >
-                  <td className="align-top p-0">
-                    {lineUnits.length > 0 ? (
-                      <div className="p-2">
-                        {lineUnits.map((unit) => (
-                          <div
-                            key={unit.id}
-                            className="mb-1 p-2 bg-white rounded-md shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer last:mb-0"
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getUnitTypeColor(unit.unit_type)}`}>
-                                  {unit.unit_type}
-                                </span>
-                                <p className="mt-1 text-xs text-gray-600 line-clamp-2">
-                                  {getPreviewText(unit.payload)}
-                                </p>
-                              </div>
-                              <div className="flex-shrink-0">
-                                <button
-                                  className="p-1 hover:bg-gray-100 rounded"
-                                  title="More options"
-                                >
-                                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-xs text-gray-400 italic py-2 px-2">
-                        No units for line {index + 1}
-                      </div>
-                    )}
+                  <td className="align-top p-2 border-r border-gray-300 w-1/5">
+                    {/* fire1 content */}
+                  </td>
+                  <td className="align-top p-2 border-r border-gray-300 w-1/5">
+                    {/* fire2 content */}
+                  </td>
+                  <td className="align-top p-2 border-r border-gray-300 w-1/5">
+                    {/* fire3 content */}
+                  </td>
+                  <td className="align-top p-2 border-r border-gray-300 w-1/5">
+                    {/* fire4 content */}
+                  </td>
+                  <td className="align-top p-2 w-1/5">
+                    {/* fire5 content */}
                   </td>
                 </tr>
               );
