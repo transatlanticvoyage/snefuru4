@@ -23,6 +23,7 @@ export default function ValanPage() {
   const searchParams = useSearchParams();
   const [editorContent, setEditorContent] = useState('');
   const [editorLines, setEditorLines] = useState<string[]>([]);
+  const [avalTitle, setAvalTitle] = useState('');
 
   // Get ID from URL parameters
   const id = searchParams?.get('id');
@@ -44,7 +45,10 @@ export default function ValanPage() {
     if (gconPiece?.aval_content) {
       setEditorContent(gconPiece.aval_content);
     }
-  }, [gconPiece?.aval_content]);
+    if (gconPiece?.aval_title) {
+      setAvalTitle(gconPiece.aval_title);
+    }
+  }, [gconPiece?.aval_content, gconPiece?.aval_title]);
 
   if (!user) {
     return (
@@ -111,6 +115,20 @@ export default function ValanPage() {
           <div className="text-xs text-gray-500 mt-1">
             ID: {id} • {avalUnits.length} units loaded
           </div>
+        </div>
+
+        {/* Title Editor */}
+        <div className="mb-4 max-w-7xl">
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            aval_title
+          </label>
+          <input
+            type="text"
+            value={avalTitle}
+            onChange={(e) => setAvalTitle(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+            placeholder="Enter avalanche title..."
+          />
         </div>
 
         {/* Main Editor Layout */}
