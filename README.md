@@ -1,5 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Code Concepts & Definitions
+
+This codebase uses several custom concepts and terminology. For a complete reference, see:
+- **[Code Concepts Documentation](./docs/CODE_CONCEPTS.md)** - Definitions of custom terms like `prisomi_`, `dorli`, etc.
+- **[UI Concept Types](./types/ui-concepts.ts)** - TypeScript definitions for UI patterns
+
 ## Getting Started
 
 First, run the development server:
