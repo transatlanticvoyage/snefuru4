@@ -146,54 +146,130 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
     const parsedBlocks: EditorBlock[] = [];
     
     try {
-      // Create a temporary div to parse the HTML
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html || '<p>Start typing...</p>';
-      
-      const elements = tempDiv.children;
-      
-      // If no block elements found, create a single paragraph
-      if (elements.length === 0 || tempDiv.textContent?.trim() === '') {
+      if (!html || html.trim() === '') {
         parsedBlocks.push({
           id: generateId(),
           type: 'paragraph',
           htmlContent: '<p>Start typing...</p>'
         });
       } else {
-        // Convert each block element to an editor block
-        Array.from(elements).forEach((element) => {
-          const blockHtml = element.outerHTML;
-          const blockType = element.tagName.toLowerCase();
-          
-          // Ensure we have valid content
-          if (blockHtml && blockHtml.trim() !== '') {
-            parsedBlocks.push({
-              id: generateId(),
-              type: blockType === 'p' ? 'paragraph' : blockType,
-              htmlContent: blockHtml
-            });
-          }
-        });
+        console.log('Parsing HTML content:', html.substring(0, 200) + '...');
+        // First, normalize the HTML by ensuring all content is in block-level elements
+        // Split content by double line breaks, headings, and other natural paragraph boundaries
+        const normalizedHtml = html
+          .replace(/\n\s*\n/g, '|||PARAGRAPH_BREAK|||') // Mark double line breaks
+          .replace(/(<\/(?:h[1-6]|p|div|ul|ol|li|blockquote)>)/gi, '$1|||PARAGRAPH_BREAK|||') // Mark after block elements
+          .split('|||PARAGRAPH_BREAK|||')
+          .map(chunk => chunk.trim())
+          .filter(chunk => chunk.length > 0);
+
+        let currentTextContent = '';
         
-        // If no valid blocks were created, add a default paragraph
-        if (parsedBlocks.length === 0) {
+        for (const chunk of normalizedHtml) {
+          const trimmedChunk = chunk.trim();
+          if (!trimmedChunk) continue;
+          
+          // Check if this chunk is already a complete block-level element
+          const blockPattern = /^<(?:h[1-6]|p|div|ul|ol|li|blockquote)[^>]*>.*<\/(?:h[1-6]|p|div|ul|ol|li|blockquote)>$/i;
+          
+          if (blockPattern.test(trimmedChunk)) {
+            // Save any accumulated text first
+            if (currentTextContent.trim()) {
+              parsedBlocks.push({
+                id: generateId(),
+                type: 'paragraph',
+                htmlContent: `<p>${currentTextContent.trim()}</p>`
+              });
+              currentTextContent = '';
+            }
+            
+            // Add the block element
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = trimmedChunk;
+            const element = tempDiv.firstElementChild;
+            
+            if (element) {
+              const tagName = element.tagName.toLowerCase();
+              parsedBlocks.push({
+                id: generateId(),
+                type: tagName,
+                htmlContent: trimmedChunk
+              });
+            }
+          } else {
+            // This is text content or mixed content - accumulate it
+            if (currentTextContent) {
+              currentTextContent += ' ' + trimmedChunk;
+            } else {
+              currentTextContent = trimmedChunk;
+            }
+          }
+        }
+        
+        // Add any remaining accumulated text
+        if (currentTextContent.trim()) {
           parsedBlocks.push({
             id: generateId(),
             type: 'paragraph',
-            htmlContent: '<p>Start typing...</p>'
+            htmlContent: `<p>${currentTextContent.trim()}</p>`
           });
+        }
+        
+        // If no blocks were created, process the original HTML as a fallback
+        if (parsedBlocks.length === 0) {
+          // Split by any block-level elements and collect everything
+          const allContentPattern = /(<(?:h[1-6]|p|div|ul|ol|li|blockquote)[^>]*>.*?<\/(?:h[1-6]|p|div|ul|ol|li|blockquote)>)|([^<]+(?:<(?!\/?)(?:strong|em|b|i|u|a|span)[^>]*>.*?<\/(?:strong|em|b|i|u|a|span)>[^<]*)*)/gi;
+          const matches = html.match(allContentPattern);
+          
+          if (matches) {
+            matches.forEach(match => {
+              const trimmed = match.trim();
+              if (trimmed) {
+                // Check if it's a block element
+                if (trimmed.startsWith('<') && /^<(?:h[1-6]|p|div|ul|ol|li|blockquote)/.test(trimmed)) {
+                  const tempDiv = document.createElement('div');
+                  tempDiv.innerHTML = trimmed;
+                  const element = tempDiv.firstElementChild;
+                  
+                  if (element) {
+                    const tagName = element.tagName.toLowerCase();
+                    parsedBlocks.push({
+                      id: generateId(),
+                      type: tagName,
+                      htmlContent: trimmed
+                    });
+                  }
+                } else {
+                  // Text content or inline elements
+                  parsedBlocks.push({
+                    id: generateId(),
+                    type: 'paragraph',
+                    htmlContent: `<p>${trimmed}</p>`
+                  });
+                }
+              }
+            });
+          } else {
+            // Last resort - wrap entire content
+            parsedBlocks.push({
+              id: generateId(),
+              type: 'paragraph',
+              htmlContent: `<p>${html}</p>`
+            });
+          }
         }
       }
     } catch (error) {
       console.error('Error parsing content into blocks:', error);
-      // Fallback to a single paragraph
+      // Fallback to a single paragraph with the original content
       parsedBlocks.push({
         id: generateId(),
         type: 'paragraph',
-        htmlContent: '<p>Start typing...</p>'
+        htmlContent: `<p>${html || 'Error parsing content. Please try again.'}</p>`
       });
     }
     
+    console.log(`Created ${parsedBlocks.length} blocks from content`);
     setBlocks(parsedBlocks);
     
     // Focus the first block
