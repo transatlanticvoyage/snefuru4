@@ -50,7 +50,7 @@ export default function ValanPage() {
     if (gconPiece?.aval_title) {
       setAvalTitle(gconPiece.aval_title);
       // Update browser title when data loads
-      document.title = `/valan - ${gconPiece.aval_title} - Snefuru`;
+      document.title = `valan_${gconPiece.aval_title} - Snefuru`;
     }
     if (gconPiece?.aval_metadata_mode) {
       setAvalMetadataMode(gconPiece.aval_metadata_mode);
@@ -60,7 +60,7 @@ export default function ValanPage() {
   // Set initial title when page loads (fallback)
   useEffect(() => {
     if (!avalTitle) {
-      document.title = '/valan - Snefuru';
+      document.title = 'valan - Snefuru';
     }
   }, []);
 
@@ -91,7 +91,7 @@ export default function ValanPage() {
       if (result.success) {
         setSaveMessage('✅ Saved successfully');
         // Update browser tab title
-        document.title = avalTitle ? `/valan - ${avalTitle} - Snefuru` : '/valan - Snefuru';
+        document.title = avalTitle ? `valan_${avalTitle} - Snefuru` : 'valan - Snefuru';
         // Clear message after 3 seconds
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
@@ -193,6 +193,60 @@ export default function ValanPage() {
                 </label>
                 <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm">
                   {gconPiece.asn_sitespren_base || 'Not set'}
+                </div>
+              </div>
+
+              {/* Page Slug */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  pageslug
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.pageslug}`, '_blank')}
+                    disabled={!gconPiece.pageslug || !gconPiece.asn_sitespren_base}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece.pageslug || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece.pageslug || 'Not set'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Page URL */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  pageurl
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => window.open(gconPiece.pageurl, '_blank')}
+                    disabled={!gconPiece.pageurl}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece.pageurl || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece.pageurl || 'Not set'}
+                  </span>
                 </div>
               </div>
 
