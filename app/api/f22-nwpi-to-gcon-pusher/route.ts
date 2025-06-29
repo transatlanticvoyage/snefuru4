@@ -58,93 +58,118 @@ interface DorliBlock {
   line_count: number;
 }
 
-// BozoHTMLNormalizationProcess1
+// BozoHTMLNormalizationProcess1 - Line-by-line processing with dorli block detection
 function bozoHTMLNormalizationProcess1(html: string, gconPieceId?: string): { normalizedContent: string; dorliBlocks: DorliBlock[] } {
   if (!html || html.trim() === '') {
     return { normalizedContent: '', dorliBlocks: [] };
   }
 
   try {
+    // Remove script and style elements completely before line processing
     let cleanHtml = html;
-    const dorliBlocks: DorliBlock[] = [];
-    
-    // Remove script and style elements completely
     cleanHtml = cleanHtml.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
     cleanHtml = cleanHtml.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
     
-    // Whitelist of block-level tags that should be extracted as dorli blocks
+    const dorliBlocks: DorliBlock[] = [];
+    const normalizedLines: string[] = [];
+    
+    // Dorli tags that should be extracted as blocks
     const dorliTags = ['table', 'div', 'form', 'label', 'section', 'article', 'aside', 'main', 'header', 'footer', 'nav'];
     
-    // Extract dorli blocks - complex multi-line structures
+    // Counter for each tag type to generate unique placeholders
+    const tagCounters: { [key: string]: number } = {};
     dorliTags.forEach(tag => {
-      // Create regex pattern to match opening and closing tags (with attributes and nested content)
-      const dorliPattern = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`, 'gi');
-      const tagCounters: { [key: string]: number } = {};
-      
-      cleanHtml = cleanHtml.replace(dorliPattern, (match) => {
-        // Count lines in the matched block
-        const lineCount = (match.match(/\r?\n/g) || []).length + 1;
-        
-        // Generate unique placeholder
-        if (!tagCounters[tag.toUpperCase()]) {
-          tagCounters[tag.toUpperCase()] = 0;
-        }
-        const placeholder = `{{DORLI:${tag.toUpperCase()}:${tagCounters[tag.toUpperCase()]}}}`;
-        tagCounters[tag.toUpperCase()]++;
-        
-        // Store the dorli block
-        dorliBlocks.push({
-          tag: tag,
-          placeholder: placeholder,
-          raw: match,
-          line_count: lineCount
-        });
-        
-        console.log(`🔄 Extracted dorli block: ${placeholder} (${lineCount} lines, ${match.length} chars)`);
-        
-        // Replace with placeholder
-        return placeholder;
-      });
+      tagCounters[tag.toUpperCase()] = 0;
     });
     
-    // Now process remaining content with normal normalization
-    // Convert remaining block-level elements to text + newline
-    // Handle headings (h1-h6)
-    cleanHtml = cleanHtml.replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi, '$1\n');
-    
-    // Handle paragraphs
-    cleanHtml = cleanHtml.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n');
-    
-    // Handle list items
-    cleanHtml = cleanHtml.replace(/<li[^>]*>(.*?)<\/li>/gi, '$1\n');
-    
-    // Handle other block elements (that weren't extracted as dorlis)
-    cleanHtml = cleanHtml.replace(/<(blockquote|ul|ol)[^>]*>(.*?)<\/\1>/gi, '$2\n');
-    
-    // Handle line breaks and horizontal rules
-    cleanHtml = cleanHtml.replace(/<br[^>]*>/gi, '\n');
-    cleanHtml = cleanHtml.replace(/<hr[^>]*>/gi, '\n');
-    
-    // Remove remaining HTML tags (keeping inline content)
-    cleanHtml = cleanHtml.replace(/<[^>]+>/g, '');
-    
-    // Decode HTML entities
-    cleanHtml = cleanHtml
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/&nbsp;/g, ' ');
-    
-    // Clean up whitespace and normalize line breaks
+    // Split content into lines for processing
     const lines = cleanHtml.split(/\r?\n/);
-    const normalizedLines = lines
-      .map(line => line.trim()) // Trim whitespace from each line
-      .filter(line => line.length > 0); // Remove empty lines
+    let i = 0;
     
-    // Join with single newlines
-    const normalizedContent = normalizedLines.join('\n');
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      
+      // Check if this line starts a dorli block
+      let dorliTagFound: string | null = null;
+      let openingTag: string = '';
+      
+      for (const tag of dorliTags) {
+        const openingPattern = new RegExp(`^\\s*<${tag}(\\s[^>]*)?>`);
+        const match = line.match(openingPattern);
+        if (match) {
+          dorliTagFound = tag;
+          openingTag = match[0];
+          break;
+        }
+      }
+      
+      if (dorliTagFound) {
+        // Enter dorli capture mode
+        console.log(`🔄 Detected dorli block start: ${dorliTagFound} on line ${i + 1}`);
+        
+        const capturedLines: string[] = [];
+        const closingTag = `</${dorliTagFound}>`;
+        let blockComplete = false;
+        let currentLine = i;
+        
+        // Check if opening and closing tags are on the same line
+        if (line.includes(closingTag)) {
+          // Single-line dorli block
+          capturedLines.push(lines[currentLine]);
+          blockComplete = true;
+        } else {
+          // Multi-line dorli block - capture until closing tag
+          while (currentLine < lines.length && !blockComplete) {
+            capturedLines.push(lines[currentLine]);
+            
+            if (lines[currentLine].includes(closingTag)) {
+              blockComplete = true;
+            }
+            currentLine++;
+          }
+        }
+        
+        if (blockComplete) {
+          // Generate unique placeholder
+          const placeholder = `{{DORLI:${dorliTagFound.toUpperCase()}:${tagCounters[dorliTagFound.toUpperCase()]}}}`;
+          tagCounters[dorliTagFound.toUpperCase()]++;
+          
+          // Store the dorli block
+          const rawContent = capturedLines.join('\n');
+          dorliBlocks.push({
+            tag: dorliTagFound,
+            placeholder: placeholder,
+            raw: rawContent,
+            line_count: capturedLines.length
+          });
+          
+          console.log(`✅ Captured dorli block: ${placeholder} (${capturedLines.length} lines, ${rawContent.length} chars)`);
+          
+          // Add placeholder to normalized content
+          normalizedLines.push(placeholder);
+          
+          // Skip to after the captured block
+          i = currentLine;
+        } else {
+          // Incomplete block - treat as regular content
+          console.warn(`⚠️ Incomplete dorli block detected for ${dorliTagFound}, treating as regular content`);
+          normalizedLines.push(processRegularLine(line));
+          i++;
+        }
+      } else {
+        // Regular line - process normally
+        const processedLine = processRegularLine(line);
+        if (processedLine) {
+          normalizedLines.push(processedLine);
+        }
+        i++;
+      }
+    }
+    
+    // Join with single newlines and remove any empty lines
+    const normalizedContent = normalizedLines
+      .filter(line => line.trim().length > 0)
+      .join('\n');
     
     console.log(`🔄 BozoHTMLNormalizationProcess1: Converted ${html.length} chars HTML to ${normalizedContent.length} chars plaintext with ${normalizedLines.length} lines, extracted ${dorliBlocks.length} dorli blocks`);
     
@@ -158,6 +183,45 @@ function bozoHTMLNormalizationProcess1(html: string, gconPieceId?: string): { no
       dorliBlocks: []
     };
   }
+}
+
+// Helper function to process regular (non-dorli) lines
+function processRegularLine(line: string): string {
+  if (!line || line.trim() === '') {
+    return '';
+  }
+  
+  let processedLine = line;
+  
+  // Handle headings (h1-h6)
+  processedLine = processedLine.replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi, '$1');
+  
+  // Handle paragraphs
+  processedLine = processedLine.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1');
+  
+  // Handle list items
+  processedLine = processedLine.replace(/<li[^>]*>(.*?)<\/li>/gi, '$1');
+  
+  // Handle other block elements
+  processedLine = processedLine.replace(/<(blockquote|ul|ol)[^>]*>(.*?)<\/\1>/gi, '$2');
+  
+  // Handle line breaks and horizontal rules
+  processedLine = processedLine.replace(/<br[^>]*>/gi, '');
+  processedLine = processedLine.replace(/<hr[^>]*>/gi, '');
+  
+  // Remove remaining HTML tags (keeping inline content)
+  processedLine = processedLine.replace(/<[^>]+>/g, '');
+  
+  // Decode HTML entities
+  processedLine = processedLine
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+  
+  return processedLine.trim();
 }
 
 export async function POST(request: NextRequest) {
