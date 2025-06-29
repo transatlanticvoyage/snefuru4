@@ -24,6 +24,9 @@ export default function ValanPage() {
   const [editorContent, setEditorContent] = useState('');
   const [editorLines, setEditorLines] = useState<string[]>([]);
   const [avalTitle, setAvalTitle] = useState('');
+  const [avalMetadataMode, setAvalMetadataMode] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
 
   // Get ID from URL parameters
   const id = searchParams?.get('id');
@@ -33,7 +36,6 @@ export default function ValanPage() {
 
   const handleEditorChange = (content: string) => {
     setEditorContent(content);
-    // TODO: Auto-save content changes to aval_content field
   };
 
   const handleLinesChange = (lines: string[]) => {
@@ -48,7 +50,49 @@ export default function ValanPage() {
     if (gconPiece?.aval_title) {
       setAvalTitle(gconPiece.aval_title);
     }
-  }, [gconPiece?.aval_content, gconPiece?.aval_title]);
+    if (gconPiece?.aval_metadata_mode) {
+      setAvalMetadataMode(gconPiece.aval_metadata_mode);
+    }
+  }, [gconPiece?.aval_content, gconPiece?.aval_title, gconPiece?.aval_metadata_mode]);
+
+  // Save function
+  const handleSave = async () => {
+    if (!id) return;
+    
+    setIsSaving(true);
+    setSaveMessage('');
+    
+    try {
+      const response = await fetch('/api/valan-save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+          aval_title: avalTitle,
+          aval_content: editorContent,
+          aval_metadata_mode: avalMetadataMode,
+          // aval_fk_featured_image_plan_id will be added later
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSaveMessage('✅ Saved successfully');
+        // Clear message after 3 seconds
+        setTimeout(() => setSaveMessage(''), 3000);
+      } else {
+        setSaveMessage(`❌ Error: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      setSaveMessage('❌ Failed to save');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -115,6 +159,34 @@ export default function ValanPage() {
           <div className="text-xs text-gray-500 mt-1">
             ID: {id} • {avalUnits.length} units loaded
           </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="mb-4 max-w-7xl">
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 transition-colors font-medium"
+          >
+            {isSaving ? 'Saving...' : 'Save Avalanche Content'}
+          </button>
+          {saveMessage && (
+            <span className="ml-3 text-sm">{saveMessage}</span>
+          )}
+        </div>
+
+        {/* Metadata Mode */}
+        <div className="mb-4 max-w-7xl">
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            aval_metadata_mode
+          </label>
+          <input
+            type="text"
+            value={avalMetadataMode}
+            onChange={(e) => setAvalMetadataMode(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter metadata mode..."
+          />
         </div>
 
         {/* Featured Image Selector */}
