@@ -771,7 +771,6 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                       // Regular content - render normal editor or HTML view
                       return viewMode === 'html' ? (
                         <div className="p-2 bg-gray-100 rounded border min-h-[2rem] font-mono text-xs">
-                          <div className="text-gray-600 mb-1 text-xs">Raw HTML:</div>
                           <pre className="whitespace-pre-wrap">{blockContent}</pre>
                         </div>
                       ) : (
