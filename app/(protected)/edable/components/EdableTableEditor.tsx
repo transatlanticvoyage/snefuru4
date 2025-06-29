@@ -390,10 +390,10 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
             <tr className="bg-purple-50">
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 lineyoshi
               </th>
-              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 Content
               </th>
@@ -402,146 +402,12 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
               <th className="border border-gray-300 p-2"></th>
             </tr>
             
-            {/* Header Row 4 - TipTap Toolbar */}
+            {/* Header Row 4 - Blank placeholders */}
             <tr className="bg-purple-50">
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-1">
-                {/* TipTap Toolbar */}
-                <div className="flex flex-wrap gap-1 justify-center">
-                  {/* Text formatting */}
-                  <button
-                    onClick={() => activeEditor?.chain().focus().toggleBold().run()}
-                    className={`px-2 py-1 rounded text-sm font-bold border ${
-                      activeEditor?.isActive('bold') 
-                        ? 'bg-purple-700 text-white border-purple-700' 
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    B
-                  </button>
-                  <button
-                    onClick={() => activeEditor?.chain().focus().toggleItalic().run()}
-                    className={`px-2 py-1 rounded text-sm italic border ${
-                      activeEditor?.isActive('italic') 
-                        ? 'bg-purple-700 text-white border-purple-700' 
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    I
-                  </button>
-                  <button
-                    onClick={() => activeEditor?.chain().focus().toggleUnderline().run()}
-                    className={`px-2 py-1 rounded text-sm underline border ${
-                      activeEditor?.isActive('underline') 
-                        ? 'bg-purple-700 text-white border-purple-700' 
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    U
-                  </button>
-
-                  <div className="w-px h-6 bg-gray-300 mx-1" />
-
-                  {/* Headings */}
-                  <button
-                    onClick={() => activeEditor?.chain().focus().toggleHeading({ level: 2 }).run()}
-                    className={`px-2 py-1 rounded text-sm font-medium border ${
-                      activeEditor?.isActive('heading', { level: 2 }) 
-                        ? 'bg-purple-700 text-white border-purple-700' 
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    H2
-                  </button>
-                  <button
-                    onClick={() => activeEditor?.chain().focus().toggleHeading({ level: 3 }).run()}
-                    className={`px-2 py-1 rounded text-sm font-medium border ${
-                      activeEditor?.isActive('heading', { level: 3 }) 
-                        ? 'bg-purple-700 text-white border-purple-700' 
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    H3
-                  </button>
-
-                  <div className="w-px h-6 bg-gray-300 mx-1" />
-
-                  {/* Links and Images */}
-                  <button
-                    onClick={insertLink}
-                    className="px-2 py-1 rounded text-sm bg-white border border-gray-300 hover:bg-gray-100"
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    🔗 Link
-                  </button>
-                  <button
-                    onClick={insertImage}
-                    className="px-2 py-1 rounded text-sm bg-white border border-gray-300 hover:bg-gray-100"
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    🖼️ Image
-                  </button>
-
-                  <div className="w-px h-6 bg-gray-300 mx-1" />
-
-                  {/* Lists */}
-                  <button
-                    onClick={() => activeEditor?.chain().focus().toggleBulletList().run()}
-                    className={`px-2 py-1 rounded text-sm border ${
-                      activeEditor?.isActive('bulletList') 
-                        ? 'bg-purple-700 text-white border-purple-700' 
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    • List
-                  </button>
-                  <button
-                    onClick={() => activeEditor?.chain().focus().toggleOrderedList().run()}
-                    className={`px-2 py-1 rounded text-sm border ${
-                      activeEditor?.isActive('orderedList') 
-                        ? 'bg-purple-700 text-white border-purple-700' 
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
-                    disabled={!activeEditor || viewMode === 'html'}
-                  >
-                    1. List
-                  </button>
-
-                  <div className="w-px h-6 bg-gray-300 mx-1" />
-
-                  {/* Visual/HTML Toggle Bar */}
-                  <div className="flex border border-gray-300 rounded overflow-hidden">
-                    <button
-                      onClick={setVisualMode}
-                      className={`px-3 py-1 text-xs font-medium ${
-                        viewMode === 'visual'
-                          ? 'bg-purple-700 text-white'
-                          : 'bg-white text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      Visual
-                    </button>
-                    <button
-                      onClick={setHtmlMode}
-                      className={`px-3 py-1 text-xs font-medium ${
-                        viewMode === 'html'
-                          ? 'bg-purple-700 text-white'
-                          : 'bg-white text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      HTML
-                    </button>
-                  </div>
-                </div>
-              </th>
+              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
