@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 import { useEdableContent } from '../hooks/useEdableContent';
 
 // Dynamically import components to avoid SSR issues
-const EdableEditor = dynamic(() => import('../components/EdableEditor'), {
+const EdableTableEditor = dynamic(() => import('../components/EdableTableEditor'), {
   ssr: false,
   loading: () => <div className="h-96 flex items-center justify-center">Loading editor...</div>
 });
@@ -112,7 +112,7 @@ export default function EdablePage() {
         </div>
         
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-purple-800">Edable - Advanced Editor</h1>
+          <h1 className="text-2xl font-bold text-purple-800">Edable - Table Editor</h1>
           <div className="text-sm text-gray-600 mt-1">
             <span>Editing: {gconPiece.meta_title || 'Untitled'}</span>
             {gconPiece.asn_sitespren_base && (
@@ -124,18 +124,30 @@ export default function EdablePage() {
           </div>
         </div>
 
-        {/* Main Editor */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-7xl">
-          <EdableEditor 
-            initialTitle={gconPiece.aval_title || ''}
+        {/* Title Editor */}
+        <div className="mb-4 bg-white rounded-lg shadow p-4">
+          <label className="block text-sm font-bold text-purple-700 mb-2">
+            Title (aval_title)
+          </label>
+          <input
+            type="text"
+            value={avalTitle}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            className="w-full px-4 py-3 text-xl font-bold border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="Enter title..."
+          />
+        </div>
+
+        {/* Main Table Editor */}
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <EdableTableEditor 
             initialContent={gconPiece.aval_content || '<p>Start editing your content...</p>'}
-            onTitleChange={handleTitleChange}
             onContentChange={handleContentChange}
           />
         </div>
 
         {/* Debug Info */}
-        <div className="mt-4 p-4 bg-gray-100 rounded text-xs text-gray-600 max-w-7xl">
+        <div className="mt-4 p-4 bg-gray-100 rounded text-xs text-gray-600">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p><strong>Title:</strong> {avalTitle}</p>
