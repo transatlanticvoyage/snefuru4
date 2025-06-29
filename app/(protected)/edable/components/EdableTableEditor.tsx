@@ -127,11 +127,13 @@ function BlockEditor({
   );
 }
 
+type ViewMode = 'visual' | 'html';
+
 export default function EdableTableEditor({ initialContent = '<p>Start typing...</p>', onContentChange }: EdableTableEditorProps) {
   const [blocks, setBlocks] = useState<EditorBlock[]>([]);
   const [focusedBlock, setFocusedBlock] = useState<string | null>(null);
   const [activeEditor, setActiveEditor] = useState<any>(null);
-  const [showHtmlView, setShowHtmlView] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('visual');
 
   // Parse initial content into blocks
   useEffect(() => {
@@ -272,7 +274,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
 
   const handleBlockFocus = useCallback((blockId: string) => {
     setFocusedBlock(blockId);
-    setShowHtmlView(false); // Reset HTML view when switching blocks
+    // Keep view mode consistent across blocks - don't reset it
   }, []);
 
   const handleEditorReady = useCallback((editor: any) => {
@@ -296,15 +298,18 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
     }
   };
 
-  const toggleHtmlView = () => {
-    setShowHtmlView(!showHtmlView);
+  const setVisualMode = () => {
+    setViewMode('visual');
   };
 
-  // Get current block's HTML content for HTML view
-  const getCurrentBlockHtml = () => {
-    if (!focusedBlock || !activeEditor) return '';
-    const currentBlock = blocks.find(b => b.id === focusedBlock);
-    return currentBlock?.htmlContent || '';
+  const setHtmlMode = () => {
+    setViewMode('html');
+  };
+
+  // Get block's HTML content for HTML view
+  const getBlockHtml = (blockId: string) => {
+    const block = blocks.find(b => b.id === blockId);
+    return block?.htmlContent || '';
   };
 
   return (
@@ -314,7 +319,10 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold text-purple-800">7-Column Table Editor</h3>
           <div className="text-sm text-purple-600">
-            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 7 columns
+            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 7 columns | 
+            <span className={`ml-2 font-medium ${viewMode === 'visual' ? 'text-green-600' : 'text-orange-600'}`}>
+              {viewMode === 'visual' ? '📝 Visual Mode' : '💻 HTML Mode'}
+            </span>
           </div>
         </div>
       </div>
@@ -375,7 +383,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                         ? 'bg-purple-700 text-white border-purple-700' 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     B
                   </button>
@@ -386,7 +394,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                         ? 'bg-purple-700 text-white border-purple-700' 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     I
                   </button>
@@ -397,7 +405,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                         ? 'bg-purple-700 text-white border-purple-700' 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     U
                   </button>
@@ -412,7 +420,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                         ? 'bg-purple-700 text-white border-purple-700' 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     H2
                   </button>
@@ -423,7 +431,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                         ? 'bg-purple-700 text-white border-purple-700' 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     H3
                   </button>
@@ -434,14 +442,14 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   <button
                     onClick={insertLink}
                     className="px-2 py-1 rounded text-sm bg-white border border-gray-300 hover:bg-gray-100"
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     🔗 Link
                   </button>
                   <button
                     onClick={insertImage}
                     className="px-2 py-1 rounded text-sm bg-white border border-gray-300 hover:bg-gray-100"
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     🖼️ Image
                   </button>
@@ -456,7 +464,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                         ? 'bg-purple-700 text-white border-purple-700' 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     • List
                   </button>
@@ -467,25 +475,36 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                         ? 'bg-purple-700 text-white border-purple-700' 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
-                    disabled={!activeEditor}
+                    disabled={!activeEditor || viewMode === 'html'}
                   >
                     1. List
                   </button>
 
                   <div className="w-px h-6 bg-gray-300 mx-1" />
 
-                  {/* HTML View Toggle */}
-                  <button
-                    onClick={toggleHtmlView}
-                    className={`px-2 py-1 rounded text-xs border ${
-                      showHtmlView 
-                        ? 'bg-purple-700 text-white border-purple-700' 
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
-                    disabled={!activeEditor}
-                  >
-                    HTML View
-                  </button>
+                  {/* Visual/HTML Toggle Bar */}
+                  <div className="flex border border-gray-300 rounded overflow-hidden">
+                    <button
+                      onClick={setVisualMode}
+                      className={`px-3 py-1 text-xs font-medium ${
+                        viewMode === 'visual'
+                          ? 'bg-purple-700 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      Visual
+                    </button>
+                    <button
+                      onClick={setHtmlMode}
+                      className={`px-3 py-1 text-xs font-medium ${
+                        viewMode === 'html'
+                          ? 'bg-purple-700 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      HTML
+                    </button>
+                  </div>
                 </div>
               </th>
               <th className="border border-gray-300 p-2"></th>
@@ -515,10 +534,10 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                 
                 {/* Column 4 - Content (TipTap Editor or HTML View) */}
                 <td className="border border-gray-300 p-1" style={{ width: '600px' }}>
-                  {showHtmlView && focusedBlock === block.id ? (
+                  {viewMode === 'html' ? (
                     <div className="p-2 bg-gray-100 rounded border min-h-[2rem] font-mono text-xs">
                       <div className="text-gray-600 mb-1 text-xs">Raw HTML:</div>
-                      <pre className="whitespace-pre-wrap">{getCurrentBlockHtml()}</pre>
+                      <pre className="whitespace-pre-wrap">{getBlockHtml(block.id)}</pre>
                     </div>
                   ) : (
                     <BlockEditor
@@ -557,8 +576,17 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
       <div className="bg-gray-50 border-t border-gray-200 p-4">
         <div className="flex justify-between items-center text-sm text-gray-600">
           <div>
-            Press <kbd className="px-2 py-1 bg-gray-200 rounded text-xs">Enter</kbd> to create new block, 
-            <kbd className="px-2 py-1 bg-gray-200 rounded text-xs ml-2">Backspace</kbd> at start to merge
+            {viewMode === 'visual' ? (
+              <>
+                Press <kbd className="px-2 py-1 bg-gray-200 rounded text-xs">Enter</kbd> to create new block, 
+                <kbd className="px-2 py-1 bg-gray-200 rounded text-xs ml-2">Backspace</kbd> at start to merge
+              </>
+            ) : (
+              <>
+                <span className="text-orange-600 font-medium">HTML View Mode:</span> Viewing raw HTML content - 
+                switch to Visual mode to edit
+              </>
+            )}
           </div>
           <button
             onClick={() => {
@@ -570,7 +598,12 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
               setBlocks(prev => [...prev, newBlock]);
               setFocusedBlock(newBlock.id);
             }}
-            className="px-3 py-1 bg-purple-600 text-white rounded text-xs hover:bg-purple-700"
+            disabled={viewMode === 'html'}
+            className={`px-3 py-1 rounded text-xs ${
+              viewMode === 'html'
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-purple-600 text-white hover:bg-purple-700'
+            }`}
           >
             + Add Block
           </button>
