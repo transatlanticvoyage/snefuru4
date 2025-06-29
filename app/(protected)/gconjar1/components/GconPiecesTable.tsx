@@ -999,8 +999,14 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           </div>
                         ) : col === 'actions' ? (
                           <div className="w-80 space-y-1">
-                            {/* First row - 4 buttons (edable and valan first) */}
+                            {/* First row - 5 buttons (mesagen, edable and valan first) */}
                             <div className="flex gap-1">
+                              <Link
+                                href={`/mesagen`}
+                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium rounded text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
+                              >
+                                /mesagen
+                              </Link>
                               <Link
                                 href={`/edable/${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium rounded text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
