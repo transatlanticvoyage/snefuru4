@@ -50,7 +50,8 @@ export default function ValanPage() {
     if (gconPiece?.aval_title) {
       setAvalTitle(gconPiece.aval_title);
       // Update browser title when data loads
-      document.title = `valan_${gconPiece.aval_title} - Snefuru`;
+      const siteBase = gconPiece.asn_sitespren_base || '';
+      document.title = `valan_${gconPiece.aval_title}_${siteBase}`;
     }
     if (gconPiece?.aval_metadata_mode) {
       setAvalMetadataMode(gconPiece.aval_metadata_mode);
@@ -59,10 +60,13 @@ export default function ValanPage() {
 
   // Set initial title when page loads (fallback)
   useEffect(() => {
-    if (!avalTitle) {
-      document.title = 'valan - Snefuru';
+    if (!avalTitle && gconPiece) {
+      const siteBase = gconPiece.asn_sitespren_base || '';
+      document.title = siteBase ? `valan_${siteBase}` : 'valan';
+    } else if (!avalTitle && !gconPiece) {
+      document.title = 'valan';
     }
-  }, []);
+  }, [avalTitle, gconPiece]);
 
   // Save function
   const handleSave = async () => {
@@ -91,7 +95,16 @@ export default function ValanPage() {
       if (result.success) {
         setSaveMessage('✅ Saved successfully');
         // Update browser tab title
-        document.title = avalTitle ? `valan_${avalTitle} - Snefuru` : 'valan - Snefuru';
+        const siteBase = gconPiece?.asn_sitespren_base || '';
+        if (avalTitle && siteBase) {
+          document.title = `valan_${avalTitle}_${siteBase}`;
+        } else if (avalTitle) {
+          document.title = `valan_${avalTitle}`;
+        } else if (siteBase) {
+          document.title = `valan_${siteBase}`;
+        } else {
+          document.title = 'valan';
+        }
         // Clear message after 3 seconds
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
