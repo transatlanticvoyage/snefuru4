@@ -364,9 +364,9 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
       {/* Header */}
       <div className="bg-purple-100 border-b border-purple-200 p-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-purple-800">8-Column Table Editor</h3>
+          <h3 className="text-lg font-semibold text-purple-800">9-Column Table Editor</h3>
           <div className="text-sm text-purple-600">
-            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 8 columns | 
+            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 9 columns | 
             <span className={`ml-2 font-medium ${viewMode === 'visual' ? 'text-green-600' : 'text-orange-600'}`}>
               {viewMode === 'visual' ? '📝 Visual Mode' : '💻 HTML Mode'}
             </span>
@@ -374,13 +374,26 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
         </div>
       </div>
 
-      {/* 7-Column Table Structure with 4-Row Header */}
+      {/* 9-Column Table Structure with 4-Row Header (including prisomi) */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse table-fixed">
           {/* Table Header - 4 Rows */}
           <thead>
             {/* Header Row 1 - Blank placeholders */}
             <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600">1</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      <span className="font-bold">prisomi column</span>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
@@ -393,6 +406,19 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
             
             {/* Header Row 2 - Blank placeholders */}
             <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600">2</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      <span className="font-bold">prisomi column</span>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
@@ -405,6 +431,19 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
             
             {/* Header Row 3 - Content label */}
             <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600">3</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      <span className="font-bold">prisomi column</span>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
@@ -421,6 +460,19 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
             
             {/* Header Row 4 - Blank placeholders */}
             <tr className="bg-purple-50">
+              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600">4</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      <span className="font-bold">prisomi column</span>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
@@ -434,29 +486,52 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
           
           {/* Table Body - Each block is a row */}
           <tbody>
-            {blocks.map((block, index) => (
-              <tr key={block.id} className="hover:bg-purple-25">
-                {/* Column 1 - Thing1 */}
+            {blocks.map((block, index) => {
+              const rowNumber = index + 5; // Start at 5 since we have 4 header rows
+              const showTooltip = rowNumber <= 5; // Only show tooltip for row 5
+              
+              return (
+                <tr key={block.id} className="hover:bg-purple-25">
+                  {/* Prisomi Column */}
+                  <td className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+                    <div className={`relative ${showTooltip ? 'group' : ''}`}>
+                      <div className="text-center text-xs font-normal text-gray-600">{rowNumber}</div>
+                      {showTooltip && (
+                        <>
+                          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                            <div className="bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                              <span className="font-bold">prisomi column</span>
+                            </div>
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                              <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  
+                  {/* Column 2 - Thing1 */}
+                  <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
+                    -
+                  </td>
+                
+                {/* Column 3 - Thing2 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 2 - Thing2 */}
+                {/* Column 4 - Thing3 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 3 - Thing3 */}
-                <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
-                  -
-                </td>
-                
-                {/* Column 4 - lineyoshi */}
+                {/* Column 5 - lineyoshi */}
                 <td className="border border-gray-300 p-2 text-center text-gray-700 text-sm font-medium">
                   {index + 1}
                 </td>
                 
-                {/* Column 5 - Content (TipTap Editor or HTML View) */}
+                {/* Column 6 - Content (TipTap Editor or HTML View) */}
                 <td className="border border-gray-300 p-1" style={{ width: '600px' }}>
                   {/* TipTap Toolbar */}
                   <div className="mb-2 p-2 bg-gray-50 border border-gray-200 rounded">
@@ -644,22 +719,23 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   })()}
                 </td>
                 
-                {/* Column 6 - Thing6 */}
+                {/* Column 7 - Thing6 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 7 - Thing7 */}
+                {/* Column 8 - Thing7 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 8 - Thing8 */}
+                {/* Column 9 - Thing8 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
-              </tr>
-            ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -728,28 +804,36 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
           min-width: 1000px; /* Minimum table width to accommodate all columns */
         }
         
-        /* Content column specific styling (now column 5) */
-        td:nth-child(5) {
+        /* Prisomi column specific styling */
+        td:nth-child(1), th:nth-child(1) {
+          width: 20px !important;
+          max-width: 20px;
+          min-width: 20px;
+          padding: 0 !important;
+        }
+        
+        /* Content column specific styling (now column 6 with prisomi) */
+        td:nth-child(6) {
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
         }
         
         /* Other columns styling */
-        td:not(:nth-child(5)) {
+        td:not(:nth-child(1)):not(:nth-child(6)) {
           width: 80px;
           max-width: 120px;
           min-width: 60px;
         }
         
-        /* Header column styling (Content column is now 5) */
-        th:nth-child(5) {
+        /* Header column styling (Content column is now 6 with prisomi) */
+        th:nth-child(6) {
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
         }
         
-        th:not(:nth-child(5)) {
+        th:not(:nth-child(1)):not(:nth-child(6)) {
           width: 80px;
           max-width: 120px;
           min-width: 60px;
