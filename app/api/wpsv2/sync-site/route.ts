@@ -331,7 +331,8 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
           i_sync_completed_at: new Date().toISOString(),
           i_sync_attempt_count: 1
         };
-        console.log(`📝 WPSv2: Processing Plugin API post: ID=${post.ID}, title="${post.post_title}", type=${post.post_type}, status=${post.post_status}, post_name=${contentData.post_name}`);
+        console.log(`📝 WPSv2: Processing Plugin API post: ID=${post.ID}, title="${post.post_title}", type=${post.post_type}, status=${post.post_status}`);
+        console.log(`🔍 WPSv2: post_name debug - from WP: "${post.post_name}", stored as: "${contentData.post_name}"`);
       } else {
         // REST API format
         contentData = {
@@ -376,7 +377,8 @@ async function wpsv2SaveContentToDatabase(posts: any[], siteData: any, syncMetho
           i_sync_completed_at: new Date().toISOString(),
           i_sync_attempt_count: 1
         };
-        console.log(`📝 WPSv2: Processing REST API post: ID=${post.id}, title="${post.title?.rendered || post.title}", type=${post.type}, status=${post.status}, post_name=${contentData.post_name}`);
+        console.log(`📝 WPSv2: Processing REST API post: ID=${post.id}, title="${post.title?.rendered || post.title}", type=${post.type}, status=${post.status}`);
+        console.log(`🔍 WPSv2: post_name debug - from WP: "${post.slug}", stored as: "${contentData.post_name}"`);
       }
 
       // Upsert content using the correct conflict resolution
