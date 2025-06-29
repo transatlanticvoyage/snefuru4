@@ -138,6 +138,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
   const [focusedBlock, setFocusedBlock] = useState<string | null>(null);
   const [activeEditor, setActiveEditor] = useState<any>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('visual');
+  const [selectedBlocks, setSelectedBlocks] = useState<Set<string>>(new Set());
 
   // Fetch dorli blocks
   const { dorliBlocks, loading: dorliLoading, error: dorliError, updateDorliBlock, getDorliByPlaceholder } = useDorliBlocks(gconPieceId || null);
@@ -363,6 +364,29 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
     setActiveEditor(editor);
   }, []);
 
+  // Selection handlers
+  const handleBlockSelection = useCallback((blockId: string) => {
+    setSelectedBlocks(prev => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(blockId)) {
+        newSelection.delete(blockId);
+      } else {
+        newSelection.add(blockId);
+      }
+      return newSelection;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedBlocks.size === blocks.length) {
+      // Deselect all
+      setSelectedBlocks(new Set());
+    } else {
+      // Select all
+      setSelectedBlocks(new Set(blocks.map(block => block.id)));
+    }
+  }, [blocks, selectedBlocks.size]);
+
   // Toolbar action handlers
   const insertLink = () => {
     if (!activeEditor) return;
@@ -399,9 +423,9 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
       {/* Header */}
       <div className="bg-purple-100 border-b border-purple-200 p-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-purple-800">9-Column Table Editor</h3>
+          <h3 className="text-lg font-semibold text-purple-800">10-Column Table Editor</h3>
           <div className="text-sm text-purple-600">
-            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 9 columns | 
+            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 10 columns | 
             <span className={`ml-2 font-medium ${viewMode === 'visual' ? 'text-green-600' : 'text-orange-600'}`}>
               {viewMode === 'visual' ? '📝 Visual Mode' : '💻 HTML Mode'}
             </span>
@@ -409,10 +433,10 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
         </div>
       </div>
 
-      {/* 9-Column Table Structure with 4-Row Header (including prisomi) */}
+      {/* 10-Column Table Structure with 6-Row Header (including prisomi and select) */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse table-fixed">
-          {/* Table Header - 4 Rows */}
+          {/* Table Header - 6 Rows */}
           <thead>
             {/* Header Row 1 - Blank placeholders */}
             <tr className="bg-purple-50">
@@ -429,6 +453,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   </div>
                 </div>
               </th>
+              <th className="border border-gray-300" style={{ padding: '6px 10px', width: '46px', maxWidth: '46px', minWidth: '46px' }}></th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
@@ -454,6 +479,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   </div>
                 </div>
               </th>
+              <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
@@ -479,6 +505,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   </div>
                 </div>
               </th>
+              <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
@@ -508,6 +535,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   </div>
                 </div>
               </th>
+              <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
@@ -674,6 +702,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   </div>
                 </div>
               </th>
+              <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
@@ -709,6 +738,14 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                     </div>
                   </div>
                 </div>
+              </th>
+              <th className="border border-gray-300" style={{ padding: '6px 10px' }}>
+                <input
+                  type="checkbox"
+                  checked={selectedBlocks.size === blocks.length && blocks.length > 0}
+                  onChange={handleSelectAll}
+                  className="w-[26px] h-[26px] cursor-pointer"
+                />
               </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
@@ -750,27 +787,41 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                     </div>
                   </td>
                   
-                  {/* Column 2 - Thing1 */}
+                  {/* Select Column */}
+                  <td 
+                    className="border border-gray-300 cursor-pointer" 
+                    style={{ padding: '6px 10px', width: '46px', maxWidth: '46px', minWidth: '46px' }}
+                    onClick={() => handleBlockSelection(block.id)}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedBlocks.has(block.id)}
+                      onChange={() => handleBlockSelection(block.id)}
+                      className="w-[26px] h-[26px] cursor-pointer pointer-events-none"
+                    />
+                  </td>
+                  
+                  {/* Column 3 - Thing1 */}
                   <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                     -
                   </td>
                 
-                {/* Column 3 - Thing2 */}
+                {/* Column 4 - Thing2 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 4 - Thing3 */}
+                {/* Column 5 - Thing3 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 5 - lineyoshi */}
+                {/* Column 6 - lineyoshi */}
                 <td className="border border-gray-300 p-2 text-center text-gray-700 text-sm font-medium">
                   {index + 1}
                 </td>
                 
-                {/* Column 6 - Content (TipTap Editor or HTML View) */}
+                {/* Column 7 - Content (TipTap Editor or HTML View) */}
                 <td className="border border-gray-300 p-1" style={{ width: '600px' }}>
                   {(() => {
                     const blockContent = getBlockHtml(block.id);
@@ -803,17 +854,17 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                   })()}
                 </td>
                 
-                {/* Column 7 - Thing6 */}
+                {/* Column 8 - Thing6 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 8 - Thing7 */}
+                {/* Column 9 - Thing7 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 9 - Thing8 */}
+                {/* Column 10 - Thing8 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
@@ -896,28 +947,36 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
           padding: 0 !important;
         }
         
-        /* Content column specific styling (now column 6 with prisomi) */
-        td:nth-child(6) {
+        /* Select column specific styling */
+        td:nth-child(2), th:nth-child(2) {
+          width: 46px !important;
+          max-width: 46px;
+          min-width: 46px;
+          padding: 6px 10px !important;
+        }
+        
+        /* Content column specific styling (now column 7 with prisomi and select) */
+        td:nth-child(7) {
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
         }
         
         /* Other columns styling */
-        td:not(:nth-child(1)):not(:nth-child(6)) {
+        td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(7)) {
           width: 80px;
           max-width: 120px;
           min-width: 60px;
         }
         
-        /* Header column styling (Content column is now 6 with prisomi) */
-        th:nth-child(6) {
+        /* Header column styling (Content column is now 7 with prisomi and select) */
+        th:nth-child(7) {
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
         }
         
-        th:not(:nth-child(1)):not(:nth-child(6)) {
+        th:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(7)) {
           width: 80px;
           max-width: 120px;
           min-width: 60px;
