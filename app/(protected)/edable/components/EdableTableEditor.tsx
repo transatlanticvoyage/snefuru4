@@ -652,7 +652,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
                     type="text"
                     value={initialTitle}
                     onChange={(e) => onTitleChange?.(e.target.value)}
-                    className="w-full px-3 py-2 text-lg font-bold border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 text-lg font-bold bg-white border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="Enter title..."
                   />
                 </div>
