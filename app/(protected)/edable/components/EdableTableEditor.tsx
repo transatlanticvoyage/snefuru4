@@ -153,114 +153,62 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
           htmlContent: '<p>Start typing...</p>'
         });
       } else {
-        console.log('Parsing HTML content:', html.substring(0, 200) + '...');
-        // First, normalize the HTML by ensuring all content is in block-level elements
-        // Split content by double line breaks, headings, and other natural paragraph boundaries
-        const normalizedHtml = html
-          .replace(/\n\s*\n/g, '|||PARAGRAPH_BREAK|||') // Mark double line breaks
-          .replace(/(<\/(?:h[1-6]|p|div|ul|ol|li|blockquote)>)/gi, '$1|||PARAGRAPH_BREAK|||') // Mark after block elements
-          .split('|||PARAGRAPH_BREAK|||')
-          .map(chunk => chunk.trim())
-          .filter(chunk => chunk.length > 0);
-
-        let currentTextContent = '';
+        console.log('Parsing content by linebreaks. Original length:', html.length);
         
-        for (const chunk of normalizedHtml) {
-          const trimmedChunk = chunk.trim();
-          if (!trimmedChunk) continue;
-          
-          // Check if this chunk is already a complete block-level element
-          const blockPattern = /^<(?:h[1-6]|p|div|ul|ol|li|blockquote)[^>]*>.*<\/(?:h[1-6]|p|div|ul|ol|li|blockquote)>$/i;
-          
-          if (blockPattern.test(trimmedChunk)) {
-            // Save any accumulated text first
-            if (currentTextContent.trim()) {
-              parsedBlocks.push({
-                id: generateId(),
-                type: 'paragraph',
-                htmlContent: `<p>${currentTextContent.trim()}</p>`
-              });
-              currentTextContent = '';
-            }
-            
-            // Add the block element
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = trimmedChunk;
-            const element = tempDiv.firstElementChild;
-            
-            if (element) {
-              const tagName = element.tagName.toLowerCase();
-              parsedBlocks.push({
-                id: generateId(),
-                type: tagName,
-                htmlContent: trimmedChunk
-              });
-            }
-          } else {
-            // This is text content or mixed content - accumulate it
-            if (currentTextContent) {
-              currentTextContent += ' ' + trimmedChunk;
-            } else {
-              currentTextContent = trimmedChunk;
-            }
-          }
-        }
+        // Split by raw linebreaks (both Unix \n and Windows \r\n)
+        const lines = html.split(/\r?\n/);
         
-        // Add any remaining accumulated text
-        if (currentTextContent.trim()) {
-          parsedBlocks.push({
-            id: generateId(),
-            type: 'paragraph',
-            htmlContent: `<p>${currentTextContent.trim()}</p>`
-          });
-        }
+        console.log(`Found ${lines.length} lines in content`);
         
-        // If no blocks were created, process the original HTML as a fallback
-        if (parsedBlocks.length === 0) {
-          // Split by any block-level elements and collect everything
-          const allContentPattern = /(<(?:h[1-6]|p|div|ul|ol|li|blockquote)[^>]*>.*?<\/(?:h[1-6]|p|div|ul|ol|li|blockquote)>)|([^<]+(?:<(?!\/?)(?:strong|em|b|i|u|a|span)[^>]*>.*?<\/(?:strong|em|b|i|u|a|span)>[^<]*)*)/gi;
-          const matches = html.match(allContentPattern);
+        lines.forEach((line, index) => {
+          // Keep the line exactly as is, including empty lines
+          const trimmedLine = line.trim();
           
-          if (matches) {
-            matches.forEach(match => {
-              const trimmed = match.trim();
-              if (trimmed) {
-                // Check if it's a block element
-                if (trimmed.startsWith('<') && /^<(?:h[1-6]|p|div|ul|ol|li|blockquote)/.test(trimmed)) {
-                  const tempDiv = document.createElement('div');
-                  tempDiv.innerHTML = trimmed;
-                  const element = tempDiv.firstElementChild;
-                  
-                  if (element) {
-                    const tagName = element.tagName.toLowerCase();
-                    parsedBlocks.push({
-                      id: generateId(),
-                      type: tagName,
-                      htmlContent: trimmed
-                    });
-                  }
-                } else {
-                  // Text content or inline elements
-                  parsedBlocks.push({
-                    id: generateId(),
-                    type: 'paragraph',
-                    htmlContent: `<p>${trimmed}</p>`
-                  });
-                }
-              }
-            });
-          } else {
-            // Last resort - wrap entire content
+          if (trimmedLine === '') {
+            // Empty line - create an empty paragraph
             parsedBlocks.push({
               id: generateId(),
               type: 'paragraph',
-              htmlContent: `<p>${html}</p>`
+              htmlContent: '<p></p>'
             });
+          } else {
+            // Line has content - detect if it's already a complete HTML element
+            const isCompleteElement = /^<(?:h[1-6]|p|div|ul|ol|li|blockquote)[^>]*>.*<\/(?:h[1-6]|p|div|ul|ol|li|blockquote)>$/i.test(trimmedLine);
+            
+            if (isCompleteElement) {
+              // It's already a complete HTML block element
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = trimmedLine;
+              const element = tempDiv.firstElementChild;
+              
+              if (element) {
+                const tagName = element.tagName.toLowerCase();
+                parsedBlocks.push({
+                  id: generateId(),
+                  type: tagName,
+                  htmlContent: trimmedLine
+                });
+              } else {
+                // Fallback if parsing fails
+                parsedBlocks.push({
+                  id: generateId(),
+                  type: 'paragraph',
+                  htmlContent: `<p>${line}</p>` // Use original line with spaces
+                });
+              }
+            } else {
+              // It's text content (may include inline HTML) - wrap in paragraph
+              parsedBlocks.push({
+                id: generateId(),
+                type: 'paragraph',
+                htmlContent: `<p>${line}</p>` // Use original line with spaces preserved
+              });
+            }
           }
-        }
+        });
       }
     } catch (error) {
-      console.error('Error parsing content into blocks:', error);
+      console.error('Error parsing content by linebreaks:', error);
       // Fallback to a single paragraph with the original content
       parsedBlocks.push({
         id: generateId(),
@@ -269,7 +217,7 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
       });
     }
     
-    console.log(`Created ${parsedBlocks.length} blocks from content`);
+    console.log(`Created ${parsedBlocks.length} blocks from ${html.split(/\r?\n/).length} lines`);
     setBlocks(parsedBlocks);
     
     // Focus the first block
@@ -292,10 +240,16 @@ export default function EdableTableEditor({ initialContent = '<p>Start typing...
           : block
       );
       
-      // Combine all blocks into final HTML and call onChange
+      // Combine all blocks into final HTML with linebreaks preserved
       const combinedHtml = updatedBlocks
-        .map(block => block.htmlContent)
-        .join('');
+        .map(block => {
+          // Extract content from paragraph tags for line-based storage
+          if (block.htmlContent.startsWith('<p>') && block.htmlContent.endsWith('</p>')) {
+            return block.htmlContent.slice(3, -4); // Remove <p> and </p>
+          }
+          return block.htmlContent;
+        })
+        .join('\n'); // Join with linebreaks
       
       onContentChange?.(combinedHtml);
       
