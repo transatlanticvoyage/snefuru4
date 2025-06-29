@@ -21,7 +21,8 @@ const NWPI_TO_GCON_MAPPING = {
       'pgb_h1title': data.post_title
     }),
     'post_content': (data: any) => ({
-      'corpus1': data.post_content || ''
+      'corpus1': data.post_content || '',
+      'aval_content': data.post_content || ''
     }),
     'post_excerpt': (data: any) => ({
       'corpus2': data.post_excerpt || ''
