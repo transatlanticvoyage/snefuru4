@@ -133,14 +133,16 @@ export default function ValanPage() {
 
         {/* Main Editor Layout */}
         <div className="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-7xl">
-          {/* Avalanche Sidebar */}
-          <AvalancheSidebar1 
-            units={avalUnits}
-            lines={editorLines}
-          />
+          {/* Avalanche Sidebar - 50% width */}
+          <div className="w-1/2">
+            <AvalancheSidebar1 
+              units={avalUnits}
+              lines={editorLines}
+            />
+          </div>
 
-          {/* TipTap Editor */}
-          <div className="flex-1">
+          {/* TipTap Editor - 50% width */}
+          <div className="w-1/2">
             <TipTapEditor 
               initialContent={'<p>Loading content...</p>'}
               content={gconPiece.aval_content || '<p>Start editing your Avalanche content...</p>'}

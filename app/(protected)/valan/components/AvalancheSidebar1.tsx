@@ -67,60 +67,66 @@ export default function AvalancheSidebar1({ units, lines }: AvalancheSidebar1Pro
   };
 
   return (
-    <div className="w-64 bg-gray-50 border-r border-gray-300 overflow-y-auto">
-      <div className="sticky top-0 bg-gray-100 border-b border-gray-300 p-2">
+    <div className="w-full h-full bg-gray-50 border-r border-gray-300 flex flex-col">
+      <div className="sticky top-0 bg-gray-100 border-b border-gray-300 p-2 z-10">
         <h3 className="text-sm font-semibold text-gray-700">Avalanche Units</h3>
       </div>
       
-      <div className="p-2">
-        {lines.map((_, index) => {
-          const lineKey = `line-${index + 1}`;
-          const lineUnits = unitsByLine[lineKey] || [];
-          
-          return (
-            <div 
-              key={lineKey}
-              data-line-id={lineKey}
-              className="mb-2 min-h-[2rem] border-b border-gray-200 pb-2 last:border-b-0"
-            >
-              {lineUnits.length > 0 ? (
-                <div className="space-y-1">
-                  {lineUnits.map((unit) => (
-                    <div
-                      key={unit.id}
-                      className="p-2 bg-white rounded-md shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getUnitTypeColor(unit.unit_type)}`}>
-                            {unit.unit_type}
-                          </span>
-                          <p className="mt-1 text-xs text-gray-600 line-clamp-2">
-                            {getPreviewText(unit.payload)}
-                          </p>
-                        </div>
-                        <div className="flex-shrink-0">
-                          <button
-                            className="p-1 hover:bg-gray-100 rounded"
-                            title="More options"
+      <div className="flex-1 overflow-y-auto">
+        <table className="w-full">
+          <tbody>
+            {lines.map((_, index) => {
+              const lineKey = `line-${index + 1}`;
+              const lineUnits = unitsByLine[lineKey] || [];
+              
+              return (
+                <tr 
+                  key={lineKey}
+                  data-line-id={lineKey}
+                  className="border-b border-gray-200"
+                >
+                  <td className="align-top p-0">
+                    {lineUnits.length > 0 ? (
+                      <div className="p-2">
+                        {lineUnits.map((unit) => (
+                          <div
+                            key={unit.id}
+                            className="mb-1 p-2 bg-white rounded-md shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer last:mb-0"
                           >
-                            <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                            </svg>
-                          </button>
-                        </div>
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getUnitTypeColor(unit.unit_type)}`}>
+                                  {unit.unit_type}
+                                </span>
+                                <p className="mt-1 text-xs text-gray-600 line-clamp-2">
+                                  {getPreviewText(unit.payload)}
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <button
+                                  className="p-1 hover:bg-gray-100 rounded"
+                                  title="More options"
+                                >
+                                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-xs text-gray-400 italic p-2">
-                  No units for line {index + 1}
-                </div>
-              )}
-            </div>
-          );
-        })}
+                    ) : (
+                      <div className="text-xs text-gray-400 italic py-2 px-2">
+                        No units for line {index + 1}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
