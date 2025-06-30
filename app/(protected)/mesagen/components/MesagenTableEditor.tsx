@@ -61,7 +61,12 @@ function BlockEditor({
     extensions: [
       StarterKit.configure({
         // Configure for block-level editing  
-        heading: { levels: [2, 3] },
+        heading: { 
+          levels: [2, 3, 4],
+          HTMLAttributes: {
+            class: 'tiptap-heading',
+          },
+        },
         paragraph: {
           HTMLAttributes: {
             class: 'block-paragraph',
@@ -86,7 +91,12 @@ function BlockEditor({
       }),
       Underline,
     ],
-    content: block.htmlContent ? `<p>${block.htmlContent}</p>` : '<p></p>',
+    content: block.htmlContent ? (
+      // Check if content already has HTML structure, if not wrap in paragraph
+      /^<h[2-6]|^<p|^<div|^<ul|^<ol|^<blockquote/i.test(block.htmlContent.trim())
+        ? block.htmlContent
+        : `<p>${block.htmlContent}</p>`
+    ) : '<p></p>',
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
@@ -308,12 +318,24 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               htmlContent: ''
             });
           } else {
-            // Store the line exactly as provided without wrapping
-            parsedBlocks.push({
-              id: generateId(),
-              type: 'paragraph',
-              htmlContent: line
-            });
+            // Check if line contains heading tags or other HTML
+            const hasHeadingTags = /<h[2-6][\s>]/i.test(line);
+            
+            if (hasHeadingTags) {
+              // Line has heading tags - preserve HTML structure
+              parsedBlocks.push({
+                id: generateId(),
+                type: 'heading',
+                htmlContent: line
+              });
+            } else {
+              // Regular text line - store as provided
+              parsedBlocks.push({
+                id: generateId(),
+                type: 'paragraph',
+                htmlContent: line
+              });
+            }
           }
         });
       }
@@ -364,20 +386,36 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     setBlocks(prevBlocks => {
       const updatedBlocks = prevBlocks.map(block => {
         if (block.id === blockId) {
-          // Extract plain text content (strip HTML tags) for storage
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = content;
-          const plainText = tempDiv.textContent || tempDiv.innerText || '';
+          // Check if content contains heading tags or other structural HTML
+          const hasStructuralHTML = /^<h[2-6]|<h[2-6]>.*<\/h[2-6]>/i.test(content);
           
-          // Store the plain text without HTML wrapping
-          return { ...block, htmlContent: plainText };
+          if (hasStructuralHTML) {
+            // For headings and structural HTML, preserve the HTML
+            return { ...block, htmlContent: content };
+          } else {
+            // For regular content, extract plain text for storage
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            const plainText = tempDiv.textContent || tempDiv.innerText || '';
+            
+            // Store the plain text without HTML wrapping
+            return { ...block, htmlContent: plainText };
+          }
         }
         return block;
       });
       
       // Combine all blocks into final content with linebreaks preserved
       const combinedContent = updatedBlocks
-        .map(block => block.htmlContent)
+        .map(block => {
+          // For output, extract text content for database storage
+          if (/^<h[2-6]/.test(block.htmlContent)) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = block.htmlContent;
+            return tempDiv.textContent || tempDiv.innerText || '';
+          }
+          return block.htmlContent;
+        })
         .join('\n'); // Join with linebreaks
       
       onContentChange?.(combinedContent);
@@ -1567,6 +1605,28 @@ mud_deplines.content_raw`;
         
         .ProseMirror p {
           margin: 0;
+        }
+        
+        /* Tiptap heading styles for Visual mode */
+        .ProseMirror h2 {
+          font-size: 18px;
+          font-weight: bold;
+          margin: 0;
+          padding: 0;
+        }
+        
+        .ProseMirror h3 {
+          font-size: 16px;
+          font-weight: bold;
+          margin: 0;
+          padding: 0;
+        }
+        
+        .ProseMirror h4 {
+          font-size: 14px;
+          font-weight: bold;
+          margin: 0;
+          padding: 0;
         }
         
         kbd {
