@@ -636,10 +636,10 @@ function transformNwpiToGcon(nwpiRecord: any, userId: string) {
       console.log(`🔍 DEBUG - Transform result for ${nwpiField}:`, Object.keys(transformed));
       
       // Special logging for mud fields
-      if (transformed.mud_title) {
+      if ('mud_title' in transformed && transformed.mud_title) {
         console.log(`🌊 MUD_TITLE FOUND: "${transformed.mud_title}"`);
       }
-      if (transformed.mud_content) {
+      if ('mud_content' in transformed && transformed.mud_content) {
         console.log(`🌊 MUD_CONTENT FOUND: length=${transformed.mud_content.length}, preview="${transformed.mud_content.substring(0, 100)}..."`);
       }
       
