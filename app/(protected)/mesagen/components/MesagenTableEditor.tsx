@@ -67,11 +67,7 @@ function BlockEditor({
             class: 'tiptap-heading',
           },
         },
-        paragraph: {
-          HTMLAttributes: {
-            class: 'block-paragraph',
-          },
-        },
+        paragraph: false, // Disable automatic paragraph wrapping
         // Keep document but disable some document-level features
         hardBreak: false,
         // Disable horizontal rule and code block for simplicity
@@ -91,12 +87,7 @@ function BlockEditor({
       }),
       Underline,
     ],
-    content: block.htmlContent ? (
-      // Check if content already has HTML structure, if not wrap in paragraph
-      /^<h[1-6]|^<p|^<div|^<ul|^<ol|^<blockquote/i.test(block.htmlContent.trim())
-        ? block.htmlContent
-        : `<p>${block.htmlContent}</p>`
-    ) : '<p></p>',
+    content: block.htmlContent || '',
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
@@ -547,7 +538,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     const newBlock: EditorBlock = {
       id: generateId(),
       type: 'paragraph',
-      htmlContent: textAfterCursor ? `<p>${escapeHtml(textAfterCursor)}</p>` : '<p></p>'
+      htmlContent: textAfterCursor ? escapeHtml(textAfterCursor) : ''
     };
     
     setBlocks(prevBlocks => {

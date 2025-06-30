@@ -275,12 +275,15 @@ function tontoNormalizationProcess1(content: string): { mudContent: string; mudD
       // Convert Set to comma-separated string (no duplicates)
       const htmlTagsDetected = Array.from(tagsFound).join(',');
       
+      // Strip HTML tags from content before storing as raw content
+      const strippedLine = line.replace(/<[^>]+>/g, '').trim();
+      
       // Create mud_depline entry
       mudDeplines.push({
         fk_gcon_piece_id: '', // Will be set when calling this function
         depline_jnumber: index + 1, // Line numbering starts at 1
         depline_knumber: null,
-        content_raw: line,
+        content_raw: strippedLine,
         html_tags_detected: htmlTagsDetected
       });
     });

@@ -48,7 +48,7 @@ export default function TipTapEditor({ initialContent = '', content, onChange, o
       }),
       Underline,
     ],
-    content: initialContent || '<p>Start typing here...</p>',
+    content: initialContent || '',
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       setHtmlContent(html);
