@@ -134,6 +134,9 @@ Processing Steps:
 
       const result = await response.json();
       
+      // Add debug logging for mesagen f22
+      console.log('🔍 Mesagen F22 API Response:', result);
+      
       if (!result.success) {
         throw new Error(`F22 processing failed: ${result.message}`);
       }
@@ -156,6 +159,12 @@ API Results:
 - Records Succeeded: ${result.results?.succeeded || 0}
 - Records Failed: ${result.results?.failed || 0}
 - Message: ${result.message}
+
+Debug Information:
+- Response Time: ${duration}ms
+- API Call Time: ${endTime.toISOString()}
+- Full Response: Check browser console for details
+- Errors: ${result.results?.errors?.length || 0} errors logged
 
 Processing Results:
 ✓ BozoHTMLNormalizationProcess1: HTML content normalized to plaintext

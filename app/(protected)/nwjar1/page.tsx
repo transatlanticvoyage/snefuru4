@@ -352,14 +352,20 @@ export default function NwJar1Page() {
       try {
         result = JSON.parse(responseText);
       } catch (jsonError) {
-        console.error('JSON parsing error:', jsonError);
-        console.error('Response status:', response.status);
-        console.error('Response text:', responseText);
-        throw new Error(`Invalid JSON response from server. Response was: "${responseText.substring(0, 200)}..."`);
+        const debugInfo = {
+          jsonError: jsonError instanceof Error ? jsonError.message : 'Unknown JSON error',
+          responseStatus: response.status,
+          responseText: responseText.substring(0, 500)
+        };
+        console.error('JSON parsing error:', debugInfo);
+        throw new Error(`Invalid JSON response from server.\n\nDebug Info:\n- Status: ${response.status}\n- JSON Error: ${debugInfo.jsonError}\n- Response: "${responseText.substring(0, 200)}..."`);
       }
 
+      // Add debug logging
+      console.log('🔍 F22 API Response:', result);
+      
       if (result.success) {
-        alert(`Success: ${result.message}`);
+        alert(`Success: ${result.message}\n\nProcessed: ${result.results?.processed || 0}\nSucceeded: ${result.results?.succeeded || 0}\nFailed: ${result.results?.failed || 0}`);
         setF22Error(null); // Clear any previous errors on success
         // Could refresh data or show more detailed results here
       } else {

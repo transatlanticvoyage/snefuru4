@@ -64,13 +64,27 @@ export default function NwpiPusherButton({ data }: NwpiPusherButtonProps) {
       try {
         result = JSON.parse(responseText);
       } catch (jsonError) {
-        console.error('JSON parsing error:', jsonError);
-        console.error('Response status:', response.status);
-        console.error('Response text:', responseText);
-        throw new Error(`Invalid JSON response from server. Response was: "${responseText.substring(0, 200)}..."`);
+        const debugInfo = {
+          jsonError: jsonError instanceof Error ? jsonError.message : 'Unknown JSON error',
+          responseStatus: response.status,
+          responseText: responseText.substring(0, 500)
+        };
+        console.error('JSON parsing error:', debugInfo);
+        throw new Error(`Invalid JSON response from server.\n\nDebug Info:\n- Status: ${response.status}\n- JSON Error: ${debugInfo.jsonError}\n- Response: "${responseText.substring(0, 200)}..."`);
       }
 
-      setPushResult(result);
+      // Add debug info to the result for display in UI
+      const resultWithDebug = {
+        ...result,
+        _debugInfo: {
+          responseStatus: response.status,
+          responseSize: responseText.length,
+          timestamp: new Date().toISOString()
+        }
+      };
+      
+      console.log('🔍 F22 API Response:', resultWithDebug);
+      setPushResult(resultWithDebug);
       setShowResultModal(true);
 
     } catch (error) {
@@ -190,6 +204,29 @@ export default function NwpiPusherButton({ data }: NwpiPusherButtonProps) {
                       ✅ Successfully pushed {pushResult.results.succeeded} records to gcon_pieces. 
                       You can view them on the <a href="/gconjar1" className="underline font-medium">gconjar1 page</a>.
                     </p>
+                  </div>
+                )}
+
+                {/* Debug Info */}
+                {(pushResult as any)._debugInfo && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
+                    <h4 className="font-medium text-gray-900 mb-2">Debug Information:</h4>
+                    <div className="text-xs text-gray-600 space-y-1">
+                      <div>Response Status: {(pushResult as any)._debugInfo.responseStatus}</div>
+                      <div>Response Size: {(pushResult as any)._debugInfo.responseSize} bytes</div>
+                      <div>Timestamp: {(pushResult as any)._debugInfo.timestamp}</div>
+                      <div className="mt-2">
+                        <button
+                          onClick={() => {
+                            console.log('🔍 Full F22 Response Details:', pushResult);
+                            alert('Full response details logged to browser console (F12 → Console)');
+                          }}
+                          className="text-blue-600 hover:text-blue-800 underline text-xs"
+                        >
+                          Log Full Response to Console
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
