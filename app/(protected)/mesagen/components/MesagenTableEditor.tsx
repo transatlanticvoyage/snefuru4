@@ -1642,6 +1642,11 @@ mud_deplines.content_raw`;
           max-width: 120px;
           min-width: 60px;
         }
+        
+        /* Background color for all td cells except content column (horizomi #8) */
+        td:not(:nth-child(8)) {
+          background-color: #e7e7e7;
+        }
       `}</style>
     </div>
   );
