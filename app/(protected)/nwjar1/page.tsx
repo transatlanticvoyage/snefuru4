@@ -23,6 +23,7 @@ export default function NwJar1Page() {
   const [f47Loading, setF47Loading] = useState(false);
   const [f22Loading, setF22Loading] = useState(false);
   const [f22Error, setF22Error] = useState<{message: string, details?: any} | null>(null);
+  const [f22Report, setF22Report] = useState<string>('');
   const [f47Error, setF47Error] = useState<{message: string, details?: any} | null>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
@@ -325,6 +326,7 @@ export default function NwJar1Page() {
 
     setF22Loading(true);
     setF22Error(null); // Clear previous errors
+    setF22Report(''); // Clear previous reports
     try {
       const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
         method: 'POST',
@@ -365,7 +367,7 @@ export default function NwJar1Page() {
       console.log('🔍 F22 API Response:', result);
       
       if (result.success) {
-        // Create comprehensive success report similar to mesagen page
+        // Create comprehensive success report for popup display
         const successReport = `✅ F22 PROCESSING COMPLETED SUCCESSFULLY
 
 Execution Summary:
@@ -399,9 +401,8 @@ Debug Information:
 
 System Status: All operations completed successfully`;
 
-        alert(successReport);
+        setF22Report(successReport); // Store in popup instead of alert
         setF22Error(null); // Clear any previous errors on success
-        // Could refresh data or show more detailed results here
       } else {
         const errorMessage = result.message || 'Failed to push to GCon pieces';
         console.error('🚨 F22 API returned error:', result);
@@ -888,6 +889,60 @@ Recommendation: Check network connection and API availability`;
                         <p className="text-sm text-gray-600">
                           SOPTION2 selected: All {nwpiContent.length} items will be processed
                         </p>
+                      )}
+
+                      {/* Success Report Display Area */}
+                      {f22Report && (
+                        <div className="mt-6 space-y-4">
+                          <h4 className="text-md font-medium text-green-700">F22 Processing Report</h4>
+                          
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div className="flex justify-between items-start mb-4">
+                              <h5 className="text-lg font-medium text-green-800 flex items-center">
+                                <svg className="h-5 w-5 text-green-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                f22_nwpi_to_gcon_pusher Results
+                              </h5>
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(f22Report);
+                                  alert('Complete F22 report copied to clipboard!');
+                                }}
+                                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+                              >
+                                📋 Copy Full Report
+                              </button>
+                            </div>
+                            
+                            <div className="space-y-4 text-sm text-green-700">
+                              <div>
+                                <p className="font-medium text-green-800">Processing Report:</p>
+                                <div className="mt-1 bg-white p-3 rounded border text-green-900 font-mono text-sm max-h-96 overflow-y-auto whitespace-pre-wrap">
+                                  {f22Report}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="mt-4 flex gap-3">
+                              <button
+                                onClick={() => setF22Report('')}
+                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+                              >
+                                Clear Report
+                              </button>
+                              <button
+                                onClick={() => {
+                                  console.log('🔍 Full F22 Report:', f22Report);
+                                  alert('Full report logged to console (F12)');
+                                }}
+                                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-colors"
+                              >
+                                Log to Console
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       )}
 
                       {/* Error Display Area */}
