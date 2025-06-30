@@ -62,7 +62,7 @@ function BlockEditor({
       StarterKit.configure({
         // Configure for block-level editing  
         heading: { 
-          levels: [2, 3, 4],
+          levels: [1, 2, 3, 4, 5, 6],
           HTMLAttributes: {
             class: 'tiptap-heading',
           },
@@ -93,7 +93,7 @@ function BlockEditor({
     ],
     content: block.htmlContent ? (
       // Check if content already has HTML structure, if not wrap in paragraph
-      /^<h[2-6]|^<p|^<div|^<ul|^<ol|^<blockquote/i.test(block.htmlContent.trim())
+      /^<h[1-6]|^<p|^<div|^<ul|^<ol|^<blockquote/i.test(block.htmlContent.trim())
         ? block.htmlContent
         : `<p>${block.htmlContent}</p>`
     ) : '<p></p>',
@@ -336,7 +336,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
             });
           } else {
             // Check if content contains heading patterns or HTML tags
-            const hasHeadingTags = /<h[2-6][\s>]/i.test(content) || depline.html_tags_detected.includes('h2') || depline.html_tags_detected.includes('h3') || depline.html_tags_detected.includes('h4');
+            const hasHeadingTags = /<h[1-6][\s>]/i.test(content) || depline.html_tags_detected.includes('h1') || depline.html_tags_detected.includes('h2') || depline.html_tags_detected.includes('h3') || depline.html_tags_detected.includes('h4') || depline.html_tags_detected.includes('h5') || depline.html_tags_detected.includes('h6');
             
             if (hasHeadingTags) {
               // Content has heading structure
@@ -407,7 +407,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
             });
           } else {
             // Check if line contains heading tags or other HTML
-            const hasHeadingTags = /<h[2-6][\s>]/i.test(line);
+            const hasHeadingTags = /<h[1-6][\s>]/i.test(line);
             
             if (hasHeadingTags) {
               // Line has heading tags - preserve HTML structure

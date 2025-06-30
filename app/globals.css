@@ -85,3 +85,46 @@ body {
 .kz_gconjar1_table_cell.actions-column .kz_rigid_div_inside_td_1 {
   padding: 0px !important;
 }
+
+/* kzstylerule - Tiptap heading styles for visual mode in mesagen depline editors */
+.ProseMirror h1 {
+  font-size: 20px !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+.ProseMirror h2 {
+  font-size: 18px !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+.ProseMirror h3 {
+  font-size: 16px !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+.ProseMirror h4 {
+  font-size: 15px !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+.ProseMirror h5 {
+  font-size: 14px !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+.ProseMirror h6 {
+  font-size: 13px !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
