@@ -543,9 +543,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 Content
               </th>
-              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
-                html_tags_detected
-              </th>
+              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
             </tr>
