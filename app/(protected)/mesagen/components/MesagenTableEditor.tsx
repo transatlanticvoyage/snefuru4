@@ -780,7 +780,47 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                 lineyoshi
               </th>
               <th className="border border-gray-300 p-2">
-                <div className="font-bold text-sm text-purple-700">mud_content</div>
+                <div className="flex items-center gap-2">
+                  {/* Tooltip */}
+                  <div className="relative group">
+                    <div className="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold cursor-help">
+                      ?
+                    </div>
+                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50">
+                      <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line min-w-max">
+                        <div className="mb-2">
+                          <div>trace depline relationships to mud_content</div>
+                          <div></div>
+                          <div>gcon_pieces.mud_content</div>
+                          <div>gcon_pieces.id</div>
+                          <div>mud_deplines.fk_gcon_piece_id</div>
+                          <div>mud_deplines.content_raw</div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const textToCopy = `trace depline relationships to mud_content
+
+gcon_pieces.mud_content
+gcon_pieces.id
+mud_deplines.fk_gcon_piece_id
+mud_deplines.content_raw`;
+                            navigator.clipboard.writeText(textToCopy);
+                          }}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                      <div className="absolute top-full left-4 transform -translate-x-1/2 -mt-1">
+                        <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Label */}
+                  <div className="font-bold text-sm text-purple-700">mud_deplines.content_raw</div>
+                </div>
               </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
