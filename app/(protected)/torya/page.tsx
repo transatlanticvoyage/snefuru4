@@ -13,11 +13,18 @@ export default function ToryaPage() {
   const supabase = createClientComponentClient();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [gconPieceId, setGconPieceId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initialize any necessary data loading here
+    // Get gcon_piece_id from URL parameters
+    const gconPieceIdParam = searchParams?.get('gcon_piece_id');
+    if (gconPieceIdParam) {
+      setGconPieceId(gconPieceIdParam);
+      console.log('Torya: Loaded with gcon_piece_id:', gconPieceIdParam);
+    }
+    
     setLoading(false);
-  }, []);
+  }, [searchParams]);
 
   if (!user) {
     return (
@@ -57,7 +64,14 @@ export default function ToryaPage() {
           </Link>
         </div>
         <h1 className="text-2xl font-bold mb-6">Torya</h1>
-        <WaterTable />
+        {gconPieceId && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>gcon_piece_id:</strong> {gconPieceId}
+            </p>
+          </div>
+        )}
+        <WaterTable gconPieceId={gconPieceId} />
       </div>
     </div>
   );

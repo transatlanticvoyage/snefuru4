@@ -87,7 +87,11 @@ const generateMockData = (): WaterRecord[] => {
   return data;
 };
 
-export default function WaterTable() {
+interface WaterTableProps {
+  gconPieceId?: string | null;
+}
+
+export default function WaterTable({ gconPieceId }: WaterTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -125,8 +129,21 @@ export default function WaterTable() {
     const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('coltemp', colTemplate);
     params.set('stickycol', stickyCol);
+    
+    // Preserve gcon_piece_id if it exists
+    if (gconPieceId) {
+      params.set('gcon_piece_id', gconPieceId);
+    }
+    
     router.push(`?${params.toString()}`);
   };
+
+  // Log when gconPieceId changes
+  useEffect(() => {
+    if (gconPieceId) {
+      console.log('WaterTable: Operating with gcon_piece_id:', gconPieceId);
+    }
+  }, [gconPieceId]);
 
   const handleColumnTemplateChange = (option: ColumnTemplateKey) => {
     setSelectedColumnTemplate(option);
