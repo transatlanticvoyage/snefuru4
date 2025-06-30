@@ -733,7 +733,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2">
                 <div className="space-y-2">
-                  <div className="font-bold text-sm text-purple-700">aval_title</div>
+                  <div className="font-bold text-sm text-purple-700">mud_title</div>
                   <input
                     type="text"
                     value={initialTitle}
@@ -780,7 +780,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                 lineyoshi
               </th>
               <th className="border border-gray-300 p-2">
-                <div className="font-bold text-sm text-purple-700">aval_content</div>
+                <div className="font-bold text-sm text-purple-700">mud_content</div>
               </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
