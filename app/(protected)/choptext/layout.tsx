@@ -1,7 +1,7 @@
 'use client';
 
 import ProtectedRoute from '@/app/components/ProtectedRoute';
-import SharmiChopTextLayout from './components/ChopTextLayout';
+import SharmiChopTextLayout from './components/SharmiChopTextLayout';
 
 export default function SharmiChopTextLayoutWrapper({
   children,
