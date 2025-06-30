@@ -878,7 +878,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         console.log(`  Depline ${depline.depline_jnumber}: "${depline.content_raw}" (tags: ${depline.html_tags_detected})`);
       });
       
-      alert(`Successfully saved ${newDeplines.length} deplines to database\n\nCheck console (F12) for detailed save information`);
+      alert(`Successfully saved ${newDeplines.length} deplines to database\n\nmud_document field updated with compiled HTML\n\nCheck console (F12) for detailed save information`);
       
       // Force a refresh of the mud_deplines from database to verify save
       const { data: verifyData, error: verifyError } = await supabase
@@ -892,6 +892,32 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         verifyData.forEach((depline, index) => {
           console.log(`  DB Depline ${depline.depline_jnumber}: "${depline.content_raw}"`);
         });
+        
+        // Generate and save compiled mud_document HTML string
+        console.log('🔄 Generating compiled mud_document from mud_deplines...');
+        
+        // Combine content_raw values into a single HTML string
+        const compiledHtml = verifyData
+          .sort((a, b) => a.depline_jnumber - b.depline_jnumber)
+          .map(depline => depline.content_raw || '')
+          .join('\n');
+          
+        console.log(`📄 Generated mud_document (${compiledHtml.length} characters):`);
+        console.log(`"${compiledHtml.substring(0, 200)}..."`);
+        
+        // gcon_pieces.mud_document = live compiled version from mud_deplines
+        // gcon_pieces.mud_content = static snapshot from f22 — should not be updated again
+        const { error: updateError } = await supabase
+          .from('gcon_pieces')
+          .update({ mud_document: compiledHtml })
+          .eq('id', gconPieceId);
+          
+        if (updateError) {
+          console.error('❌ Error updating mud_document:', updateError);
+          alert('Warning: mud_deplines saved but failed to update mud_document field');
+        } else {
+          console.log('✅ Successfully updated gcon_pieces.mud_document');
+        }
       }
 
     } catch (error) {
