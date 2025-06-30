@@ -75,3 +75,13 @@ body {
   overflow: hidden;
   box-sizing: border-box;
 }
+
+/* kzstylerule - remove padding from actions1 and actions2 td elements in /gconjar1 table */
+.kz_gconjar1_table_cell.actions-column {
+  padding: 0px !important;
+}
+
+/* kzstylerule - ensure actions column inner divs also have no padding */
+.kz_gconjar1_table_cell.actions-column .kz_rigid_div_inside_td_1 {
+  padding: 0px !important;
+}

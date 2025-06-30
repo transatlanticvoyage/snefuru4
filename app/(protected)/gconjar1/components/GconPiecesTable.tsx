@@ -47,7 +47,8 @@ type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option
 
 const allColumns = [
   'select',
-  'actions',
+  'actions1',
+  'actions2',
   'id',
   'is_starred1',
   'is_starred2',
@@ -94,23 +95,23 @@ const sourceFieldMapping: Record<string, string> = {
 const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: string[] }> = {
   'option1': {
     name: 'col temp all',
-    range: 'columns 1-22',
+    range: 'columns 1-23',
     columns: allColumns
   },
   'option2': {
     name: 'col temp a',
-    range: 'columns 1-7',
-    columns: allColumns.slice(0, 7)
+    range: 'columns 1-8',
+    columns: allColumns.slice(0, 8)
   },
   'option3': {
     name: 'col temp b',
-    range: 'columns 8-15',
-    columns: allColumns.slice(7, 15)
+    range: 'columns 9-16',
+    columns: allColumns.slice(8, 16)
   },
   'option4': {
     name: 'col temp c',
-    range: 'columns 16-22',
-    columns: allColumns.slice(15, 22)
+    range: 'columns 17-23',
+    columns: allColumns.slice(16, 23)
   },
   'option5': {
     name: 'col temp d',
@@ -900,10 +901,12 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                     <th
                       key={`native-${col}`}
                       className={`kz_gconjar1_table_cell text-left text-xs text-gray-700 lowercase tracking-wider ${
-                        col === 'select' ? 'px-[6px] py-2' : 'px-6 py-2'
+                        col === 'select' ? 'px-[6px] py-2' : col === 'actions1' || col === 'actions2' ? '' : 'px-6 py-2'
                       } ${isSortable ? 'cursor-pointer hover:bg-blue-200' : ''} ${
                         isSticky ? 'sticky z-10' : ''
-                      } ${isSeparator ? 'border-r-4 border-black' : ''}`}
+                      } ${isSeparator ? 'border-r-4 border-black' : ''} ${
+                        col === 'actions1' || col === 'actions2' ? 'actions-column' : ''
+                      }`}
                       style={{
                         backgroundColor: colors['nativetier_gconjar_bgcolor1'] || '#dbeafe',
                         ...(isSticky ? { left: `${index * 150}px` } : {}),
@@ -926,10 +929,15 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             style={{ width: '18px', height: '18px' }}
                           />
                         </div>
-                      ) : col === 'actions' ? (
+                      ) : col === 'actions1' ? (
                         <div className="flex flex-col">
                           <div className="font-normal text-xs">nativetier</div>
-                          <div className="font-bold">actions</div>
+                          <div className="font-bold">actions1</div>
+                        </div>
+                      ) : col === 'actions2' ? (
+                        <div className="flex flex-col">
+                          <div className="font-normal text-xs">nativetier</div>
+                          <div className="font-bold">actions2</div>
                         </div>
                       ) : (
                         <div className="flex flex-col">
@@ -976,8 +984,8 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                           isSticky ? 'sticky bg-white z-10' : ''
                         } ${
                           isSeparator ? 'border-r-4 border-black' : ''
-                        } ${col === 'actions' || col === 'select' ? 'whitespace-nowrap' : ''}`}
-                        style={isSticky ? { left: `${index * 150}px`, padding: '0' } : { padding: '0' }}
+                        } ${col === 'actions1' || col === 'actions2' || col === 'select' ? 'whitespace-nowrap' : ''}`}
+                        style={isSticky ? { left: `${index * 150}px`, padding: col === 'actions1' || col === 'actions2' ? '0px' : '6px' } : { padding: col === 'actions1' || col === 'actions2' ? '0px' : '6px' }}
                         onClick={col === 'select' ? () => handleRowSelect(item.id) : undefined}
                       >
                         <div className="kz_rigid_div_inside_td_1">
@@ -997,81 +1005,83 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                               style={{ width: '18px', height: '18px' }}
                             />
                           </div>
-                        ) : col === 'actions' ? (
-                          <div className="w-80 space-y-1">
-                            {/* First row - 5 buttons (mesagen, edable and valan first) */}
-                            <div className="flex gap-1">
+                        ) : col === 'actions1' ? (
+                          <div style={{ padding: '0px' }}>
+                            <div style={{ padding: '0px', display: 'flex', flexDirection: 'column', gap: '0px' }}>
                               <Link
                                 href={`/mesagen`}
-                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium rounded text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /mesagen
                               </Link>
                               <Link
                                 href={`/edable/${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium rounded text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /edable
                               </Link>
                               <Link
                                 href={`/valan?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-green-300 text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-green-300 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /valan
                               </Link>
                               <Link
                                 href={`/torya?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /torya
                               </Link>
                               <Link
                                 href={`/torlid1?id=${item.id}&mtab=talk1`}
-                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /torlid1
                               </Link>
                             </div>
-                            {/* Second row - 5 buttons */}
-                            <div className="flex gap-1">
+                          </div>
+                        ) : col === 'actions2' ? (
+                          <div style={{ padding: '0px' }}>
+                            <div style={{ padding: '0px', display: 'flex', flexDirection: 'column', gap: '0px' }}>
                               <Link
                                 href={`/pedbar?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /pedbar
                               </Link>
                               <Link
                                 href={`/pedtor1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /pedtor
                               </Link>
                               <Link
                                 href={`/flatx1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /flatx1
                               </Link>
                               <Link
                                 href={`/slotx1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /slotx1
                               </Link>
                               <Link
                                 href={`/fanex1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                style={{ margin: '0px' }}
                               >
                                 /fanex1
-                              </Link>
-                            </div>
-                            {/* Third row - 1 button */}
-                            <div className="flex gap-1">
-                              <Link
-                                href={`/karfi1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                              >
-                                /karfi1
                               </Link>
                             </div>
                           </div>
