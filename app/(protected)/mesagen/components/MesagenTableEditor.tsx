@@ -1710,6 +1710,25 @@ mud_deplines.content_raw`;
                             // Allow natural cursor positioning from click
                             e.stopPropagation();
                           }}
+                          onKeyDown={(e) => {
+                            // Handle Enter key in HTML mode
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              handleEnterPressed(block.id);
+                            }
+                            
+                            // Handle Backspace at start of empty content
+                            if (e.key === 'Backspace') {
+                              const textarea = e.target as HTMLTextAreaElement;
+                              const { selectionStart, selectionEnd } = textarea;
+                              const isEmpty = resolvedContent.trim() === '';
+                              
+                              if (isEmpty || (selectionStart === 0 && selectionEnd === 0)) {
+                                e.preventDefault();
+                                handleBackspacePressed(block.id, resolvedContent);
+                              }
+                            }
+                          }}
                           className={`w-full p-2 font-mono text-xs bg-transparent border-none resize-none focus:outline-none ${
                             isDorli ? 'bg-orange-50' : 'bg-white'
                           }`}
