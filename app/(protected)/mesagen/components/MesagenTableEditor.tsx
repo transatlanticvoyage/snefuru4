@@ -42,21 +42,23 @@ function BlockEditor({
   onFocus,
   focused,
   onEditorReady,
-  isDorliBlock = false
+  isDorliBlock = false,
+  focusPosition = null
 }: {
   block: EditorBlock;
   onUpdate: (id: string, content: string) => void;
   onEnterPressed: (id: string, textAfterCursor?: string) => void;
-  onBackspacePressed: (id: string) => void;
+  onBackspacePressed: (id: string, currentText?: string) => void;
   onFocus: (id: string) => void;
   focused: boolean;
   onEditorReady?: (editor: any) => void;
   isDorliBlock?: boolean;
+  focusPosition?: number | null;
 }) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Configure for block-level editing
+        // Configure for block-level editing  
         heading: { levels: [2, 3] },
         paragraph: {
           HTMLAttributes: {
@@ -82,7 +84,7 @@ function BlockEditor({
       }),
       Underline,
     ],
-    content: block.htmlContent || '<p></p>',
+    content: block.htmlContent ? `<p>${block.htmlContent}</p>` : '<p></p>',
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
@@ -111,7 +113,7 @@ function BlockEditor({
           // Update current block with text before cursor
           // Wrap in paragraph tags to maintain proper HTML structure
           if (editor) {
-            editor.commands.setContent(beforeCursor ? `<p>${beforeCursor}</p>` : '<p></p>');
+            editor.commands.setContent(beforeCursor || '');
           }
           
           // Pass both block ID and the text after cursor
@@ -119,14 +121,19 @@ function BlockEditor({
           return true;
         }
         
-        // Handle Backspace at start of empty block - merge with previous
+        // Handle Backspace at start of block - merge with previous
         if (event.key === 'Backspace') {
           const { from, to } = view.state.selection;
-          const isEmpty = view.state.doc.textContent === '';
           
-          if (from === 0 && to === 0 && isEmpty) {
+          // Only handle if cursor is at the very start
+          if (from === 0 && to === 0) {
             event.preventDefault();
-            onBackspacePressed(block.id);
+            
+            // Get current block's text content
+            const currentText = view.state.doc.textContent;
+            
+            // Pass both block ID and current content to merge handler
+            onBackspacePressed(block.id, currentText);
             return true;
           }
         }
@@ -139,11 +146,17 @@ function BlockEditor({
   // Focus this editor when it becomes the focused block
   useEffect(() => {
     if (focused && editor) {
-      // Focus at the start of the editor to place cursor at beginning
-      editor.commands.focus('start');
+      if (focusPosition !== null && focusPosition >= 0) {
+        // Set cursor at specific position after merge
+        editor.commands.focus();
+        editor.commands.setTextSelection(focusPosition);
+      } else {
+        // Focus at the start of the editor to place cursor at beginning
+        editor.commands.focus('start');
+      }
       onEditorReady?.(editor);
     }
-  }, [focused, editor, onEditorReady]);
+  }, [focused, editor, onEditorReady, focusPosition]);
 
   if (!editor) {
     return (
@@ -192,6 +205,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
   const [selectedBlocks, setSelectedBlocks] = useState<Set<string>>(new Set());
   const [mudDeplines, setMudDeplines] = useState<MudDepline[]>([]);
   const [loading, setLoading] = useState(false);
+  const [mergePosition, setMergePosition] = useState<number | null>(null);
 
   // Dummy dorli functions for UI-only version (no backend)
   const getDorliByPlaceholder = (placeholder: string) => null;
@@ -264,7 +278,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         parsedBlocks.push({
           id: generateId(),
           type: 'paragraph',
-          htmlContent: '<p>Start typing...</p>'
+          htmlContent: 'Start typing...'
         });
       } else {
         console.log('Parsing content by linebreaks. Original length:', html.length);
@@ -275,59 +289,31 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         console.log(`Found ${lines.length} lines in content`);
         
         lines.forEach((line, index) => {
-          // Keep the line exactly as is, including empty lines
-          const trimmedLine = line.trim();
-          
-          if (trimmedLine === '') {
-            // Empty line - create an empty paragraph
+          // Keep the line exactly as is - no automatic paragraph wrapping
+          if (line === '') {
+            // Empty line - store as empty content
             parsedBlocks.push({
               id: generateId(),
               type: 'paragraph',
-              htmlContent: '<p></p>'
+              htmlContent: ''
             });
           } else {
-            // Line has content - detect if it's already a complete HTML element
-            const isCompleteElement = /^<(?:h[1-6]|p|div|ul|ol|li|blockquote)[^>]*>.*<\/(?:h[1-6]|p|div|ul|ol|li|blockquote)>$/i.test(trimmedLine);
-            
-            if (isCompleteElement) {
-              // It's already a complete HTML block element
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = trimmedLine;
-              const element = tempDiv.firstElementChild;
-              
-              if (element) {
-                const tagName = element.tagName.toLowerCase();
-                parsedBlocks.push({
-                  id: generateId(),
-                  type: tagName,
-                  htmlContent: trimmedLine
-                });
-              } else {
-                // Fallback if parsing fails
-                parsedBlocks.push({
-                  id: generateId(),
-                  type: 'paragraph',
-                  htmlContent: `<p>${line}</p>` // Use original line with spaces
-                });
-              }
-            } else {
-              // It's text content (may include inline HTML) - wrap in paragraph
-              parsedBlocks.push({
-                id: generateId(),
-                type: 'paragraph',
-                htmlContent: `<p>${line}</p>` // Use original line with spaces preserved
-              });
-            }
+            // Store the line exactly as provided without wrapping
+            parsedBlocks.push({
+              id: generateId(),
+              type: 'paragraph',
+              htmlContent: line
+            });
           }
         });
       }
     } catch (error) {
       console.error('Error parsing content by linebreaks:', error);
-      // Fallback to a single paragraph with the original content
+      // Fallback to a single block with the original content
       parsedBlocks.push({
         id: generateId(),
         type: 'paragraph',
-        htmlContent: `<p>${html || 'Error parsing content. Please try again.'}</p>`
+        htmlContent: html || 'Error parsing content. Please try again.'
       });
     }
     
@@ -368,39 +354,34 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     setBlocks(prevBlocks => {
       const updatedBlocks = prevBlocks.map(block => {
         if (block.id === blockId) {
-          // Find the original block content from the initial parsing
-          const originalBlock = blocks.find(b => b.id === blockId);
-          if (!originalBlock) return block;
+          // Extract plain text content (strip HTML tags) for storage
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = content;
+          const plainText = tempDiv.textContent || tempDiv.innerText || '';
           
-          // For UI-only version, just update the block normally (no dorli handling)
-          return { ...block, htmlContent: content };
+          // Store the plain text without HTML wrapping
+          return { ...block, htmlContent: plainText };
         }
         return block;
       });
       
-      // Combine all blocks into final HTML with linebreaks preserved
-      const combinedHtml = updatedBlocks
-        .map(block => {
-          // Extract content from paragraph tags for line-based storage
-          if (block.htmlContent.startsWith('<p>') && block.htmlContent.endsWith('</p>')) {
-            return block.htmlContent.slice(3, -4); // Remove <p> and </p>
-          }
-          return block.htmlContent;
-        })
+      // Combine all blocks into final content with linebreaks preserved
+      const combinedContent = updatedBlocks
+        .map(block => block.htmlContent)
         .join('\n'); // Join with linebreaks
       
-      onContentChange?.(combinedHtml);
+      onContentChange?.(combinedContent);
       
       return updatedBlocks;
     });
-  }, [blocks, onContentChange, getDorliByPlaceholder, updateDorliBlock, extractDorliPlaceholder]);
+  }, [blocks, onContentChange]);
 
   const handleAddRowBelow = useCallback((rowIndex: number) => {
     // Create new blank block
     const newBlock: EditorBlock = {
       id: generateId(),
       type: 'paragraph',
-      htmlContent: '<p></p>'
+      htmlContent: ''
     };
     
     // Insert the new block at the specified position
@@ -410,13 +391,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
       
       // Update aval_content to maintain line-by-line sync
       const combinedHtml = newBlocks
-        .map(block => {
-          // Extract content from paragraph tags for line-based storage
-          if (block.htmlContent.startsWith('<p>') && block.htmlContent.endsWith('</p>')) {
-            return block.htmlContent.slice(3, -4); // Remove <p> and </p>
-          }
-          return block.htmlContent;
-        })
+        .map(block => block.htmlContent)
         .join('\n'); // Join with linebreaks
       
       onContentChange?.(combinedHtml);
@@ -469,8 +444,8 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
           const { error: updateError } = await supabase
             .from('mud_deplines')
             .update({ 
-              content_raw: currentBlock.htmlContent.replace(/<[^>]*>/g, ''), 
-              html_tags_detected: extractHtmlTags(currentBlock.htmlContent) 
+              content_raw: currentBlock.htmlContent || '', 
+              html_tags_detected: '' // No HTML tags since we store plain text 
             })
             .eq('depline_id', currentDepline.depline_id);
             
@@ -502,7 +477,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
             depline_jnumber: blockIndex + 2,
             depline_knumber: null,
             content_raw: textAfterCursor || '',
-            html_tags_detected: textAfterCursor ? extractHtmlTags(`<p>${textAfterCursor}</p>`) : '',
+            html_tags_detected: '', // No HTML tags since we store plain text
             created_at: new Date().toISOString()
           });
           
@@ -531,7 +506,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     }, 50);
   }, [blocks, gconPieceId, mudDeplines, activeEditor]);
 
-  const handleBackspacePressed = useCallback((blockId: string) => {
+  const handleBackspacePressed = useCallback(async (blockId: string, currentText?: string) => {
     const blockIndex = blocks.findIndex(b => b.id === blockId);
     
     // Don't delete if it's the only block
@@ -540,23 +515,120 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     // Don't delete if it's the first block
     if (blockIndex <= 0) return;
     
-    // Remove this block and focus the previous one
+    const currentBlock = blocks[blockIndex];
+    const previousBlock = blocks[blockIndex - 1];
+    
+    if (!previousBlock) return;
+    
+    // Get the previous block's text content (strip HTML tags)
+    const previousText = previousBlock.htmlContent.replace(/<[^>]*>/g, '');
+    const mergedText = previousText + (currentText || '');
+    
+    // Escape HTML for the merged content
+    const escapeHtml = (text: string) => {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    };
+    
+    // Update the previous block with merged content
+    const updatedPreviousBlock = {
+      ...previousBlock,
+      htmlContent: `<p>${escapeHtml(mergedText)}</p>`
+    };
+    
+    // Update blocks state
     setBlocks(prevBlocks => {
-      const newBlocks = prevBlocks.filter(b => b.id !== blockId);
+      const newBlocks = [...prevBlocks];
+      // Update previous block
+      newBlocks[blockIndex - 1] = updatedPreviousBlock;
+      // Remove current block
+      newBlocks.splice(blockIndex, 1);
       return newBlocks;
     });
     
-    // Focus the previous block
-    const previousBlock = blocks[blockIndex - 1];
-    if (previousBlock) {
-      setFocusedBlock(previousBlock.id);
+    // If we have gconPieceId, update mud_deplines in the database
+    if (gconPieceId) {
+      try {
+        const { createClientComponentClient } = await import('@supabase/auth-helpers-nextjs');
+        const supabase = createClientComponentClient();
+        
+        // Get deplines for current and previous blocks
+        const currentDepline = mudDeplines.find(d => d.depline_jnumber === blockIndex + 1);
+        const previousDepline = mudDeplines.find(d => d.depline_jnumber === blockIndex);
+        
+        if (previousDepline) {
+          // Update previous depline with merged content
+          const { error: updateError } = await supabase
+            .from('mud_deplines')
+            .update({ 
+              content_raw: mergedText,
+              html_tags_detected: '' // No HTML tags since we store plain text
+            })
+            .eq('depline_id', previousDepline.depline_id);
+            
+          if (updateError) {
+            console.error('Error updating previous depline:', updateError);
+          }
+        }
+        
+        if (currentDepline) {
+          // Delete current depline
+          const { error: deleteError } = await supabase
+            .from('mud_deplines')
+            .delete()
+            .eq('depline_id', currentDepline.depline_id);
+            
+          if (deleteError) {
+            console.error('Error deleting current depline:', deleteError);
+          }
+        }
+        
+        // Decrement jnumber for all deplines after the deleted one
+        const deplinesAfter = mudDeplines.filter(d => d.depline_jnumber > blockIndex + 1);
+        for (const depline of deplinesAfter) {
+          const { error: updateError } = await supabase
+            .from('mud_deplines')
+            .update({ depline_jnumber: depline.depline_jnumber - 1 })
+            .eq('depline_id', depline.depline_id);
+            
+          if (updateError) {
+            console.error('Error decrementing depline jnumber:', updateError);
+          }
+        }
+        
+        // Refresh mud_deplines data
+        const { data: newDeplines, error: fetchError } = await supabase
+          .from('mud_deplines')
+          .select('*')
+          .eq('fk_gcon_piece_id', gconPieceId)
+          .order('depline_jnumber', { ascending: true });
+          
+        if (!fetchError && newDeplines) {
+          setMudDeplines(newDeplines);
+        }
+      } catch (error) {
+        console.error('Error handling Backspace with mud_deplines:', error);
+      }
     }
-  }, [blocks]);
+    
+    // Focus the previous block and set cursor at the merge point
+    setTimeout(() => {
+      setFocusedBlock(previousBlock.id);
+      // The cursor position will be set in the BlockEditor's useEffect
+      // We need to store where the merge happened
+      setMergePosition(previousText.length);
+    }, 50);
+  }, [blocks, gconPieceId, mudDeplines]);
 
   const handleBlockFocus = useCallback((blockId: string) => {
     setFocusedBlock(blockId);
+    // Clear merge position after it's been used
+    if (mergePosition !== null) {
+      setTimeout(() => setMergePosition(null), 100);
+    }
     // Keep view mode consistent across blocks - don't reset it
-  }, []);
+  }, [mergePosition]);
 
   const handleEditorReady = useCallback((editor: any) => {
     setActiveEditor(editor);
@@ -1394,6 +1466,7 @@ mud_deplines.content_raw`;
                         focused={focusedBlock === block.id}
                         onEditorReady={handleEditorReady}
                         isDorliBlock={isDorli}
+                        focusPosition={focusedBlock === block.id ? mergePosition : null}
                       />
                     );
                   })()}
@@ -1447,7 +1520,7 @@ mud_deplines.content_raw`;
               const newBlock: EditorBlock = {
                 id: generateId(),
                 type: 'paragraph',
-                htmlContent: '<p></p>'
+                htmlContent: ''
               };
               setBlocks(prev => [...prev, newBlock]);
               setFocusedBlock(newBlock.id);
