@@ -37,10 +37,26 @@ export default function MesagenPage() {
   // Get ID from URL parameters
   const id = params?.id as string;
 
-  // Initialize current URL
+  // Initialize current URL and accordion state
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setCurrentUrl(window.location.href);
+      
+      // Check URL parameter for zarno1
+      const urlParams = new URLSearchParams(window.location.search);
+      const zarno1Param = urlParams.get('zarno1');
+      
+      // Check localStorage for saved state
+      const savedState = localStorage.getItem('mesagen_zarno1_state');
+      
+      // Priority: URL parameter > localStorage > default (open)
+      if (zarno1Param === 'closed') {
+        setIsTopAreaOpen(false);
+      } else if (zarno1Param === 'open') {
+        setIsTopAreaOpen(true);
+      } else if (savedState) {
+        setIsTopAreaOpen(savedState === 'open');
+      }
     }
   }, []);
 
@@ -298,6 +314,19 @@ Recommendation: Check logs and retry operation`;
     setActivePopupTab(tab);
   };
 
+  // Handle accordion state change
+  const handleAccordionToggle = (open: boolean) => {
+    setIsTopAreaOpen(open);
+    
+    // Save to localStorage
+    localStorage.setItem('mesagen_zarno1_state', open ? 'open' : 'closed');
+    
+    // Update URL parameter
+    const url = new URL(window.location.href);
+    url.searchParams.set('zarno1', open ? 'open' : 'closed');
+    window.history.replaceState({}, '', url.toString());
+  };
+
   // Set initial content when data loads
   useEffect(() => {
     if (gconPiece?.mud_title) {
@@ -352,7 +381,7 @@ Recommendation: Check logs and retry operation`;
     <div className="min-h-screen bg-gray-50">
       <div className="p-4">
         <div className="mb-4">
-          <div className="flex items-start" style={{ gap: '16px' }}>
+          <div className="flex items-start gap-4">
             <div className="bg-gray-100 rounded-lg p-4" style={{ width: '330px' }}>
               <div className="mb-2">
                 <Link href="/gconjar1" className="text-purple-600 hover:text-purple-800">
@@ -398,26 +427,36 @@ Recommendation: Check logs and retry operation`;
             {!isTopAreaOpen ? (
               // Collapsed State - Compact View
               <div 
-                className="flex items-center justify-center cursor-pointer hover:bg-yellow-50 transition-colors"
+                className="flex items-center justify-between px-4 hover:bg-yellow-50 transition-colors"
                 style={{ width: '200px', height: '60px' }}
-                onClick={() => setIsTopAreaOpen(true)}
               >
-                <span className="text-sm font-medium text-gray-700">
+                <span 
+                  className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                  onClick={() => handleAccordionToggle(true)}
+                >
                   📂 Open Top Area Manager
                 </span>
+                <span className="text-xs text-gray-500 ml-2">zarno1</span>
               </div>
             ) : (
               // Expanded State - Full Content
-              <div className="p-4">
-                {/* Close/Compact Button */}
-                <div className="flex justify-end mb-4">
+              <div>
+                {/* Top bar with Compact Button and zarno1 label */}
+                <div 
+                  className="flex items-center justify-between px-4 border-b border-gray-200"
+                  style={{ height: '60px', backgroundColor: '#fefef8' }}
+                >
                   <button
-                    onClick={() => setIsTopAreaOpen(false)}
-                    className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded transition-colors"
+                    onClick={() => handleAccordionToggle(false)}
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
                   >
                     📁 Compact
                   </button>
+                  <span className="text-xs text-gray-500">zarno1</span>
                 </div>
+                
+                {/* Content area */}
+                <div className="p-4">
                 
                 {/* Original Content */}
                 <div className="flex items-start justify-between">
@@ -565,6 +604,7 @@ Recommendation: Check logs and retry operation`;
                       )}
                     </div>
                   </div>
+                </div>
                 </div>
                 </div>
               </div>
