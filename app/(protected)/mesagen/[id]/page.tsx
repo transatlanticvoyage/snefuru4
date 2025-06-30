@@ -25,11 +25,23 @@ export default function MesagenPage() {
   const [error, setError] = useState<string | null>(null);
   const [showMudContentModal, setShowMudContentModal] = useState(false);
   const [showMudDocumentModal, setShowMudDocumentModal] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [activePopupTab, setActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
+  const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
+  const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
+  const [currentUrl, setCurrentUrl] = useState<string>('');
   
   const supabase = createClientComponentClient();
   
   // Get ID from URL parameters
   const id = params?.id as string;
+
+  // Initialize current URL
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCurrentUrl(window.location.href);
+    }
+  }, []);
 
   // Fetch gcon_piece data
   useEffect(() => {
@@ -271,6 +283,20 @@ Recommendation: Check logs and retry operation`;
     }
   };
 
+  // Handle popup open/close
+  const handlePopupOpen = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handlePopupClose = () => {
+    setIsPopupOpen(false);
+  };
+
+  // Handle tab change
+  const handleTabChange = (tab: 'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7') => {
+    setActivePopupTab(tab);
+  };
+
   // Set initial content when data loads
   useEffect(() => {
     if (gconPiece?.mud_title) {
@@ -325,22 +351,40 @@ Recommendation: Check logs and retry operation`;
     <div className="min-h-screen bg-gray-50">
       <div className="p-4">
         <div className="mb-4">
-          <div className="bg-gray-100 rounded-lg p-4" style={{ width: '330px' }}>
-            <div className="mb-2">
-              <Link href="/gconjar1" className="text-purple-600 hover:text-purple-800">
-                ← Back to GconJar1
-              </Link>
+          <div className="flex items-start" style={{ gap: '16px' }}>
+            <div className="bg-gray-100 rounded-lg p-4" style={{ width: '330px' }}>
+              <div className="mb-2">
+                <Link href="/gconjar1" className="text-purple-600 hover:text-purple-800">
+                  ← Back to GconJar1
+                </Link>
+              </div>
+              <h1 className="text-2xl font-bold text-purple-800">Mesagen - Advanced Table Editor</h1>
+              <div className="text-sm text-gray-600 mt-1">
+                <span>Editing: {gconPiece?.meta_title || 'Untitled'}</span>
+                {gconPiece?.asn_sitespren_base && (
+                  <span className="ml-2">({gconPiece.asn_sitespren_base})</span>
+                )}
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                ID: {id}
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-purple-800">Mesagen - Advanced Table Editor</h1>
-            <div className="text-sm text-gray-600 mt-1">
-              <span>Editing: {gconPiece?.meta_title || 'Untitled'}</span>
-              {gconPiece?.asn_sitespren_base && (
-                <span className="ml-2">({gconPiece.asn_sitespren_base})</span>
-              )}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              ID: {id}
-            </div>
+            
+            {/* Functions Button */}
+            <button
+              onClick={handlePopupOpen}
+              className="font-bold text-white rounded"
+              style={{
+                backgroundColor: '#800000',
+                fontSize: '20px',
+                paddingLeft: '14px',
+                paddingRight: '14px',
+                paddingTop: '10px',
+                paddingBottom: '10px'
+              }}
+            >
+              functions popup
+            </button>
           </div>
         </div>
         
@@ -596,6 +640,129 @@ Recommendation: Check logs and retry operation`;
               <div className="mt-4 text-xs text-gray-600">
                 <p><strong>Content Length:</strong> {gconPiece?.mud_document?.length || 0} characters</p>
                 <p><strong>Record ID:</strong> {id}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Functions Popup Modal */}
+        {isPopupOpen && (
+          <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white rounded-lg shadow-xl w-full h-full max-w-[95vw] max-h-[95vh] flex flex-col">
+              
+              {/* Header Bar 1 - URL Display */}
+              <div 
+                className="flex justify-between items-center px-4 py-3 border-b"
+                style={{ backgroundColor: uelBar37Colors.bg, color: uelBar37Colors.text }}
+              >
+                <div className="flex items-center gap-4">
+                  <span className="font-medium">BROWSER URL:</span>
+                  <span className="text-sm font-mono">{currentUrl}</span>
+                </div>
+                <button
+                  onClick={handlePopupClose}
+                  className="text-xl font-bold hover:opacity-75"
+                  style={{ color: uelBar37Colors.text }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Header Bar 2 - Actions */}
+              <div 
+                className="flex justify-between items-center px-4 py-3 border-b"
+                style={{ backgroundColor: uelBarColors.bg, color: uelBarColors.text }}
+              >
+                <div className="flex items-center gap-4">
+                  <span className="font-medium">Mesagen Functions:</span>
+                  <span className="text-sm">Select action mode</span>
+                </div>
+                <button
+                  onClick={handlePopupClose}
+                  className="text-xl font-bold hover:opacity-75"
+                  style={{ color: uelBarColors.text }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Tab Navigation */}
+              <div className="flex border-b bg-gray-50">
+                {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => handleTabChange(tab as any)}
+                    className={`px-4 py-2 font-medium border-r last:border-r-0 transition-colors ${
+                      activePopupTab === tab
+                        ? 'bg-blue-100 text-blue-700 border-b-2 border-blue-500'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {tab.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab Content */}
+              <div className="flex-1 p-6 overflow-auto">
+                {activePopupTab === 'ptab1' && (
+                  <div className="text-center text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">PTAB1 Content</h3>
+                    <p>Content for tab 1 will be added here.</p>
+                  </div>
+                )}
+                
+                {activePopupTab === 'ptab2' && (
+                  <div className="text-center text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">PTAB2 Content</h3>
+                    <p>Content for tab 2 will be added here.</p>
+                  </div>
+                )}
+                
+                {activePopupTab === 'ptab3' && (
+                  <div className="text-center text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">PTAB3 Content</h3>
+                    <p>Content for tab 3 will be added here.</p>
+                  </div>
+                )}
+                
+                {activePopupTab === 'ptab4' && (
+                  <div className="text-center text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">PTAB4 Content</h3>
+                    <p>Content for tab 4 will be added here.</p>
+                  </div>
+                )}
+                
+                {activePopupTab === 'ptab5' && (
+                  <div className="text-center text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">PTAB5 Content</h3>
+                    <p>Content for tab 5 will be added here.</p>
+                  </div>
+                )}
+                
+                {activePopupTab === 'ptab6' && (
+                  <div className="text-center text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">PTAB6 Content</h3>
+                    <p>Content for tab 6 will be added here.</p>
+                  </div>
+                )}
+                
+                {activePopupTab === 'ptab7' && (
+                  <div className="text-center text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">PTAB7 Content</h3>
+                    <p>Content for tab 7 will be added here.</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Footer */}
+              <div className="border-t px-4 py-3 bg-gray-50 flex justify-end">
+                <button
+                  onClick={handlePopupClose}
+                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
