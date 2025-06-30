@@ -67,7 +67,11 @@ function BlockEditor({
             class: 'tiptap-heading',
           },
         },
-        paragraph: false, // Disable automatic paragraph wrapping
+        paragraph: {
+          HTMLAttributes: {
+            class: 'block-paragraph',
+          },
+        },
         // Keep document but disable some document-level features
         hardBreak: false,
         // Disable horizontal rule and code block for simplicity
