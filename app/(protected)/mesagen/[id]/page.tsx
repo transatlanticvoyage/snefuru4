@@ -436,6 +436,7 @@ Recommendation: Check logs and retry operation`;
             </div>
           </div>
         </div>
+        </div>
 
         {/* Main Table Editor */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
