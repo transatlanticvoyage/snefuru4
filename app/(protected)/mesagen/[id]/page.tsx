@@ -346,8 +346,6 @@ Recommendation: Check logs and retry operation`;
         
         <div className="mb-4">
           <div className="flex items-start justify-between">
-            <div>
-            
             <div className="flex gap-6">
               {/* mud_content Display Section */}
               <div className="flex flex-col">
@@ -493,7 +491,6 @@ Recommendation: Check logs and retry operation`;
               </div>
             </div>
           </div>
-        </div>
         </div>
 
         {/* Main Table Editor */}
