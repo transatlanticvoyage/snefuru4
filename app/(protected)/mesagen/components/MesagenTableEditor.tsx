@@ -532,7 +532,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
             <tr className="bg-purple-50">
               <th className="border border-gray-300 bg-purple-50 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">1</div>
+                  <div className="text-center text-xs font-normal text-gray-600">1</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line">
                       <div className="mb-2">
@@ -560,7 +560,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50" style={{ padding: '6px 10px', width: '46px', maxWidth: '46px', minWidth: '46px' }}>
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">2</div>
+                  <div className="text-center text-xs font-normal text-gray-600">2</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -584,7 +584,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2 w-20">
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">3</div>
+                  <div className="text-center text-xs font-normal text-gray-600">3</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -608,7 +608,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2 w-20">
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">4</div>
+                  <div className="text-center text-xs font-normal text-gray-600">4</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -632,7 +632,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2" style={{ width: '120px' }}>
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">5</div>
+                  <div className="text-center text-xs font-normal text-gray-600">5</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -656,7 +656,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2" style={{ width: '100px' }}>
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">6</div>
+                  <div className="text-center text-xs font-normal text-gray-600">6</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -680,7 +680,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2 w-20">
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">7</div>
+                  <div className="text-center text-xs font-normal text-gray-600">7</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -704,7 +704,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2" style={{ width: '600px' }}>
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">8</div>
+                  <div className="text-center text-xs font-normal text-gray-600">8</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -728,7 +728,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2 w-20">
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">9</div>
+                  <div className="text-center text-xs font-normal text-gray-600">9</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -752,7 +752,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2 w-20">
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">10</div>
+                  <div className="text-center text-xs font-normal text-gray-600">10</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
@@ -776,7 +776,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2 w-20">
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">11</div>
+                  <div className="text-center text-xs font-normal text-gray-600">11</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
                     <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                       <div className="mb-2">
