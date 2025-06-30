@@ -600,10 +600,10 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 Content
               </th>
-              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
             </tr>
@@ -624,6 +624,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                 </div>
               </th>
               <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
+              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
