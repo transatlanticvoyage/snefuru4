@@ -46,7 +46,7 @@ function BlockEditor({
 }: {
   block: EditorBlock;
   onUpdate: (id: string, content: string) => void;
-  onEnterPressed: (id: string) => void;
+  onEnterPressed: (id: string, textAfterCursor?: string) => void;
   onBackspacePressed: (id: string) => void;
   onFocus: (id: string) => void;
   focused: boolean;
@@ -99,7 +99,21 @@ function BlockEditor({
         // Handle Enter key - create new block
         if (event.key === 'Enter' && !event.shiftKey) {
           event.preventDefault();
-          onEnterPressed(block.id);
+          
+          // Get cursor position and text content
+          const { from } = view.state.selection;
+          const text = view.state.doc.textContent;
+          
+          // Split text at cursor position
+          const beforeCursor = text.slice(0, from);
+          const afterCursor = text.slice(from);
+          
+          // Update current block with text before cursor
+          // Wrap in paragraph tags to maintain proper HTML structure
+          editor.commands.setContent(beforeCursor ? `<p>${beforeCursor}</p>` : '<p></p>');
+          
+          // Pass both block ID and the text after cursor
+          onEnterPressed(block.id, afterCursor);
           return true;
         }
         
@@ -123,7 +137,8 @@ function BlockEditor({
   // Focus this editor when it becomes the focused block
   useEffect(() => {
     if (focused && editor) {
-      editor.commands.focus();
+      // Focus at the start of the editor to place cursor at beginning
+      editor.commands.focus('start');
       onEditorReady?.(editor);
     }
   }, [focused, editor, onEditorReady]);
@@ -153,6 +168,19 @@ function BlockEditor({
 }
 
 type ViewMode = 'visual' | 'html';
+
+// Helper function to extract HTML tags from content
+function extractHtmlTags(html: string): string {
+  const tagRegex = /<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
+  const tags = new Set<string>();
+  let match;
+  
+  while ((match = tagRegex.exec(html)) !== null) {
+    tags.add(match[1].toLowerCase());
+  }
+  
+  return Array.from(tags).join(',');
+}
 
 export default function MesagenTableEditor({ initialContent = '<p>Start typing...</p>', onContentChange, gconPieceId, initialTitle = '', onTitleChange }: MesagenTableEditorProps) {
   const [blocks, setBlocks] = useState<EditorBlock[]>([]);
@@ -400,15 +428,22 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     }, 50);
   }, [blocks, onContentChange]);
 
-  const handleEnterPressed = useCallback((blockId: string) => {
+  const handleEnterPressed = useCallback(async (blockId: string, textAfterCursor?: string) => {
     const blockIndex = blocks.findIndex(b => b.id === blockId);
     if (blockIndex === -1) return;
     
-    // Create new block after current one
+    // Create new block after current one with the text after cursor
+    // Escape HTML characters to prevent XSS
+    const escapeHtml = (text: string) => {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    };
+    
     const newBlock: EditorBlock = {
       id: generateId(),
       type: 'paragraph',
-      htmlContent: '<p></p>'
+      htmlContent: textAfterCursor ? `<p>${escapeHtml(textAfterCursor)}</p>` : '<p></p>'
     };
     
     setBlocks(prevBlocks => {
@@ -417,11 +452,82 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
       return newBlocks;
     });
     
+    // If we have gconPieceId, update mud_deplines in the database
+    if (gconPieceId) {
+      try {
+        const { createClientComponentClient } = await import('@supabase/auth-helpers-nextjs');
+        const supabase = createClientComponentClient();
+        
+        // Get current block's content for updating current depline
+        const currentBlock = blocks[blockIndex];
+        const currentDepline = mudDeplines.find(d => d.depline_jnumber === blockIndex + 1);
+        
+        if (currentDepline) {
+          // Update current depline with text before cursor
+          const { error: updateError } = await supabase
+            .from('mud_deplines')
+            .update({ 
+              content_raw: currentBlock.htmlContent.replace(/<[^>]*>/g, ''), 
+              html_tags_detected: extractHtmlTags(currentBlock.htmlContent) 
+            })
+            .eq('depline_id', currentDepline.depline_id);
+            
+          if (updateError) {
+            console.error('Error updating current depline:', updateError);
+          }
+        }
+        
+        // Increment jnumber for all deplines after the current position
+        // Supabase doesn't support SQL expressions in update, so we need to do it manually
+        const deplinesAfter = mudDeplines.filter(d => d.depline_jnumber > blockIndex + 1);
+        for (const depline of deplinesAfter) {
+          const { error: updateError } = await supabase
+            .from('mud_deplines')
+            .update({ depline_jnumber: depline.depline_jnumber + 1 })
+            .eq('depline_id', depline.depline_id);
+            
+          if (updateError) {
+            console.error('Error incrementing depline jnumber:', updateError);
+          }
+        }
+        
+        // Insert new depline for the new block
+        const { error: insertError } = await supabase
+          .from('mud_deplines')
+          .insert({
+            depline_id: crypto.randomUUID(),
+            fk_gcon_piece_id: gconPieceId,
+            depline_jnumber: blockIndex + 2,
+            depline_knumber: null,
+            content_raw: textAfterCursor || '',
+            html_tags_detected: textAfterCursor ? extractHtmlTags(`<p>${textAfterCursor}</p>`) : '',
+            created_at: new Date().toISOString()
+          });
+          
+        if (insertError) {
+          console.error('Error inserting new depline:', insertError);
+        }
+        
+        // Refresh mud_deplines data
+        const { data: newDeplines, error: fetchError } = await supabase
+          .from('mud_deplines')
+          .select('*')
+          .eq('fk_gcon_piece_id', gconPieceId)
+          .order('depline_jnumber', { ascending: true });
+          
+        if (!fetchError && newDeplines) {
+          setMudDeplines(newDeplines);
+        }
+      } catch (error) {
+        console.error('Error handling Enter press with mud_deplines:', error);
+      }
+    }
+    
     // Focus the new block
     setTimeout(() => {
       setFocusedBlock(newBlock.id);
     }, 50);
-  }, [blocks]);
+  }, [blocks, gconPieceId, mudDeplines, activeEditor]);
 
   const handleBackspacePressed = useCallback((blockId: string) => {
     const blockIndex = blocks.findIndex(b => b.id === blockId);
