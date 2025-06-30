@@ -57,59 +57,59 @@ export default function SharmiChopTextLayout({ children }: SharmiChopTextLayoutP
         return {
           icon: "M4 6h16M4 12h16M4 18h16", // Classic hamburger (3 lines)
           bgColor: "bg-gray-800 hover:bg-gray-700",
-          tooltip: "Hide header (keep sidebar)",
+          tooltip: "Sharmi: Hide header (keep sidebar)",
           label: "Both"
         };
       case 'sidebar-only':
         return {
           icon: "M4 6h16", // Single line at top (header hidden)
           bgColor: "bg-blue-800 hover:bg-blue-700",
-          tooltip: "Hide sidebar (keep header)",
+          tooltip: "Sharmi: Hide sidebar (keep header)",
           label: "Side"
         };
       case 'header-only':
         return {
           icon: "M4 12h16M4 18h16", // Two lines at bottom (sidebar hidden)
           bgColor: "bg-orange-800 hover:bg-orange-700",
-          tooltip: "Hide both sidebar and header",
+          tooltip: "Sharmi: Hide both sidebar and header",
           label: "Head"
         };
       case 'both-hidden':
         return {
           icon: "M3 3h18v18H3z", // Square/restore icon
           bgColor: "bg-red-800 hover:bg-red-700",
-          tooltip: "Show sidebar and header",
+          tooltip: "Sharmi: Show sidebar and header",
           label: "Hide"
         };
       default:
         return {
           icon: "M4 6h16M4 12h16M4 18h16",
           bgColor: "bg-gray-800 hover:bg-gray-700",
-          tooltip: "Toggle navigation",
+          tooltip: "Sharmi: Toggle navigation",
           label: "Menu"
         };
     }
   };
 
-  const buttonProps = getToggleButtonProps();
+  const sharmiButtonProps = getSharmiToggleButtonProps();
 
-  // Enhanced toggle button component
-  const EnhancedToggleButton = () => (
+  // Sharmi enhanced toggle button component for header and sidebar management
+  const SharmiEnhancedToggleButton = () => (
     <button
-      onClick={cycleToggleState}
-      className={`fixed top-4 left-4 z-50 p-2 rounded-md shadow-lg border border-gray-600 transition-colors ${buttonProps.bgColor}`}
-      title={buttonProps.tooltip}
+      onClick={cycleSharmiToggleState}
+      className={`fixed top-4 left-4 z-50 p-2 rounded-md shadow-lg border border-gray-600 transition-colors ${sharmiButtonProps.bgColor}`}
+      title={sharmiButtonProps.tooltip}
     >
       <svg className="h-5 w-5 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={buttonProps.icon} />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sharmiButtonProps.icon} />
       </svg>
       
-      {/* State indicator badge */}
+      {/* Sharmi state indicator badge */}
       <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full border border-white">
         <div className={`w-full h-full rounded-full ${
-          toggleState === 'both-visible' ? 'bg-green-500' :
-          toggleState === 'sidebar-only' ? 'bg-blue-500' :
-          toggleState === 'header-only' ? 'bg-orange-500' :
+          sharmiToggleState === 'both-visible' ? 'bg-green-500' :
+          sharmiToggleState === 'sidebar-only' ? 'bg-blue-500' :
+          sharmiToggleState === 'header-only' ? 'bg-orange-500' :
           'bg-red-500'
         }`} />
       </div>
@@ -117,31 +117,31 @@ export default function SharmiChopTextLayout({ children }: SharmiChopTextLayoutP
   );
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${sidebarVisible ? 'snefuru-app-container sidebar-open' : 'snefuru-app-container'}`}>
-      {/* Enhanced Toggle Button - always visible */}
-      <EnhancedToggleButton />
+    <div className={`min-h-screen bg-gray-50 ${sharmiSidebarVisible ? 'snefuru-app-container sidebar-open' : 'snefuru-app-container'}`}>
+      {/* Sharmi Enhanced Toggle Button - always visible */}
+      <SharmiEnhancedToggleButton />
       
-      {/* Sidebar Wrapper */}
-      {sidebarVisible && (
+      {/* Sharmi Sidebar Wrapper */}
+      {sharmiSidebarVisible && (
         <div className="snefuru-sidebar-wrapper">
           <SidebarMenu 
-            isOpen={sidebarVisible} 
-            onToggle={cycleToggleState}
-            showToggleButton={false} // Hide the original toggle button
+            isOpen={sharmiSidebarVisible} 
+            onToggle={cycleSharmiToggleState}
+            showToggleButton={false} // Hide the original toggle button (Sharmi handles this)
           />
         </div>
       )}
       
-      {/* Content Wrapper */}
-      <div className={`${sidebarVisible ? 'snefuru-content-wrapper' : 'w-full'}`}>
-        {/* Header - conditionally rendered */}
-        {headerVisible && <Header />}
+      {/* Sharmi Content Wrapper */}
+      <div className={`${sharmiSidebarVisible ? 'snefuru-content-wrapper' : 'w-full'}`}>
+        {/* Sharmi Header - conditionally rendered */}
+        {sharmiHeaderVisible && <Header />}
         
-        {/* Main Content */}
+        {/* Sharmi Main Content */}
         <main className={`py-6 px-4 transition-all duration-300 ${
-          !headerVisible ? 'pt-16' : '' // Add top padding when header is hidden to account for toggle button
+          !sharmiHeaderVisible ? 'pt-16' : '' // Add top padding when Sharmi header is hidden to account for toggle button
         } ${
-          !sidebarVisible ? 'ml-0' : '' // Remove left margin when sidebar is hidden
+          !sharmiSidebarVisible ? 'ml-0' : '' // Remove left margin when Sharmi sidebar is hidden
         }`}>
           {children}
         </main>
@@ -149,11 +149,11 @@ export default function SharmiChopTextLayout({ children }: SharmiChopTextLayoutP
       
       <SelectedRowStyles />
       
-      {/* State Debug Info (can remove in production) */}
+      {/* Sharmi State Debug Info (can remove in production) */}
       <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white text-xs px-3 py-2 rounded z-40 font-mono">
-        <div>State: <span className="font-bold">{toggleState}</span></div>
-        <div>Sidebar: <span className={sidebarVisible ? 'text-green-400' : 'text-red-400'}>{sidebarVisible ? 'ON' : 'OFF'}</span></div>
-        <div>Header: <span className={headerVisible ? 'text-green-400' : 'text-red-400'}>{headerVisible ? 'ON' : 'OFF'}</span></div>
+        <div>Sharmi State: <span className="font-bold">{sharmiToggleState}</span></div>
+        <div>Sharmi Sidebar: <span className={sharmiSidebarVisible ? 'text-green-400' : 'text-red-400'}>{sharmiSidebarVisible ? 'ON' : 'OFF'}</span></div>
+        <div>Sharmi Header: <span className={sharmiHeaderVisible ? 'text-green-400' : 'text-red-400'}>{sharmiHeaderVisible ? 'ON' : 'OFF'}</span></div>
       </div>
     </div>
   );

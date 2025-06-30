@@ -1,18 +1,18 @@
 'use client';
 
 import ProtectedRoute from '@/app/components/ProtectedRoute';
-import ChopTextLayout from './components/ChopTextLayout';
+import SharmiChopTextLayout from './components/ChopTextLayout';
 
-export default function ChopTextLayoutWrapper({
+export default function SharmiChopTextLayoutWrapper({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <ProtectedRoute>
-      <ChopTextLayout>
+      <SharmiChopTextLayout>
         {children}
-      </ChopTextLayout>
+      </SharmiChopTextLayout>
     </ProtectedRoute>
   );
 }
