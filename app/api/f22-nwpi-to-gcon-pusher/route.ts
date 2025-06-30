@@ -24,14 +24,18 @@ const NWPI_TO_GCON_MAPPING = {
       'meta_title': data.post_title,
       'h1title': data.post_title,
       'pgb_h1title': data.post_title,
-      'aval_title': data.post_title
+      'aval_title': data.post_title,
+      'mud_title': data.post_title // Add mud_title
     }),
     'post_content': (data: any) => {
-      const result = bozoHTMLNormalizationProcess1(data.post_content || '');
+      const bozoResult = bozoHTMLNormalizationProcess1(data.post_content || '');
+      const tontoResult = tontoNormalizationProcess1(data.post_content || '');
       return {
         'corpus1': data.post_content || '',
-        'aval_content': result.normalizedContent,
-        '_dorli_blocks': result.dorliBlocks // Store for later processing
+        'aval_content': bozoResult.normalizedContent,
+        '_dorli_blocks': bozoResult.dorliBlocks, // Store for later processing
+        'mud_content': tontoResult.mudContent, // Add mud_content
+        '_mud_deplines': tontoResult.mudDeplines // Store for later processing
       };
     },
     'post_excerpt': (data: any) => ({
@@ -224,6 +228,71 @@ function processRegularLine(line: string): string {
   return processedLine.trim();
 }
 
+// Interface for mud_deplines
+interface MudDepline {
+  depline_id?: string;
+  fk_gcon_piece_id: string;
+  depline_jnumber: number;
+  depline_knumber: number | null;
+  content_raw: string;
+  html_tags_detected: string;
+  created_at?: string;
+}
+
+// TontoNormalizationProcess1 - Text-based line processing for mud system
+function tontoNormalizationProcess1(content: string): { mudContent: string; mudDeplines: MudDepline[] } {
+  if (!content || content.trim() === '') {
+    return { mudContent: '', mudDeplines: [] };
+  }
+
+  try {
+    // Split content by actual text linebreaks (\n or \r\n)
+    const lines = content.split(/\r?\n/);
+    const mudDeplines: MudDepline[] = [];
+    
+    // Regular expression to find opening HTML tags
+    const htmlTagRegex = /<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
+    
+    // Process each line
+    lines.forEach((line, index) => {
+      // Extract all opening HTML tags from this line
+      const tagsFound = new Set<string>();
+      let match;
+      
+      while ((match = htmlTagRegex.exec(line)) !== null) {
+        tagsFound.add(match[1].toLowerCase());
+      }
+      
+      // Convert Set to comma-separated string (no duplicates)
+      const htmlTagsDetected = Array.from(tagsFound).join(',');
+      
+      // Create mud_depline entry
+      mudDeplines.push({
+        fk_gcon_piece_id: '', // Will be set when calling this function
+        depline_jnumber: index + 1, // Line numbering starts at 1
+        depline_knumber: null,
+        content_raw: line,
+        html_tags_detected: htmlTagsDetected
+      });
+    });
+    
+    // Reconstruct mud_content by joining lines with \n
+    const mudContent = lines.join('\n');
+    
+    console.log(`🌊 TontoNormalizationProcess1: Processed ${lines.length} lines, found ${mudDeplines.length} deplines`);
+    
+    return { mudContent, mudDeplines };
+    
+  } catch (error) {
+    console.error('❌ TontoNormalizationProcess1 error:', error);
+    // Fallback: return original content with no deplines
+    return { 
+      mudContent: content,
+      mudDeplines: []
+    };
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -329,6 +398,10 @@ export async function POST(request: NextRequest) {
         const dorliBlocks = gconData._dorli_blocks || [];
         delete gconData._dorli_blocks; // Remove from data to be inserted
         
+        // Extract mud_deplines from the transformed data
+        const mudDeplines = gconData._mud_deplines || [];
+        delete gconData._mud_deplines; // Remove from data to be inserted
+        
         console.log(`🔄 Processing: ${nwpiRecord.post_title} (ID: ${nwpiRecord.internal_post_id})`);
         console.log(`📊 Debug - post_id: ${nwpiRecord.post_id}, sitespren: ${nwpiRecord.fk_sitespren_base}, user: ${userData.id}`);
 
@@ -371,15 +444,16 @@ export async function POST(request: NextRequest) {
             results.failed++;
             results.errors.push(`Failed to update "${nwpiRecord.post_title}": ${updateError.message}`);
           } else {
-            // Process dorli blocks for updated record
+            // Process dorli blocks and mud_deplines for updated record
             try {
               await processDorliBlocks(dorliBlocks, existingRecord.id, supabase);
+              await processMudDeplines(mudDeplines, existingRecord.id, supabase);
               console.log(`✅ Successfully updated: ${nwpiRecord.post_title}`);
               results.succeeded++;
-            } catch (dorliError) {
-              console.error(`❌ Failed to process dorli blocks for updated record:`, dorliError);
+            } catch (error) {
+              console.error(`❌ Failed to process blocks for updated record:`, error);
               results.failed++;
-              results.errors.push(`Failed to process dorli blocks for "${nwpiRecord.post_title}": ${dorliError instanceof Error ? dorliError.message : 'Unknown error'}`);
+              results.errors.push(`Failed to process blocks for "${nwpiRecord.post_title}": ${error instanceof Error ? error.message : 'Unknown error'}`);
             }
           }
         } else {
@@ -395,15 +469,16 @@ export async function POST(request: NextRequest) {
             results.failed++;
             results.errors.push(`Failed to insert "${nwpiRecord.post_title}": ${insertError.message}`);
           } else {
-            // Process dorli blocks for new record
+            // Process dorli blocks and mud_deplines for new record
             try {
               await processDorliBlocks(dorliBlocks, insertedData.id, supabase);
+              await processMudDeplines(mudDeplines, insertedData.id, supabase);
               console.log(`✅ Successfully inserted: ${nwpiRecord.post_title}`);
               results.succeeded++;
-            } catch (dorliError) {
-              console.error(`❌ Failed to process dorli blocks for new record:`, dorliError);
+            } catch (error) {
+              console.error(`❌ Failed to process blocks for new record:`, error);
               results.failed++;
-              results.errors.push(`Failed to process dorli blocks for "${nwpiRecord.post_title}": ${dorliError instanceof Error ? dorliError.message : 'Unknown error'}`);
+              results.errors.push(`Failed to process blocks for "${nwpiRecord.post_title}": ${error instanceof Error ? error.message : 'Unknown error'}`);
             }
           }
         }
@@ -514,6 +589,48 @@ async function processDorliBlocks(dorliBlocks: DorliBlock[], gconPieceId: string
   }
 
   console.log(`✅ Successfully inserted ${dorliBlocks.length} dorli blocks`);
+}
+
+// Process mud_deplines by inserting them into mud_deplines table
+async function processMudDeplines(mudDeplines: MudDepline[], gconPieceId: string, supabase: any) {
+  if (!mudDeplines || mudDeplines.length === 0) {
+    return;
+  }
+
+  console.log(`🌊 Processing ${mudDeplines.length} mud_deplines for gcon_piece: ${gconPieceId}`);
+
+  // Delete all existing mud_deplines for this gcon_piece
+  const { error: deleteError } = await supabase
+    .from('mud_deplines')
+    .delete()
+    .eq('fk_gcon_piece_id', gconPieceId);
+
+  if (deleteError) {
+    console.error('❌ Error clearing existing mud_deplines:', deleteError);
+    throw new Error(`Failed to clear existing mud_deplines: ${deleteError.message}`);
+  }
+
+  // Insert new mud_deplines with generated UUIDs
+  const mudInserts = mudDeplines.map(depline => ({
+    depline_id: crypto.randomUUID(), // Generate UUID for each depline
+    fk_gcon_piece_id: gconPieceId,
+    depline_jnumber: depline.depline_jnumber,
+    depline_knumber: depline.depline_knumber,
+    content_raw: depline.content_raw,
+    html_tags_detected: depline.html_tags_detected,
+    created_at: new Date().toISOString()
+  }));
+
+  const { error: insertError } = await supabase
+    .from('mud_deplines')
+    .insert(mudInserts);
+
+  if (insertError) {
+    console.error('❌ Error inserting mud_deplines:', insertError);
+    throw new Error(`Failed to insert mud_deplines: ${insertError.message}`);
+  }
+
+  console.log(`✅ Successfully inserted ${mudDeplines.length} mud_deplines`);
 }
 
 // Generate slug from title if needed

@@ -534,14 +534,18 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
+                html_tags_detected
+              </th>
               <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 lineyoshi
               </th>
               <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 Content
               </th>
-              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
+                html_tags_detected
+              </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
             </tr>
@@ -837,7 +841,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   -
                 </td>
                 
-                {/* Column 5 - Thing3 */}
+                {/* Column 5 - html_tags_detected */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
@@ -903,7 +907,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   </button>
                 </td>
                 
-                {/* Column 9 - Thing6 */}
+                {/* Column 9 - html_tags_detected (right of content) */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>

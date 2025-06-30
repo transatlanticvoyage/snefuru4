@@ -20,7 +20,7 @@ export default function MesagenPage() {
   const dummyData = {
     meta_title: 'Sample Mesagen Content',
     aval_title: 'Sample Mesagen Title',
-    aval_content: 'This is sample content for mesagen\nSecond line of content\nThird line with more text',
+    aval_content: 'This is line 1\nThis is line 2\nThis is line 3\nThis is line 4\nThis is line 5\nThis is line 6\nThis is line 7\nThis is line 8\nThis is line 9\nThis is line 10',
     asn_sitespren_base: 'example.com',
     g_post_status: 'draft'
   };
