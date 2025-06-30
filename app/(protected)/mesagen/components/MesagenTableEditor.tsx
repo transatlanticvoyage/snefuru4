@@ -795,6 +795,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2">
                 <div className="space-y-2">
                   <div className="text-sm text-purple-700">
@@ -810,7 +811,6 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   />
                 </div>
               </th>
-              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
             </tr>
             
