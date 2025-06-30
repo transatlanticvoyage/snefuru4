@@ -1088,7 +1088,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                                 /valan
                               </Link>
                               <Link
-                                href={`/torya?id=${item.id}`}
+                                href={`/torya?gcon_piece_id=${item.id}`}
                                 className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
                               >
                                 /torya
