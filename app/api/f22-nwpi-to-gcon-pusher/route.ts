@@ -31,7 +31,7 @@ const NWPI_TO_GCON_MAPPING = {
       console.log(`🔍 DEBUG - post_content transform input: "${data.post_content?.substring(0, 100)}..."`);
       const bozoResult = bozoHTMLNormalizationProcess1(data.post_content || '');
       const tontoResult = tontoNormalizationProcess1(data.post_content || '');
-      console.log(`🔍 DEBUG - TontoNormalizationProcess1 result: mudContent="${tontoResult.mudContent?.substring(0, 100)}...", deplines=${tontoResult.mudDeplines?.length}`);
+      console.log(`🔍 DEBUG - TontoNormalizationProcess1 result: mudContent length=${tontoResult.mudContent?.length || 0}, deplines=${tontoResult.mudDeplines?.length || 0}`);
       const result = {
         'corpus1': data.post_content || '',
         'aval_content': bozoResult.normalizedContent,
@@ -284,8 +284,7 @@ function tontoNormalizationProcess1(content: string): { mudContent: string; mudD
     const mudContent = lines.join('\n');
     
     console.log(`🌊 TontoNormalizationProcess1: Processed ${lines.length} lines, found ${mudDeplines.length} deplines`);
-    console.log(`🔍 DEBUG - tontoResult.mudContent: "${mudContent.substring(0, 200)}..." (length: ${mudContent.length})`);
-    console.log(`🔍 DEBUG - tontoResult.mudDeplines.length: ${mudDeplines.length}`);
+    console.log(`🔍 DEBUG - mudContent length: ${mudContent?.length || 0}, deplines: ${mudDeplines?.length || 0}`);
     
     return { mudContent, mudDeplines };
     
@@ -412,15 +411,8 @@ export async function POST(request: NextRequest) {
         // Transform the record using the mapping configuration
         const gconData = transformNwpiToGcon(nwpiRecord, userData.id);
         
-        // DEBUG: Log the transformed data to see if mud_title and mud_content are present
-        console.log(`🔍 DEBUG - Transformed gconData for "${nwpiRecord.post_title}":`, {
-          mud_title: gconData.mud_title,
-          mud_content: gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING',
-          aval_title: gconData.aval_title,
-          aval_content: gconData.aval_content ? `${gconData.aval_content.substring(0, 100)}...` : 'MISSING',
-          post_title: nwpiRecord.post_title,
-          post_content: nwpiRecord.post_content ? `${nwpiRecord.post_content.substring(0, 100)}...` : 'MISSING'
-        });
+        // DEBUG: Check key fields
+        console.log(`🔍 DEBUG - mud_title: ${gconData.mud_title}, mud_content length: ${gconData.mud_content?.length || 0}`);
         
         // Extract dorli blocks from the transformed data
         const dorliBlocks = gconData._dorli_blocks || [];
@@ -464,14 +456,7 @@ export async function POST(request: NextRequest) {
           console.log(`🔍 DEBUG - About to update gconData with keys:`, Object.keys(gconData));
           console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
           console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
-          console.log(`🔍 DEBUG - FULL UPDATE PAYLOAD:`, JSON.stringify({
-            mud_title: gconData.mud_title,
-            mud_content: gconData.mud_content ? `${gconData.mud_content.substring(0, 200)}...` : 'NULL/MISSING',
-            aval_title: gconData.aval_title,
-            aval_content: gconData.aval_content ? `${gconData.aval_content.substring(0, 200)}...` : 'NULL/MISSING',
-            meta_title: gconData.meta_title,
-            existing_record_id: existingRecord.id
-          }, null, 2));
+          // Removed complex JSON.stringify to avoid errors
           
           const { error: updateError } = await supabase
             .from('gcon_pieces')
@@ -490,13 +475,7 @@ export async function POST(request: NextRequest) {
               .eq('id', existingRecord.id)
               .single();
             
-            console.log(`🔍 DEBUG - VERIFICATION after UPDATE:`, {
-              id: verifyData?.id,
-              mud_title: verifyData?.mud_title,
-              mud_content: verifyData?.mud_content ? `${verifyData.mud_content.substring(0, 100)}...` : 'NULL/MISSING',
-              aval_title: verifyData?.aval_title,
-              aval_content: verifyData?.aval_content ? `${verifyData.aval_content.substring(0, 100)}...` : 'NULL/MISSING'
-            });
+            console.log(`🔍 DEBUG - VERIFICATION after UPDATE - mud_title: ${verifyData?.mud_title}, mud_content length: ${verifyData?.mud_content?.length || 0}`);
             
             // Process dorli blocks and mud_deplines for updated record
             try {
@@ -515,16 +494,7 @@ export async function POST(request: NextRequest) {
           console.log(`🔍 DEBUG - About to insert gconData with keys:`, Object.keys(gconData));
           console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
           console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
-          console.log(`🔍 DEBUG - FULL INSERT PAYLOAD:`, JSON.stringify({
-            mud_title: gconData.mud_title,
-            mud_content: gconData.mud_content ? `${gconData.mud_content.substring(0, 200)}...` : 'NULL/MISSING',
-            aval_title: gconData.aval_title,
-            aval_content: gconData.aval_content ? `${gconData.aval_content.substring(0, 200)}...` : 'NULL/MISSING',
-            meta_title: gconData.meta_title,
-            fk_users_id: gconData.fk_users_id,
-            g_post_id: gconData.g_post_id,
-            asn_sitespren_base: gconData.asn_sitespren_base
-          }, null, 2));
+          // Removed complex JSON.stringify to avoid errors
           
           const { data: insertedData, error: insertError } = await supabase
             .from('gcon_pieces')
@@ -544,13 +514,7 @@ export async function POST(request: NextRequest) {
               .eq('id', insertedData.id)
               .single();
             
-            console.log(`🔍 DEBUG - VERIFICATION after INSERT:`, {
-              id: verifyData?.id,
-              mud_title: verifyData?.mud_title,
-              mud_content: verifyData?.mud_content ? `${verifyData.mud_content.substring(0, 100)}...` : 'NULL/MISSING',
-              aval_title: verifyData?.aval_title,
-              aval_content: verifyData?.aval_content ? `${verifyData.aval_content.substring(0, 100)}...` : 'NULL/MISSING'
-            });
+            console.log(`🔍 DEBUG - VERIFICATION after INSERT - mud_title: ${verifyData?.mud_title}, mud_content length: ${verifyData?.mud_content?.length || 0}`);
             
             // Process dorli blocks and mud_deplines for new record
             try {
