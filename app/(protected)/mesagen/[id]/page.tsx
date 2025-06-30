@@ -645,124 +645,189 @@ Recommendation: Check logs and retry operation`;
           </div>
         )}
 
-        {/* Functions Popup Modal */}
+        {/* Functions Popup Modal - Matching nwjar1 styling exactly */}
         {isPopupOpen && (
-          <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg shadow-xl w-full h-full max-w-[95vw] max-h-[95vh] flex flex-col">
-              
-              {/* Header Bar 1 - URL Display */}
+          <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
+              {/* uelbar37 header bar */}
               <div 
-                className="flex justify-between items-center px-4 py-3 border-b"
-                style={{ backgroundColor: uelBar37Colors.bg, color: uelBar37Colors.text }}
+                className="absolute top-0 left-0 right-0 flex items-center px-4"
+                style={{ 
+                  height: '50px',
+                  backgroundColor: uelBar37Colors.bg,
+                  color: uelBar37Colors.text
+                }}
               >
-                <div className="flex items-center gap-4">
-                  <span className="font-medium">BROWSER URL:</span>
-                  <span className="text-sm font-mono">{currentUrl}</span>
-                </div>
+                <span className="font-semibold">BROWSER URL</span>
+                
+                {/* Vertical separator */}
+                <div 
+                  className="bg-gray-600"
+                  style={{
+                    width: '3px',
+                    height: '100%',
+                    marginLeft: '30px',
+                    marginRight: '30px'
+                  }}
+                />
+                
+                <span className="font-mono text-sm overflow-hidden whitespace-nowrap text-ellipsis flex-1">
+                  {currentUrl}
+                </span>
+
+                {/* Copy buttons in uelbar37 - positioned to the left of close button */}
                 <button
-                  onClick={handlePopupClose}
-                  className="text-xl font-bold hover:opacity-75"
-                  style={{ color: uelBar37Colors.text }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(currentUrl);
+                  }}
+                  className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
+                  style={{
+                    width: '80px',
+                    height: '50px',
+                    marginRight: '0px',
+                    fontSize: '10px',
+                    flexDirection: 'column',
+                    gap: '2px'
+                  }}
+                  title="Copy Full URL"
                 >
-                  ×
+                  <div>COPY URL</div>
                 </button>
-              </div>
-
-              {/* Header Bar 2 - Actions */}
-              <div 
-                className="flex justify-between items-center px-4 py-3 border-b"
-                style={{ backgroundColor: uelBarColors.bg, color: uelBarColors.text }}
-              >
-                <div className="flex items-center gap-4">
-                  <span className="font-medium">Mesagen Functions:</span>
-                  <span className="text-sm">Select action mode</span>
-                </div>
-                <button
-                  onClick={handlePopupClose}
-                  className="text-xl font-bold hover:opacity-75"
-                  style={{ color: uelBarColors.text }}
-                >
-                  ×
-                </button>
-              </div>
-
-              {/* Tab Navigation */}
-              <div className="flex border-b bg-gray-50">
-                {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => handleTabChange(tab as any)}
-                    className={`px-4 py-2 font-medium border-r last:border-r-0 transition-colors ${
-                      activePopupTab === tab
-                        ? 'bg-blue-100 text-blue-700 border-b-2 border-blue-500'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {tab.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tab Content */}
-              <div className="flex-1 p-6 overflow-auto">
-                {activePopupTab === 'ptab1' && (
-                  <div className="text-center text-gray-500">
-                    <h3 className="text-lg font-medium mb-2">PTAB1 Content</h3>
-                    <p>Content for tab 1 will be added here.</p>
-                  </div>
-                )}
-                
-                {activePopupTab === 'ptab2' && (
-                  <div className="text-center text-gray-500">
-                    <h3 className="text-lg font-medium mb-2">PTAB2 Content</h3>
-                    <p>Content for tab 2 will be added here.</p>
-                  </div>
-                )}
-                
-                {activePopupTab === 'ptab3' && (
-                  <div className="text-center text-gray-500">
-                    <h3 className="text-lg font-medium mb-2">PTAB3 Content</h3>
-                    <p>Content for tab 3 will be added here.</p>
-                  </div>
-                )}
-                
-                {activePopupTab === 'ptab4' && (
-                  <div className="text-center text-gray-500">
-                    <h3 className="text-lg font-medium mb-2">PTAB4 Content</h3>
-                    <p>Content for tab 4 will be added here.</p>
-                  </div>
-                )}
-                
-                {activePopupTab === 'ptab5' && (
-                  <div className="text-center text-gray-500">
-                    <h3 className="text-lg font-medium mb-2">PTAB5 Content</h3>
-                    <p>Content for tab 5 will be added here.</p>
-                  </div>
-                )}
-                
-                {activePopupTab === 'ptab6' && (
-                  <div className="text-center text-gray-500">
-                    <h3 className="text-lg font-medium mb-2">PTAB6 Content</h3>
-                    <p>Content for tab 6 will be added here.</p>
-                  </div>
-                )}
-                
-                {activePopupTab === 'ptab7' && (
-                  <div className="text-center text-gray-500">
-                    <h3 className="text-lg font-medium mb-2">PTAB7 Content</h3>
-                    <p>Content for tab 7 will be added here.</p>
-                  </div>
-                )}
               </div>
               
-              {/* Footer */}
-              <div className="border-t px-4 py-3 bg-gray-50 flex justify-end">
+              {/* uelbar38 header bar */}
+              <div 
+                className="absolute left-0 right-0 flex items-center px-4"
+                style={{ 
+                  top: '50px',
+                  height: '50px',
+                  backgroundColor: uelBarColors.bg,
+                  color: uelBarColors.text
+                }}
+              >
+                <span className="font-semibold">uelbar38</span>
+                
+                {/* Vertical separator */}
+                <div 
+                  className="bg-gray-600"
+                  style={{
+                    width: '3px',
+                    height: '100%',
+                    marginLeft: '30px',
+                    marginRight: '30px'
+                  }}
+                />
+                
+                <span className="font-bold">{typeof window !== 'undefined' ? window.location.pathname : ''}</span>
+                
+                {/* Close button in header - spans both bars */}
                 <button
                   onClick={handlePopupClose}
-                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                  className="absolute right-0 top-0 bg-gray-400 text-gray-800 font-bold flex items-center justify-center hover:bg-gray-500 transition-colors"
+                  style={{
+                    width: '260px',
+                    height: '100px', // Spans both 50px bars
+                    border: '2px solid #4a4a4a',
+                    fontSize: '14px',
+                    flexDirection: 'column',
+                    gap: '4px'
+                  }}
                 >
-                  Close
+                  <div style={{ fontSize: '20px' }}>×</div>
+                  <div style={{ fontSize: '12px', lineHeight: '12px', textAlign: 'center' }}>
+                    CLOSE<br/>POPUP
+                  </div>
                 </button>
+              </div>
+              
+              {/* Popup content - adjusted to start below both headers */}
+              <div className="h-full" style={{ paddingTop: '100px' }}>
+                {/* Tab Navigation */}
+                <div className="border-b border-gray-200 bg-gray-50">
+                  <nav className="flex">
+                    {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => handleTabChange(tab as any)}
+                        className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                          activePopupTab === tab
+                            ? 'border-blue-500 text-blue-600 bg-white'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                        }`}
+                      >
+                        {tab}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+                
+                {/* Tab Content */}
+                <div className="p-8 h-full overflow-auto">
+                  {activePopupTab === 'ptab1' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Mesagen Functions</h3>
+                      <div className="space-y-4">
+                        <div className="text-center text-gray-500">
+                          <p>Content for tab 1 will be added here.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activePopupTab === 'ptab2' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">PTAB2</h3>
+                      <div className="text-center text-gray-500">
+                        <p>Content for tab 2 will be added here.</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activePopupTab === 'ptab3' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">PTAB3</h3>
+                      <div className="text-center text-gray-500">
+                        <p>Content for tab 3 will be added here.</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activePopupTab === 'ptab4' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">PTAB4</h3>
+                      <div className="text-center text-gray-500">
+                        <p>Content for tab 4 will be added here.</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activePopupTab === 'ptab5' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">PTAB5</h3>
+                      <div className="text-center text-gray-500">
+                        <p>Content for tab 5 will be added here.</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activePopupTab === 'ptab6' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">PTAB6</h3>
+                      <div className="text-center text-gray-500">
+                        <p>Content for tab 6 will be added here.</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activePopupTab === 'ptab7' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">PTAB7</h3>
+                      <div className="text-center text-gray-500">
+                        <p>Content for tab 7 will be added here.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
