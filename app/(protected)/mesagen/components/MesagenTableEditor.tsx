@@ -474,36 +474,27 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     setBlocks(prevBlocks => {
       const updatedBlocks = prevBlocks.map(block => {
         if (block.id === blockId) {
-          // Check if content contains heading tags or other structural HTML
-          const hasStructuralHTML = /^<h[2-6]|<h[2-6]>.*<\/h[2-6]>/i.test(content);
+          // Always preserve HTML content - do not strip HTML tags
+          // Clean up unwanted auto-generated <p> tags only if they wrap the entire content
+          let cleanContent = content;
           
-          if (hasStructuralHTML) {
-            // For headings and structural HTML, preserve the HTML
-            return { ...block, htmlContent: content };
-          } else {
-            // For regular content, extract plain text for storage
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = content;
-            const plainText = tempDiv.textContent || tempDiv.innerText || '';
-            
-            // Store the plain text without HTML wrapping
-            return { ...block, htmlContent: plainText };
+          // Remove unnecessary <p> wrapper if it's the only tag and wraps everything
+          if (cleanContent.match(/^<p>.*<\/p>$/s)) {
+            const innerContent = cleanContent.replace(/^<p>(.*)<\/p>$/s, '$1');
+            // Only remove <p> tags if the inner content doesn't have block-level elements
+            if (!innerContent.match(/<(h[1-6]|div|ul|ol|blockquote|pre|strong|em|b|i|span)\b/i)) {
+              cleanContent = innerContent;
+            }
           }
+          
+          return { ...block, htmlContent: cleanContent };
         }
         return block;
       });
       
       // Combine all blocks into final content with linebreaks preserved
       const combinedContent = updatedBlocks
-        .map(block => {
-          // For output, extract text content for database storage
-          if (/^<h[2-6]/.test(block.htmlContent)) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = block.htmlContent;
-            return tempDiv.textContent || tempDiv.innerText || '';
-          }
-          return block.htmlContent;
-        })
+        .map(block => block.htmlContent) // Preserve all HTML content
         .join('\n'); // Join with linebreaks
       
       onContentChange?.(combinedContent);
@@ -829,17 +820,24 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
 
       // Prepare new mud_deplines data from current blocks
       const newDeplines = blocks.map((block, index) => {
-        // Extract plain text content from HTML
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = block.htmlContent;
-        const plainTextContent = tempDiv.textContent || tempDiv.innerText || '';
-
-        // Extract HTML tags from the content
+        // Preserve HTML content but clean up unwanted auto-generated <p> tags
+        let cleanContent = block.htmlContent;
+        
+        // Remove auto-generated <p> wrapper if it's the only tag and contains the entire content
+        if (cleanContent.match(/^<p>.*<\/p>$/s)) {
+          const innerContent = cleanContent.replace(/^<p>(.*)<\/p>$/s, '$1');
+          // Only remove <p> tags if the inner content doesn't have its own block-level tags
+          if (!innerContent.match(/<(h[1-6]|div|ul|ol|blockquote|pre)\b/i)) {
+            cleanContent = innerContent;
+          }
+        }
+        
+        // Extract HTML tags from the content for detection
         const htmlTagRegex = /<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
         const tagsFound = new Set<string>();
         let match;
         
-        while ((match = htmlTagRegex.exec(block.htmlContent)) !== null) {
+        while ((match = htmlTagRegex.exec(cleanContent)) !== null) {
           tagsFound.add(match[1].toLowerCase());
         }
         
@@ -850,7 +848,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
           fk_gcon_piece_id: gconPieceId,
           depline_jnumber: index + 1,
           depline_knumber: null,
-          content_raw: plainTextContent,
+          content_raw: cleanContent, // Store HTML content, not plain text
           html_tags_detected: htmlTagsDetected,
           created_at: new Date().toISOString()
         };
