@@ -276,7 +276,7 @@ Recommendation: Check logs and retry operation`;
     if (gconPiece?.mud_title) {
       setMudTitle(gconPiece.mud_title);
       // Update browser title
-      document.title = `mesagen_${gconPiece.mud_title}_${gconPiece.asn_sitespren_base || ''}`;
+      document.title = 'mesagen_' + gconPiece.mud_title + '_' + (gconPiece.asn_sitespren_base || '');
     }
     if (gconPiece?.mud_content) {
       setMudContent(gconPiece.mud_content);
@@ -286,7 +286,7 @@ Recommendation: Check logs and retry operation`;
   // Set fallback title
   useEffect(() => {
     if (!mudTitle && gconPiece?.asn_sitespren_base) {
-      document.title = `mesagen_${gconPiece.asn_sitespren_base}`;
+      document.title = 'mesagen_' + gconPiece.asn_sitespren_base;
     } else if (!mudTitle) {
       document.title = 'mesagen';
     }
