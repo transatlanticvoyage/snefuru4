@@ -708,12 +708,101 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     return block?.htmlContent || '';
   };
 
+  // Save all current mud_deplines state to database
+  const handleSave = useCallback(async () => {
+    if (!gconPieceId) {
+      alert('No gcon_piece ID available for saving');
+      return;
+    }
+
+    try {
+      const { createClientComponentClient } = await import('@supabase/auth-helpers-nextjs');
+      const supabase = createClientComponentClient();
+
+      console.log(`🔄 Saving ${blocks.length} mud_deplines for gcon_piece: ${gconPieceId}`);
+
+      // Delete all existing mud_deplines for this gcon_piece
+      const { error: deleteError } = await supabase
+        .from('mud_deplines')
+        .delete()
+        .eq('fk_gcon_piece_id', gconPieceId);
+
+      if (deleteError) {
+        console.error('Error clearing existing mud_deplines:', deleteError);
+        alert('Error clearing existing deplines. Save failed.');
+        return;
+      }
+
+      // Prepare new mud_deplines data from current blocks
+      const newDeplines = blocks.map((block, index) => {
+        // Extract plain text content from HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = block.htmlContent;
+        const plainTextContent = tempDiv.textContent || tempDiv.innerText || '';
+
+        // Extract HTML tags from the content
+        const htmlTagRegex = /<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
+        const tagsFound = new Set<string>();
+        let match;
+        
+        while ((match = htmlTagRegex.exec(block.htmlContent)) !== null) {
+          tagsFound.add(match[1].toLowerCase());
+        }
+        
+        const htmlTagsDetected = Array.from(tagsFound).join(',');
+
+        return {
+          depline_id: crypto.randomUUID(),
+          fk_gcon_piece_id: gconPieceId,
+          depline_jnumber: index + 1,
+          depline_knumber: null,
+          content_raw: plainTextContent,
+          html_tags_detected: htmlTagsDetected,
+          created_at: new Date().toISOString()
+        };
+      });
+
+      // Insert new mud_deplines
+      if (newDeplines.length > 0) {
+        const { error: insertError } = await supabase
+          .from('mud_deplines')
+          .insert(newDeplines);
+
+        if (insertError) {
+          console.error('Error inserting new mud_deplines:', insertError);
+          alert('Error saving deplines. Save failed.');
+          return;
+        }
+      }
+
+      // Update local mud_deplines state
+      setMudDeplines(newDeplines);
+
+      console.log(`✅ Successfully saved ${newDeplines.length} mud_deplines`);
+      alert(`Successfully saved ${newDeplines.length} deplines to database`);
+
+    } catch (error) {
+      console.error('Error during save operation:', error);
+      alert('Error during save operation. Please try again.');
+    }
+  }, [blocks, gconPieceId]);
+
   return (
     <div className="w-full">
       {/* Header */}
       <div className="bg-purple-100 border-b border-purple-200 p-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-purple-800">Mesagen - 11-Column Table Editor</h3>
+          <div className="flex items-center gap-4">
+            <h3 className="text-lg font-semibold text-purple-800">Mesagen - 11-Column Table Editor</h3>
+            {gconPieceId && (
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition-colors text-sm"
+              >
+                💾 Save
+              </button>
+            )}
+          </div>
           <div className="text-sm text-purple-600">
             {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 11 columns | 
             <span className={`ml-2 font-medium ${viewMode === 'visual' ? 'text-green-600' : 'text-orange-600'}`}>
