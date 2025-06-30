@@ -528,14 +528,29 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         <table className="w-full border-collapse table-fixed">
           {/* Table Header - 6 Rows */}
           <thead>
-            {/* Header Row 1 - Blank placeholders */}
+            {/* Header Row 1 - Horizomi numbering system */}
             <tr className="bg-purple-50">
-              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+              <th className="border border-gray-300 bg-purple-50 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
                 <div className="relative group">
-                  <div className="text-center text-xs font-normal text-gray-600">1</div>
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">1</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
-                    <div className="bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                      <span className="font-bold">prisomi column</span>
+                    <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line">
+                      <div className="mb-2">
+                        <div>upper-left-most cell in the ui table grid</div>
+                        <div>prisomi column</div>
+                        <div>horizomi row</div>
+                        <div>intersection point</div>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const textToCopy = `upper-left-most cell in the ui table grid\nprisomi column\nhorizomi row\nintersection point`;
+                          navigator.clipboard.writeText(textToCopy);
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
                     </div>
                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
                       <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
@@ -543,20 +558,251 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   </div>
                 </div>
               </th>
-              <th className="border border-gray-300" style={{ padding: '6px 10px', width: '46px', maxWidth: '46px', minWidth: '46px' }}></th>
-              <th className="border border-gray-300 p-2 w-20"></th>
-              <th className="border border-gray-300 p-2 w-20"></th>
-              <th className="border border-gray-300 p-2" style={{ width: '120px' }}></th>
-              <th className="border border-gray-300 p-2" style={{ width: '100px' }}></th>
-              <th className="border border-gray-300 p-2 w-20"></th>
-              <th className="border border-gray-300 p-2" style={{ width: '600px' }}></th>
-              <th className="border border-gray-300 p-2 w-20"></th>
-              <th className="border border-gray-300 p-2 w-20"></th>
+              <th className="border border-gray-300 bg-purple-50" style={{ padding: '6px 10px', width: '46px', maxWidth: '46px', minWidth: '46px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">2</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2 w-20">
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">3</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2 w-20">
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">4</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2" style={{ width: '120px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">5</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2" style={{ width: '100px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">6</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2 w-20">
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">7</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2" style={{ width: '600px' }}>
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">8</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2 w-20">
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">9</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2 w-20">
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">10</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2 w-20">
+                <div className="relative group">
+                  <div className="text-center text-xs font-normal text-gray-600 cursor-help">11</div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
+                    <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                      <div className="mb-2">
+                        <span className="font-bold">horizomi row</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText('horizomi row');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
             </tr>
             
             {/* Header Row 2 - Blank placeholders */}
             <tr className="bg-purple-50">
-              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+              <th className="border border-gray-300 bg-purple-50 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
                 <div className="relative group">
                   <div className="text-center text-xs font-normal text-gray-600">2</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
@@ -569,20 +815,20 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   </div>
                 </div>
               </th>
-              <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50" style={{ padding: '6px 10px' }}></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
             </tr>
             
             {/* Header Row 3 - Content label */}
             <tr className="bg-purple-50">
-              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+              <th className="border border-gray-300 bg-purple-50 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
                 <div className="relative group">
                   <div className="text-center text-xs font-normal text-gray-600">3</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
@@ -595,22 +841,22 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   </div>
                 </div>
               </th>
-              <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
+              <th className="border border-gray-300 bg-purple-50" style={{ padding: '6px 10px' }}></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700">
                 Content
               </th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
             </tr>
             
             {/* Header Row 4 - Toolbar row */}
             <tr className="bg-purple-50">
-              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+              <th className="border border-gray-300 bg-purple-50 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
                 <div className="relative group">
                   <div className="text-center text-xs font-normal text-gray-600">4</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
@@ -623,13 +869,13 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   </div>
                 </div>
               </th>
-              <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2">
+              <th className="border border-gray-300 bg-purple-50" style={{ padding: '6px 10px' }}></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2">
                 {/* TipTap Toolbar in Header */}
                 <div className="p-2 bg-gray-50 border border-gray-200 rounded">
                   <div className="flex flex-wrap gap-1 justify-center">
@@ -771,13 +1017,13 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   </div>
                 </div>
               </th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
             </tr>
             
             {/* Header Row 5 - aval_title row */}
             <tr className="bg-purple-50">
-              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+              <th className="border border-gray-300 bg-purple-50 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
                 <div className="relative group">
                   <div className="text-center text-xs font-normal text-gray-600">5</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
@@ -790,13 +1036,13 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   </div>
                 </div>
               </th>
-              <th className="border border-gray-300" style={{ padding: '6px 10px' }}></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2">
+              <th className="border border-gray-300 bg-purple-50" style={{ padding: '6px 10px' }}></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2">
                 <div className="space-y-2">
                   <div className="text-sm text-purple-700">
                     <span>gcon_pieces.</span>
@@ -811,12 +1057,12 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   />
                 </div>
               </th>
-              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
             </tr>
             
             {/* Header Row 6 - aval_content label row */}
             <tr className="bg-purple-50">
-              <th className="border border-gray-300 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
+              <th className="border border-gray-300 bg-purple-50 p-0 w-5" style={{ width: '20px', maxWidth: '20px', minWidth: '20px' }}>
                 <div className="relative group">
                   <div className="text-center text-xs font-normal text-gray-600">6</div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-50">
@@ -829,7 +1075,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   </div>
                 </div>
               </th>
-              <th className="border border-gray-300" style={{ padding: '6px 10px' }}>
+              <th className="border border-gray-300 bg-purple-50" style={{ padding: '6px 10px' }}>
                 <input
                   type="checkbox"
                   checked={selectedBlocks.size === blocks.length && blocks.length > 0}
@@ -837,18 +1083,18 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   className="w-[26px] h-[26px] cursor-pointer"
                 />
               </th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700" style={{ width: '120px' }}>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700" style={{ width: '120px' }}>
                 html_tags_detected
               </th>
-              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700" style={{ width: '100px' }}>
+              <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700" style={{ width: '100px' }}>
                 depline_id
               </th>
-              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
+              <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700">
                 lineyoshi
               </th>
-              <th className="border border-gray-300 p-2">
+              <th className="border border-gray-300 bg-purple-50 p-2">
                 <div className="flex items-center gap-2">
                   {/* Tooltip */}
                   <div className="relative group">
@@ -893,8 +1139,8 @@ mud_deplines.content_raw`;
                   <div className="font-bold text-sm text-purple-700">mud_deplines.content_raw</div>
                 </div>
               </th>
-              <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2"></th>
             </tr>
           </thead>
           
