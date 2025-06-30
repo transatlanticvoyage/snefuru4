@@ -370,23 +370,38 @@ export default function NwJar1Page() {
         // Could refresh data or show more detailed results here
       } else {
         const errorMessage = result.message || 'Failed to push to GCon pieces';
+        console.error('🚨 F22 API returned error:', result);
         alert(`Error: ${errorMessage}`);
         setF22Error({
           message: errorMessage,
-          details: result.results || result
+          details: {
+            apiResponse: result,
+            debugInfo: result.debugInfo,
+            results: result.results,
+            timestamp: new Date().toISOString(),
+            endpoint: '/api/f22-nwpi-to-gcon-pusher',
+            selectedItems: kz101Checked ? selectedContentIds.size : (kz103Checked ? nwpiContent.length : 0)
+          }
         });
       }
     } catch (error) {
-      console.error('Error calling f22_nwpi_to_gcon_pusher:', error);
+      console.error('🚨 Error calling f22_nwpi_to_gcon_pusher:', error);
       const errorMessage = 'An error occurred while pushing to GCon pieces';
       alert(errorMessage);
       setF22Error({
         message: errorMessage,
-        details: error instanceof Error ? {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        } : error
+        details: {
+          clientError: error instanceof Error ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+          } : error,
+          timestamp: new Date().toISOString(),
+          endpoint: '/api/f22-nwpi-to-gcon-pusher',
+          selectedItems: kz101Checked ? selectedContentIds.size : (kz103Checked ? nwpiContent.length : 0),
+          userAgent: navigator.userAgent,
+          url: window.location.href
+        }
       });
     } finally {
       setF22Loading(false);

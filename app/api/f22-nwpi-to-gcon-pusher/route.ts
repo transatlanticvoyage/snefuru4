@@ -245,7 +245,10 @@ interface MudDepline {
 
 // TontoNormalizationProcess1 - Text-based line processing for mud system
 function tontoNormalizationProcess1(content: string): { mudContent: string; mudDeplines: MudDepline[] } {
+  console.log(`🌊 TontoNormalizationProcess1 ENTRY: content length=${content?.length || 0}`);
+  
   if (!content || content.trim() === '') {
+    console.log(`🌊 TontoNormalizationProcess1 EMPTY INPUT: returning empty result`);
     return { mudContent: '', mudDeplines: [] };
   }
 
@@ -253,6 +256,8 @@ function tontoNormalizationProcess1(content: string): { mudContent: string; mudD
     // Split content by actual text linebreaks (\n or \r\n)
     const lines = content.split(/\r?\n/);
     const mudDeplines: MudDepline[] = [];
+    
+    console.log(`🌊 TontoNormalizationProcess1 PROCESSING: split into ${lines.length} lines`);
     
     // Regular expression to find opening HTML tags
     const htmlTagRegex = /<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
@@ -283,7 +288,11 @@ function tontoNormalizationProcess1(content: string): { mudContent: string; mudD
     // Reconstruct mud_content by joining lines with \n
     const mudContent = lines.join('\n');
     
-    console.log(`🌊 TontoNormalizationProcess1: Processed ${lines.length} lines, found ${mudDeplines.length} deplines`);
+    console.log(`🌊 TontoNormalizationProcess1 RESULT:`);
+    console.log(`  - Input lines: ${lines.length}`);
+    console.log(`  - Output mudDeplines: ${mudDeplines.length}`);
+    console.log(`  - mudContent length: ${mudContent?.length || 0}`);
+    console.log(`  - mudContent preview: "${mudContent.substring(0, 100)}..."`);
     console.log(`🔍 DEBUG - mudContent length: ${mudContent?.length || 0}, deplines: ${mudDeplines?.length || 0}`);
     
     return { mudContent, mudDeplines };
@@ -409,10 +418,16 @@ export async function POST(request: NextRequest) {
         }
         
         // Transform the record using the mapping configuration
+        console.log(`🔍 DEBUG - PRE-TRANSFORM: post_title="${nwpiRecord.post_title}", post_content length=${nwpiRecord.post_content?.length || 0}`);
         const gconData = transformNwpiToGcon(nwpiRecord, userData.id);
         
-        // DEBUG: Check key fields
-        console.log(`🔍 DEBUG - mud_title: ${gconData.mud_title}, mud_content length: ${gconData.mud_content?.length || 0}`);
+        // DEBUG: Check key fields in detail
+        console.log(`🔍 DEBUG - POST-TRANSFORM FIELDS:`);
+        console.log(`  - mud_title: "${gconData.mud_title}"`);
+        console.log(`  - mud_content length: ${gconData.mud_content?.length || 0}`);
+        console.log(`  - aval_title: "${gconData.aval_title}"`);
+        console.log(`  - aval_content length: ${gconData.aval_content?.length || 0}`);
+        console.log(`  - All gconData keys:`, Object.keys(gconData));
         
         // Extract dorli blocks from the transformed data
         const dorliBlocks = gconData._dorli_blocks || [];
@@ -456,11 +471,22 @@ export async function POST(request: NextRequest) {
           console.log(`🔍 DEBUG - About to update gconData with keys:`, Object.keys(gconData));
           console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
           console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
-          // Removed complex JSON.stringify to avoid errors
+          
+          // Create final update object with explicit mud fields check
+          const updateData = {
+            ...gconData,
+            updated_at: new Date().toISOString()
+          };
+          
+          console.log(`🌊 FINAL UPDATE DATA VERIFICATION:`);
+          console.log(`  - mud_title: "${updateData.mud_title}"`);
+          console.log(`  - mud_content: ${updateData.mud_content ? `"${updateData.mud_content.substring(0, 50)}..." (length: ${updateData.mud_content.length})` : 'NULL/UNDEFINED'}`);
+          console.log(`  - aval_title: "${updateData.aval_title}"`);
+          console.log(`  - aval_content: ${updateData.aval_content ? `length: ${updateData.aval_content.length}` : 'NULL/UNDEFINED'}`);
           
           const { error: updateError } = await supabase
             .from('gcon_pieces')
-            .update(gconData)
+            .update(updateData)
             .eq('id', existingRecord.id);
 
           if (updateError) {
@@ -494,11 +520,23 @@ export async function POST(request: NextRequest) {
           console.log(`🔍 DEBUG - About to insert gconData with keys:`, Object.keys(gconData));
           console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
           console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
-          // Removed complex JSON.stringify to avoid errors
+          
+          // Create final insert object with explicit mud fields check
+          const insertData = {
+            ...gconData,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          
+          console.log(`🌊 FINAL INSERT DATA VERIFICATION:`);
+          console.log(`  - mud_title: "${insertData.mud_title}"`);
+          console.log(`  - mud_content: ${insertData.mud_content ? `"${insertData.mud_content.substring(0, 50)}..." (length: ${insertData.mud_content.length})` : 'NULL/UNDEFINED'}`);
+          console.log(`  - aval_title: "${insertData.aval_title}"`);
+          console.log(`  - aval_content: ${insertData.aval_content ? `length: ${insertData.aval_content.length}` : 'NULL/UNDEFINED'}`);
           
           const { data: insertedData, error: insertError } = await supabase
             .from('gcon_pieces')
-            .insert([gconData])
+            .insert([insertData])
             .select('id')
             .single();
 
@@ -549,13 +587,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response);
 
   } catch (error) {
-    console.error('f22_nwpi_to_gcon_pusher API error:', error);
+    console.error('🚨 f22_nwpi_to_gcon_pusher API CRITICAL ERROR:', error);
     const errorResponse = { 
       success: false, 
       message: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      results: { processed: 0, succeeded: 0, failed: 0, errors: [] }
+      results: { processed: 0, succeeded: 0, failed: 0, errors: [] },
+      debugInfo: {
+        timestamp: new Date().toISOString(),
+        errorType: error instanceof Error ? error.name : 'UnknownError',
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : 'No stack trace available',
+        apiEndpoint: '/api/f22-nwpi-to-gcon-pusher',
+        method: 'POST'
+      }
     };
-    console.log(`🔄 f22_nwpi_to_gcon_pusher: Sending error response:`, errorResponse);
+    console.log(`🔄 f22_nwpi_to_gcon_pusher: Sending detailed error response:`, errorResponse);
     return NextResponse.json(errorResponse, { status: 500 });
   }
 }
@@ -588,6 +634,15 @@ function transformNwpiToGcon(nwpiRecord: any, userId: string) {
       console.log(`🔍 DEBUG - Processing transform field: ${nwpiField} = "${nwpiRecord[nwpiField]?.substring(0, 50)}..."`);
       const transformed = transformFn(nwpiRecord);
       console.log(`🔍 DEBUG - Transform result for ${nwpiField}:`, Object.keys(transformed));
+      
+      // Special logging for mud fields
+      if (transformed.mud_title) {
+        console.log(`🌊 MUD_TITLE FOUND: "${transformed.mud_title}"`);
+      }
+      if (transformed.mud_content) {
+        console.log(`🌊 MUD_CONTENT FOUND: length=${transformed.mud_content.length}, preview="${transformed.mud_content.substring(0, 100)}..."`);
+      }
+      
       Object.assign(gconData, transformed);
     } else {
       console.log(`🔍 DEBUG - Skipping transform field ${nwpiField}: value is null/undefined`);

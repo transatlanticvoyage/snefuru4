@@ -134,11 +134,15 @@ Processing Steps:
 
       const result = await response.json();
       
-      // Add debug logging for mesagen f22
+      // Add comprehensive debug logging for mesagen f22
       console.log('🔍 Mesagen F22 API Response:', result);
+      console.log('🔍 Mesagen F22 Debug Info:', result.debugInfo);
+      console.log('🔍 Mesagen F22 Results:', result.results);
       
       if (!result.success) {
-        throw new Error(`F22 processing failed: ${result.message}`);
+        // Enhanced error reporting with full API response details
+        const detailedError = `F22 processing failed: ${result.message}\n\nAPI Details:\n${JSON.stringify(result, null, 2)}`;
+        throw new Error(detailedError);
       }
       
       const endTime = new Date();
