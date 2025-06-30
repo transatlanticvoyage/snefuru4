@@ -159,7 +159,7 @@ function BlockEditor({
   useEffect(() => {
     if (focused && editor) {
       if (focusPosition !== null && focusPosition >= 0) {
-        // Set cursor at specific position after merge
+        // Set cursor at specific position after merge (backspace operation)
         editor.commands.focus();
         editor.commands.setTextSelection(focusPosition);
       } else if (isNewFromEnter) {
@@ -170,8 +170,9 @@ function BlockEditor({
           editor.commands.setTextSelection(0);
         }, 10);
       } else {
-        // Focus at the start of the editor to place cursor at beginning
-        editor.commands.focus('start');
+        // For all other cases (including user clicks), just focus without forcing position
+        // This allows natural click behavior to determine cursor position
+        editor.commands.focus();
       }
       onEditorReady?.(editor);
     }
@@ -186,11 +187,13 @@ function BlockEditor({
   }
 
   return (
-    <div className={`border rounded ${focused ? 'ring-2 ring-purple-500 border-purple-300' : ''} ${
-      isDorliBlock 
-        ? 'border-orange-400 bg-orange-50' 
-        : 'border-gray-200'
-    }`}>
+    <div 
+      className={`border rounded ${focused ? 'ring-2 ring-purple-500 border-purple-300' : ''} ${
+        isDorliBlock 
+          ? 'border-orange-400 bg-orange-50' 
+          : 'border-gray-200'
+      }`}
+    >
       {isDorliBlock && (
         <div className="bg-orange-100 border-b border-orange-200 px-2 py-1">
           <span className="text-xs font-semibold text-orange-800">🧩 DORLI BLOCK</span>
