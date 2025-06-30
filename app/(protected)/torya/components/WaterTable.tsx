@@ -162,8 +162,8 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
 
   // Get sticky columns
   const stickyColumnCount = stickyOptions[selectedStickyOption];
-  const allColumns: (keyof WaterRecord | 'select')[] = ['select', 'water1', 'water2', 'water3', 'water4', 'water5', 'water6', 'water7', 'water8', 'water9', 'water10', 'water11', 'water12', 'water13', 'water14', 'water15'];
-  const stickyColumns = allColumns.slice(0, stickyColumnCount + 1); // +1 to include select column
+  const allColumns: (keyof WaterRecord | 'select' | 'prisomi')[] = ['prisomi', 'select', 'water1', 'water2', 'water3', 'water4', 'water5', 'water6', 'water7', 'water8', 'water9', 'water10', 'water11', 'water12', 'water13', 'water14', 'water15'];
+  const stickyColumns = allColumns.slice(0, stickyColumnCount + 2); // +2 to include prisomi and select columns
   const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
 
   // Filter data based on search term
@@ -331,11 +331,127 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
+            {/* Horizomi Row - Column Numbering */}
+            <tr>
+              {/* Horizomi header column numbering */}
+              {allColumns.map((col, index) => {
+                const isLastStickyCol = index === stickyColumns.length - 1;
+                const isPrisomiCol = col === 'prisomi';
+                const isSelectCol = col === 'select';
+                const isVisible = isPrisomiCol || isSelectCol || visibleColumns.includes(col as keyof WaterRecord);
+                
+                if (!isVisible) return null;
+                
+                const isSticky = stickyColumns.includes(col);
+                let leftPosition = '0px';
+                
+                if (isSticky) {
+                  if (isPrisomiCol) {
+                    leftPosition = '0px';
+                  } else if (isSelectCol) {
+                    leftPosition = '20px'; // After prisomi (20px width)
+                  } else {
+                    // Other sticky columns
+                    const stickyIndex = stickyColumns.indexOf(col);
+                    leftPosition = `${20 + 60 + (stickyIndex - 2) * 150}px`; // 20px (prisomi) + 60px (select) + others
+                  }
+                }
+                
+                return (
+                  <th
+                    key={`horizomi-${col}`}
+                    className={`border border-gray-300 bg-purple-50 p-0 text-center ${
+                      isSticky ? 'sticky z-10' : ''
+                    } ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
+                    style={{ 
+                      width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
+                      maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
+                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
+                      left: isSticky ? leftPosition : undefined
+                    }}
+                  >
+                    <div className="relative group">
+                      <div className="text-center text-xs font-normal text-gray-600">
+                        {index + 1}
+                      </div>
+                      <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
+                        <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
+                          <div className="mb-2">
+                            <span className="font-bold">horizomi row</span>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText('horizomi row');
+                            }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                          <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </th>
+                );
+              })}
+            </tr>
+            
+            {/* Main Header Row */}
             <tr>
               {/* Sticky columns */}
               {stickyColumns.map((col, index) => {
                 const isLastStickyCol = index === stickyColumns.length - 1;
+                const isPrisomiCol = col === 'prisomi';
                 const isSelectCol = col === 'select';
+                
+                if (isPrisomiCol) {
+                  return (
+                    <th
+                      key={col}
+                      className={`border border-gray-300 bg-purple-50 p-0 sticky bg-gray-50 z-10 ${
+                        isLastStickyCol ? 'border-r-4 border-black' : ''
+                      }`}
+                      style={{ 
+                        left: '0px',
+                        width: '20px',
+                        maxWidth: '20px',
+                        minWidth: '20px'
+                      }}
+                    >
+                      <div className="relative group">
+                        <div className="text-center text-xs font-normal text-gray-600">
+                          prisomi
+                        </div>
+                        <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
+                          <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line">
+                            <div className="mb-2">
+                              <div>upper-left-most cell in the ui table grid</div>
+                              <div>prisomi column</div>
+                              <div>horizomi row</div>
+                              <div>intersection point</div>
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const textToCopy = `upper-left-most cell in the ui table grid\nprisomi column\nhorizomi row\nintersection point`;
+                                navigator.clipboard.writeText(textToCopy);
+                              }}
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                            <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </th>
+                  );
+                }
                 
                 if (isSelectCol) {
                   return (
@@ -345,7 +461,7 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
                         isLastStickyCol ? 'border-r-4 border-black' : ''
                       }`}
                       style={{ 
-                        left: index === 0 ? '0px' : `${(index - 1) * 150 + 60}px`,
+                        left: '20px', // After prisomi column (20px width)
                         width: '60px',
                         padding: '6px 10px !important',
                         paddingTop: '6px !important',
@@ -380,7 +496,7 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
                     className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 sticky bg-gray-50 z-10 ${
                       isLastStickyCol ? 'border-r-4 border-black' : ''
                     }`}
-                    style={{ left: index === 0 ? '60px' : `${(index - 1) * 150 + 60}px` }}
+                    style={{ left: `${20 + 60 + (index - 2) * 150}px` }} // 20px (prisomi) + 60px (select) + column positions
                   >
                     <div className="flex items-center gap-1">
                       <span>{col}</span>
@@ -413,12 +529,59 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedData.map((row) => (
+            {paginatedData.map((row, rowIndex) => (
               <tr key={row.id} className="hover:bg-gray-50">
                 {/* Sticky columns */}
                 {stickyColumns.map((col, index) => {
                   const isLastStickyCol = index === stickyColumns.length - 1;
+                  const isPrisomiCol = col === 'prisomi';
                   const isSelectCol = col === 'select';
+                  
+                  if (isPrisomiCol) {
+                    const prisomiNumber = (currentPage - 1) * itemsPerPage + rowIndex + 1;
+                    return (
+                      <td 
+                        key={col} 
+                        className={`border border-gray-300 bg-purple-50 p-0 sticky bg-white z-10 ${
+                          isLastStickyCol ? 'border-r-4 border-black' : ''
+                        }`}
+                        style={{ 
+                          left: '0px',
+                          width: '20px',
+                          maxWidth: '20px',
+                          minWidth: '20px'
+                        }}
+                      >
+                        <div className="relative group">
+                          <div className="text-center text-xs font-normal text-gray-600">
+                            {prisomiNumber}
+                          </div>
+                          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
+                            <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line">
+                              <div className="mb-2">
+                                <div>row number: {prisomiNumber}</div>
+                                <div>prisomi column</div>
+                                <div>absolute row positioning</div>
+                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const textToCopy = `row number: ${prisomiNumber}\nprisomi column\nabsolute row positioning`;
+                                  navigator.clipboard.writeText(textToCopy);
+                                }}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                              >
+                                Copy
+                              </button>
+                            </div>
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                              <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    );
+                  }
                   
                   if (isSelectCol) {
                     return (
@@ -428,7 +591,7 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
                           isLastStickyCol ? 'border-r-4 border-black' : ''
                         }`}
                         style={{ 
-                          left: index === 0 ? '0px' : `${(index - 1) * 150 + 60}px`,
+                          left: '20px', // After prisomi column (20px width)
                           width: '60px',
                           padding: '6px 10px !important',
                           paddingTop: '6px !important',
@@ -463,7 +626,7 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
                       className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white ${
                         isLastStickyCol ? 'border-r-4 border-black' : ''
                       }`}
-                      style={{ left: index === 0 ? '60px' : `${(index - 1) * 150 + 60}px` }}
+                      style={{ left: `${20 + 60 + (index - 2) * 150}px` }} // 20px (prisomi) + 60px (select) + column positions
                     >
                       {row[col as keyof WaterRecord]}
                     </td>

@@ -38,6 +38,54 @@ prisomi | Column A | Column B
 **Related Concepts**:
 - `lineyoshi` - content-only line numbering (different from prisomi)
 
+**Tooltip Implementation Requirements:**
+- **Z-Index Critical**: Tooltip popups MUST use `z-index: 100` or higher (`z-[100]` in Tailwind)
+- **Visual Integrity**: Ensures tooltip content is never visually cut off by other page elements
+- **Positioning**: Tooltips should be positioned to avoid bleeding off-screen
+- **Copy Functionality**: Include copy button for tooltip content accessibility
+
+---
+
+### horizomi_ (Horizomi Row)
+
+**Type**: UI Interface Pattern  
+**Category**: Table Grid Numbering  
+**First Defined**: 2025-01-XX  
+
+**Definition**:  
+A **horizomi row** is a dynamically generated column numbering row that appears at the top of UI table grids. It provides continuous numbering across ALL table columns, including both header (`<th>`) and data (`<td>`) columns.
+
+**Key Characteristics**:
+- Displays sequential numbers starting from 1
+- Counts ALL `<th>` and `<td>` elements in each row
+- Updates automatically when columns are added/removed
+- Exists only in the UI layer (not stored in database)
+- Used for absolute column referencing in complex table layouts
+
+**Example**:
+```
+horizomi | 1 | 2 | 3 | 4 | 5
+---------|---|---|---|---|---
+prisomi  | A | B | C | D | E
+1        |   |   |   |   |
+2        |   |   |   |   |
+```
+
+**Usage Context**:
+- `/mesagen` editor tables
+- `/torya` water tables
+- Any complex table with multiple columns
+- When absolute column positioning reference is needed
+
+**Tooltip Implementation Requirements**:
+- **Z-Index Critical**: Tooltip popups MUST use `z-index: 100` or higher (`z-[100]` in Tailwind)
+- **Visual Integrity**: Ensures tooltip content is never visually cut off by other page elements
+- **Positioning**: Tooltips should be positioned to avoid bleeding off-screen
+- **Copy Functionality**: Include copy button for tooltip content accessibility
+
+**Related Concepts**:
+- `prisomi_` - row numbering (different from horizomi)
+
 ---
 
 ## Naming Conventions
