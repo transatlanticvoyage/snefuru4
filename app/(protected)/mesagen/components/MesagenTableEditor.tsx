@@ -286,12 +286,97 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     }
   };
 
-  // Parse initial content into blocks
+  // Initialize blocks from mud_deplines or fallback to initialContent
   useEffect(() => {
-    if (initialContent) {
-      parseContentIntoBlocks(initialContent);
+    const initializeBlocks = () => {
+      if (mudDeplines.length > 0) {
+        // Priority: Create blocks from mud_deplines data
+        console.log(`Creating ${mudDeplines.length} blocks from mud_deplines data`);
+        createBlocksFromMudDeplines();
+      } else if (initialContent) {
+        // Fallback: Create blocks from initialContent
+        console.log('No mud_deplines found, creating blocks from initialContent');
+        parseContentIntoBlocks(initialContent);
+      }
+    };
+
+    // Only initialize after both gconPieceId and loading state are settled
+    if (gconPieceId && !loading) {
+      initializeBlocks();
     }
-  }, [initialContent]);
+  }, [mudDeplines, initialContent, gconPieceId, loading]);
+
+  // Create blocks from mud_deplines data
+  const createBlocksFromMudDeplines = () => {
+    const parsedBlocks: EditorBlock[] = [];
+    
+    try {
+      if (mudDeplines.length === 0) {
+        parsedBlocks.push({
+          id: generateId(),
+          type: 'paragraph',
+          htmlContent: 'Start typing...'
+        });
+      } else {
+        // Sort mud_deplines by depline_jnumber to ensure correct order
+        const sortedDeplines = [...mudDeplines].sort((a, b) => a.depline_jnumber - b.depline_jnumber);
+        
+        console.log(`Creating blocks from ${sortedDeplines.length} mud_deplines`);
+        
+        sortedDeplines.forEach((depline, index) => {
+          // Use content_raw as the text content
+          const content = depline.content_raw || '';
+          
+          // If content is empty, create empty block
+          if (content === '') {
+            parsedBlocks.push({
+              id: generateId(),
+              type: 'paragraph',
+              htmlContent: ''
+            });
+          } else {
+            // Check if content contains heading patterns or HTML tags
+            const hasHeadingTags = /<h[2-6][\s>]/i.test(content) || depline.html_tags_detected.includes('h2') || depline.html_tags_detected.includes('h3') || depline.html_tags_detected.includes('h4');
+            
+            if (hasHeadingTags) {
+              // Content has heading structure
+              parsedBlocks.push({
+                id: generateId(),
+                type: 'heading',
+                htmlContent: content
+              });
+            } else {
+              // Regular text content - wrap in paragraph if it's plain text
+              const htmlContent = content.includes('<') ? content : `<p>${content}</p>`;
+              parsedBlocks.push({
+                id: generateId(),
+                type: 'paragraph',
+                htmlContent: htmlContent
+              });
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error creating blocks from mud_deplines:', error);
+      // Fallback to a single block
+      parsedBlocks.push({
+        id: generateId(),
+        type: 'paragraph',
+        htmlContent: 'Error loading content. Please try again.'
+      });
+    }
+    
+    console.log(`Created ${parsedBlocks.length} blocks from mud_deplines`);
+    setBlocks(parsedBlocks);
+    
+    // Focus the first block
+    if (parsedBlocks.length > 0) {
+      setTimeout(() => {
+        setFocusedBlock(parsedBlocks[0].id);
+      }, 100);
+    }
+  };
 
   const parseContentIntoBlocks = (html: string) => {
     const parsedBlocks: EditorBlock[] = [];
@@ -720,6 +805,13 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
       const supabase = createClientComponentClient();
 
       console.log(`🔄 Saving ${blocks.length} mud_deplines for gcon_piece: ${gconPieceId}`);
+      console.log('📋 Current blocks content:');
+      blocks.forEach((block, index) => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = block.htmlContent;
+        const plainText = tempDiv.textContent || tempDiv.innerText || '';
+        console.log(`  Block ${index + 1}: "${plainText}"`);
+      });
 
       // Delete all existing mud_deplines for this gcon_piece
       const { error: deleteError } = await supabase
@@ -732,6 +824,8 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         alert('Error clearing existing deplines. Save failed.');
         return;
       }
+      
+      console.log('✅ Successfully cleared existing mud_deplines');
 
       // Prepare new mud_deplines data from current blocks
       const newDeplines = blocks.map((block, index) => {
@@ -779,7 +873,26 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
       setMudDeplines(newDeplines);
 
       console.log(`✅ Successfully saved ${newDeplines.length} mud_deplines`);
-      alert(`Successfully saved ${newDeplines.length} deplines to database`);
+      console.log('📋 Saved deplines data:');
+      newDeplines.forEach((depline, index) => {
+        console.log(`  Depline ${depline.depline_jnumber}: "${depline.content_raw}" (tags: ${depline.html_tags_detected})`);
+      });
+      
+      alert(`Successfully saved ${newDeplines.length} deplines to database\n\nCheck console (F12) for detailed save information`);
+      
+      // Force a refresh of the mud_deplines from database to verify save
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('mud_deplines')
+        .select('*')
+        .eq('fk_gcon_piece_id', gconPieceId)
+        .order('depline_jnumber', { ascending: true });
+        
+      if (!verifyError && verifyData) {
+        console.log(`🔍 Verification: Found ${verifyData.length} deplines in database after save`);
+        verifyData.forEach((depline, index) => {
+          console.log(`  DB Depline ${depline.depline_jnumber}: "${depline.content_raw}"`);
+        });
+      }
 
     } catch (error) {
       console.error('Error during save operation:', error);
