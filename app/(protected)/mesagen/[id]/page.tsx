@@ -32,6 +32,11 @@ export default function MesagenPage() {
   const [currentUrl, setCurrentUrl] = useState<string>('');
   const [isTopAreaOpen, setIsTopAreaOpen] = useState<boolean>(true);
   
+  // Joni state variables
+  const [isJoniLoadingDeplines, setIsJoniLoadingDeplines] = useState(false);
+  const [hasJoniDeplines, setHasJoniDeplines] = useState<boolean | null>(null);
+  const [isJoniRebuilding, setIsJoniRebuilding] = useState(false);
+  
   const supabase = createClientComponentClient();
   
   // Get ID from URL parameters
@@ -107,6 +112,62 @@ export default function MesagenPage() {
 
     fetchGconPiece();
   }, [user?.id, id, supabase]);
+
+  // Check for mud_deplines and auto-trigger Joni if needed
+  useEffect(() => {
+    const checkAndTriggerJoni = async () => {
+      if (!gconPiece || !id || isJoniLoadingDeplines) {
+        return;
+      }
+
+      try {
+        console.log('🌊 Joni: Checking if mud_deplines exist for piece:', id);
+        
+        // Check if mud_deplines exist for this gcon_piece
+        const { data: deplines, error: deplinesError } = await supabase
+          .from('mud_deplines')
+          .select('depline_id')
+          .eq('fk_gcon_piece_id', id)
+          .limit(1);
+
+        if (deplinesError) {
+          console.error('❌ Joni: Error checking mud_deplines:', deplinesError);
+          setHasJoniDeplines(false);
+          return;
+        }
+
+        const deplinesExist = deplines && deplines.length > 0;
+        setHasJoniDeplines(deplinesExist);
+
+        if (!deplinesExist && gconPiece.mud_content) {
+          console.log('🌊 Joni: No mud_deplines found, auto-triggering population');
+          setIsJoniLoadingDeplines(true);
+          
+          try {
+            await triggerJoniDeplinePopulation(id);
+            console.log('✅ Joni: Auto-population completed successfully');
+            setHasJoniDeplines(true);
+          } catch (error) {
+            console.error('❌ Joni: Auto-population failed:', error);
+            setHasJoniDeplines(false);
+          } finally {
+            setIsJoniLoadingDeplines(false);
+          }
+        } else if (!gconPiece.mud_content) {
+          console.log('🌊 Joni: No mud_content available for population');
+          setHasJoniDeplines(false);
+        } else {
+          console.log('🌊 Joni: mud_deplines already exist, no action needed');
+        }
+      } catch (error) {
+        console.error('❌ Joni: Error in auto-trigger check:', error);
+        setHasJoniDeplines(false);
+        setIsJoniLoadingDeplines(false);
+      }
+    };
+
+    checkAndTriggerJoni();
+  }, [gconPiece, id, supabase]);
 
   const handleTitleChange = (title: string) => {
     setMudTitle(title);
@@ -327,6 +388,52 @@ Recommendation: Check logs and retry operation`;
     window.history.replaceState({}, '', url.toString());
   };
 
+  // Joni functions
+  const triggerJoniDeplinePopulation = async (gconPieceId: string) => {
+    console.log('🌊 Joni: Starting manual rebuild for piece:', gconPieceId);
+    
+    try {
+      const response = await fetch('/api/joni-mud-depline-population-process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gcon_piece_id: gconPieceId })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('✅ Joni: Manual rebuild completed:', result.data);
+        return result;
+      } else {
+        throw new Error(result.message || 'Joni process failed');
+      }
+    } catch (error) {
+      console.error('❌ Joni: Manual rebuild failed:', error);
+      throw error;
+    }
+  };
+
+  const handleJoniRebuild = async () => {
+    if (!id) return;
+    
+    const confirmed = confirm('Reset content structure from original using Joni process?');
+    if (!confirmed) return;
+    
+    setIsJoniRebuilding(true);
+    
+    try {
+      await triggerJoniDeplinePopulation(id);
+      alert('Joni rebuild completed successfully');
+      // Refresh the page to show updated content
+      window.location.reload();
+    } catch (error) {
+      console.error('❌ Joni rebuild failed:', error);
+      alert(`Joni process failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsJoniRebuilding(false);
+    }
+  };
+
   // Set initial content when data loads
   useEffect(() => {
     if (gconPiece?.mud_title) {
@@ -414,6 +521,25 @@ Recommendation: Check logs and retry operation`;
               }}
             >
               functions popup
+            </button>
+            
+            {/* Joni Rebuild Button */}
+            <button
+              onClick={handleJoniRebuild}
+              disabled={isJoniRebuilding}
+              className="font-bold text-white rounded ml-3"
+              style={{
+                backgroundColor: '#581c87', // dark purple
+                fontSize: '20px',
+                paddingLeft: '14px',
+                paddingRight: '14px',
+                paddingTop: '10px',
+                paddingBottom: '10px',
+                opacity: isJoniRebuilding ? 0.6 : 1,
+                cursor: isJoniRebuilding ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {isJoniRebuilding ? 'Processing...' : 'Rebuild (Joni)'}
             </button>
           </div>
         </div>
@@ -614,13 +740,26 @@ Recommendation: Check logs and retry operation`;
 
         {/* Main Table Editor */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <MesagenTableEditor 
-            initialContent={gconPiece?.mud_content || '<p>Start editing your content...</p>'}
-            onContentChange={handleContentChange}
-            gconPieceId={id}
-            initialTitle={mudTitle}
-            onTitleChange={handleTitleChange}
-          />
+          {isJoniLoadingDeplines ? (
+            // Joni loading state
+            <div className="p-8 text-center">
+              <div className="flex items-center justify-center mb-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+              </div>
+              <p className="text-gray-600">Joni processing content structure...</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Setting up editable content from mud_content
+              </p>
+            </div>
+          ) : (
+            <MesagenTableEditor 
+              initialContent={gconPiece?.mud_content || '<p>Start editing your content...</p>'}
+              onContentChange={handleContentChange}
+              gconPieceId={id}
+              initialTitle={mudTitle}
+              onTitleChange={handleTitleChange}
+            />
+          )}
         </div>
 
         {/* Debug Info */}

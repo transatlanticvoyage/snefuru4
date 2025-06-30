@@ -509,7 +509,7 @@ export async function POST(request: NextRequest) {
             // Process dorli blocks and mud_deplines for updated record
             try {
               await processDorliBlocks(dorliBlocks, existingRecord.id, supabase);
-              await processMudDeplines(mudDeplines, existingRecord.id, supabase);
+              // await processMudDeplines(mudDeplines, existingRecord.id, supabase); // COMMENTED OUT: Joni will handle mud_deplines on-demand
               console.log(`✅ Successfully updated: ${nwpiRecord.post_title}`);
               results.succeeded++;
             } catch (error) {
@@ -560,7 +560,7 @@ export async function POST(request: NextRequest) {
             // Process dorli blocks and mud_deplines for new record
             try {
               await processDorliBlocks(dorliBlocks, insertedData.id, supabase);
-              await processMudDeplines(mudDeplines, insertedData.id, supabase);
+              // await processMudDeplines(mudDeplines, insertedData.id, supabase); // COMMENTED OUT: Joni will handle mud_deplines on-demand
               console.log(`✅ Successfully inserted: ${nwpiRecord.post_title}`);
               results.succeeded++;
             } catch (error) {
