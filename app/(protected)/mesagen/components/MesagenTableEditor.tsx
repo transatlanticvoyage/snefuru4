@@ -479,8 +479,8 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
           let cleanContent = content;
           
           // Remove unnecessary <p> wrapper if it's the only tag and wraps everything
-          if (cleanContent.match(/^<p>.*<\/p>$/s)) {
-            const innerContent = cleanContent.replace(/^<p>(.*)<\/p>$/s, '$1');
+          if (cleanContent.match(/^<p>[\s\S]*<\/p>$/)) {
+            const innerContent = cleanContent.replace(/^<p>([\s\S]*)<\/p>$/, '$1');
             // Only remove <p> tags if the inner content doesn't have block-level elements
             if (!innerContent.match(/<(h[1-6]|div|ul|ol|blockquote|pre|strong|em|b|i|span)\b/i)) {
               cleanContent = innerContent;
@@ -824,8 +824,8 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         let cleanContent = block.htmlContent;
         
         // Remove auto-generated <p> wrapper if it's the only tag and contains the entire content
-        if (cleanContent.match(/^<p>.*<\/p>$/s)) {
-          const innerContent = cleanContent.replace(/^<p>(.*)<\/p>$/s, '$1');
+        if (cleanContent.match(/^<p>[\s\S]*<\/p>$/)) {
+          const innerContent = cleanContent.replace(/^<p>([\s\S]*)<\/p>$/, '$1');
           // Only remove <p> tags if the inner content doesn't have its own block-level tags
           if (!innerContent.match(/<(h[1-6]|div|ul|ol|blockquote|pre)\b/i)) {
             cleanContent = innerContent;
