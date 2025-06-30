@@ -284,6 +284,8 @@ function tontoNormalizationProcess1(content: string): { mudContent: string; mudD
     const mudContent = lines.join('\n');
     
     console.log(`🌊 TontoNormalizationProcess1: Processed ${lines.length} lines, found ${mudDeplines.length} deplines`);
+    console.log(`🔍 DEBUG - tontoResult.mudContent: "${mudContent.substring(0, 200)}..." (length: ${mudContent.length})`);
+    console.log(`🔍 DEBUG - tontoResult.mudDeplines.length: ${mudDeplines.length}`);
     
     return { mudContent, mudDeplines };
     
@@ -462,6 +464,14 @@ export async function POST(request: NextRequest) {
           console.log(`🔍 DEBUG - About to update gconData with keys:`, Object.keys(gconData));
           console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
           console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
+          console.log(`🔍 DEBUG - FULL UPDATE PAYLOAD:`, JSON.stringify({
+            mud_title: gconData.mud_title,
+            mud_content: gconData.mud_content ? `${gconData.mud_content.substring(0, 200)}...` : 'NULL/MISSING',
+            aval_title: gconData.aval_title,
+            aval_content: gconData.aval_content ? `${gconData.aval_content.substring(0, 200)}...` : 'NULL/MISSING',
+            meta_title: gconData.meta_title,
+            existing_record_id: existingRecord.id
+          }, null, 2));
           
           const { error: updateError } = await supabase
             .from('gcon_pieces')
@@ -473,6 +483,21 @@ export async function POST(request: NextRequest) {
             results.failed++;
             results.errors.push(`Failed to update "${nwpiRecord.post_title}": ${updateError.message}`);
           } else {
+            // Verify what was actually saved by reading it back
+            const { data: verifyData } = await supabase
+              .from('gcon_pieces')
+              .select('id, mud_title, mud_content, aval_title, aval_content')
+              .eq('id', existingRecord.id)
+              .single();
+            
+            console.log(`🔍 DEBUG - VERIFICATION after UPDATE:`, {
+              id: verifyData?.id,
+              mud_title: verifyData?.mud_title,
+              mud_content: verifyData?.mud_content ? `${verifyData.mud_content.substring(0, 100)}...` : 'NULL/MISSING',
+              aval_title: verifyData?.aval_title,
+              aval_content: verifyData?.aval_content ? `${verifyData.aval_content.substring(0, 100)}...` : 'NULL/MISSING'
+            });
+            
             // Process dorli blocks and mud_deplines for updated record
             try {
               await processDorliBlocks(dorliBlocks, existingRecord.id, supabase);
@@ -490,6 +515,16 @@ export async function POST(request: NextRequest) {
           console.log(`🔍 DEBUG - About to insert gconData with keys:`, Object.keys(gconData));
           console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
           console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
+          console.log(`🔍 DEBUG - FULL INSERT PAYLOAD:`, JSON.stringify({
+            mud_title: gconData.mud_title,
+            mud_content: gconData.mud_content ? `${gconData.mud_content.substring(0, 200)}...` : 'NULL/MISSING',
+            aval_title: gconData.aval_title,
+            aval_content: gconData.aval_content ? `${gconData.aval_content.substring(0, 200)}...` : 'NULL/MISSING',
+            meta_title: gconData.meta_title,
+            fk_users_id: gconData.fk_users_id,
+            g_post_id: gconData.g_post_id,
+            asn_sitespren_base: gconData.asn_sitespren_base
+          }, null, 2));
           
           const { data: insertedData, error: insertError } = await supabase
             .from('gcon_pieces')
@@ -502,6 +537,21 @@ export async function POST(request: NextRequest) {
             results.failed++;
             results.errors.push(`Failed to insert "${nwpiRecord.post_title}": ${insertError.message}`);
           } else {
+            // Verify what was actually saved by reading it back
+            const { data: verifyData } = await supabase
+              .from('gcon_pieces')
+              .select('id, mud_title, mud_content, aval_title, aval_content')
+              .eq('id', insertedData.id)
+              .single();
+            
+            console.log(`🔍 DEBUG - VERIFICATION after INSERT:`, {
+              id: verifyData?.id,
+              mud_title: verifyData?.mud_title,
+              mud_content: verifyData?.mud_content ? `${verifyData.mud_content.substring(0, 100)}...` : 'NULL/MISSING',
+              aval_title: verifyData?.aval_title,
+              aval_content: verifyData?.aval_content ? `${verifyData.aval_content.substring(0, 100)}...` : 'NULL/MISSING'
+            });
+            
             // Process dorli blocks and mud_deplines for new record
             try {
               await processDorliBlocks(dorliBlocks, insertedData.id, supabase);
