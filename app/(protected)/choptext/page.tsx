@@ -81,7 +81,7 @@ export default function ChopTextPage() {
         </Link>
       </div>
       
-      <h1 className="text-2xl font-bold mb-6">Text Chopper</h1>
+      <h1 className="text-2xl font-bold mb-6">Text Chopper - Enhanced</h1>
         
         {/* Input Section */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
