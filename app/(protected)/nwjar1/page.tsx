@@ -336,7 +336,27 @@ export default function NwJar1Page() {
         }),
       });
 
-      const result = await response.json();
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      // Get response text first to check if it's empty
+      const responseText = await response.text();
+      if (!responseText.trim()) {
+        throw new Error('Empty response from server');
+      }
+
+      // Try to parse JSON
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (jsonError) {
+        console.error('JSON parsing error:', jsonError);
+        console.error('Response status:', response.status);
+        console.error('Response text:', responseText);
+        throw new Error(`Invalid JSON response from server. Response was: "${responseText.substring(0, 200)}..."`);
+      }
 
       if (result.success) {
         alert(`Success: ${result.message}`);

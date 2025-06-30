@@ -299,8 +299,20 @@ function tontoNormalizationProcess1(content: string): { mudContent: string; mudD
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Add error handling for request body parsing
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error('❌ Failed to parse request body:', parseError);
+      return NextResponse.json(
+        { success: false, message: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+    
     const { recordIds = [], pushAll = false } = body;
+    console.log(`🔄 f22_nwpi_to_gcon_pusher: Request received with recordIds.length=${recordIds.length}, pushAll=${pushAll}`);
 
     // Initialize Supabase client with service role to bypass RLS
     const supabase = createRouteHandlerClient({ cookies });
@@ -513,21 +525,24 @@ export async function POST(request: NextRequest) {
 
     console.log(`📈 f22_nwpi_to_gcon_pusher completed: ${results.succeeded}/${results.processed} successful`);
 
-    return NextResponse.json({
+    const response = {
       success: true,
       message: `Processed ${results.processed} records: ${results.succeeded} succeeded, ${results.failed} failed`,
       results: results
-    });
+    };
+    
+    console.log(`🔄 f22_nwpi_to_gcon_pusher: Sending response:`, response);
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('f22_nwpi_to_gcon_pusher API error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        message: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}` 
-      },
-      { status: 500 }
-    );
+    const errorResponse = { 
+      success: false, 
+      message: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      results: { processed: 0, succeeded: 0, failed: 0, errors: [] }
+    };
+    console.log(`🔄 f22_nwpi_to_gcon_pusher: Sending error response:`, errorResponse);
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }
 
