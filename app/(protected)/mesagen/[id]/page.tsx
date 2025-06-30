@@ -443,6 +443,7 @@ Recommendation: Check logs and retry operation`;
           <MesagenTableEditor 
             initialContent={gconPiece?.mud_content || '<p>Start editing your content...</p>'}
             onContentChange={handleContentChange}
+            gconPieceId={id}
             initialTitle={mudTitle}
             onTitleChange={handleTitleChange}
           />

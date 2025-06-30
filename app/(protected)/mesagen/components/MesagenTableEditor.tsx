@@ -15,10 +15,20 @@ interface EditorBlock {
   htmlContent: string;
 }
 
+interface MudDepline {
+  depline_id: string;
+  fk_gcon_piece_id: string;
+  depline_jnumber: number;
+  depline_knumber: number | null;
+  content_raw: string;
+  html_tags_detected: string;
+  created_at: string;
+}
+
 interface MesagenTableEditorProps {
   initialContent?: string;
   onContentChange?: (content: string) => void;
-  // gconPieceId removed for UI-only version
+  gconPieceId?: string; // Re-added for fetching mud_deplines
   initialTitle?: string;
   onTitleChange?: (title: string) => void;
 }
@@ -144,16 +154,70 @@ function BlockEditor({
 
 type ViewMode = 'visual' | 'html';
 
-export default function MesagenTableEditor({ initialContent = '<p>Start typing...</p>', onContentChange, initialTitle = '', onTitleChange }: MesagenTableEditorProps) {
+export default function MesagenTableEditor({ initialContent = '<p>Start typing...</p>', onContentChange, gconPieceId, initialTitle = '', onTitleChange }: MesagenTableEditorProps) {
   const [blocks, setBlocks] = useState<EditorBlock[]>([]);
   const [focusedBlock, setFocusedBlock] = useState<string | null>(null);
   const [activeEditor, setActiveEditor] = useState<any>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('visual');
   const [selectedBlocks, setSelectedBlocks] = useState<Set<string>>(new Set());
+  const [mudDeplines, setMudDeplines] = useState<MudDepline[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Dummy dorli functions for UI-only version (no backend)
   const getDorliByPlaceholder = (placeholder: string) => null;
   const updateDorliBlock = async (dorliId: string, content: string) => true;
+
+  // Fetch mud_deplines data for this gcon_piece
+  useEffect(() => {
+    const fetchMudDeplines = async () => {
+      if (!gconPieceId) {
+        setMudDeplines([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const { createClientComponentClient } = await import('@supabase/auth-helpers-nextjs');
+        const supabase = createClientComponentClient();
+        
+        const { data, error } = await supabase
+          .from('mud_deplines')
+          .select('*')
+          .eq('fk_gcon_piece_id', gconPieceId)
+          .order('depline_jnumber', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching mud_deplines:', error);
+          setMudDeplines([]);
+        } else {
+          setMudDeplines(data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching mud_deplines:', error);
+        setMudDeplines([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMudDeplines();
+  }, [gconPieceId]);
+
+  // Get mud_depline data for a specific block index
+  const getMudDeplineForBlock = (blockIndex: number): MudDepline | null => {
+    // Find mud_depline that matches this block's line number (blockIndex + 1)
+    return mudDeplines.find(depline => depline.depline_jnumber === blockIndex + 1) || null;
+  };
+
+  // Handle copying depline_id to clipboard
+  const handleCopyDeplineId = async (deplineId: string) => {
+    try {
+      await navigator.clipboard.writeText(deplineId);
+      // Could add a toast notification here
+    } catch (error) {
+      console.error('Failed to copy depline_id:', error);
+    }
+  };
 
   // Parse initial content into blocks
   useEffect(() => {
@@ -449,9 +513,9 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
       {/* Header */}
       <div className="bg-purple-100 border-b border-purple-200 p-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-purple-800">Mesagen - 10-Column Table Editor</h3>
+          <h3 className="text-lg font-semibold text-purple-800">Mesagen - 11-Column Table Editor</h3>
           <div className="text-sm text-purple-600">
-            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 10 columns | 
+            {blocks.length} block{blocks.length !== 1 ? 's' : ''} × 11 columns | 
             <span className={`ml-2 font-medium ${viewMode === 'visual' ? 'text-green-600' : 'text-orange-600'}`}>
               {viewMode === 'visual' ? '📝 Visual Mode' : '💻 HTML Mode'}
             </span>
@@ -459,7 +523,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         </div>
       </div>
 
-      {/* 10-Column Table Structure with 6-Row Header (including prisomi and select) */}
+      {/* 11-Column Table Structure with 6-Row Header (including prisomi, select, html_tags_detected, depline_id) */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse table-fixed">
           {/* Table Header - 6 Rows */}
@@ -482,10 +546,10 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300" style={{ padding: '6px 10px', width: '46px', maxWidth: '46px', minWidth: '46px' }}></th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
-              <th className="border border-gray-300 p-2 w-20"></th>
+              <th className="border border-gray-300 p-2" style={{ width: '120px' }}></th>
+              <th className="border border-gray-300 p-2" style={{ width: '100px' }}></th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2" style={{ width: '600px' }}></th>
-              <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
               <th className="border border-gray-300 p-2 w-20"></th>
             </tr>
@@ -708,7 +772,6 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
             </tr>
             
             {/* Header Row 5 - aval_title row */}
@@ -748,7 +811,6 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2"></th>
             </tr>
             
             {/* Header Row 6 - aval_content label row */}
@@ -776,8 +838,11 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               </th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
-              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
+              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700" style={{ width: '120px' }}>
                 html_tags_detected
+              </th>
+              <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700" style={{ width: '100px' }}>
+                depline_id
               </th>
               <th className="border border-gray-300 p-2 text-center text-sm font-bold text-purple-700">
                 lineyoshi
@@ -827,7 +892,6 @@ mud_deplines.content_raw`;
                   <div className="font-bold text-sm text-purple-700">mud_deplines.content_raw</div>
                 </div>
               </th>
-              <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2"></th>
             </tr>
@@ -885,16 +949,50 @@ mud_deplines.content_raw`;
                 </td>
                 
                 {/* Column 5 - html_tags_detected */}
-                <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
-                  -
+                <td className="border border-gray-300 p-2 text-left" style={{ width: '120px', maxWidth: '120px' }}>
+                  {(() => {
+                    const mudDepline = getMudDeplineForBlock(index);
+                    const htmlTags = mudDepline?.html_tags_detected || '';
+                    return htmlTags ? (
+                      <div className="text-xs text-gray-700 break-words" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: '1.3' }}>
+                        {htmlTags.split(',').map((tag, i) => (
+                          <span key={i}>
+                            {tag.trim()}
+                            {i < htmlTags.split(',').length - 1 && <br />}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-xs">-</span>
+                    );
+                  })()}
                 </td>
                 
-                {/* Column 6 - lineyoshi */}
+                {/* Column 6 - depline_id */}
+                <td className="border border-gray-300 p-2 text-center" style={{ width: '100px', maxWidth: '100px' }}>
+                  {(() => {
+                    const mudDepline = getMudDeplineForBlock(index);
+                    const deplineId = mudDepline?.depline_id;
+                    return deplineId ? (
+                      <button
+                        onClick={() => handleCopyDeplineId(deplineId)}
+                        className="text-xs text-blue-600 hover:text-blue-800 underline cursor-pointer font-mono"
+                        title={`Click to copy full UUID: ${deplineId}`}
+                      >
+                        {deplineId.substring(0, 3)}..
+                      </button>
+                    ) : (
+                      <span className="text-gray-400 text-xs">-</span>
+                    );
+                  })()}
+                </td>
+                
+                {/* Column 7 - lineyoshi */}
                 <td className="border border-gray-300 p-2 text-center text-gray-700 text-sm font-medium">
                   {index + 1}
                 </td>
                 
-                {/* Column 7 - Content (TipTap Editor or HTML View) */}
+                {/* Column 8 - Content (TipTap Editor or HTML View) */}
                 <td className="border border-gray-300 p-1" style={{ width: '600px' }}>
                   {(() => {
                     const blockContent = getBlockHtml(block.id);
@@ -939,7 +1037,7 @@ mud_deplines.content_raw`;
                   })()}
                 </td>
                 
-                {/* Column 8 - Add Row Button */}
+                {/* Column 9 - Add Row Button */}
                 <td className="border border-gray-300 p-2 text-center">
                   <button
                     onClick={() => handleAddRowBelow(index)}
@@ -950,12 +1048,12 @@ mud_deplines.content_raw`;
                   </button>
                 </td>
                 
-                {/* Column 9 - html_tags_detected (right of content) */}
+                {/* Column 10 - Thing9 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
                 
-                {/* Column 10 - Thing7 */}
+                {/* Column 11 - Thing10 */}
                 <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
                   -
                 </td>
@@ -1046,11 +1144,26 @@ mud_deplines.content_raw`;
           padding: 6px 10px !important;
         }
         
-        /* Content column specific styling (now column 7 with prisomi and select) */
-        td:nth-child(7) {
+        /* Content column specific styling (now column 8 with prisomi, select, html_tags, depline_id) */
+        td:nth-child(8) {
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
+        }
+        
+        /* html_tags_detected column styling */
+        td:nth-child(5) {
+          width: 120px !important;
+          max-width: 120px;
+          min-width: 120px;
+          vertical-align: top;
+        }
+        
+        /* depline_id column styling */
+        td:nth-child(6) {
+          width: 100px !important;
+          max-width: 100px;
+          min-width: 100px;
         }
         
         /* Other columns styling */
@@ -1060,14 +1173,36 @@ mud_deplines.content_raw`;
           min-width: 60px;
         }
         
-        /* Header column styling (Content column is now 7 with prisomi and select) */
-        th:nth-child(7) {
+        /* Header column styling (Content column is now 8 with prisomi, select, html_tags, depline_id) */
+        th:nth-child(8) {
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
         }
         
-        th:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(7)) {
+        /* html_tags_detected header styling */
+        th:nth-child(5) {
+          width: 120px !important;
+          max-width: 120px;
+          min-width: 120px;
+          vertical-align: top;
+        }
+        
+        /* depline_id header styling */
+        th:nth-child(6) {
+          width: 100px !important;
+          max-width: 100px;
+          min-width: 100px;
+        }
+        
+        th:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(8)) {
+          width: 80px;
+          max-width: 120px;
+          min-width: 60px;
+        }
+        
+        /* Other data columns styling */
+        td:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(8)) {
           width: 80px;
           max-width: 120px;
           min-width: 60px;
