@@ -491,6 +491,7 @@ Recommendation: Check logs and retry operation`;
               </div>
             </div>
           </div>
+          </div>
         </div>
 
         {/* Main Table Editor */}
