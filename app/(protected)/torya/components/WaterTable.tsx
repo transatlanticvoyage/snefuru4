@@ -372,17 +372,28 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
                   >
                     <div className="relative group">
                       <div className="text-center text-xs font-normal text-gray-600">
-                        {index + 1}
+                        {isPrisomiCol ? '1' : index + 1}
                       </div>
                       <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
                         <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                           <div className="mb-2">
-                            <span className="font-bold">horizomi row</span>
+                            {isPrisomiCol ? (
+                              <>
+                                <div>intersection cell</div>
+                                <div>horizomi row 1</div>
+                                <div>prisomi column 1</div>
+                              </>
+                            ) : (
+                              <span className="font-bold">horizomi row</span>
+                            )}
                           </div>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigator.clipboard.writeText('horizomi row');
+                              const textToCopy = isPrisomiCol 
+                                ? 'intersection cell\nhorizomi row 1\nprisomi column 1'
+                                : 'horizomi row';
+                              navigator.clipboard.writeText(textToCopy);
                             }}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
                           >
@@ -423,20 +434,19 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
                     >
                       <div className="relative group">
                         <div className="text-center text-xs font-normal text-gray-600">
-                          prisomi
+                          2
                         </div>
                         <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
                           <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line">
                             <div className="mb-2">
-                              <div>upper-left-most cell in the ui table grid</div>
+                              <div>row number: 2</div>
                               <div>prisomi column</div>
-                              <div>horizomi row</div>
-                              <div>intersection point</div>
+                              <div>table header row</div>
                             </div>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const textToCopy = `upper-left-most cell in the ui table grid\nprisomi column\nhorizomi row\nintersection point`;
+                                const textToCopy = `row number: 2\nprisomi column\ntable header row`;
                                 navigator.clipboard.writeText(textToCopy);
                               }}
                               className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
@@ -538,7 +548,7 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
                   const isSelectCol = col === 'select';
                   
                   if (isPrisomiCol) {
-                    const prisomiNumber = (currentPage - 1) * itemsPerPage + rowIndex + 1;
+                    const prisomiNumber = (currentPage - 1) * itemsPerPage + rowIndex + 3; // +3 to account for horizomi row (1) and header row (2)
                     return (
                       <td 
                         key={col} 
