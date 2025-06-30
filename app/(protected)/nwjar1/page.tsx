@@ -796,38 +796,82 @@ export default function NwJar1Page() {
                           
                           {f22Error && (
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                              <div className="flex">
-                                <div className="flex-shrink-0">
-                                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                              <div className="flex justify-between items-start mb-4">
+                                <h5 className="text-lg font-medium text-red-800 flex items-center">
+                                  <svg className="h-5 w-5 text-red-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                                   </svg>
+                                  f22_nwpi_to_gcon_pusher Error
+                                </h5>
+                                <button
+                                  onClick={() => {
+                                    const errorReport = {
+                                      timestamp: new Date().toISOString(),
+                                      errorType: 'f22_nwpi_to_gcon_pusher',
+                                      message: f22Error.message,
+                                      details: f22Error.details,
+                                      userAgent: navigator.userAgent,
+                                      url: window.location.href,
+                                      instructions: 'Check browser console (F12) for 🔍 DEBUG messages'
+                                    };
+                                    navigator.clipboard.writeText(JSON.stringify(errorReport, null, 2));
+                                    alert('Complete error report copied to clipboard!');
+                                  }}
+                                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+                                >
+                                  📋 Copy Full Report
+                                </button>
+                              </div>
+                              
+                              <div className="space-y-4 text-sm text-red-700">
+                                <div>
+                                  <p className="font-medium text-red-800">Error Message:</p>
+                                  <p className="mt-1 bg-white p-3 rounded border text-red-900 font-mono text-sm">{f22Error.message}</p>
                                 </div>
-                                <div className="ml-3 flex-1">
-                                  <h5 className="text-sm font-medium text-red-800">f22_nwpi_to_gcon_pusher Error</h5>
-                                  <div className="mt-2 text-sm text-red-700">
-                                    <p className="font-medium">Error Message:</p>
-                                    <p className="mt-1 bg-white p-2 rounded border">{f22Error.message}</p>
-                                    
-                                    {f22Error.details && (
-                                      <div className="mt-3">
-                                        <p className="font-medium">Additional Details:</p>
-                                        <div className="mt-1 bg-white p-2 rounded border max-h-48 overflow-y-auto">
-                                          <pre className="text-xs whitespace-pre-wrap">
-                                            {JSON.stringify(f22Error.details, null, 2)}
-                                          </pre>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="mt-3">
-                                    <button
-                                      onClick={() => setF22Error(null)}
-                                      className="text-sm text-red-600 hover:text-red-800 underline"
-                                    >
-                                      Clear f22 Error
-                                    </button>
+                                
+                                <div>
+                                  <p className="font-medium text-red-800">🔍 Debug Analysis:</p>
+                                  <div className="mt-2 bg-white p-3 rounded border space-y-2">
+                                    <div><strong>Error Type:</strong> f22 API communication failure</div>
+                                    <div><strong>Likely Causes:</strong> Server error, network issue, or API route problem</div>
+                                    <div><strong>Debug Steps:</strong></div>
+                                    <ul className="list-disc list-inside text-xs space-y-1 ml-4">
+                                      <li>Check browser console (F12) for detailed error messages</li>
+                                      <li>Look for 🔍 DEBUG messages in console</li>
+                                      <li>Check Network tab for actual API response</li>
+                                      <li>Copy full report above for support</li>
+                                    </ul>
                                   </div>
                                 </div>
+                                
+                                {f22Error.details && (
+                                  <div>
+                                    <p className="font-medium text-red-800">Technical Details:</p>
+                                    <div className="mt-1 bg-white p-3 rounded border max-h-60 overflow-y-auto">
+                                      <pre className="text-xs whitespace-pre-wrap text-gray-800">
+                                        {JSON.stringify(f22Error.details, null, 2)}
+                                      </pre>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <div className="mt-4 flex gap-3">
+                                <button
+                                  onClick={() => setF22Error(null)}
+                                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
+                                >
+                                  Clear Error
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    console.log('🔍 Full F22 Error Object:', f22Error);
+                                    alert('Full error details logged to console (F12)');
+                                  }}
+                                  className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-colors"
+                                >
+                                  Log to Console
+                                </button>
                               </div>
                             </div>
                           )}

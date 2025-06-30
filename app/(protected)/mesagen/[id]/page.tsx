@@ -332,16 +332,44 @@ Recommendation: Check logs and retry operation`;
                         : 'bg-blue-600 text-white hover:bg-blue-700'
                     }`}
                   >
-                    Copy Report
+                    📋 Copy Report
+                  </button>
+                  <button
+                    onClick={() => {
+                      const detailedReport = {
+                        timestamp: new Date().toISOString(),
+                        pageType: 'mesagen',
+                        gconPieceId: id,
+                        f22Report: f22Report,
+                        userAgent: navigator.userAgent,
+                        url: window.location.href,
+                        instructions: 'Check browser console (F12) for 🔍 DEBUG messages about mud_title and mud_content'
+                      };
+                      navigator.clipboard.writeText(JSON.stringify(detailedReport, null, 2));
+                      alert('Complete diagnostic report copied to clipboard!');
+                    }}
+                    disabled={!f22Report}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                      !f22Report
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-green-600 text-white hover:bg-green-700'
+                    }`}
+                  >
+                    🔍 Full Diagnostic
                   </button>
                 </div>
                 <textarea
                   value={f22Report}
                   readOnly
-                  placeholder="F22 function reports will appear here after execution..."
-                  className="resize-none border border-gray-300 rounded p-2 text-sm font-mono bg-gray-50"
-                  style={{ width: '300px', height: '100px' }}
+                  placeholder="F22 function reports will appear here after execution...\n\nLook for:\n- TontoNormalizationProcess1 results\n- mud_title and mud_content processing\n- Database verification results\n- Any error messages\n\nCheck browser console (F12) for detailed debug logs."
+                  className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-gray-50"
+                  style={{ width: '500px', height: '200px' }}
                 />
+                {f22Report && (
+                  <div className="text-xs text-gray-600 mt-1">
+                    💡 Tip: Check browser console (F12) for detailed 🔍 DEBUG messages about mud_title and mud_content processing
+                  </div>
+                )}
               </div>
             </div>
           </div>

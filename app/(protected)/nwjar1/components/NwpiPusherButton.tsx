@@ -151,10 +151,29 @@ export default function NwpiPusherButton({ data }: NwpiPusherButtonProps) {
       {/* Result Modal */}
       {showResultModal && pushResult && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl mx-4 max-h-96 overflow-y-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Push Operation Results
-            </h3>
+          <div className="bg-white rounded-lg p-6 max-w-6xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                f22 Push Operation Results
+              </h3>
+              <button
+                onClick={() => {
+                  const reportData = {
+                    timestamp: new Date().toISOString(),
+                    success: pushResult.success,
+                    message: pushResult.message,
+                    results: pushResult.results,
+                    debugInfo: (pushResult as any)._debugInfo,
+                    fullResponse: pushResult
+                  };
+                  navigator.clipboard.writeText(JSON.stringify(reportData, null, 2));
+                  alert('Full error report copied to clipboard!');
+                }}
+                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+              >
+                📋 Copy Full Report
+              </button>
+            </div>
             
             <div className={`p-4 rounded-md mb-4 ${
               pushResult.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -215,20 +234,54 @@ export default function NwpiPusherButton({ data }: NwpiPusherButtonProps) {
                       <div>Response Status: {(pushResult as any)._debugInfo.responseStatus}</div>
                       <div>Response Size: {(pushResult as any)._debugInfo.responseSize} bytes</div>
                       <div>Timestamp: {(pushResult as any)._debugInfo.timestamp}</div>
-                      <div className="mt-2">
-                        <button
-                          onClick={() => {
-                            console.log('🔍 Full F22 Response Details:', pushResult);
-                            alert('Full response details logged to browser console (F12 → Console)');
-                          }}
-                          className="text-blue-600 hover:text-blue-800 underline text-xs"
-                        >
-                          Log Full Response to Console
-                        </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Detailed Error Information */}
+                {!pushResult.success && (
+                  <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                    <h4 className="font-medium text-red-900 mb-3">🔍 Detailed Error Analysis:</h4>
+                    <div className="space-y-3 text-sm text-red-800">
+                      <div>
+                        <strong>Error Type:</strong> f22_nwpi_to_gcon_pusher API failure
+                      </div>
+                      <div>
+                        <strong>Primary Message:</strong> {pushResult.message}
+                      </div>
+                      {pushResult.results?.errors && (
+                        <div>
+                          <strong>API Errors ({pushResult.results.errors.length}):</strong>
+                          <ul className="list-disc list-inside mt-1 space-y-1">
+                            {pushResult.results.errors.map((error, index) => (
+                              <li key={index} className="text-xs">{error}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <div>
+                        <strong>Console Logs:</strong> Check browser console (F12) for detailed debug messages starting with 🔍 DEBUG
+                      </div>
+                      <div>
+                        <strong>Next Steps:</strong>
+                        <ul className="list-disc list-inside mt-1 space-y-1 text-xs">
+                          <li>Copy this report using the button above</li>
+                          <li>Check browser console for 🔍 DEBUG messages</li>
+                          <li>Look for specific mud_title and mud_content debug logs</li>
+                          <li>Share this report for further analysis</li>
+                        </ul>
                       </div>
                     </div>
                   </div>
                 )}
+
+                {/* Raw Response Data */}
+                <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
+                  <h4 className="font-medium text-gray-900 mb-2">Raw API Response:</h4>
+                  <pre className="text-xs text-gray-600 overflow-x-auto whitespace-pre-wrap max-h-40 overflow-y-auto">
+                    {JSON.stringify(pushResult, null, 2)}
+                  </pre>
+                </div>
               </div>
             )}
 
