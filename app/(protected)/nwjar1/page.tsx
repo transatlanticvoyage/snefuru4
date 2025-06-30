@@ -830,16 +830,45 @@ export default function NwJar1Page() {
                                 </div>
                                 
                                 <div>
-                                  <p className="font-medium text-red-800">🔍 Debug Analysis:</p>
-                                  <div className="mt-2 bg-white p-3 rounded border space-y-2">
-                                    <div><strong>Error Type:</strong> f22 API communication failure</div>
-                                    <div><strong>Likely Causes:</strong> Server error, network issue, or API route problem</div>
+                                  <p className="font-medium text-red-800">🔍 Detailed Debug Analysis:</p>
+                                  <div className="mt-2 bg-white p-3 rounded border space-y-3">
+                                    <div><strong>Error Type:</strong> f22_nwpi_to_gcon_pusher API failure</div>
+                                    <div><strong>HTTP Status:</strong> {f22Error.details?.message?.includes('405') ? '405 Method Not Allowed' : 
+                                                                                 f22Error.details?.message?.includes('500') ? '500 Internal Server Error' : 
+                                                                                 'Unknown HTTP error'}</div>
+                                    <div><strong>Likely Causes:</strong></div>
+                                    <ul className="list-disc list-inside text-xs space-y-1 ml-4">
+                                      {f22Error.details?.message?.includes('405') && (
+                                        <>
+                                          <li>API route not properly configured for POST requests</li>
+                                          <li>Next.js server needs restart</li>
+                                          <li>API route file corrupted or missing</li>
+                                        </>
+                                      )}
+                                      {f22Error.details?.message?.includes('500') && (
+                                        <>
+                                          <li>Server-side error in f22 processing logic</li>
+                                          <li>Database connection issue</li>
+                                          <li>Missing environment variables</li>
+                                        </>
+                                      )}
+                                      <li>Network connectivity issue</li>
+                                      <li>Authentication/session expired</li>
+                                    </ul>
+                                    <div><strong>API Details:</strong></div>
+                                    <div className="text-xs bg-gray-100 p-2 rounded">
+                                      <div>Endpoint: POST /api/f22-nwpi-to-gcon-pusher</div>
+                                      <div>User Agent: {navigator.userAgent.substring(0, 100)}...</div>
+                                      <div>Timestamp: {new Date().toISOString()}</div>
+                                      <div>Selected Items: {kz101Checked ? selectedContentIds.size : (kz103Checked ? nwpiContent.length : 0)}</div>
+                                    </div>
                                     <div><strong>Debug Steps:</strong></div>
                                     <ul className="list-disc list-inside text-xs space-y-1 ml-4">
-                                      <li>Check browser console (F12) for detailed error messages</li>
-                                      <li>Look for 🔍 DEBUG messages in console</li>
-                                      <li>Check Network tab for actual API response</li>
-                                      <li>Copy full report above for support</li>
+                                      <li>Open browser console (F12) and look for detailed error messages</li>
+                                      <li>Check Network tab for actual API response body</li>
+                                      <li>Look for 🔍 DEBUG messages in console logs</li>
+                                      <li>Try refreshing the page and attempting again</li>
+                                      <li>Copy full report above for developer support</li>
                                     </ul>
                                   </div>
                                 </div>

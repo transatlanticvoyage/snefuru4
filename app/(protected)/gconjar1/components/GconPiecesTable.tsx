@@ -124,7 +124,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
   const [data, setData] = useState<GconPiece[]>(initialData);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(200);
   const [sortField, setSortField] = useState<SortField>("created_at");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [secondarySortField, setSecondarySortField] = useState<SortField | null>(null);
@@ -873,9 +873,66 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
         </div>
       </div>
 
-      {/* Results count */}
-      <div className="text-sm text-gray-600">
-        Showing {paginatedData.length} of {sortedData.length} results
+      {/* Results count and Top Pagination */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm text-gray-600">
+          Showing {paginatedData.length} of {sortedData.length} results
+        </div>
+        
+        {/* Top Pagination Controls */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-700">Items per page:</span>
+            <select
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <button
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            >
+              First
+            </button>
+            <button
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+            <button
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              Last
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Table */}
@@ -1193,6 +1250,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
             <option value={20}>20</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
+            <option value={200}>200</option>
           </select>
         </div>
 
