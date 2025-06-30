@@ -1244,11 +1244,18 @@ mud_deplines.content_raw`;
                   </div>
                   
                   {/* Label */}
-                  <div className="font-bold text-sm text-purple-700">mud_deplines.content_raw</div>
+                  <div className="text-sm text-purple-700">
+                    <span>mud_deplines.</span>
+                    <span className="font-bold">content_raw</span>
+                  </div>
                 </div>
               </th>
-              <th className="border border-gray-300 bg-purple-50 p-2"></th>
-              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm text-purple-700">
+                buttons5
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700">
+                is_inline_dorli
+              </th>
             </tr>
           </thead>
           
