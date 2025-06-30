@@ -116,13 +116,32 @@ Processing Steps:
 4. Updating mud_deplines table...
 5. Updating aval_dorlis table...`);
       
-      // TODO: Call actual f22 API endpoint
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      // Call the actual f22 API endpoint
+      const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recordIds: [], // Empty array means process all records
+          pushAll: true
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`F22 API failed: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(`F22 processing failed: ${result.message}`);
+      }
       
       const endTime = new Date();
       const duration = endTime.getTime() - startTime.getTime();
       
-      // Generate comprehensive success report
+      // Generate comprehensive success report with actual API results
       const successReport = `✅ F22 PROCESSING COMPLETED SUCCESSFULLY
 
 Execution Summary:
@@ -132,23 +151,33 @@ Execution Summary:
 - Target: gcon_piece ID ${id}
 - User: ${user.id}
 
+API Results:
+- Records Processed: ${result.results?.processed || 0}
+- Records Succeeded: ${result.results?.succeeded || 0}
+- Records Failed: ${result.results?.failed || 0}
+- Message: ${result.message}
+
 Processing Results:
 ✓ BozoHTMLNormalizationProcess1: HTML content normalized to plaintext
-✓ TontoNormalizationProcess1: Text split by linebreaks (\n)
-✓ mud_content: Reconstructed and updated
+✓ TontoNormalizationProcess1: Text split by linebreaks (\\n)
+✓ mud_content: Reconstructed and updated in gcon_pieces
+✓ mud_title: Title field updated in gcon_pieces
 ✓ mud_deplines: Line-by-line entries created with HTML tag detection
 ✓ aval_dorlis: Complex HTML blocks extracted and stored with placeholders
 
 Database Operations:
-- gcon_pieces table: mud_content and aval_content updated
+- gcon_pieces table: mud_content, mud_title, and aval_content updated
 - mud_deplines table: Previous entries deleted, new entries inserted
 - aval_dorlis table: Previous dorli blocks cleared, new blocks stored
 
-System Status: All operations completed without errors
-Next Steps: Content is ready for editing in mud system`;
+System Status: All operations completed successfully
+Next Steps: Refresh page to see updated content in mud system`;
 
       setF22Report(successReport);
-      alert(`F22 processing completed for gcon_piece: ${id}`);
+      alert(`F22 processing completed for gcon_piece: ${id}\n\nThe page will refresh to load the updated content.`);
+      
+      // Refresh the page to load updated mud_title and mud_content
+      window.location.reload();
     } catch (error) {
       const endTime = new Date();
       const duration = endTime.getTime() - startTime.getTime();

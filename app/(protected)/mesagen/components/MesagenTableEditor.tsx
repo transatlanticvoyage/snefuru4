@@ -733,7 +733,10 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300 p-2"></th>
               <th className="border border-gray-300 p-2">
                 <div className="space-y-2">
-                  <div className="font-bold text-sm text-purple-700">mud_title</div>
+                  <div className="text-sm text-purple-700">
+                    <span>gcon_pieces.</span>
+                    <span className="font-bold">mud_title</span>
+                  </div>
                   <input
                     type="text"
                     value={initialTitle}

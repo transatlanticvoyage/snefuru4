@@ -28,15 +28,19 @@ const NWPI_TO_GCON_MAPPING = {
       'mud_title': data.post_title // Add mud_title
     }),
     'post_content': (data: any) => {
+      console.log(`🔍 DEBUG - post_content transform input: "${data.post_content?.substring(0, 100)}..."`);
       const bozoResult = bozoHTMLNormalizationProcess1(data.post_content || '');
       const tontoResult = tontoNormalizationProcess1(data.post_content || '');
-      return {
+      console.log(`🔍 DEBUG - TontoNormalizationProcess1 result: mudContent="${tontoResult.mudContent?.substring(0, 100)}...", deplines=${tontoResult.mudDeplines?.length}`);
+      const result = {
         'corpus1': data.post_content || '',
         'aval_content': bozoResult.normalizedContent,
         '_dorli_blocks': bozoResult.dorliBlocks, // Store for later processing
         'mud_content': tontoResult.mudContent, // Add mud_content
         '_mud_deplines': tontoResult.mudDeplines // Store for later processing
       };
+      console.log(`🔍 DEBUG - post_content transform result keys:`, Object.keys(result));
+      return result;
     },
     'post_excerpt': (data: any) => ({
       'corpus2': data.post_excerpt || ''
@@ -394,6 +398,16 @@ export async function POST(request: NextRequest) {
         // Transform the record using the mapping configuration
         const gconData = transformNwpiToGcon(nwpiRecord, userData.id);
         
+        // DEBUG: Log the transformed data to see if mud_title and mud_content are present
+        console.log(`🔍 DEBUG - Transformed gconData for "${nwpiRecord.post_title}":`, {
+          mud_title: gconData.mud_title,
+          mud_content: gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING',
+          aval_title: gconData.aval_title,
+          aval_content: gconData.aval_content ? `${gconData.aval_content.substring(0, 100)}...` : 'MISSING',
+          post_title: nwpiRecord.post_title,
+          post_content: nwpiRecord.post_content ? `${nwpiRecord.post_content.substring(0, 100)}...` : 'MISSING'
+        });
+        
         // Extract dorli blocks from the transformed data
         const dorliBlocks = gconData._dorli_blocks || [];
         delete gconData._dorli_blocks; // Remove from data to be inserted
@@ -433,6 +447,9 @@ export async function POST(request: NextRequest) {
         if (existingRecord) {
           // UPDATE existing record instead of skipping
           console.log(`🔄 Updating existing record: post_id=${nwpiRecord.post_id}, sitespren=${nwpiRecord.fk_sitespren_base}`);
+          console.log(`🔍 DEBUG - About to update gconData with keys:`, Object.keys(gconData));
+          console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
+          console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
           
           const { error: updateError } = await supabase
             .from('gcon_pieces')
@@ -458,6 +475,10 @@ export async function POST(request: NextRequest) {
           }
         } else {
           // Insert new record
+          console.log(`🔍 DEBUG - About to insert gconData with keys:`, Object.keys(gconData));
+          console.log(`🔍 DEBUG - mud_title in gconData:`, gconData.mud_title);
+          console.log(`🔍 DEBUG - mud_content in gconData:`, gconData.mud_content ? `${gconData.mud_content.substring(0, 100)}...` : 'MISSING');
+          
           const { data: insertedData, error: insertError } = await supabase
             .from('gcon_pieces')
             .insert([gconData])
@@ -535,8 +556,12 @@ function transformNwpiToGcon(nwpiRecord: any, userId: string) {
   // Apply transform mappings
   for (const [nwpiField, transformFn] of Object.entries(NWPI_TO_GCON_MAPPING.transform)) {
     if (nwpiRecord[nwpiField] !== null && nwpiRecord[nwpiField] !== undefined) {
+      console.log(`🔍 DEBUG - Processing transform field: ${nwpiField} = "${nwpiRecord[nwpiField]?.substring(0, 50)}..."`);
       const transformed = transformFn(nwpiRecord);
+      console.log(`🔍 DEBUG - Transform result for ${nwpiField}:`, Object.keys(transformed));
       Object.assign(gconData, transformed);
+    } else {
+      console.log(`🔍 DEBUG - Skipping transform field ${nwpiField}: value is null/undefined`);
     }
   }
 
