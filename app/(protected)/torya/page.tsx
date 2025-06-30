@@ -14,6 +14,7 @@ export default function ToryaPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [gconPieceId, setGconPieceId] = useState<string | null>(null);
+  const [gconPiece, setGconPiece] = useState<any>(null);
 
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
@@ -25,6 +26,60 @@ export default function ToryaPage() {
     
     setLoading(false);
   }, [searchParams]);
+
+  // Fetch gcon_piece data when gconPieceId is available
+  useEffect(() => {
+    const fetchGconPiece = async () => {
+      if (!user?.id || !gconPieceId) {
+        return;
+      }
+
+      try {
+        // Get user's internal ID first
+        const { data: userData } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (!userData) {
+          setError('User not found');
+          return;
+        }
+
+        // Fetch the gcon_piece
+        const { data: gconData, error: gconError } = await supabase
+          .from('gcon_pieces')
+          .select('id, asn_sitespren_base, mud_title')
+          .eq('id', gconPieceId)
+          .eq('fk_users_id', userData.id)
+          .single();
+
+        if (gconError) {
+          setError('Content piece not found');
+          return;
+        }
+
+        setGconPiece(gconData);
+      } catch (err) {
+        console.error('Error fetching gcon_piece:', err);
+        setError('Failed to load content');
+      }
+    };
+
+    fetchGconPiece();
+  }, [user?.id, gconPieceId, supabase]);
+
+  // Set browser title based on gcon_piece data
+  useEffect(() => {
+    if (gconPiece?.asn_sitespren_base) {
+      document.title = 'torya_' + gconPiece.asn_sitespren_base;
+    } else if (gconPieceId) {
+      document.title = 'torya';
+    } else {
+      document.title = 'torya';
+    }
+  }, [gconPiece?.asn_sitespren_base, gconPieceId]);
 
   if (!user) {
     return (
@@ -68,6 +123,11 @@ export default function ToryaPage() {
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
               <strong>gcon_piece_id:</strong> {gconPieceId}
+              {gconPiece?.asn_sitespren_base && (
+                <span className="ml-4">
+                  <strong>Site:</strong> {gconPiece.asn_sitespren_base}
+                </span>
+              )}
             </p>
           </div>
         )}
