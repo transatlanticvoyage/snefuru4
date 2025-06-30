@@ -43,7 +43,8 @@ function BlockEditor({
   focused,
   onEditorReady,
   isDorliBlock = false,
-  focusPosition = null
+  focusPosition = null,
+  isNewFromEnter = false
 }: {
   block: EditorBlock;
   onUpdate: (id: string, content: string) => void;
@@ -54,6 +55,7 @@ function BlockEditor({
   onEditorReady?: (editor: any) => void;
   isDorliBlock?: boolean;
   focusPosition?: number | null;
+  isNewFromEnter?: boolean;
 }) {
   const editor = useEditor({
     extensions: [
@@ -150,13 +152,20 @@ function BlockEditor({
         // Set cursor at specific position after merge
         editor.commands.focus();
         editor.commands.setTextSelection(focusPosition);
+      } else if (isNewFromEnter) {
+        // For new blocks created from Enter, ensure cursor is at the start
+        editor.commands.focus();
+        // Force cursor to the beginning of the new block
+        setTimeout(() => {
+          editor.commands.setTextSelection(0);
+        }, 10);
       } else {
         // Focus at the start of the editor to place cursor at beginning
         editor.commands.focus('start');
       }
       onEditorReady?.(editor);
     }
-  }, [focused, editor, onEditorReady, focusPosition]);
+  }, [focused, editor, onEditorReady, focusPosition, isNewFromEnter]);
 
   if (!editor) {
     return (
@@ -206,6 +215,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
   const [mudDeplines, setMudDeplines] = useState<MudDepline[]>([]);
   const [loading, setLoading] = useState(false);
   const [mergePosition, setMergePosition] = useState<number | null>(null);
+  const [newBlockFromEnter, setNewBlockFromEnter] = useState<string | null>(null);
 
   // Dummy dorli functions for UI-only version (no backend)
   const getDorliByPlaceholder = (placeholder: string) => null;
@@ -500,8 +510,9 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
       }
     }
     
-    // Focus the new block
+    // Focus the new block and mark it as created from Enter
     setTimeout(() => {
+      setNewBlockFromEnter(newBlock.id);
       setFocusedBlock(newBlock.id);
     }, 50);
   }, [blocks, gconPieceId, mudDeplines, activeEditor]);
@@ -627,8 +638,12 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     if (mergePosition !== null) {
       setTimeout(() => setMergePosition(null), 100);
     }
+    // Clear newBlockFromEnter flag after it's been used
+    if (newBlockFromEnter !== null) {
+      setTimeout(() => setNewBlockFromEnter(null), 100);
+    }
     // Keep view mode consistent across blocks - don't reset it
-  }, [mergePosition]);
+  }, [mergePosition, newBlockFromEnter]);
 
   const handleEditorReady = useCallback((editor: any) => {
     setActiveEditor(editor);
@@ -1467,6 +1482,7 @@ mud_deplines.content_raw`;
                         onEditorReady={handleEditorReady}
                         isDorliBlock={isDorli}
                         focusPosition={focusedBlock === block.id ? mergePosition : null}
+                        isNewFromEnter={focusedBlock === block.id && newBlockFromEnter === block.id}
                       />
                     );
                   })()}
