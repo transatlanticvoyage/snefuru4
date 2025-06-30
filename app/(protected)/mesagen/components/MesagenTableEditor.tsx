@@ -1692,15 +1692,31 @@ mud_deplines.content_raw`;
 
                     // Render editor or HTML view based on mode
                     return viewMode === 'html' ? (
-                      <div className={`p-2 rounded border min-h-[2rem] font-mono text-xs ${
-                        isDorli ? 'bg-orange-100 border-orange-200' : 'bg-gray-100'
-                      }`}>
+                      <div className={`rounded border min-h-[2rem] ${
+                        isDorli ? 'bg-orange-100 border-orange-200' : 'bg-gray-100 border-gray-200'
+                      } ${focusedBlock === block.id ? 'ring-2 ring-purple-500 border-purple-300' : ''}`}>
                         {isDorli && (
-                          <div className="mb-2 text-xs font-semibold text-orange-800">
-                            🧩 DORLI: {placeholder}
+                          <div className="bg-orange-100 border-b border-orange-200 px-2 py-1">
+                            <span className="text-xs font-semibold text-orange-800">🧩 DORLI: {placeholder}</span>
                           </div>
                         )}
-                        <pre className="whitespace-pre-wrap">{resolvedContent}</pre>
+                        <textarea
+                          value={resolvedContent}
+                          onChange={(e) => handleBlockUpdate(block.id, e.target.value)}
+                          onFocus={() => handleBlockFocus(block.id)}
+                          onClick={(e) => {
+                            // Ensure focus is set when clicking
+                            handleBlockFocus(block.id);
+                            // Allow natural cursor positioning from click
+                            e.stopPropagation();
+                          }}
+                          className={`w-full p-2 font-mono text-xs bg-transparent border-none resize-none focus:outline-none ${
+                            isDorli ? 'bg-orange-50' : 'bg-white'
+                          }`}
+                          style={{ minHeight: '2rem' }}
+                          rows={Math.max(1, resolvedContent.split('\n').length)}
+                          placeholder="Enter HTML content..."
+                        />
                       </div>
                     ) : (
                       <BlockEditor
