@@ -74,15 +74,14 @@ export default function ChopTextPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-4">
-        <div className="mb-4">
-          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
-            ← Back to Dashboard
-          </Link>
-        </div>
-        
-        <h1 className="text-2xl font-bold mb-6">Text Chopper</h1>
+    <div>
+      <div className="mb-4">
+        <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
+          ← Back to Dashboard
+        </Link>
+      </div>
+      
+      <h1 className="text-2xl font-bold mb-6">Text Chopper</h1>
         
         {/* Input Section */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -206,7 +205,6 @@ export default function ChopTextPage() {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }

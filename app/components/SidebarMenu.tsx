@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 interface SidebarMenuProps {
   isOpen: boolean;
   onToggle: () => void;
+  showToggleButton?: boolean; // Optional prop to hide the default toggle button
 }
 
 interface NavItem {
@@ -19,7 +20,7 @@ interface NavItem {
   children?: NavItem[];
 }
 
-export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
+export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true }: SidebarMenuProps) {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [shouldShow, setShouldShow] = useState(false);
@@ -413,16 +414,18 @@ export default function SidebarMenu({ isOpen, onToggle }: SidebarMenuProps) {
         </div>
       </div>
 
-      {/* Toggle Button */}
-      <button
-        onClick={onToggle}
-        className="fixed top-4 left-4 z-40 p-2 bg-gray-800 rounded-md shadow-lg border border-gray-600 hover:bg-gray-700 transition-colors"
-        title="Toggle Navigation Menu"
-      >
-        <svg className="h-5 w-5 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
+      {/* Toggle Button - only show if showToggleButton is true */}
+      {showToggleButton && (
+        <button
+          onClick={onToggle}
+          className="fixed top-4 left-4 z-40 p-2 bg-gray-800 rounded-md shadow-lg border border-gray-600 hover:bg-gray-700 transition-colors"
+          title="Toggle Navigation Menu"
+        >
+          <svg className="h-5 w-5 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      )}
     </>
   );
 }
