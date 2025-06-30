@@ -32,6 +32,9 @@ export default function MesagenPage() {
   const [currentUrl, setCurrentUrl] = useState<string>('');
   const [isTopAreaOpen, setIsTopAreaOpen] = useState<boolean>(true);
   
+  // Export dropdown state
+  const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
+  
   // Joni state variables
   const [isJoniLoadingDeplines, setIsJoniLoadingDeplines] = useState(false);
   const [hasJoniDeplines, setHasJoniDeplines] = useState<boolean | null>(null);
@@ -64,6 +67,21 @@ export default function MesagenPage() {
       }
     }
   }, []);
+
+  // Close export dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isExportDropdownOpen) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.export-dropdown-container')) {
+          setIsExportDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isExportDropdownOpen]);
 
   // Fetch gcon_piece data
   useEffect(() => {
@@ -434,6 +452,159 @@ Recommendation: Check logs and retry operation`;
     }
   };
 
+  // Export functions
+  const handleExportSQL = async () => {
+    if (!id) return;
+    
+    try {
+      const { data: mudDeplines, error } = await supabase
+        .from('mud_deplines')
+        .select('*')
+        .eq('fk_gcon_piece_id', id);
+
+      if (error) throw error;
+
+      if (!mudDeplines || mudDeplines.length === 0) {
+        alert('No mud_deplines found for this content piece');
+        return;
+      }
+
+      // Generate SQL INSERT statements
+      const tableName = 'mud_deplines';
+      const columns = Object.keys(mudDeplines[0]).join(', ');
+      
+      let sqlContent = `-- SQL Export for mud_deplines (gcon_piece_id: ${id})\n`;
+      sqlContent += `-- Generated on: ${new Date().toISOString()}\n\n`;
+      
+      mudDeplines.forEach(row => {
+        const values = Object.values(row).map(val => {
+          if (val === null) return 'NULL';
+          if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`;
+          return val;
+        }).join(', ');
+        
+        sqlContent += `INSERT INTO ${tableName} (${columns}) VALUES (${values});\n`;
+      });
+
+      // Download file
+      const blob = new Blob([sqlContent], { type: 'text/sql' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mud_deplines_${id}_${new Date().toISOString().split('T')[0]}.sql`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setIsExportDropdownOpen(false);
+    } catch (error) {
+      console.error('Export SQL failed:', error);
+      alert('Failed to export SQL');
+    }
+  };
+
+  const handleExportCSV = async () => {
+    if (!id) return;
+    
+    try {
+      const { data: mudDeplines, error } = await supabase
+        .from('mud_deplines')
+        .select('*')
+        .eq('fk_gcon_piece_id', id);
+
+      if (error) throw error;
+
+      if (!mudDeplines || mudDeplines.length === 0) {
+        alert('No mud_deplines found for this content piece');
+        return;
+      }
+
+      // Generate CSV content
+      const headers = Object.keys(mudDeplines[0]);
+      let csvContent = headers.join(',') + '\n';
+      
+      mudDeplines.forEach(row => {
+        const values = headers.map(header => {
+          const val = row[header];
+          if (val === null) return '';
+          if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
+            return `"${val.replace(/"/g, '""')}"`;
+          }
+          return val;
+        });
+        csvContent += values.join(',') + '\n';
+      });
+
+      // Download file
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mud_deplines_${id}_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setIsExportDropdownOpen(false);
+    } catch (error) {
+      console.error('Export CSV failed:', error);
+      alert('Failed to export CSV');
+    }
+  };
+
+  const handleExportXLS = async () => {
+    if (!id) return;
+    
+    try {
+      const { data: mudDeplines, error } = await supabase
+        .from('mud_deplines')
+        .select('*')
+        .eq('fk_gcon_piece_id', id);
+
+      if (error) throw error;
+
+      if (!mudDeplines || mudDeplines.length === 0) {
+        alert('No mud_deplines found for this content piece');
+        return;
+      }
+
+      // For XLS, we'll create a tab-separated values file that Excel can open
+      const headers = Object.keys(mudDeplines[0]);
+      let xlsContent = headers.join('\t') + '\n';
+      
+      mudDeplines.forEach(row => {
+        const values = headers.map(header => {
+          const val = row[header];
+          if (val === null) return '';
+          if (typeof val === 'string') {
+            // Replace tabs and newlines for XLS compatibility
+            return val.replace(/\t/g, ' ').replace(/\n/g, ' ');
+          }
+          return val;
+        });
+        xlsContent += values.join('\t') + '\n';
+      });
+
+      // Download file
+      const blob = new Blob([xlsContent], { type: 'application/vnd.ms-excel' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mud_deplines_${id}_${new Date().toISOString().split('T')[0]}.xls`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setIsExportDropdownOpen(false);
+    } catch (error) {
+      console.error('Export XLS failed:', error);
+      alert('Failed to export XLS');
+    }
+  };
+
   // Set initial content when data loads
   useEffect(() => {
     if (gconPiece?.mud_title) {
@@ -489,28 +660,119 @@ Recommendation: Check logs and retry operation`;
       <div className="p-4">
         <div className="mb-4">
           <div className="flex items-start gap-4" style={{ marginTop: '10px' }}>
-            {/* Info Box Wrapper - Uniform 12px font */}
-            <div 
-              className="bg-gray-100 rounded-lg p-4" 
-              style={{ 
-                width: '330px',
-                fontSize: '12px'
-              }}
-            >
-              <div className="mb-2">
-                <Link href="/gconjar1" className="text-purple-600 hover:text-purple-800">
+            {/* Info Box Wrapper - Valan-inspired styling */}
+            <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
+              <div className="mb-3">
+                <Link href="/gconjar1" className="text-blue-600 hover:text-blue-800">
                   ← Back to GconJar1
                 </Link>
               </div>
-              <h1 className="font-bold text-purple-800">Mesagen - Advanced Table Editor</h1>
-              <div className="text-gray-600 mt-1">
-                <span>Editing: {gconPiece?.meta_title || 'Untitled'}</span>
-                {gconPiece?.asn_sitespren_base && (
-                  <span className="ml-2">({gconPiece.asn_sitespren_base})</span>
-                )}
+              
+              <div className="mb-3 text-sm text-gray-600">
+                <strong>gcon_pieces.id:</strong> {id}
               </div>
-              <div className="text-gray-500 mt-1">
-                ID: {id}
+
+              {/* asn_sitespren_base */}
+              <div className="mb-3">
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                  asn_sitespren_base
+                </label>
+                <div className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm">
+                  {gconPiece?.asn_sitespren_base || 'Not set'}
+                </div>
+              </div>
+
+              {/* post_name */}
+              <div className="mb-3">
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                  post_name
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => {
+                      if (gconPiece?.asn_sitespren_base && gconPiece?.post_name) {
+                        window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.post_name}`, '_blank');
+                      }
+                    }}
+                    disabled={!gconPiece?.post_name || !gconPiece?.asn_sitespren_base}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece?.post_name || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece?.post_name || 'Not set'}
+                  </span>
+                </div>
+              </div>
+
+              {/* pageslug */}
+              <div className="mb-3">
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                  pageslug
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => {
+                      if (gconPiece?.asn_sitespren_base && gconPiece?.pageslug) {
+                        window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.pageslug}`, '_blank');
+                      }
+                    }}
+                    disabled={!gconPiece?.pageslug || !gconPiece?.asn_sitespren_base}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece?.pageslug || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece?.pageslug || 'Not set'}
+                  </span>
+                </div>
+              </div>
+
+              {/* pageurl */}
+              <div className="mb-3">
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                  pageurl
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => {
+                      if (gconPiece?.pageurl) {
+                        window.open(gconPiece.pageurl, '_blank');
+                      }
+                    }}
+                    disabled={!gconPiece?.pageurl}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece?.pageurl || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece?.pageurl || 'Not set'}
+                  </span>
+                </div>
               </div>
             </div>
             
@@ -548,6 +810,48 @@ Recommendation: Check logs and retry operation`;
             >
               {isJoniRebuilding ? 'Processing...' : 'Rebuild (Joni)'}
             </button>
+            
+            {/* Export Button with Dropdown */}
+            <div className="relative ml-3 export-dropdown-container">
+              <button
+                onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
+                className="font-bold text-white rounded"
+                style={{
+                  backgroundColor: '#581c87', // dark purple to match Joni button
+                  fontSize: '20px',
+                  paddingLeft: '14px',
+                  paddingRight: '14px',
+                  paddingTop: '10px',
+                  paddingBottom: '10px'
+                }}
+              >
+                Export
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isExportDropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded shadow-lg z-50">
+                  <button
+                    onClick={handleExportSQL}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    SQL
+                  </button>
+                  <button
+                    onClick={handleExportXLS}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    XLS
+                  </button>
+                  <button
+                    onClick={handleExportCSV}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    CSV
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
