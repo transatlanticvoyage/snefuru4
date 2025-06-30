@@ -5,6 +5,15 @@ import Header from '@/app/components/Header';
 import SidebarMenu from '@/app/components/SidebarMenu';
 import SelectedRowStyles from '@/app/components/SelectedRowStyles';
 
+/**
+ * SHARMI SYSTEM - Enhanced header and sidebar management
+ * 
+ * This is the Sharmi system for managing header and sidebar visibility
+ * Currently ONLY active on the choptext page for testing purposes
+ * 
+ * Does NOT affect the normal header/sidebar system used on other pages
+ */
+
 // Sharmi enhanced toggle states for header and sidebar management
 type SharmiToggleState = 'both-visible' | 'sidebar-only' | 'header-only' | 'both-hidden';
 
