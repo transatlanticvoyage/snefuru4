@@ -30,6 +30,7 @@ export default function MesagenPage() {
   const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [currentUrl, setCurrentUrl] = useState<string>('');
+  const [isTopAreaOpen, setIsTopAreaOpen] = useState<boolean>(true);
   
   const supabase = createClientComponentClient();
   
@@ -388,153 +389,186 @@ Recommendation: Check logs and retry operation`;
           </div>
         </div>
         
+        {/* Top Area Manager - Accordion Wrapper */}
         <div className="mb-4">
-          <div className="flex items-start justify-between">
-            <div className="flex gap-6">
-              {/* mud_content Display Section */}
-              <div className="flex flex-col">
-                <label className="text-sm font-bold text-gray-700 mb-2">gcon_pieces.mud_content</label>
-                <div className="flex gap-2">
-                  <textarea
-                    value={gconPiece?.mud_content || ''}
-                    readOnly
-                    placeholder="mud_content field value will appear here..."
-                    className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-gray-50"
-                    style={{ width: '500px', height: '300px' }}
-                  />
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={handleCopyMudContent}
-                      disabled={!gconPiece?.mud_content}
-                      className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                        !gconPiece?.mud_content
-                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
-                      }`}
-                    >
-                      📋 Copy
-                    </button>
-                    <button
-                      onClick={() => setShowMudContentModal(true)}
-                      disabled={!gconPiece?.mud_content}
-                      className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                        !gconPiece?.mud_content
-                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          : 'bg-green-600 text-white hover:bg-green-700'
-                      }`}
-                    >
-                      🔍 Expand
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* mud_document Display Section */}
-              <div className="flex flex-col">
-                <label className="text-sm font-bold text-gray-700 mb-2">gcon_pieces.mud_document</label>
-                <div className="flex gap-2">
-                  <textarea
-                    value={gconPiece?.mud_document || ''}
-                    readOnly
-                    placeholder="mud_document field value will appear here..."
-                    className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-gray-50"
-                    style={{ width: '500px', height: '300px' }}
-                  />
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={handleCopyMudDocument}
-                      disabled={!gconPiece?.mud_document}
-                      className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                        !gconPiece?.mud_document
-                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
-                      }`}
-                    >
-                      📋 Copy
-                    </button>
-                    <button
-                      onClick={() => setShowMudDocumentModal(true)}
-                      disabled={!gconPiece?.mud_document}
-                      className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                        !gconPiece?.mud_document
-                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          : 'bg-green-600 text-white hover:bg-green-700'
-                      }`}
-                    >
-                      🔍 Expand
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* F22 Section */}
-              <div className="flex flex-col items-end gap-3">
-              <button
-                onClick={handleRunF22}
-                disabled={isRunningF22}
-                className={`px-4 py-2 rounded font-medium transition-colors ${
-                  isRunningF22
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-purple-600 text-white hover:bg-purple-700'
-                }`}
+          <div 
+            className="rounded-lg border border-gray-200 overflow-hidden transition-all duration-300"
+            style={{ backgroundColor: '#fefef8' }} // Very soft light yellow
+          >
+            {!isTopAreaOpen ? (
+              // Collapsed State - Compact View
+              <div 
+                className="flex items-center justify-center cursor-pointer hover:bg-yellow-50 transition-colors"
+                style={{ width: '200px', height: '60px' }}
+                onClick={() => setIsTopAreaOpen(true)}
               >
-                {isRunningF22 ? 'Running f22...' : 'Run f22 on this gcon_pieces row'}
-              </button>
-              
-              {/* F22 Report Text Box */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-gray-700">F22 Function Report:</label>
+                <span className="text-sm font-medium text-gray-700">
+                  📂 Open Top Area Manager
+                </span>
+              </div>
+            ) : (
+              // Expanded State - Full Content
+              <div className="p-4">
+                {/* Close/Compact Button */}
+                <div className="flex justify-end mb-4">
                   <button
-                    onClick={handleCopyF22Report}
-                    disabled={!f22Report}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      !f22Report
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                    onClick={() => setIsTopAreaOpen(false)}
+                    className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded transition-colors"
                   >
-                    📋 Copy Report
-                  </button>
-                  <button
-                    onClick={() => {
-                      const detailedReport = {
-                        timestamp: new Date().toISOString(),
-                        pageType: 'mesagen',
-                        gconPieceId: id,
-                        f22Report: f22Report,
-                        userAgent: navigator.userAgent,
-                        url: window.location.href,
-                        instructions: 'Check browser console (F12) for 🔍 DEBUG messages about mud_title and mud_content'
-                      };
-                      navigator.clipboard.writeText(JSON.stringify(detailedReport, null, 2));
-                      alert('Complete diagnostic report copied to clipboard!');
-                    }}
-                    disabled={!f22Report}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      !f22Report
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-green-600 text-white hover:bg-green-700'
-                    }`}
-                  >
-                    🔍 Full Diagnostic
+                    📁 Compact
                   </button>
                 </div>
-                <textarea
-                  value={f22Report}
-                  readOnly
-                  placeholder="F22 function reports will appear here after execution...\n\nLook for:\n- TontoNormalizationProcess1 results\n- mud_title and mud_content processing\n- Database verification results\n- Any error messages\n\nCheck browser console (F12) for detailed debug logs."
-                  className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-gray-50"
-                  style={{ width: '500px', height: '200px' }}
-                />
-                {f22Report && (
-                  <div className="text-xs text-gray-600 mt-1">
-                    💡 Tip: Check browser console (F12) for detailed 🔍 DEBUG messages about mud_title and mud_content processing
+                
+                {/* Original Content */}
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-6">
+                    {/* mud_content Display Section */}
+                    <div className="flex flex-col">
+                      <label className="text-sm font-bold text-gray-700 mb-2">gcon_pieces.mud_content</label>
+                      <div className="flex gap-2">
+                        <textarea
+                          value={gconPiece?.mud_content || ''}
+                          readOnly
+                          placeholder="mud_content field value will appear here..."
+                          className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
+                          style={{ width: '500px', height: '300px' }}
+                        />
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={handleCopyMudContent}
+                            disabled={!gconPiece?.mud_content}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                              !gconPiece?.mud_content
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
+                          >
+                            📋 Copy
+                          </button>
+                          <button
+                            onClick={() => setShowMudContentModal(true)}
+                            disabled={!gconPiece?.mud_content}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                              !gconPiece?.mud_content
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-green-600 text-white hover:bg-green-700'
+                            }`}
+                          >
+                            🔍 Expand
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* mud_document Display Section */}
+                    <div className="flex flex-col">
+                      <label className="text-sm font-bold text-gray-700 mb-2">gcon_pieces.mud_document</label>
+                      <div className="flex gap-2">
+                        <textarea
+                          value={gconPiece?.mud_document || ''}
+                          readOnly
+                          placeholder="mud_document field value will appear here..."
+                          className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
+                          style={{ width: '500px', height: '300px' }}
+                        />
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={handleCopyMudDocument}
+                            disabled={!gconPiece?.mud_document}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                              !gconPiece?.mud_document
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
+                          >
+                            📋 Copy
+                          </button>
+                          <button
+                            onClick={() => setShowMudDocumentModal(true)}
+                            disabled={!gconPiece?.mud_document}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                              !gconPiece?.mud_document
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-green-600 text-white hover:bg-green-700'
+                            }`}
+                          >
+                            🔍 Expand
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* F22 Section */}
+                    <div className="flex flex-col items-end gap-3">
+                    <button
+                      onClick={handleRunF22}
+                      disabled={isRunningF22}
+                      className={`px-4 py-2 rounded font-medium transition-colors ${
+                        isRunningF22
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                      }`}
+                    >
+                      {isRunningF22 ? 'Running f22...' : 'Run f22 on this gcon_pieces row'}
+                    </button>
+                    
+                    {/* F22 Report Text Box */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-700">F22 Function Report:</label>
+                        <button
+                          onClick={handleCopyF22Report}
+                          disabled={!f22Report}
+                          className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                            !f22Report
+                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                          }`}
+                        >
+                          📋 Copy Report
+                        </button>
+                        <button
+                          onClick={() => {
+                            const detailedReport = {
+                              timestamp: new Date().toISOString(),
+                              pageType: 'mesagen',
+                              gconPieceId: id,
+                              f22Report: f22Report,
+                              userAgent: navigator.userAgent,
+                              url: window.location.href,
+                              instructions: 'Check browser console (F12) for 🔍 DEBUG messages about mud_title and mud_content'
+                            };
+                            navigator.clipboard.writeText(JSON.stringify(detailedReport, null, 2));
+                            alert('Complete diagnostic report copied to clipboard!');
+                          }}
+                          disabled={!f22Report}
+                          className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                            !f22Report
+                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                              : 'bg-green-600 text-white hover:bg-green-700'
+                          }`}
+                        >
+                          🔍 Full Diagnostic
+                        </button>
+                      </div>
+                      <textarea
+                        value={f22Report}
+                        readOnly
+                        placeholder="F22 function reports will appear here after execution...\n\nLook for:\n- TontoNormalizationProcess1 results\n- mud_title and mud_content processing\n- Database verification results\n- Any error messages\n\nCheck browser console (F12) for detailed debug logs."
+                        className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
+                        style={{ width: '500px', height: '200px' }}
+                      />
+                      {f22Report && (
+                        <div className="text-xs text-gray-600 mt-1">
+                          💡 Tip: Check browser console (F12) for detailed 🔍 DEBUG messages about mud_title and mud_content processing
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
+                </div>
               </div>
-            </div>
-          </div>
+            )}
           </div>
         </div>
 
