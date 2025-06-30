@@ -488,21 +488,28 @@ Recommendation: Check logs and retry operation`;
     <div className="min-h-screen bg-gray-50">
       <div className="p-4">
         <div className="mb-4">
-          <div className="flex items-start gap-4">
-            <div className="bg-gray-100 rounded-lg p-4" style={{ width: '330px' }}>
+          <div className="flex items-start gap-4" style={{ marginTop: '10px' }}>
+            {/* Info Box Wrapper - Uniform 12px font */}
+            <div 
+              className="bg-gray-100 rounded-lg p-4" 
+              style={{ 
+                width: '330px',
+                fontSize: '12px'
+              }}
+            >
               <div className="mb-2">
                 <Link href="/gconjar1" className="text-purple-600 hover:text-purple-800">
                   ← Back to GconJar1
                 </Link>
               </div>
-              <h1 className="text-2xl font-bold text-purple-800">Mesagen - Advanced Table Editor</h1>
-              <div className="text-sm text-gray-600 mt-1">
+              <h1 className="font-bold text-purple-800">Mesagen - Advanced Table Editor</h1>
+              <div className="text-gray-600 mt-1">
                 <span>Editing: {gconPiece?.meta_title || 'Untitled'}</span>
                 {gconPiece?.asn_sitespren_base && (
                   <span className="ml-2">({gconPiece.asn_sitespren_base})</span>
                 )}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-gray-500 mt-1">
                 ID: {id}
               </div>
             </div>

@@ -341,12 +341,11 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                 htmlContent: content
               });
             } else {
-              // Regular text content - wrap in paragraph if it's plain text
-              const htmlContent = content.includes('<') ? content : `<p>${content}</p>`;
+              // Regular text content - store as-is without automatic paragraph wrapping
               parsedBlocks.push({
                 id: generateId(),
                 type: 'paragraph',
-                htmlContent: htmlContent
+                htmlContent: content
               });
             }
           }
@@ -566,7 +565,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
           const { error: updateError } = await supabase
             .from('mud_deplines')
             .update({ 
-              content_raw: currentBlock.htmlContent || '', 
+              content_raw: (currentBlock.htmlContent || '').replace(/<[^>]+>/g, '').trim(), // Strip HTML tags
               html_tags_detected: '' // No HTML tags since we store plain text 
             })
             .eq('depline_id', currentDepline.depline_id);
@@ -598,7 +597,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
             fk_gcon_piece_id: gconPieceId,
             depline_jnumber: blockIndex + 2,
             depline_knumber: null,
-            content_raw: textAfterCursor || '',
+            content_raw: (textAfterCursor || '').replace(/<[^>]+>/g, '').trim(), // Strip HTML tags
             html_tags_detected: '', // No HTML tags since we store plain text
             created_at: new Date().toISOString()
           });
@@ -843,7 +842,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
           fk_gcon_piece_id: gconPieceId,
           depline_jnumber: index + 1,
           depline_knumber: null,
-          content_raw: cleanContent, // Store HTML content, not plain text
+          content_raw: cleanContent.replace(/<[^>]+>/g, '').trim(), // Strip HTML tags before storing as raw content
           html_tags_detected: htmlTagsDetected,
           created_at: new Date().toISOString()
         };
