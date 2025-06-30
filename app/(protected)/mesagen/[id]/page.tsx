@@ -23,6 +23,7 @@ export default function MesagenPage() {
   const [gconPiece, setGconPiece] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showMudContentModal, setShowMudContentModal] = useState(false);
   
   const supabase = createClientComponentClient();
   
@@ -237,6 +238,22 @@ Recommendation: Check logs and retry operation`;
     }
   };
 
+  // Handle copying mud_content to clipboard
+  const handleCopyMudContent = async () => {
+    if (!gconPiece?.mud_content) {
+      alert('No mud_content available to copy');
+      return;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(gconPiece.mud_content);
+      alert('mud_content copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy mud_content:', error);
+      alert('Failed to copy mud_content to clipboard');
+    }
+  };
+
   // Set initial content when data loads
   useEffect(() => {
     if (gconPiece?.mud_title) {
@@ -297,7 +314,7 @@ Recommendation: Check logs and retry operation`;
         </div>
         
         <div className="mb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between">
             <div>
               <h1 className="text-2xl font-bold text-purple-800">Mesagen - Advanced Table Editor</h1>
               <div className="text-sm text-gray-600 mt-1">
@@ -310,7 +327,48 @@ Recommendation: Check logs and retry operation`;
                 ID: {id}
               </div>
             </div>
-            <div className="flex flex-col items-end gap-3">
+            
+            <div className="flex gap-6">
+              {/* mud_content Display Section */}
+              <div className="flex flex-col">
+                <label className="text-sm font-bold text-gray-700 mb-2">gcon_pieces.mud_content</label>
+                <div className="flex gap-2">
+                  <textarea
+                    value={gconPiece?.mud_content || ''}
+                    readOnly
+                    placeholder="mud_content field value will appear here..."
+                    className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-gray-50"
+                    style={{ width: '500px', height: '300px' }}
+                  />
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={handleCopyMudContent}
+                      disabled={!gconPiece?.mud_content}
+                      className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                        !gconPiece?.mud_content
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      📋 Copy
+                    </button>
+                    <button
+                      onClick={() => setShowMudContentModal(true)}
+                      disabled={!gconPiece?.mud_content}
+                      className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                        !gconPiece?.mud_content
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                    >
+                      🔍 Expand
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* F22 Section */}
+              <div className="flex flex-col items-end gap-3">
               <button
                 onClick={handleRunF22}
                 disabled={isRunningF22}
@@ -402,6 +460,47 @@ Recommendation: Check logs and retry operation`;
             </div>
           </div>
         </div>
+
+        {/* mud_content Expanded Modal */}
+        {showMudContentModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-6xl max-h-[90vh] w-[90vw] flex flex-col">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-gray-900">
+                  gcon_pieces.mud_content - Expanded View
+                </h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCopyMudContent}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+                  >
+                    📋 Copy Content
+                  </button>
+                  <button
+                    onClick={() => setShowMudContentModal(false)}
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-colors"
+                  >
+                    × Close
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex-1 min-h-0">
+                <textarea
+                  value={gconPiece?.mud_content || ''}
+                  readOnly
+                  placeholder="mud_content field value will appear here..."
+                  className="w-full h-full resize-none border border-gray-300 rounded p-4 text-sm font-mono bg-gray-50"
+                />
+              </div>
+              
+              <div className="mt-4 text-xs text-gray-600">
+                <p><strong>Content Length:</strong> {gconPiece?.mud_content?.length || 0} characters</p>
+                <p><strong>Record ID:</strong> {id}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
