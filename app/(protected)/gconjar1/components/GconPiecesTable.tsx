@@ -985,7 +985,7 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                         } ${
                           isSeparator ? 'border-r-4 border-black' : ''
                         } ${col === 'actions1' || col === 'actions2' || col === 'select' ? 'whitespace-nowrap' : ''}`}
-                        style={isSticky ? { left: `${index * 150}px`, padding: col === 'actions1' || col === 'actions2' ? '0px' : '6px' } : { padding: col === 'actions1' || col === 'actions2' ? '0px' : '6px' }}
+                        style={isSticky ? { left: `${index * 150}px`, padding: '6px' } : { padding: '6px' }}
                         onClick={col === 'select' ? () => handleRowSelect(item.id) : undefined}
                       >
                         <div className="kz_rigid_div_inside_td_1">
@@ -1006,80 +1006,84 @@ export default function GconPiecesTable({ initialData, userId, selectedRows: ext
                             />
                           </div>
                         ) : col === 'actions1' ? (
-                          <div style={{ padding: '0px' }}>
-                            <div style={{ padding: '0px', display: 'flex', flexDirection: 'column', gap: '0px' }}>
+                          <div className="w-40 space-y-1">
+                            {/* First row - 2 buttons */}
+                            <div className="flex gap-1">
                               <Link
-                                href={`/mesagen`}
-                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
-                                style={{ margin: '0px' }}
+                                href={`/mesagen/${item.id}`}
+                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium rounded text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
                               >
                                 /mesagen
                               </Link>
                               <Link
                                 href={`/edable/${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-purple-300 text-xs font-medium rounded text-purple-700 bg-purple-50 hover:bg-purple-100 transition-colors"
                               >
                                 /edable
                               </Link>
+                            </div>
+                            {/* Second row - 2 buttons */}
+                            <div className="flex gap-1">
                               <Link
                                 href={`/valan?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-green-300 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-green-300 text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
                               >
                                 /valan
                               </Link>
                               <Link
                                 href={`/torya?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
                               >
                                 /torya
                               </Link>
+                            </div>
+                            {/* Third row - 1 button */}
+                            <div className="flex gap-1">
                               <Link
                                 href={`/torlid1?id=${item.id}&mtab=talk1`}
-                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
                               >
                                 /torlid1
                               </Link>
                             </div>
                           </div>
                         ) : col === 'actions2' ? (
-                          <div style={{ padding: '0px' }}>
-                            <div style={{ padding: '0px', display: 'flex', flexDirection: 'column', gap: '0px' }}>
+                          <div className="w-40 space-y-1">
+                            {/* First row - 2 buttons */}
+                            <div className="flex gap-1">
                               <Link
                                 href={`/pedbar?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                               >
                                 /pedbar
                               </Link>
                               <Link
                                 href={`/pedtor1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                               >
                                 /pedtor
                               </Link>
+                            </div>
+                            {/* Second row - 2 buttons */}
+                            <div className="flex gap-1">
                               <Link
                                 href={`/flatx1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                               >
                                 /flatx1
                               </Link>
                               <Link
                                 href={`/slotx1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                               >
                                 /slotx1
                               </Link>
+                            </div>
+                            {/* Third row - 1 button */}
+                            <div className="flex gap-1">
                               <Link
                                 href={`/fanex1?id=${item.id}`}
-                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                                style={{ margin: '0px' }}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                               >
                                 /fanex1
                               </Link>
