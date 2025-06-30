@@ -564,7 +564,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     // Don't delete if it's the only block
     if (blocks.length <= 1) return;
     
-    // Don't delete if it's the first block
+    // Don't delete if it's the first block (top row)
     if (blockIndex <= 0) return;
     
     const currentBlock = blocks[blockIndex];
@@ -572,29 +572,9 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     
     if (!previousBlock) return;
     
-    // Get the previous block's text content (strip HTML tags)
-    const previousText = previousBlock.htmlContent.replace(/<[^>]*>/g, '');
-    const mergedText = previousText + (currentText || '');
-    
-    // Escape HTML for the merged content
-    const escapeHtml = (text: string) => {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    };
-    
-    // Update the previous block with merged content
-    const updatedPreviousBlock = {
-      ...previousBlock,
-      htmlContent: `<p>${escapeHtml(mergedText)}</p>`
-    };
-    
-    // Update blocks state
+    // Remove the current block from UI
     setBlocks(prevBlocks => {
       const newBlocks = [...prevBlocks];
-      // Update previous block
-      newBlocks[blockIndex - 1] = updatedPreviousBlock;
-      // Remove current block
       newBlocks.splice(blockIndex, 1);
       return newBlocks;
     });
@@ -605,27 +585,11 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
         const { createClientComponentClient } = await import('@supabase/auth-helpers-nextjs');
         const supabase = createClientComponentClient();
         
-        // Get deplines for current and previous blocks
+        // Get current depline
         const currentDepline = mudDeplines.find(d => d.depline_jnumber === blockIndex + 1);
-        const previousDepline = mudDeplines.find(d => d.depline_jnumber === blockIndex);
-        
-        if (previousDepline) {
-          // Update previous depline with merged content
-          const { error: updateError } = await supabase
-            .from('mud_deplines')
-            .update({ 
-              content_raw: mergedText,
-              html_tags_detected: '' // No HTML tags since we store plain text
-            })
-            .eq('depline_id', previousDepline.depline_id);
-            
-          if (updateError) {
-            console.error('Error updating previous depline:', updateError);
-          }
-        }
         
         if (currentDepline) {
-          // Delete current depline
+          // Delete current depline from database
           const { error: deleteError } = await supabase
             .from('mud_deplines')
             .delete()
@@ -664,11 +628,11 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
       }
     }
     
-    // Focus the previous block and set cursor at the merge point
+    // Focus the previous block and set cursor at the end
     setTimeout(() => {
       setFocusedBlock(previousBlock.id);
-      // The cursor position will be set in the BlockEditor's useEffect
-      // We need to store where the merge happened
+      // Get the text length of the previous block to place cursor at the end
+      const previousText = previousBlock.htmlContent.replace(/<[^>]*>/g, '');
       setMergePosition(previousText.length);
     }, 50);
   }, [blocks, gconPieceId, mudDeplines]);
