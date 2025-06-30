@@ -24,6 +24,7 @@ export default function MesagenPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showMudContentModal, setShowMudContentModal] = useState(false);
+  const [showMudDocumentModal, setShowMudDocumentModal] = useState(false);
   
   const supabase = createClientComponentClient();
   
@@ -254,6 +255,22 @@ Recommendation: Check logs and retry operation`;
     }
   };
 
+  // Handle copying mud_document to clipboard
+  const handleCopyMudDocument = async () => {
+    if (!gconPiece?.mud_document) {
+      alert('No mud_document available to copy');
+      return;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(gconPiece.mud_document);
+      alert('mud_document copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy mud_document:', error);
+      alert('Failed to copy mud_document to clipboard');
+    }
+  };
+
   // Set initial content when data loads
   useEffect(() => {
     if (gconPiece?.mud_title) {
@@ -308,25 +325,28 @@ Recommendation: Check logs and retry operation`;
     <div className="min-h-screen bg-gray-50">
       <div className="p-4">
         <div className="mb-4">
-          <Link href="/gconjar1" className="text-purple-600 hover:text-purple-800">
-            ← Back to GconJar1
-          </Link>
+          <div className="bg-gray-100 rounded-lg p-4" style={{ width: '330px' }}>
+            <div className="mb-2">
+              <Link href="/gconjar1" className="text-purple-600 hover:text-purple-800">
+                ← Back to GconJar1
+              </Link>
+            </div>
+            <h1 className="text-2xl font-bold text-purple-800">Mesagen - Advanced Table Editor</h1>
+            <div className="text-sm text-gray-600 mt-1">
+              <span>Editing: {gconPiece?.meta_title || 'Untitled'}</span>
+              {gconPiece?.asn_sitespren_base && (
+                <span className="ml-2">({gconPiece.asn_sitespren_base})</span>
+              )}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              ID: {id}
+            </div>
+          </div>
         </div>
         
         <div className="mb-4">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-purple-800">Mesagen - Advanced Table Editor</h1>
-              <div className="text-sm text-gray-600 mt-1">
-                <span>Editing: {gconPiece?.meta_title || 'Untitled'}</span>
-                {gconPiece?.asn_sitespren_base && (
-                  <span className="ml-2">({gconPiece.asn_sitespren_base})</span>
-                )}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                ID: {id}
-              </div>
-            </div>
             
             <div className="flex gap-6">
               {/* mud_content Display Section */}
@@ -357,6 +377,44 @@ Recommendation: Check logs and retry operation`;
                       disabled={!gconPiece?.mud_content}
                       className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
                         !gconPiece?.mud_content
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                    >
+                      🔍 Expand
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* mud_document Display Section */}
+              <div className="flex flex-col">
+                <label className="text-sm font-bold text-gray-700 mb-2">gcon_pieces.mud_document</label>
+                <div className="flex gap-2">
+                  <textarea
+                    value={gconPiece?.mud_document || ''}
+                    readOnly
+                    placeholder="mud_document field value will appear here..."
+                    className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-gray-50"
+                    style={{ width: '500px', height: '300px' }}
+                  />
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={handleCopyMudDocument}
+                      disabled={!gconPiece?.mud_document}
+                      className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                        !gconPiece?.mud_document
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      📋 Copy
+                    </button>
+                    <button
+                      onClick={() => setShowMudDocumentModal(true)}
+                      disabled={!gconPiece?.mud_document}
+                      className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                        !gconPiece?.mud_document
                           ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                           : 'bg-green-600 text-white hover:bg-green-700'
                       }`}
@@ -498,6 +556,47 @@ Recommendation: Check logs and retry operation`;
               
               <div className="mt-4 text-xs text-gray-600">
                 <p><strong>Content Length:</strong> {gconPiece?.mud_content?.length || 0} characters</p>
+                <p><strong>Record ID:</strong> {id}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* mud_document Expanded Modal */}
+        {showMudDocumentModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-6xl max-h-[90vh] w-[90vw] flex flex-col">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-gray-900">
+                  gcon_pieces.mud_document - Expanded View
+                </h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCopyMudDocument}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+                  >
+                    📋 Copy Content
+                  </button>
+                  <button
+                    onClick={() => setShowMudDocumentModal(false)}
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-colors"
+                  >
+                    × Close
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex-1 min-h-0">
+                <textarea
+                  value={gconPiece?.mud_document || ''}
+                  readOnly
+                  placeholder="mud_document field value will appear here..."
+                  className="w-full h-full resize-none border border-gray-300 rounded p-4 text-sm font-mono bg-gray-50"
+                />
+              </div>
+              
+              <div className="mt-4 text-xs text-gray-600">
+                <p><strong>Content Length:</strong> {gconPiece?.mud_document?.length || 0} characters</p>
                 <p><strong>Record ID:</strong> {id}</p>
               </div>
             </div>
