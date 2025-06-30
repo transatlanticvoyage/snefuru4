@@ -787,7 +787,9 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                       ?
                     </div>
                     <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50">
-                      <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line min-w-max">
+                      {/* Invisible bridge area to keep tooltip open when moving mouse */}
+                      <div className="absolute inset-0 -m-2"></div>
+                      <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line min-w-max relative">
                         <div className="mb-2">
                           <div>trace depline relationships to mud_content</div>
                           <div></div>
