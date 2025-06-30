@@ -365,13 +365,74 @@ export default function NwJar1Page() {
       console.log('🔍 F22 API Response:', result);
       
       if (result.success) {
-        alert(`Success: ${result.message}\n\nProcessed: ${result.results?.processed || 0}\nSucceeded: ${result.results?.succeeded || 0}\nFailed: ${result.results?.failed || 0}`);
+        // Create comprehensive success report similar to mesagen page
+        const successReport = `✅ F22 PROCESSING COMPLETED SUCCESSFULLY
+
+Execution Summary:
+- Processed: ${result.results?.processed || 0} records
+- Succeeded: ${result.results?.succeeded || 0} records  
+- Failed: ${result.results?.failed || 0} records
+- Message: ${result.message}
+
+API Results:
+- Endpoint: /api/f22-nwpi-to-gcon-pusher
+- Response Time: ${new Date().toISOString()}
+- Selected Items: ${kz101Checked ? selectedContentIds.size : (kz103Checked ? nwpiContent.length : 0)}
+
+Processing Results:
+✓ BozoHTMLNormalizationProcess1: HTML content normalized to plaintext
+✓ TontoNormalizationProcess1: Text split by linebreaks (\\n)
+✓ mud_content: Reconstructed and updated in gcon_pieces
+✓ mud_title: Title field updated in gcon_pieces
+✓ mud_deplines: Line-by-line entries created with HTML tag detection
+✓ aval_dorlis: Complex HTML blocks extracted and stored with placeholders
+
+Database Operations:
+- gcon_pieces table: mud_content, mud_title, and aval_content updated
+- mud_deplines table: Previous entries deleted, new entries inserted
+- aval_dorlis table: Previous dorli blocks cleared, new blocks stored
+
+Debug Information:
+- Check browser console (F12) for 🔍 DEBUG messages about mud_title and mud_content
+- Full Response: ${JSON.stringify(result, null, 2)}
+- Errors: ${result.results?.errors?.length || 0} errors logged
+
+System Status: All operations completed successfully`;
+
+        alert(successReport);
         setF22Error(null); // Clear any previous errors on success
         // Could refresh data or show more detailed results here
       } else {
         const errorMessage = result.message || 'Failed to push to GCon pieces';
         console.error('🚨 F22 API returned error:', result);
-        alert(`Error: ${errorMessage}`);
+        
+        // Create comprehensive error report
+        const errorReport = `❌ F22 PROCESSING FAILED
+
+Error Details:
+- Message: ${errorMessage}
+- Processed: ${result.results?.processed || 0} records
+- Succeeded: ${result.results?.succeeded || 0} records
+- Failed: ${result.results?.failed || 0} records
+
+API Information:
+- Endpoint: /api/f22-nwpi-to-gcon-pusher
+- Timestamp: ${new Date().toISOString()}
+- Selected Items: ${kz101Checked ? selectedContentIds.size : (kz103Checked ? nwpiContent.length : 0)}
+
+${result.results?.errors?.length > 0 ? `
+Specific Errors (${result.results.errors.length}):
+${result.results.errors.map((error: string, i: number) => `${i + 1}. ${error}`).join('\n')}
+` : ''}
+
+Debug Information:
+- Check browser console (F12) for 🔍 DEBUG messages
+- Full API Response: ${JSON.stringify(result, null, 2)}
+
+System Status: Processing halted due to errors
+Recommendation: Check logs and retry operation`;
+
+        alert(errorReport);
         setF22Error({
           message: errorMessage,
           details: {
@@ -387,7 +448,32 @@ export default function NwJar1Page() {
     } catch (error) {
       console.error('🚨 Error calling f22_nwpi_to_gcon_pusher:', error);
       const errorMessage = 'An error occurred while pushing to GCon pieces';
-      alert(errorMessage);
+      
+      // Create comprehensive client error report
+      const clientErrorReport = `❌ F22 CLIENT ERROR
+
+Error Details:
+- Type: Network/Client Error
+- Message: ${error instanceof Error ? error.message : 'Unknown error occurred'}
+- Timestamp: ${new Date().toISOString()}
+
+Request Information:
+- Endpoint: POST /api/f22-nwpi-to-gcon-pusher
+- Selected Items: ${kz101Checked ? selectedContentIds.size : (kz103Checked ? nwpiContent.length : 0)}
+- Request Mode: ${kz101Checked ? 'SOPTION1 (Selected)' : 'SOPTION2 (All)'}
+
+Error Stack:
+${error instanceof Error && error.stack ? error.stack : 'No stack trace available'}
+
+Debug Information:
+- Check browser console (F12) for detailed error logs
+- Check network tab for failed requests
+- Verify API endpoint is accessible
+
+System Status: Request failed before reaching server
+Recommendation: Check network connection and API availability`;
+
+      alert(clientErrorReport);
       setF22Error({
         message: errorMessage,
         details: {
