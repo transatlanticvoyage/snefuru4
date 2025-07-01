@@ -1504,8 +1504,12 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                   className="w-[26px] h-[26px] cursor-pointer"
                 />
               </th>
-              <th className="border border-gray-300 bg-purple-50 p-2"></th>
-              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700">
+                fk_gcon_piece_id
+              </th>
+              <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700">
+                depline_jnumber
+              </th>
               <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700" style={{ width: '120px' }}>
                 html_tags_detected
               </th>
