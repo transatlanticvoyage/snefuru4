@@ -40,6 +40,11 @@ export default function MesagenPage() {
   const [hasJoniDeplines, setHasJoniDeplines] = useState<boolean | null>(null);
   const [isJoniRebuilding, setIsJoniRebuilding] = useState(false);
   
+  // Image Plans Batch state
+  const [imagePlansBatches, setImagePlansBatches] = useState<any[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState<string>('');
+  const [isSavingBatch, setIsSavingBatch] = useState(false);
+  
   const supabase = createClientComponentClient();
   
   // Get ID from URL parameters
@@ -186,6 +191,47 @@ export default function MesagenPage() {
 
     checkAndTriggerJoni();
   }, [gconPiece, id, supabase]);
+
+  // Fetch images_plans_batches for current user
+  useEffect(() => {
+    const fetchImagePlansBatches = async () => {
+      if (!user?.id) return;
+
+      try {
+        // Get user's internal ID first
+        const { data: userData } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (!userData) return;
+
+        // Fetch images_plans_batches for this user
+        const { data: batchesData, error } = await supabase
+          .from('images_plans_batches')
+          .select('*')
+          .eq('user_id', userData.id)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching images_plans_batches:', error);
+          return;
+        }
+
+        setImagePlansBatches(batchesData || []);
+
+        // Set current selected batch if gconPiece has one
+        if (gconPiece?.mudfk_image_plan_batch_id) {
+          setSelectedBatchId(gconPiece.mudfk_image_plan_batch_id);
+        }
+      } catch (err) {
+        console.error('Error in fetchImagePlansBatches:', err);
+      }
+    };
+
+    fetchImagePlansBatches();
+  }, [user?.id, supabase, gconPiece?.mudfk_image_plan_batch_id]);
 
   const handleTitleChange = (title: string) => {
     setMudTitle(title);
@@ -376,6 +422,37 @@ Recommendation: Check logs and retry operation`;
     } catch (error) {
       console.error('Failed to copy mud_document:', error);
       alert('Failed to copy mud_document to clipboard');
+    }
+  };
+
+  // Handle saving image plan batch
+  const handleSaveImagePlanBatch = async () => {
+    if (!id || !selectedBatchId) {
+      alert('Please select an image plan batch first');
+      return;
+    }
+
+    setIsSavingBatch(true);
+
+    try {
+      const { error } = await supabase
+        .from('gcon_pieces')
+        .update({ mudfk_image_plan_batch_id: selectedBatchId })
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Update local state
+      setGconPiece(prev => prev ? { ...prev, mudfk_image_plan_batch_id: selectedBatchId } : prev);
+      
+      alert('Image plan batch saved successfully!');
+    } catch (error) {
+      console.error('Error saving image plan batch:', error);
+      alert('Failed to save image plan batch');
+    } finally {
+      setIsSavingBatch(false);
     }
   };
 
@@ -779,6 +856,41 @@ Recommendation: Check logs and retry operation`;
                     {gconPiece?.pageurl || 'Not set'}
                   </span>
                 </div>
+              </div>
+            </div>
+
+            {/* New Image Plans Batch Box */}
+            <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
+              <div className="mb-3">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  mudfk_image_plan_batch_id
+                </label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm"
+                  value={selectedBatchId}
+                  onChange={(e) => setSelectedBatchId(e.target.value)}
+                >
+                  <option value="">Select image plan batch...</option>
+                  {imagePlansBatches.map((batch) => (
+                    <option key={batch.id} value={batch.id}>
+                      {batch.batch_name || `Batch ${batch.id.substring(0, 8)}...`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="mt-4">
+                <button
+                  onClick={handleSaveImagePlanBatch}
+                  disabled={isSavingBatch || !selectedBatchId}
+                  className="px-4 py-2 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    backgroundColor: '#000000',
+                    fontSize: '16px'
+                  }}
+                >
+                  {isSavingBatch ? 'Saving...' : 'save'}
+                </button>
               </div>
             </div>
             
