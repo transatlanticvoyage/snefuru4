@@ -1697,7 +1697,7 @@ mud_deplines.content_raw`;
 
                     // Render editor or HTML view based on mode
                     return viewMode === 'html' ? (
-                      <div className={`rounded border min-h-[2rem] ${
+                      <div className={`rounded border ${
                         isDorli ? 'bg-orange-100 border-orange-200' : 'bg-gray-100 border-gray-200'
                       } ${focusedBlock === block.id ? 'ring-2 ring-purple-500 border-purple-300' : ''}`}>
                         {isDorli && (
