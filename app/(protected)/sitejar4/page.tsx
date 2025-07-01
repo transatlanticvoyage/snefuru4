@@ -98,21 +98,22 @@ export default function Sitejar4Page() {
     window.addEventListener('urlchange', handleCustomUrlUpdate);
     
     // Use MutationObserver as fallback
-    const observer = new MutationObserver(() => {
-      if (window.location.href !== currentUrl) {
-        setCurrentUrl(window.location.href);
-      }
-    });
-    
-    observer.observe(document.querySelector('head') || document.documentElement, {
-      childList: true,
-      subtree: true
-    });
+    // COMMENTED OUT: This was causing navigation link issues - preventing normal clicks from working
+    // const observer = new MutationObserver(() => {
+    //   if (window.location.href !== currentUrl) {
+    //     setCurrentUrl(window.location.href);
+    //   }
+    // });
+    // 
+    // observer.observe(document.querySelector('head') || document.documentElement, {
+    //   childList: true,
+    //   subtree: true
+    // });
     
     return () => {
       window.removeEventListener('popstate', handleUrlChange);
       window.removeEventListener('urlchange', handleCustomUrlUpdate);
-      observer.disconnect();
+      // observer.disconnect(); // Commented out since observer is disabled
     };
   }, [currentUrl]);
 
