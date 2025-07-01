@@ -1517,7 +1517,9 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                 depline_id
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2 text-center text-sm font-bold text-purple-700">
-                lineyoshi
+                <span title="lineyoshi" className="cursor-default">
+                  ly
+                </span>
               </th>
               <th className="border border-gray-300 bg-purple-50 p-2">
                 <div className="flex items-center gap-2">
@@ -1674,7 +1676,9 @@ mud_deplines.content_raw`;
                 
                 {/* Column 7 - lineyoshi */}
                 <td className="border border-gray-300 p-2 text-center text-gray-700 text-sm font-medium">
-                  {index + 1}
+                  <span title="lineyoshi" className="cursor-default">
+                    ly
+                  </span>
                 </td>
                 
                 {/* Column 8 - Content (TipTap Editor or HTML View) */}
