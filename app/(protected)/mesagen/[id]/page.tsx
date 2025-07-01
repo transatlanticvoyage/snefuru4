@@ -668,6 +668,12 @@ Recommendation: Check logs and retry operation`;
                 </Link>
               </div>
               
+              <div className="mb-3">
+                <Link href={`/torya/${id}`} className="text-blue-600 hover:text-blue-800">
+                  -- Visit /torya --
+                </Link>
+              </div>
+              
               <div className="mb-3 text-sm text-gray-600">
                 <strong>gcon_pieces.id:</strong> {id}
               </div>
