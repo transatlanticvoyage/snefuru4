@@ -1699,7 +1699,7 @@ mud_deplines.content_raw`;
                     return viewMode === 'html' ? (
                       <div className={`rounded border ${
                         isDorli ? 'bg-orange-100 border-orange-200' : 'bg-gray-100 border-gray-200'
-                      } ${focusedBlock === block.id ? 'ring-2 ring-purple-500 border-purple-300' : ''}`}>
+                      } ${focusedBlock === block.id ? 'border-purple-300' : ''}`}>
                         {isDorli && (
                           <div className="bg-orange-100 border-b border-orange-200 px-2 py-1">
                             <span className="text-xs font-semibold text-orange-800">🧩 DORLI: {placeholder}</span>
