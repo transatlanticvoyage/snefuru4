@@ -842,7 +842,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
           fk_gcon_piece_id: gconPieceId,
           depline_jnumber: index + 1,
           depline_knumber: null,
-          content_raw: cleanContent.replace(/<[^>]+>/g, '').trim(), // Strip HTML tags before storing as raw content
+          content_raw: cleanContent, // Keep HTML tags in raw content
           html_tags_detected: htmlTagsDetected,
           created_at: new Date().toISOString()
         };
