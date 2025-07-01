@@ -1740,7 +1740,6 @@ mud_deplines.content_raw`;
                           style={{ 
                             fontSize: '17px', 
                             height: `${Math.max(1, resolvedContent.split('\n').length) * 24 + 16}px`,
-                            overflow: 'hidden', 
                             resize: 'none' 
                           }}
                         />
