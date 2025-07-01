@@ -81,7 +81,8 @@ function BlockEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-purple-600 underline',
+          class: 'underline',
+          style: 'color: #009bff',
         },
       }),
       Image.configure({
