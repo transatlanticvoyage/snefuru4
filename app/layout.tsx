@@ -26,6 +26,11 @@ export default function RootLayout({
           href="https://valueoffershq.com/wp-json/snefuru/v1/css/bespoke" 
           type="text/css"
         />
+        <link 
+          rel="stylesheet" 
+          href="https://valueoffershq.com/wp-content/ketch/ketch-widths-all.css" 
+          type="text/css"
+        />
       </head>
       <body className={inter.className}>
         <AuthProvider>{children}</AuthProvider>
