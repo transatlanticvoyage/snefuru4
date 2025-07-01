@@ -1739,7 +1739,6 @@ mud_deplines.content_raw`;
                           }`}
                           style={{ fontSize: '17px' }}
                           rows={Math.max(1, resolvedContent.split('\n').length)}
-                          placeholder="Enter HTML content..."
                         />
                       </div>
                     ) : (
