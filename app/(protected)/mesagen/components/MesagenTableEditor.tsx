@@ -1738,10 +1738,11 @@ mud_deplines.content_raw`;
                             isDorli ? 'bg-orange-50' : 'bg-white'
                           }`}
                           style={{ 
-                            fontSize: '17px', 
-                            height: `${Math.max(1, resolvedContent.split('\n').length) * 24 + 16}px`,
+                            fontSize: '17px',
+                            lineHeight: '140%',
                             resize: 'none' 
                           }}
+                          rows={Math.max(1, resolvedContent.split('\n').length)}
                         />
                       </div>
                     ) : (
