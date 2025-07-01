@@ -1734,10 +1734,10 @@ mud_deplines.content_raw`;
                               }
                             }
                           }}
-                          className={`w-full p-2 font-mono text-xs bg-transparent border-none resize-none focus:outline-none ${
+                          className={`w-full p-2 font-mono bg-transparent border-none resize-none focus:outline-none ${
                             isDorli ? 'bg-orange-50' : 'bg-white'
                           }`}
-                          style={{ minHeight: '2rem' }}
+                          style={{ fontSize: '17px' }}
                           rows={Math.max(1, resolvedContent.split('\n').length)}
                           placeholder="Enter HTML content..."
                         />
