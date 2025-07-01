@@ -337,7 +337,7 @@ export default function DeplineImperativesPage() {
               />
               <textarea
                 placeholder="Current Behavior"
-                value={newFormData.current_behavior}
+                value={newFormData.current_behavior || ''}
                 onChange={(e) => setNewFormData({...newFormData, current_behavior: e.target.value})}
                 className="px-3 py-2 border border-gray-300 rounded-md"
                 rows={2}
