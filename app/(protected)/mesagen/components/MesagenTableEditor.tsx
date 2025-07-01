@@ -945,7 +945,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
       </div>
 
       {/* 11-Column Table Structure with 6-Row Header (including prisomi, select, html_tags_detected, depline_id) */}
-      <div className="overflow-x-auto overflow-y-visible relative">
+      <div className="overflow-x-auto relative">
         <table className="w-full border-collapse table-fixed">
           {/* Table Header - 6 Rows */}
           <thead>
@@ -1892,6 +1892,8 @@ mud_deplines.content_raw`;
           width: 600px !important;
           max-width: 600px;
           min-width: 600px;
+          vertical-align: top;
+          height: auto;
         }
         
         /* html_tags_detected column styling */
