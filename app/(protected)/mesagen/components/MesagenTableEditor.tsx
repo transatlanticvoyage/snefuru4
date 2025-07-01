@@ -1617,14 +1617,20 @@ mud_deplines.content_raw`;
                     />
                   </td>
                   
-                  {/* Column 3 - Thing1 */}
-                  <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
-                    -
+                  {/* Column 3 - fk_gcon_piece_id */}
+                  <td className="border border-gray-300 p-2 text-center text-gray-700 text-sm">
+                    {(() => {
+                      const mudDepline = getMudDeplineForBlock(index);
+                      return mudDepline ? mudDepline.fk_gcon_piece_id : '-';
+                    })()}
                   </td>
                 
-                {/* Column 4 - Thing2 */}
-                <td className="border border-gray-300 p-2 text-center text-gray-500 text-sm">
-                  -
+                {/* Column 4 - depline_jnumber */}
+                <td className="border border-gray-300 p-2 text-center text-gray-700 text-sm">
+                  {(() => {
+                    const mudDepline = getMudDeplineForBlock(index);
+                    return mudDepline ? mudDepline.depline_jnumber : '-';
+                  })()}
                 </td>
                 
                 {/* Column 5 - html_tags_detected */}
