@@ -1678,7 +1678,7 @@ mud_deplines.content_raw`;
                 </td>
                 
                 {/* Column 8 - Content (TipTap Editor or HTML View) */}
-                <td className="border border-gray-300 p-1" style={{ width: '600px' }}>
+                <td className="border border-gray-300" style={{ width: '600px', padding: '4px' }}>
                   {(() => {
                     const blockContent = getBlockHtml(block.id);
                     
@@ -1697,9 +1697,9 @@ mud_deplines.content_raw`;
 
                     // Render editor or HTML view based on mode
                     return viewMode === 'html' ? (
-                      <div className={`rounded border ${
-                        isDorli ? 'bg-orange-100 border-orange-200' : 'bg-gray-100 border-gray-200'
-                      } ${focusedBlock === block.id ? 'border-purple-300' : ''}`}>
+                      <div className={`${
+                        isDorli ? 'bg-orange-100' : 'bg-white'
+                      } ${focusedBlock === block.id ? 'ring-1 ring-purple-300' : ''}`}>
                         {isDorli && (
                           <div className="bg-orange-100 border-b border-orange-200 px-2 py-1">
                             <span className="text-xs font-semibold text-orange-800">🧩 DORLI: {placeholder}</span>
