@@ -1734,11 +1734,15 @@ mud_deplines.content_raw`;
                               }
                             }
                           }}
-                          className={`w-full p-2 font-mono bg-transparent border-none resize-none focus:outline-none ${
+                          className={`w-full p-2 font-mono bg-transparent border-none focus:outline-none ${
                             isDorli ? 'bg-orange-50' : 'bg-white'
                           }`}
-                          style={{ fontSize: '17px' }}
-                          rows={Math.max(1, resolvedContent.split('\n').length)}
+                          style={{ 
+                            fontSize: '17px', 
+                            height: `${Math.max(1, resolvedContent.split('\n').length) * 24 + 16}px`,
+                            overflow: 'hidden', 
+                            resize: 'none' 
+                          }}
                         />
                       </div>
                     ) : (
