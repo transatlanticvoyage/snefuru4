@@ -21,7 +21,8 @@ interface NemtorUnit {
   depth_level: number;
   sort_index: number;
   summary_text: string | null;
-  full_text: string | null;
+  full_text_cached: string | null;
+  full_text_edits: string | null;
   unit_label: string | null;
   settings_json: Record<string, any>;
   style_json: Record<string, any>;
@@ -154,6 +155,7 @@ export async function POST(request: NextRequest) {
       depthLevel: number = 0,
       positionOrder: number = 0
     ): void {
+      const fullTextContent = extractFullText(element.settings);
       const baseUnit: Partial<NemtorUnit> = {
         fk_gcon_piece_id: gcon_piece_id,
         el_id: element.id,
@@ -163,7 +165,8 @@ export async function POST(request: NextRequest) {
         position_order: positionOrder,
         depth_level: depthLevel,
         summary_text: extractSummaryText(element.settings),
-        full_text: extractFullText(element.settings),
+        full_text_cached: fullTextContent,
+        full_text_edits: fullTextContent,
         settings_json: element.settings || {},
         style_json: element.style || {},
         globals_json: element.__globals__ || {},
