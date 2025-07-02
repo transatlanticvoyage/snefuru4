@@ -211,7 +211,7 @@ export default function MesagenPage() {
         const { data: batchesData, error } = await supabase
           .from('images_plans_batches')
           .select('*')
-          .eq('user_id', userData.id)
+          .eq('rel_users_id', userData.id)
           .order('created_at', { ascending: false });
 
         if (error) {
