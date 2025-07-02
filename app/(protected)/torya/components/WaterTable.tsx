@@ -224,7 +224,7 @@ export default function WaterTable({
 
   // Get sticky columns
   const stickyColumnCount = stickyOptions[selectedStickyOption];
-  const allColumns: (keyof NemtorUnit | 'select' | 'prisomi')[] = ['prisomi', 'select', 'unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'full_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at'];
+  const allColumns: (keyof NemtorUnit | 'select' | 'prisomi')[] = ['prisomi', 'select', 'unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at'];
   const stickyColumns = allColumns.slice(0, stickyColumnCount + 2); // +2 to include prisomi and select columns
   const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
 
@@ -631,7 +631,7 @@ export default function WaterTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
+      <div className="overflow-x-auto border border-gray-200 rounded-lg" style={{ height: '826px', overflowY: 'auto' }}>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             {/* Horizomi Row - Column Numbering */}
