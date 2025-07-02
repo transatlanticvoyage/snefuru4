@@ -850,7 +850,7 @@ export default function WaterTable({
                   onClick={() => handleSort(col)}
                   className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200 ${
                     col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                  } ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
+                  } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                   style={{
                     width: col === 'full_text_edits' ? '600px' : undefined,
                     minWidth: col === 'full_text_edits' ? '600px' : undefined,
@@ -966,7 +966,7 @@ export default function WaterTable({
                       key={col} 
                       className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white border border-gray-200 ${
                         col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                      } ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''} ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
+                      } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''} ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
                       style={{ 
                         left: `${20 + 60 + (index - 2) * 150}px`, // 20px (prisomi) + 60px (select) + column positions
                         width: col === 'full_text_edits' ? '600px' : undefined,
@@ -1034,7 +1034,7 @@ export default function WaterTable({
                     key={col} 
                     className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
                       col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                    } ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
+                    } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                     style={{
                       width: col === 'full_text_edits' ? '600px' : undefined,
                       minWidth: col === 'full_text_edits' ? '600px' : undefined,
