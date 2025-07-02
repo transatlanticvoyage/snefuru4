@@ -637,46 +637,50 @@ export default function WaterTable({
             {/* Horizomi Row - Column Numbering */}
             <tr>
               {/* Horizomi header column numbering */}
-              {allColumns.map((col, index) => {
-                const isLastStickyCol = index === stickyColumns.length - 1;
-                const isPrisomiCol = col === 'prisomi';
-                const isSelectCol = col === 'select';
-                const isVisible = isPrisomiCol || isSelectCol || visibleColumns.includes(col as keyof NemtorUnit);
-                
-                if (!isVisible) return null;
-                
-                const isSticky = stickyColumns.includes(col);
-                let leftPosition = '0px';
-                
-                if (isSticky) {
-                  if (isPrisomiCol) {
-                    leftPosition = '0px';
-                  } else if (isSelectCol) {
-                    leftPosition = '20px'; // After prisomi (20px width)
-                  } else {
-                    // Other sticky columns
-                    const stickyIndex = stickyColumns.indexOf(col);
-                    leftPosition = `${20 + 60 + (stickyIndex - 2) * 150}px`; // 20px (prisomi) + 60px (select) + others
+              {(() => {
+                let visibleColumnNumber = 1;
+                return allColumns.map((col, index) => {
+                  const isLastStickyCol = index === stickyColumns.length - 1;
+                  const isPrisomiCol = col === 'prisomi';
+                  const isSelectCol = col === 'select';
+                  const isVisible = isPrisomiCol || isSelectCol || visibleColumns.includes(col as keyof NemtorUnit);
+                  
+                  if (!isVisible) return null;
+                  
+                  const currentColumnNumber = visibleColumnNumber++;
+                  
+                  const isSticky = stickyColumns.includes(col);
+                  let leftPosition = '0px';
+                  
+                  if (isSticky) {
+                    if (isPrisomiCol) {
+                      leftPosition = '0px';
+                    } else if (isSelectCol) {
+                      leftPosition = '20px'; // After prisomi (20px width)
+                    } else {
+                      // Other sticky columns
+                      const stickyIndex = stickyColumns.indexOf(col);
+                      leftPosition = `${20 + 60 + (stickyIndex - 2) * 150}px`; // 20px (prisomi) + 60px (select) + others
+                    }
                   }
-                }
-                
-                return (
-                  <th
-                    key={`horizomi-${col}`}
-                    className={`border border-gray-300 bg-purple-50 p-0 text-center ${
-                      isSticky ? 'sticky z-10' : ''
-                    } ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
-                    style={{ 
-                      width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
-                      maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
-                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
-                      left: isSticky ? leftPosition : undefined
-                    }}
-                  >
-                    <div className="relative group">
-                      <div className="text-center text-xs font-normal text-gray-600">
-                        {isPrisomiCol ? '1' : index + 1}
-                      </div>
+                  
+                  return (
+                    <th
+                      key={`horizomi-${col}`}
+                      className={`border border-gray-300 bg-purple-50 p-0 text-center ${
+                        isSticky ? 'sticky z-10' : ''
+                      } ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
+                      style={{ 
+                        width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
+                        maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
+                        minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
+                        left: isSticky ? leftPosition : undefined
+                      }}
+                    >
+                      <div className="relative group">
+                        <div className="text-center text-xs font-normal text-gray-600">
+                          {currentColumnNumber}
+                        </div>
                       <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
                         <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                           <div className="mb-2">
@@ -710,7 +714,8 @@ export default function WaterTable({
                     </div>
                   </th>
                 );
-              })}
+                });
+              })()}
             </tr>
             
             {/* Main Header Row */}
