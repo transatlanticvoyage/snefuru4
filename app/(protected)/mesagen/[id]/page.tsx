@@ -445,7 +445,7 @@ Recommendation: Check logs and retry operation`;
       }
 
       // Update local state
-      setGconPiece(prev => prev ? { ...prev, mudfk_image_plan_batch_id: selectedBatchId } : prev);
+      setGconPiece((prev: any) => prev ? { ...prev, mudfk_image_plan_batch_id: selectedBatchId } : prev);
       
       alert('Image plan batch saved successfully!');
     } catch (error) {

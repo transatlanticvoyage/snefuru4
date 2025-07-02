@@ -283,6 +283,7 @@ export default function BaklijarPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Link</th>
                   <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Name</th>
                   <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Description</th>
                   <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Status</th>
@@ -295,6 +296,14 @@ export default function BaklijarPage() {
               <tbody className="divide-y divide-gray-200">
                 {paginatedMockups.map((mockup) => (
                   <tr key={mockup.bakli_id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <Link 
+                        href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
+                        className="inline-flex items-center px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors"
+                      >
+                        Edit
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">
                       <Link 
                         href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
@@ -344,7 +353,7 @@ export default function BaklijarPage() {
                 ))}
                 {paginatedMockups.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                       {filteredMockups.length === 0 ? 'No mockups found' : 'No mockups match your filters'}
                     </td>
                   </tr>
