@@ -2,54 +2,57 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-interface WaterRecord {
-  id: string;
-  water1: string;
-  water2: string;
-  water3: string;
-  water4: string;
-  water5: string;
-  water6: string;
-  water7: string;
-  water8: string;
-  water9: string;
-  water10: string;
-  water11: string;
-  water12: string;
-  water13: string;
-  water14: string;
-  water15: string;
+interface NemtorUnit {
+  unit_id: string;
+  fk_gcon_piece_id: string;
+  unit_marker: string;
+  el_id: string;
+  el_type: string;
+  widget_type: string | null;
+  parent_el_id: string | null;
+  position_order: number;
+  depth_level: number;
+  sort_index: number;
+  summary_text: string | null;
+  unit_label: string | null;
+  settings_json: any;
+  style_json: any;
+  globals_json: any;
+  raw_json: any;
+  created_at: string;
+  updated_at: string;
 }
 
 type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 type StickyColumnKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
-const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: (keyof WaterRecord)[] }> = {
+const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: (keyof NemtorUnit)[] }> = {
   'option1': {
     name: 'col temp all',
-    range: 'columns 1-~',
-    columns: ['water1', 'water2', 'water3', 'water4', 'water5', 'water6', 'water7', 'water8', 'water9', 'water10', 'water11', 'water12', 'water13', 'water14', 'water15']
+    range: 'all fields',
+    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
   },
   'option2': {
-    name: 'col temp a',
-    range: 'columns 1-7',
-    columns: ['water1', 'water2', 'water3', 'water4', 'water5', 'water6', 'water7']
+    name: 'col temp core',
+    range: 'core fields',
+    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'summary_text']
   },
   'option3': {
-    name: 'col temp b',
-    range: 'columns 8-14',
-    columns: ['water8', 'water9', 'water10', 'water11', 'water12', 'water13', 'water14']
+    name: 'col temp hierarchy',
+    range: 'hierarchy',
+    columns: ['unit_marker', 'parent_el_id', 'depth_level', 'sort_index', 'position_order']
   },
   'option4': {
-    name: 'col temp c',
-    range: 'columns 15-21',
-    columns: ['water15'] // Only water15 exists, but keeping structure for future expansion
+    name: 'col temp json',
+    range: 'json fields',
+    columns: ['el_id', 'settings_json', 'style_json', 'globals_json', 'raw_json']
   },
   'option5': {
-    name: 'col temp d',
-    range: 'columns 22-28',
-    columns: [] // No columns in this range currently
+    name: 'col temp summary',
+    range: 'summary',
+    columns: ['unit_marker', 'el_type', 'widget_type', 'summary_text', 'unit_label']
   }
 };
 
@@ -61,31 +64,7 @@ const stickyOptions: Record<StickyColumnKey, number> = {
   'option5': 5
 };
 
-// Generate mock data for now
-const generateMockData = (): WaterRecord[] => {
-  const data: WaterRecord[] = [];
-  for (let i = 1; i <= 100; i++) {
-    data.push({
-      id: `row-${i}`,
-      water1: `Data ${i}-1`,
-      water2: `Data ${i}-2`,
-      water3: `Data ${i}-3`,
-      water4: `Data ${i}-4`,
-      water5: `Data ${i}-5`,
-      water6: `Data ${i}-6`,
-      water7: `Data ${i}-7`,
-      water8: `Data ${i}-8`,
-      water9: `Data ${i}-9`,
-      water10: `Data ${i}-10`,
-      water11: `Data ${i}-11`,
-      water12: `Data ${i}-12`,
-      water13: `Data ${i}-13`,
-      water14: `Data ${i}-14`,
-      water15: `Data ${i}-15`,
-    });
-  }
-  return data;
-};
+// No mock data - we'll fetch real nemtor_units data from database
 
 interface WaterTableProps {
   gconPieceId?: string | null;
@@ -114,12 +93,15 @@ export default function WaterTable({
 }: WaterTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const supabase = createClientComponentClient();
   
-  const [data] = useState<WaterRecord[]>(generateMockData());
+  const [data, setData] = useState<NemtorUnit[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [sortField, setSortField] = useState<keyof WaterRecord | null>(null);
+  const [sortField, setSortField] = useState<keyof NemtorUnit | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
   // Selection state
@@ -158,6 +140,43 @@ export default function WaterTable({
     router.push(`?${params.toString()}`);
   };
 
+  // Fetch nemtor_units data
+  useEffect(() => {
+    const fetchNemtorUnits = async () => {
+      if (!gconPieceId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const { data: nemtorData, error: fetchError } = await supabase
+          .from('nemtor_units')
+          .select('*')
+          .eq('fk_gcon_piece_id', gconPieceId)
+          .order('sort_index', { ascending: true });
+
+        if (fetchError) {
+          console.error('Error fetching nemtor_units:', fetchError);
+          setError('Failed to fetch nemtor_units data');
+          setData([]);
+        } else {
+          setData(nemtorData || []);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        setError('An error occurred while fetching data');
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNemtorUnits();
+  }, [gconPieceId, supabase]);
+
   // Log when gconPieceId changes
   useEffect(() => {
     if (gconPieceId) {
@@ -182,7 +201,7 @@ export default function WaterTable({
 
   // Get sticky columns
   const stickyColumnCount = stickyOptions[selectedStickyOption];
-  const allColumns: (keyof WaterRecord | 'select' | 'prisomi')[] = ['prisomi', 'select', 'water1', 'water2', 'water3', 'water4', 'water5', 'water6', 'water7', 'water8', 'water9', 'water10', 'water11', 'water12', 'water13', 'water14', 'water15'];
+  const allColumns: (keyof NemtorUnit | 'select' | 'prisomi')[] = ['prisomi', 'select', 'unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at'];
   const stickyColumns = allColumns.slice(0, stickyColumnCount + 2); // +2 to include prisomi and select columns
   const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
 
@@ -223,7 +242,7 @@ export default function WaterTable({
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
   // Handle sorting
-  const handleSort = (field: keyof WaterRecord) => {
+  const handleSort = (field: keyof NemtorUnit) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -469,11 +488,12 @@ export default function WaterTable({
       {/* Column Template Controls */}
       <div className="flex flex-wrap items-center gap-4">
         {/* SQL View Info */}
-        <div className="border border-gray-300 rounded p-2" style={{ maxWidth: '130px', maxHeight: '75px' }}>
+        <div className="border border-gray-300 rounded p-2" style={{ maxWidth: '150px', maxHeight: '75px' }}>
           <div className="text-xs">
-            <div className="font-bold">SQL View Info</div>
-            <div>view name: water_view</div>
-            <div># columns: 16</div>
+            <div className="font-bold">SQL Table Info</div>
+            <div>table: nemtor_units</div>
+            <div># columns: 17</div>
+            <div># rows: {data.length}</div>
           </div>
         </div>
 
@@ -561,7 +581,7 @@ export default function WaterTable({
                 const isLastStickyCol = index === stickyColumns.length - 1;
                 const isPrisomiCol = col === 'prisomi';
                 const isSelectCol = col === 'select';
-                const isVisible = isPrisomiCol || isSelectCol || visibleColumns.includes(col as keyof WaterRecord);
+                const isVisible = isPrisomiCol || isSelectCol || visibleColumns.includes(col as keyof NemtorUnit);
                 
                 if (!isVisible) return null;
                 
@@ -725,7 +745,7 @@ export default function WaterTable({
                 return (
                   <th
                     key={col}
-                    onClick={() => handleSort(col as keyof WaterRecord)}
+                    onClick={() => handleSort(col as keyof NemtorUnit)}
                     className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 sticky bg-gray-50 z-10 ${
                       isLastStickyCol ? 'border-r-4 border-black' : ''
                     }`}
@@ -763,7 +783,7 @@ export default function WaterTable({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.map((row, rowIndex) => (
-              <tr key={row.id} className="hover:bg-gray-50">
+              <tr key={row.unit_id} className="hover:bg-gray-50">
                 {/* Sticky columns */}
                 {stickyColumns.map((col, index) => {
                   const isLastStickyCol = index === stickyColumns.length - 1;
@@ -832,18 +852,18 @@ export default function WaterTable({
                           paddingLeft: '10px !important',
                           paddingRight: '10px !important'
                         }}
-                        onClick={() => handleRowSelect(row.id)}
+                        onClick={() => handleRowSelect(row.unit_id)}
                       >
                         <div 
                           className="cursor-pointer flex items-center justify-center w-full h-full"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRowSelect(row.id);
+                            handleRowSelect(row.unit_id);
                           }}
                         >
                           <input
                             type="checkbox"
-                            checked={selectedRows.has(row.id)}
+                            checked={selectedRows.has(row.unit_id)}
                             onChange={() => {}} // Handled by div click
                             className="cursor-pointer"
                             style={{ width: '26px', height: '26px' }}
@@ -861,14 +881,34 @@ export default function WaterTable({
                       }`}
                       style={{ left: `${20 + 60 + (index - 2) * 150}px` }} // 20px (prisomi) + 60px (select) + column positions
                     >
-                      {row[col as keyof WaterRecord]}
+                      {(() => {
+                        const value = row[col as keyof NemtorUnit];
+                        if (col.includes('_json') && value) {
+                          return (
+                            <div className="truncate max-w-xs" title={JSON.stringify(value, null, 2)}>
+                              {typeof value === 'object' ? JSON.stringify(value).substring(0, 50) + '...' : value}
+                            </div>
+                          );
+                        }
+                        return value?.toString() || '-';
+                      })()}
                     </td>
                   );
                 })}
                 {/* Non-sticky visible columns */}
                 {nonStickyVisibleColumns.map((col) => (
                   <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {row[col]}
+                    {(() => {
+                      const value = row[col as keyof NemtorUnit];
+                      if (col.includes('_json') && value) {
+                        return (
+                          <div className="truncate max-w-xs" title={JSON.stringify(value, null, 2)}>
+                            {typeof value === 'object' ? JSON.stringify(value).substring(0, 50) + '...' : value}
+                          </div>
+                        );
+                      }
+                      return value?.toString() || '-';
+                    })()}
                   </td>
                 ))}
               </tr>
