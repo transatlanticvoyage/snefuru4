@@ -15,16 +15,16 @@ interface NemtorUnit {
   unit_marker: string;
   el_id: string;
   el_type: string;
-  widget_type?: string;
-  parent_el_id?: string;
+  widget_type: string | null;
+  parent_el_id: string | null;
   position_order: number;
   depth_level: number;
   sort_index: number;
-  summary_text?: string;
-  unit_label?: string;
-  settings_json?: Record<string, any>;
-  style_json?: Record<string, any>;
-  globals_json?: Record<string, any>;
+  summary_text: string | null;
+  unit_label: string | null;
+  settings_json: Record<string, any>;
+  style_json: Record<string, any>;
+  globals_json: Record<string, any>;
   raw_json: Record<string, any>;
 }
 
@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
     const nemtorUnits: NemtorUnit[] = [];
     let sortIndex = 0;
 
-    function extractSummaryText(settings?: Record<string, any>): string | undefined {
-      if (!settings) return undefined;
+    function extractSummaryText(settings?: Record<string, any>): string | null {
+      if (!settings) return null;
       
       // Common Elementor text fields
       const textFields = ['title', 'title_text', 'text', 'content', 'heading_text', 'description'];
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      return undefined;
+      return null;
     }
 
     function processElement(
