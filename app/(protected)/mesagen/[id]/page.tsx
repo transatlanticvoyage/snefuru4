@@ -746,7 +746,7 @@ Recommendation: Check logs and retry operation`;
               </div>
               
               <div className="mb-3">
-                <Link href={`/torya/${id}`} className="text-blue-600 hover:text-blue-800">
+                <Link href={`/torya?gcon_piece_id=${id}`} className="text-blue-600 hover:text-blue-800">
                   -- Visit /torya --
                 </Link>
               </div>
