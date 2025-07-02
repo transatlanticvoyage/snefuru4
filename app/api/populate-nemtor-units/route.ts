@@ -98,11 +98,19 @@ export async function POST(request: NextRequest) {
       return null;
     }
 
-    function extractFullText(settings?: Record<string, any>): string | null {
+    function extractFullText(settings?: Record<string, any>, widgetType?: string): string | null {
       if (!settings) return null;
       
+      // Special handling for text_editor widget type - prioritize "editor" field
+      if (widgetType === 'text_editor' && settings.editor && typeof settings.editor === 'string') {
+        const editorContent = settings.editor.trim();
+        if (editorContent.length > 0) {
+          return editorContent;
+        }
+      }
+      
       // Collect all text content from various fields
-      const textFields = ['title', 'title_text', 'text', 'content', 'heading_text', 'description', 'caption', 'link_text', 'button_text', 'placeholder', 'html', 'shortcode'];
+      const textFields = ['title', 'title_text', 'text', 'content', 'heading_text', 'description', 'caption', 'link_text', 'button_text', 'placeholder', 'html', 'shortcode', 'editor'];
       const textParts: string[] = [];
       
       for (const field of textFields) {
@@ -155,7 +163,7 @@ export async function POST(request: NextRequest) {
       depthLevel: number = 0,
       positionOrder: number = 0
     ): void {
-      const fullTextContent = extractFullText(element.settings);
+      const fullTextContent = extractFullText(element.settings, element.widgetType);
       const baseUnit: Partial<NemtorUnit> = {
         fk_gcon_piece_id: gcon_piece_id,
         el_id: element.id,
