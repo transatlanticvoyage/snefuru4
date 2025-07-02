@@ -708,6 +708,89 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
     }, 50);
   }, [blocks, gconPieceId, mudDeplines]);
 
+  const handleDeleteRow = useCallback(async (rowIndex: number) => {
+    const blockIndex = rowIndex;
+    
+    // Don't delete if it's the only block
+    if (blocks.length <= 1) return;
+    
+    const currentBlock = blocks[blockIndex];
+    if (!currentBlock) return;
+    
+    // Remove the current block from UI
+    setBlocks(prevBlocks => {
+      const newBlocks = [...prevBlocks];
+      newBlocks.splice(blockIndex, 1);
+      
+      // Update aval_content to maintain line-by-line sync
+      const combinedHtml = newBlocks
+        .map(block => block.htmlContent)
+        .join('\n'); // Join with linebreaks
+      
+      onContentChange?.(combinedHtml);
+      
+      return newBlocks;
+    });
+    
+    // If we have gconPieceId, update mud_deplines in the database
+    if (gconPieceId) {
+      try {
+        const { createClientComponentClient } = await import('@supabase/auth-helpers-nextjs');
+        const supabase = createClientComponentClient();
+        
+        // Get current depline
+        const currentDepline = mudDeplines.find(d => d.depline_jnumber === blockIndex + 1);
+        
+        if (currentDepline) {
+          // Delete current depline from database
+          const { error: deleteError } = await supabase
+            .from('mud_deplines')
+            .delete()
+            .eq('depline_id', currentDepline.depline_id);
+            
+          if (deleteError) {
+            console.error('Error deleting current depline:', deleteError);
+          }
+        }
+        
+        // Decrement jnumber for all deplines after the deleted one
+        const deplinesAfter = mudDeplines.filter(d => d.depline_jnumber > blockIndex + 1);
+        for (const depline of deplinesAfter) {
+          const { error: updateError } = await supabase
+            .from('mud_deplines')
+            .update({ depline_jnumber: depline.depline_jnumber - 1 })
+            .eq('depline_id', depline.depline_id);
+            
+          if (updateError) {
+            console.error('Error decrementing depline jnumber:', updateError);
+          }
+        }
+        
+        // Refresh mud_deplines data
+        const { data: newDeplines, error: fetchError } = await supabase
+          .from('mud_deplines')
+          .select('*')
+          .eq('fk_gcon_piece_id', gconPieceId)
+          .order('depline_jnumber', { ascending: true });
+          
+        if (!fetchError && newDeplines) {
+          setMudDeplines(newDeplines);
+        }
+      } catch (error) {
+        console.error('Error handling row deletion with mud_deplines:', error);
+      }
+    }
+    
+    // Focus the previous block if it exists, otherwise focus the next one
+    setTimeout(() => {
+      if (blockIndex > 0 && blocks[blockIndex - 1]) {
+        setFocusedBlock(blocks[blockIndex - 1].id);
+      } else if (blocks[blockIndex + 1]) {
+        setFocusedBlock(blocks[blockIndex + 1].id);
+      }
+    }, 50);
+  }, [blocks, gconPieceId, mudDeplines, onContentChange]);
+
   const handleBlockFocus = useCallback((blockId: string) => {
     setFocusedBlock(blockId);
     // Clear merge position after it's been used
@@ -1791,15 +1874,24 @@ mud_deplines.content_raw`;
                   })()}
                 </td>
                 
-                {/* Column 9 - Add Row Button */}
+                {/* Column 9 - Add Row Button & Delete Button */}
                 <td className="border border-gray-300 p-2 text-center">
-                  <button
-                    onClick={() => handleAddRowBelow(index)}
-                    className="w-4 h-4 bg-purple-700 hover:bg-purple-800 text-white rounded flex items-center justify-center text-xs font-bold transition-colors"
-                    title="Add new row below"
-                  >
-                    +
-                  </button>
+                  <div className="flex gap-1 justify-center">
+                    <button
+                      onClick={() => handleAddRowBelow(index)}
+                      className="w-5 h-5 bg-purple-700 hover:bg-purple-800 text-white rounded flex items-center justify-center text-xs font-bold transition-colors"
+                      title="Add new row below"
+                    >
+                      +
+                    </button>
+                    <button
+                      onClick={() => handleDeleteRow(index)}
+                      className="w-5 h-5 bg-purple-400 hover:bg-purple-500 text-white rounded flex items-center justify-center text-xs font-bold transition-colors"
+                      title="Delete this row"
+                    >
+                      −
+                    </button>
+                  </div>
                 </td>
                 
                 {/* Column 10 - Thing9 */}
