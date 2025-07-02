@@ -110,6 +110,9 @@ export default function WaterTable({
   // Column template and sticky column state
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
   const [selectedStickyOption, setSelectedStickyOption] = useState<StickyColumnKey>('option1');
+  
+  // Unit marker filter state
+  const [unitMarkerFilter, setUnitMarkerFilter] = useState<string>('all');
 
   // Initialize from URL parameters
   useEffect(() => {
@@ -117,6 +120,7 @@ export default function WaterTable({
     
     const coltemp = searchParams.get('coltemp') as ColumnTemplateKey;
     const stickycol = searchParams.get('stickycol') as StickyColumnKey;
+    const unitMarker = searchParams.get('unit_marker');
     
     if (coltemp && columnTemplates[coltemp]) {
       setSelectedColumnTemplate(coltemp);
@@ -124,13 +128,25 @@ export default function WaterTable({
     if (stickycol && stickyOptions[stickycol]) {
       setSelectedStickyOption(stickycol);
     }
+    if (unitMarker) {
+      setUnitMarkerFilter(unitMarker);
+    }
   }, [searchParams]);
 
   // Update URL when selections change
-  const updateUrl = (colTemplate: ColumnTemplateKey, stickyCol: StickyColumnKey) => {
+  const updateUrl = (colTemplate: ColumnTemplateKey, stickyCol: StickyColumnKey, unitMarker?: string) => {
     const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('coltemp', colTemplate);
     params.set('stickycol', stickyCol);
+    
+    // Handle unit_marker
+    if (unitMarker !== undefined) {
+      if (unitMarker === 'all') {
+        params.delete('unit_marker');
+      } else {
+        params.set('unit_marker', unitMarker);
+      }
+    }
     
     // Preserve gcon_piece_id if it exists
     if (gconPieceId) {
@@ -194,6 +210,12 @@ export default function WaterTable({
     updateUrl(selectedColumnTemplate, option);
   };
 
+  const handleUnitMarkerFilterChange = (unitMarker: string) => {
+    setUnitMarkerFilter(unitMarker);
+    setCurrentPage(1); // Reset to first page when filtering
+    updateUrl(selectedColumnTemplate, selectedStickyOption, unitMarker);
+  };
+
   // Get visible columns based on template
   const visibleColumns = useMemo(() => {
     return columnTemplates[selectedColumnTemplate].columns;
@@ -205,16 +227,26 @@ export default function WaterTable({
   const stickyColumns = allColumns.slice(0, stickyColumnCount + 2); // +2 to include prisomi and select columns
   const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
 
-  // Filter data based on search term
+  // Filter data based on search term and unit_marker
   const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
+    let filtered = data;
     
-    return data.filter(row => {
-      return Object.values(row).some(value => 
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-  }, [data, searchTerm]);
+    // Filter by unit_marker first
+    if (unitMarkerFilter !== 'all') {
+      filtered = filtered.filter(row => row.unit_marker === unitMarkerFilter);
+    }
+    
+    // Then filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(row => {
+        return Object.values(row).some(value => 
+          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
+    }
+    
+    return filtered;
+  }, [data, searchTerm, unitMarkerFilter]);
 
   // Sort data
   const sortedData = useMemo(() => {
