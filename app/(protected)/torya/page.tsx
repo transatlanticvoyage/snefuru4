@@ -15,6 +15,7 @@ export default function ToryaPage() {
   const [error, setError] = useState<string | null>(null);
   const [gconPieceId, setGconPieceId] = useState<string | null>(null);
   const [gconPiece, setGconPiece] = useState<any>(null);
+  const [isTopAreaOpen, setIsTopAreaOpen] = useState<boolean>(true);
 
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
@@ -22,6 +23,22 @@ export default function ToryaPage() {
     if (gconPieceIdParam) {
       setGconPieceId(gconPieceIdParam);
       console.log('Torya: Loaded with gcon_piece_id:', gconPieceIdParam);
+    }
+    
+    // Handle zarno1 state from URL and localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const zarno1Param = urlParams.get('zarno1');
+    
+    // Try to get saved state from localStorage
+    const savedState = localStorage.getItem('torya_zarno1_state');
+    
+    if (zarno1Param === 'closed') {
+      setIsTopAreaOpen(false);
+    } else if (zarno1Param === 'open') {
+      setIsTopAreaOpen(true);
+    } else if (savedState) {
+      // Use saved state if no URL param
+      setIsTopAreaOpen(savedState === 'open');
     }
     
     setLoading(false);
@@ -81,6 +98,19 @@ export default function ToryaPage() {
     }
   }, [gconPiece?.asn_sitespren_base, gconPieceId]);
 
+  // Handle accordion state change
+  const handleAccordionToggle = (open: boolean) => {
+    setIsTopAreaOpen(open);
+    
+    // Save to localStorage
+    localStorage.setItem('torya_zarno1_state', open ? 'open' : 'closed');
+    
+    // Update URL parameter
+    const url = new URL(window.location.href);
+    url.searchParams.set('zarno1', open ? 'open' : 'closed');
+    window.history.replaceState({}, '', url.toString());
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -131,7 +161,11 @@ export default function ToryaPage() {
             </p>
           </div>
         )}
-        <WaterTable gconPieceId={gconPieceId} />
+        <WaterTable 
+          gconPieceId={gconPieceId} 
+          isTopAreaOpen={isTopAreaOpen}
+          handleAccordionToggle={handleAccordionToggle}
+        />
       </div>
     </div>
   );

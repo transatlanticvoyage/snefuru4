@@ -89,9 +89,11 @@ const generateMockData = (): WaterRecord[] => {
 
 interface WaterTableProps {
   gconPieceId?: string | null;
+  isTopAreaOpen?: boolean;
+  handleAccordionToggle?: (open: boolean) => void;
 }
 
-export default function WaterTable({ gconPieceId }: WaterTableProps) {
+export default function WaterTable({ gconPieceId, isTopAreaOpen, handleAccordionToggle }: WaterTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -243,6 +245,147 @@ export default function WaterTable({ gconPieceId }: WaterTableProps) {
 
   return (
     <div className="space-y-4">
+      {/* Top Area Manager - Accordion Wrapper (zarno1) */}
+      <div className="mb-4">
+        <div 
+          className="rounded-lg border border-gray-200 overflow-hidden transition-all duration-300"
+          style={{ backgroundColor: '#fefef8' }} // Very soft light yellow
+        >
+          {!isTopAreaOpen ? (
+            // Collapsed State - Compact View
+            <div 
+              className="flex items-center justify-between px-4 hover:bg-yellow-50 transition-colors"
+              style={{ width: '200px', height: '60px' }}
+            >
+              <span 
+                className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                onClick={() => handleAccordionToggle?.(true)}
+              >
+                📂 Open Top Area Manager
+              </span>
+              <span className="text-xs text-gray-500 ml-2">zarno1</span>
+            </div>
+          ) : (
+            // Expanded State - Full Content
+            <div>
+              {/* Top bar with Compact Button and zarno1 label */}
+              <div 
+                className="flex items-center justify-between px-4 border-b border-gray-200"
+                style={{ height: '60px', backgroundColor: '#fefef8' }}
+              >
+                <button
+                  onClick={() => handleAccordionToggle?.(false)}
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  📁 Compact
+                </button>
+                <span className="text-xs text-gray-500">zarno1</span>
+              </div>
+              
+              {/* Content area */}
+              <div className="p-4">
+                {/* Original Content */}
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-6">
+                    {/* pelementor_cached Display Section */}
+                    <div className="flex flex-col">
+                      <label className="text-sm text-gray-700 mb-2">gcon_pieces.<span className="font-bold">pelementor_cached</span></label>
+                      <div className="flex gap-2">
+                        <textarea
+                          value=""
+                          readOnly
+                          placeholder="pelementor_cached field value will appear here..."
+                          className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
+                          style={{ width: '500px', height: '300px' }}
+                        />
+                        <div className="flex flex-col gap-2">
+                          <button
+                            disabled={true}
+                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-2 rounded text-sm font-medium"
+                          >
+                            📋 Copy
+                          </button>
+                          <button
+                            disabled={true}
+                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-2 rounded text-sm font-medium"
+                          >
+                            🔍 Expand
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* pelementor_edits Display Section */}
+                    <div className="flex flex-col">
+                      <label className="text-sm text-gray-700 mb-2">gcon_pieces.<span className="font-bold">pelementor_edits</span></label>
+                      <div className="flex gap-2">
+                        <textarea
+                          value=""
+                          readOnly
+                          placeholder="pelementor_edits field value will appear here..."
+                          className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
+                          style={{ width: '500px', height: '300px' }}
+                        />
+                        <div className="flex flex-col gap-2">
+                          <button
+                            disabled={true}
+                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-2 rounded text-sm font-medium"
+                          >
+                            📋 Copy
+                          </button>
+                          <button
+                            disabled={true}
+                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-2 rounded text-sm font-medium"
+                          >
+                            🔍 Expand
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* F22 Section */}
+                    <div className="flex flex-col items-end gap-3">
+                      <button
+                        disabled={true}
+                        className="bg-gray-300 text-gray-500 cursor-not-allowed px-4 py-2 rounded font-medium"
+                      >
+                        Run f22 on this gcon_pieces row
+                      </button>
+                      
+                      {/* F22 Report Text Box */}
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm font-medium text-gray-700">F22 Function Report:</label>
+                          <button
+                            disabled={true}
+                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-1 rounded text-sm font-medium"
+                          >
+                            📋 Copy Report
+                          </button>
+                          <button
+                            disabled={true}
+                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-1 rounded text-sm font-medium"
+                          >
+                            🔍 Full Diagnostic
+                          </button>
+                        </div>
+                        <textarea
+                          value=""
+                          readOnly
+                          placeholder="F22 function reports will appear here after execution...\n\nLook for:\n- TontoNormalizationProcess1 results\n- mud_title and mud_content processing\n- Database verification results\n- Any error messages\n\nCheck browser console (F12) for detailed debug logs."
+                          className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
+                          style={{ width: '500px', height: '200px' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Column Template Controls */}
       <div className="flex flex-wrap items-center gap-4">
         {/* SQL View Info */}
