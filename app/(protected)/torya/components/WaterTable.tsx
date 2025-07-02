@@ -999,6 +999,16 @@ export default function WaterTable({
                           );
                         }
                         
+                        // Special handling for has_img_slot - show green dot for true
+                        if (col === 'has_img_slot' && value === true) {
+                          return (
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              <span>true</span>
+                            </div>
+                          );
+                        }
+                        
                         // Special handling for unit_id - truncate and make clickable
                         if (col === 'unit_id' && value) {
                           const fullValue = value.toString();
@@ -1063,6 +1073,16 @@ export default function WaterTable({
                               // Handle text change here if needed
                             }}
                           />
+                        );
+                      }
+                      
+                      // Special handling for has_img_slot - show green dot for true
+                      if (col === 'has_img_slot' && value === true) {
+                        return (
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span>true</span>
+                          </div>
                         );
                       }
                       
