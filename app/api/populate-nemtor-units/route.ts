@@ -21,6 +21,7 @@ interface NemtorUnit {
   depth_level: number;
   sort_index: number;
   summary_text: string | null;
+  full_text: string | null;
   unit_label: string | null;
   settings_json: Record<string, any>;
   style_json: Record<string, any>;
@@ -96,6 +97,57 @@ export async function POST(request: NextRequest) {
       return null;
     }
 
+    function extractFullText(settings?: Record<string, any>): string | null {
+      if (!settings) return null;
+      
+      // Collect all text content from various fields
+      const textFields = ['title', 'title_text', 'text', 'content', 'heading_text', 'description', 'caption', 'link_text', 'button_text', 'placeholder', 'html', 'shortcode'];
+      const textParts: string[] = [];
+      
+      for (const field of textFields) {
+        if (settings[field] && typeof settings[field] === 'string') {
+          const cleanText = settings[field].trim();
+          if (cleanText.length > 0) {
+            textParts.push(cleanText);
+          }
+        }
+      }
+      
+      // Also check for nested objects that might contain text
+      const nestedFields = ['typography', 'text_color', 'background', 'border'];
+      for (const field of nestedFields) {
+        if (settings[field] && typeof settings[field] === 'object') {
+          const nestedText = extractTextFromObject(settings[field]);
+          if (nestedText) {
+            textParts.push(nestedText);
+          }
+        }
+      }
+      
+      return textParts.length > 0 ? textParts.join(' | ') : null;
+    }
+
+    function extractTextFromObject(obj: any): string | null {
+      if (!obj || typeof obj !== 'object') return null;
+      
+      const textValues: string[] = [];
+      for (const [key, value] of Object.entries(obj)) {
+        if (typeof value === 'string' && value.trim().length > 0) {
+          // Skip technical values like colors, sizes, etc.
+          if (!key.includes('color') && !key.includes('size') && !key.includes('weight') && value.length > 2) {
+            textValues.push(value.trim());
+          }
+        } else if (typeof value === 'object' && value !== null) {
+          const nestedText = extractTextFromObject(value);
+          if (nestedText) {
+            textValues.push(nestedText);
+          }
+        }
+      }
+      
+      return textValues.length > 0 ? textValues.join(' ') : null;
+    }
+
     function processElement(
       element: ElementorElement,
       parentId: string | null = null,
@@ -111,6 +163,7 @@ export async function POST(request: NextRequest) {
         position_order: positionOrder,
         depth_level: depthLevel,
         summary_text: extractSummaryText(element.settings),
+        full_text: extractFullText(element.settings),
         settings_json: element.settings || {},
         style_json: element.style || {},
         globals_json: element.__globals__ || {},
