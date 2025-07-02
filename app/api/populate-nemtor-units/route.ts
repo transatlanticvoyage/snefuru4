@@ -24,6 +24,14 @@ interface NemtorUnit {
   full_text_cached: string | null;
   full_text_edits: string | null;
   unit_label: string | null;
+  image_type: string | null;
+  image_id: string | null;
+  image_url: string | null;
+  image_alt: string | null;
+  image_size: string | null;
+  image_source: string | null;
+  carousel_position: number | null;
+  image_context: string | null;
   settings_json: Record<string, any>;
   style_json: Record<string, any>;
   globals_json: Record<string, any>;
@@ -101,8 +109,8 @@ export async function POST(request: NextRequest) {
     function extractFullText(settings?: Record<string, any>, widgetType?: string): string | null {
       if (!settings) return null;
       
-      // Special handling for text_editor widget type - prioritize "editor" field
-      if (widgetType === 'text_editor' && settings.editor && typeof settings.editor === 'string') {
+      // Special handling for text-editor widget type - prioritize "editor" field
+      if (widgetType === 'text-editor' && settings.editor && typeof settings.editor === 'string') {
         const editorContent = settings.editor.trim();
         if (editorContent.length > 0) {
           return editorContent;
@@ -157,6 +165,92 @@ export async function POST(request: NextRequest) {
       return textValues.length > 0 ? textValues.join(' ') : null;
     }
 
+    function extractImageData(element: ElementorElement): {
+      image_type: string | null;
+      image_id: string | null;
+      image_url: string | null;
+      image_alt: string | null;
+      image_size: string | null;
+      image_source: string | null;
+      carousel_position: number | null;
+      image_context: string | null;
+    } {
+      const settings = element.settings || {};
+      
+      // Check for background image in containers/sections
+      if (settings.background_image && (element.elType === 'container' || element.elType === 'section')) {
+        const bgImage = settings.background_image;
+        return {
+          image_type: 'background',
+          image_id: bgImage.id || null,
+          image_url: bgImage.url || null,
+          image_alt: bgImage.alt || null,
+          image_size: bgImage.size || null,
+          image_source: bgImage.source || null,
+          carousel_position: null,
+          image_context: JSON.stringify({
+            background_size: settings.background_size,
+            background_position: settings.background_position,
+            background_repeat: settings.background_repeat
+          })
+        };
+      }
+      
+      // Check for widget images (image-box, image widgets)
+      if (settings.image && element.elType === 'widget') {
+        const widgetImage = settings.image;
+        return {
+          image_type: 'widget',
+          image_id: widgetImage.id || null,
+          image_url: widgetImage.url || null,
+          image_alt: widgetImage.alt || null,
+          image_size: widgetImage.size || settings.image_size?.size?.toString() || null,
+          image_source: null,
+          carousel_position: null,
+          image_context: JSON.stringify({
+            widget_type: element.widgetType,
+            image_size: settings.image_size,
+            hover_animation: settings.hover_animation
+          })
+        };
+      }
+      
+      // Check for carousel images
+      if (settings.carousel && Array.isArray(settings.carousel) && element.widgetType === 'image-carousel') {
+        // For carousel, we'll handle the first image here and create additional records separately
+        const firstImage = settings.carousel[0];
+        if (firstImage) {
+          return {
+            image_type: 'carousel',
+            image_id: firstImage.id?.toString() || null,
+            image_url: firstImage.url || null,
+            image_alt: firstImage.alt || null,
+            image_size: settings.thumbnail_size || null,
+            image_source: null,
+            carousel_position: 1,
+            image_context: JSON.stringify({
+              carousel_name: settings.carousel_name,
+              slides_to_show: settings.slides_to_show,
+              navigation: settings.navigation,
+              total_slides: settings.carousel.length
+            })
+          };
+        }
+      }
+      
+      // No image found
+      return {
+        image_type: null,
+        image_id: null,
+        image_url: null,
+        image_alt: null,
+        image_size: null,
+        image_source: null,
+        carousel_position: null,
+        image_context: null
+      };
+    }
+
     function processElement(
       element: ElementorElement,
       parentId: string | null = null,
@@ -164,6 +258,7 @@ export async function POST(request: NextRequest) {
       positionOrder: number = 0
     ): void {
       const fullTextContent = extractFullText(element.settings, element.widgetType);
+      const imageData = extractImageData(element);
       const baseUnit: Partial<NemtorUnit> = {
         fk_gcon_piece_id: gcon_piece_id,
         el_id: element.id,
@@ -175,6 +270,14 @@ export async function POST(request: NextRequest) {
         summary_text: extractSummaryText(element.settings),
         full_text_cached: fullTextContent,
         full_text_edits: fullTextContent,
+        image_type: imageData.image_type,
+        image_id: imageData.image_id,
+        image_url: imageData.image_url,
+        image_alt: imageData.image_alt,
+        image_size: imageData.image_size,
+        image_source: imageData.image_source,
+        carousel_position: imageData.carousel_position,
+        image_context: imageData.image_context,
         settings_json: element.settings || {},
         style_json: element.style || {},
         globals_json: element.__globals__ || {},

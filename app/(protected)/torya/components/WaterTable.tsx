@@ -18,6 +18,14 @@ interface NemtorUnit {
   summary_text: string | null;
   full_text_cached: string | null;
   full_text_edits: string | null;
+  image_type: string | null;
+  image_id: string | null;
+  image_url: string | null;
+  image_alt: string | null;
+  image_size: string | null;
+  image_source: string | null;
+  carousel_position: number | null;
+  image_context: string | null;
   unit_label: string | null;
   settings_json: any;
   style_json: any;
@@ -34,12 +42,12 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   'option1': {
     name: 'col temp all',
     range: 'all fields',
-    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
+    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
   },
   'option2': {
     name: 'col temp core',
     range: 'core fields',
-    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'summary_text']
+    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'image_type', 'image_url', 'summary_text']
   },
   'option3': {
     name: 'col temp hierarchy',
@@ -54,7 +62,7 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   'option5': {
     name: 'col temp summary',
     range: 'summary',
-    columns: ['unit_marker', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'summary_text', 'unit_label']
+    columns: ['unit_marker', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'image_type', 'image_url', 'summary_text', 'unit_label']
   }
 };
 
@@ -225,7 +233,7 @@ export default function WaterTable({
 
   // Get sticky columns
   const stickyColumnCount = stickyOptions[selectedStickyOption];
-  const allColumns: (keyof NemtorUnit | 'select' | 'prisomi')[] = ['prisomi', 'select', 'unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at'];
+  const allColumns: (keyof NemtorUnit | 'select' | 'prisomi')[] = ['prisomi', 'select', 'unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at'];
   const stickyColumns = allColumns.slice(0, stickyColumnCount + 2); // +2 to include prisomi and select columns
   const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
 
@@ -833,7 +841,9 @@ export default function WaterTable({
                 <th
                   key={col}
                   onClick={() => handleSort(col)}
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                  className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200 ${
+                    col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
+                  } ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                 >
                   <div className="flex items-center gap-1">
                     <span>{col}</span>
@@ -944,7 +954,7 @@ export default function WaterTable({
                       key={col} 
                       className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white border border-gray-200 ${
                         col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                      } ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
+                      } ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''} ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
                       style={{ left: `${20 + 60 + (index - 2) * 150}px` }} // 20px (prisomi) + 60px (select) + column positions
                     >
                       {(() => {
@@ -994,7 +1004,7 @@ export default function WaterTable({
                     key={col} 
                     className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
                       col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                    }`}
+                    } ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                   >
                     {(() => {
                       const value = row[col as keyof NemtorUnit];
