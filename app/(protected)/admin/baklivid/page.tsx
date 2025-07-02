@@ -36,6 +36,7 @@ export default function BaklidPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('html');
+  const [viewMode, setViewMode] = useState<ViewMode>('view1');
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
