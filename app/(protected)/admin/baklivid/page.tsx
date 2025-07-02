@@ -178,8 +178,16 @@ export default function BaklidPage() {
   };
 
   const renderPreview = () => {
-    // Create the CSS link reference to our API endpoint
+    // Create the CSS link reference to our API endpoint for saved CSS
     const cssLinkTag = bakliId ? `<link rel="stylesheet" type="text/css" href="/api/bakli-css/${bakliId}">` : '';
+    
+    // Also include current editor CSS for live preview
+    const liveStyles = `
+      <style id="live-css">
+        /* Live CSS from editor */
+        ${cssContent}
+      </style>
+    `;
     
     const resetStyles = `
       <style>
@@ -201,6 +209,7 @@ export default function BaklidPage() {
         <title>Preview</title>
         ${resetStyles}
         ${cssLinkTag}
+        ${liveStyles}
       </head>
       <body>
         ${htmlContent}
