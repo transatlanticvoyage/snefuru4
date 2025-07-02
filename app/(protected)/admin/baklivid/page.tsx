@@ -318,87 +318,221 @@ export default function BaklidPage() {
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 flex-shrink-0">
-        <div className="max-w-7xl mx-auto">
-          <nav className="flex">
-            {[
-              { id: 'html' as TabType, label: 'Enter HTML', icon: '📝' },
-              { id: 'css' as TabType, label: 'Enter CSS', icon: '🎨' },
-              { id: 'preview' as TabType, label: 'View Frontend', icon: '👁️' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
-                  activeTab === tab.id
-                    ? 'border-purple-500 text-purple-600 bg-purple-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <span>{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+      {/* View Mode Toggle */}
+      <div className="bg-gray-100 border-b border-gray-200 p-4 flex-shrink-0">
+        <div className="max-w-7xl mx-auto flex items-center justify-center">
+          <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
+            <button
+              onClick={() => setViewMode('view1')}
+              className={`px-6 py-2 text-sm font-medium transition-colors ${
+                viewMode === 'view1'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              View 1
+            </button>
+            <button
+              onClick={() => setViewMode('view2')}
+              className={`px-6 py-2 text-sm font-medium transition-colors border-l border-gray-300 ${
+                viewMode === 'view2'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              View 2
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Tab Content */}
-      <div className="flex-1 overflow-hidden">
-        <div className="max-w-7xl mx-auto h-full p-4">
-          {activeTab === 'html' && (
-            <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">HTML Content</h3>
-                <div className="text-sm text-gray-500">
-                  {htmlContent.length} characters
-                </div>
-              </div>
-              <textarea
-                value={htmlContent}
-                onChange={(e) => setHtmlContent(e.target.value)}
-                className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                style={{ minHeight: '700px' }}
-                placeholder="Enter your HTML content here..."
-                spellCheck={false}
-              />
-            </div>
-          )}
-
-          {activeTab === 'css' && (
-            <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">CSS Styles</h3>
-                <div className="text-sm text-gray-500">
-                  {cssContent.length} characters
-                </div>
-              </div>
-              <textarea
-                value={cssContent}
-                onChange={(e) => setCssContent(e.target.value)}
-                className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                style={{ minHeight: '700px' }}
-                placeholder="Enter your CSS styles here..."
-                spellCheck={false}
-              />
-            </div>
-          )}
-
-          {activeTab === 'preview' && (
-            <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Live Preview</h3>
-                <div className="text-sm text-gray-500">
-                  Renders your HTML + CSS
-                </div>
-              </div>
-              <div className="flex-1 border border-gray-300 rounded-md overflow-hidden bg-white" style={{ minHeight: '700px' }}>
-                {renderPreview()}
-              </div>
-            </div>
-          )}
+      {/* Tab Navigation */}
+      {viewMode === 'view1' && (
+        <div className="bg-white border-b border-gray-200 flex-shrink-0">
+          <div className="max-w-7xl mx-auto">
+            <nav className="flex">
+              {[
+                { id: 'html' as TabType, label: 'Enter HTML', icon: '📝' },
+                { id: 'css' as TabType, label: 'Enter CSS', icon: '🎨' },
+                { id: 'preview' as TabType, label: 'View Frontend', icon: '👁️' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                    activeTab === tab.id
+                      ? 'border-purple-500 text-purple-600 bg-purple-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
         </div>
+      )}
+
+      {/* Content Area */}
+      <div className="flex-1 overflow-hidden">
+        {viewMode === 'view1' ? (
+          // View 1: Original single-pane layout
+          <div className="max-w-7xl mx-auto h-full p-4">
+            {activeTab === 'html' && (
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">HTML Content</h3>
+                  <div className="text-sm text-gray-500">
+                    {htmlContent.length} characters
+                  </div>
+                </div>
+                <textarea
+                  value={htmlContent}
+                  onChange={(e) => setHtmlContent(e.target.value)}
+                  className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  style={{ minHeight: '700px' }}
+                  placeholder="Enter your HTML content here..."
+                  spellCheck={false}
+                />
+              </div>
+            )}
+
+            {activeTab === 'css' && (
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">CSS Styles</h3>
+                  <div className="text-sm text-gray-500">
+                    {cssContent.length} characters
+                  </div>
+                </div>
+                <textarea
+                  value={cssContent}
+                  onChange={(e) => setCssContent(e.target.value)}
+                  className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  style={{ minHeight: '700px' }}
+                  placeholder="Enter your CSS styles here..."
+                  spellCheck={false}
+                />
+              </div>
+            )}
+
+            {activeTab === 'preview' && (
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">Live Preview</h3>
+                  <div className="text-sm text-gray-500">
+                    Renders your HTML + CSS
+                  </div>
+                </div>
+                <div className="flex-1 border border-gray-300 rounded-md overflow-hidden bg-white" style={{ minHeight: '700px' }}>
+                  {renderPreview()}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          // View 2: Split layout with preview always visible on left
+          <div className="h-full flex">
+            {/* Left Side - Live Preview */}
+            <div className="flex-1 flex flex-col">
+              {/* Left Tab Navigation */}
+              <div className="bg-white border-b border-gray-200">
+                <nav className="flex">
+                  <button className="px-6 py-4 text-sm font-medium border-b-2 border-purple-500 text-purple-600 bg-purple-50 flex items-center gap-2">
+                    <span>👁️</span>
+                    View Frontend
+                  </button>
+                </nav>
+              </div>
+              
+              {/* Left Content */}
+              <div className="flex-1 p-4">
+                <div className="h-full flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">Live Preview</h3>
+                    <div className="text-sm text-gray-500">
+                      Renders your HTML + CSS
+                    </div>
+                  </div>
+                  <div className="flex-1 border border-gray-300 rounded-md overflow-hidden bg-white" style={{ minHeight: '700px' }}>
+                    {renderPreview()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Vertical Separator */}
+            <div className="w-1 bg-gray-600 flex-shrink-0"></div>
+
+            {/* Right Side - HTML/CSS Editing */}
+            <div className="flex-1 flex flex-col">
+              {/* Right Tab Navigation */}
+              <div className="bg-white border-b border-gray-200">
+                <nav className="flex">
+                  {[
+                    { id: 'html' as TabType, label: 'Enter HTML', icon: '📝' },
+                    { id: 'css' as TabType, label: 'Enter CSS', icon: '🎨' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                        activeTab === tab.id
+                          ? 'border-purple-500 text-purple-600 bg-purple-50'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span>{tab.icon}</span>
+                      {tab.label}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+              
+              {/* Right Content */}
+              <div className="flex-1 p-4">
+                {activeTab === 'html' && (
+                  <div className="h-full flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-medium text-gray-900">HTML Content</h3>
+                      <div className="text-sm text-gray-500">
+                        {htmlContent.length} characters
+                      </div>
+                    </div>
+                    <textarea
+                      value={htmlContent}
+                      onChange={(e) => setHtmlContent(e.target.value)}
+                      className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      style={{ minHeight: '700px' }}
+                      placeholder="Enter your HTML content here..."
+                      spellCheck={false}
+                    />
+                  </div>
+                )}
+
+                {activeTab === 'css' && (
+                  <div className="h-full flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-medium text-gray-900">CSS Styles</h3>
+                      <div className="text-sm text-gray-500">
+                        {cssContent.length} characters
+                      </div>
+                    </div>
+                    <textarea
+                      value={cssContent}
+                      onChange={(e) => setCssContent(e.target.value)}
+                      className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      style={{ minHeight: '700px' }}
+                      placeholder="Enter your CSS styles here..."
+                      spellCheck={false}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Notes Section (always visible at bottom) */}
