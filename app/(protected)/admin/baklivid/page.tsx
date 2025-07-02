@@ -24,6 +24,7 @@ interface BakliMockup {
 }
 
 type TabType = 'html' | 'css' | 'preview';
+type ViewMode = 'view1' | 'view2';
 
 export default function BaklidPage() {
   const { user } = useAuth();
@@ -357,6 +358,7 @@ export default function BaklidPage() {
                 value={htmlContent}
                 onChange={(e) => setHtmlContent(e.target.value)}
                 className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                style={{ minHeight: '700px' }}
                 placeholder="Enter your HTML content here..."
                 spellCheck={false}
               />
@@ -375,6 +377,7 @@ export default function BaklidPage() {
                 value={cssContent}
                 onChange={(e) => setCssContent(e.target.value)}
                 className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                style={{ minHeight: '700px' }}
                 placeholder="Enter your CSS styles here..."
                 spellCheck={false}
               />
@@ -389,7 +392,7 @@ export default function BaklidPage() {
                   Renders your HTML + CSS
                 </div>
               </div>
-              <div className="flex-1 border border-gray-300 rounded-md overflow-hidden bg-white">
+              <div className="flex-1 border border-gray-300 rounded-md overflow-hidden bg-white" style={{ minHeight: '700px' }}>
                 {renderPreview()}
               </div>
             </div>
