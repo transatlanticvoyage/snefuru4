@@ -167,6 +167,53 @@ export async function POST(request: NextRequest) {
       return textValues.length > 0 ? textValues.join(' ') : null;
     }
 
+    function detectImageSlots(element: ElementorElement): {
+      has_img_slot: boolean | null;
+      img_slot_qty: number | null;
+    } {
+      const settings = element.settings || {};
+      
+      // Check for image slots in various widget types
+      if (element.elType === 'widget') {
+        switch (element.widgetType) {
+          case 'image':
+          case 'image-box':
+            return { has_img_slot: true, img_slot_qty: 1 };
+          
+          case 'image-carousel':
+            // Check if carousel has predefined slots or can accept multiple images
+            if (settings.carousel && Array.isArray(settings.carousel)) {
+              return { has_img_slot: true, img_slot_qty: settings.carousel.length || 1 };
+            }
+            return { has_img_slot: true, img_slot_qty: 1 };
+          
+          case 'image-gallery':
+            // Gallery widgets can have multiple image slots
+            if (settings.gallery && Array.isArray(settings.gallery)) {
+              return { has_img_slot: true, img_slot_qty: settings.gallery.length || 1 };
+            }
+            return { has_img_slot: true, img_slot_qty: 1 };
+          
+          default:
+            // Check if any widget has image-related settings
+            if (settings.image || settings.background_image) {
+              return { has_img_slot: true, img_slot_qty: 1 };
+            }
+            break;
+        }
+      }
+      
+      // Check for background image slots in containers/sections
+      if (element.elType === 'container' || element.elType === 'section') {
+        if (settings.background_image || settings.background_image_url) {
+          return { has_img_slot: true, img_slot_qty: 1 };
+        }
+      }
+      
+      // No image slots detected
+      return { has_img_slot: false, img_slot_qty: 0 };
+    }
+
     function extractImageData(element: ElementorElement): {
       image_type: string | null;
       image_id: string | null;
@@ -261,6 +308,7 @@ export async function POST(request: NextRequest) {
     ): void {
       const fullTextContent = extractFullText(element.settings, element.widgetType);
       const imageData = extractImageData(element);
+      const imageSlotData = detectImageSlots(element);
       const baseUnit: Partial<NemtorUnit> = {
         fk_gcon_piece_id: gcon_piece_id,
         el_id: element.id,
@@ -272,6 +320,8 @@ export async function POST(request: NextRequest) {
         summary_text: extractSummaryText(element.settings),
         full_text_cached: fullTextContent,
         full_text_edits: fullTextContent,
+        has_img_slot: imageSlotData.has_img_slot,
+        img_slot_qty: imageSlotData.img_slot_qty,
         image_type: imageData.image_type,
         image_id: imageData.image_id,
         image_url: imageData.image_url,
