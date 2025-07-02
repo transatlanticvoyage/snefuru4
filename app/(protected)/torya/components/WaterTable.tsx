@@ -91,9 +91,27 @@ interface WaterTableProps {
   gconPieceId?: string | null;
   isTopAreaOpen?: boolean;
   handleAccordionToggle?: (open: boolean) => void;
+  gconPiece?: any;
+  isRunningF22?: boolean;
+  f22Report?: string;
+  handleRunF22?: () => void;
+  handleCopyPelementorCached?: () => void;
+  handleCopyPelementorEdits?: () => void;
+  handleCopyF22Report?: () => void;
 }
 
-export default function WaterTable({ gconPieceId, isTopAreaOpen, handleAccordionToggle }: WaterTableProps) {
+export default function WaterTable({ 
+  gconPieceId, 
+  isTopAreaOpen, 
+  handleAccordionToggle,
+  gconPiece,
+  isRunningF22,
+  f22Report,
+  handleRunF22,
+  handleCopyPelementorCached,
+  handleCopyPelementorEdits,
+  handleCopyF22Report
+}: WaterTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -292,7 +310,13 @@ export default function WaterTable({ gconPieceId, isTopAreaOpen, handleAccordion
                       <label className="text-sm text-gray-700 mb-2">gcon_pieces.<span className="font-bold">pelementor_cached</span></label>
                       <div className="flex gap-2">
                         <textarea
-                          value=""
+                          value={(() => {
+                            if (!gconPiece?.pelementor_cached) return '';
+                            if (typeof gconPiece.pelementor_cached === 'string') {
+                              return gconPiece.pelementor_cached;
+                            }
+                            return JSON.stringify(gconPiece.pelementor_cached, null, 2);
+                          })()}
                           readOnly
                           placeholder="pelementor_cached field value will appear here..."
                           className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
@@ -300,14 +324,23 @@ export default function WaterTable({ gconPieceId, isTopAreaOpen, handleAccordion
                         />
                         <div className="flex flex-col gap-2">
                           <button
-                            disabled={true}
-                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-2 rounded text-sm font-medium"
+                            onClick={handleCopyPelementorCached}
+                            disabled={!gconPiece?.pelementor_cached}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                              !gconPiece?.pelementor_cached
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
                           >
                             📋 Copy
                           </button>
                           <button
-                            disabled={true}
-                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-2 rounded text-sm font-medium"
+                            disabled={!gconPiece?.pelementor_cached}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                              !gconPiece?.pelementor_cached
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-green-600 text-white hover:bg-green-700'
+                            }`}
                           >
                             🔍 Expand
                           </button>
@@ -320,7 +353,13 @@ export default function WaterTable({ gconPieceId, isTopAreaOpen, handleAccordion
                       <label className="text-sm text-gray-700 mb-2">gcon_pieces.<span className="font-bold">pelementor_edits</span></label>
                       <div className="flex gap-2">
                         <textarea
-                          value=""
+                          value={(() => {
+                            if (!gconPiece?.pelementor_edits) return '';
+                            if (typeof gconPiece.pelementor_edits === 'string') {
+                              return gconPiece.pelementor_edits;
+                            }
+                            return JSON.stringify(gconPiece.pelementor_edits, null, 2);
+                          })()}
                           readOnly
                           placeholder="pelementor_edits field value will appear here..."
                           className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
@@ -328,14 +367,23 @@ export default function WaterTable({ gconPieceId, isTopAreaOpen, handleAccordion
                         />
                         <div className="flex flex-col gap-2">
                           <button
-                            disabled={true}
-                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-2 rounded text-sm font-medium"
+                            onClick={handleCopyPelementorEdits}
+                            disabled={!gconPiece?.pelementor_edits}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                              !gconPiece?.pelementor_edits
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
                           >
                             📋 Copy
                           </button>
                           <button
-                            disabled={true}
-                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-2 rounded text-sm font-medium"
+                            disabled={!gconPiece?.pelementor_edits}
+                            className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                              !gconPiece?.pelementor_edits
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-green-600 text-white hover:bg-green-700'
+                            }`}
                           >
                             🔍 Expand
                           </button>
@@ -346,10 +394,15 @@ export default function WaterTable({ gconPieceId, isTopAreaOpen, handleAccordion
                     {/* F22 Section */}
                     <div className="flex flex-col items-end gap-3">
                       <button
-                        disabled={true}
-                        className="bg-gray-300 text-gray-500 cursor-not-allowed px-4 py-2 rounded font-medium"
+                        onClick={handleRunF22}
+                        disabled={isRunningF22}
+                        className={`px-4 py-2 rounded font-medium transition-colors ${
+                          isRunningF22
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-purple-600 text-white hover:bg-purple-700'
+                        }`}
                       >
-                        Run f22 on this gcon_pieces row
+                        {isRunningF22 ? 'Running f22...' : 'Run f22 on this gcon_pieces row'}
                       </button>
                       
                       {/* F22 Report Text Box */}
@@ -357,25 +410,52 @@ export default function WaterTable({ gconPieceId, isTopAreaOpen, handleAccordion
                         <div className="flex items-center gap-2">
                           <label className="text-sm font-medium text-gray-700">F22 Function Report:</label>
                           <button
-                            disabled={true}
-                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-1 rounded text-sm font-medium"
+                            onClick={handleCopyF22Report}
+                            disabled={!f22Report}
+                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                              !f22Report
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
                           >
                             📋 Copy Report
                           </button>
                           <button
-                            disabled={true}
-                            className="bg-gray-200 text-gray-400 cursor-not-allowed px-3 py-1 rounded text-sm font-medium"
+                            onClick={() => {
+                              const detailedReport = {
+                                timestamp: new Date().toISOString(),
+                                pageType: 'torya',
+                                gconPieceId: gconPieceId,
+                                f22Report: f22Report,
+                                userAgent: navigator.userAgent,
+                                url: window.location.href,
+                                instructions: 'Check browser console (F12) for 🔍 DEBUG messages about mud_title and mud_content'
+                              };
+                              navigator.clipboard.writeText(JSON.stringify(detailedReport, null, 2));
+                              alert('Complete diagnostic report copied to clipboard!');
+                            }}
+                            disabled={!f22Report}
+                            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                              !f22Report
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-green-600 text-white hover:bg-green-700'
+                            }`}
                           >
                             🔍 Full Diagnostic
                           </button>
                         </div>
                         <textarea
-                          value=""
+                          value={f22Report || ''}
                           readOnly
                           placeholder="F22 function reports will appear here after execution...\n\nLook for:\n- TontoNormalizationProcess1 results\n- mud_title and mud_content processing\n- Database verification results\n- Any error messages\n\nCheck browser console (F12) for detailed debug logs."
                           className="resize-none border border-gray-300 rounded p-3 text-sm font-mono bg-white"
                           style={{ width: '500px', height: '200px' }}
                         />
+                        {f22Report && (
+                          <div className="text-xs text-gray-600 mt-1">
+                            💡 Tip: Check browser console (F12) for detailed 🔍 DEBUG messages about mud_title and mud_content processing
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

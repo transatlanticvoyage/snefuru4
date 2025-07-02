@@ -18,6 +18,8 @@ export default function ToryaPage() {
   const [isTopAreaOpen, setIsTopAreaOpen] = useState<boolean>(true);
   const [isPopulatingUnits, setIsPopulatingUnits] = useState(false);
   const [populateMessage, setPopulateMessage] = useState<string | null>(null);
+  const [isRunningF22, setIsRunningF22] = useState(false);
+  const [f22Report, setF22Report] = useState<string>('');
 
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
@@ -69,7 +71,7 @@ export default function ToryaPage() {
         // Fetch the gcon_piece
         const { data: gconData, error: gconError } = await supabase
           .from('gcon_pieces')
-          .select('id, asn_sitespren_base, mud_title')
+          .select('id, asn_sitespren_base, mud_title, pelementor_cached, pelementor_edits')
           .eq('id', gconPieceId)
           .eq('fk_users_id', userData.id)
           .single();
@@ -151,6 +153,89 @@ export default function ToryaPage() {
     }
   };
 
+  // Handle f22 function
+  const handleRunF22 = async () => {
+    if (!gconPieceId) {
+      setF22Report('Error: No gcon_piece_id available');
+      return;
+    }
+
+    setIsRunningF22(true);
+    setF22Report('Starting F22 processing...');
+
+    try {
+      const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gcon_piece_id: gconPieceId
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setF22Report(result.message || 'F22 function completed successfully');
+        
+        // Refresh the gcon_piece data to get updated values
+        if (user?.id) {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('id')
+            .eq('auth_id', user.id)
+            .single();
+
+          if (userData) {
+            const { data: refreshedData } = await supabase
+              .from('gcon_pieces')
+              .select('id, asn_sitespren_base, mud_title, pelementor_cached, pelementor_edits')
+              .eq('id', gconPieceId)
+              .eq('fk_users_id', userData.id)
+              .single();
+
+            if (refreshedData) {
+              setGconPiece(refreshedData);
+            }
+          }
+        }
+      } else {
+        setF22Report(`Error: ${result.error || 'F22 function failed'}`);
+      }
+    } catch (error) {
+      console.error('Error running F22:', error);
+      setF22Report('Error: Failed to run F22 function');
+    } finally {
+      setIsRunningF22(false);
+    }
+  };
+
+  // Copy functions
+  const handleCopyPelementorCached = () => {
+    if (gconPiece?.pelementor_cached) {
+      const content = typeof gconPiece.pelementor_cached === 'string' 
+        ? gconPiece.pelementor_cached 
+        : JSON.stringify(gconPiece.pelementor_cached, null, 2);
+      navigator.clipboard.writeText(content);
+    }
+  };
+
+  const handleCopyPelementorEdits = () => {
+    if (gconPiece?.pelementor_edits) {
+      const content = typeof gconPiece.pelementor_edits === 'string' 
+        ? gconPiece.pelementor_edits 
+        : JSON.stringify(gconPiece.pelementor_edits, null, 2);
+      navigator.clipboard.writeText(content);
+    }
+  };
+
+  const handleCopyF22Report = () => {
+    if (f22Report) {
+      navigator.clipboard.writeText(f22Report);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -227,6 +312,13 @@ export default function ToryaPage() {
           gconPieceId={gconPieceId} 
           isTopAreaOpen={isTopAreaOpen}
           handleAccordionToggle={handleAccordionToggle}
+          gconPiece={gconPiece}
+          isRunningF22={isRunningF22}
+          f22Report={f22Report}
+          handleRunF22={handleRunF22}
+          handleCopyPelementorCached={handleCopyPelementorCached}
+          handleCopyPelementorEdits={handleCopyPelementorEdits}
+          handleCopyF22Report={handleCopyF22Report}
         />
       </div>
     </div>
