@@ -253,7 +253,7 @@ export default function BaklijarPage() {
             >
               <option value="all">All Folders</option>
               {uniqueFolders.map(folder => (
-                <option key={folder} value={folder}>{folder}</option>
+                <option key={folder} value={folder || ''}>{folder}</option>
               ))}
             </select>
           </div>
