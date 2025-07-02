@@ -634,7 +634,7 @@ export default function WaterTable({
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg" style={{ height: '440px', overflowY: 'auto' }}>
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 sticky top-0 z-20">
             {/* Horizomi Row - Column Numbering */}
             <tr>
               {/* Horizomi header column numbering */}
