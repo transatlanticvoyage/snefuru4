@@ -18,6 +18,8 @@ interface NemtorUnit {
   summary_text: string | null;
   full_text_cached: string | null;
   full_text_edits: string | null;
+  has_img_slot: boolean | null;
+  img_slot_qty: number | null;
   image_type: string | null;
   image_id: string | null;
   image_url: string | null;
@@ -42,12 +44,12 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   'option1': {
     name: 'col temp all',
     range: 'all fields',
-    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
+    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
   },
   'option2': {
     name: 'col temp core',
     range: 'core fields',
-    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'image_type', 'image_url', 'summary_text']
+    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'image_type', 'image_url', 'summary_text']
   },
   'option3': {
     name: 'col temp hierarchy',
@@ -62,7 +64,7 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   'option5': {
     name: 'col temp summary',
     range: 'summary',
-    columns: ['unit_marker', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'image_type', 'image_url', 'summary_text', 'unit_label']
+    columns: ['unit_marker', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'image_type', 'image_url', 'summary_text', 'unit_label']
   }
 };
 

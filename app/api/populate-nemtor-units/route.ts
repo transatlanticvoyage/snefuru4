@@ -24,6 +24,8 @@ interface NemtorUnit {
   full_text_cached: string | null;
   full_text_edits: string | null;
   unit_label: string | null;
+  has_img_slot: boolean | null;
+  img_slot_qty: number | null;
   image_type: string | null;
   image_id: string | null;
   image_url: string | null;
