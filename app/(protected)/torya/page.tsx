@@ -16,6 +16,8 @@ export default function ToryaPage() {
   const [gconPieceId, setGconPieceId] = useState<string | null>(null);
   const [gconPiece, setGconPiece] = useState<any>(null);
   const [isTopAreaOpen, setIsTopAreaOpen] = useState<boolean>(true);
+  const [isPopulatingUnits, setIsPopulatingUnits] = useState(false);
+  const [populateMessage, setPopulateMessage] = useState<string | null>(null);
 
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
@@ -111,6 +113,44 @@ export default function ToryaPage() {
     window.history.replaceState({}, '', url.toString());
   };
 
+  // Handle populate nemtor_units
+  const handlePopulateNemtorUnits = async () => {
+    if (!gconPieceId) {
+      setPopulateMessage('Error: No gcon_piece_id available');
+      return;
+    }
+
+    setIsPopulatingUnits(true);
+    setPopulateMessage(null);
+
+    try {
+      const response = await fetch('/api/populate-nemtor-units', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gcon_piece_id: gconPieceId
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setPopulateMessage(`✅ ${result.message}`);
+      } else {
+        setPopulateMessage(`❌ Error: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error populating nemtor_units:', error);
+      setPopulateMessage('❌ Error: Failed to populate nemtor_units');
+    } finally {
+      setIsPopulatingUnits(false);
+      // Clear message after 5 seconds
+      setTimeout(() => setPopulateMessage(null), 5000);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -148,15 +188,28 @@ export default function ToryaPage() {
             ← Back to Dashboard
           </Link>
           <button
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition-colors"
-            onClick={() => {
-              // Backend functionality to be implemented later
-              console.log('Populate nemtor_units clicked');
-            }}
+            className={`px-4 py-2 font-medium rounded-md transition-colors ${
+              isPopulatingUnits
+                ? 'bg-gray-400 cursor-not-allowed text-white'
+                : 'bg-purple-600 hover:bg-purple-700 text-white'
+            }`}
+            onClick={handlePopulateNemtorUnits}
+            disabled={isPopulatingUnits || !gconPieceId}
           >
-            populate nemtor_units
+            {isPopulatingUnits ? 'Populating...' : 'populate nemtor_units'}
           </button>
         </div>
+        
+        {/* Populate feedback message */}
+        {populateMessage && (
+          <div className={`mb-4 p-3 rounded-md ${
+            populateMessage.startsWith('✅') 
+              ? 'bg-green-100 border border-green-400 text-green-700'
+              : 'bg-red-100 border border-red-400 text-red-700'
+          }`}>
+            {populateMessage}
+          </div>
+        )}
         <h1 className="text-2xl font-bold mb-6">Torya</h1>
         {gconPieceId && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
