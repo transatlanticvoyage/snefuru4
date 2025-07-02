@@ -178,7 +178,10 @@ export default function BaklidPage() {
   };
 
   const renderPreview = () => {
-    const combinedStyles = `
+    // Create the CSS link reference to our API endpoint
+    const cssLinkTag = bakliId ? `<link rel="stylesheet" type="text/css" href="/api/bakli-css/${bakliId}">` : '';
+    
+    const resetStyles = `
       <style>
         /* Reset styles for iframe content */
         * {
@@ -186,9 +189,6 @@ export default function BaklidPage() {
           padding: 0;
           box-sizing: border-box;
         }
-        
-        /* User's CSS */
-        ${cssContent}
       </style>
     `;
 
@@ -199,7 +199,8 @@ export default function BaklidPage() {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Preview</title>
-        ${combinedStyles}
+        ${resetStyles}
+        ${cssLinkTag}
       </head>
       <body>
         ${htmlContent}
