@@ -1889,8 +1889,7 @@ mud_deplines.content_raw`;
                           }`}
                           style={{ 
                             fontSize: '17px',
-                            lineHeight: '140%',
-                            resize: 'none' 
+                            lineHeight: '140%'
                           }}
                           rows={Math.max(1, resolvedContent.split('\n').length)}
                         />
