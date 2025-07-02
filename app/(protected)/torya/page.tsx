@@ -281,7 +281,7 @@ export default function ToryaPage() {
             onClick={handlePopulateNemtorUnits}
             disabled={isPopulatingUnits || !gconPieceId}
           >
-            {isPopulatingUnits ? 'Populating...' : 'populate nemtor_units'}
+            {isPopulatingUnits ? 'Populating...' : 'handlePopulateNemtorUnit'}
           </button>
         </div>
         
