@@ -892,6 +892,26 @@ Recommendation: Check logs and retry operation`;
                   {isSavingBatch ? 'Saving...' : 'save'}
                 </button>
               </div>
+
+              {/* Batch Link - Show if batch is assigned */}
+              {gconPiece?.mudfk_image_plan_batch_id && (
+                <div className="mt-3">
+                  <a
+                    href={`/bin34/tebnar2?batchid=${gconPiece.mudfk_image_plan_batch_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block px-4 py-2 rounded text-center"
+                    style={{
+                      fontSize: '16px',
+                      color: '#374151', // dark gray
+                      backgroundColor: '#faf8f1', // very light beige
+                      textDecoration: 'none'
+                    }}
+                  >
+                    open batch in /tebnar2
+                  </a>
+                </div>
+              )}
             </div>
             
             {/* Functions Button */}
