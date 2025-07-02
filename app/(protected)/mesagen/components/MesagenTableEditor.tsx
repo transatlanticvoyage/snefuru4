@@ -1328,8 +1328,11 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300 bg-purple-50 p-2">
                 <div className="relative group inline-block">
                   <span className="font-bold cursor-help">•featured-image</span>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100] w-max">
-                    <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-wrap" style={{ maxWidth: '400px' }}>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block z-[100] w-max">
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1">
+                      <div className="border-solid border-b-gray-800 border-b-4 border-x-transparent border-x-4 border-t-0"></div>
+                    </div>
+                    <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-wrap relative" style={{ maxWidth: '400px' }}>
                       <div className="text-left">
 ———————————————————————
 gcon_pieces.mudfk_image_plan_batch_id
@@ -1344,9 +1347,27 @@ TAKE images_plans WHERE images_plans.submission_order = 1 OR is lowest of all ia
 FOR THAT row in images_plans, use field fk_image1_id
 ———————————————————————
                       </div>
-                    </div>
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(`———————————————————————
+gcon_pieces.mudfk_image_plan_batch_id
+
+images_plans_batches.
+
+FIND ALL rows in
+images_plans WHERE images_plans.rel_images_plans_batches_id matches images_plans_batches.id
+———————————————————————
+TAKE images_plans WHERE images_plans.submission_order = 1 OR is lowest of all iamges_plans
+———————————————————————
+FOR THAT row in images_plans, use field fk_image1_id
+———————————————————————`);
+                        }}
+                        className="absolute top-1 right-1 bg-gray-600 hover:bg-gray-500 text-white text-xs px-2 py-1 rounded"
+                        title="Copy text"
+                      >
+                        Copy
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1731,7 +1752,24 @@ mud_deplines.content_raw`;
                   <td className="border border-gray-300 p-2 text-center text-gray-700 text-sm">
                     {(() => {
                       const mudDepline = getMudDeplineForBlock(index);
-                      return mudDepline ? mudDepline.fk_gcon_piece_id : '-';
+                      if (!mudDepline || !mudDepline.fk_gcon_piece_id) return '-';
+                      
+                      const fullValue = mudDepline.fk_gcon_piece_id;
+                      const displayValue = fullValue.substring(0, 3) + '..';
+                      
+                      const handleCopy = () => {
+                        navigator.clipboard.writeText(fullValue);
+                      };
+                      
+                      return (
+                        <span 
+                          onClick={handleCopy}
+                          className="cursor-pointer hover:bg-gray-100 px-1 rounded"
+                          title={`Click to copy: ${fullValue}`}
+                        >
+                          {displayValue}
+                        </span>
+                      );
                     })()}
                   </td>
                 
