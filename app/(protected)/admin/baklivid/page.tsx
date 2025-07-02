@@ -25,6 +25,7 @@ interface BakliMockup {
 
 type TabType = 'html' | 'css' | 'preview';
 type ViewMode = 'view1' | 'view2';
+type EditorTheme = 'light' | 'dark';
 
 export default function BaklidPage() {
   const { user } = useAuth();
@@ -37,6 +38,7 @@ export default function BaklidPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('html');
   const [viewMode, setViewMode] = useState<ViewMode>('view1');
+  const [editorTheme, setEditorTheme] = useState<EditorTheme>('light');
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
@@ -215,6 +217,44 @@ export default function BaklidPage() {
     );
   };
 
+  // Get editor styling based on theme
+  const getEditorClasses = () => {
+    const baseClasses = "flex-1 w-full p-4 border rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent";
+    
+    if (editorTheme === 'dark') {
+      return `${baseClasses} bg-gray-900 text-gray-100 border-gray-600`;
+    }
+    return `${baseClasses} bg-white text-gray-900 border-gray-300`;
+  };
+
+  // Simple syntax highlighting for HTML content
+  const highlightHTML = (content: string) => {
+    if (editorTheme === 'light') {
+      return content
+        .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*)(.*?)(&gt;)/g, '<span style="color: #0066cc;">$1$2</span><span style="color: #cc6600;">$3</span><span style="color: #0066cc;">$4</span>')
+        .replace(/(\w+)(=)("[^"]*")/g, '<span style="color: #cc0066;">$1</span><span style="color: #666;">$2</span><span style="color: #009900;">$3</span>');
+    } else {
+      return content
+        .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*)(.*?)(&gt;)/g, '<span style="color: #7dd3fc;">$1$2</span><span style="color: #fbbf24;">$3</span><span style="color: #7dd3fc;">$4</span>')
+        .replace(/(\w+)(=)("[^"]*")/g, '<span style="color: #f472b6;">$1</span><span style="color: #9ca3af;">$2</span><span style="color: #34d399;">$3</span>');
+    }
+  };
+
+  // Simple syntax highlighting for CSS content
+  const highlightCSS = (content: string) => {
+    if (editorTheme === 'light') {
+      return content
+        .replace(/(\/\*.*?\*\/)/g, '<span style="color: #999; font-style: italic;">$1</span>')
+        .replace(/([a-zA-Z-]+)(\s*:\s*)([^;]+)(;)/g, '<span style="color: #0066cc;">$1</span><span style="color: #666;">$2</span><span style="color: #009900;">$3</span><span style="color: #666;">$4</span>')
+        .replace(/(\{|\})/g, '<span style="color: #cc6600;">$1</span>');
+    } else {
+      return content
+        .replace(/(\/\*.*?\*\/)/g, '<span style="color: #6b7280; font-style: italic;">$1</span>')
+        .replace(/([a-zA-Z-]+)(\s*:\s*)([^;]+)(;)/g, '<span style="color: #7dd3fc;">$1</span><span style="color: #9ca3af;">$2</span><span style="color: #34d399;">$3</span><span style="color: #9ca3af;">$4</span>')
+        .replace(/(\{|\})/g, '<span style="color: #fbbf24;">$1</span>');
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -318,9 +358,10 @@ export default function BaklidPage() {
         </div>
       </div>
 
-      {/* View Mode Toggle */}
+      {/* View Mode & Theme Toggle */}
       <div className="bg-gray-100 border-b border-gray-200 p-4 flex-shrink-0">
-        <div className="max-w-7xl mx-auto flex items-center justify-center">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-8">
+          {/* View Mode Toggle */}
           <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
             <button
               onClick={() => setViewMode('view1')}
@@ -341,6 +382,30 @@ export default function BaklidPage() {
               }`}
             >
               View 2
+            </button>
+          </div>
+
+          {/* Editor Theme Toggle */}
+          <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
+            <button
+              onClick={() => setEditorTheme('light')}
+              className={`px-6 py-2 text-sm font-medium transition-colors ${
+                editorTheme === 'light'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Light Mode
+            </button>
+            <button
+              onClick={() => setEditorTheme('dark')}
+              className={`px-6 py-2 text-sm font-medium transition-colors border-l border-gray-300 ${
+                editorTheme === 'dark'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Dark Mode
             </button>
           </div>
         </div>
@@ -390,8 +455,15 @@ export default function BaklidPage() {
                 <textarea
                   value={htmlContent}
                   onChange={(e) => setHtmlContent(e.target.value)}
-                  className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  style={{ minHeight: '700px' }}
+                  className={getEditorClasses()}
+                  style={{ 
+                    minHeight: '700px',
+                    ...(editorTheme === 'dark' && {
+                      backgroundColor: '#111827',
+                      color: '#f3f4f6',
+                      borderColor: '#374151'
+                    })
+                  }}
                   placeholder="Enter your HTML content here..."
                   spellCheck={false}
                 />
@@ -409,8 +481,15 @@ export default function BaklidPage() {
                 <textarea
                   value={cssContent}
                   onChange={(e) => setCssContent(e.target.value)}
-                  className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  style={{ minHeight: '700px' }}
+                  className={getEditorClasses()}
+                  style={{ 
+                    minHeight: '700px',
+                    ...(editorTheme === 'dark' && {
+                      backgroundColor: '#111827',
+                      color: '#f3f4f6',
+                      borderColor: '#374151'
+                    })
+                  }}
                   placeholder="Enter your CSS styles here..."
                   spellCheck={false}
                 />
@@ -503,8 +582,15 @@ export default function BaklidPage() {
                     <textarea
                       value={htmlContent}
                       onChange={(e) => setHtmlContent(e.target.value)}
-                      className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      style={{ minHeight: '700px' }}
+                      className={getEditorClasses()}
+                      style={{ 
+                        minHeight: '700px',
+                        ...(editorTheme === 'dark' && {
+                          backgroundColor: '#111827',
+                          color: '#f3f4f6',
+                          borderColor: '#374151'
+                        })
+                      }}
                       placeholder="Enter your HTML content here..."
                       spellCheck={false}
                     />
@@ -522,8 +608,15 @@ export default function BaklidPage() {
                     <textarea
                       value={cssContent}
                       onChange={(e) => setCssContent(e.target.value)}
-                      className="flex-1 w-full p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      style={{ minHeight: '700px' }}
+                      className={getEditorClasses()}
+                      style={{ 
+                        minHeight: '700px',
+                        ...(editorTheme === 'dark' && {
+                          backgroundColor: '#111827',
+                          color: '#f3f4f6',
+                          borderColor: '#374151'
+                        })
+                      }}
                       placeholder="Enter your CSS styles here..."
                       spellCheck={false}
                     />
