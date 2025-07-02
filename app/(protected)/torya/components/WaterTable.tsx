@@ -812,7 +812,7 @@ export default function WaterTable({
                   <th
                     key={col}
                     onClick={() => handleSort(col as keyof NemtorUnit)}
-                    className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 sticky bg-gray-50 z-10 ${
+                    className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 sticky bg-gray-50 z-10 border border-gray-200 ${
                       isLastStickyCol ? 'border-r-4 border-black' : ''
                     }`}
                     style={{ left: `${20 + 60 + (index - 2) * 150}px` }} // 20px (prisomi) + 60px (select) + column positions
@@ -833,7 +833,7 @@ export default function WaterTable({
                 <th
                   key={col}
                   onClick={() => handleSort(col)}
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
                 >
                   <div className="flex items-center gap-1">
                     <span>{col}</span>
@@ -942,7 +942,7 @@ export default function WaterTable({
                   return (
                     <td 
                       key={col} 
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white ${
+                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white border border-gray-200 ${
                         isLastStickyCol ? 'border-r-4 border-black' : ''
                       }`}
                       style={{ left: `${20 + 60 + (index - 2) * 150}px` }} // 20px (prisomi) + 60px (select) + column positions
@@ -971,7 +971,7 @@ export default function WaterTable({
                 })}
                 {/* Non-sticky visible columns */}
                 {nonStickyVisibleColumns.map((col) => (
-                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                     {(() => {
                       const value = row[col as keyof NemtorUnit];
                       if (col.includes('_json') && value) {
