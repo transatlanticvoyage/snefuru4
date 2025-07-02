@@ -960,6 +960,19 @@ export default function WaterTable({
                       {(() => {
                         const value = row[col as keyof NemtorUnit];
                         
+                        // Special handling for full_text_edits - use textarea for code editing
+                        if (col === 'full_text_edits') {
+                          return (
+                            <textarea
+                              className="kz_torya_fulltextedits_box1 w-full h-20 p-2 text-xs font-mono border border-gray-300 rounded resize-none"
+                              value={value?.toString() || ''}
+                              onChange={(e) => {
+                                // Handle text change here if needed
+                              }}
+                            />
+                          );
+                        }
+                        
                         // Special handling for unit_id - truncate and make clickable
                         if (col === 'unit_id' && value) {
                           const fullValue = value.toString();
@@ -1008,6 +1021,19 @@ export default function WaterTable({
                   >
                     {(() => {
                       const value = row[col as keyof NemtorUnit];
+                      
+                      // Special handling for full_text_edits - use textarea for code editing
+                      if (col === 'full_text_edits') {
+                        return (
+                          <textarea
+                            className="kz_torya_fulltextedits_box1 w-full h-20 p-2 text-xs font-mono border border-gray-300 rounded resize-none"
+                            value={value?.toString() || ''}
+                            onChange={(e) => {
+                              // Handle text change here if needed
+                            }}
+                          />
+                        );
+                      }
                       
                       // Special handling for unit_id - truncate and make clickable
                       if (col === 'unit_id' && value) {
