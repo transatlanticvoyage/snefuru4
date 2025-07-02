@@ -33,12 +33,12 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   'option1': {
     name: 'col temp all',
     range: 'all fields',
-    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'full_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
+    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
   },
   'option2': {
     name: 'col temp core',
     range: 'core fields',
-    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'summary_text', 'full_text']
+    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text', 'summary_text']
   },
   'option3': {
     name: 'col temp hierarchy',
@@ -53,7 +53,7 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   'option5': {
     name: 'col temp summary',
     range: 'summary',
-    columns: ['unit_marker', 'el_type', 'widget_type', 'summary_text', 'full_text', 'unit_label']
+    columns: ['unit_marker', 'el_type', 'widget_type', 'full_text', 'summary_text', 'unit_label']
   }
 };
 
@@ -631,7 +631,7 @@ export default function WaterTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-lg" style={{ height: '800px', overflowY: 'auto' }}>
+      <div className="overflow-x-auto border border-gray-200 rounded-lg" style={{ height: '440px', overflowY: 'auto' }}>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             {/* Horizomi Row - Column Numbering */}
