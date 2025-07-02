@@ -242,7 +242,7 @@ export default function WaterTable({
   // Get unique unit_marker values for dropdown
   const uniqueUnitMarkers = useMemo(() => {
     const markers = Array.from(new Set(data.map(row => row.unit_marker))).sort();
-    return ['all', ...markers];
+    return ['all', 'widget_core + img_slot containing units', ...markers];
   }, [data]);
 
   // Filter data based on search term and unit_marker
@@ -251,7 +251,14 @@ export default function WaterTable({
     
     // Filter by unit_marker first
     if (unitMarkerFilter !== 'all') {
-      filtered = filtered.filter(row => row.unit_marker === unitMarkerFilter);
+      if (unitMarkerFilter === 'widget_core + img_slot containing units') {
+        // Special filter: widget_core units OR any unit with has_img_slot = true
+        filtered = filtered.filter(row => 
+          row.unit_marker === 'widget_core' || row.has_img_slot === true
+        );
+      } else {
+        filtered = filtered.filter(row => row.unit_marker === unitMarkerFilter);
+      }
     }
     
     // Then filter by search term
@@ -627,7 +634,9 @@ export default function WaterTable({
             >
               {uniqueUnitMarkers.map((marker) => (
                 <option key={marker} value={marker}>
-                  {marker === 'all' ? 'All' : marker}
+                  {marker === 'all' ? 'All' : 
+                   marker === 'widget_core + img_slot containing units' ? 'widget_core + img_slot containing units' : 
+                   marker}
                 </option>
               ))}
             </select>
