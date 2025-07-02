@@ -227,6 +227,12 @@ export default function WaterTable({
   const stickyColumns = allColumns.slice(0, stickyColumnCount + 2); // +2 to include prisomi and select columns
   const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
 
+  // Get unique unit_marker values for dropdown
+  const uniqueUnitMarkers = useMemo(() => {
+    const markers = Array.from(new Set(data.map(row => row.unit_marker))).sort();
+    return ['all', ...markers];
+  }, [data]);
+
   // Filter data based on search term and unit_marker
   const filteredData = useMemo(() => {
     let filtered = data;
@@ -585,14 +591,35 @@ export default function WaterTable({
 
       {/* Search and Controls */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="w-full sm:w-auto">
-          <input
-            type="text"
-            placeholder="Search all columns..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+        <div className="flex items-center gap-4">
+          <div className="w-full sm:w-auto">
+            <input
+              type="text"
+              placeholder="Search all columns..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <label className="font-bold text-sm whitespace-nowrap">unit_marker</label>
+            <select
+              value={unitMarkerFilter}
+              onChange={(e) => handleUnitMarkerFilterChange(e.target.value)}
+              className={`px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                unitMarkerFilter !== 'all' 
+                  ? 'bg-blue-900 text-white' 
+                  : 'bg-white text-gray-900'
+              }`}
+            >
+              {uniqueUnitMarkers.map((marker) => (
+                <option key={marker} value={marker}>
+                  {marker === 'all' ? 'All' : marker}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         
         <div className="flex items-center gap-4">
