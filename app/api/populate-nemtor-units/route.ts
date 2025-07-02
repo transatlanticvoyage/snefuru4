@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         fk_gcon_piece_id: gcon_piece_id,
         el_id: element.id,
         el_type: element.elType,
-        widget_type: element.widgetType || null,
+        widget_type: element.widgetType ?? null,
         parent_el_id: parentId,
         position_order: positionOrder,
         depth_level: depthLevel,
