@@ -275,7 +275,7 @@ export default function WaterTable({
       setSelectedRows(new Set());
     } else {
       // Select all visible rows
-      const allRowIds = new Set(paginatedData.map(row => row.id));
+      const allRowIds = new Set(paginatedData.map(row => row.unit_id));
       setSelectedRows(allRowIds);
     }
   };
