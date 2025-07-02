@@ -944,8 +944,16 @@ export default function WaterTable({
                       {(() => {
                         const value = row[col as keyof NemtorUnit];
                         if (col.includes('_json') && value) {
+                          const isRawJson = col === 'raw_json';
                           return (
-                            <div className="truncate max-w-xs" title={JSON.stringify(value, null, 2)}>
+                            <div 
+                              className={`truncate max-w-xs ${isRawJson ? 'cursor-pointer hover:bg-blue-50' : ''}`}
+                              title={JSON.stringify(value, null, 2)}
+                              onClick={isRawJson ? (e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(JSON.stringify(value, null, 2));
+                              } : undefined}
+                            >
                               {typeof value === 'object' ? JSON.stringify(value).substring(0, 50) + '...' : value}
                             </div>
                           );
@@ -961,8 +969,16 @@ export default function WaterTable({
                     {(() => {
                       const value = row[col as keyof NemtorUnit];
                       if (col.includes('_json') && value) {
+                        const isRawJson = col === 'raw_json';
                         return (
-                          <div className="truncate max-w-xs" title={JSON.stringify(value, null, 2)}>
+                          <div 
+                            className={`truncate max-w-xs ${isRawJson ? 'cursor-pointer hover:bg-blue-50' : ''}`}
+                            title={JSON.stringify(value, null, 2)}
+                            onClick={isRawJson ? (e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(JSON.stringify(value, null, 2));
+                            } : undefined}
+                          >
                             {typeof value === 'object' ? JSON.stringify(value).substring(0, 50) + '...' : value}
                           </div>
                         );
