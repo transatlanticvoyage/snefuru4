@@ -943,12 +943,31 @@ export default function WaterTable({
                     <td 
                       key={col} 
                       className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white border border-gray-200 ${
-                        isLastStickyCol ? 'border-r-4 border-black' : ''
-                      }`}
+                        col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
+                      } ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
                       style={{ left: `${20 + 60 + (index - 2) * 150}px` }} // 20px (prisomi) + 60px (select) + column positions
                     >
                       {(() => {
                         const value = row[col as keyof NemtorUnit];
+                        
+                        // Special handling for unit_id - truncate and make clickable
+                        if (col === 'unit_id' && value) {
+                          const fullValue = value.toString();
+                          const truncatedValue = fullValue.substring(0, 2) + '.';
+                          return (
+                            <div 
+                              className="cursor-pointer hover:bg-blue-50"
+                              title={fullValue}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(fullValue);
+                              }}
+                            >
+                              {truncatedValue}
+                            </div>
+                          );
+                        }
+                        
                         if (col.includes('_json') && value) {
                           const isRawJson = col === 'raw_json';
                           return (
@@ -971,9 +990,33 @@ export default function WaterTable({
                 })}
                 {/* Non-sticky visible columns */}
                 {nonStickyVisibleColumns.map((col) => (
-                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                  <td 
+                    key={col} 
+                    className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
+                      col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
+                    }`}
+                  >
                     {(() => {
                       const value = row[col as keyof NemtorUnit];
+                      
+                      // Special handling for unit_id - truncate and make clickable
+                      if (col === 'unit_id' && value) {
+                        const fullValue = value.toString();
+                        const truncatedValue = fullValue.substring(0, 2) + '.';
+                        return (
+                          <div 
+                            className="cursor-pointer hover:bg-blue-50"
+                            title={fullValue}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(fullValue);
+                            }}
+                          >
+                            {truncatedValue}
+                          </div>
+                        );
+                      }
+                      
                       if (col.includes('_json') && value) {
                         const isRawJson = col === 'raw_json';
                         return (
