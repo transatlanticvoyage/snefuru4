@@ -2012,7 +2012,13 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               title="Sync site using Plugin API"
             >
               <span className="info-icon group">ℹ</span>
-              Plugin API
+              <div className="text-center leading-tight">
+                chep11<br />
+                articles<br />
+                wp → nwpi<br />
+                xplugin<br />
+                Plugin API
+              </div>
             </button>
             
             <button
@@ -2022,7 +2028,13 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               title="Sync site using REST API"
             >
               <span className="info-icon group">ℹ</span>
-              REST API
+              <div className="text-center leading-tight">
+                chep21<br />
+                articles<br />
+                wp → nwpi<br />
+                xrest<br />
+                REST API
+              </div>
             </button>
             
             <button
@@ -2032,7 +2044,10 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               title="Test plugin connection"
             >
               <span className="info-icon group">ℹ</span>
-              Test Plugin
+              <div className="text-center leading-tight">
+                chep31<br />
+                Test Plugin
+              </div>
             </button>
             
             <button
@@ -2042,7 +2057,10 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               title="Check plugin version"
             >
               <span className="info-icon group">ℹ</span>
-              Check Version
+              <div className="text-center leading-tight">
+                chep41<br />
+                Check Version
+              </div>
             </button>
             
             <button
@@ -2052,7 +2070,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               title="Update plugin"
             >
               <span className="info-icon group">ℹ</span>
-              Update Plugin
+              <div className="text-center leading-tight">
+                chep51<br />
+                xrest<br />
+                Update Plugin
+              </div>
             </button>
             
             <button
@@ -2062,7 +2084,11 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               title="Push Barkro update"
             >
               <span className="info-icon group">ℹ</span>
-              Barkro Push
+              <div className="text-center leading-tight">
+                chep61<br />
+                xplugin<br />
+                Barkro Push
+              </div>
             </button>
           </div>
           
