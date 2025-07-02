@@ -1242,7 +1242,32 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
               <th className="border border-gray-300 bg-purple-50 p-2"></th>
               <th className="border border-gray-300 bg-purple-50 p-2"></th>
               <th className="border border-gray-300 bg-purple-50 p-2"></th>
-              <th className="border border-gray-300 bg-purple-50 p-2"></th>
+              <th className="border border-gray-300 bg-purple-50 p-2">
+                <div className="relative group inline-block">
+                  <span className="font-bold cursor-help">•featured-image</span>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100] w-max">
+                    <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-wrap" style={{ maxWidth: '400px' }}>
+                      <div className="text-left">
+———————————————————————
+gcon_pieces.mudfk_image_plan_batch_id
+
+images_plans_batches.
+
+FIND ALL rows in
+images_plans WHERE images_plans.rel_images_plans_batches_id matches images_plans_batches.id
+———————————————————————
+TAKE images_plans WHERE images_plans.submission_order = 1 OR is lowest of all iamges_plans
+———————————————————————
+FOR THAT row in images_plans, use field fk_image1_id
+———————————————————————
+                      </div>
+                    </div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                      <div className="border-solid border-t-gray-800 border-t-4 border-x-transparent border-x-4 border-b-0"></div>
+                    </div>
+                  </div>
+                </div>
+              </th>
               <th className="border border-gray-300 bg-purple-50 p-2"></th>
               <th className="border border-gray-300 bg-purple-50 p-2"></th>
             </tr>
