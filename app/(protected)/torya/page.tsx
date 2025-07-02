@@ -143,10 +143,19 @@ export default function ToryaPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="p-4">
-        <div className="mb-4">
+        <div className="mb-4 flex items-center gap-4">
           <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
             ← Back to Dashboard
           </Link>
+          <button
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition-colors"
+            onClick={() => {
+              // Backend functionality to be implemented later
+              console.log('Populate nemtor_units clicked');
+            }}
+          >
+            populate nemtor_units
+          </button>
         </div>
         <h1 className="text-2xl font-bold mb-6">Torya</h1>
         {gconPieceId && (
