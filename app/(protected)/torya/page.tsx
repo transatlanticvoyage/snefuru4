@@ -348,6 +348,87 @@ export default function ToryaPage() {
     }
   };
 
+  // Helper function to recursively find and update Elementor element by ID
+  const updateElementorImageById = (elementorData: any, targetElId: string, imageUrl: string, imageId: string): boolean => {
+    let updated = false;
+    
+    // Recursive function to traverse the Elementor structure
+    const traverseElements = (elements: any[]): boolean => {
+      if (!Array.isArray(elements)) return false;
+      
+      for (const element of elements) {
+        // Check if this is the target element
+        if (element.id === targetElId) {
+          console.log(`🎯 Found target element ${targetElId}, checking for image settings...`);
+          // Update image data in this element's settings
+          if (element.settings) {
+            // Handle different image property patterns
+            if (element.settings.image) {
+              if (typeof element.settings.image === 'object') {
+                element.settings.image.url = imageUrl;
+                element.settings.image.id = parseInt(imageId);
+              } else {
+                element.settings.image = {
+                  url: imageUrl,
+                  id: parseInt(imageId)
+                };
+              }
+              updated = true;
+            }
+            
+            // Handle background image
+            if (element.settings.background_image) {
+              if (typeof element.settings.background_image === 'object') {
+                element.settings.background_image.url = imageUrl;
+                element.settings.background_image.id = parseInt(imageId);
+              } else {
+                element.settings.background_image = {
+                  url: imageUrl,
+                  id: parseInt(imageId)
+                };
+              }
+              updated = true;
+            }
+            
+            // Handle other common image properties
+            ['background_background', '_background_background'].forEach(prop => {
+              if (element.settings[prop] === 'classic' && element.settings[prop + '_image']) {
+                if (typeof element.settings[prop + '_image'] === 'object') {
+                  element.settings[prop + '_image'].url = imageUrl;
+                  element.settings[prop + '_image'].id = parseInt(imageId);
+                } else {
+                  element.settings[prop + '_image'] = {
+                    url: imageUrl,
+                    id: parseInt(imageId)
+                  };
+                }
+                updated = true;
+              }
+            });
+          }
+          
+          return true; // Found and processed the target element
+        }
+        
+        // Recursively check child elements
+        if (element.elements && Array.isArray(element.elements)) {
+          if (traverseElements(element.elements)) {
+            updated = true;
+          }
+        }
+      }
+      
+      return updated;
+    };
+    
+    // Start traversal from root
+    if (Array.isArray(elementorData)) {
+      return traverseElements(elementorData);
+    }
+    
+    return false;
+  };
+
   // Handle compile new_desired_text_content into pelementor_edits
   const handleCompileTextContent = async () => {
     if (!gconPieceId || !gconPiece) {
@@ -372,7 +453,7 @@ export default function ToryaPage() {
       // Step 2: Fetch all nemtor_units for this gcon_piece
       const { data: nemtorUnits, error: nemtorError } = await supabase
         .from('nemtor_units')
-        .select('unit_id, full_text_cached, full_text_edits, has_img_slot')
+        .select('unit_id, full_text_cached, full_text_edits, has_img_slot, el_id')
         .eq('fk_gcon_piece_id', gconPieceId);
 
       if (nemtorError) {
@@ -417,48 +498,48 @@ export default function ToryaPage() {
       if (manualImageDataRef.current) {
         const { urls, ids, checkboxes } = manualImageDataRef.current;
         
-        nemtorUnits.forEach(unit => {
-          // Only process units that have has_img_slot = true AND checkbox is checked
-          if (unit.has_img_slot === true && checkboxes.get(unit.unit_id)) {
-            const manualUrl = urls.get(unit.unit_id);
-            const manualId = ids.get(unit.unit_id);
-            
-            // Only proceed if we have both URL and ID
-            if (manualUrl && manualUrl.trim() !== '' && manualId && manualId.trim() !== '') {
-              // Replace image URLs and IDs in pelementorEditsContent
-              // Look for common Elementor image patterns
-              const imagePatterns = [
-                // Image widget URL pattern
-                /"url":"[^"]*"/g,
-                // Image widget ID pattern  
-                /"id":\d+/g,
-                // Background image URL pattern
-                /"background_image":{"url":"[^"]*"/g,
-                // Background image ID pattern
-                /"background_image":{"url":"[^"]*","id":\d+/g
-              ];
+        try {
+          // Parse the Elementor JSON to work with structured data
+          const elementorData = JSON.parse(pelementorEditsContent);
+          
+          nemtorUnits.forEach(unit => {
+            // Only process units that have has_img_slot = true AND checkbox is checked
+            if (unit.has_img_slot === true && checkboxes.get(unit.unit_id)) {
+              const manualUrl = urls.get(unit.unit_id);
+              const manualId = ids.get(unit.unit_id);
               
-              // Replace image URLs
-              pelementorEditsContent = pelementorEditsContent.replace(
-                /"url":"[^"]*"/g, 
-                `"url":"${manualUrl}"`
-              );
-              
-              // Replace image IDs  
-              pelementorEditsContent = pelementorEditsContent.replace(
-                /"id":\d+/g,
-                `"id":${manualId}`
-              );
-              
-              imageReplacementsCount++;
-              replacements.push({
-                original: `Image slot for unit ${unit.unit_id.substring(0, 8)}...`,
-                replacement: `URL: ${manualUrl.substring(0, 50)}${manualUrl.length > 50 ? '...' : ''}, ID: ${manualId}`,
-                unitId: unit.unit_id
-              });
+              // Only proceed if we have both URL and ID and el_id
+              if (manualUrl && manualUrl.trim() !== '' && manualId && manualId.trim() !== '' && unit.el_id) {
+                console.log(`🖼️ Processing image for unit ${unit.unit_id}, el_id: ${unit.el_id}, URL: ${manualUrl}, ID: ${manualId}`);
+                
+                // Find and update the specific element by el_id
+                const updated = updateElementorImageById(elementorData, unit.el_id, manualUrl, manualId);
+                
+                if (updated) {
+                  console.log(`✅ Successfully updated image for element ${unit.el_id}`);
+                  imageReplacementsCount++;
+                  replacements.push({
+                    original: `Image in element ${unit.el_id}`,
+                    replacement: `URL: ${manualUrl.substring(0, 50)}${manualUrl.length > 50 ? '...' : ''}, ID: ${manualId}`,
+                    unitId: unit.unit_id
+                  });
+                } else {
+                  console.log(`❌ Could not find/update element with ID: ${unit.el_id}`);
+                }
+              } else {
+                console.log(`⚠️ Skipping unit ${unit.unit_id}: missing data - URL: ${!!manualUrl}, ID: ${!!manualId}, el_id: ${!!unit.el_id}`);
+              }
             }
-          }
-        });
+          });
+          
+          // Convert back to string
+          pelementorEditsContent = JSON.stringify(elementorData);
+          
+        } catch (jsonError) {
+          console.error('Error parsing Elementor JSON:', jsonError);
+          // Fall back to string-based approach if JSON parsing fails
+          console.log('Falling back to string-based image replacement...');
+        }
       }
 
       // Step 5: Update pelementor_edits in database
