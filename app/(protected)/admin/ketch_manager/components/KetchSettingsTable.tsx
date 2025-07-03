@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface KetchSettings {
   setting_id: string;
@@ -122,22 +123,31 @@ interface KetchSettings {
 }
 
 export default function KetchSettingsTable() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [data, setData] = useState<KetchSettings[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [sortField, setSortField] = useState<keyof KetchSettings | null>(null);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
-  // Filter states
+  // Initialize state from URL parameters
+  const [searchTerm, setSearchTerm] = useState(searchParams?.get('search') || '');
+  const [currentPage, setCurrentPage] = useState(Number(searchParams?.get('page')) || 1);
+  const [itemsPerPage, setItemsPerPage] = useState(Number(searchParams?.get('perPage')) || 10);
+  const [sortField, setSortField] = useState<keyof KetchSettings | null>(
+    (searchParams?.get('sortField') as keyof KetchSettings) || null
+  );
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
+    (searchParams?.get('sortOrder') as 'asc' | 'desc') || 'asc'
+  );
+  
+  // Filter states from URL parameters
   const [filters, setFilters] = useState({
-    app_page: 'all',
-    ancestor_element: 'all',
-    element_tag: 'all',
-    id: 'all',
-    class: 'all'
+    app_page: searchParams?.get('filter_app_page') || 'all',
+    ancestor_element: searchParams?.get('filter_ancestor_element') || 'all',
+    element_tag: searchParams?.get('filter_element_tag') || 'all',
+    id: searchParams?.get('filter_id') || 'all',
+    class: searchParams?.get('filter_class') || 'all'
   });
   
   // Modal states
@@ -241,6 +251,21 @@ export default function KetchSettingsTable() {
   
   const supabase = createClientComponentClient();
   
+  // Update URL parameters when state changes
+  const updateURLParams = (updates: Record<string, string | number | null>) => {
+    const params = new URLSearchParams(searchParams || '');
+    
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '' || value === 'all') {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+    
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+  
   // Get unique values for filters
   const getUniqueValues = (field: keyof KetchSettings) => {
     const values = data.map(item => item[field]).filter(val => val !== null && val !== undefined);
@@ -322,12 +347,15 @@ export default function KetchSettingsTable() {
   
   // Handle sorting
   const handleSort = (field: keyof KetchSettings) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
+    const newOrder = sortField === field ? (sortOrder === 'asc' ? 'desc' : 'asc') : 'asc';
+    setSortField(field);
+    setSortOrder(newOrder);
+    updateURLParams({
+      sortField: field,
+      sortOrder: newOrder,
+      page: 1 // Reset to first page when sorting
+    });
+    setCurrentPage(1);
   };
   
   // Prepare form data for submission
@@ -355,6 +383,18 @@ export default function KetchSettingsTable() {
       console.error('Error creating record:', err);
       alert('Failed to create record');
     }
+  };
+
+  // Handle duplicate
+  const handleDuplicate = (record: KetchSettings) => {
+    const duplicateData: any = {};
+    Object.keys(getEmptyFormData()).forEach(key => {
+      if (key === 'setting_id') return; // Skip the ID field
+      const value = (record as any)[key];
+      duplicateData[key] = value === null ? '' : value;
+    });
+    setFormData(duplicateData);
+    setIsCreateModalOpen(true);
   };
   
   // Handle edit
@@ -499,7 +539,15 @@ export default function KetchSettingsTable() {
             <label className="font-bold text-sm lowercase">{field.replace('_', ' ')}</label>
             <select
               value={value}
-              onChange={(e) => setFilters({...filters, [field]: e.target.value})}
+              onChange={(e) => {
+                const newFilters = {...filters, [field]: e.target.value};
+                setFilters(newFilters);
+                setCurrentPage(1);
+                updateURLParams({
+                  [`filter_${field}`]: e.target.value,
+                  page: 1
+                });
+              }}
               className={`px-3 py-2 border border-gray-300 rounded-md ${
                 value !== 'all' ? 'bg-blue-900 text-white' : ''
               }`}
@@ -521,12 +569,27 @@ export default function KetchSettingsTable() {
             type="text"
             placeholder="Search..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+              updateURLParams({
+                search: e.target.value,
+                page: 1
+              });
+            }}
             className="px-3 py-2 border border-gray-300 rounded-md"
           />
           <select
             value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            onChange={(e) => {
+              const newPerPage = Number(e.target.value);
+              setItemsPerPage(newPerPage);
+              setCurrentPage(1);
+              updateURLParams({
+                perPage: newPerPage,
+                page: 1
+              });
+            }}
             className="px-3 py-2 border border-gray-300 rounded-md"
           >
             <option value={10}>10 per page</option>
@@ -571,38 +634,46 @@ export default function KetchSettingsTable() {
             {paginatedData.map((row) => (
               <tr key={row.setting_id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <button
-                    onClick={() => startEdit(row)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
-                  >
-                    Edit
-                  </button>
-                  {deleteConfirmId === row.setting_id ? (
-                    <div className="inline-flex items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEdit(row)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDuplicate(row)}
+                      className="text-green-600 hover:text-green-900"
+                    >
+                      Duplicate
+                    </button>
+                    {deleteConfirmId === row.setting_id ? (
+                      <div className="inline-flex items-center gap-2">
+                        <button
+                          onClick={() => handleDelete(row.setting_id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          {deleteSecondConfirm ? 'Really Delete?' : 'Confirm Delete'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDeleteConfirmId(null);
+                            setDeleteSecondConfirm(false);
+                          }}
+                          className="text-gray-600 hover:text-gray-900"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
                       <button
-                        onClick={() => handleDelete(row.setting_id)}
+                        onClick={() => setDeleteConfirmId(row.setting_id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        {deleteSecondConfirm ? 'Really Delete?' : 'Confirm Delete'}
+                        Delete
                       </button>
-                      <button
-                        onClick={() => {
-                          setDeleteConfirmId(null);
-                          setDeleteSecondConfirm(false);
-                        }}
-                        className="text-gray-600 hover:text-gray-900"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setDeleteConfirmId(row.setting_id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
-                  )}
+                    )}
+                  </div>
                 </td>
                 {Object.entries(row).map(([key, value]) => (
                   <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -635,14 +706,21 @@ export default function KetchSettingsTable() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setCurrentPage(1)}
+            onClick={() => {
+              setCurrentPage(1);
+              updateURLParams({ page: 1 });
+            }}
             disabled={currentPage === 1}
             className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             First
           </button>
           <button
-            onClick={() => setCurrentPage(currentPage - 1)}
+            onClick={() => {
+              const newPage = currentPage - 1;
+              setCurrentPage(newPage);
+              updateURLParams({ page: newPage });
+            }}
             disabled={currentPage === 1}
             className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -652,14 +730,21 @@ export default function KetchSettingsTable() {
             Page {currentPage} of {totalPages}
           </span>
           <button
-            onClick={() => setCurrentPage(currentPage + 1)}
+            onClick={() => {
+              const newPage = currentPage + 1;
+              setCurrentPage(newPage);
+              updateURLParams({ page: newPage });
+            }}
             disabled={currentPage === totalPages}
             className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
           <button
-            onClick={() => setCurrentPage(totalPages)}
+            onClick={() => {
+              setCurrentPage(totalPages);
+              updateURLParams({ page: totalPages });
+            }}
             disabled={currentPage === totalPages}
             className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >

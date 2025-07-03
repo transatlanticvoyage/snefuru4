@@ -3,9 +3,14 @@
 import { useAuth } from '@/app/context/AuthContext';
 import Link from 'next/link';
 import KetchSettingsTable from './components/KetchSettingsTable';
+import { useEffect } from 'react';
 
 export default function KetchManagerPage() {
   const { user } = useAuth();
+
+  useEffect(() => {
+    document.title = "Ketch Manager - Snefuru";
+  }, []);
 
   if (!user) {
     return (
