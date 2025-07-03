@@ -13,6 +13,9 @@ const MesagenTableEditor = dynamic(() => import('../components/MesagenTableEdito
   loading: () => <div className="h-96 flex items-center justify-center">Loading editor...</div>
 });
 
+// Import the sticky menu component
+import MarzdiStickyMenu from '../components/marzdi_sticky_menu';
+
 export default function MesagenPage() {
   const { user } = useAuth();
   const params = useParams();
@@ -734,6 +737,9 @@ Recommendation: Check logs and retry operation`;
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Sticky Menu Component */}
+      <MarzdiStickyMenu />
+      
       <div className="p-4">
         <div className="mb-4">
           <div className="flex items-start gap-4" style={{ marginTop: '10px' }}>
