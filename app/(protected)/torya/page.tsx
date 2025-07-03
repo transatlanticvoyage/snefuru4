@@ -557,6 +557,64 @@ export default function ToryaPage() {
                   </div>
                 )}
               </div>
+
+              {/* NEW AREA 3: Dublish Function Box */}
+              <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
+                <div className="mb-3">
+                  <strong className="text-sm font-bold text-gray-700">
+                    Publish new elementor page using dublish function
+                  </strong>
+                </div>
+                
+                <hr className="my-3 border-gray-300" />
+                
+                <div className="mb-3">
+                  <button
+                    onClick={() => alert('compile new_desired_text_content into pelementor_edits - functionality coming soon')}
+                    className="w-full px-4 py-2 text-white rounded"
+                    style={{
+                      backgroundColor: '#000000',
+                      fontSize: '14px'
+                    }}
+                  >
+                    compile new_desired_text_content into pelementor_edits
+                  </button>
+                </div>
+                
+                <hr className="my-3 border-gray-300" />
+                
+                <div className="mb-3">
+                  <button
+                    onClick={() => alert('compile new_desired_image_content into pelementor_edits - functionality coming soon')}
+                    className="w-full px-4 py-2 text-white rounded"
+                    style={{
+                      backgroundColor: '#000000',
+                      fontSize: '14px'
+                    }}
+                  >
+                    compile new_desired_image_content into pelementor_edits
+                  </button>
+                </div>
+                
+                <hr className="my-3 border-gray-300" />
+                
+                <div className="mb-3">
+                  <button
+                    onClick={() => alert('run dublish function - functionality coming soon')}
+                    className="w-full px-4 py-2 text-white rounded"
+                    style={{
+                      backgroundColor: '#000000',
+                      fontSize: '14px'
+                    }}
+                  >
+                    run dublish function
+                  </button>
+                </div>
+                
+                <div className="text-xs text-gray-600 mt-2">
+                  create new page on asn_sitespren_base from defined data (such as pelementor_edits field in some cases, etc.)
+                </div>
+              </div>
             </div>
           </div>
         )}
