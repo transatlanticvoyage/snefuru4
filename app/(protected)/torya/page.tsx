@@ -1242,9 +1242,26 @@ export default function ToryaPage() {
               {/* AREA 2: Image Plans Batch Box - Cloned from mesagen */}
               <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
                 <div className="mb-3">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    asn_image_plan_batch_id
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-bold text-gray-700">
+                      asn_image_plan_batch_id
+                    </label>
+                    <button
+                      onClick={() => {
+                        // Placeholder - waiting for backend functionality instructions
+                        console.log('Create new batch clicked');
+                      }}
+                      className="rounded"
+                      style={{
+                        backgroundColor: '#d3d3d3', // light gray
+                        color: '#4a4a4a', // dark gray
+                        fontSize: '13px',
+                        padding: '3px 8px'
+                      }}
+                    >
+                      create new batch
+                    </button>
+                  </div>
                   <select
                     className="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm"
                     value={selectedBatchId}
@@ -1274,22 +1291,20 @@ export default function ToryaPage() {
                   
                   {/* Open Batch Button - Show if batch is selected or assigned */}
                   {(selectedBatchId || gconPiece?.asn_image_plan_batch_id) && (
-                    <button
-                      onClick={() => {
-                        const batchId = selectedBatchId || gconPiece?.asn_image_plan_batch_id;
-                        window.open(`https://snef.me/bin34/tebnar2?batchid=${batchId}`, '_blank');
-                      }}
-                      className="px-4 py-2 rounded"
+                    <a
+                      href={`https://snef.me/bin34/tebnar2?batchid=${selectedBatchId || gconPiece?.asn_image_plan_batch_id}`}
+                      className="px-4 py-2 rounded inline-block text-center"
                       style={{
                         backgroundColor: '#009bff', // bestlinkcol
                         fontSize: '16px',
                         fontWeight: 'bold',
                         color: '#000',
-                        border: '2px solid #000'
+                        border: '2px solid #000',
+                        textDecoration: 'none'
                       }}
                     >
                       open batch in /tebnar2
-                    </button>
+                    </a>
                   )}
                 </div>
               </div>
