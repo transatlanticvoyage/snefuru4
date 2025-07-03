@@ -1063,7 +1063,7 @@ export default function WaterTable({
                               className="kz_torya_fulltextedits_box1 w-full h-20 p-2 text-xs font-mono border border-gray-300 rounded resize-none"
                               value={value?.toString() || ''}
                               onChange={(e) => {
-                                // Handle text change here if needed
+                                handleFullTextEditsChange(row.unit_id, e.target.value);
                               }}
                             />
                           );
@@ -1140,7 +1140,7 @@ export default function WaterTable({
                             className="kz_torya_fulltextedits_box1 w-full h-20 p-2 text-xs font-mono border border-gray-300 rounded resize-none"
                             value={value?.toString() || ''}
                             onChange={(e) => {
-                              // Handle text change here if needed
+                              handleFullTextEditsChange(row.unit_id, e.target.value);
                             }}
                           />
                         );

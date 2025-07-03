@@ -27,6 +27,9 @@ export default function ToryaPage() {
   const [selectedBatchId, setSelectedBatchId] = useState<string>('');
   const [isSavingBatch, setIsSavingBatch] = useState(false);
 
+  // Compile text content state
+  const [isCompilingTextContent, setIsCompilingTextContent] = useState(false);
+
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
     const gconPieceIdParam = searchParams?.get('gcon_piece_id');
@@ -314,6 +317,95 @@ export default function ToryaPage() {
     }
   };
 
+  // Handle compile new_desired_text_content into pelementor_edits
+  const handleCompileTextContent = async () => {
+    if (!gconPieceId || !gconPiece) {
+      alert('No gcon_piece found to process');
+      return;
+    }
+
+    if (!gconPiece.pelementor_cached) {
+      alert('No pelementor_cached data found to use as starting point');
+      return;
+    }
+
+    setIsCompilingTextContent(true);
+
+    try {
+      // Step 1: Start with pelementor_cached as our base for pelementor_edits
+      let pelementorEditsContent = gconPiece.pelementor_cached;
+
+      // Step 2: Fetch all nemtor_units for this gcon_piece
+      const { data: nemtorUnits, error: nemtorError } = await supabase
+        .from('nemtor_units')
+        .select('unit_id, full_text_cached, full_text_edits')
+        .eq('fk_gcon_piece_id', gconPieceId);
+
+      if (nemtorError) {
+        console.error('Error fetching nemtor_units:', nemtorError);
+        throw nemtorError;
+      }
+
+      if (!nemtorUnits || nemtorUnits.length === 0) {
+        alert('No nemtor_units found for this gcon_piece');
+        return;
+      }
+
+      // Step 3: Process units that have full_text_edits values
+      let replacementsCount = 0;
+      const replacements: { original: string; replacement: string; unitId: string }[] = [];
+
+      nemtorUnits.forEach(unit => {
+        // Only process if full_text_edits has a real value (not null, empty, or whitespace)
+        if (unit.full_text_edits && unit.full_text_edits.trim() !== '') {
+          // Only process if we also have original full_text_cached to replace
+          if (unit.full_text_cached && unit.full_text_cached.trim() !== '') {
+            // Replace full_text_cached with full_text_edits in pelementorEditsContent
+            const originalText = unit.full_text_cached;
+            const newText = unit.full_text_edits;
+            
+            // Check if the original text exists in pelementorEditsContent
+            if (pelementorEditsContent.includes(originalText)) {
+              pelementorEditsContent = pelementorEditsContent.replace(originalText, newText);
+              replacementsCount++;
+              replacements.push({
+                original: originalText.substring(0, 100) + (originalText.length > 100 ? '...' : ''),
+                replacement: newText.substring(0, 100) + (newText.length > 100 ? '...' : ''),
+                unitId: unit.unit_id
+              });
+            }
+          }
+        }
+      });
+
+      // Step 4: Update pelementor_edits in database
+      const { error: updateError } = await supabase
+        .from('gcon_pieces')
+        .update({ pelementor_edits: pelementorEditsContent })
+        .eq('id', gconPieceId);
+
+      if (updateError) {
+        console.error('Error updating pelementor_edits:', updateError);
+        throw updateError;
+      }
+
+      // Step 5: Update local state
+      setGconPiece((prev: any) => prev ? { ...prev, pelementor_edits: pelementorEditsContent } : prev);
+
+      // Step 6: Show success message with details
+      const successMessage = `Successfully compiled text content!\n\nReplacements made: ${replacementsCount}\n\n` +
+        replacements.map(r => `• Unit ${r.unitId.substring(0, 8)}...\n  FROM: ${r.original}\n  TO: ${r.replacement}`).join('\n\n');
+      
+      alert(successMessage);
+
+    } catch (error) {
+      console.error('Error compiling text content:', error);
+      alert('Failed to compile text content. Please try again.');
+    } finally {
+      setIsCompilingTextContent(false);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -570,14 +662,18 @@ export default function ToryaPage() {
                 
                 <div className="mb-3">
                   <button
-                    onClick={() => alert('compile new_desired_text_content into pelementor_edits - functionality coming soon')}
-                    className="w-full px-4 py-2 text-white rounded"
+                    onClick={handleCompileTextContent}
+                    disabled={isCompilingTextContent || !gconPiece?.pelementor_cached}
+                    className={`w-full px-4 py-2 text-white rounded transition-colors ${
+                      isCompilingTextContent || !gconPiece?.pelementor_cached
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-black hover:bg-gray-800'
+                    }`}
                     style={{
-                      backgroundColor: '#000000',
                       fontSize: '14px'
                     }}
                   >
-                    compile new_desired_text_content into pelementor_edits
+                    {isCompilingTextContent ? 'Compiling...' : 'compile new_desired_text_content into pelementor_edits'}
                   </button>
                 </div>
                 
