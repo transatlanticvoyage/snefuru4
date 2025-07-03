@@ -111,7 +111,7 @@ export default function ToryaPage() {
         // Fetch the gcon_piece
         const { data: gconData, error: gconError } = await supabase
           .from('gcon_pieces')
-          .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits, g_post_id')
+          .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits, g_post_id, asn_image_plan_batch_id')
           .eq('id', gconPieceId)
           .eq('fk_users_id', userData.id)
           .single();
@@ -161,8 +161,8 @@ export default function ToryaPage() {
         setImagePlansBatches(batchesData || []);
 
         // Set current selected batch if gconPiece has one
-        if (gconPiece?.mudfk_image_plan_batch_id) {
-          setSelectedBatchId(gconPiece.mudfk_image_plan_batch_id);
+        if (gconPiece?.asn_image_plan_batch_id) {
+          setSelectedBatchId(gconPiece.asn_image_plan_batch_id);
         }
       } catch (err) {
         console.error('Error in fetchImagePlansBatches:', err);
@@ -170,7 +170,7 @@ export default function ToryaPage() {
     };
 
     fetchImagePlansBatches();
-  }, [user?.id, supabase, gconPiece?.mudfk_image_plan_batch_id]);
+  }, [user?.id, supabase, gconPiece?.asn_image_plan_batch_id]);
 
   // Set browser title based on gcon_piece data
   useEffect(() => {
@@ -271,7 +271,7 @@ export default function ToryaPage() {
           if (userData) {
             const { data: refreshedData } = await supabase
               .from('gcon_pieces')
-              .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits')
+              .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits, asn_image_plan_batch_id')
               .eq('id', gconPieceId)
               .eq('fk_users_id', userData.id)
               .single();
@@ -329,7 +329,7 @@ export default function ToryaPage() {
     try {
       const { error } = await supabase
         .from('gcon_pieces')
-        .update({ mudfk_image_plan_batch_id: selectedBatchId })
+        .update({ asn_image_plan_batch_id: selectedBatchId })
         .eq('id', gconPieceId);
 
       if (error) {
@@ -337,7 +337,7 @@ export default function ToryaPage() {
       }
 
       // Update local state
-      setGconPiece((prev: any) => prev ? { ...prev, mudfk_image_plan_batch_id: selectedBatchId } : prev);
+      setGconPiece((prev: any) => prev ? { ...prev, asn_image_plan_batch_id: selectedBatchId } : prev);
       
       alert('Image plan batch saved successfully!');
     } catch (error) {
@@ -1162,7 +1162,7 @@ export default function ToryaPage() {
               <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
                 <div className="mb-3">
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    mudfk_image_plan_batch_id
+                    asn_image_plan_batch_id
                   </label>
                   <select
                     className="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm"
@@ -1193,10 +1193,10 @@ export default function ToryaPage() {
                 </div>
 
                 {/* Batch Link - Show if batch is assigned */}
-                {gconPiece?.mudfk_image_plan_batch_id && (
+                {gconPiece?.asn_image_plan_batch_id && (
                   <div className="mt-3">
                     <a
-                      href={`/bin34/tebnar2?batchid=${gconPiece.mudfk_image_plan_batch_id}`}
+                      href={`/bin34/tebnar2?batchid=${gconPiece.asn_image_plan_batch_id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-block px-4 py-2 rounded text-center"

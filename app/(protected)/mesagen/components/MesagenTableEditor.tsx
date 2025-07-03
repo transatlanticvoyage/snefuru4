@@ -1335,7 +1335,7 @@ export default function MesagenTableEditor({ initialContent = '<p>Start typing..
                     <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-wrap relative" style={{ maxWidth: '400px' }}>
                       <div className="text-left">
 ———————————————————————
-gcon_pieces.mudfk_image_plan_batch_id
+gcon_pieces.asn_image_plan_batch_id
 
 images_plans_batches.
 
@@ -1351,7 +1351,7 @@ FOR THAT row in images_plans, use field fk_image1_id
                         onClick={(e) => {
                           e.stopPropagation();
                           navigator.clipboard.writeText(`———————————————————————
-gcon_pieces.mudfk_image_plan_batch_id
+gcon_pieces.asn_image_plan_batch_id
 
 images_plans_batches.
 

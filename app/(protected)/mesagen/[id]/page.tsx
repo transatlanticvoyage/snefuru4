@@ -225,8 +225,8 @@ export default function MesagenPage() {
         setImagePlansBatches(batchesData || []);
 
         // Set current selected batch if gconPiece has one
-        if (gconPiece?.mudfk_image_plan_batch_id) {
-          setSelectedBatchId(gconPiece.mudfk_image_plan_batch_id);
+        if (gconPiece?.asn_image_plan_batch_id) {
+          setSelectedBatchId(gconPiece.asn_image_plan_batch_id);
         }
       } catch (err) {
         console.error('Error in fetchImagePlansBatches:', err);
@@ -234,7 +234,7 @@ export default function MesagenPage() {
     };
 
     fetchImagePlansBatches();
-  }, [user?.id, supabase, gconPiece?.mudfk_image_plan_batch_id]);
+  }, [user?.id, supabase, gconPiece?.asn_image_plan_batch_id]);
 
   const handleTitleChange = (title: string) => {
     setMudTitle(title);
@@ -440,7 +440,7 @@ Recommendation: Check logs and retry operation`;
     try {
       const { error } = await supabase
         .from('gcon_pieces')
-        .update({ mudfk_image_plan_batch_id: selectedBatchId })
+        .update({ asn_image_plan_batch_id: selectedBatchId })
         .eq('id', id);
 
       if (error) {
@@ -448,7 +448,7 @@ Recommendation: Check logs and retry operation`;
       }
 
       // Update local state
-      setGconPiece((prev: any) => prev ? { ...prev, mudfk_image_plan_batch_id: selectedBatchId } : prev);
+      setGconPiece((prev: any) => prev ? { ...prev, asn_image_plan_batch_id: selectedBatchId } : prev);
       
       alert('Image plan batch saved successfully!');
     } catch (error) {
@@ -869,7 +869,7 @@ Recommendation: Check logs and retry operation`;
             <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
               <div className="mb-3">
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  mudfk_image_plan_batch_id
+                  asn_image_plan_batch_id
                 </label>
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm"
@@ -900,10 +900,10 @@ Recommendation: Check logs and retry operation`;
               </div>
 
               {/* Batch Link - Show if batch is assigned */}
-              {gconPiece?.mudfk_image_plan_batch_id && (
+              {gconPiece?.asn_image_plan_batch_id && (
                 <div className="mt-3">
                   <a
-                    href={`/bin34/tebnar2?batchid=${gconPiece.mudfk_image_plan_batch_id}`}
+                    href={`/bin34/tebnar2?batchid=${gconPiece.asn_image_plan_batch_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block px-4 py-2 rounded text-center"
