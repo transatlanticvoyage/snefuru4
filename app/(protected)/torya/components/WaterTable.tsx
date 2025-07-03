@@ -40,16 +40,16 @@ interface NemtorUnit {
 type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 type StickyColumnKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
-const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: (keyof NemtorUnit)[] }> = {
+const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: (keyof NemtorUnit | 'man_img_url' | 'man_img_id')[] }> = {
   'option1': {
     name: 'col temp all',
     range: 'all fields',
-    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
+    columns: ['unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
   },
   'option2': {
     name: 'col temp core',
     range: 'core fields',
-    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'image_type', 'image_url', 'summary_text']
+    columns: ['unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_url', 'summary_text']
   },
   'option3': {
     name: 'col temp hierarchy',
@@ -64,7 +64,7 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   'option5': {
     name: 'col temp summary',
     range: 'summary',
-    columns: ['unit_marker', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'image_type', 'image_url', 'summary_text', 'unit_label']
+    columns: ['unit_marker', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_url', 'summary_text', 'unit_label']
   }
 };
 
@@ -129,6 +129,10 @@ export default function WaterTable({
   // Save full_text_edits state
   const [isSavingFullTextEdits, setIsSavingFullTextEdits] = useState(false);
   const [fullTextEditsChanges, setFullTextEditsChanges] = useState<Map<string, string>>(new Map());
+
+  // Manual image input state
+  const [manualImageUrls, setManualImageUrls] = useState<Map<string, string>>(new Map());
+  const [manualImageIds, setManualImageIds] = useState<Map<string, string>>(new Map());
 
   // Initialize from URL parameters
   useEffect(() => {
@@ -239,7 +243,7 @@ export default function WaterTable({
 
   // Get sticky columns
   const stickyColumnCount = stickyOptions[selectedStickyOption];
-  const allColumns: (keyof NemtorUnit | 'select' | 'prisomi')[] = ['prisomi', 'select', 'unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at'];
+  const allColumns: (keyof NemtorUnit | 'select' | 'prisomi' | 'man_img_url' | 'man_img_id')[] = ['prisomi', 'select', 'unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at'];
   const stickyColumns = allColumns.slice(0, stickyColumnCount + 2); // +2 to include prisomi and select columns
   const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
 
@@ -355,6 +359,20 @@ export default function WaterTable({
           : item
       )
     );
+  };
+
+  // Handle manual image URL change
+  const handleManualImageUrlChange = (unitId: string, newValue: string) => {
+    const newUrls = new Map(manualImageUrls);
+    newUrls.set(unitId, newValue);
+    setManualImageUrls(newUrls);
+  };
+
+  // Handle manual image ID change
+  const handleManualImageIdChange = (unitId: string, newValue: string) => {
+    const newIds = new Map(manualImageIds);
+    newIds.set(unitId, newValue);
+    setManualImageIds(newIds);
   };
 
   // Save all full_text_edits changes
@@ -900,8 +918,12 @@ export default function WaterTable({
                 return (
                   <th
                     key={col}
-                    onClick={() => handleSort(col as keyof NemtorUnit)}
-                    className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 sticky bg-gray-50 z-10 border border-gray-200 ${
+                    onClick={() => col !== 'man_img_url' && col !== 'man_img_id' ? handleSort(col as keyof NemtorUnit) : undefined}
+                    className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider ${
+                      col !== 'man_img_url' && col !== 'man_img_id' ? 'cursor-pointer hover:bg-gray-100' : ''
+                    } sticky bg-gray-50 z-10 border border-gray-200 ${
+                      col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''
+                    } ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${
                       isLastStickyCol ? 'border-r-4 border-black' : ''
                     }`}
                     style={{ 
@@ -926,10 +948,12 @@ export default function WaterTable({
               {nonStickyVisibleColumns.map((col) => (
                 <th
                   key={col}
-                  onClick={() => handleSort(col)}
-                  className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200 ${
+                  onClick={() => col !== 'man_img_url' && col !== 'man_img_id' ? handleSort(col) : undefined}
+                  className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider ${
+                    col !== 'man_img_url' && col !== 'man_img_id' ? 'cursor-pointer hover:bg-gray-100' : ''
+                  } border border-gray-200 ${
                     col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                  } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
+                  } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                   style={{
                     width: col === 'full_text_edits' ? '600px' : undefined,
                     minWidth: col === 'full_text_edits' ? '600px' : undefined,
@@ -1045,7 +1069,7 @@ export default function WaterTable({
                       key={col} 
                       className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white border border-gray-200 ${
                         col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                      } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''} ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
+                      } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''} ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
                       style={{ 
                         left: `${20 + 60 + (index - 2) * 150}px`, // 20px (prisomi) + 60px (select) + column positions
                         width: col === 'full_text_edits' ? '600px' : undefined,
@@ -1087,6 +1111,34 @@ export default function WaterTable({
                         // Special handling for has_img_slot - show only false text for false values
                         if (col === 'has_img_slot' && value === false) {
                           return <span>false</span>;
+                        }
+                        
+                        // Special handling for man_img_url - text input for manual image URL
+                        if (col === 'man_img_url') {
+                          return (
+                            <input
+                              type="text"
+                              placeholder="paste image URL here"
+                              value={manualImageUrls.get(row.unit_id) || ''}
+                              onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
+                              className="w-full p-2 text-xs border border-gray-300 rounded"
+                              style={{ minWidth: '200px' }}
+                            />
+                          );
+                        }
+                        
+                        // Special handling for man_img_id - text input for manual image ID
+                        if (col === 'man_img_id') {
+                          return (
+                            <input
+                              type="text"
+                              placeholder="paste image ID like 3933"
+                              value={manualImageIds.get(row.unit_id) || ''}
+                              onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
+                              className="w-full p-2 text-xs border border-gray-300 rounded"
+                              style={{ minWidth: '150px' }}
+                            />
+                          );
                         }
                         
                         // Special handling for unit_id - truncate and make clickable
@@ -1133,7 +1185,7 @@ export default function WaterTable({
                     key={col} 
                     className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
                       col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                    } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
+                    } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                     style={{
                       width: col === 'full_text_edits' ? '600px' : undefined,
                       minWidth: col === 'full_text_edits' ? '600px' : undefined,
@@ -1174,6 +1226,34 @@ export default function WaterTable({
                       // Special handling for has_img_slot - show only false text for false values
                       if (col === 'has_img_slot' && value === false) {
                         return <span>false</span>;
+                      }
+                      
+                      // Special handling for man_img_url - text input for manual image URL
+                      if (col === 'man_img_url') {
+                        return (
+                          <input
+                            type="text"
+                            placeholder="paste image URL here"
+                            value={manualImageUrls.get(row.unit_id) || ''}
+                            onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
+                            className="w-full p-2 text-xs border border-gray-300 rounded"
+                            style={{ minWidth: '200px' }}
+                          />
+                        );
+                      }
+                      
+                      // Special handling for man_img_id - text input for manual image ID
+                      if (col === 'man_img_id') {
+                        return (
+                          <input
+                            type="text"
+                            placeholder="paste image ID like 3933"
+                            value={manualImageIds.get(row.unit_id) || ''}
+                            onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
+                            className="w-full p-2 text-xs border border-gray-300 rounded"
+                            style={{ minWidth: '150px' }}
+                          />
+                        );
                       }
                       
                       // Special handling for unit_id - truncate and make clickable
