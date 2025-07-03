@@ -542,7 +542,7 @@ export default function ToryaPage() {
     gconPieceId: string;
   }) => {
     // This would connect to your custom WordPress plugin
-    const response = await fetch('/api/snefuruplin/create-elementor-page', {
+    const response = await fetch('/api/dublish-create-elementor-page', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
