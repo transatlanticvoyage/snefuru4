@@ -42,6 +42,18 @@ export default function ToryaPage() {
     message?: string;
   } | null>(null);
 
+  // Snoverride function state
+  const [isRunningSnoverride, setIsRunningSnoverride] = useState(false);
+  const [snoverrideConnectionType, setSnoverrideConnectionType] = useState<'snefuruplin' | 'rest_api' | 'api_other'>('snefuruplin');
+  const [snoverrideProgress, setSnoverrideProgress] = useState<string>('');
+  const [snoverrideResult, setSnoverrideResult] = useState<{
+    success: boolean;
+    wpEditorUrl?: string;
+    liveUrl?: string;
+    postId?: number;
+    message?: string;
+  } | null>(null);
+
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
     const gconPieceIdParam = searchParams?.get('gcon_piece_id');
@@ -92,7 +104,7 @@ export default function ToryaPage() {
         // Fetch the gcon_piece
         const { data: gconData, error: gconError } = await supabase
           .from('gcon_pieces')
-          .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits')
+          .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits, g_post_id')
           .eq('id', gconPieceId)
           .eq('fk_users_id', userData.id)
           .single();
@@ -672,6 +684,234 @@ export default function ToryaPage() {
     return await response.json();
   };
 
+  // Handle run snoverride function
+  const handleRunSnoverride = async () => {
+    if (!gconPieceId || !gconPiece) {
+      alert('No gcon_piece found to process');
+      return;
+    }
+
+    if (!gconPiece.pelementor_edits) {
+      alert('No pelementor_edits data found. Please compile text content first.');
+      return;
+    }
+
+    if (!gconPiece.asn_sitespren_base) {
+      alert('No asn_sitespren_base found. Cannot determine target WordPress site.');
+      return;
+    }
+
+    if (!gconPiece.g_post_id) {
+      alert('No g_post_id found. Cannot identify which WordPress post to update.');
+      return;
+    }
+
+    setIsRunningSnoverride(true);
+    setSnoverrideProgress('Initializing...');
+    setSnoverrideResult(null);
+
+    try {
+      // Step 1: Prepare update data
+      setSnoverrideProgress('Preparing Elementor page update...');
+      
+      const pageTitle = gconPiece.h1title || gconPiece.mud_title || 'Updated Elementor Page';
+      const elementorData = gconPiece.pelementor_edits;
+      const postId = gconPiece.g_post_id;
+
+      // Step 2: Update WordPress post
+      setSnoverrideProgress('Updating WordPress post...');
+      
+      let apiResponse;
+      
+      switch (snoverrideConnectionType) {
+        case 'snefuruplin':
+          // Use Snefuruplin WP Plugin
+          setSnoverrideProgress('Connecting via Snefuruplin WP Plugin...');
+          apiResponse = await updateElementorPageViaSnefuruplin({
+            siteUrl: gconPiece.asn_sitespren_base,
+            postId: postId,
+            title: pageTitle,
+            elementorData: elementorData,
+            gconPieceId: gconPieceId
+          });
+          break;
+          
+        case 'rest_api':
+          // Use WordPress REST API
+          setSnoverrideProgress('Connecting via WordPress REST API...');
+          apiResponse = await updateElementorPageViaRestAPI({
+            siteUrl: gconPiece.asn_sitespren_base,
+            postId: postId,
+            title: pageTitle,
+            elementorData: elementorData,
+            gconPieceId: gconPieceId
+          });
+          break;
+          
+        case 'api_other':
+          // Use other API method
+          setSnoverrideProgress('Connecting via alternative API...');
+          apiResponse = await updateElementorPageViaOtherAPI({
+            siteUrl: gconPiece.asn_sitespren_base,
+            postId: postId,
+            title: pageTitle,
+            elementorData: elementorData,
+            gconPieceId: gconPieceId
+          });
+          break;
+          
+        default:
+          throw new Error('Invalid connection type selected');
+      }
+
+      // Step 3: Process response
+      setSnoverrideProgress('Processing response...');
+      
+      if (apiResponse.success) {
+        const wpEditorUrl = `https://${gconPiece.asn_sitespren_base}/wp-admin/post.php?post=${postId}&action=elementor`;
+        const liveUrl = `https://${gconPiece.asn_sitespren_base}/?p=${postId}`;
+        
+        setSnoverrideResult({
+          success: true,
+          wpEditorUrl,
+          liveUrl,
+          postId: postId,
+          message: `Successfully updated Elementor page "${pageTitle}"`
+        });
+        
+        setSnoverrideProgress('✅ Page updated successfully!');
+      } else {
+        throw new Error(apiResponse.message || 'Failed to update page');
+      }
+
+    } catch (error) {
+      console.error('Error running snoverride function:', error);
+      setSnoverrideResult({
+        success: false,
+        message: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
+      setSnoverrideProgress('❌ Failed to update page');
+    } finally {
+      setIsRunningSnoverride(false);
+    }
+  };
+
+  // Snefuruplin WP Plugin update implementation
+  const updateElementorPageViaSnefuruplin = async (params: {
+    siteUrl: string;
+    postId: number;
+    title: string;
+    elementorData: string;
+    gconPieceId: string;
+  }) => {
+    const response = await fetch('/api/snoverride-update-elementor-page', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        site_url: params.siteUrl,
+        post_id: params.postId,
+        post_title: params.title,
+        elementor_data: params.elementorData,
+        gcon_piece_id: params.gconPieceId,
+        // Update only the elementor data and title
+        update_fields: {
+          post_title: params.title,
+          meta_input: {
+            '_elementor_data': params.elementorData,
+            '_elementor_edit_mode': 'builder',
+            '_elementor_version': '3.17.0'
+          }
+        }
+      })
+    });
+
+    return await response.json();
+  };
+
+  // WordPress REST API update implementation
+  const updateElementorPageViaRestAPI = async (params: {
+    siteUrl: string;
+    postId: number;
+    title: string;
+    elementorData: string;
+    gconPieceId: string;
+  }) => {
+    // Step 1: Update the post via REST API
+    const updatePostResponse = await fetch(`https://${params.siteUrl}/wp-json/wp/v2/pages/${params.postId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_WP_TOKEN', // You'll need to implement auth
+      },
+      body: JSON.stringify({
+        title: params.title
+      })
+    });
+
+    const post = await updatePostResponse.json();
+    
+    if (!updatePostResponse.ok) {
+      throw new Error(post.message || 'Failed to update post');
+    }
+
+    // Step 2: Update Elementor meta data
+    const metaUpdates = [
+      { key: '_elementor_data', value: params.elementorData },
+      { key: '_elementor_edit_mode', value: 'builder' },
+      { key: '_elementor_version', value: '3.17.0' }
+    ];
+
+    for (const meta of metaUpdates) {
+      await fetch(`https://${params.siteUrl}/wp-json/wp/v2/pages/${params.postId}/meta`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_WP_TOKEN',
+        },
+        body: JSON.stringify(meta)
+      });
+    }
+
+    return {
+      success: true,
+      postId: params.postId,
+      message: 'Page updated successfully via REST API'
+    };
+  };
+
+  // Alternative API update implementation
+  const updateElementorPageViaOtherAPI = async (params: {
+    siteUrl: string;
+    postId: number;
+    title: string;
+    elementorData: string;
+    gconPieceId: string;
+  }) => {
+    const response = await fetch('/api/wordpress/update-elementor-page', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        target_site: params.siteUrl,
+        post_id: params.postId,
+        update_data: {
+          post_title: params.title,
+          meta_input: {
+            '_elementor_data': params.elementorData,
+            '_elementor_edit_mode': 'builder',
+            '_elementor_version': '3.17.0'
+          }
+        },
+        gcon_piece_id: params.gconPieceId
+      })
+    });
+
+    return await response.json();
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -1055,6 +1295,122 @@ export default function ToryaPage() {
                 
                 <div className="text-xs text-gray-600 mt-2">
                   create new page on asn_sitespren_base from defined data (such as pelementor_edits field in some cases, etc.)
+                </div>
+              </div>
+
+              {/* NEW AREA 4: Snoverride Function Box */}
+              <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
+                <div className="mb-3">
+                  <strong className="text-sm font-bold text-gray-700">
+                    Update existing elementor page using snoverride function
+                  </strong>
+                </div>
+                
+                <hr className="my-3 border-gray-300" />
+                
+                <div className="mb-3">
+                  <button
+                    onClick={handleRunSnoverride}
+                    disabled={isRunningSnoverride || !gconPiece?.pelementor_edits || !gconPiece?.asn_sitespren_base || !gconPiece?.g_post_id}
+                    className={`w-full px-4 py-2 text-white rounded transition-colors ${
+                      isRunningSnoverride || !gconPiece?.pelementor_edits || !gconPiece?.asn_sitespren_base || !gconPiece?.g_post_id
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-black hover:bg-gray-800'
+                    }`}
+                    style={{
+                      fontSize: '14px'
+                    }}
+                  >
+                    {isRunningSnoverride ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Updating...
+                      </div>
+                    ) : (
+                      'run snoverride'
+                    )}
+                  </button>
+                </div>
+
+                {/* Connection Type Selector */}
+                <div className="mb-3">
+                  <label className="block text-xs font-bold text-gray-700 mb-2">
+                    Connection Type:
+                  </label>
+                  <select
+                    value={snoverrideConnectionType}
+                    onChange={(e) => setSnoverrideConnectionType(e.target.value as 'snefuruplin' | 'rest_api' | 'api_other')}
+                    disabled={isRunningSnoverride}
+                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white disabled:bg-gray-100"
+                  >
+                    <option value="snefuruplin">Snefuruplin WP Plugin</option>
+                    <option value="rest_api">REST API</option>
+                    <option value="api_other">API (other)</option>
+                  </select>
+                </div>
+
+                {/* Progress Indicator */}
+                {snoverrideProgress && (
+                  <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
+                    <div className="text-xs text-blue-800">
+                      <strong>Status:</strong> {snoverrideProgress}
+                    </div>
+                    {isRunningSnoverride && (
+                      <div className="mt-2">
+                        <div className="w-full bg-blue-200 rounded-full h-2">
+                          <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Results Section */}
+                {snoverrideResult && (
+                  <div className={`mb-3 p-3 border rounded ${
+                    snoverrideResult.success 
+                      ? 'bg-green-50 border-green-200' 
+                      : 'bg-red-50 border-red-200'
+                  }`}>
+                    <div className={`text-sm font-medium ${
+                      snoverrideResult.success ? 'text-green-800' : 'text-red-800'
+                    }`}>
+                      {snoverrideResult.message}
+                    </div>
+                    
+                    {snoverrideResult.success && snoverrideResult.wpEditorUrl && snoverrideResult.liveUrl && (
+                      <div className="mt-3 space-y-2">
+                        <a
+                          href={snoverrideResult.wpEditorUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full px-3 py-2 bg-blue-600 text-white text-center rounded text-sm hover:bg-blue-700 transition-colors"
+                        >
+                          🔧 Edit in Elementor (Post ID: {snoverrideResult.postId})
+                        </a>
+                        <a
+                          href={snoverrideResult.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded text-sm hover:bg-green-700 transition-colors"
+                        >
+                          🌐 View Updated Page
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <div className="text-xs text-gray-600 mt-2">
+                  {gconPiece?.g_post_id ? (
+                    <span>
+                      Update existing post ID: <strong>{gconPiece.g_post_id}</strong> on {gconPiece.asn_sitespren_base}
+                    </span>
+                  ) : (
+                    <span className="text-red-600">
+                      No g_post_id found - cannot update without target post ID
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
