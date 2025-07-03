@@ -157,6 +157,10 @@ export default function KetchSettingsTable() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteSecondConfirm, setDeleteSecondConfirm] = useState(false);
   
+  // Inline editing states
+  const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
+  
   // Form data - initialize all fields
   const getEmptyFormData = () => ({
     app_page: '',
@@ -459,6 +463,53 @@ export default function KetchSettingsTable() {
   const resetForm = () => {
     setFormData(getEmptyFormData());
   };
+
+  // Handle inline editing
+  const startInlineEdit = (id: string, field: string, currentValue: any) => {
+    setEditingCell({ id, field });
+    setEditingValue(currentValue || '');
+  };
+
+  const saveInlineEdit = async () => {
+    if (!editingCell) return;
+    
+    try {
+      const updates = { [editingCell.field]: editingValue || null };
+      const { error } = await supabase
+        .from('ketch_settings')
+        .update(updates)
+        .eq('setting_id', editingCell.id);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(prevData => 
+        prevData.map(item => 
+          item.setting_id === editingCell.id 
+            ? { ...item, [editingCell.field]: editingValue || null }
+            : item
+        )
+      );
+      
+      setEditingCell(null);
+      setEditingValue('');
+    } catch (err) {
+      console.error('Error updating field:', err);
+      alert('Failed to update field');
+    }
+  };
+
+  const cancelInlineEdit = () => {
+    setEditingCell(null);
+    setEditingValue('');
+  };
+
+  // Define which fields can be inline edited
+  const inlineEditableFields = [
+    'app_page', 'ancestor_element', 'element_tag', 'id', 'class', 
+    'other_rules_needed', 'width', 'height', 'min_width', 'min_height', 
+    'max_width', 'max_height'
+  ];
   
   // Get column display names
   const getColumnHeaders = () => {
@@ -688,6 +739,32 @@ export default function KetchSettingsTable() {
                       >
                         {String(value).substring(0, 3)}..
                       </div>
+                    ) : inlineEditableFields.includes(key) ? (
+                      editingCell?.id === row.setting_id && editingCell?.field === key ? (
+                        <input
+                          type="text"
+                          value={editingValue}
+                          onChange={(e) => setEditingValue(e.target.value)}
+                          onBlur={saveInlineEdit}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              saveInlineEdit();
+                            } else if (e.key === 'Escape') {
+                              cancelInlineEdit();
+                            }
+                          }}
+                          className="w-full min-w-[30px] h-full bg-yellow-50 border border-yellow-300 rounded px-1 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                          autoFocus
+                        />
+                      ) : (
+                        <div
+                          className="min-w-[30px] min-h-[1.25rem] cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded"
+                          onClick={() => startInlineEdit(row.setting_id, key, value)}
+                          title="Click to edit"
+                        >
+                          {String(value) || ''}
+                        </div>
+                      )
                     ) : typeof value === 'boolean' ? (value ? 'true' : 'false') : 
                      typeof value === 'object' ? JSON.stringify(value) : 
                      String(value) || '-'}
