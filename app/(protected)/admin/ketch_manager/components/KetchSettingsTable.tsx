@@ -131,6 +131,15 @@ export default function KetchSettingsTable() {
   const [sortField, setSortField] = useState<keyof KetchSettings | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
+  // Filter states
+  const [filters, setFilters] = useState({
+    app_page: 'all',
+    ancestor_element: 'all',
+    element_tag: 'all',
+    id: 'all',
+    class: 'all'
+  });
+  
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -232,6 +241,12 @@ export default function KetchSettingsTable() {
   
   const supabase = createClientComponentClient();
   
+  // Get unique values for filters
+  const getUniqueValues = (field: keyof KetchSettings) => {
+    const values = data.map(item => item[field]).filter(val => val !== null && val !== undefined);
+    return ['all', ...Array.from(new Set(values)).sort()];
+  };
+  
   // Fetch data
   useEffect(() => {
     fetchData();
@@ -255,16 +270,28 @@ export default function KetchSettingsTable() {
     }
   };
   
-  // Filter data based on search
+  // Filter data based on search and filters
   const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
+    let filtered = data;
     
-    return data.filter(row => {
-      return Object.values(row).some(value => 
-        String(value).toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    // Apply dropdown filters
+    Object.entries(filters).forEach(([field, value]) => {
+      if (value !== 'all') {
+        filtered = filtered.filter(row => row[field as keyof KetchSettings] === value);
+      }
     });
-  }, [data, searchTerm]);
+    
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(row => {
+        return Object.values(row).some(value => 
+          String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
+    }
+    
+    return filtered;
+  }, [data, searchTerm, filters]);
   
   // Sort data
   const sortedData = useMemo(() => {
@@ -465,6 +492,28 @@ export default function KetchSettingsTable() {
   
   return (
     <div className="p-4">
+      {/* Filter Dropdowns */}
+      <div className="mb-4 flex items-center gap-4 flex-wrap">
+        {Object.entries(filters).map(([field, value]) => (
+          <div key={field} className="flex items-center gap-2">
+            <label className="font-bold text-sm lowercase">{field.replace('_', ' ')}</label>
+            <select
+              value={value}
+              onChange={(e) => setFilters({...filters, [field]: e.target.value})}
+              className={`px-3 py-2 border border-gray-300 rounded-md ${
+                value !== 'all' ? 'bg-blue-900 text-white' : ''
+              }`}
+            >
+              {getUniqueValues(field as keyof KetchSettings).map(option => (
+                <option key={option} value={option}>
+                  {option === 'all' ? 'All' : option}
+                </option>
+              ))}
+            </select>
+          </div>
+        ))}
+      </div>
+      
       {/* Controls */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
