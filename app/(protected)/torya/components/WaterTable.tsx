@@ -1069,14 +1069,24 @@ export default function WaterTable({
                           );
                         }
                         
-                        // Special handling for has_img_slot - show green dot for true
+                        // Special handling for has_img_slot - show green dot for true with checkbox
                         if (col === 'has_img_slot' && value === true) {
                           return (
                             <div className="flex items-center gap-1">
                               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                               <span>true</span>
+                              <input
+                                type="checkbox"
+                                className="ml-1"
+                                style={{ width: '26px', height: '26px' }}
+                              />
                             </div>
                           );
+                        }
+                        
+                        // Special handling for has_img_slot - show only false text for false values
+                        if (col === 'has_img_slot' && value === false) {
+                          return <span>false</span>;
                         }
                         
                         // Special handling for unit_id - truncate and make clickable
@@ -1146,14 +1156,24 @@ export default function WaterTable({
                         );
                       }
                       
-                      // Special handling for has_img_slot - show green dot for true
+                      // Special handling for has_img_slot - show green dot for true with checkbox
                       if (col === 'has_img_slot' && value === true) {
                         return (
                           <div className="flex items-center gap-1">
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                             <span>true</span>
+                            <input
+                              type="checkbox"
+                              className="ml-1"
+                              style={{ width: '26px', height: '26px' }}
+                            />
                           </div>
                         );
+                      }
+                      
+                      // Special handling for has_img_slot - show only false text for false values
+                      if (col === 'has_img_slot' && value === false) {
+                        return <span>false</span>;
                       }
                       
                       // Special handling for unit_id - truncate and make clickable
