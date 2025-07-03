@@ -1259,7 +1259,7 @@ export default function ToryaPage() {
                   </select>
                 </div>
                 
-                <div className="mt-4">
+                <div className="mt-4 flex gap-2">
                   <button
                     onClick={handleSaveImagePlanBatch}
                     disabled={isSavingBatch || !selectedBatchId}
@@ -1271,27 +1271,24 @@ export default function ToryaPage() {
                   >
                     {isSavingBatch ? 'Saving...' : 'save'}
                   </button>
-                </div>
-
-                {/* Batch Link - Show if batch is assigned */}
-                {gconPiece?.asn_image_plan_batch_id && (
-                  <div className="mt-3">
-                    <a
-                      href={`/bin34/tebnar2?batchid=${gconPiece.asn_image_plan_batch_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block px-4 py-2 rounded text-center"
+                  
+                  {/* Open Batch Button - Show if batch is selected or assigned */}
+                  {(selectedBatchId || gconPiece?.asn_image_plan_batch_id) && (
+                    <button
+                      onClick={() => {
+                        const batchId = selectedBatchId || gconPiece?.asn_image_plan_batch_id;
+                        window.open(`https://snef.me/bin34/tebnar2?batchid=${batchId}`, '_blank');
+                      }}
+                      className="px-4 py-2 text-white rounded"
                       style={{
-                        fontSize: '16px',
-                        color: '#374151', // dark gray
-                        backgroundColor: '#faf8f1', // very light beige
-                        textDecoration: 'none'
+                        backgroundColor: '#87CEEB', // baby blue
+                        fontSize: '16px'
                       }}
                     >
                       open batch in /tebnar2
-                    </a>
-                  </div>
-                )}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* NEW AREA 3: Dublish Function Box */}
