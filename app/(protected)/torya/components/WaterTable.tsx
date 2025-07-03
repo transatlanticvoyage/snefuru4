@@ -1136,32 +1136,40 @@ export default function WaterTable({
                           return <span>false</span>;
                         }
                         
-                        // Special handling for man_img_url - text input for manual image URL
+                        // Special handling for man_img_url - text input only if has_img_slot is true
                         if (col === 'man_img_url') {
-                          return (
-                            <input
-                              type="text"
-                              placeholder="paste image URL here"
-                              value={manualImageUrls.get(row.unit_id) || ''}
-                              onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
-                              className="w-full p-2 text-xs border border-gray-300 rounded"
-                              style={{ minWidth: '200px' }}
-                            />
-                          );
+                          if (row.has_img_slot === true) {
+                            return (
+                              <input
+                                type="text"
+                                placeholder="paste image URL here"
+                                value={manualImageUrls.get(row.unit_id) || ''}
+                                onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
+                                className="w-full p-2 text-xs border border-gray-300 rounded"
+                                style={{ minWidth: '200px' }}
+                              />
+                            );
+                          } else {
+                            return null; // Show nothing if has_img_slot is not true
+                          }
                         }
                         
-                        // Special handling for man_img_id - text input for manual image ID
+                        // Special handling for man_img_id - text input only if has_img_slot is true
                         if (col === 'man_img_id') {
-                          return (
-                            <input
-                              type="text"
-                              placeholder="paste image ID like 3933"
-                              value={manualImageIds.get(row.unit_id) || ''}
-                              onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
-                              className="w-full p-2 text-xs border border-gray-300 rounded"
-                              style={{ minWidth: '150px' }}
-                            />
-                          );
+                          if (row.has_img_slot === true) {
+                            return (
+                              <input
+                                type="text"
+                                placeholder="paste image ID like 3933"
+                                value={manualImageIds.get(row.unit_id) || ''}
+                                onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
+                                className="w-full p-2 text-xs border border-gray-300 rounded"
+                                style={{ minWidth: '150px' }}
+                              />
+                            );
+                          } else {
+                            return null; // Show nothing if has_img_slot is not true
+                          }
                         }
                         
                         // Special handling for unit_id - truncate and make clickable
@@ -1253,32 +1261,40 @@ export default function WaterTable({
                         return <span>false</span>;
                       }
                       
-                      // Special handling for man_img_url - text input for manual image URL
+                      // Special handling for man_img_url - text input only if has_img_slot is true
                       if (col === 'man_img_url') {
-                        return (
-                          <input
-                            type="text"
-                            placeholder="paste image URL here"
-                            value={manualImageUrls.get(row.unit_id) || ''}
-                            onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
-                            className="w-full p-2 text-xs border border-gray-300 rounded"
-                            style={{ minWidth: '200px' }}
-                          />
-                        );
+                        if (row.has_img_slot === true) {
+                          return (
+                            <input
+                              type="text"
+                              placeholder="paste image URL here"
+                              value={manualImageUrls.get(row.unit_id) || ''}
+                              onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
+                              className="w-full p-2 text-xs border border-gray-300 rounded"
+                              style={{ minWidth: '200px' }}
+                            />
+                          );
+                        } else {
+                          return null; // Show nothing if has_img_slot is not true
+                        }
                       }
                       
-                      // Special handling for man_img_id - text input for manual image ID
+                      // Special handling for man_img_id - text input only if has_img_slot is true
                       if (col === 'man_img_id') {
-                        return (
-                          <input
-                            type="text"
-                            placeholder="paste image ID like 3933"
-                            value={manualImageIds.get(row.unit_id) || ''}
-                            onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
-                            className="w-full p-2 text-xs border border-gray-300 rounded"
-                            style={{ minWidth: '150px' }}
-                          />
-                        );
+                        if (row.has_img_slot === true) {
+                          return (
+                            <input
+                              type="text"
+                              placeholder="paste image ID like 3933"
+                              value={manualImageIds.get(row.unit_id) || ''}
+                              onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
+                              className="w-full p-2 text-xs border border-gray-300 rounded"
+                              style={{ minWidth: '150px' }}
+                            />
+                          );
+                        } else {
+                          return null; // Show nothing if has_img_slot is not true
+                        }
                       }
                       
                       // Special handling for unit_id - truncate and make clickable
