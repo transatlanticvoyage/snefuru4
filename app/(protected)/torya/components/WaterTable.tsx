@@ -38,7 +38,6 @@ interface NemtorUnit {
 }
 
 type ColumnTemplateKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
-type StickyColumnKey = 'option1' | 'option2' | 'option3' | 'option4' | 'option5';
 
 const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; columns: (keyof NemtorUnit | 'man_img_url' | 'man_img_id')[] }> = {
   'option1': {
@@ -68,13 +67,6 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   }
 };
 
-const stickyOptions: Record<StickyColumnKey, number> = {
-  'option1': 1,
-  'option2': 2,
-  'option3': 3,
-  'option4': 4,
-  'option5': 5
-};
 
 // No mock data - we'll fetch real nemtor_units data from database
 
@@ -121,9 +113,8 @@ export default function WaterTable({
   // Selection state
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   
-  // Column template and sticky column state
+  // Column template state
   const [selectedColumnTemplate, setSelectedColumnTemplate] = useState<ColumnTemplateKey>('option1');
-  const [selectedStickyOption, setSelectedStickyOption] = useState<StickyColumnKey>('option1');
   
   // Unit marker filter state
   const [unitMarkerFilter, setUnitMarkerFilter] = useState<string>('all');
@@ -142,14 +133,10 @@ export default function WaterTable({
     if (!searchParams) return;
     
     const coltemp = searchParams.get('coltemp') as ColumnTemplateKey;
-    const stickycol = searchParams.get('stickycol') as StickyColumnKey;
     const unitMarker = searchParams.get('unit_marker');
     
     if (coltemp && columnTemplates[coltemp]) {
       setSelectedColumnTemplate(coltemp);
-    }
-    if (stickycol && stickyOptions[stickycol]) {
-      setSelectedStickyOption(stickycol);
     }
     if (unitMarker) {
       setUnitMarkerFilter(unitMarker);
@@ -157,10 +144,9 @@ export default function WaterTable({
   }, [searchParams]);
 
   // Update URL when selections change
-  const updateUrl = (colTemplate: ColumnTemplateKey, stickyCol: StickyColumnKey, unitMarker?: string) => {
+  const updateUrl = (colTemplate: ColumnTemplateKey, unitMarker?: string) => {
     const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('coltemp', colTemplate);
-    params.set('stickycol', stickyCol);
     
     // Handle unit_marker
     if (unitMarker !== undefined) {
@@ -225,18 +211,13 @@ export default function WaterTable({
 
   const handleColumnTemplateChange = (option: ColumnTemplateKey) => {
     setSelectedColumnTemplate(option);
-    updateUrl(option, selectedStickyOption);
-  };
-
-  const handleStickyOptionChange = (option: StickyColumnKey) => {
-    setSelectedStickyOption(option);
-    updateUrl(selectedColumnTemplate, option);
+    updateUrl(option);
   };
 
   const handleUnitMarkerFilterChange = (unitMarker: string) => {
     setUnitMarkerFilter(unitMarker);
     setCurrentPage(1); // Reset to first page when filtering
-    updateUrl(selectedColumnTemplate, selectedStickyOption, unitMarker);
+    updateUrl(selectedColumnTemplate, unitMarker);
   };
 
   // Get visible columns based on template
@@ -244,11 +225,8 @@ export default function WaterTable({
     return columnTemplates[selectedColumnTemplate].columns;
   }, [selectedColumnTemplate]);
 
-  // Get sticky columns
-  const stickyColumnCount = stickyOptions[selectedStickyOption];
-  const allColumns: (keyof NemtorUnit | 'select' | 'prisomi' | 'man_img_url' | 'man_img_id')[] = ['prisomi', 'select', 'unit_id', 'unit_marker', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at'];
-  const stickyColumns = allColumns.slice(0, stickyColumnCount + 2); // +2 to include prisomi and select columns
-  const nonStickyVisibleColumns = visibleColumns.filter(col => !stickyColumns.includes(col));
+  // Add select and prisomi columns to the front of visible columns
+  const allVisibleColumns = ['prisomi', 'select', ...visibleColumns];
 
   // Get unique unit_marker values for dropdown
   const uniqueUnitMarkers = useMemo(() => {
@@ -678,31 +656,6 @@ export default function WaterTable({
           </div>
         </div>
 
-        {/* Sticky Columns */}
-        <div className="flex items-center gap-2">
-          <div className="font-bold text-sm">Sticky Columns At Left Side Of UI Grid Table</div>
-          <div className="flex" style={{ maxHeight: '75px' }}>
-            {Object.entries(stickyOptions).map(([key, count]) => (
-              <button
-                key={key}
-                onClick={() => handleStickyOptionChange(key as StickyColumnKey)}
-                className={`border text-xs leading-tight px-3 py-2 ${
-                  selectedStickyOption === key 
-                    ? 'bg-navy-900 text-white border-navy-900' 
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-                style={{ 
-                  minWidth: '80px',
-                  backgroundColor: selectedStickyOption === key ? '#1e3a8a' : undefined 
-                }}
-              >
-                <div>{key.toUpperCase()}</div>
-                <div>{count} left-most</div>
-                <div>column{count > 1 ? 's' : ''}</div>
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Search and Controls */}
@@ -762,54 +715,28 @@ export default function WaterTable({
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg" style={{ height: '750px', overflowY: 'auto' }}>
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50 sticky top-0 z-20">
-            {/* Horizomi Row - Column Numbering */}
+          <thead className="bg-gray-50">
+            {/* Column Numbering Row */}
             <tr>
-              {/* Horizomi header column numbering */}
-              {(() => {
-                let visibleColumnNumber = 1;
-                return allColumns.map((col, index) => {
-                  const isLastStickyCol = index === stickyColumns.length - 1;
-                  const isPrisomiCol = col === 'prisomi';
-                  const isSelectCol = col === 'select';
-                  const isVisible = isPrisomiCol || isSelectCol || visibleColumns.includes(col as keyof NemtorUnit);
-                  
-                  if (!isVisible) return null;
-                  
-                  const currentColumnNumber = visibleColumnNumber++;
-                  
-                  const isSticky = stickyColumns.includes(col);
-                  let leftPosition = '0px';
-                  
-                  if (isSticky) {
-                    if (isPrisomiCol) {
-                      leftPosition = '0px';
-                    } else if (isSelectCol) {
-                      leftPosition = '20px'; // After prisomi (20px width)
-                    } else {
-                      // Other sticky columns
-                      const stickyIndex = stickyColumns.indexOf(col);
-                      leftPosition = `${20 + 60 + (stickyIndex - 2) * 150}px`; // 20px (prisomi) + 60px (select) + others
-                    }
-                  }
-                  
-                  return (
-                    <th
-                      key={`horizomi-${col}`}
-                      className={`border border-gray-300 bg-purple-50 p-0 text-center ${
-                        isSticky ? 'sticky z-10' : ''
-                      } ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
-                      style={{ 
-                        width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
-                        maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
-                        minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
-                        left: isSticky ? leftPosition : undefined
-                      }}
-                    >
-                      <div className="relative group">
-                        <div className="text-center text-xs font-normal text-gray-600">
-                          {currentColumnNumber}
-                        </div>
+              {allVisibleColumns.map((col, index) => {
+                const isPrisomiCol = col === 'prisomi';
+                const isSelectCol = col === 'select';
+                const currentColumnNumber = index + 1;
+                
+                return (
+                  <th
+                    key={`horizomi-${col}`}
+                    className="border border-gray-300 bg-purple-50 p-0 text-center"
+                    style={{ 
+                      width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
+                      maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
+                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px'
+                    }}
+                  >
+                    <div className="relative group">
+                      <div className="text-center text-xs font-normal text-gray-600">
+                        {currentColumnNumber}
+                      </div>
                       <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
                         <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
                           <div className="mb-2">
@@ -843,15 +770,12 @@ export default function WaterTable({
                     </div>
                   </th>
                 );
-                });
-              })()}
+              })}
             </tr>
             
             {/* Main Header Row */}
             <tr>
-              {/* Sticky columns */}
-              {stickyColumns.map((col, index) => {
-                const isLastStickyCol = index === stickyColumns.length - 1;
+              {allVisibleColumns.map((col) => {
                 const isPrisomiCol = col === 'prisomi';
                 const isSelectCol = col === 'select';
                 
@@ -859,11 +783,8 @@ export default function WaterTable({
                   return (
                     <th
                       key={col}
-                      className={`border border-gray-300 bg-purple-50 p-0 sticky bg-gray-50 z-10 ${
-                        isLastStickyCol ? 'border-r-4 border-black' : ''
-                      }`}
+                      className="border border-gray-300 bg-purple-50 p-0 bg-gray-50"
                       style={{ 
-                        left: '0px',
                         width: '20px',
                         maxWidth: '20px',
                         minWidth: '20px'
@@ -904,17 +825,10 @@ export default function WaterTable({
                   return (
                     <th
                       key={col}
-                      className={`text-left sticky bg-gray-50 z-10 ${
-                        isLastStickyCol ? 'border-r-4 border-black' : ''
-                      }`}
+                      className="text-left bg-gray-50"
                       style={{ 
-                        left: '20px', // After prisomi column (20px width)
                         width: '60px',
-                        padding: '6px 10px !important',
-                        paddingTop: '6px !important',
-                        paddingBottom: '6px !important',
-                        paddingLeft: '10px !important',
-                        paddingRight: '10px !important'
+                        padding: '6px 10px'
                       }}
                     >
                       <div 
@@ -942,13 +856,10 @@ export default function WaterTable({
                     onClick={() => col !== 'man_img_url' && col !== 'man_img_id' ? handleSort(col as keyof NemtorUnit) : undefined}
                     className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider ${
                       col !== 'man_img_url' && col !== 'man_img_id' ? 'cursor-pointer hover:bg-gray-100' : ''
-                    } sticky bg-gray-50 z-10 border border-gray-200 ${
-                      col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''
-                    } ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${
-                      isLastStickyCol ? 'border-r-4 border-black' : ''
-                    }`}
-                    style={{ 
-                      left: `${20 + 60 + (index - 2) * 150}px`, // 20px (prisomi) + 60px (select) + column positions
+                    } bg-gray-50 border border-gray-200 ${
+                      col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
+                    } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
+                    style={{
                       width: col === 'full_text_edits' ? '600px' : undefined,
                       minWidth: col === 'full_text_edits' ? '600px' : undefined,
                       maxWidth: col === 'full_text_edits' ? '600px' : undefined
@@ -965,40 +876,12 @@ export default function WaterTable({
                   </th>
                 );
               })}
-              {/* Non-sticky visible columns */}
-              {nonStickyVisibleColumns.map((col) => (
-                <th
-                  key={col}
-                  onClick={() => col !== 'man_img_url' && col !== 'man_img_id' ? handleSort(col) : undefined}
-                  className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider ${
-                    col !== 'man_img_url' && col !== 'man_img_id' ? 'cursor-pointer hover:bg-gray-100' : ''
-                  } border border-gray-200 ${
-                    col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                  } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
-                  style={{
-                    width: col === 'full_text_edits' ? '600px' : undefined,
-                    minWidth: col === 'full_text_edits' ? '600px' : undefined,
-                    maxWidth: col === 'full_text_edits' ? '600px' : undefined
-                  }}
-                >
-                  <div className="flex items-center gap-1">
-                    <span>{col}</span>
-                    {sortField === col && (
-                      <span className="text-blue-600">
-                        {sortOrder === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </div>
-                </th>
-              ))}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.map((row, rowIndex) => (
               <tr key={row.unit_id} className="hover:bg-gray-50">
-                {/* Sticky columns */}
-                {stickyColumns.map((col, index) => {
-                  const isLastStickyCol = index === stickyColumns.length - 1;
+                {allVisibleColumns.map((col) => {
                   const isPrisomiCol = col === 'prisomi';
                   const isSelectCol = col === 'select';
                   
@@ -1007,11 +890,8 @@ export default function WaterTable({
                     return (
                       <td 
                         key={col} 
-                        className={`border border-gray-300 bg-purple-50 p-0 sticky bg-white z-10 ${
-                          isLastStickyCol ? 'border-r-4 border-black' : ''
-                        }`}
+                        className="border border-gray-300 bg-purple-50 p-0"
                         style={{ 
-                          left: '0px',
                           width: '20px',
                           maxWidth: '20px',
                           minWidth: '20px'
@@ -1052,11 +932,8 @@ export default function WaterTable({
                     return (
                       <td 
                         key={col} 
-                        className={`whitespace-nowrap text-sm text-gray-900 sticky bg-white ${
-                          isLastStickyCol ? 'border-r-4 border-black' : ''
-                        }`}
+                        className="whitespace-nowrap text-sm text-gray-900"
                         style={{ 
-                          left: '20px', // After prisomi column (20px width)
                           width: '60px',
                           padding: '6px 10px !important',
                           paddingTop: '6px !important',
@@ -1088,11 +965,10 @@ export default function WaterTable({
                   return (
                     <td 
                       key={col} 
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 sticky bg-white border border-gray-200 ${
+                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
                         col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                      } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''} ${isLastStickyCol ? 'border-r-4 border-black' : ''}`}
+                      } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                       style={{ 
-                        left: `${20 + 60 + (index - 2) * 150}px`, // 20px (prisomi) + 60px (select) + column positions
                         width: col === 'full_text_edits' ? '600px' : undefined,
                         minWidth: col === 'full_text_edits' ? '600px' : undefined,
                         maxWidth: col === 'full_text_edits' ? '600px' : undefined
@@ -1210,130 +1086,6 @@ export default function WaterTable({
                     </td>
                   );
                 })}
-                {/* Non-sticky visible columns */}
-                {nonStickyVisibleColumns.map((col) => (
-                  <td 
-                    key={col} 
-                    className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
-                      col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                    } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
-                    style={{
-                      width: col === 'full_text_edits' ? '600px' : undefined,
-                      minWidth: col === 'full_text_edits' ? '600px' : undefined,
-                      maxWidth: col === 'full_text_edits' ? '600px' : undefined
-                    }}
-                  >
-                    {(() => {
-                      const value = row[col as keyof NemtorUnit];
-                      
-                      // Special handling for full_text_edits - use textarea for code editing
-                      if (col === 'full_text_edits') {
-                        return (
-                          <textarea
-                            className="kz_torya_fulltextedits_box1 w-full h-20 p-2 text-xs font-mono border border-gray-300 rounded resize-none"
-                            value={value?.toString() || ''}
-                            onChange={(e) => {
-                              handleFullTextEditsChange(row.unit_id, e.target.value);
-                            }}
-                          />
-                        );
-                      }
-                      
-                      // Special handling for has_img_slot - show green dot for true with checkbox
-                      if (col === 'has_img_slot' && value === true) {
-                        return (
-                          <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>true</span>
-                            <input
-                              type="checkbox"
-                              checked={hasImgSlotCheckboxes.get(row.unit_id) || false}
-                              onChange={(e) => handleHasImgSlotCheckboxChange(row.unit_id, e.target.checked)}
-                              className="ml-1"
-                              style={{ width: '26px', height: '26px' }}
-                            />
-                          </div>
-                        );
-                      }
-                      
-                      // Special handling for has_img_slot - show only false text for false values
-                      if (col === 'has_img_slot' && value === false) {
-                        return <span>false</span>;
-                      }
-                      
-                      // Special handling for man_img_url - text input only if has_img_slot is true
-                      if (col === 'man_img_url') {
-                        if (row.has_img_slot === true) {
-                          return (
-                            <input
-                              type="text"
-                              placeholder="paste image URL here"
-                              value={manualImageUrls.get(row.unit_id) || ''}
-                              onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
-                              className="w-full p-2 text-xs border border-gray-300 rounded"
-                              style={{ minWidth: '200px' }}
-                            />
-                          );
-                        } else {
-                          return null; // Show nothing if has_img_slot is not true
-                        }
-                      }
-                      
-                      // Special handling for man_img_id - text input only if has_img_slot is true
-                      if (col === 'man_img_id') {
-                        if (row.has_img_slot === true) {
-                          return (
-                            <input
-                              type="text"
-                              placeholder="paste image ID like 3933"
-                              value={manualImageIds.get(row.unit_id) || ''}
-                              onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
-                              className="w-full p-2 text-xs border border-gray-300 rounded"
-                              style={{ minWidth: '150px' }}
-                            />
-                          );
-                        } else {
-                          return null; // Show nothing if has_img_slot is not true
-                        }
-                      }
-                      
-                      // Special handling for unit_id - truncate and make clickable
-                      if (col === 'unit_id' && value) {
-                        const fullValue = value.toString();
-                        const truncatedValue = fullValue.substring(0, 2) + '.';
-                        return (
-                          <div 
-                            className="cursor-pointer hover:bg-blue-50"
-                            title={fullValue}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigator.clipboard.writeText(fullValue);
-                            }}
-                          >
-                            {truncatedValue}
-                          </div>
-                        );
-                      }
-                      
-                      if (col.includes('_json') && value) {
-                        const isRawJson = col === 'raw_json';
-                        return (
-                          <div 
-                            className={`truncate max-w-xs ${isRawJson ? 'cursor-pointer hover:bg-blue-50' : ''}`}
-                            title={JSON.stringify(value, null, 2)}
-                            onClick={isRawJson ? (e) => {
-                              e.stopPropagation();
-                              navigator.clipboard.writeText(JSON.stringify(value, null, 2));
-                            } : undefined}
-                          >
-                            {typeof value === 'object' ? JSON.stringify(value).substring(0, 50) + '...' : value}
-                          </div>
-                        );
-                      }
-                      return value?.toString() || '-';
-                    })()}
-                  </td>
-                ))}
               </tr>
             ))}
           </tbody>
