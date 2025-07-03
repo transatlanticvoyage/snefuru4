@@ -499,6 +499,9 @@ export default function KetchSettingsTable() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider">
+                actions
+              </th>
               {getColumnHeaders().map((column) => (
                 <th
                   key={column}
@@ -513,21 +516,11 @@ export default function KetchSettingsTable() {
                   )}
                 </th>
               ))}
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider">
-                actions
-              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.map((row) => (
               <tr key={row.setting_id} className="hover:bg-gray-50">
-                {Object.entries(row).map(([key, value]) => (
-                  <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {typeof value === 'boolean' ? (value ? 'true' : 'false') : 
-                     typeof value === 'object' ? JSON.stringify(value) : 
-                     String(value) || '-'}
-                  </td>
-                ))}
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <button
                     onClick={() => startEdit(row)}
@@ -562,6 +555,13 @@ export default function KetchSettingsTable() {
                     </button>
                   )}
                 </td>
+                {Object.entries(row).map(([key, value]) => (
+                  <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {typeof value === 'boolean' ? (value ? 'true' : 'false') : 
+                     typeof value === 'object' ? JSON.stringify(value) : 
+                     String(value) || '-'}
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>
