@@ -345,7 +345,10 @@ export default function ToryaPage() {
 
     try {
       // Step 1: Start with pelementor_cached as our base for pelementor_edits
-      let pelementorEditsContent = gconPiece.pelementor_cached;
+      // Ensure we're working with a string, not an object
+      let pelementorEditsContent = typeof gconPiece.pelementor_cached === 'string' 
+        ? gconPiece.pelementor_cached 
+        : JSON.stringify(gconPiece.pelementor_cached);
 
       // Step 2: Fetch all nemtor_units for this gcon_piece
       const { data: nemtorUnits, error: nemtorError } = await supabase
@@ -391,9 +394,14 @@ export default function ToryaPage() {
       });
 
       // Step 4: Update pelementor_edits in database
+      // Convert back to object if original was an object, or keep as string
+      const pelementorEditsForDb = typeof gconPiece.pelementor_cached === 'object' 
+        ? JSON.parse(pelementorEditsContent)
+        : pelementorEditsContent;
+
       const { error: updateError } = await supabase
         .from('gcon_pieces')
-        .update({ pelementor_edits: pelementorEditsContent })
+        .update({ pelementor_edits: pelementorEditsForDb })
         .eq('id', gconPieceId);
 
       if (updateError) {
@@ -402,7 +410,7 @@ export default function ToryaPage() {
       }
 
       // Step 5: Update local state
-      setGconPiece((prev: any) => prev ? { ...prev, pelementor_edits: pelementorEditsContent } : prev);
+      setGconPiece((prev: any) => prev ? { ...prev, pelementor_edits: pelementorEditsForDb } : prev);
 
       // Step 6: Show success message with details
       const successMessage = `Successfully compiled text content!\n\nReplacements made: ${replacementsCount}\n\n` +
