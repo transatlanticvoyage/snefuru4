@@ -6,6 +6,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import WaterTable from './components/WaterTable';
+import MarzdiStickyMenu from './components/marzdi_sticky_menu';
 
 export default function ToryaPage() {
   const { user } = useAuth();
@@ -267,6 +268,9 @@ export default function ToryaPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Sticky Menu Component */}
+      <MarzdiStickyMenu mudTitle={gconPiece?.mud_title} />
+      
       <div className="p-4">
         <div className="mb-4 flex items-center gap-4">
           <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
