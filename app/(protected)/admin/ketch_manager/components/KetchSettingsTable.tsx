@@ -762,12 +762,12 @@ export default function KetchSettingsTable() {
                           onClick={() => startInlineEdit(row.setting_id, key, value)}
                           title="Click to edit"
                         >
-                          {String(value) || ''}
+                          {value === null ? '' : String(value)}
                         </div>
                       )
                     ) : typeof value === 'boolean' ? (value ? 'true' : 'false') : 
                      typeof value === 'object' ? JSON.stringify(value) : 
-                     String(value) || '-'}
+                     value === null ? '' : String(value)}
                   </td>
                 ))}
               </tr>
