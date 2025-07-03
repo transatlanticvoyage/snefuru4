@@ -713,7 +713,7 @@ export default function WaterTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-lg" style={{ height: '750px', overflowY: 'auto' }}>
+      <div className="overflow-x-auto border border-gray-200 rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             {/* Column Numbering Row */}
