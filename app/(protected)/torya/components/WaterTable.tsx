@@ -125,6 +125,10 @@ export default function WaterTable({
   
   // Unit marker filter state
   const [unitMarkerFilter, setUnitMarkerFilter] = useState<string>('all');
+  
+  // Save full_text_edits state
+  const [isSavingFullTextEdits, setIsSavingFullTextEdits] = useState(false);
+  const [fullTextEditsChanges, setFullTextEditsChanges] = useState<Map<string, string>>(new Map());
 
   // Initialize from URL parameters
   useEffect(() => {
@@ -334,6 +338,60 @@ export default function WaterTable({
       // Select all visible rows
       const allRowIds = new Set(paginatedData.map(row => row.unit_id));
       setSelectedRows(allRowIds);
+    }
+  };
+
+  // Handle full_text_edits change
+  const handleFullTextEditsChange = (unitId: string, newValue: string) => {
+    const newChanges = new Map(fullTextEditsChanges);
+    newChanges.set(unitId, newValue);
+    setFullTextEditsChanges(newChanges);
+    
+    // Update local data immediately for UI responsiveness
+    setData(prevData => 
+      prevData.map(item => 
+        item.unit_id === unitId 
+          ? { ...item, full_text_edits: newValue }
+          : item
+      )
+    );
+  };
+
+  // Save all full_text_edits changes
+  const handleSaveFullTextEdits = async () => {
+    if (fullTextEditsChanges.size === 0) {
+      alert('No changes to save');
+      return;
+    }
+
+    setIsSavingFullTextEdits(true);
+
+    try {
+      const updates = Array.from(fullTextEditsChanges.entries()).map(([unitId, fullTextEdits]) => ({
+        unit_id: unitId,
+        full_text_edits: fullTextEdits || null
+      }));
+
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('nemtor_units')
+          .update({ full_text_edits: update.full_text_edits })
+          .eq('unit_id', update.unit_id);
+
+        if (error) {
+          console.error(`Error updating unit ${update.unit_id}:`, error);
+          throw error;
+        }
+      }
+
+      // Clear changes after successful save
+      setFullTextEditsChanges(new Map());
+      alert(`Successfully saved ${updates.length} full_text_edits changes!`);
+    } catch (error) {
+      console.error('Error saving full_text_edits:', error);
+      alert('Failed to save changes. Please try again.');
+    } finally {
+      setIsSavingFullTextEdits(false);
     }
   };
 
@@ -640,6 +698,18 @@ export default function WaterTable({
                 </option>
               ))}
             </select>
+            
+            <button
+              onClick={handleSaveFullTextEdits}
+              disabled={isSavingFullTextEdits || fullTextEditsChanges.size === 0}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                isSavingFullTextEdits || fullTextEditsChanges.size === 0
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              }`}
+            >
+              {isSavingFullTextEdits ? 'Saving...' : `Save${fullTextEditsChanges.size > 0 ? ` (${fullTextEditsChanges.size})` : ''}`}
+            </button>
           </div>
         </div>
         
