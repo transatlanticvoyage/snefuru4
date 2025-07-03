@@ -15,7 +15,7 @@ export default function UtgManagerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <div className="p-4">
         <div className="mb-4">
           <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
@@ -24,9 +24,9 @@ export default function UtgManagerPage() {
         </div>
         
         <h1 className="text-2xl font-bold mb-6">UTG Manager</h1>
-        
-        {/* Rest of UI will be added later */}
       </div>
+      
+      <div className="test_parkerxnow"></div>
     </div>
   );
 }
