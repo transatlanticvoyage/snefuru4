@@ -244,7 +244,7 @@ export default function KetchSettingsTable() {
   // Get unique values for filters
   const getUniqueValues = (field: keyof KetchSettings) => {
     const values = data.map(item => item[field]).filter(val => val !== null && val !== undefined);
-    return ['all', ...Array.from(new Set(values)).sort()];
+    return ['all', ...Array.from(new Set(values.map(v => String(v)))).sort()];
   };
   
   // Fetch data
