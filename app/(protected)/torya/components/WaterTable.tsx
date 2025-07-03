@@ -89,6 +89,7 @@ interface WaterTableProps {
   handleCopyPelementorCached?: () => void;
   handleCopyPelementorEdits?: () => void;
   handleCopyF22Report?: () => void;
+  onGetManualImageData?: React.MutableRefObject<{ urls: Map<string, string>; ids: Map<string, string>; checkboxes: Map<string, boolean> } | null>;
 }
 
 export default function WaterTable({ 
@@ -101,7 +102,8 @@ export default function WaterTable({
   handleRunF22,
   handleCopyPelementorCached,
   handleCopyPelementorEdits,
-  handleCopyF22Report
+  handleCopyF22Report,
+  onGetManualImageData
 }: WaterTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -133,6 +135,7 @@ export default function WaterTable({
   // Manual image input state
   const [manualImageUrls, setManualImageUrls] = useState<Map<string, string>>(new Map());
   const [manualImageIds, setManualImageIds] = useState<Map<string, string>>(new Map());
+  const [hasImgSlotCheckboxes, setHasImgSlotCheckboxes] = useState<Map<string, boolean>>(new Map());
 
   // Initialize from URL parameters
   useEffect(() => {
@@ -374,6 +377,24 @@ export default function WaterTable({
     newIds.set(unitId, newValue);
     setManualImageIds(newIds);
   };
+
+  // Handle has_img_slot checkbox change
+  const handleHasImgSlotCheckboxChange = (unitId: string, checked: boolean) => {
+    const newCheckboxes = new Map(hasImgSlotCheckboxes);
+    newCheckboxes.set(unitId, checked);
+    setHasImgSlotCheckboxes(newCheckboxes);
+  };
+
+  // Set up ref for parent to access manual image data
+  useEffect(() => {
+    if (onGetManualImageData) {
+      onGetManualImageData.current = {
+        urls: manualImageUrls,
+        ids: manualImageIds,
+        checkboxes: hasImgSlotCheckboxes
+      };
+    }
+  }, [manualImageUrls, manualImageIds, hasImgSlotCheckboxes, onGetManualImageData]);
 
   // Save all full_text_edits changes
   const handleSaveFullTextEdits = async () => {
@@ -1101,6 +1122,8 @@ export default function WaterTable({
                               <span>true</span>
                               <input
                                 type="checkbox"
+                                checked={hasImgSlotCheckboxes.get(row.unit_id) || false}
+                                onChange={(e) => handleHasImgSlotCheckboxChange(row.unit_id, e.target.checked)}
                                 className="ml-1"
                                 style={{ width: '26px', height: '26px' }}
                               />
@@ -1216,6 +1239,8 @@ export default function WaterTable({
                             <span>true</span>
                             <input
                               type="checkbox"
+                              checked={hasImgSlotCheckboxes.get(row.unit_id) || false}
+                              onChange={(e) => handleHasImgSlotCheckboxChange(row.unit_id, e.target.checked)}
                               className="ml-1"
                               style={{ width: '26px', height: '26px' }}
                             />

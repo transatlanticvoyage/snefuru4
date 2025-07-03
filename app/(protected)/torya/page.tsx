@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useSearchParams } from 'next/navigation';
@@ -52,6 +52,13 @@ export default function ToryaPage() {
     liveUrl?: string;
     postId?: number;
     message?: string;
+  } | null>(null);
+
+  // Ref to access manual image data from WaterTable
+  const manualImageDataRef = useRef<{ 
+    urls: Map<string, string>; 
+    ids: Map<string, string>; 
+    checkboxes: Map<string, boolean> 
   } | null>(null);
 
   useEffect(() => {
@@ -365,7 +372,7 @@ export default function ToryaPage() {
       // Step 2: Fetch all nemtor_units for this gcon_piece
       const { data: nemtorUnits, error: nemtorError } = await supabase
         .from('nemtor_units')
-        .select('unit_id, full_text_cached, full_text_edits')
+        .select('unit_id, full_text_cached, full_text_edits, has_img_slot')
         .eq('fk_gcon_piece_id', gconPieceId);
 
       if (nemtorError) {
@@ -405,7 +412,56 @@ export default function ToryaPage() {
         }
       });
 
-      // Step 4: Update pelementor_edits in database
+      // Step 4: Process manual image inputs (includes active checkboxes for man_img_url and man_img_id)
+      let imageReplacementsCount = 0;
+      if (manualImageDataRef.current) {
+        const { urls, ids, checkboxes } = manualImageDataRef.current;
+        
+        nemtorUnits.forEach(unit => {
+          // Only process units that have has_img_slot = true AND checkbox is checked
+          if (unit.has_img_slot === true && checkboxes.get(unit.unit_id)) {
+            const manualUrl = urls.get(unit.unit_id);
+            const manualId = ids.get(unit.unit_id);
+            
+            // Only proceed if we have both URL and ID
+            if (manualUrl && manualUrl.trim() !== '' && manualId && manualId.trim() !== '') {
+              // Replace image URLs and IDs in pelementorEditsContent
+              // Look for common Elementor image patterns
+              const imagePatterns = [
+                // Image widget URL pattern
+                /"url":"[^"]*"/g,
+                // Image widget ID pattern  
+                /"id":\d+/g,
+                // Background image URL pattern
+                /"background_image":{"url":"[^"]*"/g,
+                // Background image ID pattern
+                /"background_image":{"url":"[^"]*","id":\d+/g
+              ];
+              
+              // Replace image URLs
+              pelementorEditsContent = pelementorEditsContent.replace(
+                /"url":"[^"]*"/g, 
+                `"url":"${manualUrl}"`
+              );
+              
+              // Replace image IDs  
+              pelementorEditsContent = pelementorEditsContent.replace(
+                /"id":\d+/g,
+                `"id":${manualId}`
+              );
+              
+              imageReplacementsCount++;
+              replacements.push({
+                original: `Image slot for unit ${unit.unit_id.substring(0, 8)}...`,
+                replacement: `URL: ${manualUrl.substring(0, 50)}${manualUrl.length > 50 ? '...' : ''}, ID: ${manualId}`,
+                unitId: unit.unit_id
+              });
+            }
+          }
+        });
+      }
+
+      // Step 5: Update pelementor_edits in database
       // Convert back to object if original was an object, or keep as string
       const pelementorEditsForDb = typeof gconPiece.pelementor_cached === 'object' 
         ? JSON.parse(pelementorEditsContent)
@@ -421,11 +477,12 @@ export default function ToryaPage() {
         throw updateError;
       }
 
-      // Step 5: Update local state
+      // Step 6: Update local state
       setGconPiece((prev: any) => prev ? { ...prev, pelementor_edits: pelementorEditsForDb } : prev);
 
-      // Step 6: Show success message with details
-      const successMessage = `Successfully compiled text content!\n\nReplacements made: ${replacementsCount}\n\n` +
+      // Step 7: Show success message with details
+      const totalReplacements = replacementsCount + imageReplacementsCount;
+      const successMessage = `Successfully compiled content!\n\nText replacements: ${replacementsCount}\nImage replacements: ${imageReplacementsCount}\nTotal replacements: ${totalReplacements}\n\n` +
         replacements.map(r => `• Unit ${r.unitId.substring(0, 8)}...\n  FROM: ${r.original}\n  TO: ${r.replacement}`).join('\n\n');
       
       alert(successMessage);
@@ -1181,6 +1238,9 @@ export default function ToryaPage() {
                   >
                     {isCompilingTextContent ? 'Compiling...' : 'compile new_desired_text_content into pelementor_edits'}
                   </button>
+                  <p className="text-xs text-gray-600 mt-2 italic">
+                    (includes active checkboxes for man_img_url and man_img_id)
+                  </p>
                 </div>
                 
                 <hr className="my-3 border-gray-300" />
@@ -1441,6 +1501,7 @@ export default function ToryaPage() {
           handleCopyPelementorCached={handleCopyPelementorCached}
           handleCopyPelementorEdits={handleCopyPelementorEdits}
           handleCopyF22Report={handleCopyF22Report}
+          onGetManualImageData={manualImageDataRef}
         />
       </div>
     </div>
