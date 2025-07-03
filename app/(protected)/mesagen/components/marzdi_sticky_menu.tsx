@@ -1,6 +1,10 @@
 'use client';
 
-export default function MarzdiStickyMenu() {
+interface MarzdiStickyMenuProps {
+  mudTitle?: string | null;
+}
+
+export default function MarzdiStickyMenu({ mudTitle }: MarzdiStickyMenuProps) {
   return (
     <>
       <style jsx>{`
@@ -67,7 +71,7 @@ export default function MarzdiStickyMenu() {
       
       <div className="marzdi_sticky_menu">
         <div className="mar_title1" style={{float:'left',borderRadius:'7px',marginTop:'2px',marginLeft:'2px'}}>
-          The Top Pest Species In Tuscaloosa, AL - Raccoons, Bats, Termites, Ants, Rodents, Iguanas, Turtles, Snakes, Cougars, Black Bears, Ursus Americanus, Wombats, Kangaroos, Dogs, Coyotes, Frogs, Bobcats
+          {mudTitle || 'The Top Pest Species In Tuscaloosa, AL - Raccoons, Bats, Termites, Ants, Rodents, Iguanas, Turtles, Snakes, Cougars, Black Bears, Ursus Americanus, Wombats, Kangaroos, Dogs, Coyotes, Frogs, Bobcats'}
         </div>
 
         <button style={{marginLeft:'4px',marginTop:'4px',width:'55px',height:'55px'}}>S</button>

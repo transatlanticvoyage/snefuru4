@@ -738,7 +738,7 @@ Recommendation: Check logs and retry operation`;
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sticky Menu Component */}
-      <MarzdiStickyMenu />
+      <MarzdiStickyMenu mudTitle={gconPiece?.mud_title} />
       
       <div className="p-4">
         <div className="mb-4">
