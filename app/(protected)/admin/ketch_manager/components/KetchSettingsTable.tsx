@@ -606,7 +606,18 @@ export default function KetchSettingsTable() {
                 </td>
                 {Object.entries(row).map(([key, value]) => (
                   <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {typeof value === 'boolean' ? (value ? 'true' : 'false') : 
+                    {key === 'setting_id' && value ? (
+                      <div 
+                        className="cursor-pointer hover:bg-blue-50"
+                        title={String(value)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(String(value));
+                        }}
+                      >
+                        {String(value).substring(0, 3)}..
+                      </div>
+                    ) : typeof value === 'boolean' ? (value ? 'true' : 'false') : 
                      typeof value === 'object' ? JSON.stringify(value) : 
                      String(value) || '-'}
                   </td>
@@ -661,7 +672,26 @@ export default function KetchSettingsTable() {
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Create New Entry</h2>
+            <div className="sticky top-0 bg-white pb-4 border-b mb-4">
+              <h2 className="text-xl font-bold mb-4">Create New Entry</h2>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setIsCreateModalOpen(false);
+                    resetForm();
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreate}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Create
+                </button>
+              </div>
+            </div>
             {renderFormFields()}
             <div className="mt-6 flex justify-end gap-3">
               <button
@@ -688,7 +718,27 @@ export default function KetchSettingsTable() {
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Edit Entry</h2>
+            <div className="sticky top-0 bg-white pb-4 border-b mb-4">
+              <h2 className="text-xl font-bold mb-4">Edit Entry</h2>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setEditingRecord(null);
+                    resetForm();
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEdit}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Update
+                </button>
+              </div>
+            </div>
             {renderFormFields()}
             <div className="mt-6 flex justify-end gap-3">
               <button
