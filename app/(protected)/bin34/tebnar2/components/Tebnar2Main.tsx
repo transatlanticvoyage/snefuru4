@@ -2059,6 +2059,53 @@ export default function Tebnar2Main() {
             </button>
           </div>
         </div>
+
+        {/* Gcon Piece Assignment Widget */}
+        <div 
+          className="bg-white border border-gray-300 rounded-lg p-2"
+          style={{ maxHeight: '85px' }}
+        >
+          <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_gcon_piece_id</div>
+          <div className="flex items-center space-x-2">
+            <div className="tbn2-select-container tbn2-gcon-piece-container">
+              <select
+                value={tbn2_selectedGconPieceId}
+                onChange={(e) => setTbn2SelectedGconPieceId(e.target.value)}
+                className="tbn2-custom-select tbn2-gcon-piece-select rounded px-2 py-1"
+                disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
+                style={{ color: 'transparent' }}
+              >
+                <option value="" disabled>
+                  {!tbn2_selectedBatchId ? 'Select batch first' : 
+                   !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
+                   'id - meta_title'}
+                </option>
+                {tbn2_gconPieceOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.id} - {option.meta_title}
+                  </option>
+                ))}
+              </select>
+              <div className={`tbn2-select-overlay ${(!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) ? 'disabled' : ''}`}>
+                {tbn2_selectedGconPieceId ? tbn2_getSelectedGconPieceDisplay() :
+                 (!tbn2_selectedBatchId ? 'Select batch first' : 
+                  !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
+                  'id - meta_title')}
+              </div>
+            </div>
+            <button
+              onClick={tbn2_handleGconPieceSave}
+              disabled={!tbn2_selectedGconPieceId || !tbn2_selectedBatchId || tbn2_gconPieceSaving}
+              className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              style={{ fontSize: '16px' }}
+              title={!tbn2_selectedBatchId ? 'Select a batch first' : 
+                     !tbn2_selectedSitesprenId ? 'Select a sitespren first' :
+                     'Save gcon piece assignment'}
+            >
+              {tbn2_gconPieceSaving ? '...' : 'save'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Column Template Controls - positioned just above the main table */}
