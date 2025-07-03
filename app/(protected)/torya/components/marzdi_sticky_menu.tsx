@@ -1,21 +1,24 @@
 'use client';
 
+import { useState } from 'react';
+
 interface MarzdiStickyMenuProps {
-  mudTitle?: string | null;
+  h1Title?: string | null;
 }
 
-export default function MarzdiStickyMenu({ mudTitle }: MarzdiStickyMenuProps) {
+export default function MarzdiStickyMenu({ h1Title }: MarzdiStickyMenuProps) {
+  const [isMinimized, setIsMinimized] = useState(false);
   return (
     <>
       <style jsx>{`
         /* Original CSS styles */
         div.marzdi_sticky_menu {
-          width: 700px;
-          height: 80px;
+          width: ${isMinimized ? '40px' : '700px'};
+          height: ${isMinimized ? '65px' : '80px'};
           font-family: Arial, sans-serif;
           border: 1px solid #000 !important;
           background-color: #fdfdfd;
-              margin-top:-10px;
+          margin-top:-10px;
           margin-left:-10px;
           margin-bottom: 0px;
           padding-bottom: 0px;
@@ -26,6 +29,8 @@ export default function MarzdiStickyMenu({ mudTitle }: MarzdiStickyMenuProps) {
           left: 10px;
           z-index: 9999;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          transition: width 0.3s ease, height 0.3s ease;
+          overflow: hidden;
         }
 
         div.mar_title1 {
@@ -72,23 +77,42 @@ export default function MarzdiStickyMenu({ mudTitle }: MarzdiStickyMenuProps) {
       `}</style>
       
       <div className="marzdi_sticky_menu">
-        <div className="mar_title1" style={{float:'left',borderRadius:'7px',marginTop:'2px',marginLeft:'2px'}}>
-          {mudTitle || 'The Top Pest Species In Tuscaloosa, AL - Raccoons, Bats, Termites, Ants, Rodents, Iguanas, Turtles, Snakes, Cougars, Black Bears, Ursus Americanus, Wombats, Kangaroos, Dogs, Coyotes, Frogs, Bobcats'}
-        </div>
+        {!isMinimized && (
+          <>
+            <div className="mar_title1" style={{float:'left',borderRadius:'7px',marginTop:'2px',marginLeft:'2px'}}>
+              {h1Title || 'The Top Pest Species In Tuscaloosa, AL - Raccoons, Bats, Termites, Ants, Rodents, Iguanas, Turtles, Snakes, Cougars, Black Bears, Ursus Americanus, Wombats, Kangaroos, Dogs, Coyotes, Frogs, Bobcats'}
+            </div>
 
-        <button style={{marginLeft:'4px',marginTop:'4px',width:'55px',height:'55px'}}>S</button>
-        <button style={{marginLeft:'0px',marginTop:'4px',width:'30px',height:'55px'}}>T</button>
+            <button style={{marginLeft:'4px',marginTop:'4px',width:'55px',height:'55px'}}>S</button>
+          </>
+        )}
+        
+        <button 
+          style={{
+            marginLeft: isMinimized ? '4px' : '0px',
+            marginTop:'4px',
+            width:'30px',
+            height:'55px'
+          }}
+          onClick={() => setIsMinimized(!isMinimized)}
+        >
+          T
+        </button>
 
-        <strong style={{fontSize:'12px',clear:'both',float:'left',marginTop:'1px',marginRight:'5px'}}>••div.marzdi_sticky_menu</strong>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-        <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+        {!isMinimized && (
+          <>
+            <strong style={{fontSize:'12px',clear:'both',float:'left',marginTop:'1px',marginRight:'5px'}}>••div.marzdi_sticky_menu</strong>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+          </>
+        )}
       </div>
     </>
   );

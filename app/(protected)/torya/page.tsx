@@ -72,7 +72,7 @@ export default function ToryaPage() {
         // Fetch the gcon_piece
         const { data: gconData, error: gconError } = await supabase
           .from('gcon_pieces')
-          .select('id, asn_sitespren_base, mud_title, pelementor_cached, pelementor_edits')
+          .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits')
           .eq('id', gconPieceId)
           .eq('fk_users_id', userData.id)
           .single();
@@ -191,7 +191,7 @@ export default function ToryaPage() {
           if (userData) {
             const { data: refreshedData } = await supabase
               .from('gcon_pieces')
-              .select('id, asn_sitespren_base, mud_title, pelementor_cached, pelementor_edits')
+              .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits')
               .eq('id', gconPieceId)
               .eq('fk_users_id', userData.id)
               .single();
@@ -269,7 +269,7 @@ export default function ToryaPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sticky Menu Component */}
-      <MarzdiStickyMenu mudTitle={gconPiece?.mud_title} />
+      <MarzdiStickyMenu h1Title={gconPiece?.h1title} />
       
       <div className="p-4">
         <div className="mb-4 flex items-center gap-4">
