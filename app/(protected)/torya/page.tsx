@@ -1279,10 +1279,13 @@ export default function ToryaPage() {
                         const batchId = selectedBatchId || gconPiece?.asn_image_plan_batch_id;
                         window.open(`https://snef.me/bin34/tebnar2?batchid=${batchId}`, '_blank');
                       }}
-                      className="px-4 py-2 text-white rounded"
+                      className="px-4 py-2 rounded"
                       style={{
-                        backgroundColor: '#87CEEB', // baby blue
-                        fontSize: '16px'
+                        backgroundColor: '#009bff', // bestlinkcol
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        color: '#000',
+                        border: '2px solid #000'
                       }}
                     >
                       open batch in /tebnar2
