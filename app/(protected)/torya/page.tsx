@@ -567,7 +567,7 @@ export default function ToryaPage() {
             "page_title": "hide",
             "page_description": "hide"
           }),
-          '_wp_page_template': 'elementor_header_footer'
+          '_wp_page_template': 'default'
         }
       })
     });
@@ -662,7 +662,7 @@ export default function ToryaPage() {
             '_elementor_template_type': 'wp-page',
             '_elementor_version': '3.17.0',
             '_elementor_data': params.elementorData,
-            '_wp_page_template': 'elementor_header_footer'
+            '_wp_page_template': 'default'
           }
         },
         gcon_piece_id: params.gconPieceId
