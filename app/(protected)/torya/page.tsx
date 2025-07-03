@@ -30,6 +30,18 @@ export default function ToryaPage() {
   // Compile text content state
   const [isCompilingTextContent, setIsCompilingTextContent] = useState(false);
 
+  // Dublish function state
+  const [isRunningDublish, setIsRunningDublish] = useState(false);
+  const [dublishConnectionType, setDublishConnectionType] = useState<'snefuruplin' | 'rest_api' | 'api_other'>('snefuruplin');
+  const [dublishProgress, setDublishProgress] = useState<string>('');
+  const [dublishResult, setDublishResult] = useState<{
+    success: boolean;
+    wpEditorUrl?: string;
+    liveUrl?: string;
+    postId?: number;
+    message?: string;
+  } | null>(null);
+
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
     const gconPieceIdParam = searchParams?.get('gcon_piece_id');
@@ -406,6 +418,252 @@ export default function ToryaPage() {
     }
   };
 
+  // Handle run dublish function
+  const handleRunDublish = async () => {
+    if (!gconPieceId || !gconPiece) {
+      alert('No gcon_piece found to process');
+      return;
+    }
+
+    if (!gconPiece.pelementor_edits) {
+      alert('No pelementor_edits data found. Please compile text content first.');
+      return;
+    }
+
+    if (!gconPiece.asn_sitespren_base) {
+      alert('No asn_sitespren_base found. Cannot determine target WordPress site.');
+      return;
+    }
+
+    setIsRunningDublish(true);
+    setDublishProgress('Initializing...');
+    setDublishResult(null);
+
+    try {
+      // Step 1: Prepare Elementor page data
+      setDublishProgress('Preparing Elementor page data...');
+      
+      const pageTitle = gconPiece.h1title || gconPiece.mud_title || 'New Elementor Page';
+      const pageSlug = gconPiece.pageslug || gconPiece.post_name || 'new-elementor-page';
+      const elementorData = gconPiece.pelementor_edits;
+
+      // Step 2: Create WordPress post
+      setDublishProgress('Creating WordPress post...');
+      
+      let apiResponse;
+      
+      switch (dublishConnectionType) {
+        case 'snefuruplin':
+          // Use Snefuruplin WP Plugin
+          setDublishProgress('Connecting via Snefuruplin WP Plugin...');
+          apiResponse = await createElementorPageViaSnefuruplin({
+            siteUrl: gconPiece.asn_sitespren_base,
+            title: pageTitle,
+            slug: pageSlug,
+            elementorData: elementorData,
+            gconPieceId: gconPieceId
+          });
+          break;
+          
+        case 'rest_api':
+          // Use WordPress REST API
+          setDublishProgress('Connecting via WordPress REST API...');
+          apiResponse = await createElementorPageViaRestAPI({
+            siteUrl: gconPiece.asn_sitespren_base,
+            title: pageTitle,
+            slug: pageSlug,
+            elementorData: elementorData,
+            gconPieceId: gconPieceId
+          });
+          break;
+          
+        case 'api_other':
+          // Use other API method
+          setDublishProgress('Connecting via alternative API...');
+          apiResponse = await createElementorPageViaOtherAPI({
+            siteUrl: gconPiece.asn_sitespren_base,
+            title: pageTitle,
+            slug: pageSlug,
+            elementorData: elementorData,
+            gconPieceId: gconPieceId
+          });
+          break;
+          
+        default:
+          throw new Error('Invalid connection type selected');
+      }
+
+      // Step 3: Process response
+      setDublishProgress('Processing response...');
+      
+      if (apiResponse.success) {
+        const wpEditorUrl = `https://${gconPiece.asn_sitespren_base}/wp-admin/post.php?post=${apiResponse.postId}&action=elementor`;
+        const liveUrl = `https://${gconPiece.asn_sitespren_base}/${pageSlug}`;
+        
+        setDublishResult({
+          success: true,
+          wpEditorUrl,
+          liveUrl,
+          postId: apiResponse.postId,
+          message: `Successfully created Elementor page "${pageTitle}"`
+        });
+        
+        setDublishProgress('✅ Page created successfully!');
+      } else {
+        throw new Error(apiResponse.message || 'Failed to create page');
+      }
+
+    } catch (error) {
+      console.error('Error running dublish function:', error);
+      setDublishResult({
+        success: false,
+        message: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
+      setDublishProgress('❌ Failed to create page');
+    } finally {
+      setIsRunningDublish(false);
+    }
+  };
+
+  // Snefuruplin WP Plugin implementation
+  const createElementorPageViaSnefuruplin = async (params: {
+    siteUrl: string;
+    title: string;
+    slug: string;
+    elementorData: string;
+    gconPieceId: string;
+  }) => {
+    // This would connect to your custom WordPress plugin
+    const response = await fetch('/api/snefuruplin/create-elementor-page', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        site_url: params.siteUrl,
+        post_title: params.title,
+        post_name: params.slug,
+        post_status: 'publish',
+        post_type: 'page',
+        elementor_data: params.elementorData,
+        gcon_piece_id: params.gconPieceId,
+        // Elementor-specific meta fields
+        meta_input: {
+          '_elementor_edit_mode': 'builder',
+          '_elementor_template_type': 'wp-page',
+          '_elementor_version': '3.17.0',
+          '_elementor_pro_version': '3.17.0',
+          '_elementor_data': params.elementorData,
+          '_elementor_page_settings': JSON.stringify({
+            "custom_css": "",
+            "page_title": "hide",
+            "page_description": "hide"
+          }),
+          '_wp_page_template': 'elementor_header_footer'
+        }
+      })
+    });
+
+    return await response.json();
+  };
+
+  // WordPress REST API implementation
+  const createElementorPageViaRestAPI = async (params: {
+    siteUrl: string;
+    title: string;
+    slug: string;
+    elementorData: string;
+    gconPieceId: string;
+  }) => {
+    // Step 1: Create the post via REST API
+    const createPostResponse = await fetch(`https://${params.siteUrl}/wp-json/wp/v2/pages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_WP_TOKEN', // You'll need to implement auth
+      },
+      body: JSON.stringify({
+        title: params.title,
+        slug: params.slug,
+        status: 'publish',
+        template: 'elementor_header_footer'
+      })
+    });
+
+    const post = await createPostResponse.json();
+    
+    if (!createPostResponse.ok) {
+      throw new Error(post.message || 'Failed to create post');
+    }
+
+    // Step 2: Add Elementor meta data
+    const metaUpdates = [
+      { key: '_elementor_edit_mode', value: 'builder' },
+      { key: '_elementor_template_type', value: 'wp-page' },
+      { key: '_elementor_version', value: '3.17.0' },
+      { key: '_elementor_data', value: params.elementorData },
+      { key: '_elementor_page_settings', value: JSON.stringify({
+        "custom_css": "",
+        "page_title": "hide", 
+        "page_description": "hide"
+      }) }
+    ];
+
+    for (const meta of metaUpdates) {
+      await fetch(`https://${params.siteUrl}/wp-json/wp/v2/pages/${post.id}/meta`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_WP_TOKEN',
+        },
+        body: JSON.stringify(meta)
+      });
+    }
+
+    return {
+      success: true,
+      postId: post.id,
+      message: 'Page created successfully via REST API'
+    };
+  };
+
+  // Alternative API implementation
+  const createElementorPageViaOtherAPI = async (params: {
+    siteUrl: string;
+    title: string;
+    slug: string;
+    elementorData: string;
+    gconPieceId: string;
+  }) => {
+    // This could be a custom API endpoint you create
+    const response = await fetch('/api/wordpress/create-elementor-page', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        target_site: params.siteUrl,
+        page_data: {
+          post_title: params.title,
+          post_name: params.slug,
+          post_status: 'publish',
+          post_type: 'page',
+          post_content: '', // Elementor uses meta, not content
+          meta_input: {
+            '_elementor_edit_mode': 'builder',
+            '_elementor_template_type': 'wp-page',
+            '_elementor_version': '3.17.0',
+            '_elementor_data': params.elementorData,
+            '_wp_page_template': 'elementor_header_footer'
+          }
+        },
+        gcon_piece_id: params.gconPieceId
+      })
+    });
+
+    return await response.json();
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -696,16 +954,96 @@ export default function ToryaPage() {
                 
                 <div className="mb-3">
                   <button
-                    onClick={() => alert('run dublish function - functionality coming soon')}
-                    className="w-full px-4 py-2 text-white rounded"
+                    onClick={handleRunDublish}
+                    disabled={isRunningDublish || !gconPiece?.pelementor_edits || !gconPiece?.asn_sitespren_base}
+                    className={`w-full px-4 py-2 text-white rounded transition-colors ${
+                      isRunningDublish || !gconPiece?.pelementor_edits || !gconPiece?.asn_sitespren_base
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-black hover:bg-gray-800'
+                    }`}
                     style={{
-                      backgroundColor: '#000000',
                       fontSize: '14px'
                     }}
                   >
-                    run dublish function
+                    {isRunningDublish ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Publishing...
+                      </div>
+                    ) : (
+                      'run dublish function'
+                    )}
                   </button>
                 </div>
+
+                {/* Connection Type Selector */}
+                <div className="mb-3">
+                  <label className="block text-xs font-bold text-gray-700 mb-2">
+                    Connection Type:
+                  </label>
+                  <select
+                    value={dublishConnectionType}
+                    onChange={(e) => setDublishConnectionType(e.target.value as 'snefuruplin' | 'rest_api' | 'api_other')}
+                    disabled={isRunningDublish}
+                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white disabled:bg-gray-100"
+                  >
+                    <option value="snefuruplin">Snefuruplin WP Plugin</option>
+                    <option value="rest_api">REST API</option>
+                    <option value="api_other">API (other)</option>
+                  </select>
+                </div>
+
+                {/* Progress Indicator */}
+                {dublishProgress && (
+                  <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
+                    <div className="text-xs text-blue-800">
+                      <strong>Status:</strong> {dublishProgress}
+                    </div>
+                    {isRunningDublish && (
+                      <div className="mt-2">
+                        <div className="w-full bg-blue-200 rounded-full h-2">
+                          <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Results Section */}
+                {dublishResult && (
+                  <div className={`mb-3 p-3 border rounded ${
+                    dublishResult.success 
+                      ? 'bg-green-50 border-green-200' 
+                      : 'bg-red-50 border-red-200'
+                  }`}>
+                    <div className={`text-sm font-medium ${
+                      dublishResult.success ? 'text-green-800' : 'text-red-800'
+                    }`}>
+                      {dublishResult.message}
+                    </div>
+                    
+                    {dublishResult.success && dublishResult.wpEditorUrl && dublishResult.liveUrl && (
+                      <div className="mt-3 space-y-2">
+                        <a
+                          href={dublishResult.wpEditorUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full px-3 py-2 bg-blue-600 text-white text-center rounded text-sm hover:bg-blue-700 transition-colors"
+                        >
+                          🔧 Edit in Elementor (Post ID: {dublishResult.postId})
+                        </a>
+                        <a
+                          href={dublishResult.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full px-3 py-2 bg-green-600 text-white text-center rounded text-sm hover:bg-green-700 transition-colors"
+                        >
+                          🌐 View Live Page
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 <div className="text-xs text-gray-600 mt-2">
                   create new page on asn_sitespren_base from defined data (such as pelementor_edits field in some cases, etc.)
