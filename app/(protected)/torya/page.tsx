@@ -21,6 +21,11 @@ export default function ToryaPage() {
   const [populateMessage, setPopulateMessage] = useState<string | null>(null);
   const [isRunningF22, setIsRunningF22] = useState(false);
   const [f22Report, setF22Report] = useState<string>('');
+  
+  // Image Plans Batch state
+  const [imagePlansBatches, setImagePlansBatches] = useState<any[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState<string>('');
+  const [isSavingBatch, setIsSavingBatch] = useState(false);
 
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
@@ -91,6 +96,47 @@ export default function ToryaPage() {
 
     fetchGconPiece();
   }, [user?.id, gconPieceId, supabase]);
+
+  // Fetch images_plans_batches for current user
+  useEffect(() => {
+    const fetchImagePlansBatches = async () => {
+      if (!user?.id) return;
+
+      try {
+        // Get user's internal ID first
+        const { data: userData } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (!userData) return;
+
+        // Fetch images_plans_batches for this user
+        const { data: batchesData, error } = await supabase
+          .from('images_plans_batches')
+          .select('*')
+          .eq('rel_users_id', userData.id)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching images_plans_batches:', error);
+          return;
+        }
+
+        setImagePlansBatches(batchesData || []);
+
+        // Set current selected batch if gconPiece has one
+        if (gconPiece?.mudfk_image_plan_batch_id) {
+          setSelectedBatchId(gconPiece.mudfk_image_plan_batch_id);
+        }
+      } catch (err) {
+        console.error('Error in fetchImagePlansBatches:', err);
+      }
+    };
+
+    fetchImagePlansBatches();
+  }, [user?.id, supabase, gconPiece?.mudfk_image_plan_batch_id]);
 
   // Set browser title based on gcon_piece data
   useEffect(() => {
@@ -237,6 +283,37 @@ export default function ToryaPage() {
     }
   };
 
+  // Handle saving image plan batch
+  const handleSaveImagePlanBatch = async () => {
+    if (!gconPieceId || !selectedBatchId) {
+      alert('Please select an image plan batch first');
+      return;
+    }
+
+    setIsSavingBatch(true);
+
+    try {
+      const { error } = await supabase
+        .from('gcon_pieces')
+        .update({ mudfk_image_plan_batch_id: selectedBatchId })
+        .eq('id', gconPieceId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Update local state
+      setGconPiece((prev: any) => prev ? { ...prev, mudfk_image_plan_batch_id: selectedBatchId } : prev);
+      
+      alert('Image plan batch saved successfully!');
+    } catch (error) {
+      console.error('Error saving image plan batch:', error);
+      alert('Failed to save image plan batch');
+    } finally {
+      setIsSavingBatch(false);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -299,6 +376,191 @@ export default function ToryaPage() {
             {populateMessage}
           </div>
         )}
+        
+        {/* Cloned Areas from Mesagen Page */}
+        {gconPieceId && (
+          <div className="mb-4">
+            <div className="flex items-start gap-4" style={{ marginTop: '10px' }}>
+              {/* AREA 1: Info Box - Cloned from mesagen */}
+              <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
+                <div className="mb-3">
+                  <Link href="/gconjar1" className="text-blue-600 hover:text-blue-800">
+                    ← Back to GconJar1
+                  </Link>
+                </div>
+                
+                <div className="mb-3">
+                  <Link href={`/torya?gcon_piece_id=${gconPieceId}`} className="text-blue-600 hover:text-blue-800">
+                    -- Visit /torya --
+                  </Link>
+                </div>
+                
+                <div className="mb-3 text-sm text-gray-600">
+                  <strong>gcon_pieces.id:</strong> {gconPieceId}
+                </div>
+
+                {/* asn_sitespren_base */}
+                <div className="mb-3">
+                  <label className="block text-sm font-bold text-gray-700 mb-1">
+                    asn_sitespren_base
+                  </label>
+                  <div className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm">
+                    {gconPiece?.asn_sitespren_base || 'Not set'}
+                  </div>
+                </div>
+
+                {/* post_name */}
+                <div className="mb-3">
+                  <label className="block text-sm font-bold text-gray-700 mb-1">
+                    post_name
+                  </label>
+                  <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                    <button
+                      onClick={() => {
+                        if (gconPiece?.asn_sitespren_base && gconPiece?.post_name) {
+                          window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.post_name}`, '_blank');
+                        }
+                      }}
+                      disabled={!gconPiece?.post_name || !gconPiece?.asn_sitespren_base}
+                      className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                      title="Open in new tab"
+                    >
+                      ↗
+                    </button>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(gconPiece?.post_name || '')}
+                      className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                      title="Copy to clipboard"
+                    >
+                      📋
+                    </button>
+                    <span className="flex-1 px-2">
+                      {gconPiece?.post_name || 'Not set'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* pageslug */}
+                <div className="mb-3">
+                  <label className="block text-sm font-bold text-gray-700 mb-1">
+                    pageslug
+                  </label>
+                  <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                    <button
+                      onClick={() => {
+                        if (gconPiece?.asn_sitespren_base && gconPiece?.pageslug) {
+                          window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.pageslug}`, '_blank');
+                        }
+                      }}
+                      disabled={!gconPiece?.pageslug || !gconPiece?.asn_sitespren_base}
+                      className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                      title="Open in new tab"
+                    >
+                      ↗
+                    </button>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(gconPiece?.pageslug || '')}
+                      className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                      title="Copy to clipboard"
+                    >
+                      📋
+                    </button>
+                    <span className="flex-1 px-2">
+                      {gconPiece?.pageslug || 'Not set'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* pageurl */}
+                <div className="mb-3">
+                  <label className="block text-sm font-bold text-gray-700 mb-1">
+                    pageurl
+                  </label>
+                  <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                    <button
+                      onClick={() => {
+                        if (gconPiece?.pageurl) {
+                          window.open(gconPiece.pageurl, '_blank');
+                        }
+                      }}
+                      disabled={!gconPiece?.pageurl}
+                      className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                      title="Open in new tab"
+                    >
+                      ↗
+                    </button>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(gconPiece?.pageurl || '')}
+                      className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                      title="Copy to clipboard"
+                    >
+                      📋
+                    </button>
+                    <span className="flex-1 px-2">
+                      {gconPiece?.pageurl || 'Not set'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* AREA 2: Image Plans Batch Box - Cloned from mesagen */}
+              <div className="bg-gray-50 border border-gray-300 rounded-lg p-4" style={{ width: '450px' }}>
+                <div className="mb-3">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    mudfk_image_plan_batch_id
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm"
+                    value={selectedBatchId}
+                    onChange={(e) => setSelectedBatchId(e.target.value)}
+                  >
+                    <option value="">Select image plan batch...</option>
+                    {imagePlansBatches.map((batch) => (
+                      <option key={batch.id} value={batch.id}>
+                        {batch.batch_name || `Batch ${batch.id.substring(0, 8)}...`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="mt-4">
+                  <button
+                    onClick={handleSaveImagePlanBatch}
+                    disabled={isSavingBatch || !selectedBatchId}
+                    className="px-4 py-2 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      backgroundColor: '#000000',
+                      fontSize: '16px'
+                    }}
+                  >
+                    {isSavingBatch ? 'Saving...' : 'save'}
+                  </button>
+                </div>
+
+                {/* Batch Link - Show if batch is assigned */}
+                {gconPiece?.mudfk_image_plan_batch_id && (
+                  <div className="mt-3">
+                    <a
+                      href={`/bin34/tebnar2?batchid=${gconPiece.mudfk_image_plan_batch_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-4 py-2 rounded text-center"
+                      style={{
+                        fontSize: '16px',
+                        color: '#374151', // dark gray
+                        backgroundColor: '#faf8f1', // very light beige
+                        textDecoration: 'none'
+                      }}
+                    >
+                      open batch in /tebnar2
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        
         <h1 className="text-2xl font-bold mb-6">Torya</h1>
         {gconPieceId && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
