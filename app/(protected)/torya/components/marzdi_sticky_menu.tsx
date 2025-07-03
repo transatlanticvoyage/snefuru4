@@ -15,6 +15,8 @@ export default function MarzdiStickyMenu({ mudTitle }: MarzdiStickyMenuProps) {
           font-family: Arial, sans-serif;
           border: 1px solid #000 !important;
           background-color: #fdfdfd;
+              margin-top:-10px;
+          margin-left:-10px;
           margin-bottom: 0px;
           padding-bottom: 0px;
           
