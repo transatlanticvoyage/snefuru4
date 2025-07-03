@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/app/context/AuthContext';
 import Link from 'next/link';
+import UiTableGridsTable from './components/UiTableGridsTable';
 
 export default function UtgManagerPage() {
   const { user } = useAuth();
@@ -26,7 +27,7 @@ export default function UtgManagerPage() {
         <h1 className="text-2xl font-bold mb-6">UTG Manager</h1>
       </div>
       
-      <div className="test_parkerxnow"></div>
+      <UiTableGridsTable />
     </div>
   );
 }
