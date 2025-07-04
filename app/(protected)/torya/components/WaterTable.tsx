@@ -824,7 +824,85 @@ export default function WaterTable({
               })}
             </tr>
             
-            {/* Main Header Row */}
+            {/* Copy Button Row - Prisomi Row 2 */}
+            <tr>
+              {allVisibleColumns.map((col) => {
+                const isPrisomiCol = col === 'prisomi';
+                const isSelectCol = col === 'select';
+                
+                if (isPrisomiCol) {
+                  return (
+                    <th
+                      key={`copy-${col}`}
+                      className="border border-gray-300 bg-purple-50 p-0"
+                      style={{ 
+                        width: '20px',
+                        maxWidth: '20px',
+                        minWidth: '20px'
+                      }}
+                    >
+                      <div className="text-center text-xs font-normal text-gray-600">
+                        2
+                      </div>
+                    </th>
+                  );
+                }
+                
+                if (isSelectCol) {
+                  return (
+                    <th
+                      key={`copy-${col}`}
+                      className="text-left bg-gray-50"
+                      style={{ 
+                        width: '60px',
+                        padding: '0px'
+                      }}
+                    >
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText('select');
+                        }}
+                        className="w-full border-none bg-transparent hover:bg-gray-200 cursor-pointer"
+                        style={{ 
+                          height: '10px',
+                          fontSize: '0px',
+                          padding: '0px',
+                          margin: '0px'
+                        }}
+                      />
+                    </th>
+                  );
+                }
+                
+                return (
+                  <th
+                    key={`copy-${col}`}
+                    className="text-left bg-gray-50"
+                    style={{ 
+                      padding: '0px'
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        const textToCopy = col === 'man_img_url' || col === 'man_img_id' 
+                          ? col 
+                          : `nemtor_units\n${col}`;
+                        navigator.clipboard.writeText(textToCopy);
+                      }}
+                      className="w-full border-none bg-transparent hover:bg-gray-200 cursor-pointer"
+                      style={{ 
+                        height: '10px',
+                        fontSize: '0px',
+                        padding: '0px',
+                        margin: '0px'
+                      }}
+                    />
+                  </th>
+                );
+              })}
+            </tr>
+            
+            {/* Main Header Row - Prisomi Row 3 */}
             <tr>
               {allVisibleColumns.map((col) => {
                 const isPrisomiCol = col === 'prisomi';
