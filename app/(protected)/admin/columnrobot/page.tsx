@@ -70,40 +70,118 @@ export default function ColumnRobotPage() {
           
           {/* 6 Brain Columns */}
           <div style={{ display: 'flex' }}>
-            <div className="brain_column" style={{ width: '225px' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
             </div>
             
-            <div className="brain_column" style={{ width: '225px' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
             </div>
             
-            <div className="brain_column" style={{ width: '225px' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
             </div>
             
-            <div className="brain_column" style={{ width: '225px' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
             </div>
             
-            <div className="brain_column" style={{ width: '225px' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
             </div>
             
-            <div className="brain_column" style={{ width: '225px' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
             </div>
           </div>
         </div>
