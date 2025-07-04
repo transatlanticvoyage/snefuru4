@@ -670,6 +670,9 @@ export default function KetchSettingsTable() {
                   key={column}
                   onClick={() => handleSort(column as keyof KetchSettings)}
                   className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+                  style={{
+                    backgroundColor: column === 'element_tag' ? '#cef7f1' : undefined
+                  }}
                 >
                   {column}
                   {sortField === column && (
@@ -727,7 +730,13 @@ export default function KetchSettingsTable() {
                   </div>
                 </td>
                 {Object.entries(row).map(([key, value]) => (
-                  <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td 
+                    key={key} 
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                    style={{
+                      backgroundColor: key === 'element_tag' ? '#cef7f1' : undefined
+                    }}
+                  >
                     {key === 'setting_id' && value ? (
                       <div 
                         className="cursor-pointer hover:bg-blue-50"
