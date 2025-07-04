@@ -464,6 +464,148 @@ export default function WaterTable({
   };
 
   return (
+    <>
+      <style jsx>{`
+        /* Tailwind Reset for Table Grid Only */
+        .table-no-tailwind {
+          all: unset;
+          display: block;
+        }
+        
+        .table-no-tailwind *,
+        .table-no-tailwind *::before,
+        .table-no-tailwind *::after {
+          all: unset;
+          display: revert;
+          box-sizing: border-box;
+        }
+        
+        /* Restore essential table display properties */
+        .table-no-tailwind table { 
+          display: table; 
+          border-collapse: collapse;
+          font-family: Arial, sans-serif;
+        }
+        .table-no-tailwind thead { display: table-header-group; }
+        .table-no-tailwind tbody { display: table-row-group; }
+        .table-no-tailwind tr { display: table-row; }
+        .table-no-tailwind th { 
+          display: table-cell;
+          vertical-align: top;
+          text-align: left;
+          font-weight: bold;
+        }
+        .table-no-tailwind td { 
+          display: table-cell;
+          vertical-align: top;
+          text-align: left;
+        }
+        
+        /* Custom table styling to replace Tailwind */
+        .table-no-tailwind .table-container {
+          overflow-x: auto;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+        }
+        
+        .table-no-tailwind table {
+          table-layout: fixed;
+        }
+        
+        .table-no-tailwind th,
+        .table-no-tailwind td {
+          border: 1px solid #e5e7eb;
+          padding: 4px;
+        }
+        
+        .table-no-tailwind thead {
+          background-color: #f9fafb;
+        }
+        
+        .table-no-tailwind tr:hover {
+          background-color: #f9fafb;
+        }
+        
+        /* Restore input/textarea/button styling */
+        .table-no-tailwind input,
+        .table-no-tailwind textarea,
+        .table-no-tailwind button {
+          font-family: inherit;
+          font-size: inherit;
+          cursor: pointer;
+        }
+        
+        .table-no-tailwind input[type="text"] {
+          border: 1px solid #d1d5db;
+          border-radius: 4px;
+          padding: 8px;
+          font-size: 12px;
+        }
+        
+        .table-no-tailwind textarea {
+          border: 1px solid #d1d5db;
+          border-radius: 4px;
+          padding: 8px;
+          font-size: 12px;
+          font-family: monospace;
+          resize: none;
+        }
+        
+        .table-no-tailwind input[type="checkbox"] {
+          cursor: pointer;
+        }
+        
+        .table-no-tailwind button {
+          background-color: transparent;
+          border: 1px solid #d1d5db;
+        }
+        
+        .table-no-tailwind button:hover {
+          background-color: #fef3c7;
+        }
+        
+        /* Preserve tooltip functionality */
+        .table-no-tailwind .relative {
+          position: relative;
+        }
+        
+        .table-no-tailwind .group:hover .group-hover\\:block {
+          display: block !important;
+        }
+        
+        .table-no-tailwind .hidden {
+          display: none;
+        }
+        
+        .table-no-tailwind .absolute {
+          position: absolute;
+        }
+        
+        /* Tooltip styling */
+        .table-no-tailwind .tooltip {
+          background-color: #1f2937;
+          color: white;
+          font-size: 12px;
+          border-radius: 4px;
+          padding: 12px 16px;
+          white-space: nowrap;
+          z-index: 100;
+        }
+        
+        .table-no-tailwind .tooltip button {
+          background-color: #2563eb;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 12px;
+          border: none;
+        }
+        
+        .table-no-tailwind .tooltip button:hover {
+          background-color: #1d4ed8;
+        }
+      `}</style>
+      
     <div className="space-y-4">
       {/* Top Area Manager - Accordion Wrapper (zarno1) */}
       <div className="mb-4">
@@ -763,10 +905,11 @@ export default function WaterTable({
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="divide-y divide-gray-200" style={{ tableLayout: 'fixed', width: calculateTableWidth(allVisibleColumns) }}>
-          <thead className="bg-gray-50">
+      {/* Table - TAILWIND-FREE ZONE */}
+      <div className="table-no-tailwind">
+        <div className="table-container">
+          <table style={{ tableLayout: 'fixed', width: calculateTableWidth(allVisibleColumns) }}>
+          <thead>
             {/* Column Numbering Row */}
             <tr>
               {allVisibleColumns.map((col, index) => {
@@ -777,20 +920,28 @@ export default function WaterTable({
                 return (
                   <th
                     key={`horizomi-${col}`}
-                    className="border border-gray-300 bg-purple-50 p-0 text-center"
                     style={{ 
                       width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : undefined,
                       maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : undefined,
-                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : undefined
+                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : undefined,
+                      backgroundColor: '#faf5ff',
+                      padding: '0',
+                      textAlign: 'center'
                     }}
                   >
                     <div className="relative group">
-                      <div className="text-center text-xs font-normal text-gray-600">
+                      <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: 'normal', color: '#4b5563' }}>
                         {currentColumnNumber}
                       </div>
-                      <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
-                        <div className="bg-gray-800 text-white text-xs rounded py-2 px-3 whitespace-nowrap">
-                          <div className="mb-2">
+                      <div className="absolute hidden group-hover:block tooltip" style={{ 
+                        left: '50%', 
+                        transform: 'translateX(-50%)', 
+                        bottom: '100%', 
+                        marginBottom: '8px',
+                        zIndex: 100
+                      }}>
+                        <div className="tooltip">
+                          <div style={{ marginBottom: '8px' }}>
                             {isPrisomiCol ? (
                               <>
                                 <div>intersection cell</div>
@@ -809,7 +960,7 @@ export default function WaterTable({
                                 : 'horizomi row';
                               navigator.clipboard.writeText(textToCopy);
                             }}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                            style={{ backgroundColor: '#2563eb', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', border: 'none', cursor: 'pointer' }}
                           >
                             Copy
                           </button>
@@ -852,7 +1003,7 @@ export default function WaterTable({
                   return (
                     <th
                       key={`copy-${col}`}
-                      className="text-left bg-gray-50"
+                      style={{ textAlign: 'left', backgroundColor: '#f9fafb' }}
                       style={{ 
                         width: '60px',
                         padding: '0px'
@@ -862,7 +1013,7 @@ export default function WaterTable({
                         onClick={() => {
                           navigator.clipboard.writeText('select');
                         }}
-                        className="w-full bg-transparent hover:bg-yellow-200 cursor-pointer"
+                        style={{ width: '100%', backgroundColor: 'transparent', cursor: 'pointer' }}
                         style={{ 
                           height: '10px',
                           fontSize: '0px',
@@ -878,8 +1029,9 @@ export default function WaterTable({
                 return (
                   <th
                     key={`copy-${col}`}
-                    className="text-left bg-gray-50"
                     style={{ 
+                      textAlign: 'left', 
+                      backgroundColor: '#f9fafb',
                       padding: '0px'
                     }}
                   >
@@ -927,7 +1079,7 @@ export default function WaterTable({
                         </div>
                         <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
                           <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line">
-                            <div className="mb-2">
+                            <div style={{ marginBottom: '8px' }}>
                               <div>row number: 2</div>
                               <div>prisomi column</div>
                               <div>table header row</div>
@@ -938,7 +1090,7 @@ export default function WaterTable({
                                 const textToCopy = `row number: 2\nprisomi column\ntable header row`;
                                 navigator.clipboard.writeText(textToCopy);
                               }}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                              style={{ backgroundColor: '#2563eb', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', border: 'none', cursor: 'pointer' }}
                             >
                               Copy
                             </button>
@@ -956,7 +1108,7 @@ export default function WaterTable({
                   return (
                     <th
                       key={col}
-                      className="text-left bg-gray-50"
+                      style={{ textAlign: 'left', backgroundColor: '#f9fafb' }}
                       style={{ 
                         width: '60px',
                         padding: '4px'
@@ -1030,9 +1182,9 @@ export default function WaterTable({
               })}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {paginatedData.map((row, rowIndex) => (
-              <tr key={row.unit_id} className="hover:bg-gray-50">
+              <tr key={row.unit_id}>
                 {allVisibleColumns.map((col) => {
                   const isPrisomiCol = col === 'prisomi';
                   const isSelectCol = col === 'select';
@@ -1042,8 +1194,8 @@ export default function WaterTable({
                     return (
                       <td 
                         key={col} 
-                        className="border border-gray-300 bg-purple-50"
                         style={{ 
+                          backgroundColor: '#faf5ff',
                           width: '20px',
                           maxWidth: '20px',
                           minWidth: '20px',
@@ -1051,12 +1203,12 @@ export default function WaterTable({
                         }}
                       >
                         <div className="relative group">
-                          <div className="text-center text-xs font-normal text-gray-600">
+                          <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: 'normal', color: '#4b5563' }}>
                             {prisomiNumber}
                           </div>
                           <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-[100]">
                             <div className="bg-gray-800 text-white text-xs rounded py-3 px-4 whitespace-pre-line">
-                              <div className="mb-2">
+                              <div style={{ marginBottom: '8px' }}>
                                 <div>row number: {prisomiNumber}</div>
                                 <div>prisomi column</div>
                                 <div>absolute row positioning</div>
@@ -1067,7 +1219,7 @@ export default function WaterTable({
                                   const textToCopy = `row number: ${prisomiNumber}\nprisomi column\nabsolute row positioning`;
                                   navigator.clipboard.writeText(textToCopy);
                                 }}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
+                                style={{ backgroundColor: '#2563eb', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', border: 'none', cursor: 'pointer' }}
                               >
                                 Copy
                               </button>
@@ -1085,15 +1237,17 @@ export default function WaterTable({
                     return (
                       <td 
                         key={col} 
-                        className="whitespace-nowrap text-sm text-gray-900"
                         style={{ 
+                          whiteSpace: 'nowrap', 
+                          fontSize: '14px', 
+                          color: '#111827',
                           width: '60px',
                           padding: '4px'
                         }}
                         onClick={() => handleRowSelect(row.unit_id)}
                       >
                         <div 
-                          className="cursor-pointer flex items-center justify-center w-full h-full"
+                          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleRowSelect(row.unit_id);
@@ -1114,10 +1268,9 @@ export default function WaterTable({
                   return (
                     <td 
                       key={col} 
-                      className={`text-sm text-gray-900 border border-gray-200 ${
-                        col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
-                      } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                       style={{ 
+                        fontSize: '14px',
+                        color: '#111827',
                         padding: '4px',
                         backgroundColor: (() => {
                           // Special background for has_img_slot cells with "true" value
@@ -1131,7 +1284,9 @@ export default function WaterTable({
                         maxWidth: getColumnWidth(col),
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        borderLeft: col === 'full_text_edits' ? '3px solid black' : undefined,
+                        borderRight: ['full_text_edits', 'img_slot_qty', 'man_img_id', 'image_context'].includes(col) ? '3px solid black' : undefined
                       }}
                     >
                       {(() => {
@@ -1141,7 +1296,7 @@ export default function WaterTable({
                         if (col === 'full_text_edits') {
                           return (
                             <textarea
-                              className="kz_torya_fulltextedits_box1 p-2 text-xs font-mono border border-gray-300 rounded resize-none"
+                              className="kz_torya_fulltextedits_box1"
                               value={value?.toString() || ''}
                               onChange={(e) => {
                                 handleFullTextEditsChange(row.unit_id, e.target.value);
@@ -1161,7 +1316,7 @@ export default function WaterTable({
                           if (tarDescriptionText && tarDescriptionText.trim() !== '') {
                             return (
                               <textarea
-                                className="p-2 text-xs border border-gray-300 rounded resize-none"
+                                style={{ padding: '8px', fontSize: '12px', border: '1px solid #d1d5db', borderRadius: '4px', resize: 'none' }}
                                 value={value?.toString() || ''}
                                 onChange={(e) => {
                                   // Handle tar_description_text_edits change - you may want to implement this similar to handleFullTextEditsChange
@@ -1175,15 +1330,15 @@ export default function WaterTable({
                               />
                             );
                           } else {
-                            return <span className="text-gray-400 italic">No tar_description_text</span>;
+                            return <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>No tar_description_text</span>;
                           }
                         }
                         
                         // Special handling for has_img_slot - show green dot for true with checkbox
                         if (col === 'has_img_slot' && value === true) {
                           return (
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <div style={{ width: '8px', height: '8px', backgroundColor: '#10b981', borderRadius: '50%' }}></div>
                               <span>true</span>
                               <input
                                 type="checkbox"
@@ -1210,7 +1365,7 @@ export default function WaterTable({
                                 placeholder="paste image URL here"
                                 value={manualImageUrls.get(row.unit_id) || ''}
                                 onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
-                                className="w-full p-2 text-xs border border-gray-300 rounded"
+                                style={{ width: '100%', padding: '8px', fontSize: '12px', border: '1px solid #d1d5db', borderRadius: '4px' }}
                                 style={{ minWidth: '200px' }}
                               />
                             );
@@ -1228,7 +1383,7 @@ export default function WaterTable({
                                 placeholder="paste image ID like 3933"
                                 value={manualImageIds.get(row.unit_id) || ''}
                                 onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
-                                className="w-full p-2 text-xs border border-gray-300 rounded"
+                                style={{ width: '100%', padding: '8px', fontSize: '12px', border: '1px solid #d1d5db', borderRadius: '4px' }}
                                 style={{ minWidth: '150px' }}
                               />
                             );
@@ -1243,7 +1398,7 @@ export default function WaterTable({
                           const truncatedValue = fullValue.substring(0, 2) + '.';
                           return (
                             <div 
-                              className="cursor-pointer hover:bg-blue-50"
+                              style={{ cursor: 'pointer' }}
                               title={fullValue}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -1279,6 +1434,7 @@ export default function WaterTable({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Pagination */}
@@ -1335,5 +1491,6 @@ export default function WaterTable({
         </div>
       </div>
     </div>
+    </>
   );
 }
