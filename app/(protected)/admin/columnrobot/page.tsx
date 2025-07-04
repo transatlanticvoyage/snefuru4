@@ -124,44 +124,48 @@ export default function ColumnRobotPage() {
               </button>
             </div>
             
-            {/* Copy button for textarea content */}
-            <button
-              onClick={handleCopyRstorData}
-              disabled={!rstorData}
-              style={{
-                width: '400px',
-                height: '20px',
-                fontSize: '12px',
-                backgroundColor: rstorData ? '#3b82f6' : '#e5e7eb',
-                color: rstorData ? 'white' : '#9ca3af',
-                border: '1px solid #d1d5db',
-                borderRadius: '4px 4px 0 0',
-                cursor: rstorData ? 'pointer' : 'not-allowed',
-                marginTop: '8px',
-                marginBottom: '0px'
-              }}
-            >
-              📋 Copy Content
-            </button>
-            
-            {/* Textarea */}
-            <textarea
-              value={rstorLoading ? 'Loading...' : rstorData}
-              readOnly
-              style={{
-                width: '400px',
-                height: '250px',
-                border: '1px solid #d1d5db',
-                borderRadius: '0 0 4px 4px',
-                padding: '8px',
-                fontSize: '12px',
-                fontFamily: 'monospace',
-                resize: 'none',
-                backgroundColor: '#f9fafb',
-                marginTop: '0px'
-              }}
-              placeholder="No data found for this page..."
-            />
+            {/* Copy button and textarea container */}
+            <div style={{ width: '400px' }}>
+              <button
+                onClick={handleCopyRstorData}
+                disabled={!rstorData}
+                style={{
+                  width: '100%',
+                  height: '20px',
+                  fontSize: '12px',
+                  backgroundColor: rstorData ? '#3b82f6' : '#e5e7eb',
+                  color: rstorData ? 'white' : '#9ca3af',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px 4px 0 0',
+                  cursor: rstorData ? 'pointer' : 'not-allowed',
+                  display: 'block',
+                  marginBottom: '0px'
+                }}
+              >
+                📋 Copy Content
+              </button>
+              
+              {/* Textarea */}
+              <textarea
+                value={rstorLoading ? 'Loading...' : rstorData}
+                readOnly
+                style={{
+                  width: '100%',
+                  height: '250px',
+                  border: '1px solid #d1d5db',
+                  borderTop: 'none',
+                  borderRadius: '0 0 4px 4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none',
+                  backgroundColor: '#f9fafb',
+                  display: 'block',
+                  boxSizing: 'border-box'
+                }}
+                placeholder="No data found for this page..."
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -190,7 +194,8 @@ export default function ColumnRobotPage() {
                 fontWeight: 'bold',
                 marginBottom: '8px',
                 wordWrap: 'break-word',
-                whiteSpace: 'normal'
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
               }}>
                 ui table grid columns definition utgcd
               </div>
@@ -224,7 +229,8 @@ export default function ColumnRobotPage() {
                 fontWeight: 'bold',
                 marginBottom: '8px',
                 wordWrap: 'break-word',
-                whiteSpace: 'normal'
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
               }}>
                 sql view (if any)
               </div>
@@ -258,7 +264,8 @@ export default function ColumnRobotPage() {
                 fontWeight: 'bold',
                 marginBottom: '8px',
                 wordWrap: 'break-word',
-                whiteSpace: 'normal'
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
               }}>
                 db tables with fields in the actual columns of this utg
               </div>
@@ -292,7 +299,8 @@ export default function ColumnRobotPage() {
                 fontWeight: 'bold',
                 marginBottom: '8px',
                 wordWrap: 'break-word',
-                whiteSpace: 'normal'
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
               }}>
                 list of specific fields
               </div>
@@ -326,7 +334,8 @@ export default function ColumnRobotPage() {
                 fontWeight: 'bold',
                 marginBottom: '8px',
                 wordWrap: 'break-word',
-                whiteSpace: 'normal'
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
               }}>
                 entire field set of specific db tables including fields not in the utg for comparison
               </div>
@@ -360,7 +369,8 @@ export default function ColumnRobotPage() {
                 fontWeight: 'bold',
                 marginBottom: '8px',
                 wordWrap: 'break-word',
-                whiteSpace: 'normal'
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
               }}>
                 linked db tables
               </div>
