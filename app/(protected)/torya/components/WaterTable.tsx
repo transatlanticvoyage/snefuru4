@@ -79,7 +79,7 @@ const COLUMN_WIDTHS: Record<string, string> = {
   'el_type': '84px',
   'widget_type': '114px',
   'full_text_cached': '300px',
-  'full_text_edits': '420px',
+  'full_text_edits': '500px',
   'has_img_slot': '100px',
   'img_slot_qty': '80px',
   'man_img_url': '200px',
@@ -755,7 +755,7 @@ export default function WaterTable({
 
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="divide-y divide-gray-200" style={{ tableLayout: 'fixed', width: 'auto' }}>
+        <table className="divide-y divide-gray-200" style={{ tableLayout: 'fixed', width: '100%' }}>
           <thead className="bg-gray-50">
             {/* Column Numbering Row */}
             <tr>
