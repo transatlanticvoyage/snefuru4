@@ -9,7 +9,7 @@ interface UiTableGrid {
   utg_description: string | null;
   page: string;
   sql_view: string | null;
-  main_db_table: string | null;
+  main_db_table1: string | null;
   associated_files: any;
   utg_class: string | null;
   created_at: string;
@@ -40,7 +40,7 @@ export default function UiTableGridsTable() {
     utg_name: '',
     utg_description: '',
     page: '',
-    main_db_table: '',
+    main_db_table1: '',
     sql_view: '',
     associated_files: '',
     utg_class: '',
@@ -198,7 +198,7 @@ export default function UiTableGridsTable() {
       utg_name: record.utg_name,
       utg_description: record.utg_description || '',
       page: record.page,
-      main_db_table: record.main_db_table || '',
+      main_db_table1: record.main_db_table1 || '',
       sql_view: record.sql_view || '',
       associated_files: record.associated_files ? JSON.stringify(record.associated_files) : '',
       utg_class: record.utg_class || '',
@@ -214,7 +214,7 @@ export default function UiTableGridsTable() {
       utg_name: '',
       utg_description: '',
       page: '',
-      main_db_table: '',
+      main_db_table1: '',
       sql_view: '',
       associated_files: '',
       utg_class: '',
@@ -417,11 +417,11 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">main_db_table</label>
+                <label className="block text-sm font-medium text-gray-700">main_db_table1</label>
                 <input
                   type="text"
-                  value={formData.main_db_table}
-                  onChange={(e) => setFormData({...formData, main_db_table: e.target.value})}
+                  value={formData.main_db_table1}
+                  onChange={(e) => setFormData({...formData, main_db_table1: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
               </div>
@@ -535,11 +535,11 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">main_db_table</label>
+                <label className="block text-sm font-medium text-gray-700">main_db_table1</label>
                 <input
                   type="text"
-                  value={formData.main_db_table}
-                  onChange={(e) => setFormData({...formData, main_db_table: e.target.value})}
+                  value={formData.main_db_table1}
+                  onChange={(e) => setFormData({...formData, main_db_table1: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
               </div>
