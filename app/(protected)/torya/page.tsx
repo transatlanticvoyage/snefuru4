@@ -1415,6 +1415,26 @@ export default function ToryaPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Open Narpo1 Button - Show if batch is selected or assigned */}
+                {(selectedBatchId || gconPiece?.asn_image_plan_batch_id) && (
+                  <div className="mt-3">
+                    <a
+                      href={`https://snef.me/bin42/narpo1?fk_batch_id=${selectedBatchId || gconPiece?.asn_image_plan_batch_id}`}
+                      className="px-4 py-2 rounded inline-block text-center"
+                      style={{
+                        backgroundColor: '#009bff', // bestlinkcol
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        color: '#000',
+                        border: '2px solid #000',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      open /narpo1
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* NEW AREA 3: Dublish Function Box */}
