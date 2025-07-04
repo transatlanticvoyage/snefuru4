@@ -856,11 +856,17 @@ export default function WaterTable({
                     onClick={() => col !== 'man_img_url' && col !== 'man_img_id' ? handleSort(col as keyof NemtorUnit) : undefined}
                     className={`text-left text-xs font-bold text-gray-900 lowercase tracking-wider ${
                       col !== 'man_img_url' && col !== 'man_img_id' ? 'cursor-pointer hover:bg-gray-100' : ''
-                    } bg-gray-50 border border-gray-200 ${
+                    } border border-gray-200 ${
                       col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
                     } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                     style={{
                       padding: '4px',
+                      backgroundColor: (() => {
+                        if (['has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id'].includes(col)) {
+                          return '#a8c2e2';
+                        }
+                        return '#f9fafb'; // default bg-gray-50
+                      })(),
                       width: (() => {
                         switch(col) {
                           case 'unit_id': return '40px';
@@ -898,13 +904,24 @@ export default function WaterTable({
                       wordWrap: 'break-word'
                     }}
                   >
-                    <div className="flex items-center gap-1">
-                      <span>{col}</span>
-                      {sortField === col && (
-                        <span className="text-blue-600">
-                          {sortOrder === 'asc' ? '↑' : '↓'}
-                        </span>
-                      )}
+                    <div className="flex flex-col items-start gap-0">
+                      <div className="text-xs font-normal text-gray-600">
+                        {(() => {
+                          // Determine database table for each column
+                          if (['man_img_url', 'man_img_id'].includes(col)) {
+                            return '-'; // These are not actual DB fields
+                          }
+                          return 'nemtor_units';
+                        })()}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="font-bold">{col}</span>
+                        {sortField === col && (
+                          <span className="text-blue-600">
+                            {sortOrder === 'asc' ? '↑' : '↓'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </th>
                 );
@@ -1000,6 +1017,13 @@ export default function WaterTable({
                       } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                       style={{ 
                         padding: '4px',
+                        backgroundColor: (() => {
+                          // Special background for has_img_slot cells with "true" value
+                          if (col === 'has_img_slot' && row[col] === true) {
+                            return '#e3c3f2';
+                          }
+                          return undefined; // default background
+                        })(),
                         width: (() => {
                           switch(col) {
                             case 'unit_id': return '40px';
