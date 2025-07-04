@@ -32,6 +32,11 @@ export default function Narpo1Page() {
   const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
   const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
   const [currentUrl, setCurrentUrl] = useState<string>('');
+  
+  // Batch filtering state
+  const [selectedBatchId, setSelectedBatchId] = useState<string>('');
+  const [availableBatches, setAvailableBatches] = useState<Array<{id: string, batch_name: string}>>([]);
+  
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -41,6 +46,7 @@ export default function Narpo1Page() {
     // Handle URL parameters for popup and tab state
     const urlParams = new URLSearchParams(window.location.search);
     const fpop = urlParams.get('fpop');
+    const fkBatchIdParam = urlParams.get('fk_batch_id');
     const ptab1 = urlParams.get('ptab1');
     const ptab2 = urlParams.get('ptab2');
     const ptab3 = urlParams.get('ptab3');
@@ -48,6 +54,11 @@ export default function Narpo1Page() {
     const ptab5 = urlParams.get('ptab5');
     const ptab6 = urlParams.get('ptab6');
     const ptab7 = urlParams.get('ptab7');
+    
+    // Set batch filter from URL parameter
+    if (fkBatchIdParam) {
+      setSelectedBatchId(fkBatchIdParam);
+    }
     
     // Auto-open popup if fpop=open is in URL
     if (fpop === 'open') {
@@ -131,6 +142,39 @@ export default function Narpo1Page() {
     };
   }, [currentUrl]);
 
+  // Fetch available batches for the dropdown
+  useEffect(() => {
+    const fetchAvailableBatches = async () => {
+      if (!user?.id) return;
+
+      try {
+        // Get user's DB id from users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (userError || !userData) return;
+
+        // Fetch batches owned by the current user
+        const { data: batchesData, error: batchesError } = await supabase
+          .from('images_plans_batches')
+          .select('id, batch_name')
+          .eq('rel_users_id', userData.id)
+          .order('batch_name', { ascending: true });
+
+        if (!batchesError && batchesData) {
+          setAvailableBatches(batchesData);
+        }
+      } catch (err) {
+        console.error('Error fetching available batches:', err);
+      }
+    };
+
+    fetchAvailableBatches();
+  }, [user, supabase]);
+
   useEffect(() => {
     const fetchNarpiPushes = async () => {
       if (!user?.id) {
@@ -153,16 +197,22 @@ export default function Narpo1Page() {
           throw new Error('Could not find user record');
         }
 
-        // Fetch narpi_pushes data for this user via batch relationship
-        const { data, error: pushesError } = await supabase
+        // Build the query with optional batch filtering
+        let query = supabase
           .from('narpi_pushes')
           .select(`
             *,
             images_plans_batches!fk_batch_id(
               rel_users_id
             )
-          `)
-          .order('created_at', { ascending: false });
+          `);
+
+        // Add batch filter if selectedBatchId is set
+        if (selectedBatchId) {
+          query = query.eq('fk_batch_id', selectedBatchId);
+        }
+
+        const { data, error: pushesError } = await query.order('created_at', { ascending: false });
 
         if (pushesError) {
           throw pushesError;
@@ -184,10 +234,29 @@ export default function Narpo1Page() {
     };
 
     fetchNarpiPushes();
-  }, [user, supabase]);
+  }, [user, supabase, selectedBatchId]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
+  };
+
+  // Handle batch filter change and update URL
+  const handleBatchFilterChange = (batchId: string) => {
+    setSelectedBatchId(batchId);
+    
+    // Update URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (batchId) {
+      urlParams.set('fk_batch_id', batchId);
+    } else {
+      urlParams.delete('fk_batch_id');
+    }
+    
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+    window.history.pushState({}, '', newUrl);
+    
+    // Trigger URL change event for other components
+    window.dispatchEvent(new Event('urlchange'));
   };
 
   const copyKareenchValue = async (pushId: string, kareenchValue: any) => {
@@ -471,8 +540,8 @@ export default function Narpo1Page() {
   return (
     <div className="min-h-screen bg-gray-50 w-full -m-6 ml-2">
       <div className="pl-2 pr-0 py-6 w-full max-w-none">
-        {/* Functions popup button */}
-        <div className="mb-4">
+        {/* Functions popup button and batch filter */}
+        <div className="mb-4 flex items-center gap-4">
           <button
             onClick={handlePopupOpen}
             className="font-bold text-white rounded"
@@ -487,6 +556,25 @@ export default function Narpo1Page() {
           >
             functions popup
           </button>
+          
+          {/* Batch filter dropdown */}
+          <div className="flex items-center gap-2">
+            <label className="font-bold text-gray-700">
+              fk_batch_id
+            </label>
+            <select
+              value={selectedBatchId}
+              onChange={(e) => handleBatchFilterChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded bg-white text-sm min-w-[200px]"
+            >
+              <option value="">All batches</option>
+              {availableBatches.map((batch) => (
+                <option key={batch.id} value={batch.id}>
+                  {batch.batch_name || `Batch ${batch.id.substring(0, 8)}...`}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Header */}
