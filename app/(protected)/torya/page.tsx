@@ -1223,7 +1223,7 @@ export default function ToryaPage() {
                       📋
                     </button>
                     <span className="flex-1 px-2">
-                      {gconPiece?.post_name || 'Not set'}
+                      {gconPiece?.post_name || ''}
                     </span>
                   </div>
                 </div>
@@ -1254,7 +1254,7 @@ export default function ToryaPage() {
                       📋
                     </button>
                     <span className="flex-1 px-2">
-                      {gconPiece?.pageslug || 'Not set'}
+                      {gconPiece?.pageslug || ''}
                     </span>
                   </div>
                 </div>
@@ -1285,7 +1285,7 @@ export default function ToryaPage() {
                       📋
                     </button>
                     <span className="flex-1 px-2">
-                      {gconPiece?.pageurl || 'Not set'}
+                      {gconPiece?.pageurl || ''}
                     </span>
                   </div>
                 </div>
