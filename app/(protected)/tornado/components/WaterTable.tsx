@@ -1003,8 +1003,9 @@ export default function WaterTable({
                   return (
                     <th
                       key={`copy-${col}`}
-                      style={{ textAlign: 'left', backgroundColor: '#f9fafb' }}
                       style={{ 
+                        textAlign: 'left', 
+                        backgroundColor: '#f9fafb',
                         width: '60px',
                         padding: '0px'
                       }}
@@ -1013,8 +1014,10 @@ export default function WaterTable({
                         onClick={() => {
                           navigator.clipboard.writeText('select');
                         }}
-                        style={{ width: '100%', backgroundColor: 'transparent', cursor: 'pointer' }}
                         style={{ 
+                          width: '100%', 
+                          backgroundColor: 'transparent', 
+                          cursor: 'pointer',
                           height: '10px',
                           fontSize: '0px',
                           padding: '0px',
@@ -1108,8 +1111,9 @@ export default function WaterTable({
                   return (
                     <th
                       key={col}
-                      style={{ textAlign: 'left', backgroundColor: '#f9fafb' }}
                       style={{ 
+                        textAlign: 'left', 
+                        backgroundColor: '#f9fafb',
                         width: '60px',
                         padding: '4px'
                       }}
@@ -1316,13 +1320,17 @@ export default function WaterTable({
                           if (tarDescriptionText && tarDescriptionText.trim() !== '') {
                             return (
                               <textarea
-                                style={{ padding: '8px', fontSize: '12px', border: '1px solid #d1d5db', borderRadius: '4px', resize: 'none' }}
                                 value={value?.toString() || ''}
                                 onChange={(e) => {
                                   // Handle tar_description_text_edits change - you may want to implement this similar to handleFullTextEditsChange
                                   console.log('tar_description_text_edits changed for unit:', row.unit_id, 'value:', e.target.value);
                                 }}
                                 style={{
+                                  padding: '8px', 
+                                  fontSize: '12px', 
+                                  border: '1px solid #d1d5db', 
+                                  borderRadius: '4px', 
+                                  resize: 'none',
                                   width: '200px',
                                   height: '60px',
                                   overflowY: 'auto'
@@ -1365,8 +1373,7 @@ export default function WaterTable({
                                 placeholder="paste image URL here"
                                 value={manualImageUrls.get(row.unit_id) || ''}
                                 onChange={(e) => handleManualImageUrlChange(row.unit_id, e.target.value)}
-                                style={{ width: '100%', padding: '8px', fontSize: '12px', border: '1px solid #d1d5db', borderRadius: '4px' }}
-                                style={{ minWidth: '200px' }}
+                                style={{ width: '100%', padding: '8px', fontSize: '12px', border: '1px solid #d1d5db', borderRadius: '4px', minWidth: '200px' }}
                               />
                             );
                           } else {
@@ -1383,8 +1390,7 @@ export default function WaterTable({
                                 placeholder="paste image ID like 3933"
                                 value={manualImageIds.get(row.unit_id) || ''}
                                 onChange={(e) => handleManualImageIdChange(row.unit_id, e.target.value)}
-                                style={{ width: '100%', padding: '8px', fontSize: '12px', border: '1px solid #d1d5db', borderRadius: '4px' }}
-                                style={{ minWidth: '150px' }}
+                                style={{ width: '100%', padding: '8px', fontSize: '12px', border: '1px solid #d1d5db', borderRadius: '4px', minWidth: '150px' }}
                               />
                             );
                           } else {
