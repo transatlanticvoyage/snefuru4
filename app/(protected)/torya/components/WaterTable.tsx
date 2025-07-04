@@ -828,7 +828,7 @@ export default function WaterTable({
                       className="text-left bg-gray-50"
                       style={{ 
                         width: '60px',
-                        padding: '6px 10px'
+                        padding: '4px'
                       }}
                     >
                       <div 
@@ -854,15 +854,48 @@ export default function WaterTable({
                   <th
                     key={col}
                     onClick={() => col !== 'man_img_url' && col !== 'man_img_id' ? handleSort(col as keyof NemtorUnit) : undefined}
-                    className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider ${
+                    className={`text-left text-xs font-bold text-gray-900 lowercase tracking-wider ${
                       col !== 'man_img_url' && col !== 'man_img_id' ? 'cursor-pointer hover:bg-gray-100' : ''
                     } bg-gray-50 border border-gray-200 ${
                       col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
                     } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                     style={{
-                      width: col === 'full_text_edits' ? '600px' : undefined,
-                      minWidth: col === 'full_text_edits' ? '600px' : undefined,
-                      maxWidth: col === 'full_text_edits' ? '600px' : undefined
+                      padding: '4px',
+                      width: (() => {
+                        switch(col) {
+                          case 'unit_id': return '40px';
+                          case 'unit_marker': return '140px';
+                          case 'el_id': return '92px';
+                          case 'el_type': return '84px';
+                          case 'widget_type': return '114px';
+                          case 'full_text_edits': return '600px';
+                          default: return undefined;
+                        }
+                      })(),
+                      minWidth: (() => {
+                        switch(col) {
+                          case 'unit_id': return '40px';
+                          case 'unit_marker': return '140px';
+                          case 'el_id': return '92px';
+                          case 'el_type': return '84px';
+                          case 'widget_type': return '114px';
+                          case 'full_text_edits': return '600px';
+                          default: return undefined;
+                        }
+                      })(),
+                      maxWidth: (() => {
+                        switch(col) {
+                          case 'unit_id': return '40px';
+                          case 'unit_marker': return '140px';
+                          case 'el_id': return '92px';
+                          case 'el_type': return '84px';
+                          case 'widget_type': return '114px';
+                          case 'full_text_edits': return '600px';
+                          default: return undefined;
+                        }
+                      })(),
+                      whiteSpace: 'normal',
+                      wordWrap: 'break-word'
                     }}
                   >
                     <div className="flex items-center gap-1">
@@ -890,11 +923,12 @@ export default function WaterTable({
                     return (
                       <td 
                         key={col} 
-                        className="border border-gray-300 bg-purple-50 p-0"
+                        className="border border-gray-300 bg-purple-50"
                         style={{ 
                           width: '20px',
                           maxWidth: '20px',
-                          minWidth: '20px'
+                          minWidth: '20px',
+                          padding: '4px'
                         }}
                       >
                         <div className="relative group">
@@ -935,11 +969,7 @@ export default function WaterTable({
                         className="whitespace-nowrap text-sm text-gray-900"
                         style={{ 
                           width: '60px',
-                          padding: '6px 10px !important',
-                          paddingTop: '6px !important',
-                          paddingBottom: '6px !important',
-                          paddingLeft: '10px !important',
-                          paddingRight: '10px !important'
+                          padding: '4px'
                         }}
                         onClick={() => handleRowSelect(row.unit_id)}
                       >
@@ -965,13 +995,44 @@ export default function WaterTable({
                   return (
                     <td 
                       key={col} 
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
+                      className={`whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
                         col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
                       } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                       style={{ 
-                        width: col === 'full_text_edits' ? '600px' : undefined,
-                        minWidth: col === 'full_text_edits' ? '600px' : undefined,
-                        maxWidth: col === 'full_text_edits' ? '600px' : undefined
+                        padding: '4px',
+                        width: (() => {
+                          switch(col) {
+                            case 'unit_id': return '40px';
+                            case 'unit_marker': return '140px';
+                            case 'el_id': return '92px';
+                            case 'el_type': return '84px';
+                            case 'widget_type': return '114px';
+                            case 'full_text_edits': return '600px';
+                            default: return undefined;
+                          }
+                        })(),
+                        minWidth: (() => {
+                          switch(col) {
+                            case 'unit_id': return '40px';
+                            case 'unit_marker': return '140px';
+                            case 'el_id': return '92px';
+                            case 'el_type': return '84px';
+                            case 'widget_type': return '114px';
+                            case 'full_text_edits': return '600px';
+                            default: return undefined;
+                          }
+                        })(),
+                        maxWidth: (() => {
+                          switch(col) {
+                            case 'unit_id': return '40px';
+                            case 'unit_marker': return '140px';
+                            case 'el_id': return '92px';
+                            case 'el_type': return '84px';
+                            case 'widget_type': return '114px';
+                            case 'full_text_edits': return '600px';
+                            default: return undefined;
+                          }
+                        })()
                       }}
                     >
                       {(() => {

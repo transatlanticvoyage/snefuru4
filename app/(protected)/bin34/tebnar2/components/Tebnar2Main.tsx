@@ -85,7 +85,7 @@ export default function Tebnar2Main() {
   const [tbn2_sitesprenSaving, setTbn2SitesprenSaving] = useState(false);
   
   // Gcon piece state for asn_gcon_piece_id widget
-  const [tbn2_gconPieceOptions, setTbn2GconPieceOptions] = useState<Array<{id: string, meta_title: string}>>([]);
+  const [tbn2_gconPieceOptions, setTbn2GconPieceOptions] = useState<Array<{id: string, meta_title: string, asn_sitespren_base: string, post_name: string}>>([]);
   const [tbn2_selectedGconPieceId, setTbn2SelectedGconPieceId] = useState<string>('');
   const [tbn2_gconPieceSaving, setTbn2GconPieceSaving] = useState(false);
   const [tbn2_currentSitesprenBase, setTbn2CurrentSitesprenBase] = useState<string>('');
@@ -1270,7 +1270,7 @@ export default function Tebnar2Main() {
 
       const { data, error } = await supabase
         .from('gcon_pieces')
-        .select('id, meta_title')
+        .select('id, meta_title, asn_sitespren_base, post_name')
         .eq('fk_users_id', userValidation.internalUserId)
         .eq('asn_sitespren_base', sitesprenBase)
         .order('meta_title', { ascending: true });
@@ -2013,49 +2013,73 @@ export default function Tebnar2Main() {
           )}
         </div>
 
-        {/* Gcon Piece Assignment Widget */}
+        {/* ReverseRelation Widget - Shows currently assigned gcon_piece */}
         <div 
           className="bg-white border border-gray-300 rounded-lg p-2"
           style={{ maxHeight: '85px' }}
         >
-          <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>asn_gcon_piece_id</div>
+          <div className="font-bold text-gray-700 mb-1" style={{ fontSize: '16px' }}>ReverseRelation-from-gcon_pieces.asn_image_plan_batch_id (assigned gcon_piece)</div>
           <div className="flex items-center space-x-2">
-            <div className="tbn2-select-container tbn2-gcon-piece-container">
-              <select
-                value={tbn2_selectedGconPieceId}
-                onChange={(e) => setTbn2SelectedGconPieceId(e.target.value)}
-                className="tbn2-custom-select tbn2-gcon-piece-select rounded px-2 py-1"
-                disabled={!tbn2_selectedBatchId || !tbn2_selectedSitesprenId}
-                style={{ color: 'transparent' }}
+            {/* Text display with copy button */}
+            <div className="flex-1 flex items-center space-x-2">
+              <input
+                type="text"
+                readOnly
+                value={(() => {
+                  if (!tbn2_selectedGconPieceId) return '';
+                  const gconPiece = tbn2_gconPieceOptions.find(g => g.id === tbn2_selectedGconPieceId);
+                  if (!gconPiece) return '';
+                  // Format: "35a.- 5nezl.ksit.me/services-hub-page/"
+                  const truncatedId = gconPiece.id.substring(0, 3) + '.';
+                  const sitesprenBase = gconPiece.asn_sitespren_base || '';
+                  const postName = gconPiece.post_name || '';
+                  return `${truncatedId}- ${sitesprenBase}/${postName}/`;
+                })()}
+                className="flex-1 px-2 py-1 border border-gray-300 rounded bg-gray-50"
+                style={{ fontSize: '14px' }}
+              />
+              <button
+                onClick={() => {
+                  if (!tbn2_selectedGconPieceId) return;
+                  const gconPiece = tbn2_gconPieceOptions.find(g => g.id === tbn2_selectedGconPieceId);
+                  if (!gconPiece) return;
+                  const truncatedId = gconPiece.id.substring(0, 3) + '.';
+                  const sitesprenBase = gconPiece.asn_sitespren_base || '';
+                  const postName = gconPiece.post_name || '';
+                  const textToCopy = `${truncatedId}- ${sitesprenBase}/${postName}/`;
+                  navigator.clipboard.writeText(textToCopy);
+                }}
+                disabled={!tbn2_selectedGconPieceId}
+                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                style={{ fontSize: '14px' }}
               >
-                <option value="" disabled>
-                  {!tbn2_selectedBatchId ? 'Select batch first' : 
-                   !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
-                   'id - meta_title'}
-                </option>
-                {tbn2_gconPieceOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.id} - {option.meta_title}
-                  </option>
-                ))}
-              </select>
-              <div className={`tbn2-select-overlay ${(!tbn2_selectedBatchId || !tbn2_selectedSitesprenId) ? 'disabled' : ''}`}>
-                {tbn2_selectedGconPieceId ? tbn2_getSelectedGconPieceDisplay() :
-                 (!tbn2_selectedBatchId ? 'Select batch first' : 
-                  !tbn2_selectedSitesprenId ? 'Select sitespren first' : 
-                  'id - meta_title')}
-              </div>
+                Copy
+              </button>
             </div>
+            {/* Open buttons */}
             <button
-              onClick={tbn2_handleGconPieceSave}
-              disabled={!tbn2_selectedGconPieceId || !tbn2_selectedBatchId || tbn2_gconPieceSaving}
-              className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              onClick={() => {
+                if (tbn2_selectedGconPieceId) {
+                  window.open(`/torya?gcon_piece_id=${tbn2_selectedGconPieceId}`, '_blank');
+                }
+              }}
+              disabled={!tbn2_selectedGconPieceId}
+              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               style={{ fontSize: '16px' }}
-              title={!tbn2_selectedBatchId ? 'Select a batch first' : 
-                     !tbn2_selectedSitesprenId ? 'Select a sitespren first' :
-                     'Save gcon piece assignment'}
             >
-              {tbn2_gconPieceSaving ? '...' : 'save'}
+              open /torya
+            </button>
+            <button
+              onClick={() => {
+                if (tbn2_selectedGconPieceId) {
+                  window.open(`/mesagen/${tbn2_selectedGconPieceId}`, '_blank');
+                }
+              }}
+              disabled={!tbn2_selectedGconPieceId}
+              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              style={{ fontSize: '16px' }}
+            >
+              open /mesagen
             </button>
           </div>
         </div>
