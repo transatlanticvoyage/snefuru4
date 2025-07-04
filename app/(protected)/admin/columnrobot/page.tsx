@@ -77,13 +77,15 @@ export default function ColumnRobotPage() {
               <div className="robot_ui_label" style={{ 
                 padding: '7px', 
                 width: '100%', 
+                height: '200px',
                 fontSize: '16px', 
                 display: 'flex', 
                 alignItems: 'flex-end', 
-                maxHeight: '300px', 
                 overflow: 'hidden',
                 fontWeight: 'bold',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal'
               }}>
                 ui table grid columns definition utgcd
               </div>
@@ -109,13 +111,15 @@ export default function ColumnRobotPage() {
               <div className="robot_ui_label" style={{ 
                 padding: '7px', 
                 width: '100%', 
+                height: '200px',
                 fontSize: '16px', 
                 display: 'flex', 
                 alignItems: 'flex-end', 
-                maxHeight: '300px', 
                 overflow: 'hidden',
                 fontWeight: 'bold',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal'
               }}>
                 sql view (if any)
               </div>
@@ -141,13 +145,15 @@ export default function ColumnRobotPage() {
               <div className="robot_ui_label" style={{ 
                 padding: '7px', 
                 width: '100%', 
+                height: '200px',
                 fontSize: '16px', 
                 display: 'flex', 
                 alignItems: 'flex-end', 
-                maxHeight: '300px', 
                 overflow: 'hidden',
                 fontWeight: 'bold',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal'
               }}>
                 db tables with fields in the actual columns of this utg
               </div>
@@ -173,13 +179,15 @@ export default function ColumnRobotPage() {
               <div className="robot_ui_label" style={{ 
                 padding: '7px', 
                 width: '100%', 
+                height: '200px',
                 fontSize: '16px', 
                 display: 'flex', 
                 alignItems: 'flex-end', 
-                maxHeight: '300px', 
                 overflow: 'hidden',
                 fontWeight: 'bold',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal'
               }}>
                 list of specific fields
               </div>
@@ -205,13 +213,15 @@ export default function ColumnRobotPage() {
               <div className="robot_ui_label" style={{ 
                 padding: '7px', 
                 width: '100%', 
+                height: '200px',
                 fontSize: '16px', 
                 display: 'flex', 
                 alignItems: 'flex-end', 
-                maxHeight: '300px', 
                 overflow: 'hidden',
                 fontWeight: 'bold',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal'
               }}>
                 entire field set of specific db tables including fields not in the utg for comparison
               </div>
@@ -237,13 +247,15 @@ export default function ColumnRobotPage() {
               <div className="robot_ui_label" style={{ 
                 padding: '7px', 
                 width: '100%', 
+                height: '200px',
                 fontSize: '16px', 
                 display: 'flex', 
                 alignItems: 'flex-end', 
-                maxHeight: '300px', 
                 overflow: 'hidden',
                 fontWeight: 'bold',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal'
               }}>
                 linked db tables
               </div>
