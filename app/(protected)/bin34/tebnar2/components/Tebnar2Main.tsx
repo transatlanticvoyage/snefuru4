@@ -90,6 +90,9 @@ export default function Tebnar2Main() {
   const [tbn2_gconPieceSaving, setTbn2GconPieceSaving] = useState(false);
   const [tbn2_currentSitesprenBase, setTbn2CurrentSitesprenBase] = useState<string>('');
   
+  // Reverse relation state - for finding gcon_piece assigned to current batch
+  const [tbn2_assignedGconPiece, setTbn2AssignedGconPiece] = useState<{id: string, asn_sitespren_base: string, post_name: string} | null>(null);
+  
   // Pushador actions state - sync actions from sitejar4
   const [tbn2_syncLoading, setTbn2SyncLoading] = useState<Set<string>>(new Set());
   const [tbn2_syncResults, setTbn2SyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
@@ -924,6 +927,7 @@ export default function Tebnar2Main() {
     tbn2_updateUrlWithBatch(batchId);
     tbn2_fetchBatchSitespren(batchId);
     tbn2_fetchBatchGconPiece(batchId);
+    tbn2_fetchAssignedGconPiece(batchId);
   };
 
   // Function to read URL parameters on component mount
@@ -951,6 +955,7 @@ export default function Tebnar2Main() {
         setTbn2SelectedBatchId(tbn2_urlBatchId);
         tbn2_fetchBatchSitespren(tbn2_urlBatchId);
         tbn2_fetchBatchGconPiece(tbn2_urlBatchId);
+        tbn2_fetchAssignedGconPiece(tbn2_urlBatchId);
         setTbn2UrlBatchId(null); // Clear the URL batch ID state
       } else {
         // Invalid batch ID - show error and clear URL param
@@ -977,6 +982,7 @@ export default function Tebnar2Main() {
           setTbn2SelectedBatchId(batchIdParam);
           tbn2_fetchBatchSitespren(batchIdParam);
           tbn2_fetchBatchGconPiece(batchIdParam);
+          tbn2_fetchAssignedGconPiece(batchIdParam);
         } else {
           setTbn2SelectedBatchId('');
           setTbn2Error(`❌ Batch ID "${batchIdParam}" not found`);
@@ -1320,6 +1326,35 @@ export default function Tebnar2Main() {
     } catch (err) {
       console.error('Error fetching batch gcon piece:', err);
       setTbn2SelectedGconPieceId('');
+    }
+  };
+
+  // Fetch assigned gcon piece - reverse lookup to find which gcon_piece has this batch assigned
+  const tbn2_fetchAssignedGconPiece = async (batchId: string) => {
+    if (!batchId) {
+      setTbn2AssignedGconPiece(null);
+      return;
+    }
+
+    try {
+      const userValidation = await tbn2_validateUserAccess(user.id);
+      if (!userValidation.success) return;
+
+      const { data, error } = await supabase
+        .from('gcon_pieces')
+        .select('id, asn_sitespren_base, post_name')
+        .eq('fk_users_id', userValidation.internalUserId)
+        .eq('asn_image_plan_batch_id', batchId)
+        .single();
+
+      if (!error && data) {
+        setTbn2AssignedGconPiece(data);
+      } else {
+        setTbn2AssignedGconPiece(null);
+      }
+    } catch (err) {
+      console.error('Error fetching assigned gcon piece:', err);
+      setTbn2AssignedGconPiece(null);
     }
   };
 
@@ -2026,13 +2061,11 @@ export default function Tebnar2Main() {
                 type="text"
                 readOnly
                 value={(() => {
-                  if (!tbn2_selectedGconPieceId) return '';
-                  const gconPiece = tbn2_gconPieceOptions.find(g => g.id === tbn2_selectedGconPieceId);
-                  if (!gconPiece) return '';
+                  if (!tbn2_assignedGconPiece) return '';
                   // Format: "35a.- 5nezl.ksit.me/services-hub-page/"
-                  const truncatedId = gconPiece.id.substring(0, 3) + '.';
-                  const sitesprenBase = gconPiece.asn_sitespren_base || '';
-                  const postName = gconPiece.post_name || '';
+                  const truncatedId = tbn2_assignedGconPiece.id.substring(0, 3) + '.';
+                  const sitesprenBase = tbn2_assignedGconPiece.asn_sitespren_base || '';
+                  const postName = tbn2_assignedGconPiece.post_name || '';
                   return `${truncatedId}- ${sitesprenBase}/${postName}/`;
                 })()}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded bg-gray-50"
@@ -2040,16 +2073,14 @@ export default function Tebnar2Main() {
               />
               <button
                 onClick={() => {
-                  if (!tbn2_selectedGconPieceId) return;
-                  const gconPiece = tbn2_gconPieceOptions.find(g => g.id === tbn2_selectedGconPieceId);
-                  if (!gconPiece) return;
-                  const truncatedId = gconPiece.id.substring(0, 3) + '.';
-                  const sitesprenBase = gconPiece.asn_sitespren_base || '';
-                  const postName = gconPiece.post_name || '';
+                  if (!tbn2_assignedGconPiece) return;
+                  const truncatedId = tbn2_assignedGconPiece.id.substring(0, 3) + '.';
+                  const sitesprenBase = tbn2_assignedGconPiece.asn_sitespren_base || '';
+                  const postName = tbn2_assignedGconPiece.post_name || '';
                   const textToCopy = `${truncatedId}- ${sitesprenBase}/${postName}/`;
                   navigator.clipboard.writeText(textToCopy);
                 }}
-                disabled={!tbn2_selectedGconPieceId}
+                disabled={!tbn2_assignedGconPiece}
                 className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 style={{ fontSize: '14px' }}
               >
@@ -2059,11 +2090,11 @@ export default function Tebnar2Main() {
             {/* Open buttons */}
             <button
               onClick={() => {
-                if (tbn2_selectedGconPieceId) {
-                  window.open(`/torya?gcon_piece_id=${tbn2_selectedGconPieceId}`, '_blank');
+                if (tbn2_assignedGconPiece) {
+                  window.open(`/torya?gcon_piece_id=${tbn2_assignedGconPiece.id}`, '_blank');
                 }
               }}
-              disabled={!tbn2_selectedGconPieceId}
+              disabled={!tbn2_assignedGconPiece}
               className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               style={{ fontSize: '16px' }}
             >
@@ -2071,11 +2102,11 @@ export default function Tebnar2Main() {
             </button>
             <button
               onClick={() => {
-                if (tbn2_selectedGconPieceId) {
-                  window.open(`/mesagen/${tbn2_selectedGconPieceId}`, '_blank');
+                if (tbn2_assignedGconPiece) {
+                  window.open(`/mesagen/${tbn2_assignedGconPiece.id}`, '_blank');
                 }
               }}
-              disabled={!tbn2_selectedGconPieceId}
+              disabled={!tbn2_assignedGconPiece}
               className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               style={{ fontSize: '16px' }}
             >
