@@ -33,6 +33,7 @@ export default function ToryaPage() {
   // Narpi pushes state
   const [narpiPushes, setNarpiPushes] = useState<any[]>([]);
   const [selectedNarpiPushes, setSelectedNarpiPushes] = useState<Set<string>>(new Set());
+  const [copiedNarpiId, setCopiedNarpiId] = useState<string | null>(null);
 
   // Dublish function state
   const [isRunningDublish, setIsRunningDublish] = useState(false);
@@ -105,7 +106,7 @@ export default function ToryaPage() {
       try {
         const { data, error } = await supabase
           .from('narpi_pushes')
-          .select('id, push_name, push_status1, created_at')
+          .select('id, push_name, push_status1, created_at, kareench1')
           .eq('fk_batch_id', batchId)
           .order('created_at', { ascending: false });
 
@@ -121,6 +122,23 @@ export default function ToryaPage() {
 
     fetchNarpiPushes();
   }, [selectedBatchId, gconPiece?.asn_image_plan_batch_id]);
+
+  // Copy kareench1 value function
+  const copyNarpiKareenchValue = async (pushId: string, kareenchValue: any) => {
+    try {
+      const valueToString = typeof kareenchValue === 'string' 
+        ? kareenchValue 
+        : JSON.stringify(kareenchValue, null, 2);
+      
+      await navigator.clipboard.writeText(valueToString);
+      setCopiedNarpiId(pushId);
+      
+      // Clear the copied indicator after 2 seconds
+      setTimeout(() => setCopiedNarpiId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy kareench1 value:', err);
+    }
+  };
 
   // Fetch gcon_piece data when gconPieceId is available
   useEffect(() => {
@@ -1345,11 +1363,11 @@ export default function ToryaPage() {
                 {/* Narpi Pushes Table */}
                 {(selectedBatchId || gconPiece?.asn_image_plan_batch_id) && narpiPushes.length > 0 && (
                   <div className="mt-4">
-                    <div className="overflow-hidden rounded border border-gray-300" style={{ maxWidth: '440px' }}>
-                      <table className="w-full" style={{ tableLayout: 'fixed', fontSize: '14px' }}>
+                    <div className="overflow-x-auto rounded border border-gray-300" style={{ maxWidth: '440px' }}>
+                      <table className="min-w-full" style={{ fontSize: '14px' }}>
                         <thead>
                           <tr className="bg-gray-100">
-                            <th style={{ width: '30px', padding: '3px' }} className="text-left font-bold">
+                            <th style={{ width: '30px', padding: '3px', minWidth: '30px' }} className="text-left font-bold">
                               <input
                                 type="checkbox"
                                 checked={selectedNarpiPushes.size === narpiPushes.length && narpiPushes.length > 0}
@@ -1362,10 +1380,11 @@ export default function ToryaPage() {
                                 }}
                               />
                             </th>
-                            <th style={{ width: '80px', padding: '3px' }} className="text-left font-bold">id</th>
-                            <th style={{ width: '180px', padding: '3px' }} className="text-left font-bold">push_name</th>
-                            <th style={{ width: '100px', padding: '3px' }} className="text-left font-bold">push_status1</th>
-                            <th style={{ width: '50px', padding: '3px' }} className="text-left font-bold">created_at</th>
+                            <th style={{ width: '200px', padding: '3px', minWidth: '200px' }} className="text-left font-bold">kareench1</th>
+                            <th style={{ width: '60px', padding: '3px', minWidth: '60px' }} className="text-left font-bold">id</th>
+                            <th style={{ width: '120px', padding: '3px', minWidth: '120px' }} className="text-left font-bold">push_name</th>
+                            <th style={{ width: '80px', padding: '3px', minWidth: '80px' }} className="text-left font-bold">push_status1</th>
+                            <th style={{ width: '60px', padding: '3px', minWidth: '60px' }} className="text-left font-bold">created_at</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1386,6 +1405,54 @@ export default function ToryaPage() {
                                       setSelectedNarpiPushes(newSelected);
                                     }}
                                   />
+                                </div>
+                              </td>
+                              <td style={{ padding: '3px' }}>
+                                <div style={{ height: '19px' }} className="flex items-center space-x-1">
+                                  <div style={{ fontSize: '11px' }}>
+                                    {push.kareench1 && Array.isArray(push.kareench1) ? (
+                                      <div className="flex space-x-1">
+                                        {(() => {
+                                          const results = push.kareench1;
+                                          const total = results.length;
+                                          const success = results.filter((r: any) => r.nupload_status1 === 'success').length;
+                                          const failed = results.filter((r: any) => r.nupload_status1 === 'failed').length;
+                                          
+                                          return (
+                                            <>
+                                              <span className="bg-blue-100 text-blue-800 px-1 rounded text-xs">T:{total}</span>
+                                              <span className="bg-green-100 text-green-800 px-1 rounded text-xs">✓{success}</span>
+                                              <span className="bg-red-100 text-red-800 px-1 rounded text-xs">✗{failed}</span>
+                                            </>
+                                          );
+                                        })()}
+                                      </div>
+                                    ) : push.kareench1 ? (
+                                      <div className="truncate text-xs" style={{ maxWidth: '120px' }}>
+                                        {typeof push.kareench1 === 'string' 
+                                          ? (push.kareench1.length > 20 ? `${push.kareench1.substring(0, 20)}...` : push.kareench1)
+                                          : JSON.stringify(push.kareench1).length > 20 
+                                            ? `${JSON.stringify(push.kareench1).substring(0, 20)}...`
+                                            : JSON.stringify(push.kareench1)
+                                        }
+                                      </div>
+                                    ) : (
+                                      <span className="text-gray-400 italic text-xs">No data</span>
+                                    )}
+                                  </div>
+                                  {push.kareench1 && (
+                                    <button
+                                      onClick={() => copyNarpiKareenchValue(push.id, push.kareench1)}
+                                      className={`px-1 py-0.5 text-xs rounded ${
+                                        copiedNarpiId === push.id
+                                          ? 'text-green-800 bg-green-100'
+                                          : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                                      }`}
+                                      style={{ fontSize: '10px' }}
+                                    >
+                                      {copiedNarpiId === push.id ? '✓' : 'Copy'}
+                                    </button>
+                                  )}
                                 </div>
                               </td>
                               <td style={{ padding: '3px' }}>
