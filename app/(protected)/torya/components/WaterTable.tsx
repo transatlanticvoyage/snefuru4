@@ -1066,10 +1066,15 @@ export default function WaterTable({
                         if (col === 'full_text_edits') {
                           return (
                             <textarea
-                              className="kz_torya_fulltextedits_box1 w-full h-20 p-2 text-xs font-mono border border-gray-300 rounded resize-none"
+                              className="kz_torya_fulltextedits_box1 p-2 text-xs font-mono border border-gray-300 rounded resize-none"
                               value={value?.toString() || ''}
                               onChange={(e) => {
                                 handleFullTextEditsChange(row.unit_id, e.target.value);
+                              }}
+                              style={{
+                                width: '410px',
+                                height: '74px',
+                                overflowY: 'auto'
                               }}
                             />
                           );
