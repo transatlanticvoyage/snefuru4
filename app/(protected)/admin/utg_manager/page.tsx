@@ -3,9 +3,14 @@
 import { useAuth } from '@/app/context/AuthContext';
 import Link from 'next/link';
 import UiTableGridsTable from './components/UiTableGridsTable';
+import { useEffect } from 'react';
 
 export default function UtgManagerPage() {
   const { user } = useAuth();
+
+  useEffect(() => {
+    document.title = "UTG Manager - Snefuru Admin";
+  }, []);
 
   if (!user) {
     return (
