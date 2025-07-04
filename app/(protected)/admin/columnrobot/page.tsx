@@ -70,7 +70,7 @@ export default function ColumnRobotPage() {
           
           {/* 6 Brain Columns */}
           <div style={{ display: 'flex' }}>
-            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
@@ -89,7 +89,7 @@ export default function ColumnRobotPage() {
               />
             </div>
             
-            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
@@ -108,7 +108,7 @@ export default function ColumnRobotPage() {
               />
             </div>
             
-            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
@@ -127,7 +127,7 @@ export default function ColumnRobotPage() {
               />
             </div>
             
-            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
@@ -146,7 +146,7 @@ export default function ColumnRobotPage() {
               />
             </div>
             
-            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
@@ -165,7 +165,7 @@ export default function ColumnRobotPage() {
               />
             </div>
             
-            <div className="brain_column" style={{ width: '225px', padding: '8px' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
