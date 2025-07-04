@@ -920,7 +920,10 @@ export default function WaterTable({
                       })(),
                       width: getColumnWidth(col),
                       minWidth: getColumnWidth(col),
-                      maxWidth: getColumnWidth(col)
+                      maxWidth: getColumnWidth(col),
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     <div className="flex flex-col items-start gap-0">
@@ -1045,7 +1048,10 @@ export default function WaterTable({
                         })(),
                         width: getColumnWidth(col),
                         minWidth: getColumnWidth(col),
-                        maxWidth: getColumnWidth(col)
+                        maxWidth: getColumnWidth(col),
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
                       }}
                     >
                       {(() => {
