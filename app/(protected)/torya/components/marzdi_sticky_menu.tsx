@@ -8,6 +8,7 @@ interface MarzdiStickyMenuProps {
 
 export default function MarzdiStickyMenu({ h1Title }: MarzdiStickyMenuProps) {
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isRightSide, setIsRightSide] = useState(false);
   return (
     <>
       <style jsx>{`
@@ -26,7 +27,7 @@ export default function MarzdiStickyMenu({ h1Title }: MarzdiStickyMenuProps) {
           /* Additional sticky positioning styles */
           position: fixed;
           top: 10px;
-          left: 10px;
+          ${isRightSide ? 'right: 10px;' : 'left: 10px;'}
           z-index: 9999;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           transition: width 0.3s ease, height 0.3s ease;
@@ -83,7 +84,12 @@ export default function MarzdiStickyMenu({ h1Title }: MarzdiStickyMenuProps) {
               {h1Title}
             </div>
 
-            <button style={{marginLeft:'4px',marginTop:'4px',width:'55px',height:'55px'}}>S</button>
+            <button 
+              style={{marginLeft:'4px',marginTop:'4px',width:'55px',height:'55px'}}
+              onClick={() => setIsRightSide(!isRightSide)}
+            >
+              S
+            </button>
           </>
         )}
         

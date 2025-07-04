@@ -109,6 +109,16 @@ const getColumnWidth = (columnName: string): string => {
   return COLUMN_WIDTHS[columnName] || '120px'; // 120px default for unlisted columns
 };
 
+// Calculate total table width based on visible columns
+const calculateTableWidth = (visibleColumns: string[]): string => {
+  const totalWidth = visibleColumns.reduce((total, col) => {
+    const width = getColumnWidth(col);
+    const numericWidth = parseInt(width) || 120;
+    return total + numericWidth;
+  }, 0);
+  return `${totalWidth}px`;
+};
+
 // No mock data - we'll fetch real nemtor_units data from database
 
 interface WaterTableProps {
@@ -755,7 +765,7 @@ export default function WaterTable({
 
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="divide-y divide-gray-200" style={{ tableLayout: 'fixed', width: '100%' }}>
+        <table className="divide-y divide-gray-200" style={{ tableLayout: 'fixed', width: calculateTableWidth(allVisibleColumns) }}>
           <thead className="bg-gray-50">
             {/* Column Numbering Row */}
             <tr>
