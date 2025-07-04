@@ -30,6 +30,10 @@ export default function ToryaPage() {
   // Compile text content state
   const [isCompilingTextContent, setIsCompilingTextContent] = useState(false);
 
+  // Narpi pushes state
+  const [narpiPushes, setNarpiPushes] = useState<any[]>([]);
+  const [selectedNarpiPushes, setSelectedNarpiPushes] = useState<Set<string>>(new Set());
+
   // Dublish function state
   const [isRunningDublish, setIsRunningDublish] = useState(false);
   const [dublishConnectionType, setDublishConnectionType] = useState<'snefuruplin' | 'rest_api' | 'api_other'>('snefuruplin');
@@ -87,6 +91,36 @@ export default function ToryaPage() {
     
     setLoading(false);
   }, [searchParams]);
+
+  // Fetch narpi pushes when batch changes
+  useEffect(() => {
+    const fetchNarpiPushes = async () => {
+      if (!selectedBatchId && !gconPiece?.asn_image_plan_batch_id) {
+        setNarpiPushes([]);
+        return;
+      }
+
+      const batchId = selectedBatchId || gconPiece?.asn_image_plan_batch_id;
+      
+      try {
+        const { data, error } = await supabase
+          .from('narpi_pushes')
+          .select('id, push_name, push_status1, created_at')
+          .eq('fk_batch_id', batchId)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching narpi_pushes:', error);
+        } else {
+          setNarpiPushes(data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching narpi_pushes:', error);
+      }
+    };
+
+    fetchNarpiPushes();
+  }, [selectedBatchId, gconPiece?.asn_image_plan_batch_id]);
 
   // Fetch gcon_piece data when gconPieceId is available
   useEffect(() => {
@@ -1307,6 +1341,80 @@ export default function ToryaPage() {
                     </a>
                   )}
                 </div>
+
+                {/* Narpi Pushes Table */}
+                {(selectedBatchId || gconPiece?.asn_image_plan_batch_id) && narpiPushes.length > 0 && (
+                  <div className="mt-4">
+                    <div className="overflow-hidden rounded border border-gray-300" style={{ maxWidth: '440px' }}>
+                      <table className="w-full" style={{ tableLayout: 'fixed', fontSize: '14px' }}>
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th style={{ width: '30px', padding: '3px' }} className="text-left font-bold">
+                              <input
+                                type="checkbox"
+                                checked={selectedNarpiPushes.size === narpiPushes.length && narpiPushes.length > 0}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedNarpiPushes(new Set(narpiPushes.map(p => p.id)));
+                                  } else {
+                                    setSelectedNarpiPushes(new Set());
+                                  }
+                                }}
+                              />
+                            </th>
+                            <th style={{ width: '80px', padding: '3px' }} className="text-left font-bold">id</th>
+                            <th style={{ width: '180px', padding: '3px' }} className="text-left font-bold">push_name</th>
+                            <th style={{ width: '100px', padding: '3px' }} className="text-left font-bold">push_status1</th>
+                            <th style={{ width: '50px', padding: '3px' }} className="text-left font-bold">created_at</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {narpiPushes.map((push) => (
+                            <tr key={push.id} className="border-t border-gray-200 hover:bg-gray-50">
+                              <td style={{ padding: '3px' }}>
+                                <div style={{ height: '19px' }} className="flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedNarpiPushes.has(push.id)}
+                                    onChange={(e) => {
+                                      const newSelected = new Set(selectedNarpiPushes);
+                                      if (e.target.checked) {
+                                        newSelected.add(push.id);
+                                      } else {
+                                        newSelected.delete(push.id);
+                                      }
+                                      setSelectedNarpiPushes(newSelected);
+                                    }}
+                                  />
+                                </div>
+                              </td>
+                              <td style={{ padding: '3px' }}>
+                                <div style={{ height: '19px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {push.id.substring(0, 8)}...
+                                </div>
+                              </td>
+                              <td style={{ padding: '3px' }}>
+                                <div style={{ height: '19px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {push.push_name || '-'}
+                                </div>
+                              </td>
+                              <td style={{ padding: '3px' }}>
+                                <div style={{ height: '19px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {push.push_status1 || '-'}
+                                </div>
+                              </td>
+                              <td style={{ padding: '3px' }}>
+                                <div style={{ height: '19px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {new Date(push.created_at).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* NEW AREA 3: Dublish Function Box */}
