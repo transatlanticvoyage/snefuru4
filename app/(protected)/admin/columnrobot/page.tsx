@@ -51,6 +51,7 @@ export default function ColumnRobotPage() {
   };
 
   useEffect(() => {
+    document.title = "Column Robot - Snefuru Admin";
     setLoading(false);
     fetchRstorData();
   }, []);
