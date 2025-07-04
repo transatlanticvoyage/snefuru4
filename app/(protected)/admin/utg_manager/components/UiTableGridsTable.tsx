@@ -8,8 +8,8 @@ interface UiTableGrid {
   utg_name: string;
   utg_description: string | null;
   page: string;
-  main_db_table: string | null;
   sql_view: string | null;
+  main_db_table: string | null;
   associated_files: any;
   utg_class: string | null;
   created_at: string;
@@ -408,6 +408,15 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700">sql_view</label>
+                <input
+                  type="text"
+                  value={formData.sql_view}
+                  onChange={(e) => setFormData({...formData, sql_view: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">main_db_table</label>
                 <input
                   type="text"
@@ -417,7 +426,7 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">sql_view</label>
+                <label className="block text-sm font-medium text-gray-700">associated_files (JSON)</label>
                 <input
                   type="text"
                   value={formData.sql_view}
@@ -517,6 +526,15 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700">sql_view</label>
+                <input
+                  type="text"
+                  value={formData.sql_view}
+                  onChange={(e) => setFormData({...formData, sql_view: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">main_db_table</label>
                 <input
                   type="text"
@@ -526,7 +544,7 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">sql_view</label>
+                <label className="block text-sm font-medium text-gray-700">associated_files (JSON)</label>
                 <input
                   type="text"
                   value={formData.sql_view}
