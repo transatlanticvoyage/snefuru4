@@ -19,6 +19,7 @@ interface NemtorUnit {
   full_text_cached: string | null;
   full_text_edits: string | null;
   tar_description_text: string | null;
+  tar_description_text_edits: string | null;
   has_img_slot: boolean | null;
   img_slot_qty: number | null;
   image_type: string | null;
@@ -44,27 +45,27 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   'option1': {
     name: 'col temp all',
     range: 'all fields',
-    columns: ['unit_id', 'unit_marker', 'tar_description_text', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
+    columns: ['unit_id', 'unit_marker', 'tar_description_text', 'tar_description_text_edits', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_id', 'image_url', 'image_alt', 'image_size', 'image_source', 'carousel_position', 'image_context', 'parent_el_id', 'position_order', 'depth_level', 'sort_index', 'summary_text', 'unit_label', 'settings_json', 'style_json', 'globals_json', 'raw_json', 'created_at', 'updated_at']
   },
   'option2': {
     name: 'col temp core',
     range: 'core fields',
-    columns: ['unit_marker', 'tar_description_text', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_url', 'summary_text']
+    columns: ['unit_marker', 'tar_description_text', 'tar_description_text_edits', 'el_id', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_url', 'summary_text']
   },
   'option3': {
     name: 'col temp hierarchy',
     range: 'hierarchy',
-    columns: ['unit_marker', 'tar_description_text', 'parent_el_id', 'depth_level', 'sort_index', 'position_order']
+    columns: ['unit_marker', 'tar_description_text', 'tar_description_text_edits', 'parent_el_id', 'depth_level', 'sort_index', 'position_order']
   },
   'option4': {
     name: 'col temp json',
     range: 'json fields',
-    columns: ['el_id', 'tar_description_text', 'settings_json', 'style_json', 'globals_json', 'raw_json']
+    columns: ['el_id', 'tar_description_text', 'tar_description_text_edits', 'settings_json', 'style_json', 'globals_json', 'raw_json']
   },
   'option5': {
     name: 'col temp summary',
     range: 'summary',
-    columns: ['unit_marker', 'tar_description_text', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_url', 'summary_text', 'unit_label']
+    columns: ['unit_marker', 'tar_description_text', 'tar_description_text_edits', 'el_type', 'widget_type', 'full_text_cached', 'full_text_edits', 'has_img_slot', 'img_slot_qty', 'man_img_url', 'man_img_id', 'image_type', 'image_url', 'summary_text', 'unit_label']
   }
 };
 
@@ -729,39 +730,9 @@ export default function WaterTable({
                     key={`horizomi-${col}`}
                     className="border border-gray-300 bg-purple-50 p-0 text-center"
                     style={{ 
-                      width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : (() => {
-                        switch(col) {
-                          case 'unit_id': return '40px';
-                          case 'unit_marker': return '140px';
-                          case 'el_id': return '92px';
-                          case 'el_type': return '84px';
-                          case 'widget_type': return '114px';
-                          case 'full_text_edits': return '420px';
-                          default: return undefined;
-                        }
-                      })(),
-                      maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : (() => {
-                        switch(col) {
-                          case 'unit_id': return '40px';
-                          case 'unit_marker': return '140px';
-                          case 'el_id': return '92px';
-                          case 'el_type': return '84px';
-                          case 'widget_type': return '114px';
-                          case 'full_text_edits': return '420px';
-                          default: return undefined;
-                        }
-                      })(),
-                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : (() => {
-                        switch(col) {
-                          case 'unit_id': return '40px';
-                          case 'unit_marker': return '140px';
-                          case 'el_id': return '92px';
-                          case 'el_type': return '84px';
-                          case 'widget_type': return '114px';
-                          case 'full_text_edits': return '420px';
-                          default: return undefined;
-                        }
-                      })()
+                      width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : undefined,
+                      maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : undefined,
+                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : undefined
                     }}
                   >
                     <div className="relative group">
@@ -1109,6 +1080,30 @@ export default function WaterTable({
                               }}
                             />
                           );
+                        }
+                        
+                        // Special handling for tar_description_text_edits - show textarea only if tar_description_text has value
+                        if (col === 'tar_description_text_edits') {
+                          const tarDescriptionText = row.tar_description_text;
+                          if (tarDescriptionText && tarDescriptionText.trim() !== '') {
+                            return (
+                              <textarea
+                                className="p-2 text-xs border border-gray-300 rounded resize-none"
+                                value={value?.toString() || ''}
+                                onChange={(e) => {
+                                  // Handle tar_description_text_edits change - you may want to implement this similar to handleFullTextEditsChange
+                                  console.log('tar_description_text_edits changed for unit:', row.unit_id, 'value:', e.target.value);
+                                }}
+                                style={{
+                                  width: '200px',
+                                  height: '60px',
+                                  overflowY: 'auto'
+                                }}
+                              />
+                            );
+                          } else {
+                            return <span className="text-gray-400 italic">No tar_description_text</span>;
+                          }
                         }
                         
                         // Special handling for has_img_slot - show green dot for true with checkbox
