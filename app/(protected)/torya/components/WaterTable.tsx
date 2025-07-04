@@ -714,7 +714,7 @@ export default function WaterTable({
 
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="divide-y divide-gray-200" style={{ tableLayout: 'fixed', width: 'auto' }}>
           <thead className="bg-gray-50">
             {/* Column Numbering Row */}
             <tr>
