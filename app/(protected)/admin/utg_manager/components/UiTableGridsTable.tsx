@@ -8,6 +8,7 @@ interface UiTableGrid {
   utg_name: string;
   utg_description: string | null;
   page: string;
+  main_db_table: string | null;
   sql_view: string | null;
   associated_files: any;
   utg_class: string | null;
@@ -39,6 +40,7 @@ export default function UiTableGridsTable() {
     utg_name: '',
     utg_description: '',
     page: '',
+    main_db_table: '',
     sql_view: '',
     associated_files: '',
     utg_class: '',
@@ -196,6 +198,7 @@ export default function UiTableGridsTable() {
       utg_name: record.utg_name,
       utg_description: record.utg_description || '',
       page: record.page,
+      main_db_table: record.main_db_table || '',
       sql_view: record.sql_view || '',
       associated_files: record.associated_files ? JSON.stringify(record.associated_files) : '',
       utg_class: record.utg_class || '',
@@ -211,6 +214,7 @@ export default function UiTableGridsTable() {
       utg_name: '',
       utg_description: '',
       page: '',
+      main_db_table: '',
       sql_view: '',
       associated_files: '',
       utg_class: '',
@@ -404,6 +408,15 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700">main_db_table</label>
+                <input
+                  type="text"
+                  value={formData.main_db_table}
+                  onChange={(e) => setFormData({...formData, main_db_table: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">sql_view</label>
                 <input
                   type="text"
@@ -500,6 +513,15 @@ export default function UiTableGridsTable() {
                   type="text"
                   value={formData.page}
                   onChange={(e) => setFormData({...formData, page: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">main_db_table</label>
+                <input
+                  type="text"
+                  value={formData.main_db_table}
+                  onChange={(e) => setFormData({...formData, main_db_table: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
               </div>
