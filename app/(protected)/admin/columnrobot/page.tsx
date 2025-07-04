@@ -74,24 +74,9 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
-              <textarea
-                style={{
-                  width: '100%',
-                  height: '500px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  padding: '8px',
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                  resize: 'none'
-                }}
-                placeholder="DB columns / HTML classes..."
-              />
-            </div>
-            
-            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
-                div.brain_column
+              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+                ui table grid columns definition<br />
+                utgcd
               </div>
               <textarea
                 style={{
@@ -112,24 +97,8 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
-              <textarea
-                style={{
-                  width: '100%',
-                  height: '500px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  padding: '8px',
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                  resize: 'none'
-                }}
-                placeholder="DB columns / HTML classes..."
-              />
-            </div>
-            
-            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
-                div.brain_column
+              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+                sql view (if any)
               </div>
               <textarea
                 style={{
@@ -150,6 +119,11 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
+              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+                db tables with fields in<br />
+                the actual columns of this<br />
+                utg
+              </div>
               <textarea
                 style={{
                   width: '100%',
@@ -168,6 +142,57 @@ export default function ColumnRobotPage() {
             <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
+              </div>
+              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+                list of specific fields
+              </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
+            </div>
+            
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                div.brain_column
+              </div>
+              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+                entire field set<br />
+                of specific db<br />
+                tables including fields<br />
+                not in the utg for<br />
+                comparison
+              </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
+            </div>
+            
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                div.brain_column
+              </div>
+              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+                linked db tables
               </div>
               <textarea
                 style={{
