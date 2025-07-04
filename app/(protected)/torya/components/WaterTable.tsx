@@ -729,9 +729,39 @@ export default function WaterTable({
                     key={`horizomi-${col}`}
                     className="border border-gray-300 bg-purple-50 p-0 text-center"
                     style={{ 
-                      width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
-                      maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px',
-                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : '150px'
+                      width: isPrisomiCol ? '20px' : isSelectCol ? '60px' : (() => {
+                        switch(col) {
+                          case 'unit_id': return '40px';
+                          case 'unit_marker': return '140px';
+                          case 'el_id': return '92px';
+                          case 'el_type': return '84px';
+                          case 'widget_type': return '114px';
+                          case 'full_text_edits': return '420px';
+                          default: return undefined;
+                        }
+                      })(),
+                      maxWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : (() => {
+                        switch(col) {
+                          case 'unit_id': return '40px';
+                          case 'unit_marker': return '140px';
+                          case 'el_id': return '92px';
+                          case 'el_type': return '84px';
+                          case 'widget_type': return '114px';
+                          case 'full_text_edits': return '420px';
+                          default: return undefined;
+                        }
+                      })(),
+                      minWidth: isPrisomiCol ? '20px' : isSelectCol ? '60px' : (() => {
+                        switch(col) {
+                          case 'unit_id': return '40px';
+                          case 'unit_marker': return '140px';
+                          case 'el_id': return '92px';
+                          case 'el_type': return '84px';
+                          case 'widget_type': return '114px';
+                          case 'full_text_edits': return '420px';
+                          default: return undefined;
+                        }
+                      })()
                     }}
                   >
                     <div className="relative group">
