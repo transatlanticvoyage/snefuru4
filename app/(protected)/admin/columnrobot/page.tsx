@@ -53,7 +53,7 @@ export default function ColumnRobotPage() {
       </div>
 
       {/* Main Controls Section */}
-      <div style={{ height: '350px', width: '100%' }} className="bg-white shadow rounded-lg mb-6">
+      <div className="main_controls bg-white shadow rounded-lg mb-6" style={{ height: '350px', width: '100%' }}>
         <div className="px-6 py-4">
           <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
             div.main_controls
@@ -62,7 +62,7 @@ export default function ColumnRobotPage() {
       </div>
 
       {/* Principal Content Section */}
-      <div style={{ width: '100%' }} className="bg-white shadow rounded-lg">
+      <div className="princ_content bg-white shadow rounded-lg" style={{ width: '100%' }}>
         <div className="px-6 py-4">
           <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '16px' }}>
             div.princ_content
@@ -74,9 +74,18 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
-              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
-                ui table grid columns definition<br />
-                utgcd
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                maxHeight: '300px', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px'
+              }}>
+                ui table grid columns definition utgcd
               </div>
               <textarea
                 style={{
@@ -97,7 +106,17 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
-              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                maxHeight: '300px', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px'
+              }}>
                 sql view (if any)
               </div>
               <textarea
@@ -119,10 +138,18 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
-              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
-                db tables with fields in<br />
-                the actual columns of this<br />
-                utg
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                maxHeight: '300px', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px'
+              }}>
+                db tables with fields in the actual columns of this utg
               </div>
               <textarea
                 style={{
@@ -143,7 +170,17 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
-              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                maxHeight: '300px', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px'
+              }}>
                 list of specific fields
               </div>
               <textarea
@@ -165,12 +202,18 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
-              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
-                entire field set<br />
-                of specific db<br />
-                tables including fields<br />
-                not in the utg for<br />
-                comparison
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                maxHeight: '300px', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px'
+              }}>
+                entire field set of specific db tables including fields not in the utg for comparison
               </div>
               <textarea
                 style={{
@@ -191,7 +234,17 @@ export default function ColumnRobotPage() {
               <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
                 div.brain_column
               </div>
-              <div style={{ fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', lineHeight: '1.3' }}>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                maxHeight: '300px', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px'
+              }}>
                 linked db tables
               </div>
               <textarea
