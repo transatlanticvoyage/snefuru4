@@ -102,15 +102,15 @@ export default function MarzdiStickyMenu({ h1Title }: MarzdiStickyMenuProps) {
         {!isMinimized && (
           <>
             <strong style={{fontSize:'12px',clear:'both',float:'left',marginTop:'1px',marginRight:'5px'}}>••div.marzdi_sticky_menu</strong>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
-            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}></button>
+            <button style={{fontSize:'12px',height:'13px',width:'60px',float:'left',marginTop:'1px'}}>a</button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}>b</button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}>c</button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}>d</button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}>e</button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}>f</button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}>g</button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}>h</button>
+            <button style={{height:'13px',width:'60px',float:'left',marginTop:'1px'}}>i</button>
           </>
         )}
       </div>
