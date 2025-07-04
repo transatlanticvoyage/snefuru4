@@ -23,6 +23,7 @@ interface NemtorUnit {
   summary_text: string | null;
   full_text_cached: string | null;
   full_text_edits: string | null;
+  tar_description_text: string | null;
   unit_label: string | null;
   has_img_slot: boolean | null;
   img_slot_qty: number | null;
@@ -165,6 +166,17 @@ export async function POST(request: NextRequest) {
       }
       
       return textValues.length > 0 ? textValues.join(' ') : null;
+    }
+
+    function extractDescriptionText(settings?: Record<string, any>): string | null {
+      if (!settings) return null;
+      
+      // Extract description_text field specifically
+      if (settings.description_text && typeof settings.description_text === 'string') {
+        return settings.description_text.trim();
+      }
+      
+      return null;
     }
 
     function detectImageSlots(element: ElementorElement): {
@@ -320,6 +332,7 @@ export async function POST(request: NextRequest) {
         summary_text: extractSummaryText(element.settings),
         full_text_cached: fullTextContent,
         full_text_edits: fullTextContent,
+        tar_description_text: extractDescriptionText(element.settings),
         has_img_slot: imageSlotData.has_img_slot,
         img_slot_qty: imageSlotData.img_slot_qty,
         image_type: imageData.image_type,
