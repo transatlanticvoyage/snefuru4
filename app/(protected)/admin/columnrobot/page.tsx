@@ -9,9 +9,50 @@ export default function ColumnRobotPage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Random storage state
+  const [rstorData, setRstorData] = useState<string>('');
+  const [rstorLoading, setRstorLoading] = useState(true);
+  const supabase = createClientComponentClient();
+
+  // Fetch random storage data
+  const fetchRstorData = async () => {
+    try {
+      setRstorLoading(true);
+      const { data, error } = await supabase
+        .from('admin_random_storage')
+        .select('rstor_body')
+        .eq('fk_app_page', '/admin/columnrobot')
+        .single();
+
+      if (error) {
+        console.error('Error fetching rstor data:', error);
+        setRstorData('');
+      } else {
+        const bodyContent = data?.rstor_body ? JSON.stringify(data.rstor_body, null, 2) : '';
+        setRstorData(bodyContent);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setRstorData('');
+    } finally {
+      setRstorLoading(false);
+    }
+  };
+
+  // Copy functions
+  const handleCopyLabel = () => {
+    const labelText = 'admin_random_storage.rstor_body where fk_app_page = /admin/columnrobot';
+    navigator.clipboard.writeText(labelText);
+  };
+
+  const handleCopyRstorData = () => {
+    navigator.clipboard.writeText(rstorData);
+  };
 
   useEffect(() => {
     setLoading(false);
+    fetchRstorData();
   }, []);
 
   if (loading) {
@@ -55,8 +96,71 @@ export default function ColumnRobotPage() {
       {/* Main Controls Section */}
       <div className="main_controls bg-white shadow rounded-lg mb-6" style={{ height: '350px', width: '100%' }}>
         <div className="px-6 py-4">
-          <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+          <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '16px' }}>
             div.main_controls
+          </div>
+          
+          {/* Random Storage Display */}
+          <div style={{ marginBottom: '16px' }}>
+            {/* Label with copy button */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                admin_random_storage.rstor_body where fk_app_page = /admin/columnrobot
+              </div>
+              <button
+                onClick={handleCopyLabel}
+                style={{
+                  height: '20px',
+                  width: '30px',
+                  fontSize: '10px',
+                  backgroundColor: '#e5e7eb',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                📋
+              </button>
+            </div>
+            
+            {/* Copy button for textarea content */}
+            <button
+              onClick={handleCopyRstorData}
+              disabled={!rstorData}
+              style={{
+                width: '400px',
+                height: '20px',
+                fontSize: '12px',
+                backgroundColor: rstorData ? '#3b82f6' : '#e5e7eb',
+                color: rstorData ? 'white' : '#9ca3af',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px 4px 0 0',
+                cursor: rstorData ? 'pointer' : 'not-allowed',
+                marginTop: '8px',
+                marginBottom: '0px'
+              }}
+            >
+              📋 Copy Content
+            </button>
+            
+            {/* Textarea */}
+            <textarea
+              value={rstorLoading ? 'Loading...' : rstorData}
+              readOnly
+              style={{
+                width: '400px',
+                height: '250px',
+                border: '1px solid #d1d5db',
+                borderRadius: '0 0 4px 4px',
+                padding: '8px',
+                fontSize: '12px',
+                fontFamily: 'monospace',
+                resize: 'none',
+                backgroundColor: '#f9fafb',
+                marginTop: '0px'
+              }}
+              placeholder="No data found for this page..."
+            />
           </div>
         </div>
       </div>
