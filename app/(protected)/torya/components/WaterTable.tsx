@@ -69,6 +69,45 @@ const columnTemplates: Record<ColumnTemplateKey, { name: string; range: string; 
   }
 };
 
+// Centralized column width configuration
+const COLUMN_WIDTHS: Record<string, string> = {
+  'unit_id': '40px',
+  'unit_marker': '140px', 
+  'tar_description_text': '180px',
+  'tar_description_text_edits': '200px',
+  'el_id': '92px',
+  'el_type': '84px',
+  'widget_type': '114px',
+  'full_text_cached': '300px',
+  'full_text_edits': '420px',
+  'has_img_slot': '100px',
+  'img_slot_qty': '80px',
+  'man_img_url': '200px',
+  'man_img_id': '150px',
+  'image_type': '100px',
+  'image_url': '250px',
+  'image_alt': '150px',
+  'image_size': '100px',
+  'image_source': '120px',
+  'carousel_position': '120px',
+  'image_context': '180px',
+  'summary_text': '200px',
+  'unit_label': '150px',
+  'parent_el_id': '100px',
+  'position_order': '100px',
+  'depth_level': '80px',
+  'sort_index': '80px',
+  'settings_json': '200px',
+  'style_json': '200px',
+  'globals_json': '200px',
+  'raw_json': '200px',
+  'created_at': '120px',
+  'updated_at': '120px'
+};
+
+const getColumnWidth = (columnName: string): string => {
+  return COLUMN_WIDTHS[columnName] || '120px'; // 120px default for unlisted columns
+};
 
 // No mock data - we'll fetch real nemtor_units data from database
 
@@ -869,39 +908,9 @@ export default function WaterTable({
                         }
                         return '#f9fafb'; // default bg-gray-50
                       })(),
-                      width: (() => {
-                        switch(col) {
-                          case 'unit_id': return '40px';
-                          case 'unit_marker': return '140px';
-                          case 'el_id': return '92px';
-                          case 'el_type': return '84px';
-                          case 'widget_type': return '114px';
-                          case 'full_text_edits': return '420px';
-                          default: return undefined;
-                        }
-                      })(),
-                      minWidth: (() => {
-                        switch(col) {
-                          case 'unit_id': return '40px';
-                          case 'unit_marker': return '140px';
-                          case 'el_id': return '92px';
-                          case 'el_type': return '84px';
-                          case 'widget_type': return '114px';
-                          case 'full_text_edits': return '420px';
-                          default: return undefined;
-                        }
-                      })(),
-                      maxWidth: (() => {
-                        switch(col) {
-                          case 'unit_id': return '40px';
-                          case 'unit_marker': return '140px';
-                          case 'el_id': return '92px';
-                          case 'el_type': return '84px';
-                          case 'widget_type': return '114px';
-                          case 'full_text_edits': return '420px';
-                          default: return undefined;
-                        }
-                      })(),
+                      width: getColumnWidth(col),
+                      minWidth: getColumnWidth(col),
+                      maxWidth: getColumnWidth(col),
                       whiteSpace: 'normal',
                       wordWrap: 'break-word'
                     }}
