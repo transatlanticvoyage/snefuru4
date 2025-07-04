@@ -1035,39 +1035,9 @@ export default function WaterTable({
                           }
                           return undefined; // default background
                         })(),
-                        width: (() => {
-                          switch(col) {
-                            case 'unit_id': return '40px';
-                            case 'unit_marker': return '140px';
-                            case 'el_id': return '92px';
-                            case 'el_type': return '84px';
-                            case 'widget_type': return '114px';
-                            case 'full_text_edits': return '600px';
-                            default: return undefined;
-                          }
-                        })(),
-                        minWidth: (() => {
-                          switch(col) {
-                            case 'unit_id': return '40px';
-                            case 'unit_marker': return '140px';
-                            case 'el_id': return '92px';
-                            case 'el_type': return '84px';
-                            case 'widget_type': return '114px';
-                            case 'full_text_edits': return '600px';
-                            default: return undefined;
-                          }
-                        })(),
-                        maxWidth: (() => {
-                          switch(col) {
-                            case 'unit_id': return '40px';
-                            case 'unit_marker': return '140px';
-                            case 'el_id': return '92px';
-                            case 'el_type': return '84px';
-                            case 'widget_type': return '114px';
-                            case 'full_text_edits': return '600px';
-                            default: return undefined;
-                          }
-                        })()
+                        width: getColumnWidth(col),
+                        minWidth: getColumnWidth(col),
+                        maxWidth: getColumnWidth(col)
                       }}
                     >
                       {(() => {
