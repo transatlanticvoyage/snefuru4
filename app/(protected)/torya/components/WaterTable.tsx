@@ -911,8 +911,9 @@ export default function WaterTable({
                       width: getColumnWidth(col),
                       minWidth: getColumnWidth(col),
                       maxWidth: getColumnWidth(col),
-                      whiteSpace: 'normal',
-                      wordWrap: 'break-word'
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     <div className="flex flex-col items-start gap-0">
@@ -1023,7 +1024,7 @@ export default function WaterTable({
                   return (
                     <td 
                       key={col} 
-                      className={`whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
+                      className={`text-sm text-gray-900 border border-gray-200 ${
                         col === 'full_text_edits' ? 'border-l-[3px] border-r-[3px] border-l-black border-r-black' : ''
                       } ${col === 'img_slot_qty' ? 'border-r-[3px] border-r-black' : ''} ${col === 'man_img_id' ? 'border-r-[3px] border-r-black' : ''} ${col === 'image_context' ? 'border-r-[3px] border-r-black' : ''}`}
                       style={{ 
@@ -1037,7 +1038,10 @@ export default function WaterTable({
                         })(),
                         width: getColumnWidth(col),
                         minWidth: getColumnWidth(col),
-                        maxWidth: getColumnWidth(col)
+                        maxWidth: getColumnWidth(col),
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
                       }}
                     >
                       {(() => {
