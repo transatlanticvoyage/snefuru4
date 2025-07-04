@@ -874,7 +874,7 @@ export default function WaterTable({
                           case 'el_id': return '92px';
                           case 'el_type': return '84px';
                           case 'widget_type': return '114px';
-                          case 'full_text_edits': return '600px';
+                          case 'full_text_edits': return '420px';
                           default: return undefined;
                         }
                       })(),
@@ -885,7 +885,7 @@ export default function WaterTable({
                           case 'el_id': return '92px';
                           case 'el_type': return '84px';
                           case 'widget_type': return '114px';
-                          case 'full_text_edits': return '600px';
+                          case 'full_text_edits': return '420px';
                           default: return undefined;
                         }
                       })(),
@@ -896,7 +896,7 @@ export default function WaterTable({
                           case 'el_id': return '92px';
                           case 'el_type': return '84px';
                           case 'widget_type': return '114px';
-                          case 'full_text_edits': return '600px';
+                          case 'full_text_edits': return '420px';
                           default: return undefined;
                         }
                       })(),
