@@ -157,7 +157,7 @@ export default function WaterTable({
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(100);
   const [sortField, setSortField] = useState<keyof NemtorUnit | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
@@ -862,12 +862,13 @@ export default function WaterTable({
                         onClick={() => {
                           navigator.clipboard.writeText('select');
                         }}
-                        className="w-full border-none bg-transparent hover:bg-gray-200 cursor-pointer"
+                        className="w-full bg-transparent hover:bg-yellow-200 cursor-pointer"
                         style={{ 
                           height: '10px',
                           fontSize: '0px',
                           padding: '0px',
-                          margin: '0px'
+                          margin: '0px',
+                          border: '1px solid #d1d5db'
                         }}
                       />
                     </th>
@@ -886,15 +887,16 @@ export default function WaterTable({
                       onClick={() => {
                         const textToCopy = col === 'man_img_url' || col === 'man_img_id' 
                           ? col 
-                          : `nemtor_units\n${col}`;
+                          : `nemtor_units.${col}`;
                         navigator.clipboard.writeText(textToCopy);
                       }}
-                      className="w-full border-none bg-transparent hover:bg-gray-200 cursor-pointer"
+                      className="w-full bg-transparent hover:bg-yellow-200 cursor-pointer"
                       style={{ 
                         height: '10px',
                         fontSize: '0px',
                         padding: '0px',
-                        margin: '0px'
+                        margin: '0px',
+                        border: '1px solid #d1d5db'
                       }}
                     />
                   </th>
