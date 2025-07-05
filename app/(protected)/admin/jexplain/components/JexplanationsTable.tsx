@@ -347,53 +347,53 @@ export default function JexplanationsTable() {
         <table className="min-w-full border-collapse border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border border-gray-200">
-                Actions
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider border border-gray-200">
+                actions
               </th>
               <th
                 onClick={() => handleSort('jexpl_id')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
-                ID
+                jexpl_id
                 {sortField === 'jexpl_id' && (
                   <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th
                 onClick={() => handleSort('jexpl_note')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
-                Note
+                jexpl_note
                 {sortField === 'jexpl_note' && (
                   <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th
                 onClick={() => handleSort('jexpl_description')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
-                Description
+                jexpl_description
                 {sortField === 'jexpl_description' && (
                   <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border border-gray-200">
-                Content Preview
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider border border-gray-200">
+                jexpl_content
               </th>
               <th
                 onClick={() => handleSort('created_at')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
-                Created
+                created_at
                 {sortField === 'created_at' && (
                   <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
               <th
                 onClick={() => handleSort('updated_at')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
-                Updated
+                updated_at
                 {sortField === 'updated_at' && (
                   <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                 )}

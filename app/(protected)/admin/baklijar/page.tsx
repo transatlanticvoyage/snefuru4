@@ -280,23 +280,23 @@ export default function BaklijarPage() {
         {/* Mockups Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+            <table className="w-full border-collapse border border-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Link</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Description</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Folder</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Views</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Updated</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">link</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_name</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_description</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_status</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_folder</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">view_count</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">updated_at</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="bg-white">
                 {paginatedMockups.map((mockup) => (
                   <tr key={mockup.bakli_id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 border border-gray-200">
                       <Link 
                         href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
                         className="inline-flex items-center px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors"
@@ -304,7 +304,7 @@ export default function BaklijarPage() {
                         Edit
                       </Link>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 border border-gray-200">
                       <Link 
                         href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
                         className="text-purple-600 hover:text-purple-800 font-medium"
@@ -312,10 +312,10 @@ export default function BaklijarPage() {
                         {mockup.bakli_name}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
+                    <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate border border-gray-200">
                       {mockup.bakli_description || '-'}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 border border-gray-200">
                       <span className={`px-2 py-1 text-xs rounded ${
                         mockup.bakli_status === 'published' ? 'bg-green-100 text-green-800' :
                         mockup.bakli_status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
@@ -324,16 +324,16 @@ export default function BaklijarPage() {
                         {mockup.bakli_status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
                       {mockup.bakli_folder || '-'}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
                       {mockup.view_count}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
                       {new Date(mockup.updated_at).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 border border-gray-200">
                       <div className="flex gap-2">
                         <Link
                           href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
@@ -353,7 +353,7 @@ export default function BaklijarPage() {
                 ))}
                 {paginatedMockups.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500 border border-gray-200">
                       {filteredMockups.length === 0 ? 'No mockups found' : 'No mockups match your filters'}
                     </td>
                   </tr>
