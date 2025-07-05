@@ -29,7 +29,29 @@ export default function KetchManagerPage() {
           </Link>
         </div>
         
-        <h1 className="text-2xl font-bold mb-6">Ketch Manager</h1>
+        <div className="flex items-center gap-4 mb-6">
+          <h1 className="text-2xl font-bold">Ketch Manager</h1>
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch('https://valueoffershq.com/wp-json/snefuru/v1/ketch/trigger-css-update', {
+                  method: 'POST'
+                });
+                const result = await response.json();
+                if (result.success) {
+                  alert('CSS updated successfully!');
+                } else {
+                  alert('Failed to update CSS: ' + (result.error || 'Unknown error'));
+                }
+              } catch (error) {
+                alert('Error triggering CSS update: ' + error);
+              }
+            }}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+          >
+            Trigger CSS Update
+          </button>
+        </div>
         
         <KetchSettingsTable />
       </div>

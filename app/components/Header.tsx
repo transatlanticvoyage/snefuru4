@@ -156,7 +156,7 @@ export default function Header() {
         },
         {
           name: 'Ketch Manager',
-          path: 'https://snef.me/admin/ketch_manager'
+          path: '/admin/ketch_manager'
         },
         {
           name: 'Ketch 1',
