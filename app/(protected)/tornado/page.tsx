@@ -1139,7 +1139,7 @@ export default function TornadoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-tornado min-h-screen bg-gray-50">
       {/* Sticky Menu Component */}
       <MarzdiStickyMenu h1Title={gconPiece?.h1title} />
       
