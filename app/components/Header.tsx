@@ -163,7 +163,7 @@ export default function Header() {
           path: 'https://snef.me/admin/columnrobot'
         },
         {
-          name: 'Baklijar',
+          name: 'Bakli Mockups',
           path: 'https://snef.me/admin/baklijar'
         },
         {

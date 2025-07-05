@@ -284,14 +284,14 @@ export default function UiTableGridsTable() {
       
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full border-collapse border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
               {Object.keys(data[0] || {}).map((column) => (
                 <th
                   key={column}
                   onClick={() => handleSort(column as keyof UiTableGrid)}
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
                 >
                   {column}
                   {sortField === column && (
@@ -301,7 +301,7 @@ export default function UiTableGridsTable() {
                   )}
                 </th>
               ))}
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider border border-gray-200">
                 actions
               </th>
             </tr>
@@ -310,11 +310,11 @@ export default function UiTableGridsTable() {
             {paginatedData.map((row) => (
               <tr key={row.utg_id} className="hover:bg-gray-50">
                 {Object.entries(row).map(([key, value]) => (
-                  <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                     {typeof value === 'object' ? JSON.stringify(value) : String(value)}
                   </td>
                 ))}
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <td className="px-6 py-4 whitespace-nowrap text-sm border border-gray-200">
                   <button
                     onClick={() => startEdit(row)}
                     className="text-blue-600 hover:text-blue-900 mr-3"

@@ -400,10 +400,10 @@ export default function XPagesManager1Page() {
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full">
+          <table className="min-w-full border-collapse border border-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left border border-gray-200">
                   <input
                     type="checkbox"
                     checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
@@ -419,12 +419,12 @@ export default function XPagesManager1Page() {
                 {columns.map((column) => (
                   <th
                     key={column.key}
-                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100"
+                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border border-gray-200"
                     style={{ width: column.width }}
                     onClick={() => handleSort(column.key)}
                   >
                     <div className="flex items-center space-x-1">
-                      <span className="font-bold text-xs uppercase">{column.key}</span>
+                      <span className="font-bold text-xs lowercase">{column.key}</span>
                       {sortField === column.key && (
                         <span className="text-gray-400">
                           {sortOrder === 'asc' ? '↑' : '↓'}
@@ -438,7 +438,7 @@ export default function XPagesManager1Page() {
             <tbody className="divide-y divide-gray-200">
               {paginatedData.map((item) => (
                 <tr key={item.xpage_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 border border-gray-200">
                     <input
                       type="checkbox"
                       checked={selectedRows.has(item.xpage_id)}
@@ -456,7 +456,7 @@ export default function XPagesManager1Page() {
                   {columns.map((column) => (
                     <td
                       key={column.key}
-                      className="px-4 py-3 text-sm"
+                      className="px-4 py-3 text-sm border border-gray-200"
                       style={{ width: column.width }}
                     >
                       {renderCell(item, column)}
