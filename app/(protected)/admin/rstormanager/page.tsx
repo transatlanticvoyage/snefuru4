@@ -224,7 +224,7 @@ export default function RstorManagerPage() {
             <tr>
               <th
                 onClick={() => handleSort('rstor_id')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>rstor_id</span>
@@ -237,7 +237,7 @@ export default function RstorManagerPage() {
               </th>
               <th
                 onClick={() => handleSort('fk_app_page')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>fk_app_page</span>
@@ -250,7 +250,7 @@ export default function RstorManagerPage() {
               </th>
               <th
                 onClick={() => handleSort('rstor_substance')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>rstor_substance</span>
@@ -262,13 +262,13 @@ export default function RstorManagerPage() {
                 </div>
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider border border-gray-200"
               >
                 rstor_body
               </th>
               <th
                 onClick={() => handleSort('created_at')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>created_at</span>
@@ -281,7 +281,7 @@ export default function RstorManagerPage() {
               </th>
               <th
                 onClick={() => handleSort('updated_at')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>updated_at</span>
