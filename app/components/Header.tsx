@@ -159,10 +159,6 @@ export default function Header() {
           path: '/admin/ketch_manager'
         },
         {
-          name: 'Ketch 1',
-          path: 'https://snef.me/admin/ketch1'
-        },
-        {
           name: 'Column Robot',
           path: 'https://snef.me/admin/columnrobot'
         },
@@ -175,7 +171,11 @@ export default function Header() {
           path: 'https://snef.me/admin/xpagesmanager1'
         },
         {
-          name: 'RSTORM Manager',
+          name: 'Jexplanations',
+          path: '/admin/jexplain'
+        },
+        {
+          name: 'RSTOR Manager',
           path: 'https://snef.me/admin/rstormanager'
         },
         {
@@ -198,13 +198,8 @@ export default function Header() {
           name: 'Download Plugin',
           path: '/downloadplugin'
         },
-        {
-          name: 'Jexplain',
-          path: '/admin/jexplain'
-        },
         ...adminPages.filter(page => 
           !page.path?.includes('/admin/ketch_manager') &&
-          !page.path?.includes('/admin/ketch1') &&
           !page.path?.includes('/admin/columnrobot') &&
           !page.path?.includes('/admin/baklijar') &&
           !page.path?.includes('/admin/xpagesmanager1') &&
