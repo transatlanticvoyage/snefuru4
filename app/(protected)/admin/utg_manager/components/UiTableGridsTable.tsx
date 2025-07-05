@@ -124,11 +124,21 @@ export default function UiTableGridsTable() {
   // Handle create
   const handleCreate = async () => {
     try {
+      let associatedFilesData = null;
+      if (formData.associated_files && formData.associated_files.trim()) {
+        try {
+          associatedFilesData = JSON.parse(formData.associated_files);
+        } catch (parseError) {
+          alert('Invalid JSON in associated_files field. Please check the format.');
+          return;
+        }
+      }
+      
       const { error: insertError } = await supabase
         .from('ui_table_grids')
         .insert([{
           ...formData,
-          associated_files: formData.associated_files ? JSON.parse(formData.associated_files) : null
+          associated_files: associatedFilesData
         }]);
         
       if (insertError) throw insertError;
@@ -138,7 +148,7 @@ export default function UiTableGridsTable() {
       fetchData();
     } catch (err) {
       console.error('Error creating record:', err);
-      alert('Failed to create record');
+      alert(`Failed to create record: ${err.message || err}`);
     }
   };
   
@@ -147,11 +157,21 @@ export default function UiTableGridsTable() {
     if (!editingRecord) return;
     
     try {
+      let associatedFilesData = null;
+      if (formData.associated_files && formData.associated_files.trim()) {
+        try {
+          associatedFilesData = JSON.parse(formData.associated_files);
+        } catch (parseError) {
+          alert('Invalid JSON in associated_files field. Please check the format.');
+          return;
+        }
+      }
+      
       const { error: updateError } = await supabase
         .from('ui_table_grids')
         .update({
           ...formData,
-          associated_files: formData.associated_files ? JSON.parse(formData.associated_files) : null
+          associated_files: associatedFilesData
         })
         .eq('utg_id', editingRecord.utg_id);
         
@@ -163,7 +183,7 @@ export default function UiTableGridsTable() {
       fetchData();
     } catch (err) {
       console.error('Error updating record:', err);
-      alert('Failed to update record');
+      alert(`Failed to update record: ${err.message || err}`);
     }
   };
   
@@ -379,6 +399,26 @@ export default function UiTableGridsTable() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Create New Entry</h2>
+            
+            {/* Top save button */}
+            <div className="mb-6 flex justify-end gap-3 border-b border-gray-200 pb-4">
+              <button
+                onClick={() => {
+                  setIsCreateModalOpen(false);
+                  resetForm();
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreate}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Create
+              </button>
+            </div>
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">utg_name</label>
@@ -427,20 +467,12 @@ export default function UiTableGridsTable() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">associated_files (JSON)</label>
-                <input
-                  type="text"
-                  value={formData.sql_view}
-                  onChange={(e) => setFormData({...formData, sql_view: e.target.value})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">associated_files (JSON)</label>
                 <textarea
                   value={formData.associated_files}
                   onChange={(e) => setFormData({...formData, associated_files: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                   rows={3}
+                  placeholder="Enter valid JSON, e.g. {&quot;key&quot;: &quot;value&quot;}"
                 />
               </div>
               <div>
@@ -471,6 +503,8 @@ export default function UiTableGridsTable() {
                 />
               </div>
             </div>
+            
+            {/* Bottom save button */}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => {
@@ -497,6 +531,27 @@ export default function UiTableGridsTable() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Edit Entry</h2>
+            
+            {/* Top save button */}
+            <div className="mb-6 flex justify-end gap-3 border-b border-gray-200 pb-4">
+              <button
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditingRecord(null);
+                  resetForm();
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEdit}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Update
+              </button>
+            </div>
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">utg_name</label>
@@ -545,20 +600,12 @@ export default function UiTableGridsTable() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">associated_files (JSON)</label>
-                <input
-                  type="text"
-                  value={formData.sql_view}
-                  onChange={(e) => setFormData({...formData, sql_view: e.target.value})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">associated_files (JSON)</label>
                 <textarea
                   value={formData.associated_files}
                   onChange={(e) => setFormData({...formData, associated_files: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                   rows={3}
+                  placeholder="Enter valid JSON, e.g. {&quot;key&quot;: &quot;value&quot;}"
                 />
               </div>
               <div>
@@ -589,6 +636,8 @@ export default function UiTableGridsTable() {
                 />
               </div>
             </div>
+            
+            {/* Bottom save button */}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => {
