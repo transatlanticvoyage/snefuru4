@@ -519,7 +519,7 @@ export default function KetchSettingsTable() {
     const allKeys = Object.keys(data[0]);
     
     // Custom order: move 'class', 'css_rule_id', 'id' to specific positions
-    const customOrder = [];
+    const customOrder: string[] = [];
     
     // Add all keys except class, css_rule_id, and id first
     allKeys.forEach(key => {

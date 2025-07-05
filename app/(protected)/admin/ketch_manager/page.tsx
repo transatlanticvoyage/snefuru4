@@ -29,9 +29,10 @@ export default function KetchManagerPage() {
           </Link>
         </div>
         
-        <div className="flex items-center gap-4 mb-6">
-          <h1 className="text-2xl font-bold">Ketch Manager</h1>
-          <button
+        <div className="mb-6">
+          <div className="flex items-center gap-4 mb-2">
+            <h1 className="text-2xl font-bold">Ketch Manager</h1>
+            <button
             onClick={async () => {
               try {
                 const response = await fetch('https://valueoffershq.com/wp-json/snefuru/v1/ketch/trigger-css-update', {
@@ -51,6 +52,10 @@ export default function KetchManagerPage() {
           >
             Trigger CSS Update
           </button>
+          </div>
+          <p className="text-gray-600" style={{ fontSize: '16px' }}>
+            <span className="font-bold">main db table:</span> ketch_settings
+          </p>
         </div>
         
         <KetchSettingsTable />
