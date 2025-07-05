@@ -587,7 +587,7 @@ export default function KetchSettingsTable() {
       <div className="mb-4 flex items-center gap-4 flex-wrap">
         {Object.entries(filters).map(([field, value]) => (
           <div key={field} className="flex items-center gap-2">
-            <label className="font-bold text-sm lowercase">{field.replace('_', ' ')}</label>
+            <label className="font-bold text-sm lowercase">{field}</label>
             <select
               value={value}
               onChange={(e) => {
