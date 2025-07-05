@@ -55,6 +55,7 @@ export default function XPagesManager1Page() {
   ];
 
   useEffect(() => {
+    document.title = "X Pages Manager";
     fetchXPages();
   }, []);
 

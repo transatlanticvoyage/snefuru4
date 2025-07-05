@@ -101,6 +101,7 @@ export default function RstorManagerPage() {
 
   // Initial data fetch
   useEffect(() => {
+    document.title = "RSTOR Manager";
     fetchData();
     fetchUniquePages();
   }, [currentPage, itemsPerPage, searchTerm, pageFilter, sortField, sortOrder]);

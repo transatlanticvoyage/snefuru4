@@ -157,6 +157,7 @@ export default function Ketch1AdminPage() {
   };
 
   useEffect(() => {
+    document.title = "Ketch 1";
     if (user) {
       fetchSettings();
     }
