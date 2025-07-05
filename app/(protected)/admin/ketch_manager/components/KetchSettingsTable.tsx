@@ -9,8 +9,9 @@ interface KetchSettings {
   app_page: string;
   ancestor_element: string | null;
   element_tag: string | null;
-  id: string | null;
   class: string | null;
+  css_rule_id: string | null;
+  id: string | null;
   other_rules_needed: string | null;
   
   // Dimensions
@@ -166,8 +167,9 @@ export default function KetchSettingsTable() {
     app_page: '',
     ancestor_element: '',
     element_tag: '',
-    id: '',
     class: '',
+    css_rule_id: '',
+    id: '',
     other_rules_needed: '',
     width: '',
     height: '',
@@ -506,22 +508,44 @@ export default function KetchSettingsTable() {
 
   // Define which fields can be inline edited
   const inlineEditableFields = [
-    'app_page', 'ancestor_element', 'element_tag', 'id', 'class', 
+    'app_page', 'ancestor_element', 'element_tag', 'class', 'css_rule_id', 'id', 
     'other_rules_needed', 'width', 'height', 'min_width', 'min_height', 
     'max_width', 'max_height'
   ];
   
-  // Get column display names
+  // Get column display names with custom order
   const getColumnHeaders = () => {
     if (data.length === 0) return [];
-    return Object.keys(data[0]);
+    const allKeys = Object.keys(data[0]);
+    
+    // Custom order: move 'class', 'css_rule_id', 'id' to specific positions
+    const customOrder = [];
+    
+    // Add all keys except class, css_rule_id, and id first
+    allKeys.forEach(key => {
+      if (key !== 'class' && key !== 'css_rule_id' && key !== 'id') {
+        customOrder.push(key);
+      }
+    });
+    
+    // Find where 'class' would be and insert our custom sequence
+    const elementTagIndex = customOrder.findIndex(key => key === 'element_tag');
+    if (elementTagIndex !== -1) {
+      // Insert after element_tag: class, css_rule_id, id
+      customOrder.splice(elementTagIndex + 1, 0, 'class', 'css_rule_id', 'id');
+    } else {
+      // Fallback: add at end
+      customOrder.push('class', 'css_rule_id', 'id');
+    }
+    
+    return customOrder;
   };
   
   // Render form fields
   const renderFormFields = () => {
     const fields = Object.keys(getEmptyFormData());
     const groups = {
-      'Basic Info': ['app_page', 'ancestor_element', 'element_tag', 'id', 'class', 'other_rules_needed'],
+      'Basic Info': ['app_page', 'ancestor_element', 'element_tag', 'class', 'css_rule_id', 'id', 'other_rules_needed'],
       'Dimensions': ['width', 'height', 'min_width', 'min_height', 'max_width', 'max_height'],
       'Margin': ['margin', 'margin_top', 'margin_bottom', 'margin_left', 'margin_right'],
       'Padding': ['padding', 'padding_top', 'padding_bottom', 'padding_left', 'padding_right'],
@@ -669,9 +693,13 @@ export default function KetchSettingsTable() {
                 <th
                   key={column}
                   onClick={() => handleSort(column as keyof KetchSettings)}
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap border border-gray-200"
+                  className={`px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap border border-gray-200 ${
+                    column === 'class' ? 'border-r-black border-r-2' : ''
+                  }`}
                   style={{
-                    backgroundColor: column === 'element_tag' ? '#cef7f1' : undefined
+                    backgroundColor: column === 'element_tag' ? '#cef7f1' : undefined,
+                    borderRightWidth: column === 'class' ? '3px' : undefined,
+                    borderRightColor: column === 'class' ? '#000000' : undefined
                   }}
                 >
                   {column}
@@ -729,12 +757,18 @@ export default function KetchSettingsTable() {
                     )}
                   </div>
                 </td>
-                {Object.entries(row).map(([key, value]) => (
+                {getColumnHeaders().map((key) => {
+                  const value = (row as any)[key];
+                  return (
                   <td 
                     key={key} 
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200"
+                    className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200 ${
+                      key === 'class' ? 'border-r-black border-r-2' : ''
+                    }`}
                     style={{
-                      backgroundColor: key === 'element_tag' ? '#cef7f1' : undefined
+                      backgroundColor: key === 'element_tag' ? '#cef7f1' : undefined,
+                      borderRightWidth: key === 'class' ? '3px' : undefined,
+                      borderRightColor: key === 'class' ? '#000000' : undefined
                     }}
                   >
                     {key === 'setting_id' && value ? (
@@ -778,7 +812,8 @@ export default function KetchSettingsTable() {
                      typeof value === 'object' ? JSON.stringify(value) : 
                      value === null ? '' : String(value)}
                   </td>
-                ))}
+                  );
+                })}
               </tr>
             ))}
           </tbody>
