@@ -344,15 +344,15 @@ export default function JexplanationsTable() {
       
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full border-collapse border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border border-gray-200">
                 Actions
               </th>
               <th
                 onClick={() => handleSort('jexpl_id')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 ID
                 {sortField === 'jexpl_id' && (
@@ -361,7 +361,7 @@ export default function JexplanationsTable() {
               </th>
               <th
                 onClick={() => handleSort('jexpl_note')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 Note
                 {sortField === 'jexpl_note' && (
@@ -370,19 +370,19 @@ export default function JexplanationsTable() {
               </th>
               <th
                 onClick={() => handleSort('jexpl_description')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 Description
                 {sortField === 'jexpl_description' && (
                   <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border border-gray-200">
                 Content Preview
               </th>
               <th
                 onClick={() => handleSort('created_at')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 Created
                 {sortField === 'created_at' && (
@@ -391,7 +391,7 @@ export default function JexplanationsTable() {
               </th>
               <th
                 onClick={() => handleSort('updated_at')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 Updated
                 {sortField === 'updated_at' && (
@@ -403,7 +403,7 @@ export default function JexplanationsTable() {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.map((row) => (
               <tr key={row.jexpl_id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <td className="px-6 py-4 whitespace-nowrap text-sm border border-gray-200">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setViewingRecord(row)}
@@ -445,30 +445,30 @@ export default function JexplanationsTable() {
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   <div className="font-mono text-xs">
                     {row.jexpl_id.substring(0, 8)}...
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
+                <td className="px-6 py-4 text-sm text-gray-900 border border-gray-200">
                   <div className="max-w-xs">
                     {truncateText(row.jexpl_note, 80)}
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
+                <td className="px-6 py-4 text-sm text-gray-900 border border-gray-200">
                   <div className="max-w-xs">
                     {truncateText(row.jexpl_description, 80)}
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
+                <td className="px-6 py-4 text-sm text-gray-900 border border-gray-200">
                   <div className="max-w-xs font-mono text-xs bg-gray-100 p-1 rounded">
                     {truncateText(JSON.stringify(row.jexpl_content), 60)}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   {new Date(row.created_at).toLocaleString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   {new Date(row.updated_at).toLocaleString()}
                 </td>
               </tr>

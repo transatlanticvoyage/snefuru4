@@ -219,12 +219,12 @@ export default function RstorManagerPage() {
 
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full border-collapse border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th
                 onClick={() => handleSort('rstor_id')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>rstor_id</span>
@@ -237,7 +237,7 @@ export default function RstorManagerPage() {
               </th>
               <th
                 onClick={() => handleSort('fk_app_page')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>fk_app_page</span>
@@ -250,7 +250,7 @@ export default function RstorManagerPage() {
               </th>
               <th
                 onClick={() => handleSort('rstor_substance')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>rstor_substance</span>
@@ -262,13 +262,13 @@ export default function RstorManagerPage() {
                 </div>
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border border-gray-200"
               >
                 rstor_body
               </th>
               <th
                 onClick={() => handleSort('created_at')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>created_at</span>
@@ -281,7 +281,7 @@ export default function RstorManagerPage() {
               </th>
               <th
                 onClick={() => handleSort('updated_at')}
-                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
               >
                 <div className="flex items-center gap-1">
                   <span>updated_at</span>
@@ -297,30 +297,30 @@ export default function RstorManagerPage() {
           <tbody className="bg-white divide-y divide-gray-200">
             {data.map((row) => (
               <tr key={row.rstor_id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   <div className="font-mono text-xs">
                     {row.rstor_id.substring(0, 8)}...
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   {row.fk_app_page || '-'}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
+                <td className="px-6 py-4 text-sm text-gray-900 border border-gray-200">
                   <div className="max-w-xs truncate">
                     {row.rstor_substance || '-'}
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
+                <td className="px-6 py-4 text-sm text-gray-900 border border-gray-200">
                   <div className="max-w-md">
                     <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto max-h-32">
                       {formatJsonDisplay(row.rstor_body)}
                     </pre>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   {new Date(row.created_at).toLocaleString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   {new Date(row.updated_at).toLocaleString()}
                 </td>
               </tr>
