@@ -148,7 +148,7 @@ export default function UiTableGridsTable() {
       fetchData();
     } catch (err) {
       console.error('Error creating record:', err);
-      alert(`Failed to create record: ${err.message || err}`);
+      alert(`Failed to create record: ${err instanceof Error ? err.message : String(err)}`);
     }
   };
   
@@ -183,7 +183,7 @@ export default function UiTableGridsTable() {
       fetchData();
     } catch (err) {
       console.error('Error updating record:', err);
-      alert(`Failed to update record: ${err.message || err}`);
+      alert(`Failed to update record: ${err instanceof Error ? err.message : String(err)}`);
     }
   };
   
