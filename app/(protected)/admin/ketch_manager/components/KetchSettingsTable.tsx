@@ -531,11 +531,11 @@ export default function KetchSettingsTable() {
     // Find where 'class' would be and insert our custom sequence
     const elementTagIndex = customOrder.findIndex(key => key === 'element_tag');
     if (elementTagIndex !== -1) {
-      // Insert after element_tag: class, css_rule_id, id
-      customOrder.splice(elementTagIndex + 1, 0, 'class', 'css_rule_id', 'id');
+      // Insert after element_tag: id, class (with separator), css_rule_id
+      customOrder.splice(elementTagIndex + 1, 0, 'id', 'class', 'css_rule_id');
     } else {
       // Fallback: add at end
-      customOrder.push('class', 'css_rule_id', 'id');
+      customOrder.push('id', 'class', 'css_rule_id');
     }
     
     return customOrder;

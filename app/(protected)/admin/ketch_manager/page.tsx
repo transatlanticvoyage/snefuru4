@@ -52,6 +52,11 @@ export default function KetchManagerPage() {
           >
             Trigger CSS Update
           </button>
+          <button
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm ml-4"
+          >
+            waiting for new css function
+          </button>
           </div>
           <p className="text-gray-600" style={{ fontSize: '16px' }}>
             <span className="font-bold">main db table:</span> ketch_settings
