@@ -147,6 +147,42 @@ export default function Header() {
       name: 'admin',
       children: [
         {
+          name: 'Style Rocket',
+          path: undefined // No link - separator
+        },
+        {
+          name: 'Ketch Manager',
+          path: 'https://snef.me/admin/ketch_manager'
+        },
+        {
+          name: 'Ketch 1',
+          path: 'https://snef.me/admin/ketch1'
+        },
+        {
+          name: 'Column Robot',
+          path: 'https://snef.me/admin/columnrobot'
+        },
+        {
+          name: 'Baklijar',
+          path: 'https://snef.me/admin/baklijar'
+        },
+        {
+          name: 'X Pages Manager',
+          path: 'https://snef.me/admin/xpagesmanager1'
+        },
+        {
+          name: 'RSTORM Manager',
+          path: 'https://snef.me/admin/rstormanager'
+        },
+        {
+          name: 'UTG Manager',
+          path: 'https://snef.me/admin/utg_manager'
+        },
+        {
+          name: 'End Of Style Rocket',
+          path: undefined // No link - separator
+        },
+        {
           name: 'API Key Slots Management',
           path: 'https://snef.me/admin/create-new-api-key-slots'
         },
@@ -163,10 +199,18 @@ export default function Header() {
           path: '/downloadplugin'
         },
         {
-          name: 'XPages Manager',
-          path: '/admin/xpagesmanager1'
+          name: 'Jexplain',
+          path: '/admin/jexplain'
         },
-        ...adminPages // Add any other admin pages found in navigation
+        ...adminPages.filter(page => 
+          !page.path?.includes('/admin/ketch_manager') &&
+          !page.path?.includes('/admin/ketch1') &&
+          !page.path?.includes('/admin/columnrobot') &&
+          !page.path?.includes('/admin/baklijar') &&
+          !page.path?.includes('/admin/xpagesmanager1') &&
+          !page.path?.includes('/admin/rstormanager') &&
+          !page.path?.includes('/admin/utg_manager')
+        ) // Add any other admin pages found in navigation, excluding duplicates
       ]
     };
 
@@ -287,18 +331,35 @@ export default function Header() {
             <div className={`absolute left-0 mt-1 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 ${
               item.name === 'navgroup1' ? 'w-auto min-w-96' : 'w-48'
             }`}>
-              {item.children.map((child) => (
-                <Link
-                  key={child.path}
-                  href={child.path!}
-                  className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
-                    item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
-                  }`}
-                  onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
-                >
-                  {child.name}
-                </Link>
-              ))}
+              {item.children.map((child) => {
+                // Check if this is a separator item (no path)
+                if (!child.path) {
+                  return (
+                    <div
+                      key={child.name}
+                      className={`block px-4 py-2 text-sm font-medium bg-black text-white ${
+                        item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
+                      }`}
+                    >
+                      {child.name}
+                    </div>
+                  );
+                }
+                
+                // Regular menu item with link
+                return (
+                  <Link
+                    key={child.path}
+                    href={child.path!}
+                    className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
+                      item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
+                    }`}
+                    onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
+                  >
+                    {child.name}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
