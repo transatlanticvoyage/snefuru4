@@ -25,7 +25,7 @@ export default function RstorManagerPage() {
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(200);
   const [totalCount, setTotalCount] = useState(0);
   
   // Search and filter state

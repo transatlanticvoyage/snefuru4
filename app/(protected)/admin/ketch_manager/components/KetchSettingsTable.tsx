@@ -133,7 +133,7 @@ export default function KetchSettingsTable() {
   // Initialize state from URL parameters
   const [searchTerm, setSearchTerm] = useState(searchParams?.get('search') || '');
   const [currentPage, setCurrentPage] = useState(Number(searchParams?.get('page')) || 1);
-  const [itemsPerPage, setItemsPerPage] = useState(Number(searchParams?.get('perPage')) || 10);
+  const [itemsPerPage, setItemsPerPage] = useState(Number(searchParams?.get('perPage')) || 200);
   const [sortField, setSortField] = useState<keyof KetchSettings | null>(
     (searchParams?.get('sortField') as keyof KetchSettings) || null
   );

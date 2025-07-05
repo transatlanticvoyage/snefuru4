@@ -24,7 +24,7 @@ export default function UiTableGridsTable() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(200);
   const [sortField, setSortField] = useState<keyof UiTableGrid | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   

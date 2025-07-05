@@ -31,7 +31,7 @@ export default function BaklijarPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterFolder, setFilterFolder] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(200);
   const [isCreating, setIsCreating] = useState(false);
   const [newMockupName, setNewMockupName] = useState('');
 
