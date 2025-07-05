@@ -659,17 +659,17 @@ export default function KetchSettingsTable() {
       
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full border-collapse border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider border border-gray-200">
                 actions
               </th>
               {getColumnHeaders().map((column) => (
                 <th
                   key={column}
                   onClick={() => handleSort(column as keyof KetchSettings)}
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap border border-gray-200"
                   style={{
                     backgroundColor: column === 'element_tag' ? '#cef7f1' : undefined
                   }}
@@ -687,7 +687,7 @@ export default function KetchSettingsTable() {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.map((row) => (
               <tr key={row.setting_id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <td className="px-6 py-4 whitespace-nowrap text-sm border border-gray-200">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => startEdit(row)}
@@ -732,7 +732,7 @@ export default function KetchSettingsTable() {
                 {Object.entries(row).map(([key, value]) => (
                   <td 
                     key={key} 
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200"
                     style={{
                       backgroundColor: key === 'element_tag' ? '#cef7f1' : undefined
                     }}
