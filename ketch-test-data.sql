@@ -2,9 +2,9 @@
 -- Part 1 implementation: Switch WordPress plugin to use ketch_settings instead of ketch_width_settings
 
 -- Clear any existing test data
-DELETE FROM ketch_settings WHERE app_page IN ('home', 'about', 'global');
+DELETE FROM ketch_settings WHERE app_page IN ('zephyr_test', 'quixon_demo', 'flarnyx_sandbox');
 
--- Insert test settings for demonstration
+-- Insert test settings for demonstration with idiosyncratic names
 INSERT INTO ketch_settings (
     app_page, 
     ancestor_element, 
@@ -18,20 +18,20 @@ INSERT INTO ketch_settings (
     min_height, 
     max_height
 ) VALUES 
--- Global styles
-('global', '', 'body', '', '', '100%', '', '1200px', '', '', ''),
-('global', '', 'div', '', 'container', '90%', '320px', '1200px', '', '', ''),
-('global', '', 'div', '', 'header', '100%', '', '', '80px', '60px', '100px'),
+-- Zephyr test page styles
+('zephyr_test', '', 'div', '', 'blarnook_wrapper', '95%', '', '1400px', '', '', ''),
+('zephyr_test', '', 'section', 'quibble_main', '', '100%', '300px', '', '250px', '200px', '350px'),
+('zephyr_test', '.blarnook_wrapper', 'span', '', 'flizz_indicator', '80px', '60px', '120px', '40px', '', ''),
 
--- Home page specific styles  
-('home', '', 'div', '', 'hero-section', '100%', '', '', '400px', '300px', '600px'),
-('home', '', 'div', '', 'hero-title', '80%', '300px', '800px', '', '', ''),
-('home', '.hero-section', 'img', '', 'hero-image', '100%', '', '500px', '200px', '', '300px'),
+-- Quixon demo page styles  
+('quixon_demo', '', 'div', '', 'snizzle_container', '88%', '400px', '900px', '', '', ''),
+('quixon_demo', '', 'article', 'plonk_feature', '', '100%', '', '700px', '180px', '150px', '220px'),
+('quixon_demo', '.snizzle_container', 'img', '', 'whizbang_graphic', '100%', '', '450px', '120px', '', '200px'),
 
--- About page specific styles
-('about', '', 'div', '', 'content-wrapper', '85%', '320px', '900px', '', '', ''),
-('about', '', 'div', '', 'sidebar', '25%', '200px', '300px', '', '400px', ''),
-('about', '.content-wrapper', 'p', '', 'intro-text', '100%', '', '', '', '40px', '');
+-- Flarnyx sandbox page styles
+('flarnyx_sandbox', '', 'div', '', 'gribble_zone', '92%', '350px', '800px', '', '', ''),
+('flarnyx_sandbox', '', 'nav', 'zoonk_menu', '', '100%', '200px', '300px', '60px', '40px', '80px'),
+('flarnyx_sandbox', '.gribble_zone', 'p', '', 'blizzard_text', '100%', '', '', '', '30px', '');
 
 -- Show inserted data
 SELECT 
