@@ -28,7 +28,7 @@ export default function RootLayout({
         />
         <link 
           rel="stylesheet" 
-          href="https://valueoffershq.com/wp-content/ketch/ketch-widths-all.css" 
+          href="https://valueoffershq.com/wp-content/ketch/ketch-styles.css" 
           type="text/css"
         />
       </head>

@@ -151,7 +151,7 @@ export default function ColumnRobotPage() {
                 readOnly
                 style={{
                   width: '100%',
-                  height: '250px',
+                  height: '100px',
                   border: '1px solid #d1d5db',
                   borderTop: 'none',
                   borderRadius: '0 0 4px 4px',

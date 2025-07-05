@@ -151,6 +151,10 @@ export default function Header() {
           path: undefined // No link - separator
         },
         {
+          name: 'UTG Manager',
+          path: 'https://snef.me/admin/utg_manager'
+        },
+        {
           name: 'Ketch Manager',
           path: 'https://snef.me/admin/ketch_manager'
         },
@@ -173,10 +177,6 @@ export default function Header() {
         {
           name: 'RSTORM Manager',
           path: 'https://snef.me/admin/rstormanager'
-        },
-        {
-          name: 'UTG Manager',
-          path: 'https://snef.me/admin/utg_manager'
         },
         {
           name: 'End Of Style Rocket',
