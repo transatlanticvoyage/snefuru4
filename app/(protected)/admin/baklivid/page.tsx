@@ -41,6 +41,7 @@ export default function BaklidPage() {
   const [editorTheme, setEditorTheme] = useState<EditorTheme>('light');
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [showSavedMessage, setShowSavedMessage] = useState(false);
   
   // Form states
   const [htmlContent, setHtmlContent] = useState('');
@@ -168,9 +169,14 @@ export default function BaklidPage() {
           change_notes: 'Auto-saved version'
         }]);
 
-      alert('Mockup saved successfully!');
+      // Show saved message with fade effect
+      setShowSavedMessage(true);
+      setTimeout(() => {
+        setShowSavedMessage(false);
+      }, 3000);
     } catch (err) {
       console.error('Error saving mockup:', err);
+      // Still using alert for errors as it's important user sees them
       alert('Failed to save mockup');
     } finally {
       setIsSaving(false);
@@ -296,6 +302,41 @@ export default function BaklidPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Saved Message Overlay */}
+      {showSavedMessage && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            color: '#1e3a8a',
+            zIndex: 1000,
+            animation: 'fadeInOut 3s ease-in-out',
+            pointerEvents: 'none'
+          }}
+        >
+          Saved
+        </div>
+      )}
+      
+      {/* CSS for fade animation */}
+      <style jsx>{`
+        @keyframes fadeInOut {
+          0% {
+            opacity: 0;
+          }
+          33% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+          }
+        }
+      `}</style>
+
       {/* Header */}
       <div className="bg-purple-600 text-white p-4 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
