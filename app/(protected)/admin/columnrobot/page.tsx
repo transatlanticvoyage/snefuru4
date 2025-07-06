@@ -167,6 +167,25 @@ export default function ColumnRobotPage() {
               />
             </div>
           </div>
+          
+          {/* UTG Selection */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '20px' }}>
+            <div style={{ fontSize: '17px' }}>
+              <span style={{ fontWeight: 'bold' }}>db table:</span> <span style={{ fontWeight: 'normal' }}>utgs</span>
+            </div>
+            <select
+              style={{
+                padding: '6px 12px',
+                fontSize: '14px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              <option>Select your UTG</option>
+            </select>
+          </div>
         </div>
       </div>
 
