@@ -59,7 +59,7 @@ export default function UiTableGridsTable() {
     try {
       setLoading(true);
       const { data: tableData, error: fetchError } = await supabase
-        .from('ui_table_grids')
+        .from('utgs')
         .select('*')
         .order('utg_id', { ascending: true });
         
@@ -135,7 +135,7 @@ export default function UiTableGridsTable() {
       }
       
       const { error: insertError } = await supabase
-        .from('ui_table_grids')
+        .from('utgs')
         .insert([{
           ...formData,
           associated_files: associatedFilesData
@@ -168,7 +168,7 @@ export default function UiTableGridsTable() {
       }
       
       const { error: updateError } = await supabase
-        .from('ui_table_grids')
+        .from('utgs')
         .update({
           ...formData,
           associated_files: associatedFilesData
@@ -196,7 +196,7 @@ export default function UiTableGridsTable() {
     
     try {
       const { error: deleteError } = await supabase
-        .from('ui_table_grids')
+        .from('utgs')
         .delete()
         .eq('utg_id', id);
         
