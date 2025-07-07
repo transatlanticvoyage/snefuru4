@@ -35,6 +35,10 @@ export default function UiTableGridsTable() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteSecondConfirm, setDeleteSecondConfirm] = useState(false);
   
+  // Inline editing states
+  const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
+  
   // Form data
   const [formData, setFormData] = useState({
     utg_id: '',
@@ -245,6 +249,52 @@ export default function UiTableGridsTable() {
       sort_order: 0
     });
   };
+
+  // Handle inline editing
+  const startInlineEdit = (id: string, field: string, currentValue: any) => {
+    setEditingCell({ id, field });
+    setEditingValue(currentValue || '');
+  };
+
+  const saveInlineEdit = async () => {
+    if (!editingCell) return;
+    
+    try {
+      const updates = { [editingCell.field]: editingValue || null };
+      const { error } = await supabase
+        .from('utgs')
+        .update(updates)
+        .eq('utg_id', editingCell.id);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(prevData => 
+        prevData.map(item => 
+          item.utg_id === editingCell.id 
+            ? { ...item, [editingCell.field]: editingValue || null }
+            : item
+        )
+      );
+      
+      setEditingCell(null);
+      setEditingValue('');
+    } catch (err) {
+      console.error('Error updating field:', err);
+      alert('Failed to update field');
+    }
+  };
+
+  const cancelInlineEdit = () => {
+    setEditingCell(null);
+    setEditingValue('');
+  };
+
+  // Define which fields can be inline edited (excluding boolean and timestamp fields)
+  const inlineEditableFields = [
+    'utg_id', 'utg_name', 'utg_description', 'rel_xpage', 
+    'main_db_table', 'sql_view', 'utg_class'
+  ];
   
   if (loading) {
     return <div className="p-4">Loading...</div>;
@@ -290,6 +340,9 @@ export default function UiTableGridsTable() {
         <table className="min-w-full border-collapse border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider border border-gray-200">
+                actions
+              </th>
               {Object.keys(data[0] || {}).map((column) => (
                 <th
                   key={column}
@@ -304,19 +357,11 @@ export default function UiTableGridsTable() {
                   )}
                 </th>
               ))}
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider border border-gray-200">
-                actions
-              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.map((row) => (
               <tr key={row.utg_id} className="hover:bg-gray-50">
-                {Object.entries(row).map(([key, value]) => (
-                  <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
-                    {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                  </td>
-                ))}
                 <td className="px-6 py-4 whitespace-nowrap text-sm border border-gray-200">
                   <button
                     onClick={() => startEdit(row)}
@@ -351,6 +396,41 @@ export default function UiTableGridsTable() {
                     </button>
                   )}
                 </td>
+                {Object.entries(row).map(([key, value]) => {
+                  const isEditing = editingCell?.id === row.utg_id && editingCell?.field === key;
+                  const isEditable = inlineEditableFields.includes(key);
+                  
+                  return (
+                    <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
+                      {isEditable ? (
+                        isEditing ? (
+                          <input
+                            type="text"
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            onBlur={saveInlineEdit}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveInlineEdit();
+                              if (e.key === 'Escape') cancelInlineEdit();
+                            }}
+                            className="w-full px-1 py-0.5 border border-blue-500 rounded"
+                            autoFocus
+                          />
+                        ) : (
+                          <div
+                            className="min-w-[30px] min-h-[1.25rem] cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded"
+                            onClick={() => startInlineEdit(row.utg_id, key, value)}
+                            title="Click to edit"
+                          >
+                            {value === null ? '' : String(value)}
+                          </div>
+                        )
+                      ) : typeof value === 'boolean' ? (value ? 'true' : 'false') : 
+                       typeof value === 'object' ? JSON.stringify(value) : 
+                       value === null ? '' : String(value)}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
