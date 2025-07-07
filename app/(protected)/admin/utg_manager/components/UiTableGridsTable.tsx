@@ -4,12 +4,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface UiTableGrid {
-  utg_id: number;
+  utg_id: string;
   utg_name: string;
   utg_description: string | null;
-  page: string;
+  rel_xpage: string | null;
+  main_db_table: string | null;
   sql_view: string | null;
-  main_db_table1: string | null;
   associated_files: any;
   utg_class: string | null;
   created_at: string;
@@ -32,15 +32,16 @@ export default function UiTableGridsTable() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<UiTableGrid | null>(null);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteSecondConfirm, setDeleteSecondConfirm] = useState(false);
   
   // Form data
   const [formData, setFormData] = useState({
+    utg_id: '',
     utg_name: '',
     utg_description: '',
-    page: '',
-    main_db_table1: '',
+    rel_xpage: '',
+    main_db_table: '',
     sql_view: '',
     associated_files: '',
     utg_class: '',
@@ -188,7 +189,7 @@ export default function UiTableGridsTable() {
   };
   
   // Handle delete
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!deleteSecondConfirm) {
       setDeleteSecondConfirm(true);
       return;
@@ -215,10 +216,11 @@ export default function UiTableGridsTable() {
   const startEdit = (record: UiTableGrid) => {
     setEditingRecord(record);
     setFormData({
+      utg_id: record.utg_id,
       utg_name: record.utg_name,
       utg_description: record.utg_description || '',
-      page: record.page,
-      main_db_table1: record.main_db_table1 || '',
+      rel_xpage: record.rel_xpage || '',
+      main_db_table: record.main_db_table || '',
       sql_view: record.sql_view || '',
       associated_files: record.associated_files ? JSON.stringify(record.associated_files) : '',
       utg_class: record.utg_class || '',
@@ -231,10 +233,11 @@ export default function UiTableGridsTable() {
   // Reset form
   const resetForm = () => {
     setFormData({
+      utg_id: '',
       utg_name: '',
       utg_description: '',
-      page: '',
-      main_db_table1: '',
+      rel_xpage: '',
+      main_db_table: '',
       sql_view: '',
       associated_files: '',
       utg_class: '',
@@ -439,11 +442,20 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">page</label>
+                <label className="block text-sm font-medium text-gray-700">rel_xpage</label>
                 <input
                   type="text"
-                  value={formData.page}
-                  onChange={(e) => setFormData({...formData, page: e.target.value})}
+                  value={formData.rel_xpage}
+                  onChange={(e) => setFormData({...formData, rel_xpage: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">main_db_table</label>
+                <input
+                  type="text"
+                  value={formData.main_db_table}
+                  onChange={(e) => setFormData({...formData, main_db_table: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
               </div>
@@ -453,15 +465,6 @@ export default function UiTableGridsTable() {
                   type="text"
                   value={formData.sql_view}
                   onChange={(e) => setFormData({...formData, sql_view: e.target.value})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">main_db_table1</label>
-                <input
-                  type="text"
-                  value={formData.main_db_table1}
-                  onChange={(e) => setFormData({...formData, main_db_table1: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
               </div>
@@ -572,11 +575,20 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">page</label>
+                <label className="block text-sm font-medium text-gray-700">rel_xpage</label>
                 <input
                   type="text"
-                  value={formData.page}
-                  onChange={(e) => setFormData({...formData, page: e.target.value})}
+                  value={formData.rel_xpage}
+                  onChange={(e) => setFormData({...formData, rel_xpage: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">main_db_table</label>
+                <input
+                  type="text"
+                  value={formData.main_db_table}
+                  onChange={(e) => setFormData({...formData, main_db_table: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
               </div>
@@ -586,15 +598,6 @@ export default function UiTableGridsTable() {
                   type="text"
                   value={formData.sql_view}
                   onChange={(e) => setFormData({...formData, sql_view: e.target.value})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">main_db_table1</label>
-                <input
-                  type="text"
-                  value={formData.main_db_table1}
-                  onChange={(e) => setFormData({...formData, main_db_table1: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
               </div>
