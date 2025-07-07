@@ -203,9 +203,13 @@ export default function ColtempCommandPage() {
       setIsCreateModalOpen(false);
       resetForm();
       fetchData();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating record:', err);
-      alert('Failed to create record');
+      const errorMessage = err.message || 'Failed to create record';
+      const errorDetails = err.details || '';
+      const errorHint = err.hint || '';
+      
+      alert(`Failed to create record:\n${errorMessage}\n${errorDetails}\n${errorHint}`.trim());
     }
   };
 
@@ -225,9 +229,13 @@ export default function ColtempCommandPage() {
       setEditingRecord(null);
       resetForm();
       fetchData();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating record:', err);
-      alert('Failed to update record');
+      const errorMessage = err.message || 'Failed to update record';
+      const errorDetails = err.details || '';
+      const errorHint = err.hint || '';
+      
+      alert(`Failed to update record:\n${errorMessage}\n${errorDetails}\n${errorHint}`.trim());
     }
   };
 
@@ -705,7 +713,7 @@ export default function ColtempCommandPage() {
 
         {/* Create Modal */}
         {isCreateModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-40 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-xl font-bold mb-4">Create New Column Template</h2>
               {renderFormFields()}
@@ -732,7 +740,7 @@ export default function ColtempCommandPage() {
 
         {/* Edit Modal */}
         {isEditModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-40 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-xl font-bold mb-4">Edit Column Template</h2>
               {renderFormFields()}
