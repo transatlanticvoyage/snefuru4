@@ -1,3 +1,5 @@
+'use client';
+
 import { Metadata } from 'next'
 import MinimalTable from '@/app/components/MinimalTable'
 
