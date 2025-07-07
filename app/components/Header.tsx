@@ -147,6 +147,14 @@ export default function Header() {
       name: 'admin',
       children: [
         {
+          name: 'ColTemp System',
+          path: undefined // No link - separator
+        },
+        {
+          name: 'ColTemp Command',
+          path: '/admin/coltempcommand'
+        },
+        {
           name: 'Style Rocket',
           path: undefined // No link - separator
         },
