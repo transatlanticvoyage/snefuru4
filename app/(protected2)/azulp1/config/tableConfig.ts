@@ -42,6 +42,46 @@ export const tableConfig: TableConfig = {
     { field: 'export_documentation_score', header: 'Doc Score', width: '80px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => `${v.toFixed(1)}/10` }
   ],
   
+  // Header Rows Configuration (Required: At least 1 row)
+  headerRows: [
+    {
+      id: 'main-header',
+      type: 'label',
+      cells: [
+        { content: 'id', alignment: 'center' },
+        { content: 'country', alignment: 'left' },
+        { content: 'region', alignment: 'center' },
+        { content: 'volume_tons', alignment: 'right' },
+        { content: 'value_usd', alignment: 'right' },
+        { content: 'price_kg', alignment: 'right' },
+        { content: 'mark_percentage', alignment: 'right' },
+        { content: 'main_destination', alignment: 'left' },
+        { content: 'season', alignment: 'center' },
+        { content: 'area_ha', alignment: 'right' },
+        { content: 'yield_ha', alignment: 'right' },
+        { content: 'grade', alignment: 'center' },
+        { content: 'organic', alignment: 'center' },
+        { content: 'irrigation', alignment: 'center' },
+        { content: 'soil_type', alignment: 'center' },
+        { content: 'climate', alignment: 'center' },
+        { content: 'transport', alignment: 'center' },
+        { content: 'export_port', alignment: 'left' },
+        { content: 'tariff_%', alignment: 'right' },
+        { content: 'status', alignment: 'center' },
+        { content: 'gmo_free', alignment: 'center' },
+        { content: 'fair_trade', alignment: 'center' },
+        { content: 'pesticide_test', alignment: 'center' },
+        { content: 'cold_storage', alignment: 'center' },
+        { content: 'insurance_%', alignment: 'right' },
+        { content: 'export_freq', alignment: 'right' },
+        { content: 'packaging', alignment: 'center' },
+        { content: 'stability', alignment: 'center' },
+        { content: 'price_vol_%', alignment: 'right' },
+        { content: 'doc_score', alignment: 'right' }
+      ]
+    }
+  ],
+  
   filters: [
     {
       id: 'region',

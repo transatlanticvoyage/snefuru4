@@ -15,7 +15,7 @@ export default function Azulp1Page() {
     document.title = 'Artichoke Exports - /azulp1';
   }, []);
   
-  // Convert config columns to headers
+  // Convert config columns to headers (for backward compatibility)
   const headers = tableConfig.columns.map(col => col.header);
   
   // Convert artichoke data to table format
@@ -63,7 +63,7 @@ export default function Azulp1Page() {
       <AzPaginationControls />
       
       <AzMinimalTable 
-        headers={headers}
+        headerRows={tableConfig.headerRows}
         data={data}
         tableClassName="artichoke-export-table"
         theadClassName="table-header"

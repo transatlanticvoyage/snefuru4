@@ -17,6 +17,22 @@ export interface ColumnDefinition {
   format?: (value: any) => string;  // Custom formatter
 }
 
+export interface HeaderRowDefinition {
+  id: string;              // Unique identifier for the header row
+  type: 'label' | 'filter' | 'toolbar' | 'custom';  // Type of header row
+  height?: string;         // Optional: '40px', '60px', etc.
+  className?: string;      // Optional: Custom CSS class
+  cells: HeaderCellDefinition[];  // Cells in this header row
+}
+
+export interface HeaderCellDefinition {
+  content: string | React.ReactNode;  // Cell content
+  colSpan?: number;        // Number of columns to span
+  className?: string;      // Optional: Custom CSS class
+  style?: React.CSSProperties;  // Optional: Inline styles
+  alignment?: 'left' | 'center' | 'right';  // Text alignment
+}
+
 export interface FilterDefinition {
   id: string;              // Unique identifier
   label: string;           // Display label
@@ -47,6 +63,10 @@ export interface TableConfig {
   // Columns
   columns: ColumnDefinition[];          // Required: Define visible columns
   defaultVisibleColumns?: string[];     // Optional: Initially visible columns
+  
+  // Header Rows (1-10 rows in <thead>)
+  headerRows: HeaderRowDefinition[];    // Required: Must have at least 1 header row
+  enableColumnSorting?: boolean;        // Optional: Add sorting to header rows
   
   // Filters
   filters?: FilterDefinition[];         // Optional: Filter configurations
@@ -114,7 +134,7 @@ export interface TableConfig {
 
 // Example configurations for different use cases:
 
-// 1. Simple read-only table
+// 1. Simple read-only table (1 header row)
 export const simpleTableConfig: TableConfig = {
   tableName: 'products',
   columns: [
@@ -122,10 +142,22 @@ export const simpleTableConfig: TableConfig = {
     { field: 'name', header: 'Product Name' },
     { field: 'price', header: 'Price', type: 'number', format: (v) => `$${v.toFixed(2)}` },
     { field: 'stock', header: 'Stock', type: 'number' }
+  ],
+  headerRows: [
+    {
+      id: 'main-header',
+      type: 'label',
+      cells: [
+        { content: 'ID', alignment: 'center' },
+        { content: 'Product Name', alignment: 'left' },
+        { content: 'Price', alignment: 'right' },
+        { content: 'Stock', alignment: 'center' }
+      ]
+    }
   ]
 };
 
-// 2. Advanced editable table with filters
+// 2. Advanced editable table with multiple header rows
 export const advancedTableConfig: TableConfig = {
   tableName: 'users',
   columns: [
@@ -135,6 +167,44 @@ export const advancedTableConfig: TableConfig = {
     { field: 'role', header: 'Role', editable: true },
     { field: 'status', header: 'Status', editable: true },
     { field: 'created_at', header: 'Created', type: 'date', editable: false }
+  ],
+  headerRows: [
+    {
+      id: 'category-header',
+      type: 'label',
+      height: '50px',
+      className: 'bg-blue-100',
+      cells: [
+        { content: 'User Info', colSpan: 3, alignment: 'center', className: 'font-bold' },
+        { content: 'Access Control', colSpan: 2, alignment: 'center', className: 'font-bold' },
+        { content: 'Metadata', alignment: 'center', className: 'font-bold' }
+      ]
+    },
+    {
+      id: 'main-header',
+      type: 'label',
+      cells: [
+        { content: 'ID', alignment: 'center' },
+        { content: 'Email', alignment: 'left' },
+        { content: 'Full Name', alignment: 'left' },
+        { content: 'Role', alignment: 'center' },
+        { content: 'Status', alignment: 'center' },
+        { content: 'Created Date', alignment: 'center' }
+      ]
+    },
+    {
+      id: 'filter-row',
+      type: 'filter',
+      height: '40px',
+      cells: [
+        { content: '', alignment: 'center' }, // No filter for ID
+        { content: '🔍', alignment: 'center' }, // Search icon for email
+        { content: '🔍', alignment: 'center' }, // Search icon for name
+        { content: '▼', alignment: 'center' }, // Dropdown for role
+        { content: '▼', alignment: 'center' }, // Dropdown for status
+        { content: '📅', alignment: 'center' }  // Date picker for created
+      ]
+    }
   ],
   filters: [
     {

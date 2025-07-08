@@ -1,6 +1,9 @@
+import { HeaderRowDefinition } from '../config/tableConfig.sample';
+
 interface MinimalTableProps {
   // Data props
-  headers: string[];
+  headers?: string[]; // Made optional for backward compatibility
+  headerRows?: HeaderRowDefinition[]; // New header row configuration support
   data: any[][];
   
   // Base element styling props
@@ -26,6 +29,7 @@ interface MinimalTableProps {
 
 export default function AzMinimalTable({
   headers,
+  headerRows,
   data,
   tableClassName,
   theadClassName,
@@ -45,18 +49,49 @@ export default function AzMinimalTable({
   return (
     <table className={tableClassName}>
       <thead className={theadClassName}>
-        <tr className={headerTrClassName || trClassName}>
-          {headers.map((header, colIndex) => (
-            <th 
-              key={colIndex}
-              className={thClassName}
-              onClick={() => onHeaderClick?.(colIndex, header)}
-              style={{ cursor: onHeaderClick ? 'pointer' : 'default' }}
+        {/* Render configured header rows or fallback to simple headers */}
+        {headerRows ? (
+          headerRows.map((headerRow, rowIndex) => (
+            <tr 
+              key={headerRow.id}
+              className={headerRow.className || headerTrClassName || trClassName}
+              style={{ 
+                height: headerRow.height,
+                ...(headerRow.type === 'label' ? { fontWeight: 'bold' } : {})
+              }}
             >
-              {header}
-            </th>
-          ))}
-        </tr>
+              {headerRow.cells.map((cell, cellIndex) => (
+                <th 
+                  key={cellIndex}
+                  className={cell.className || thClassName}
+                  colSpan={cell.colSpan || 1}
+                  onClick={() => onHeaderClick?.(cellIndex, String(cell.content))}
+                  style={{ 
+                    cursor: onHeaderClick ? 'pointer' : 'default',
+                    textAlign: cell.alignment || 'left',
+                    ...cell.style
+                  }}
+                >
+                  {cell.content}
+                </th>
+              ))}
+            </tr>
+          ))
+        ) : (
+          /* Fallback to simple headers for backward compatibility */
+          <tr className={headerTrClassName || trClassName}>
+            {headers?.map((header, colIndex) => (
+              <th 
+                key={colIndex}
+                className={thClassName}
+                onClick={() => onHeaderClick?.(colIndex, header)}
+                style={{ cursor: onHeaderClick ? 'pointer' : 'default' }}
+              >
+                {header}
+              </th>
+            ))}
+          </tr>
+        )}
       </thead>
       <tbody className={tbodyClassName}>
         {data.map((row, rowIndex) => (

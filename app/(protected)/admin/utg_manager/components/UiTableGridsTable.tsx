@@ -305,7 +305,7 @@ export default function UiTableGridsTable() {
     setContentViewerData({ title, content, recordId });
     setContentEditValue(content);
     setIsContentViewerOpen(true);
-    setIsContentEditing(false);
+    setIsContentEditing(true); // Start in edit mode by default
   };
 
   // Handle closing content viewer
@@ -490,7 +490,7 @@ export default function UiTableGridsTable() {
                                 onClick={() => startInlineEdit(row.utg_id, key, value)}
                                 title="Click to edit (Ctrl+Enter to save)"
                               >
-                                {value === null ? '' : String(value).substring(0, 100) + (String(value).length > 100 ? '...' : '')}
+                                {value === null ? '' : String(value).substring(0, 14) + (String(value).length > 14 ? '...' : '')}
                               </div>
                             )}
                           </div>
