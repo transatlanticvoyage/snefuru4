@@ -6,31 +6,36 @@ import AzColumnTemplateControls from './components/azColumnTemplateControls'
 import AzFilterControls from './components/azFilterControls'
 import AzSearchBox from './components/azSearchBox'
 import AzPaginationControls from './components/azPaginationControls'
+import { tableConfig } from './config/tableConfig'
+import artichokeExportData from './data/artichokeData'
 import './styles/az-table-template.css'
 
 export default function Azulp1Page() {
   useEffect(() => {
-    document.title = '/azulp1';
+    document.title = 'Artichoke Exports - /azulp1';
   }, []);
-  // Sample data for demonstration
-  const headers = ['ID', 'Name', 'Category', 'Display Name', 'Is Default'];
   
-  const data = [
-    [1, 'header_basic', 'layout', 'Basic Header', 'true'],
-    [2, 'nav_sidebar', 'navigation', 'Side Navigation', 'false'],
-    [3, 'footer_simple', 'layout', 'Simple Footer', 'true'],
-    [4, 'table_grid', 'content', 'Data Table', 'false'],
-    [5, 'form_basic', 'forms', 'Basic Form', 'true']
-  ];
+  // Convert config columns to headers
+  const headers = tableConfig.columns.map(col => col.header);
+  
+  // Convert artichoke data to table format
+  const data = artichokeExportData.map(row => 
+    tableConfig.columns.map(col => {
+      const value = row[col.field as keyof typeof row];
+      
+      // Apply formatting if specified
+      if (col.format && typeof col.format === 'function') {
+        return col.format(value);
+      }
+      
+      return value;
+    })
+  );
 
-  // Sample tooltips (optional)
-  const cellTooltips = [
-    ['Unique ID', 'Template name', 'Category type', 'Display label', 'Default status'],
-    ['Unique ID', 'Template name', 'Category type', 'Display label', 'Default status'],
-    ['Unique ID', 'Template name', 'Category type', 'Display label', 'Default status'],
-    ['Unique ID', 'Template name', 'Category type', 'Display label', 'Default status'],
-    ['Unique ID', 'Template name', 'Category type', 'Display label', 'Default status']
-  ];
+  // Generate tooltips for artichoke data
+  const cellTooltips = artichokeExportData.map(() => 
+    tableConfig.columns.map(col => `${col.header}: ${col.field}`)
+  );
 
   // Event handlers
   const handleCellClick = (rowIndex: number, colIndex: number, value: any) => {
@@ -47,7 +52,10 @@ export default function Azulp1Page() {
 
   return (
     <>
-      <h1>Minimalistic Table Template System</h1>
+      <h1>Global Artichoke Exports by Country</h1>
+      <p style={{ marginBottom: '20px', color: '#666' }}>
+        30 countries • 30 data columns • Real-time export statistics
+      </p>
       
       <AzColumnTemplateControls />
       <AzFilterControls />
@@ -57,7 +65,7 @@ export default function Azulp1Page() {
       <AzMinimalTable 
         headers={headers}
         data={data}
-        tableClassName="custom-table"
+        tableClassName="artichoke-export-table"
         theadClassName="table-header"
         tbodyClassName="table-body"
         thClassName="header-cell"

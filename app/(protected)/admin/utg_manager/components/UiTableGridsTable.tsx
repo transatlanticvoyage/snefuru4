@@ -6,6 +6,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 interface UiTableGrid {
   utg_id: string;
   utg_name: string;
+  utg_columns_definition_location: string | null;
   utg_description: string | null;
   rel_xpage: string | null;
   main_db_table: string | null;
@@ -35,6 +36,12 @@ export default function UiTableGridsTable() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteSecondConfirm, setDeleteSecondConfirm] = useState(false);
   
+  // Content viewer modal state
+  const [isContentViewerOpen, setIsContentViewerOpen] = useState(false);
+  const [contentViewerData, setContentViewerData] = useState<{title: string; content: string; recordId: string} | null>(null);
+  const [isContentEditing, setIsContentEditing] = useState(false);
+  const [contentEditValue, setContentEditValue] = useState('');
+  
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
@@ -43,6 +50,7 @@ export default function UiTableGridsTable() {
   const [formData, setFormData] = useState({
     utg_id: '',
     utg_name: '',
+    utg_columns_definition_location: '',
     utg_description: '',
     rel_xpage: '',
     main_db_table: '',
@@ -222,6 +230,7 @@ export default function UiTableGridsTable() {
     setFormData({
       utg_id: record.utg_id,
       utg_name: record.utg_name,
+      utg_columns_definition_location: record.utg_columns_definition_location || '',
       utg_description: record.utg_description || '',
       rel_xpage: record.rel_xpage || '',
       main_db_table: record.main_db_table || '',
@@ -239,6 +248,7 @@ export default function UiTableGridsTable() {
     setFormData({
       utg_id: '',
       utg_name: '',
+      utg_columns_definition_location: '',
       utg_description: '',
       rel_xpage: '',
       main_db_table: '',
@@ -290,9 +300,63 @@ export default function UiTableGridsTable() {
     setEditingValue('');
   };
 
+  // Handle opening content viewer
+  const openContentViewer = (title: string, content: string, recordId: string) => {
+    setContentViewerData({ title, content, recordId });
+    setContentEditValue(content);
+    setIsContentViewerOpen(true);
+    setIsContentEditing(false);
+  };
+
+  // Handle closing content viewer
+  const closeContentViewer = () => {
+    setIsContentViewerOpen(false);
+    setContentViewerData(null);
+    setIsContentEditing(false);
+    setContentEditValue('');
+  };
+
+  // Handle saving content from viewer
+  const saveContentFromViewer = async () => {
+    if (!contentViewerData) return;
+    
+    try {
+      const { error } = await supabase
+        .from('utgs')
+        .update({ utg_columns_definition_location: contentEditValue })
+        .eq('utg_id', contentViewerData.recordId);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(prevData => 
+        prevData.map(item => 
+          item.utg_id === contentViewerData.recordId 
+            ? { ...item, utg_columns_definition_location: contentEditValue }
+            : item
+        )
+      );
+      
+      // Update the viewer data
+      setContentViewerData(prev => prev ? { ...prev, content: contentEditValue } : null);
+      setIsContentEditing(false);
+      alert('Content saved successfully!');
+    } catch (err) {
+      console.error('Error saving content:', err);
+      alert('Failed to save content');
+    }
+  };
+
+  // Define column order
+  const columnOrder = [
+    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage',
+    'main_db_table', 'sql_view', 'associated_files', 'utg_class', 'created_at', 'updated_at',
+    'is_active', 'sort_order'
+  ];
+
   // Define which fields can be inline edited (excluding boolean and timestamp fields)
   const inlineEditableFields = [
-    'utg_id', 'utg_name', 'utg_description', 'rel_xpage', 
+    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage', 
     'main_db_table', 'sql_view', 'utg_class'
   ];
   
@@ -343,7 +407,7 @@ export default function UiTableGridsTable() {
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider border border-gray-200">
                 actions
               </th>
-              {Object.keys(data[0] || {}).map((column) => (
+              {columnOrder.map((column) => (
                 <th
                   key={column}
                   onClick={() => handleSort(column as keyof UiTableGrid)}
@@ -396,13 +460,51 @@ export default function UiTableGridsTable() {
                     </button>
                   )}
                 </td>
-                {Object.entries(row).map(([key, value]) => {
+                {columnOrder.map((key) => {
+                  const value = row[key as keyof UiTableGrid];
                   const isEditing = editingCell?.id === row.utg_id && editingCell?.field === key;
                   const isEditable = inlineEditableFields.includes(key);
                   
                   return (
                     <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
-                      {isEditable ? (
+                      {key === 'utg_columns_definition_location' ? (
+                        // Special handling for utg_columns_definition_location
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1">
+                            {isEditing ? (
+                              <textarea
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onBlur={saveInlineEdit}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && e.ctrlKey) saveInlineEdit();
+                                  if (e.key === 'Escape') cancelInlineEdit();
+                                }}
+                                className="w-full px-1 py-0.5 border border-blue-500 rounded"
+                                rows={3}
+                                autoFocus
+                              />
+                            ) : (
+                              <div
+                                className="min-w-[30px] min-h-[1.25rem] cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded"
+                                onClick={() => startInlineEdit(row.utg_id, key, value)}
+                                title="Click to edit (Ctrl+Enter to save)"
+                              >
+                                {value === null ? '' : String(value).substring(0, 100) + (String(value).length > 100 ? '...' : '')}
+                              </div>
+                            )}
+                          </div>
+                          {value && String(value).length > 0 && (
+                            <button
+                              onClick={() => openContentViewer(`utgs.utg_columns_definition_location FOR utg_id: ${row.utg_id}`, String(value), row.utg_id)}
+                              className="w-4 h-4 bg-blue-600 hover:bg-blue-700 text-white rounded flex items-center justify-center text-xs"
+                              title="View full content"
+                            >
+                              📄
+                            </button>
+                          )}
+                        </div>
+                      ) : isEditable ? (
                         isEditing ? (
                           <input
                             type="text"
@@ -510,6 +612,16 @@ export default function UiTableGridsTable() {
                   value={formData.utg_name}
                   onChange={(e) => setFormData({...formData, utg_name: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">utg_columns_definition_location</label>
+                <textarea
+                  value={formData.utg_columns_definition_location}
+                  onChange={(e) => setFormData({...formData, utg_columns_definition_location: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
+                  rows={6}
+                  placeholder="Store large text responses from Claude/Cursor for column definitions..."
                 />
               </div>
               <div>
@@ -646,6 +758,16 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700">utg_columns_definition_location</label>
+                <textarea
+                  value={formData.utg_columns_definition_location}
+                  onChange={(e) => setFormData({...formData, utg_columns_definition_location: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 font-mono text-sm"
+                  rows={6}
+                  placeholder="Store large text responses from Claude/Cursor for column definitions..."
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">utg_description</label>
                 <textarea
                   value={formData.utg_description}
@@ -738,6 +860,89 @@ export default function UiTableGridsTable() {
               >
                 Update
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Content Viewer/Editor Modal */}
+      {isContentViewerOpen && contentViewerData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-900">{contentViewerData.title}</h2>
+              <div className="flex gap-2">
+                {!isContentEditing ? (
+                  <button
+                    onClick={() => setIsContentEditing(true)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={saveContentFromViewer}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsContentEditing(false);
+                        setContentEditValue(contentViewerData.content);
+                      }}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={closeContentViewer}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 min-h-[400px]">
+              {isContentEditing ? (
+                <textarea
+                  value={contentEditValue}
+                  onChange={(e) => setContentEditValue(e.target.value)}
+                  className="w-full h-96 font-mono text-sm text-gray-800 bg-white border border-gray-300 rounded p-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your content here... (linebreaks and blank lines will be preserved)"
+                  style={{ lineHeight: '1.5' }}
+                />
+              ) : (
+                <pre className="whitespace-pre-wrap text-sm font-mono text-gray-800 leading-relaxed min-h-[350px]">
+                  {contentViewerData.content || 'No content available'}
+                </pre>
+              )}
+            </div>
+            
+            <div className="mt-4 flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                Length: {isContentEditing ? contentEditValue.length : contentViewerData.content.length} characters
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigator.clipboard.writeText(isContentEditing ? contentEditValue : contentViewerData.content)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Copy to Clipboard
+                </button>
+                {isContentEditing && (
+                  <button
+                    onClick={saveContentFromViewer}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    Save Changes
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
