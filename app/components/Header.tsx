@@ -147,6 +147,14 @@ export default function Header() {
       name: 'admin',
       children: [
         {
+          name: 'Azo System',
+          path: undefined // No link - separator
+        },
+        {
+          name: 'Azo Page Creator',
+          path: '/admin/azo'
+        },
+        {
           name: 'ColTemp System',
           path: undefined // No link - separator
         },
@@ -212,7 +220,8 @@ export default function Header() {
           !page.path?.includes('/admin/baklijar') &&
           !page.path?.includes('/admin/xpagesmanager1') &&
           !page.path?.includes('/admin/rstormanager') &&
-          !page.path?.includes('/admin/utg_manager')
+          !page.path?.includes('/admin/utg_manager') &&
+          !page.path?.includes('/admin/azo')
         ) // Add any other admin pages found in navigation, excluding duplicates
       ]
     };

@@ -5,7 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
 
 interface XPage {
-  xpage_id: string;
+  xpage_id: number;
   title1: string | null;
   title2: string | null;
   desc1: string | null;
@@ -27,8 +27,8 @@ export default function XPagesManager1Page() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(200);
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-  const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const [editingCell, setEditingCell] = useState<{id: number, field: string} | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   const [filterParentContainer, setFilterParentContainer] = useState<string>('');
   const [filterShowInNav, setFilterShowInNav] = useState<string>('');
@@ -39,7 +39,7 @@ export default function XPagesManager1Page() {
 
   // Define column order and properties
   const columns: Array<{ key: keyof XPage; type: string; width: string }> = [
-    { key: 'xpage_id', type: 'text', width: '300px' },
+    { key: 'xpage_id', type: 'integer', width: '100px' },
     { key: 'title1', type: 'text', width: '200px' },
     { key: 'title2', type: 'text', width: '200px' },
     { key: 'desc1', type: 'text', width: '250px' },
@@ -114,7 +114,7 @@ export default function XPagesManager1Page() {
     }
   };
 
-  const updateField = async (id: string, field: keyof XPage, value: any) => {
+  const updateField = async (id: number, field: keyof XPage, value: any) => {
     try {
       const { error } = await supabase
         .from('xpages')
@@ -135,7 +135,7 @@ export default function XPagesManager1Page() {
     }
   };
 
-  const handleCellClick = (id: string, field: string, currentValue: any) => {
+  const handleCellClick = (id: number, field: string, currentValue: any) => {
     if (field === 'xpage_id' || field === 'created_at' || field === 'updated_at') {
       return; // Don't allow editing these fields
     }
@@ -173,7 +173,7 @@ export default function XPagesManager1Page() {
     setEditValue('');
   };
 
-  const handleBooleanToggle = async (id: string, field: keyof XPage, currentValue: boolean | null) => {
+  const handleBooleanToggle = async (id: number, field: keyof XPage, currentValue: boolean | null) => {
     const newValue = currentValue === null ? true : !currentValue;
     await updateField(id, field, newValue);
   };
