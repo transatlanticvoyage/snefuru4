@@ -85,6 +85,7 @@ export default function AzColumnTemplateControls() {
 
         <span style={separatorStyle}></span>
 
+        <button style={openJarButtonStyle}>Open /coltempcommand</button>
         <button style={openJarButtonStyle}>Open /coltempjar</button>
       </div>
     </div>
