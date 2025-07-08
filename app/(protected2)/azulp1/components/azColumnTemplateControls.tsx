@@ -60,7 +60,7 @@ export default function AzColumnTemplateControls() {
 
         range
 
-        <button style={coltempButtonStyle}>coltemp1</button>
+        <button style={coltempButtonStyle}>15 | i | st | color | coltemp1</button>
         <button style={coltempButtonStyle}>coltemp2</button>
         <button style={coltempButtonStyle}>coltemp3</button>
         <button style={moreButtonStyle}>more</button>
