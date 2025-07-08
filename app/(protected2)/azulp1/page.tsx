@@ -2,6 +2,10 @@
 
 import { useEffect } from 'react';
 import AzMinimalTable from './components/azMinimalTable'
+import AzColumnTemplateControls from './components/azColumnTemplateControls'
+import AzFilterControls from './components/azFilterControls'
+import AzSearchBox from './components/azSearchBox'
+import AzPaginationControls from './components/azPaginationControls'
 import './styles/az-table-template.css'
 
 export default function Azulp1Page() {
@@ -44,6 +48,11 @@ export default function Azulp1Page() {
   return (
     <>
       <h1>Minimalistic Table Template System</h1>
+      
+      <AzColumnTemplateControls />
+      <AzFilterControls />
+      <AzSearchBox />
+      <AzPaginationControls />
       
       <AzMinimalTable 
         headers={headers}
