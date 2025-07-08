@@ -1,13 +1,13 @@
 'use client';
 
-import { Metadata } from 'next'
-import MinimalTable from '@/app/components/MinimalTable'
+import { useEffect } from 'react';
+import AzMinimalTable from './components/azMinimalTable'
+import './styles/az-table-template.css'
 
-export const metadata: Metadata = {
-  title: '/chanbri_filter_controls_2',
-}
-
-export default function ChanbriFilterControls2Page() {
+export default function Azulp1Page() {
+  useEffect(() => {
+    document.title = '/azulp1';
+  }, []);
   // Sample data for demonstration
   const headers = ['ID', 'Name', 'Category', 'Display Name', 'Is Default'];
   
@@ -45,7 +45,7 @@ export default function ChanbriFilterControls2Page() {
     <>
       <h1>Minimalistic Table Template System</h1>
       
-      <MinimalTable 
+      <AzMinimalTable 
         headers={headers}
         data={data}
         tableClassName="custom-table"
