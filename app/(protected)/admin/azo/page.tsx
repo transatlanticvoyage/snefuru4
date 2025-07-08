@@ -4,13 +4,13 @@ import { useEffect } from 'react';
 
 export default function AzoPage() {
   useEffect(() => {
-    document.title = 'Azo Page Creator';
+    document.title = 'Azo Page Settings Manager';
   }, []);
 
   return (
     <div>
       <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>
-        <span style={{ fontWeight: 'bold' }}>Azo Page Creator</span>
+        <span style={{ fontWeight: 'bold' }}>Azo Page Settings Manager</span>
         <span style={{ fontWeight: 'normal' }}> (internal snefuru app page creator)</span>
       </h1>
     </div>
