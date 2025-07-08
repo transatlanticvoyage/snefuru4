@@ -1,4 +1,5 @@
 import { HeaderRowDefinition } from '../config/tableConfig.sample';
+import { processHeaderRows, HeaderRowRenderOptions } from './azHeaderRows';
 
 interface MinimalTableProps {
   // Data props
@@ -46,12 +47,20 @@ export default function AzMinimalTable({
   cellIds,
   cellClasses
 }: MinimalTableProps) {
+  // Process header rows if provided
+  const processedHeaderRows = headerRows ? processHeaderRows(headerRows, {
+    onHeaderClick,
+    defaultThClassName: thClassName,
+    defaultTrClassName: headerTrClassName || trClassName,
+    enableSorting: true
+  }) : null;
+
   return (
     <table className={tableClassName}>
       <thead className={theadClassName}>
         {/* Render configured header rows or fallback to simple headers */}
-        {headerRows ? (
-          headerRows.map((headerRow, rowIndex) => (
+        {processedHeaderRows ? (
+          processedHeaderRows.map((headerRow) => (
             <tr 
               key={headerRow.id}
               className={headerRow.className || headerTrClassName || trClassName}
@@ -60,17 +69,13 @@ export default function AzMinimalTable({
                 ...(headerRow.type === 'label' ? { fontWeight: 'bold' } : {})
               }}
             >
-              {headerRow.cells.map((cell, cellIndex) => (
+              {headerRow.processedCells.map((cell) => (
                 <th 
-                  key={cellIndex}
+                  key={cell.key}
                   className={cell.className || thClassName}
                   colSpan={cell.colSpan || 1}
-                  onClick={() => onHeaderClick?.(cellIndex, String(cell.content))}
-                  style={{ 
-                    cursor: onHeaderClick ? 'pointer' : 'default',
-                    textAlign: cell.alignment || 'left',
-                    ...cell.style
-                  }}
+                  onClick={cell.onClick}
+                  style={cell.style}
                 >
                   {cell.content}
                 </th>
