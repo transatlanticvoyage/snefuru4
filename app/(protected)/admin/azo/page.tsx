@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import BensaFieldTable from '@/app/(protected3)/bensa/components/BensaFieldTable';
+import { bensaUtgsConfig } from '@/app/(protected3)/bensa/config/bensaUtgsConfig';
 
 interface XPage {
   xpage_id: number;
@@ -34,6 +36,7 @@ export default function AzoPage() {
   const [selectedXpage, setSelectedXpage] = useState<XPage | null>(null);
   const [selectedXpageId, setSelectedXpageId] = useState<number | null>(null);
   const [selectedUtgId, setSelectedUtgId] = useState<string | null>(null);
+  const [selectedUtgRecord, setSelectedUtgRecord] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingUtgs, setLoadingUtgs] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -65,6 +68,7 @@ export default function AzoPage() {
     const utgIdParam = searchParams.get('utg_id');
     if (utgIdParam) {
       setSelectedUtgId(utgIdParam);
+      fetchSelectedUtg(utgIdParam);
     }
   }, [searchParams]);
 
@@ -112,6 +116,25 @@ export default function AzoPage() {
       }
 
       setSelectedXpage(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchSelectedUtg = async (utgId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('utgs')
+        .select('*')
+        .eq('utg_id', utgId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching selected utg:', error);
+        return;
+      }
+
+      setSelectedUtgRecord(data);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -174,6 +197,11 @@ export default function AzoPage() {
 
   const handleUtgChange = (utgId: string) => {
     setSelectedUtgId(utgId);
+    if (utgId) {
+      fetchSelectedUtg(utgId);
+    } else {
+      setSelectedUtgRecord(null);
+    }
     const params = new URLSearchParams(searchParams);
     params.set('utg_id', utgId);
     router.push(`/admin/azo?${params.toString()}`);
@@ -276,6 +304,27 @@ export default function AzoPage() {
       setSelectedFields(new Set(xpageFields.map(f => f.key)));
     } else {
       setSelectedFields(new Set());
+    }
+  };
+
+  const handleUtgUpdate = async (field: string, value: any) => {
+    if (!selectedUtgId) return;
+
+    try {
+      const { error } = await supabase
+        .from('utgs')
+        .update({ [field]: value })
+        .eq('utg_id', selectedUtgId);
+
+      if (error) {
+        console.error('Error updating utg field:', error);
+        return;
+      }
+
+      // Update local state
+      setSelectedUtgRecord(prev => prev ? { ...prev, [field]: value } : null);
+    } catch (error) {
+      console.error('Error updating utg field:', error);
     }
   };
 
@@ -853,6 +902,15 @@ export default function AzoPage() {
                 <h2>UTGs Settings</h2>
                 <p>Configure UTG settings for XPage ID: {selectedXpageId}</p>
                 {selectedUtgId && <p>Selected UTG: {selectedUtgId}</p>}
+
+                {/* UTG Table */}
+                {selectedUtgId && selectedUtgRecord && (
+                  <BensaFieldTable
+                    config={bensaUtgsConfig}
+                    selectedRecord={selectedUtgRecord}
+                    onRecordUpdate={handleUtgUpdate}
+                  />
+                )}
               </div>
             )}
             {activeTab === 'zarnos' && (
