@@ -5,11 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import BensaFieldTable from '@/app/(protected3)/bensa/components/BensaFieldTable';
 import { bensaUtgsConfig } from '@/app/(protected3)/bensa/config/bensaUtgsConfig';
+import { bensaZarnosConfig } from '@/app/(protected3)/bensa/config/bensaZarnosConfig';
 
 interface XPage {
   xpage_id: number;
   title1: string | null;
   main_url: string | null;
+  meta_title: string | null;
   title2: string | null;
   desc1: string | null;
   caption: string | null;
@@ -29,16 +31,43 @@ interface UTG {
   rel_xpage_id: number | null;
 }
 
+interface Zarno {
+  zarno_id: number;
+  fk_xpage_id: number | null;
+  zarno_name: string | null;
+  zarno_type: string | null;
+  zarno_path: string | null;
+  zarno_status: string | null;
+  zarno_config: any;
+  execution_order: number | null;
+  dependencies: any;
+  metadata: any;
+  is_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+}
+
+interface ZarnoDropdownItem {
+  zarno_id: number;
+  zarno_name: string | null;
+  fk_xpage_id: number | null;
+}
+
 export default function AzoPage() {
   const [activeTab, setActiveTab] = useState<'xpages' | 'utgs' | 'zarnos'>('xpages');
   const [xpages, setXpages] = useState<XPage[]>([]);
   const [utgs, setUtgs] = useState<UTG[]>([]);
+  const [zarnos, setZarnos] = useState<ZarnoDropdownItem[]>([]);
   const [selectedXpage, setSelectedXpage] = useState<XPage | null>(null);
   const [selectedXpageId, setSelectedXpageId] = useState<number | null>(null);
   const [selectedUtgId, setSelectedUtgId] = useState<string | null>(null);
   const [selectedUtgRecord, setSelectedUtgRecord] = useState<any | null>(null);
+  const [selectedZarnoId, setSelectedZarnoId] = useState<number | null>(null);
+  const [selectedZarnoRecord, setSelectedZarnoRecord] = useState<Zarno | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingUtgs, setLoadingUtgs] = useState(false);
+  const [loadingZarnos, setLoadingZarnos] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -57,7 +86,7 @@ export default function AzoPage() {
     fetchFieldMetadata();
     
     // Get xpage_id from URL if present
-    const xpageIdParam = searchParams.get('xpage_id');
+    const xpageIdParam = searchParams?.get('xpage_id');
     if (xpageIdParam) {
       const xpageId = parseInt(xpageIdParam);
       setSelectedXpageId(xpageId);
@@ -65,10 +94,18 @@ export default function AzoPage() {
     }
     
     // Get utg_id from URL if present
-    const utgIdParam = searchParams.get('utg_id');
+    const utgIdParam = searchParams?.get('utg_id');
     if (utgIdParam) {
       setSelectedUtgId(utgIdParam);
       fetchSelectedUtg(utgIdParam);
+    }
+    
+    // Get zarno_id from URL if present
+    const zarnoIdParam = searchParams?.get('zarno_id');
+    if (zarnoIdParam) {
+      const zarnoId = parseInt(zarnoIdParam);
+      setSelectedZarnoId(zarnoId);
+      fetchSelectedZarno(zarnoId);
     }
   }, [searchParams]);
 
@@ -79,6 +116,18 @@ export default function AzoPage() {
     } else {
       setUtgs([]);
       setSelectedUtgId(null);
+      setSelectedUtgRecord(null);
+    }
+  }, [selectedXpageId]);
+
+  // Fetch Zarnos when xpage is selected
+  useEffect(() => {
+    if (selectedXpageId) {
+      fetchRelatedZarnos(selectedXpageId);
+    } else {
+      setZarnos([]);
+      setSelectedZarnoId(null);
+      setSelectedZarnoRecord(null);
     }
   }, [selectedXpageId]);
 
@@ -86,7 +135,7 @@ export default function AzoPage() {
     try {
       const { data, error } = await supabase
         .from('xpages')
-        .select('xpage_id, title1')
+        .select('*')
         .order('xpage_id', { ascending: true });
 
       if (error) {
@@ -189,9 +238,57 @@ export default function AzoPage() {
     }
   };
 
+  const fetchSelectedZarno = async (zarnoId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from('zarnos')
+        .select('*')
+        .eq('zarno_id', zarnoId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching selected zarno:', error);
+        return;
+      }
+
+      setSelectedZarnoRecord(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchRelatedZarnos = async (xpageId: number) => {
+    try {
+      setLoadingZarnos(true);
+      
+      // Fetch Zarnos where fk_xpage_id matches the selected xpage_id
+      const { data, error } = await supabase
+        .from('zarnos')
+        .select('zarno_id, zarno_name, fk_xpage_id')
+        .eq('fk_xpage_id', xpageId)
+        .order('zarno_name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching Zarnos:', error);
+        return;
+      }
+
+      setZarnos(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoadingZarnos(false);
+    }
+  };
+
   const handleXpageChange = (xpageId: number) => {
     setSelectedXpageId(xpageId);
     fetchSelectedXpage(xpageId);
+    // Reset selected UTG and Zarno when XPage changes
+    setSelectedUtgId(null);
+    setSelectedUtgRecord(null);
+    setSelectedZarnoId(null);
+    setSelectedZarnoRecord(null);
     router.push(`/admin/azo?xpage_id=${xpageId}`);
   };
 
@@ -202,8 +299,25 @@ export default function AzoPage() {
     } else {
       setSelectedUtgRecord(null);
     }
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams || '');
     params.set('utg_id', utgId);
+    router.push(`/admin/azo?${params.toString()}`);
+  };
+
+  const handleZarnoChange = (zarnoId: number) => {
+    const validZarnoId = zarnoId > 0 ? zarnoId : null;
+    setSelectedZarnoId(validZarnoId);
+    if (validZarnoId) {
+      fetchSelectedZarno(validZarnoId);
+    } else {
+      setSelectedZarnoRecord(null);
+    }
+    const params = new URLSearchParams(searchParams || '');
+    if (validZarnoId) {
+      params.set('zarno_id', validZarnoId.toString());
+    } else {
+      params.delete('zarno_id');
+    }
     router.push(`/admin/azo?${params.toString()}`);
   };
 
@@ -217,6 +331,7 @@ export default function AzoPage() {
     { key: 'xpage_id', type: 'integer', editable: false },
     { key: 'title1', type: 'text', editable: true },
     { key: 'main_url', type: 'text', editable: true },
+    { key: 'meta_title', type: 'text', editable: true },
     { key: 'title2', type: 'text', editable: true },
     { key: 'desc1', type: 'text', editable: true },
     { key: 'caption', type: 'text', editable: true },
@@ -245,7 +360,7 @@ export default function AzoPage() {
       }
 
       // Update local state
-      setSelectedXpage(prev => prev ? { ...prev, [field]: value } : null);
+      setSelectedXpage((prev: XPage | null) => prev ? { ...prev, [field]: value } : null);
     } catch (error) {
       console.error('Error updating field:', error);
     }
@@ -322,9 +437,30 @@ export default function AzoPage() {
       }
 
       // Update local state
-      setSelectedUtgRecord(prev => prev ? { ...prev, [field]: value } : null);
+      setSelectedUtgRecord((prev: any) => prev ? { ...prev, [field]: value } : null);
     } catch (error) {
       console.error('Error updating utg field:', error);
+    }
+  };
+
+  const handleZarnoUpdate = async (field: string, value: any) => {
+    if (!selectedZarnoId) return;
+
+    try {
+      const { error } = await supabase
+        .from('zarnos')
+        .update({ [field]: value })
+        .eq('zarno_id', selectedZarnoId);
+
+      if (error) {
+        console.error('Error updating zarno field:', error);
+        return;
+      }
+
+      // Update local state
+      setSelectedZarnoRecord((prev: Zarno | null) => prev ? { ...prev, [field]: value } : null);
+    } catch (error) {
+      console.error('Error updating zarno field:', error);
     }
   };
 
@@ -604,6 +740,21 @@ export default function AzoPage() {
             </option>
           ))}
         </select>
+
+        <label style={labelStyle}>Select Zarno:</label>
+        <select 
+          style={!selectedXpageId ? disabledSelectStyle : selectStyle}
+          value={selectedZarnoId || ''}
+          onChange={(e) => handleZarnoChange(e.target.value ? Number(e.target.value) : 0)}
+          disabled={!selectedXpageId || loadingZarnos}
+        >
+          <option value="">-- Select a Zarno --</option>
+          {zarnos.map((zarno) => (
+            <option key={zarno.zarno_id} value={zarno.zarno_id}>
+              {zarno.zarno_id} - {zarno.zarno_name || '(No name)'}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div style={tabContainerStyle}>
@@ -612,13 +763,13 @@ export default function AzoPage() {
             style={activeTab === 'xpages' ? activeTabStyle : tabStyle}
             onClick={() => setActiveTab('xpages')}
           >
-            xpages - main settings
+            xpages
           </li>
           <li 
             style={activeTab === 'utgs' ? activeTabStyle : tabStyle}
             onClick={() => setActiveTab('utgs')}
           >
-            utgs - main settings
+            utgs
           </li>
           <li 
             style={activeTab === 'zarnos' ? activeTabStyle : tabStyle}
@@ -643,6 +794,18 @@ export default function AzoPage() {
                 
                 {selectedXpage && (
                   <div style={{ marginTop: '20px' }}>
+                    <div style={{ 
+                      backgroundColor: '#b5edbc', 
+                      border: '1px solid #273929', 
+                      borderRadius: '7px', 
+                      padding: '4px', 
+                      marginBottom: '15px', 
+                      fontSize: '16px', 
+                      fontWeight: 'bold', 
+                      color: '#252525' 
+                    }}>
+                      bensa table instance
+                    </div>
                     <table style={{ borderCollapse: 'collapse', border: '1px solid #ddd', width: 'auto' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#f5f5f5' }}>
@@ -905,17 +1068,56 @@ export default function AzoPage() {
 
                 {/* UTG Table */}
                 {selectedUtgId && selectedUtgRecord && (
-                  <BensaFieldTable
+                  <>
+                    <div style={{ 
+                      backgroundColor: '#b5edbc', 
+                      border: '1px solid #273929', 
+                      borderRadius: '7px', 
+                      padding: '4px', 
+                      marginBottom: '15px', 
+                      fontSize: '16px', 
+                      fontWeight: 'bold', 
+                      color: '#252525' 
+                    }}>
+                      bensa table instance
+                    </div>
+                    <BensaFieldTable
                     config={bensaUtgsConfig}
                     selectedRecord={selectedUtgRecord}
                     onRecordUpdate={handleUtgUpdate}
                   />
+                  </>
                 )}
               </div>
             )}
             {activeTab === 'zarnos' && (
               <div>
-                
+                <h2>Zarnos Settings</h2>
+                <p>Configure Zarno settings for XPage ID: {selectedXpageId}</p>
+                {selectedZarnoId && <p>Selected Zarno: {selectedZarnoId}</p>}
+
+                {/* Zarno Table */}
+                {selectedZarnoId && selectedZarnoRecord && (
+                  <>
+                    <div style={{ 
+                      backgroundColor: '#b5edbc', 
+                      border: '1px solid #273929', 
+                      borderRadius: '7px', 
+                      padding: '4px', 
+                      marginBottom: '15px', 
+                      fontSize: '16px', 
+                      fontWeight: 'bold', 
+                      color: '#252525' 
+                    }}>
+                      bensa table instance
+                    </div>
+                    <BensaFieldTable
+                    config={bensaZarnosConfig}
+                    selectedRecord={selectedZarnoRecord}
+                    onRecordUpdate={handleZarnoUpdate}
+                  />
+                  </>
+                )}
               </div>
             )}
           </>

@@ -8,6 +8,7 @@ interface XPage {
   xpage_id: number;
   title1: string | null;
   main_url: string | null;
+  meta_title: string | null;
   title2: string | null;
   desc1: string | null;
   caption: string | null;
@@ -43,6 +44,7 @@ export default function XPagesManager1Page() {
     { key: 'xpage_id', type: 'integer', width: '80px' },
     { key: 'title1', type: 'text', width: '200px' },
     { key: 'main_url', type: 'text', width: '200px' },
+    { key: 'meta_title', type: 'text', width: '200px' },
     { key: 'title2', type: 'text', width: '200px' },
     { key: 'desc1', type: 'text', width: '200px' },
     { key: 'caption', type: 'text', width: '200px' },
@@ -89,6 +91,7 @@ export default function XPagesManager1Page() {
         .insert({
           title1: null,
           main_url: null,
+          meta_title: null,
           title2: null,
           desc1: null,
           caption: null,

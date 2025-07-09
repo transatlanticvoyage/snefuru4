@@ -281,13 +281,27 @@ export const advancedTableConfig: TableConfig = {
 
 // 3. Custom view with complex filters
 export const customViewConfig: TableConfig = {
-  viewName: 'order_summary_view',  // Using a database view
+  tableName: 'order_summary_view',  // Required: table name
+  viewName: 'order_summary_view',   // Optional: view name for clarity
   columns: [
     { field: 'order_id', header: 'Order #', width: '100px' },
     { field: 'customer_name', header: 'Customer' },
     { field: 'total_amount', header: 'Total', type: 'number', format: (v) => `$${v.toFixed(2)}` },
     { field: 'order_status', header: 'Status' },
     { field: 'item_count', header: 'Items', type: 'number' }
+  ],
+  headerRows: [
+    {
+      id: 'main-header',
+      type: 'label',
+      cells: [
+        { content: 'Order #', alignment: 'center' },
+        { content: 'Customer', alignment: 'left' },
+        { content: 'Total', alignment: 'right' },
+        { content: 'Status', alignment: 'center' },
+        { content: 'Items', alignment: 'right' }
+      ]
+    }
   ],
   filters: [
     {

@@ -71,7 +71,7 @@ export default function BensaPage() {
     fetchXpages();
     
     // Get xpage_id from URL if present
-    const xpageIdParam = searchParams.get('xpage_id');
+    const xpageIdParam = searchParams?.get('xpage_id');
     if (xpageIdParam) {
       const xpageId = parseInt(xpageIdParam);
       setSelectedXpageId(xpageId);
@@ -79,7 +79,7 @@ export default function BensaPage() {
     }
     
     // Get utg_id from URL if present
-    const utgIdParam = searchParams.get('utg_id');
+    const utgIdParam = searchParams?.get('utg_id');
     if (utgIdParam) {
       setSelectedUtgId(utgIdParam);
     }
@@ -102,7 +102,7 @@ export default function BensaPage() {
     try {
       const { data, error } = await supabase
         .from('xpages')
-        .select('xpage_id, title1')
+        .select('*')
         .order('xpage_id', { ascending: true });
 
       if (error) {
@@ -191,7 +191,7 @@ export default function BensaPage() {
 
   const handleUtgChange = (utgId: string) => {
     setSelectedUtgId(utgId);
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams || '');
     params.set('utg_id', utgId);
     router.push(`/bensa?${params.toString()}`);
   };

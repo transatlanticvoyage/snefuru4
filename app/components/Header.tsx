@@ -157,6 +157,14 @@ export default function Header() {
       name: 'admin',
       children: [
         {
+          name: 'Venla Masterlist',
+          path: '/admin/venlamaster'
+        },
+        {
+          name: 'Bensa Masterlist',
+          path: '/admin/bensamaster'
+        },
+        {
           name: 'Azo System',
           path: undefined // No link - separator
         },
@@ -179,6 +187,10 @@ export default function Header() {
         {
           name: 'UTG Manager',
           path: `${baseUrl}/admin/utg_manager`
+        },
+        {
+          name: 'Zarno Manager',
+          path: `${baseUrl}/admin/zarnomanager`
         },
         {
           name: 'Ketch Manager',
