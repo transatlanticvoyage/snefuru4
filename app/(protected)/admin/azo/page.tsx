@@ -75,6 +75,11 @@ export default function AzoPage() {
   const [fieldMetadata, setFieldMetadata] = useState<{[key: string]: {starred: boolean, flagged: boolean}}>({});
   const [sortBy, setSortBy] = useState<string>('starred');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [boxEditorOpen, setBoxEditorOpen] = useState(false);
+  const [boxEditorValue, setBoxEditorValue] = useState('');
+  const [boxEditorField, setBoxEditorField] = useState<string>('');
+  const [boxEditorRecord, setBoxEditorRecord] = useState<any>(null);
+  const [boxEditorUpdateHandler, setBoxEditorUpdateHandler] = useState<((field: string, value: any) => Promise<void>) | null>(null);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -507,6 +512,25 @@ export default function AzoPage() {
     }
   };
 
+  const handleBoxEditorOpen = (field: string, value: string, record: any, updateHandler: (field: string, value: any) => Promise<void>) => {
+    setBoxEditorField(field);
+    setBoxEditorValue(value || '');
+    setBoxEditorRecord(record);
+    setBoxEditorUpdateHandler(() => updateHandler);
+    setBoxEditorOpen(true);
+  };
+
+  const handleBoxEditorSave = async () => {
+    if (boxEditorUpdateHandler) {
+      await boxEditorUpdateHandler(boxEditorField, boxEditorValue);
+    }
+    setBoxEditorOpen(false);
+  };
+
+  const handleBoxEditorClose = () => {
+    setBoxEditorOpen(false);
+  };
+
   const toggleFieldStar = async (fieldName: string) => {
     const currentStarred = fieldMetadata[fieldName]?.starred || false;
     const newStarred = !currentStarred;
@@ -692,7 +716,6 @@ export default function AzoPage() {
 
   const tabContainerStyle = {
     width: '100%',
-    borderBottom: '2px solid #ddd',
     marginBottom: '20px'
   };
 
@@ -709,10 +732,12 @@ export default function AzoPage() {
     textAlign: 'center' as const,
     padding: '12px 16px',
     cursor: 'pointer',
-    border: '1px solid #ddd',
-    borderBottom: 'none',
+    borderTop: '2px solid #a4a4a4',
+    borderLeft: '2px solid #a4a4a4',
+    borderRight: '2px solid #a4a4a4',
+    borderBottom: '2px solid #ba5816',
     backgroundColor: '#f8f9fa',
-    fontSize: '14px',
+    fontSize: '20px',
     fontWeight: '500'
   };
 
@@ -723,13 +748,46 @@ export default function AzoPage() {
     borderTop: '2px solid #ba5816',
     borderLeft: '2px solid #ba5816',
     borderRight: '2px solid #ba5816',
-    marginBottom: '-2px',
     fontWeight: 'bold'
   };
 
   const contentStyle = {
     padding: '20px',
     minHeight: '400px'
+  };
+
+  // Function to get appropriate tab style based on active tab and position
+  const getTabStyle = (tabName: 'xpages' | 'utgs' | 'zarnos') => {
+    if (tabName === activeTab) {
+      return activeTabStyle;
+    }
+    
+    // For inactive tabs, handle border collision with active tab and adjacent tabs
+    let style = { ...tabStyle };
+    
+    // Remove right border if this tab is to the left of active tab
+    if ((tabName === 'xpages' && activeTab === 'utgs') || 
+        (tabName === 'utgs' && activeTab === 'zarnos')) {
+      style.borderRight = 'none';
+    }
+    
+    // Remove left border if this tab is to the right of active tab
+    if ((tabName === 'utgs' && activeTab === 'xpages') || 
+        (tabName === 'zarnos' && activeTab === 'utgs')) {
+      style.borderLeft = 'none';
+    }
+    
+    // Handle border doubling between adjacent inactive tabs
+    // Remove right border from left tab in inactive pairs
+    if (tabName === 'xpages' && activeTab === 'zarnos') {
+      // xpages and utgs are both inactive, remove right border from xpages
+      style.borderRight = 'none';
+    } else if (tabName === 'utgs' && activeTab === 'xpages') {
+      // utgs and zarnos are both inactive, remove right border from utgs
+      style.borderRight = 'none';
+    }
+    
+    return style;
   };
 
   return (
@@ -803,30 +861,42 @@ export default function AzoPage() {
       <div style={tabContainerStyle}>
         <ul style={tabListStyle}>
           <li 
-            style={activeTab === 'xpages' ? activeTabStyle : tabStyle}
+            style={getTabStyle('xpages')}
             onClick={() => {
               setActiveTab('xpages');
               updateURLWithCurrentState({ tab: 'xpages' });
             }}
           >
+            {activeTab === 'xpages' ? 
+              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+            }
             xpages
           </li>
           <li 
-            style={activeTab === 'utgs' ? activeTabStyle : tabStyle}
+            style={getTabStyle('utgs')}
             onClick={() => {
               setActiveTab('utgs');
               updateURLWithCurrentState({ tab: 'utgs' });
             }}
           >
+            {activeTab === 'utgs' ? 
+              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+            }
             utgs
           </li>
           <li 
-            style={activeTab === 'zarnos' ? activeTabStyle : tabStyle}
+            style={getTabStyle('zarnos')}
             onClick={() => {
               setActiveTab('zarnos');
               updateURLWithCurrentState({ tab: 'zarnos' });
             }}
           >
+            {activeTab === 'zarnos' ? 
+              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+            }
             zarnos
           </li>
         </ul>
@@ -841,6 +911,66 @@ export default function AzoPage() {
           <>
             {activeTab === 'xpages' && (
               <div>
+                <div style={{
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  padding: '15px',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: 'black',
+                    marginBottom: '10px'
+                  }}>
+                    devinfobox
+                  </div>
+                  <div style={{
+                    backgroundColor: '#f1f3f4',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '8px',
+                    fontFamily: 'monospace',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <button
+                      onClick={() => {
+                        const url = 'vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx';
+                        navigator.clipboard.writeText(url);
+                      }}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '2px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title="Copy to clipboard"
+                    >
+                      📋
+                    </button>
+                    <a 
+                      href="vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx"
+                      style={{
+                        color: '#0066cc',
+                        textDecoration: 'none',
+                        flex: 1
+                      }}
+                    >
+                      vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx
+                    </a>
+                  </div>
+                </div>
                 <h2>XPages Settings</h2>
                 <p>Configure main settings for XPage ID: {selectedXpageId}</p>
                 
@@ -1137,6 +1267,7 @@ export default function AzoPage() {
                     config={bensaUtgsConfig}
                     selectedRecord={selectedUtgRecord}
                     onRecordUpdate={handleUtgUpdate}
+                    onBoxEditorOpen={handleBoxEditorOpen}
                   />
                   </>
                 )}
@@ -1167,6 +1298,7 @@ export default function AzoPage() {
                     config={bensaZarnosConfig}
                     selectedRecord={selectedZarnoRecord}
                     onRecordUpdate={handleZarnoUpdate}
+                    onBoxEditorOpen={handleBoxEditorOpen}
                   />
                   </>
                 )}
@@ -1175,6 +1307,107 @@ export default function AzoPage() {
           </>
         )}
       </div>
+
+      {/* Box Editor Popup */}
+      {boxEditorOpen && (
+        <div style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '660px',
+          height: '760px',
+          backgroundColor: 'white',
+          border: '2px solid #ccc',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '20px'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+            borderBottom: '1px solid #ddd',
+            paddingBottom: '10px'
+          }}>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>
+              Box Editor - {boxEditorField}
+            </h3>
+            <button
+              onClick={handleBoxEditorClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666'
+              }}
+            >
+              ×
+            </button>
+          </div>
+          
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <textarea
+              value={boxEditorValue}
+              onChange={(e) => setBoxEditorValue(e.target.value)}
+              style={{
+                flex: 1,
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '14px',
+                fontFamily: 'monospace',
+                resize: 'none',
+                outline: 'none',
+                whiteSpace: 'pre-wrap'
+              }}
+              placeholder="Enter text here..."
+            />
+          </div>
+          
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '10px',
+            marginTop: '20px',
+            borderTop: '1px solid #ddd',
+            paddingTop: '10px'
+          }}>
+            <button
+              onClick={handleBoxEditorClose}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f5f5f5',
+                color: '#333',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleBoxEditorSave}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#22c55e',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

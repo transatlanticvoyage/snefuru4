@@ -157,6 +157,10 @@ export default function Header() {
       name: 'admin',
       children: [
         {
+          name: 'Code Range Jar',
+          path: '/admin/coderangejar'
+        },
+        {
           name: 'Jetla Masterlist',
           path: '/admin/jetlamaster'
         },

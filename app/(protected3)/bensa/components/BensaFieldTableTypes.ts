@@ -20,6 +20,7 @@ export interface BensaTableProps {
   config: BensaTableConfig;
   selectedRecord: any;
   onRecordUpdate: (field: string, value: any) => Promise<void>;
+  onBoxEditorOpen?: (field: string, value: string, record: any, updateHandler: (field: string, value: any) => Promise<void>) => void;
 }
 
 export interface BensaSortState {

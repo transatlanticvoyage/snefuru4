@@ -17,7 +17,7 @@ import {
   BENSA_SORT_INDICATOR_STYLES
 } from './BensaFieldTableStyles';
 
-export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate }: BensaTableProps) {
+export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate, onBoxEditorOpen }: BensaTableProps) {
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState<BensaEditingState>({ field: null, value: '' });
   const [sort, setSort] = useState<BensaSortState>({ sortBy: 'starred', sortDirection: 'asc' });
@@ -161,6 +161,39 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
           />
           <button onClick={handleFieldSave} style={BENSA_BUTTON_STYLES.saveButton}>✓</button>
           <button onClick={handleFieldCancel} style={BENSA_BUTTON_STYLES.cancelButton}>✕</button>
+        </div>
+      );
+    }
+
+    // Special handling for utg_columns_definition_location field
+    if (field.key === 'utg_columns_definition_location' && onBoxEditorOpen) {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={() => onBoxEditorOpen(field.key, field.value || '', selectedRecord, onRecordUpdate)}
+            style={{
+              padding: '4px 8px',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 'bold'
+            }}
+          >
+            BOX EDITOR
+          </button>
+          <span style={{ 
+            fontSize: '12px', 
+            color: '#666',
+            maxWidth: '200px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {field.value ? (field.value.length > 30 ? field.value.substring(0, 30) + '...' : field.value) : ''}
+          </span>
         </div>
       );
     }
