@@ -40,6 +40,8 @@ export default function AzoPage() {
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
+  const [fieldMetadata, setFieldMetadata] = useState<{[key: string]: {starred: boolean, flagged: boolean}}>({});
+  const [sortBy, setSortBy] = useState<'starred' | 'flagged' | 'alphabetical'>('alphabetical');
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,6 +50,7 @@ export default function AzoPage() {
   useEffect(() => {
     document.title = 'Azo Page Settings Manager';
     fetchXpages();
+    fetchFieldMetadata();
     
     // Get xpage_id from URL if present
     const xpageIdParam = searchParams.get('xpage_id');
@@ -108,6 +111,31 @@ export default function AzoPage() {
       }
 
       setSelectedXpage(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchFieldMetadata = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('frenzi_field_metadata')
+        .select('field_name, starred, flagged')
+        .eq('table_name', 'xpages');
+
+      if (error) {
+        console.error('Error fetching field metadata:', error);
+        return;
+      }
+
+      const metadataMap: {[key: string]: {starred: boolean, flagged: boolean}} = {};
+      data?.forEach(item => {
+        metadataMap[item.field_name] = {
+          starred: item.starred || false,
+          flagged: item.flagged || false
+        };
+      });
+      setFieldMetadata(metadataMap);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -247,6 +275,101 @@ export default function AzoPage() {
       setSelectedFields(new Set(xpageFields.map(f => f.key)));
     } else {
       setSelectedFields(new Set());
+    }
+  };
+
+  const toggleFieldStar = async (fieldName: string) => {
+    const currentStarred = fieldMetadata[fieldName]?.starred || false;
+    const newStarred = !currentStarred;
+
+    try {
+      const { error } = await supabase
+        .from('frenzi_field_metadata')
+        .upsert({
+          table_name: 'xpages',
+          field_name: fieldName,
+          starred: newStarred,
+          flagged: fieldMetadata[fieldName]?.flagged || false
+        }, {
+          onConflict: 'table_name,field_name'
+        });
+
+      if (error) {
+        console.error('Error updating field star:', error);
+        return;
+      }
+
+      // Update local state
+      setFieldMetadata(prev => ({
+        ...prev,
+        [fieldName]: {
+          starred: newStarred,
+          flagged: prev[fieldName]?.flagged || false
+        }
+      }));
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const toggleFieldFlag = async (fieldName: string) => {
+    const currentFlagged = fieldMetadata[fieldName]?.flagged || false;
+    const newFlagged = !currentFlagged;
+
+    try {
+      const { error } = await supabase
+        .from('frenzi_field_metadata')
+        .upsert({
+          table_name: 'xpages',
+          field_name: fieldName,
+          starred: fieldMetadata[fieldName]?.starred || false,
+          flagged: newFlagged
+        }, {
+          onConflict: 'table_name,field_name'
+        });
+
+      if (error) {
+        console.error('Error updating field flag:', error);
+        return;
+      }
+
+      // Update local state
+      setFieldMetadata(prev => ({
+        ...prev,
+        [fieldName]: {
+          starred: prev[fieldName]?.starred || false,
+          flagged: newFlagged
+        }
+      }));
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  // Sort fields based on selected sort option
+  const getSortedFields = () => {
+    const fieldsWithMetadata = xpageFields.map(field => ({
+      ...field,
+      starred: fieldMetadata[field.key]?.starred || false,
+      flagged: fieldMetadata[field.key]?.flagged || false
+    }));
+
+    switch (sortBy) {
+      case 'starred':
+        return fieldsWithMetadata.sort((a, b) => {
+          if (a.starred && !b.starred) return -1;
+          if (!a.starred && b.starred) return 1;
+          return a.key.localeCompare(b.key);
+        });
+      case 'flagged':
+        return fieldsWithMetadata.sort((a, b) => {
+          if (a.flagged && !b.flagged) return -1;
+          if (!a.flagged && b.flagged) return 1;
+          return a.key.localeCompare(b.key);
+        });
+      case 'alphabetical':
+      default:
+        return fieldsWithMetadata.sort((a, b) => a.key.localeCompare(b.key));
     }
   };
 
@@ -452,28 +575,80 @@ export default function AzoPage() {
                 
                 {selectedXpage && (
                   <div style={{ marginTop: '20px' }}>
-                    <table style={{ borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+                    {/* Sort Controls */}
+                    <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                      <label style={{ fontWeight: 'bold' }}>Sort by:</label>
+                      <button
+                        onClick={() => setSortBy('alphabetical')}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: sortBy === 'alphabetical' ? '#3b82f6' : '#e5e7eb',
+                          color: sortBy === 'alphabetical' ? 'white' : '#374151',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Alphabetical
+                      </button>
+                      <button
+                        onClick={() => setSortBy('starred')}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: sortBy === 'starred' ? '#3b82f6' : '#e5e7eb',
+                          color: sortBy === 'starred' ? 'white' : '#374151',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ⭐ Starred First
+                      </button>
+                      <button
+                        onClick={() => setSortBy('flagged')}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: sortBy === 'flagged' ? '#3b82f6' : '#e5e7eb',
+                          color: sortBy === 'flagged' ? 'white' : '#374151',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🚩 Flagged First
+                      </button>
+                    </div>
+
+                    <table style={{ borderCollapse: 'collapse', border: '1px solid #ddd', width: 'auto' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#f5f5f5' }}>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', width: '60px' }}>
+                          <th style={{ border: '1px solid #ddd', padding: '8px', whiteSpace: 'nowrap' }}>
                             <input
                               type="checkbox"
                               checked={selectedFields.size === xpageFields.length}
                               onChange={(e) => handleSelectAllFields(e.target.checked)}
                             />
                           </th>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold', textAlign: 'left' }}>
+                          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            ⭐
+                          </th>
+                          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            🚩
+                          </th>
+                          <th style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold', textAlign: 'left', whiteSpace: 'nowrap' }}>
                             xpages db field
                           </th>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold', textAlign: 'left' }}>
+                          <th style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold', textAlign: 'left', whiteSpace: 'nowrap' }}>
                             value
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {xpageFields.map((field) => {
+                        {getSortedFields().map((field) => {
                           const value = selectedXpage[field.key as keyof XPage];
                           const isEditing = editingField === field.key;
+                          const isStarred = fieldMetadata[field.key]?.starred || false;
+                          const isFlagged = fieldMetadata[field.key]?.flagged || false;
                           
                           return (
                             <tr key={field.key}>
@@ -483,6 +658,38 @@ export default function AzoPage() {
                                   checked={selectedFields.has(field.key)}
                                   onChange={(e) => handleFieldCheckboxChange(field.key, e.target.checked)}
                                 />
+                              </td>
+                              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
+                                <button
+                                  onClick={() => toggleFieldStar(field.key)}
+                                  style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    fontSize: '18px',
+                                    cursor: 'pointer',
+                                    opacity: isStarred ? 1 : 0.3,
+                                    transition: 'opacity 0.2s'
+                                  }}
+                                  title={isStarred ? 'Remove star' : 'Add star'}
+                                >
+                                  ⭐
+                                </button>
+                              </td>
+                              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
+                                <button
+                                  onClick={() => toggleFieldFlag(field.key)}
+                                  style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    fontSize: '18px',
+                                    cursor: 'pointer',
+                                    opacity: isFlagged ? 1 : 0.3,
+                                    transition: 'opacity 0.2s'
+                                  }}
+                                  title={isFlagged ? 'Remove flag' : 'Add flag'}
+                                >
+                                  🚩
+                                </button>
                               </td>
                               <td style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold' }}>
                                 {field.key}
