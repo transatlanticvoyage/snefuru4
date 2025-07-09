@@ -27,7 +27,8 @@ export default function AzColumnTemplateControls() {
     borderRadius: '4px',
     padding: '0px 10px',
     border: '1px solid #595959',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    fontSize: '14px'
   };
 
   const moreButtonStyle = {
