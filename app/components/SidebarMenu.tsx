@@ -123,6 +123,7 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
     const isStarred = item.name === 'admin' || item.name === 'navgroup1';
     
     
+    
     // Handle separator items (no path)
     if (hasChildren && item.children?.some(child => !child.path)) {
       // This is a dropdown with separator items

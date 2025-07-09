@@ -50,6 +50,10 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
     name: 'admin',
     children: [
       {
+        name: 'Drahi Docking Stations',
+        path: '/admin/drahiman'
+      },
+      {
         name: 'Code Range Jar',
         path: '/admin/coderangejar'
       },
@@ -199,6 +203,11 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
       }
     ]
   };
+
+  // Debug logging
+  console.log('adminMenuItem children:', adminMenuItem.children.map(c => c.name));
+  console.log('specialFirstItem children:', specialFirstItem.children.map(c => c.name));
+  console.log('nonAdminItems:', nonAdminItems.map(item => ({ name: item.name, path: item.path, hasChildren: !!item.children })));
 
   return {
     adminMenuItem,
