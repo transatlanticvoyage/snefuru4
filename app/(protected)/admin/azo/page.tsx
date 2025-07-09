@@ -73,7 +73,7 @@ export default function AzoPage() {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   const [fieldMetadata, setFieldMetadata] = useState<{[key: string]: {starred: boolean, flagged: boolean}}>({});
-  const [sortBy, setSortBy] = useState<string>('field_name');
+  const [sortBy, setSortBy] = useState<string>('starred');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   
   const router = useRouter();

@@ -20,7 +20,7 @@ import {
 export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate }: BensaTableProps) {
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState<BensaEditingState>({ field: null, value: '' });
-  const [sort, setSort] = useState<BensaSortState>({ sortBy: 'field_name', sortDirection: 'asc' });
+  const [sort, setSort] = useState<BensaSortState>({ sortBy: 'starred', sortDirection: 'asc' });
   
   const { fieldMetadata, toggleFieldStar, toggleFieldFlag } = useBensaFieldMetadata(config.tableName);
   const supabase = createClientComponentClient();
