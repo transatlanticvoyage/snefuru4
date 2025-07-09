@@ -41,7 +41,8 @@ export default function AzoPage() {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   const [fieldMetadata, setFieldMetadata] = useState<{[key: string]: {starred: boolean, flagged: boolean}}>({});
-  const [sortBy, setSortBy] = useState<'starred' | 'flagged' | 'alphabetical'>('alphabetical');
+  const [sortBy, setSortBy] = useState<string>('field_name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -346,31 +347,49 @@ export default function AzoPage() {
     }
   };
 
+  // Handle column header click for sorting
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortDirection('asc');
+    }
+  };
+
   // Sort fields based on selected sort option
   const getSortedFields = () => {
     const fieldsWithMetadata = xpageFields.map(field => ({
       ...field,
       starred: fieldMetadata[field.key]?.starred || false,
-      flagged: fieldMetadata[field.key]?.flagged || false
+      flagged: fieldMetadata[field.key]?.flagged || false,
+      value: selectedXpage ? selectedXpage[field.key as keyof XPage] : null
     }));
 
-    switch (sortBy) {
-      case 'starred':
-        return fieldsWithMetadata.sort((a, b) => {
-          if (a.starred && !b.starred) return -1;
-          if (!a.starred && b.starred) return 1;
-          return a.key.localeCompare(b.key);
-        });
-      case 'flagged':
-        return fieldsWithMetadata.sort((a, b) => {
-          if (a.flagged && !b.flagged) return -1;
-          if (!a.flagged && b.flagged) return 1;
-          return a.key.localeCompare(b.key);
-        });
-      case 'alphabetical':
-      default:
-        return fieldsWithMetadata.sort((a, b) => a.key.localeCompare(b.key));
-    }
+    return fieldsWithMetadata.sort((a, b) => {
+      let compareResult = 0;
+
+      switch (sortBy) {
+        case 'starred':
+          compareResult = (b.starred ? 1 : 0) - (a.starred ? 1 : 0);
+          break;
+        case 'flagged':
+          compareResult = (b.flagged ? 1 : 0) - (a.flagged ? 1 : 0);
+          break;
+        case 'field_name':
+          compareResult = a.key.localeCompare(b.key);
+          break;
+        case 'value':
+          const aVal = a.value?.toString() || '';
+          const bVal = b.value?.toString() || '';
+          compareResult = aVal.localeCompare(bVal);
+          break;
+        default:
+          compareResult = 0;
+      }
+
+      return sortDirection === 'asc' ? compareResult : -compareResult;
+    });
   };
 
   const dropdownContainerStyle = {
@@ -575,71 +594,105 @@ export default function AzoPage() {
                 
                 {selectedXpage && (
                   <div style={{ marginTop: '20px' }}>
-                    {/* Sort Controls */}
-                    <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                      <label style={{ fontWeight: 'bold' }}>Sort by:</label>
-                      <button
-                        onClick={() => setSortBy('alphabetical')}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: sortBy === 'alphabetical' ? '#3b82f6' : '#e5e7eb',
-                          color: sortBy === 'alphabetical' ? 'white' : '#374151',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Alphabetical
-                      </button>
-                      <button
-                        onClick={() => setSortBy('starred')}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: sortBy === 'starred' ? '#3b82f6' : '#e5e7eb',
-                          color: sortBy === 'starred' ? 'white' : '#374151',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ⭐ Starred First
-                      </button>
-                      <button
-                        onClick={() => setSortBy('flagged')}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: sortBy === 'flagged' ? '#3b82f6' : '#e5e7eb',
-                          color: sortBy === 'flagged' ? 'white' : '#374151',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        🚩 Flagged First
-                      </button>
-                    </div>
-
                     <table style={{ borderCollapse: 'collapse', border: '1px solid #ddd', width: 'auto' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#f5f5f5' }}>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', whiteSpace: 'nowrap' }}>
+                          <th style={{ border: '1px solid #ddd', padding: '8px', width: '35px', whiteSpace: 'nowrap' }}>
                             <input
                               type="checkbox"
                               checked={selectedFields.size === xpageFields.length}
                               onChange={(e) => handleSelectAllFields(e.target.checked)}
                             />
                           </th>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                            ⭐
+                          <th 
+                            style={{ 
+                              border: '1px solid #ddd', 
+                              padding: '8px', 
+                              width: '35px', 
+                              textAlign: 'center', 
+                              whiteSpace: 'nowrap',
+                              cursor: 'pointer',
+                              userSelect: 'none',
+                              position: 'relative'
+                            }}
+                            onClick={() => handleSort('starred')}
+                          >
+                            <span style={{ color: '#149a24' }}>★</span>
+                            {sortBy === 'starred' && (
+                              <span style={{ position: 'absolute', right: '2px', top: '50%', transform: 'translateY(-50%)', fontSize: '10px' }}>
+                                {sortDirection === 'asc' ? '▲' : '▼'}
+                              </span>
+                            )}
                           </th>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                            🚩
+                          <th 
+                            style={{ 
+                              border: '1px solid #ddd', 
+                              padding: '8px', 
+                              width: '35px', 
+                              textAlign: 'center', 
+                              whiteSpace: 'nowrap',
+                              cursor: 'pointer',
+                              userSelect: 'none',
+                              position: 'relative'
+                            }}
+                            onClick={() => handleSort('flagged')}
+                          >
+                            <svg 
+                              width="16" 
+                              height="16" 
+                              viewBox="0 0 16 16" 
+                              fill="#dc2626"
+                              stroke="#dc2626"
+                              strokeWidth="1.5"
+                            >
+                              <path d="M3 2v12M3 2l7 4-7 4" />
+                            </svg>
+                            {sortBy === 'flagged' && (
+                              <span style={{ position: 'absolute', right: '2px', top: '50%', transform: 'translateY(-50%)', fontSize: '10px' }}>
+                                {sortDirection === 'asc' ? '▲' : '▼'}
+                              </span>
+                            )}
                           </th>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold', textAlign: 'left', whiteSpace: 'nowrap' }}>
+                          <th 
+                            style={{ 
+                              border: '1px solid #ddd', 
+                              padding: '8px', 
+                              width: '300px', 
+                              fontWeight: 'bold', 
+                              textAlign: 'left', 
+                              whiteSpace: 'nowrap',
+                              cursor: 'pointer',
+                              userSelect: 'none',
+                              position: 'relative'
+                            }}
+                            onClick={() => handleSort('field_name')}
+                          >
                             xpages db field
+                            {sortBy === 'field_name' && (
+                              <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px' }}>
+                                {sortDirection === 'asc' ? '▲' : '▼'}
+                              </span>
+                            )}
                           </th>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold', textAlign: 'left', whiteSpace: 'nowrap' }}>
+                          <th 
+                            style={{ 
+                              border: '1px solid #ddd', 
+                              padding: '8px', 
+                              fontWeight: 'bold', 
+                              textAlign: 'left', 
+                              whiteSpace: 'nowrap',
+                              cursor: 'pointer',
+                              userSelect: 'none',
+                              position: 'relative'
+                            }}
+                            onClick={() => handleSort('value')}
+                          >
                             value
+                            {sortBy === 'value' && (
+                              <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px' }}>
+                                {sortDirection === 'asc' ? '▲' : '▼'}
+                              </span>
+                            )}
                           </th>
                         </tr>
                       </thead>
@@ -667,12 +720,12 @@ export default function AzoPage() {
                                     background: 'none',
                                     fontSize: '18px',
                                     cursor: 'pointer',
-                                    opacity: isStarred ? 1 : 0.3,
-                                    transition: 'opacity 0.2s'
+                                    color: isStarred ? '#149a24' : '#666',
+                                    transition: 'color 0.2s'
                                   }}
                                   title={isStarred ? 'Remove star' : 'Add star'}
                                 >
-                                  ⭐
+                                  {isStarred ? '★' : '☆'}
                                 </button>
                               </td>
                               <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
@@ -683,12 +736,20 @@ export default function AzoPage() {
                                     background: 'none',
                                     fontSize: '18px',
                                     cursor: 'pointer',
-                                    opacity: isFlagged ? 1 : 0.3,
-                                    transition: 'opacity 0.2s'
+                                    transition: 'all 0.2s'
                                   }}
                                   title={isFlagged ? 'Remove flag' : 'Add flag'}
                                 >
-                                  🚩
+                                  <svg 
+                                    width="16" 
+                                    height="16" 
+                                    viewBox="0 0 16 16" 
+                                    fill={isFlagged ? '#dc2626' : 'none'}
+                                    stroke={isFlagged ? '#dc2626' : '#666'}
+                                    strokeWidth="1.5"
+                                  >
+                                    <path d="M3 2v12M3 2l7 4-7 4" />
+                                  </svg>
                                 </button>
                               </td>
                               <td style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold' }}>
