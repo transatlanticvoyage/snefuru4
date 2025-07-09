@@ -91,6 +91,12 @@ export default function AzoPage() {
   useEffect(() => {
     if (!searchParams) return;
     
+    // Get tab from URL if present
+    const tabParam = searchParams.get('tab');
+    if (tabParam && (tabParam === 'xpages' || tabParam === 'utgs' || tabParam === 'zarnos')) {
+      setActiveTab(tabParam as 'xpages' | 'utgs' | 'zarnos');
+    }
+    
     // Get xpage_id from URL if present
     const xpageIdParam = searchParams.get('xpage_id');
     if (xpageIdParam) {
@@ -287,6 +293,45 @@ export default function AzoPage() {
     }
   };
 
+  const updateURLWithCurrentState = (updates: {
+    tab?: 'xpages' | 'utgs' | 'zarnos';
+    xpage_id?: number;
+    utg_id?: string;
+    zarno_id?: number;
+  }) => {
+    const params = new URLSearchParams(searchParams || '');
+    
+    // Update or set tab
+    if (updates.tab) {
+      params.set('tab', updates.tab);
+    }
+    
+    // Update or set xpage_id
+    if (updates.xpage_id !== undefined) {
+      params.set('xpage_id', updates.xpage_id.toString());
+    }
+    
+    // Update or set utg_id
+    if (updates.utg_id !== undefined) {
+      if (updates.utg_id) {
+        params.set('utg_id', updates.utg_id);
+      } else {
+        params.delete('utg_id');
+      }
+    }
+    
+    // Update or set zarno_id
+    if (updates.zarno_id !== undefined) {
+      if (updates.zarno_id) {
+        params.set('zarno_id', updates.zarno_id.toString());
+      } else {
+        params.delete('zarno_id');
+      }
+    }
+    
+    router.push(`/admin/azo?${params.toString()}`);
+  };
+
   const handleXpageChange = (xpageId: number) => {
     setSelectedXpageId(xpageId);
     fetchSelectedXpage(xpageId);
@@ -295,7 +340,7 @@ export default function AzoPage() {
     setSelectedUtgRecord(null);
     setSelectedZarnoId(null);
     setSelectedZarnoRecord(null);
-    router.push(`/admin/azo?xpage_id=${xpageId}`);
+    updateURLWithCurrentState({ xpage_id: xpageId, utg_id: '', zarno_id: 0 });
   };
 
   const handleUtgChange = (utgId: string) => {
@@ -305,9 +350,7 @@ export default function AzoPage() {
     } else {
       setSelectedUtgRecord(null);
     }
-    const params = new URLSearchParams(searchParams || '');
-    params.set('utg_id', utgId);
-    router.push(`/admin/azo?${params.toString()}`);
+    updateURLWithCurrentState({ utg_id: utgId });
   };
 
   const handleZarnoChange = (zarnoId: number) => {
@@ -318,13 +361,7 @@ export default function AzoPage() {
     } else {
       setSelectedZarnoRecord(null);
     }
-    const params = new URLSearchParams(searchParams || '');
-    if (validZarnoId) {
-      params.set('zarno_id', validZarnoId.toString());
-    } else {
-      params.delete('zarno_id');
-    }
-    router.push(`/admin/azo?${params.toString()}`);
+    updateURLWithCurrentState({ zarno_id: validZarnoId || 0 });
   };
 
   const copyTooltipText = () => {
@@ -767,19 +804,28 @@ export default function AzoPage() {
         <ul style={tabListStyle}>
           <li 
             style={activeTab === 'xpages' ? activeTabStyle : tabStyle}
-            onClick={() => setActiveTab('xpages')}
+            onClick={() => {
+              setActiveTab('xpages');
+              updateURLWithCurrentState({ tab: 'xpages' });
+            }}
           >
             xpages
           </li>
           <li 
             style={activeTab === 'utgs' ? activeTabStyle : tabStyle}
-            onClick={() => setActiveTab('utgs')}
+            onClick={() => {
+              setActiveTab('utgs');
+              updateURLWithCurrentState({ tab: 'utgs' });
+            }}
           >
             utgs
           </li>
           <li 
             style={activeTab === 'zarnos' ? activeTabStyle : tabStyle}
-            onClick={() => setActiveTab('zarnos')}
+            onClick={() => {
+              setActiveTab('zarnos');
+              updateURLWithCurrentState({ tab: 'zarnos' });
+            }}
           >
             zarnos
           </li>
@@ -807,10 +853,10 @@ export default function AzoPage() {
                       padding: '4px', 
                       marginBottom: '15px', 
                       fontSize: '16px', 
-                      fontWeight: 'bold', 
                       color: '#252525' 
                     }}>
-                      bensa table instance
+                      <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
+                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on xpages, utgs, zarnos, etc.</span>
                     </div>
                     <table style={{ borderCollapse: 'collapse', border: '1px solid #ddd', width: 'auto' }}>
                       <thead>
@@ -1082,10 +1128,10 @@ export default function AzoPage() {
                       padding: '4px', 
                       marginBottom: '15px', 
                       fontSize: '16px', 
-                      fontWeight: 'bold', 
                       color: '#252525' 
                     }}>
-                      bensa table instance
+                      <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
+                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on xpages, utgs, zarnos, etc.</span>
                     </div>
                     <BensaFieldTable
                     config={bensaUtgsConfig}
@@ -1112,10 +1158,10 @@ export default function AzoPage() {
                       padding: '4px', 
                       marginBottom: '15px', 
                       fontSize: '16px', 
-                      fontWeight: 'bold', 
                       color: '#252525' 
                     }}>
-                      bensa table instance
+                      <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
+                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on xpages, utgs, zarnos, etc.</span>
                     </div>
                     <BensaFieldTable
                     config={bensaZarnosConfig}
