@@ -4,11 +4,11 @@ import { useAuth } from '@/app/context/AuthContext';
 import Link from 'next/link';
 import { useEffect } from 'react';
 
-export default function VenlaMasterPage() {
+export default function JetlaMasterPage() {
   const { user } = useAuth();
 
   useEffect(() => {
-    document.title = "Venla Masterlist - Snefuru Admin";
+    document.title = "Jetla Masterlist - Snefuru Admin";
   }, []);
 
   if (!user) {
@@ -28,7 +28,7 @@ export default function VenlaMasterPage() {
           </Link>
         </div>
         
-        <h1 className="text-2xl font-bold mb-6">Venla Masterlist</h1>
+        <h1 className="text-2xl font-bold mb-6">Jetla Masterlist</h1>
       </div>
     </div>
   );

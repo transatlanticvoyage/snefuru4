@@ -80,13 +80,19 @@ export default function AzoPage() {
   const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
 
+  // Initialize page - only run once
   useEffect(() => {
     document.title = 'Azo Page Settings Manager';
     fetchXpages();
     fetchFieldMetadata();
+  }, []);
+
+  // Handle URL parameters - only when searchParams change
+  useEffect(() => {
+    if (!searchParams) return;
     
     // Get xpage_id from URL if present
-    const xpageIdParam = searchParams?.get('xpage_id');
+    const xpageIdParam = searchParams.get('xpage_id');
     if (xpageIdParam) {
       const xpageId = parseInt(xpageIdParam);
       setSelectedXpageId(xpageId);
@@ -94,14 +100,14 @@ export default function AzoPage() {
     }
     
     // Get utg_id from URL if present
-    const utgIdParam = searchParams?.get('utg_id');
+    const utgIdParam = searchParams.get('utg_id');
     if (utgIdParam) {
       setSelectedUtgId(utgIdParam);
       fetchSelectedUtg(utgIdParam);
     }
     
     // Get zarno_id from URL if present
-    const zarnoIdParam = searchParams?.get('zarno_id');
+    const zarnoIdParam = searchParams.get('zarno_id');
     if (zarnoIdParam) {
       const zarnoId = parseInt(zarnoIdParam);
       setSelectedZarnoId(zarnoId);

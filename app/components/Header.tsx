@@ -157,8 +157,8 @@ export default function Header() {
       name: 'admin',
       children: [
         {
-          name: 'Venla Masterlist',
-          path: '/admin/venlamaster'
+          name: 'Jetla Masterlist',
+          path: '/admin/jetlamaster'
         },
         {
           name: 'Bensa Masterlist',

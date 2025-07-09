@@ -66,12 +66,18 @@ export default function BensaPage() {
   const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
 
+  // Initialize page - only run once
   useEffect(() => {
     document.title = 'Bensa Field Management System';
     fetchXpages();
+  }, []);
+
+  // Handle URL parameters - only when searchParams change
+  useEffect(() => {
+    if (!searchParams) return;
     
     // Get xpage_id from URL if present
-    const xpageIdParam = searchParams?.get('xpage_id');
+    const xpageIdParam = searchParams.get('xpage_id');
     if (xpageIdParam) {
       const xpageId = parseInt(xpageIdParam);
       setSelectedXpageId(xpageId);
@@ -79,7 +85,7 @@ export default function BensaPage() {
     }
     
     // Get utg_id from URL if present
-    const utgIdParam = searchParams?.get('utg_id');
+    const utgIdParam = searchParams.get('utg_id');
     if (utgIdParam) {
       setSelectedUtgId(utgIdParam);
     }
