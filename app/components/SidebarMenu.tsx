@@ -7,6 +7,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { createNavigationStructure } from '@/app/utils/navigationHelper';
 
 interface SidebarMenuProps {
   isOpen: boolean;
@@ -30,87 +31,12 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
   const supabase = createClientComponentClient();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Admin menu items
-  const adminMenuItem: NavItem = {
-    name: 'admin',
-    children: [
-      {
-        name: 'API Key Slots Management',
-        path: 'https://snef.me/admin/create-new-api-key-slots'
-      },
-      {
-        name: 'User Management',
-        path: '/admin/usersp1'
-      },
-      {
-        name: 'Popup Development',
-        path: '/admin/popnow'
-      },
-      {
-        name: 'Download Plugin',
-        path: '/downloadplugin'
-      },
-      {
-        name: 'XPages Manager',
-        path: '/admin/xpagesmanager1'
-      }
-    ]
-  };
-
-  // Special starred menu
-  const specialFirstItem: NavItem = {
-    name: 'navgroup1',
-    children: [
-      {
-        name: '/tebnar2 - Generate Images In A Batch',
-        path: 'https://snef.me/bin34/tebnar2'
-      },
-      {
-        name: '/nwjar1 - T.NWPI_CONTENT - UTG',
-        path: '/nwjar1'
-      },
-      {
-        name: '/nwivid - t.nwpi_content - item',
-        path: '/nwivid'
-      },
-      {
-        name: '/sitejar4 - T.SITESPREN - UTG',
-        path: '/sitejar4'
-      },
-      {
-        name: '/gconjar1 - T.GCON_PIECES - UTG',
-        path: '/gconjar1'
-      },
-      {
-        name: '/pedbar - t.gcon_pieces - item',
-        path: '/pedbar'
-      },
-      {
-        name: '/pedtor - t.gcon_pieces - item',
-        path: '/pedtor'
-      },
-      {
-        name: '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item',
-        path: '/flatx1'
-      },
-      {
-        name: '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item',
-        path: '/slotx1'
-      },
-      {
-        name: '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item',
-        path: '/fanex1'
-      },
-      {
-        name: '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data',
-        path: 'https://snef.me/karfi1'
-      },
-      {
-        name: '/narpo1 - Narpi Image Pushes',
-        path: '/narpo1'
-      }
-    ]
-  };
+  // Navigation structure will be created from the shared utility
+  const [navigationStructure, setNavigationStructure] = useState<{
+    adminMenuItem: NavItem;
+    specialFirstItem: NavItem;
+    nonAdminItems: NavItem[];
+  } | null>(null);
 
   useEffect(() => {
     const checkSidebarSetting = async () => {
@@ -149,6 +75,10 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
         const response = await fetch('/api/navigation');
         const data = await response.json();
         setNavItems(data);
+        
+        // Create navigation structure using shared utility
+        const navStructure = createNavigationStructure(data);
+        setNavigationStructure(navStructure);
       } catch (error) {
         console.error('Error fetching navigation:', error);
       }
@@ -191,6 +121,21 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems[item.name];
     const isStarred = item.name === 'admin' || item.name === 'navgroup1';
+    
+    
+    // Handle separator items (no path)
+    if (hasChildren && item.children?.some(child => !child.path)) {
+      // This is a dropdown with separator items
+    } else if (!item.path && hasChildren) {
+      // This is a separator item itself
+      return (
+        <div key={item.name} className="px-4 py-1">
+          <div className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
+            {item.name}
+          </div>
+        </div>
+      );
+    }
 
     if (hasChildren) {
       return (
@@ -224,17 +169,39 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
           </button>
           {isExpanded && (
             <div className="bg-gray-900">
-              {item.children?.map(child => renderNavItem(child, depth + 1))}
+              {item.children?.map(child => {
+                // Handle separator items in dropdown
+                if (!child.path) {
+                  return (
+                    <div key={child.name} className="px-8 py-1">
+                      <div className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
+                        {child.name}
+                      </div>
+                    </div>
+                  );
+                }
+                return renderNavItem(child, depth + 1);
+              })}
             </div>
           )}
         </div>
       );
     }
 
+    
+    // Only render Link if path exists
+    if (!item.path) {
+      return (
+        <div key={item.name} className="px-4 py-2 text-sm text-gray-400">
+          {item.name} (no path)
+        </div>
+      );
+    }
+    
     return (
       <Link
         key={item.path}
-        href={item.path!}
+        href={item.path}
         className={`block px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 transition-colors ${
           depth > 0 ? 'pl-8 text-gray-300' : ''
         }`}
@@ -247,18 +214,12 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
 
   // Organize all navigation items
   const getAllNavItems = () => {
-    const items = [adminMenuItem, specialFirstItem];
+    if (!navigationStructure) return [];
     
-    // Add other nav items from API
-    navItems.forEach(item => {
-      // Skip admin pages and items already in special menus
-      if (!item.path?.includes('/admin/') && 
-          item.name !== 'admin' && 
-          item.name !== 'navgroup1') {
-        items.push(item);
-      }
-    });
-
+    const items = [navigationStructure.adminMenuItem, navigationStructure.specialFirstItem];
+    
+    // Add other nav items from the structure
+    items.push(...navigationStructure.nonAdminItems);
     return items;
   };
 
