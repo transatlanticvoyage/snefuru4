@@ -8,6 +8,7 @@ interface UiTableGrid {
   utg_name: string;
   utg_columns_definition_location: string | null;
   utg_description: string | null;
+  rel_xpage_id: number | null;
   rel_xpage: string | null;
   main_db_table: string | null;
   sql_view: string | null;
@@ -19,8 +20,14 @@ interface UiTableGrid {
   sort_order: number;
 }
 
+interface XPage {
+  xpage_id: number;
+  title1: string | null;
+}
+
 export default function UiTableGridsTable() {
   const [data, setData] = useState<UiTableGrid[]>([]);
+  const [xpages, setXpages] = useState<XPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,6 +59,7 @@ export default function UiTableGridsTable() {
     utg_name: '',
     utg_columns_definition_location: '',
     utg_description: '',
+    rel_xpage_id: null as number | null,
     rel_xpage: '',
     main_db_table: '',
     sql_view: '',
@@ -66,6 +74,7 @@ export default function UiTableGridsTable() {
   // Fetch data
   useEffect(() => {
     fetchData();
+    fetchXpages();
   }, []);
   
   const fetchData = async () => {
@@ -83,6 +92,20 @@ export default function UiTableGridsTable() {
       setError('Failed to fetch data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchXpages = async () => {
+    try {
+      const { data: xpagesData, error: fetchError } = await supabase
+        .from('xpages')
+        .select('xpage_id, title1')
+        .order('xpage_id', { ascending: true });
+        
+      if (fetchError) throw fetchError;
+      setXpages(xpagesData || []);
+    } catch (err) {
+      console.error('Error fetching xpages:', err);
     }
   };
   
@@ -232,6 +255,7 @@ export default function UiTableGridsTable() {
       utg_name: record.utg_name,
       utg_columns_definition_location: record.utg_columns_definition_location || '',
       utg_description: record.utg_description || '',
+      rel_xpage_id: record.rel_xpage_id,
       rel_xpage: record.rel_xpage || '',
       main_db_table: record.main_db_table || '',
       sql_view: record.sql_view || '',
@@ -250,6 +274,7 @@ export default function UiTableGridsTable() {
       utg_name: '',
       utg_columns_definition_location: '',
       utg_description: '',
+      rel_xpage_id: null,
       rel_xpage: '',
       main_db_table: '',
       sql_view: '',
@@ -298,6 +323,32 @@ export default function UiTableGridsTable() {
   const cancelInlineEdit = () => {
     setEditingCell(null);
     setEditingValue('');
+  };
+
+  // Handle xpage dropdown change
+  const handleXpageChange = async (utgId: string, xpageId: string) => {
+    try {
+      const xpageIdValue = xpageId === '' ? null : parseInt(xpageId);
+      
+      const { error } = await supabase
+        .from('utgs')
+        .update({ rel_xpage_id: xpageIdValue })
+        .eq('utg_id', utgId);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(prevData => 
+        prevData.map(item => 
+          item.utg_id === utgId 
+            ? { ...item, rel_xpage_id: xpageIdValue }
+            : item
+        )
+      );
+    } catch (err) {
+      console.error('Error updating xpage relationship:', err);
+      alert('Failed to update xpage relationship');
+    }
   };
 
   // Handle opening content viewer
@@ -349,7 +400,7 @@ export default function UiTableGridsTable() {
 
   // Define column order
   const columnOrder = [
-    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage',
+    'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage_id', 'rel_xpage',
     'main_db_table', 'sql_view', 'associated_files', 'utg_class', 'created_at', 'updated_at',
     'is_active', 'sort_order'
   ];
@@ -504,6 +555,20 @@ export default function UiTableGridsTable() {
                             </button>
                           )}
                         </div>
+                      ) : key === 'rel_xpage_id' ? (
+                        // Special dropdown for xpage relationship
+                        <select
+                          value={value || ''}
+                          onChange={(e) => handleXpageChange(row.utg_id, e.target.value)}
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">-- Select XPage --</option>
+                          {xpages.map((xpage) => (
+                            <option key={xpage.xpage_id} value={xpage.xpage_id}>
+                              {xpage.xpage_id} - {xpage.title1 || '(No title)'}
+                            </option>
+                          ))}
+                        </select>
                       ) : isEditable ? (
                         isEditing ? (
                           <input

@@ -21,18 +21,35 @@ export default function AzColumnTemplateControls() {
     float: 'left' as const
   };
 
+  const buttonGroupColtempStyle = {
+    display: 'flex'
+  };
+
   const coltempButtonStyle = {
     backgroundColor: '#ebebeb',
     fontFamily: 'Arial, sans-serif',
-    borderRadius: '4px',
+    borderRadius: '0',
     padding: '0px 10px',
     border: '1px solid #595959',
+    borderRight: 'none',
     cursor: 'pointer',
-    fontSize: '14px'
+    fontSize: '14px',
+    margin: '0'
+  };
+
+  const coltempButtonFirstStyle = {
+    ...coltempButtonStyle,
+    borderRadius: '4px 0 0 4px'
+  };
+
+  const coltempButtonLastStyle = {
+    ...coltempButtonStyle,
+    borderRight: '1px solid #595959',
+    borderRadius: '0 4px 4px 0'
   };
 
   const moreButtonStyle = {
-    ...coltempButtonStyle,
+    ...coltempButtonLastStyle,
     backgroundColor: '#8baaec'
   };
 
@@ -61,28 +78,34 @@ export default function AzColumnTemplateControls() {
 
         range
 
-        <button style={coltempButtonStyle}>15 | i | st | color | coltemp1</button>
-        <button style={coltempButtonStyle}>coltemp2</button>
-        <button style={coltempButtonStyle}>coltemp3</button>
-        <button style={moreButtonStyle}>more</button>
+        <div style={buttonGroupColtempStyle}>
+          <button style={coltempButtonFirstStyle}>15 | i | st | color | coltemp1</button>
+          <button style={coltempButtonStyle}>coltemp2</button>
+          <button style={coltempButtonStyle}>coltemp3</button>
+          <button style={moreButtonStyle}>more</button>
+        </div>
 
         <span style={separatorStyle}></span>
 
         adminpublic
 
-        <button style={coltempButtonStyle}>coltemp1</button>
-        <button style={coltempButtonStyle}>coltemp2</button>
-        <button style={coltempButtonStyle}>coltemp3</button>
-        <button style={moreButtonStyle}>more</button>
+        <div style={buttonGroupColtempStyle}>
+          <button style={coltempButtonFirstStyle}>coltemp1</button>
+          <button style={coltempButtonStyle}>coltemp2</button>
+          <button style={coltempButtonStyle}>coltemp3</button>
+          <button style={moreButtonStyle}>more</button>
+        </div>
 
         <span style={separatorStyle}></span>
 
         personal
 
-        <button style={coltempButtonStyle}>coltemp1</button>
-        <button style={coltempButtonStyle}>coltemp2</button>
-        <button style={coltempButtonStyle}>coltemp3</button>
-        <button style={moreButtonStyle}>more</button>
+        <div style={buttonGroupColtempStyle}>
+          <button style={coltempButtonFirstStyle}>coltemp1</button>
+          <button style={coltempButtonStyle}>coltemp2</button>
+          <button style={coltempButtonStyle}>coltemp3</button>
+          <button style={moreButtonStyle}>more</button>
+        </div>
 
         <span style={separatorStyle}></span>
 

@@ -7,6 +7,7 @@ import { useAuth } from '@/app/context/AuthContext';
 interface XPage {
   xpage_id: number;
   title1: string | null;
+  main_url: string | null;
   title2: string | null;
   desc1: string | null;
   caption: string | null;
@@ -39,17 +40,18 @@ export default function XPagesManager1Page() {
 
   // Define column order and properties
   const columns: Array<{ key: keyof XPage; type: string; width: string }> = [
-    { key: 'xpage_id', type: 'integer', width: '100px' },
+    { key: 'xpage_id', type: 'integer', width: '80px' },
     { key: 'title1', type: 'text', width: '200px' },
+    { key: 'main_url', type: 'text', width: '200px' },
     { key: 'title2', type: 'text', width: '200px' },
-    { key: 'desc1', type: 'text', width: '250px' },
+    { key: 'desc1', type: 'text', width: '200px' },
     { key: 'caption', type: 'text', width: '200px' },
-    { key: 'pagepath_url', type: 'text', width: '300px' },
+    { key: 'pagepath_url', type: 'text', width: '200px' },
     { key: 'pagepath_long', type: 'text', width: '200px' },
-    { key: 'pagepath_short', type: 'text', width: '150px' },
+    { key: 'pagepath_short', type: 'text', width: '200px' },
     { key: 'position_marker', type: 'integer', width: '120px' },
     { key: 'show_in_all_pages_nav_area1', type: 'boolean', width: '80px' },
-    { key: 'broad_parent_container', type: 'text', width: '180px' },
+    { key: 'broad_parent_container', type: 'text', width: '200px' },
     { key: 'created_at', type: 'text', width: '200px' },
     { key: 'updated_at', type: 'text', width: '200px' }
   ];
@@ -86,6 +88,7 @@ export default function XPagesManager1Page() {
         .from('xpages')
         .insert({
           title1: null,
+          main_url: null,
           title2: null,
           desc1: null,
           caption: null,
@@ -257,23 +260,24 @@ export default function XPagesManager1Page() {
             type="text"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleCellSave}
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleCellSave();
               if (e.key === 'Escape') handleCellCancel();
             }}
-            className="px-2 py-1 border rounded text-sm w-full"
+            className="w-full px-1 py-0.5 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             autoFocus
           />
           <button
             onClick={handleCellSave}
-            className="text-green-600 hover:text-green-800"
+            className="text-green-600 hover:text-green-800 text-sm"
             title="Save"
           >
             ✓
           </button>
           <button
             onClick={handleCellCancel}
-            className="text-red-600 hover:text-red-800"
+            className="text-red-600 hover:text-red-800 text-sm"
             title="Cancel"
           >
             ✕
@@ -285,10 +289,11 @@ export default function XPagesManager1Page() {
     return (
       <div
         onClick={() => !isReadOnly && handleCellClick(item.xpage_id, column.key, value)}
-        className={`truncate ${!isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} ${
-          isReadOnly ? 'text-gray-500' : ''
-        }`}
-        title={value?.toString() || ''}
+        className={`min-w-[30px] min-h-[1.25rem] px-1 py-0.5 rounded break-words ${
+          !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+        } ${isReadOnly ? 'text-gray-500' : ''}`}
+        style={{ maxWidth: '200px', wordWrap: 'break-word', overflowWrap: 'break-word' }}
+        title={isReadOnly ? value?.toString() || '' : `${value?.toString() || ''} (Click to edit)`}
       >
         {column.key === 'created_at' || column.key === 'updated_at' 
           ? new Date(value as string).toLocaleString()
@@ -400,7 +405,7 @@ export default function XPagesManager1Page() {
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse border border-gray-200">
+          <table className="border-collapse border border-gray-200" style={{ minWidth: '1600px' }}>
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left border border-gray-200">
@@ -416,23 +421,33 @@ export default function XPagesManager1Page() {
                     }}
                   />
                 </th>
-                {columns.map((column) => (
-                  <th
-                    key={column.key}
-                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border border-gray-200"
-                    style={{ width: column.width }}
-                    onClick={() => handleSort(column.key)}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span className="font-bold text-xs lowercase">{column.key}</span>
-                      {sortField === column.key && (
-                        <span className="text-gray-400">
-                          {sortOrder === 'asc' ? '↑' : '↓'}
+                {columns.map((column) => {
+                  const isReadOnly = column.key === 'xpage_id' || column.key === 'created_at' || column.key === 'updated_at';
+                  return (
+                    <th
+                      key={column.key}
+                      className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border border-gray-200"
+                      style={{ width: column.width }}
+                      onClick={() => handleSort(column.key)}
+                    >
+                      <div className="flex items-center space-x-1">
+                        <span className={`font-bold text-xs lowercase ${isReadOnly ? 'text-gray-500' : 'text-gray-900'}`}>
+                          {column.key}
                         </span>
-                      )}
-                    </div>
-                  </th>
-                ))}
+                        {!isReadOnly && (
+                          <span className="text-blue-500 text-xs" title="Click cells to edit">
+                            ✎
+                          </span>
+                        )}
+                        {sortField === column.key && (
+                          <span className="text-gray-400">
+                            {sortOrder === 'asc' ? '↑' : '↓'}
+                          </span>
+                        )}
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">

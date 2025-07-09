@@ -21,6 +21,16 @@ export default function Header() {
   const pathname = usePathname();
   const supabase = createClientComponentClient();
   
+  // Get dynamic base URL
+  const getBaseUrl = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.origin;
+    }
+    return 'https://snef.me'; // Fallback for SSR
+  };
+  
+  const baseUrl = getBaseUrl();
+  
   // kzstylerule - custom header bg color for /admin/ pages
   const isAdminPage = pathname?.startsWith('/admin/');
   // kzstylerule - custom header bg color for /pedbar page
@@ -151,7 +161,7 @@ export default function Header() {
           path: undefined // No link - separator
         },
         {
-          name: 'Azo Page Creator',
+          name: 'Azo Page Settings Manager',
           path: '/admin/azo'
         },
         {
@@ -168,7 +178,7 @@ export default function Header() {
         },
         {
           name: 'UTG Manager',
-          path: 'https://snef.me/admin/utg_manager'
+          path: `${baseUrl}/admin/utg_manager`
         },
         {
           name: 'Ketch Manager',
@@ -176,15 +186,15 @@ export default function Header() {
         },
         {
           name: 'Column Robot',
-          path: 'https://snef.me/admin/columnrobot'
+          path: `${baseUrl}/admin/columnrobot`
         },
         {
           name: 'Bakli Mockups',
-          path: 'https://snef.me/admin/baklijar'
+          path: `${baseUrl}/admin/baklijar`
         },
         {
           name: 'X Pages Manager',
-          path: 'https://snef.me/admin/xpagesmanager1'
+          path: `${baseUrl}/admin/xpagesmanager1`
         },
         {
           name: 'Jexplanations',
@@ -192,7 +202,7 @@ export default function Header() {
         },
         {
           name: 'RSTOR Manager',
-          path: 'https://snef.me/admin/rstormanager'
+          path: `${baseUrl}/admin/rstormanager`
         },
         {
           name: 'End Of Style Rocket',
@@ -200,7 +210,7 @@ export default function Header() {
         },
         {
           name: 'API Key Slots Management',
-          path: 'https://snef.me/admin/create-new-api-key-slots'
+          path: `${baseUrl}/admin/create-new-api-key-slots`
         },
         {
           name: 'User Management',
@@ -232,7 +242,7 @@ export default function Header() {
       children: [
         {
           name: '/tebnar2 - Generate Images In A Batch',
-          path: 'https://snef.me/bin34/tebnar2'
+          path: `${baseUrl}/bin34/tebnar2`
         },
         {
           name: '/nwjar1 - T.NWPI_CONTENT - UTG',
@@ -272,7 +282,7 @@ export default function Header() {
         },
         {
           name: '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data',
-          path: 'https://snef.me/karfi1'
+          path: `${baseUrl}/karfi1`
         },
         {
           name: '/narpo1 - Narpi Image Pushes',
