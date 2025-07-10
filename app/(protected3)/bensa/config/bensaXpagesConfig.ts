@@ -7,6 +7,7 @@ export const bensaXpagesConfig: BensaTableConfig = {
     { key: 'xpage_id', type: 'integer', editable: false },
     { key: 'title1', type: 'text', editable: true },
     { key: 'main_url', type: 'text', editable: true },
+    { key: 'meta_title', type: 'text', editable: true },
     { key: 'title2', type: 'text', editable: true },
     { key: 'desc1', type: 'text', editable: true },
     { key: 'caption', type: 'text', editable: true },
@@ -16,6 +17,7 @@ export const bensaXpagesConfig: BensaTableConfig = {
     { key: 'position_marker', type: 'integer', editable: true },
     { key: 'show_in_all_pages_nav_area1', type: 'boolean', editable: true },
     { key: 'broad_parent_container', type: 'text', editable: true },
+    { key: 'urlparam_total_keys_listed', type: 'jsonb', editable: true },
     { key: 'created_at', type: 'timestamp', editable: false },
     { key: 'updated_at', type: 'timestamp', editable: false }
   ]

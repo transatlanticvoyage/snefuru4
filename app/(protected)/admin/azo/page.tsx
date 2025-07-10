@@ -6,6 +6,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import BensaFieldTable from '@/app/(protected3)/bensa/components/BensaFieldTable';
 import { bensaUtgsConfig } from '@/app/(protected3)/bensa/config/bensaUtgsConfig';
 import { bensaZarnosConfig } from '@/app/(protected3)/bensa/config/bensaZarnosConfig';
+import { bensaXpagesConfig } from '@/app/(protected3)/bensa/config/bensaXpagesConfig';
 
 interface XPage {
   xpage_id: number;
@@ -979,7 +980,7 @@ export default function AzoPage() {
                 <p>Configure main settings for XPage ID: {selectedXpageId}</p>
                 
                 {selectedXpage && (
-                  <div style={{ marginTop: '20px' }}>
+                  <>
                     <div style={{ 
                       backgroundColor: '#b5edbc', 
                       border: '1px solid #273929', 
@@ -992,257 +993,13 @@ export default function AzoPage() {
                       <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
                       <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on xpages, utgs, zarnos, etc.</span>
                     </div>
-                    <table style={{ borderCollapse: 'collapse', border: '1px solid #ddd', width: 'auto' }}>
-                      <thead>
-                        <tr style={{ backgroundColor: '#f5f5f5' }}>
-                          <th style={{ border: '1px solid #ddd', padding: '8px', width: '35px', whiteSpace: 'nowrap' }}>
-                            <input
-                              type="checkbox"
-                              checked={selectedFields.size === xpageFields.length}
-                              onChange={(e) => handleSelectAllFields(e.target.checked)}
-                            />
-                          </th>
-                          <th 
-                            style={{ 
-                              border: '1px solid #ddd', 
-                              padding: '8px', 
-                              width: '35px', 
-                              textAlign: 'center', 
-                              whiteSpace: 'nowrap',
-                              cursor: 'pointer',
-                              userSelect: 'none',
-                              position: 'relative'
-                            }}
-                            onClick={() => handleSort('starred')}
-                          >
-                            <span style={{ color: '#149a24' }}>★</span>
-                            {sortBy === 'starred' && (
-                              <span style={{ position: 'absolute', right: '2px', top: '50%', transform: 'translateY(-50%)', fontSize: '10px' }}>
-                                {sortDirection === 'asc' ? '▲' : '▼'}
-                              </span>
-                            )}
-                          </th>
-                          <th 
-                            style={{ 
-                              border: '1px solid #ddd', 
-                              padding: '8px', 
-                              width: '35px', 
-                              textAlign: 'center', 
-                              whiteSpace: 'nowrap',
-                              cursor: 'pointer',
-                              userSelect: 'none',
-                              position: 'relative'
-                            }}
-                            onClick={() => handleSort('flagged')}
-                          >
-                            <svg 
-                              width="16" 
-                              height="16" 
-                              viewBox="0 0 16 16" 
-                              fill="#dc2626"
-                              stroke="#dc2626"
-                              strokeWidth="1.5"
-                            >
-                              <path d="M3 2v12M3 2l7 4-7 4" />
-                            </svg>
-                            {sortBy === 'flagged' && (
-                              <span style={{ position: 'absolute', right: '2px', top: '50%', transform: 'translateY(-50%)', fontSize: '10px' }}>
-                                {sortDirection === 'asc' ? '▲' : '▼'}
-                              </span>
-                            )}
-                          </th>
-                          <th 
-                            style={{ 
-                              border: '1px solid #ddd', 
-                              padding: '8px', 
-                              width: '300px', 
-                              fontWeight: 'bold', 
-                              textAlign: 'left', 
-                              whiteSpace: 'nowrap',
-                              cursor: 'pointer',
-                              userSelect: 'none',
-                              position: 'relative'
-                            }}
-                            onClick={() => handleSort('field_name')}
-                          >
-                            xpages db field
-                            {sortBy === 'field_name' && (
-                              <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px' }}>
-                                {sortDirection === 'asc' ? '▲' : '▼'}
-                              </span>
-                            )}
-                          </th>
-                          <th 
-                            style={{ 
-                              border: '1px solid #ddd', 
-                              padding: '8px', 
-                              fontWeight: 'bold', 
-                              textAlign: 'left', 
-                              whiteSpace: 'nowrap',
-                              cursor: 'pointer',
-                              userSelect: 'none',
-                              position: 'relative'
-                            }}
-                            onClick={() => handleSort('value')}
-                          >
-                            value
-                            {sortBy === 'value' && (
-                              <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px' }}>
-                                {sortDirection === 'asc' ? '▲' : '▼'}
-                              </span>
-                            )}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {getSortedFields().map((field) => {
-                          const value = selectedXpage[field.key as keyof XPage];
-                          const isEditing = editingField === field.key;
-                          const isStarred = fieldMetadata[field.key]?.starred || false;
-                          const isFlagged = fieldMetadata[field.key]?.flagged || false;
-                          
-                          return (
-                            <tr key={field.key}>
-                              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
-                                <input
-                                  type="checkbox"
-                                  checked={selectedFields.has(field.key)}
-                                  onChange={(e) => handleFieldCheckboxChange(field.key, e.target.checked)}
-                                />
-                              </td>
-                              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
-                                <button
-                                  onClick={() => toggleFieldStar(field.key)}
-                                  style={{
-                                    border: 'none',
-                                    background: 'none',
-                                    fontSize: '18px',
-                                    cursor: 'pointer',
-                                    color: isStarred ? '#149a24' : '#666',
-                                    transition: 'color 0.2s'
-                                  }}
-                                  title={isStarred ? 'Remove star' : 'Add star'}
-                                >
-                                  {isStarred ? '★' : '☆'}
-                                </button>
-                              </td>
-                              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
-                                <button
-                                  onClick={() => toggleFieldFlag(field.key)}
-                                  style={{
-                                    border: 'none',
-                                    background: 'none',
-                                    fontSize: '18px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                  }}
-                                  title={isFlagged ? 'Remove flag' : 'Add flag'}
-                                >
-                                  <svg 
-                                    width="16" 
-                                    height="16" 
-                                    viewBox="0 0 16 16" 
-                                    fill={isFlagged ? '#dc2626' : 'none'}
-                                    stroke={isFlagged ? '#dc2626' : '#666'}
-                                    strokeWidth="1.5"
-                                  >
-                                    <path d="M3 2v12M3 2l7 4-7 4" />
-                                  </svg>
-                                </button>
-                              </td>
-                              <td style={{ border: '1px solid #ddd', padding: '8px', fontWeight: 'bold' }}>
-                                {field.key}
-                              </td>
-                              <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                {field.type === 'boolean' && field.editable ? (
-                                  <button
-                                    onClick={() => handleBooleanToggle(field.key, value as boolean | null)}
-                                    style={{
-                                      width: '48px',
-                                      height: '24px',
-                                      borderRadius: '12px',
-                                      border: 'none',
-                                      cursor: 'pointer',
-                                      backgroundColor: value === true ? '#22c55e' : value === false ? '#d1d5db' : '#fbbf24',
-                                      color: 'white',
-                                      fontSize: '12px',
-                                      fontWeight: 'bold'
-                                    }}
-                                  >
-                                    {value === true ? 'true' : value === false ? 'false' : 'null'}
-                                  </button>
-                                ) : isEditing ? (
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <input
-                                      type="text"
-                                      value={editingValue}
-                                      onChange={(e) => setEditingValue(e.target.value)}
-                                      onBlur={handleFieldSave}
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') handleFieldSave();
-                                        if (e.key === 'Escape') handleFieldCancel();
-                                      }}
-                                      style={{
-                                        flex: 1,
-                                        padding: '4px 8px',
-                                        border: '2px solid #3b82f6',
-                                        borderRadius: '4px',
-                                        outline: 'none'
-                                      }}
-                                      autoFocus
-                                    />
-                                    <button
-                                      onClick={handleFieldSave}
-                                      style={{
-                                        padding: '4px 8px',
-                                        backgroundColor: '#22c55e',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer'
-                                      }}
-                                    >
-                                      ✓
-                                    </button>
-                                    <button
-                                      onClick={handleFieldCancel}
-                                      style={{
-                                        padding: '4px 8px',
-                                        backgroundColor: '#ef4444',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer'
-                                      }}
-                                    >
-                                      ✕
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <div
-                                    onClick={() => handleFieldClick(field.key, value)}
-                                    style={{
-                                      cursor: field.editable ? 'pointer' : 'default',
-                                      padding: '4px',
-                                      borderRadius: '4px',
-                                      backgroundColor: field.editable ? 'transparent' : '#f9f9f9',
-                                      color: field.editable ? '#000' : '#666',
-                                      minHeight: '20px'
-                                    }}
-                                    title={field.editable ? 'Click to edit' : 'Read only'}
-                                  >
-                                    {field.type === 'timestamp' && value
-                                      ? new Date(value as string).toLocaleString()
-                                      : value?.toString() || ''}
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                    <BensaFieldTable
+                      config={bensaXpagesConfig}
+                      selectedRecord={selectedXpage}
+                      onRecordUpdate={updateXpageField}
+                      onBoxEditorOpen={handleBoxEditorOpen}
+                    />
+                  </>
                 )}
               </div>
             )}

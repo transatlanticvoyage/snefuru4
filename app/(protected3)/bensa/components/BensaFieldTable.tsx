@@ -388,7 +388,7 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
               style={BENSA_TABLE_STYLES.headerCell}
               onClick={() => handleSort('chain_of_custody')}
             >
-              chain of custody
+              chain_of_custody_desc
               {sort.sortBy === 'chain_of_custody' && (
                 <span style={BENSA_SORT_INDICATOR_STYLES.sortArrow}>
                   {sort.sortDirection === 'asc' ? '▲' : '▼'}
