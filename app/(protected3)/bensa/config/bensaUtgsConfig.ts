@@ -17,6 +17,9 @@ export const bensaUtgsConfig: BensaTableConfig = {
     { key: 'is_active', type: 'boolean', editable: true },
     { key: 'sort_order', type: 'integer', editable: true },
     { key: 'utg_columns_definition_location', type: 'text', editable: true },
-    { key: 'rel_xpage_id', type: 'integer', editable: true }
+    { key: 'rel_xpage_id', type: 'integer', editable: true },
+    { key: 'horomi_active', type: 'boolean', editable: true },
+    { key: 'vertomi_active', type: 'boolean', editable: true },
+    { key: 'header_rows_definition_fantasy', type: 'jsonb', editable: true }
   ]
 };

@@ -18,6 +18,9 @@ interface UiTableGrid {
   updated_at: string;
   is_active: boolean;
   sort_order: number;
+  horomi_active: boolean;
+  vertomi_active: boolean;
+  header_rows_definition_fantasy: any;
 }
 
 interface XPage {
@@ -66,7 +69,10 @@ export default function UiTableGridsTable() {
     associated_files: '',
     utg_class: '',
     is_active: true,
-    sort_order: 0
+    sort_order: 0,
+    horomi_active: false,
+    vertomi_active: false,
+    header_rows_definition_fantasy: ''
   });
   
   const supabase = createClientComponentClient();
@@ -169,12 +175,23 @@ export default function UiTableGridsTable() {
           return;
         }
       }
+
+      let headerRowsDefinitionFantasyData = null;
+      if (formData.header_rows_definition_fantasy && formData.header_rows_definition_fantasy.trim()) {
+        try {
+          headerRowsDefinitionFantasyData = JSON.parse(formData.header_rows_definition_fantasy);
+        } catch (parseError) {
+          alert('Invalid JSON in header_rows_definition_fantasy field. Please check the format.');
+          return;
+        }
+      }
       
       const { error: insertError } = await supabase
         .from('utgs')
         .insert([{
           ...formData,
-          associated_files: associatedFilesData
+          associated_files: associatedFilesData,
+          header_rows_definition_fantasy: headerRowsDefinitionFantasyData
         }]);
         
       if (insertError) throw insertError;
@@ -202,12 +219,23 @@ export default function UiTableGridsTable() {
           return;
         }
       }
+
+      let headerRowsDefinitionFantasyData = null;
+      if (formData.header_rows_definition_fantasy && formData.header_rows_definition_fantasy.trim()) {
+        try {
+          headerRowsDefinitionFantasyData = JSON.parse(formData.header_rows_definition_fantasy);
+        } catch (parseError) {
+          alert('Invalid JSON in header_rows_definition_fantasy field. Please check the format.');
+          return;
+        }
+      }
       
       const { error: updateError } = await supabase
         .from('utgs')
         .update({
           ...formData,
-          associated_files: associatedFilesData
+          associated_files: associatedFilesData,
+          header_rows_definition_fantasy: headerRowsDefinitionFantasyData
         })
         .eq('utg_id', editingRecord.utg_id);
         
@@ -262,7 +290,10 @@ export default function UiTableGridsTable() {
       associated_files: record.associated_files ? JSON.stringify(record.associated_files) : '',
       utg_class: record.utg_class || '',
       is_active: record.is_active,
-      sort_order: record.sort_order
+      sort_order: record.sort_order,
+      horomi_active: record.horomi_active,
+      vertomi_active: record.vertomi_active,
+      header_rows_definition_fantasy: record.header_rows_definition_fantasy ? JSON.stringify(record.header_rows_definition_fantasy) : ''
     });
     setIsEditModalOpen(true);
   };
@@ -281,7 +312,10 @@ export default function UiTableGridsTable() {
       associated_files: '',
       utg_class: '',
       is_active: true,
-      sort_order: 0
+      sort_order: 0,
+      horomi_active: false,
+      vertomi_active: false,
+      header_rows_definition_fantasy: ''
     });
   };
 
@@ -402,7 +436,7 @@ export default function UiTableGridsTable() {
   const columnOrder = [
     'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage_id', 'rel_xpage',
     'main_db_table', 'sql_view', 'associated_files', 'utg_class', 'created_at', 'updated_at',
-    'is_active', 'sort_order'
+    'is_active', 'sort_order', 'horomi_active', 'vertomi_active', 'header_rows_definition_fantasy'
   ];
 
   // Define which fields can be inline edited (excluding boolean and timestamp fields)
@@ -736,6 +770,16 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700">header_rows_definition_fantasy (JSON)</label>
+                <textarea
+                  value={formData.header_rows_definition_fantasy}
+                  onChange={(e) => setFormData({...formData, header_rows_definition_fantasy: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Enter valid JSON, e.g. {&quot;key&quot;: &quot;value&quot;}"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">utg_class</label>
                 <input
                   type="text"
@@ -750,6 +794,24 @@ export default function UiTableGridsTable() {
                   type="checkbox"
                   checked={formData.is_active}
                   onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">horomi_active</label>
+                <input
+                  type="checkbox"
+                  checked={formData.horomi_active}
+                  onChange={(e) => setFormData({...formData, horomi_active: e.target.checked})}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">vertomi_active</label>
+                <input
+                  type="checkbox"
+                  checked={formData.vertomi_active}
+                  onChange={(e) => setFormData({...formData, vertomi_active: e.target.checked})}
                   className="mt-1"
                 />
               </div>
@@ -879,6 +941,16 @@ export default function UiTableGridsTable() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700">header_rows_definition_fantasy (JSON)</label>
+                <textarea
+                  value={formData.header_rows_definition_fantasy}
+                  onChange={(e) => setFormData({...formData, header_rows_definition_fantasy: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Enter valid JSON, e.g. {&quot;key&quot;: &quot;value&quot;}"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">utg_class</label>
                 <input
                   type="text"
@@ -893,6 +965,24 @@ export default function UiTableGridsTable() {
                   type="checkbox"
                   checked={formData.is_active}
                   onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">horomi_active</label>
+                <input
+                  type="checkbox"
+                  checked={formData.horomi_active}
+                  onChange={(e) => setFormData({...formData, horomi_active: e.target.checked})}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">vertomi_active</label>
+                <input
+                  type="checkbox"
+                  checked={formData.vertomi_active}
+                  onChange={(e) => setFormData({...formData, vertomi_active: e.target.checked})}
                   className="mt-1"
                 />
               </div>

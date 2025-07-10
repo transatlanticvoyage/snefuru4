@@ -87,7 +87,7 @@ export default function AzoPage() {
 
   // Initialize page - only run once
   useEffect(() => {
-    document.title = 'Azo Page Settings Manager';
+    document.title = 'Azo Page Settings Manager - Snefuru';
     fetchXpages();
     fetchFieldMetadata();
   }, []);
@@ -95,6 +95,9 @@ export default function AzoPage() {
   // Handle URL parameters - only when searchParams change
   useEffect(() => {
     if (!searchParams) return;
+    
+    // Ensure title stays correct when URL changes
+    document.title = 'Azo Page Settings Manager - Snefuru';
     
     // Get tab from URL if present
     const tabParam = searchParams.get('tab');
@@ -389,12 +392,15 @@ export default function AzoPage() {
     { key: 'position_marker', type: 'integer', editable: true },
     { key: 'show_in_all_pages_nav_area1', type: 'boolean', editable: true },
     { key: 'broad_parent_container', type: 'text', editable: true },
+    { key: 'urlparam_total_keys_listed', type: 'jsonb', editable: true },
     { key: 'created_at', type: 'timestamp', editable: false },
     { key: 'updated_at', type: 'timestamp', editable: false }
   ];
 
   const updateXpageField = async (field: string, value: any) => {
     if (!selectedXpageId) return;
+
+    console.log('Updating field:', field, 'with value:', value, 'for xpage_id:', selectedXpageId);
 
     try {
       const { error } = await supabase
@@ -407,6 +413,7 @@ export default function AzoPage() {
         return;
       }
 
+      console.log('Field updated successfully');
       // Update local state
       setSelectedXpage((prev: XPage | null) => prev ? { ...prev, [field]: value } : null);
     } catch (error) {
