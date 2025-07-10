@@ -238,7 +238,7 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
             }}
             style={{
               padding: '4px 8px',
-              backgroundColor: '#3b82f6',
+              backgroundColor: '#1e46a3',
               color: 'white',
               border: 'none',
               borderRadius: '4px',

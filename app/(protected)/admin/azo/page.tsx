@@ -252,6 +252,14 @@ export default function AzoPage() {
       }
 
       setUtgs(data || []);
+      
+      // Auto-select if only one UTG available
+      if (data && data.length === 1) {
+        const singleUtg = data[0];
+        setSelectedUtgId(singleUtg.utg_id);
+        fetchSelectedUtg(singleUtg.utg_id);
+        updateURLWithCurrentState({ utg_id: singleUtg.utg_id });
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -295,6 +303,14 @@ export default function AzoPage() {
       }
 
       setZarnos(data || []);
+      
+      // Auto-select if only one Zarno available
+      if (data && data.length === 1) {
+        const singleZarno = data[0];
+        setSelectedZarnoId(singleZarno.zarno_id);
+        fetchSelectedZarno(singleZarno.zarno_id);
+        updateURLWithCurrentState({ zarno_id: singleZarno.zarno_id });
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -349,6 +365,11 @@ export default function AzoPage() {
     setSelectedUtgRecord(null);
     setSelectedZarnoId(null);
     setSelectedZarnoRecord(null);
+    
+    // Fetch related entities (which will auto-select if only one option)
+    fetchRelatedUtgs(xpageId);
+    fetchRelatedZarnos(xpageId);
+    
     updateURLWithCurrentState({ xpage_id: xpageId, utg_id: '', zarno_id: 0 });
   };
 

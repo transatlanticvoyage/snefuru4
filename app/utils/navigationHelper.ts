@@ -86,6 +86,10 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         path: undefined // No link - separator
       },
       {
+        name: 'XPages Manager',
+        path: `${baseUrl}/admin/xpagesmanager1`
+      },
+      {
         name: 'UTG Manager',
         path: `${baseUrl}/admin/utg_manager`
       },
@@ -104,10 +108,6 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
       {
         name: 'Bakli Mockups',
         path: `${baseUrl}/admin/baklijar`
-      },
-      {
-        name: 'X Pages Manager',
-        path: `${baseUrl}/admin/xpagesmanager1`
       },
       {
         name: 'Jexplanations',
