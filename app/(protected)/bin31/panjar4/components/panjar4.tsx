@@ -268,7 +268,7 @@ export default function Panjar4UI({ images, onImagesRefresh }: Panjar4UIProps) {
 
   // Effect to handle popup URL parameters on mount - cloned from nwjar1 and tebnar2
   useEffect(() => {
-    document.title = '/panjar4 - Snefuru';
+    // Note: document.title is now handled by parent page component using static cache
     
     // Handle URL parameters for popup and tab state
     const urlParams = new URLSearchParams(window.location.search);

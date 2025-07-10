@@ -1,5 +1,11 @@
 'use client';
 
+// @xpage-metadata
+// URL: /admin/azo
+// Title: Azo Page Settings Manager - Snefuru
+// Last Sync: 2024-01-10T10:30:00Z
+export const XPAGE_ID = 12;
+
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -7,6 +13,7 @@ import BensaFieldTable from '@/app/(protected3)/bensa/components/BensaFieldTable
 import { bensaUtgsConfig } from '@/app/(protected3)/bensa/config/bensaUtgsConfig';
 import { bensaZarnosConfig } from '@/app/(protected3)/bensa/config/bensaZarnosConfig';
 import { bensaXpagesConfig } from '@/app/(protected3)/bensa/config/bensaXpagesConfig';
+import xpageCache from '@/app/metadata/xpage-cache.json';
 
 interface XPage {
   xpage_id: number;
@@ -85,20 +92,24 @@ export default function AzoPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
+  
+  // Get static metadata from cache
+  const staticMetadata = xpageCache[XPAGE_ID.toString()];
 
   // Initialize page - only run once
   useEffect(() => {
-    document.title = 'Azo Page Settings Manager - Snefuru';
+    // Use static title from cache, fallback to hardcoded
+    const staticTitle = staticMetadata?.title || 'Azo Page Settings Manager - Snefuru';
+    document.title = staticTitle;
     fetchXpages();
     fetchFieldMetadata();
-  }, []);
+  }, [staticMetadata?.title]);
 
   // Handle URL parameters - only when searchParams change
   useEffect(() => {
     if (!searchParams) return;
     
-    // Ensure title stays correct when URL changes
-    document.title = 'Azo Page Settings Manager - Snefuru';
+    // Note: document.title is now handled by the initial useEffect with static cache
     
     // Get tab from URL if present
     const tabParam = searchParams.get('tab');
@@ -324,6 +335,9 @@ export default function AzoPage() {
     utg_id?: string;
     zarno_id?: number;
   }) => {
+    // Preserve current title before navigation
+    const currentTitle = document.title;
+    
     const params = new URLSearchParams(searchParams || '');
     
     // Update or set tab
@@ -355,6 +369,11 @@ export default function AzoPage() {
     }
     
     router.push(`/admin/azo?${params.toString()}`);
+    
+    // Restore title after navigation to prevent Next.js metadata race condition
+    setTimeout(() => {
+      document.title = currentTitle;
+    }, 0);
   };
 
   const handleXpageChange = (xpageId: number) => {
