@@ -49,7 +49,8 @@ export function useBensaFieldMetadata(tableName: string) {
           table_name: tableName,
           field_name: fieldName,
           starred: newStarred,
-          flagged: fieldMetadata[fieldName]?.flagged || false
+          flagged: fieldMetadata[fieldName]?.flagged || false,
+          chain_of_custody_desc: fieldMetadata[fieldName]?.chain_of_custody_desc || null
         }, {
           onConflict: 'table_name,field_name'
         });
@@ -84,7 +85,8 @@ export function useBensaFieldMetadata(tableName: string) {
           table_name: tableName,
           field_name: fieldName,
           starred: fieldMetadata[fieldName]?.starred || false,
-          flagged: newFlagged
+          flagged: newFlagged,
+          chain_of_custody_desc: fieldMetadata[fieldName]?.chain_of_custody_desc || null
         }, {
           onConflict: 'table_name,field_name'
         });
