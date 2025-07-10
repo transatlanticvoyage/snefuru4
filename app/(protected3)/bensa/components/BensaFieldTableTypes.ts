@@ -1,6 +1,6 @@
 export interface BensaFieldDefinition {
   key: string;
-  type: 'text' | 'integer' | 'boolean' | 'timestamp' | 'jsonb';
+  type: 'text' | 'integer' | 'boolean' | 'timestamp' | 'jsonb' | 'filelink';
   editable: boolean;
   label?: string;
 }
