@@ -1042,8 +1042,8 @@ export default function AzoPage() {
                       marginBottom: '16px',
                       cursor: 'pointer'
                     }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#121c67'}
+                    onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#2563eb'}
+                    onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#121c67'}
                   >
                     View ColTemps For This UTG
                   </a>
