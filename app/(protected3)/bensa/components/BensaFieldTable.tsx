@@ -459,7 +459,7 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
                           if (e.key === 'Enter') handleChainOfCustodySave();
                           if (e.key === 'Escape') handleChainOfCustodyCancel();
                         }}
-                        style={BENSA_INPUT_STYLES.textInput}
+                        style={BENSA_INPUT_STYLES.editInput}
                         placeholder="Enter chain of custody description..."
                         autoFocus
                       />
