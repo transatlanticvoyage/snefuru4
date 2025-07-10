@@ -1251,6 +1251,26 @@ export default function AzoPage() {
             )}
             {activeTab === 'utgs' && (
               <div>
+                {selectedUtgId && (
+                  <a
+                    href={`/admin/coltempcommand?filter_rel_utg_id=${selectedUtgId}`}
+                    style={{
+                      display: 'inline-block',
+                      padding: '8px 16px',
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      textDecoration: 'none',
+                      borderRadius: '4px',
+                      fontSize: '16px',
+                      marginBottom: '16px',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                  >
+                    View ColTemps For This UTG
+                  </a>
+                )}
                 <h2>UTGs Settings</h2>
                 <p>Configure UTG settings for XPage ID: {selectedXpageId}</p>
                 {selectedUtgId && <p>Selected UTG: {selectedUtgId}</p>}

@@ -165,8 +165,11 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
       );
     }
 
-    // Special handling for utg_columns_definition_location field
-    if (field.key === 'utg_columns_definition_location' && onBoxEditorOpen) {
+    // Special handling for fields that need box editor
+    if ((field.key === 'utg_columns_definition_location' || 
+         field.key === 'filters_notes' || 
+         field.key === 'pagination_notes' || 
+         field.key === 'searchbox_notes') && onBoxEditorOpen) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button

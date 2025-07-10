@@ -21,6 +21,9 @@ interface UiTableGrid {
   horomi_active: boolean;
   vertomi_active: boolean;
   header_rows_definition_fantasy: any;
+  filters_notes: string | null;
+  pagination_notes: string | null;
+  searchbox_notes: string | null;
 }
 
 interface XPage {
@@ -72,7 +75,10 @@ export default function UiTableGridsTable() {
     sort_order: 0,
     horomi_active: false,
     vertomi_active: false,
-    header_rows_definition_fantasy: ''
+    header_rows_definition_fantasy: '',
+    filters_notes: '',
+    pagination_notes: '',
+    searchbox_notes: ''
   });
   
   const supabase = createClientComponentClient();
@@ -293,7 +299,10 @@ export default function UiTableGridsTable() {
       sort_order: record.sort_order,
       horomi_active: record.horomi_active,
       vertomi_active: record.vertomi_active,
-      header_rows_definition_fantasy: record.header_rows_definition_fantasy ? JSON.stringify(record.header_rows_definition_fantasy) : ''
+      header_rows_definition_fantasy: record.header_rows_definition_fantasy ? JSON.stringify(record.header_rows_definition_fantasy) : '',
+      filters_notes: record.filters_notes || '',
+      pagination_notes: record.pagination_notes || '',
+      searchbox_notes: record.searchbox_notes || ''
     });
     setIsEditModalOpen(true);
   };
@@ -315,7 +324,10 @@ export default function UiTableGridsTable() {
       sort_order: 0,
       horomi_active: false,
       vertomi_active: false,
-      header_rows_definition_fantasy: ''
+      header_rows_definition_fantasy: '',
+      filters_notes: '',
+      pagination_notes: '',
+      searchbox_notes: ''
     });
   };
 
@@ -436,13 +448,14 @@ export default function UiTableGridsTable() {
   const columnOrder = [
     'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage_id', 'rel_xpage',
     'main_db_table', 'sql_view', 'associated_files', 'utg_class', 'created_at', 'updated_at',
-    'is_active', 'sort_order', 'horomi_active', 'vertomi_active', 'header_rows_definition_fantasy'
+    'is_active', 'sort_order', 'horomi_active', 'vertomi_active', 'header_rows_definition_fantasy',
+    'filters_notes', 'pagination_notes', 'searchbox_notes'
   ];
 
   // Define which fields can be inline edited (excluding boolean and timestamp fields)
   const inlineEditableFields = [
     'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage', 
-    'main_db_table', 'sql_view', 'utg_class'
+    'main_db_table', 'sql_view', 'utg_class', 'filters_notes', 'pagination_notes', 'searchbox_notes'
   ];
   
   if (loading) {
@@ -824,6 +837,36 @@ export default function UiTableGridsTable() {
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">filters_notes</label>
+                <textarea
+                  value={formData.filters_notes}
+                  onChange={(e) => setFormData({...formData, filters_notes: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Notes about filters..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">pagination_notes</label>
+                <textarea
+                  value={formData.pagination_notes}
+                  onChange={(e) => setFormData({...formData, pagination_notes: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Notes about pagination..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">searchbox_notes</label>
+                <textarea
+                  value={formData.searchbox_notes}
+                  onChange={(e) => setFormData({...formData, searchbox_notes: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Notes about search functionality..."
+                />
+              </div>
             </div>
             
             {/* Bottom save button */}
@@ -993,6 +1036,36 @@ export default function UiTableGridsTable() {
                   value={formData.sort_order}
                   onChange={(e) => setFormData({...formData, sort_order: Number(e.target.value)})}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">filters_notes</label>
+                <textarea
+                  value={formData.filters_notes}
+                  onChange={(e) => setFormData({...formData, filters_notes: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Notes about filters..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">pagination_notes</label>
+                <textarea
+                  value={formData.pagination_notes}
+                  onChange={(e) => setFormData({...formData, pagination_notes: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Notes about pagination..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">searchbox_notes</label>
+                <textarea
+                  value={formData.searchbox_notes}
+                  onChange={(e) => setFormData({...formData, searchbox_notes: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  rows={3}
+                  placeholder="Notes about search functionality..."
                 />
               </div>
             </div>

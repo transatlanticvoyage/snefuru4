@@ -20,6 +20,9 @@ export const bensaUtgsConfig: BensaTableConfig = {
     { key: 'rel_xpage_id', type: 'integer', editable: true },
     { key: 'horomi_active', type: 'boolean', editable: true },
     { key: 'vertomi_active', type: 'boolean', editable: true },
-    { key: 'header_rows_definition_fantasy', type: 'jsonb', editable: true }
+    { key: 'header_rows_definition_fantasy', type: 'jsonb', editable: true },
+    { key: 'filters_notes', type: 'text', editable: true },
+    { key: 'pagination_notes', type: 'text', editable: true },
+    { key: 'searchbox_notes', type: 'text', editable: true }
   ]
 };
