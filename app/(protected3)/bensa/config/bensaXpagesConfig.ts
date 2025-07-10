@@ -1,4 +1,5 @@
 import { BensaTableConfig } from '../components/BensaFieldTableTypes';
+import { syncXPageMetadataAPI } from '@/app/utils/syncXPageMetadata';
 
 export const bensaXpagesConfig: BensaTableConfig = {
   tableName: 'xpages',
@@ -7,7 +8,15 @@ export const bensaXpagesConfig: BensaTableConfig = {
     { key: 'xpage_id', type: 'integer', editable: false },
     { key: 'title1', type: 'text', editable: true },
     { key: 'main_url', type: 'text', editable: true },
-    { key: 'meta_title', type: 'text', editable: true },
+    { 
+      key: 'meta_title', 
+      type: 'text', 
+      editable: true,
+      syncButton: {
+        enabled: true,
+        syncFunction: syncXPageMetadataAPI
+      }
+    },
     { key: 'title2', type: 'text', editable: true },
     { key: 'desc1', type: 'text', editable: true },
     { key: 'caption', type: 'text', editable: true },

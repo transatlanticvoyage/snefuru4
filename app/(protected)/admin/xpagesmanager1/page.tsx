@@ -1,8 +1,16 @@
 'use client';
 
+// @xpage-metadata
+// URL: /admin/xpagesmanager1
+// Title: X Pages Manager - Snefuru
+// Last Sync: 2024-01-10T10:30:00Z
+export const XPAGE_ID = 102; // Use 100+ range for admin-created pages
+
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
+import xpageCache from '@/app/metadata/xpage-cache.json';
+import { syncXPageMetadataAPI } from '@/app/utils/syncXPageMetadata';
 
 interface XPage {
   xpage_id: number;
@@ -36,8 +44,13 @@ export default function XPagesManager1Page() {
   const [filterShowInNav, setFilterShowInNav] = useState<string>('');
   const [sortField, setSortField] = useState<keyof XPage>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [syncingField, setSyncingField] = useState<number | null>(null);
+  const [syncMessage, setSyncMessage] = useState<{ xpage_id: number; message: string; success: boolean } | null>(null);
   
   const supabase = createClientComponentClient();
+  
+  // Get static metadata from cache
+  const staticMetadata = xpageCache[XPAGE_ID.toString()];
 
   // Define column order and properties
   const columns: Array<{ key: keyof XPage; type: string; width: string }> = [
@@ -59,9 +72,11 @@ export default function XPagesManager1Page() {
   ];
 
   useEffect(() => {
-    document.title = "X Pages Manager";
+    // Use static title from cache, fallback to hardcoded
+    const staticTitle = staticMetadata?.title || 'X Pages Manager - Snefuru';
+    document.title = staticTitle;
     fetchXPages();
-  }, []);
+  }, [staticMetadata?.title]);
 
   const fetchXPages = async () => {
     try {
@@ -184,6 +199,39 @@ export default function XPagesManager1Page() {
     await updateField(id, field, newValue);
   };
 
+  // Sync button handler (borrowed from Bensa system)
+  const handleSyncButtonClick = async (xpage_id: number) => {
+    setSyncingField(xpage_id);
+    setSyncMessage(null);
+    
+    try {
+      const result = await syncXPageMetadataAPI();
+      setSyncMessage({
+        xpage_id,
+        message: result.message,
+        success: result.success
+      });
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setSyncMessage(null);
+      }, 3000);
+    } catch (error) {
+      setSyncMessage({
+        xpage_id,
+        message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        success: false
+      });
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setSyncMessage(null);
+      }, 3000);
+    } finally {
+      setSyncingField(null);
+    }
+  };
+
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
     let filtered = xpages.filter(item => {
@@ -285,6 +333,74 @@ export default function XPagesManager1Page() {
           >
             ✕
           </button>
+        </div>
+      );
+    }
+
+    // Special handling for meta_title column with sync button (borrowed from Bensa system)
+    if (column.key === 'meta_title') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ 
+            fontSize: '10px', 
+            fontWeight: 'bold', 
+            color: '#666',
+            whiteSpace: 'nowrap'
+          }}>
+            button borrowed from bensa system
+          </span>
+          <button
+            onClick={() => handleSyncButtonClick(item.xpage_id)}
+            disabled={syncingField === item.xpage_id}
+            style={{
+              padding: '4px 8px',
+              backgroundColor: syncingField === item.xpage_id ? '#9ca3af' : '#059669',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: syncingField === item.xpage_id ? 'not-allowed' : 'pointer',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            {syncingField === item.xpage_id ? (
+              <>
+                <span style={{ animation: 'spin 1s linear infinite' }}>⟲</span>
+                SYNCING...
+              </>
+            ) : (
+              'SYNC'
+            )}
+          </button>
+          <div
+            onClick={() => !isReadOnly && handleCellClick(item.xpage_id, column.key, value)}
+            className={`min-w-[30px] min-h-[1.25rem] px-1 py-0.5 rounded break-words ${
+              !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+            } ${isReadOnly ? 'text-gray-500' : ''}`}
+            style={{ maxWidth: '200px', wordWrap: 'break-word', overflowWrap: 'break-word' }}
+            title={isReadOnly ? value?.toString() || '' : `${value?.toString() || ''} (Click to edit)`}
+          >
+            {value?.toString() || ''}
+          </div>
+          {syncMessage && syncMessage.xpage_id === item.xpage_id && (
+            <div style={{
+              padding: '4px 8px',
+              borderRadius: '4px',
+              backgroundColor: syncMessage.success ? '#10b981' : '#ef4444',
+              color: 'white',
+              fontSize: '11px',
+              fontWeight: 'bold',
+              maxWidth: '150px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
+              {syncMessage.message}
+            </div>
+          )}
         </div>
       );
     }

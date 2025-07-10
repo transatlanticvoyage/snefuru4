@@ -3,6 +3,10 @@ export interface BensaFieldDefinition {
   type: 'text' | 'integer' | 'boolean' | 'timestamp' | 'jsonb' | 'filelink';
   editable: boolean;
   label?: string;
+  syncButton?: {
+    enabled: boolean;
+    syncFunction: () => Promise<{ success: boolean; message: string; updatedPages?: number }>;
+  };
 }
 
 export interface BensaTableConfig {

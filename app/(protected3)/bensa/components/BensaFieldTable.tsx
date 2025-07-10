@@ -22,6 +22,8 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
   const [editing, setEditing] = useState<BensaEditingState>({ field: null, value: '' });
   const [sort, setSort] = useState<BensaSortState>({ sortBy: 'starred', sortDirection: 'asc' });
   const [editingChainOfCustody, setEditingChainOfCustody] = useState<{ field: string | null; value: string }>({ field: null, value: '' });
+  const [syncingField, setSyncingField] = useState<string | null>(null);
+  const [syncMessage, setSyncMessage] = useState<{ field: string; message: string; success: boolean } | null>(null);
   
   const { fieldMetadata, toggleFieldStar, toggleFieldFlag, updateChainOfCustody } = useBensaFieldMetadata(config.tableName);
   const supabase = createClientComponentClient();
@@ -145,6 +147,41 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
 
   const handleChainOfCustodyCancel = () => {
     setEditingChainOfCustody({ field: null, value: '' });
+  };
+
+  // Sync button handler
+  const handleSyncButtonClick = async (field: BensaFieldDefinition) => {
+    if (!field.syncButton?.syncFunction) return;
+    
+    setSyncingField(field.key);
+    setSyncMessage(null);
+    
+    try {
+      const result = await field.syncButton.syncFunction();
+      setSyncMessage({
+        field: field.key,
+        message: result.message,
+        success: result.success
+      });
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setSyncMessage(null);
+      }, 3000);
+    } catch (error) {
+      setSyncMessage({
+        field: field.key,
+        message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        success: false
+      });
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setSyncMessage(null);
+      }, 3000);
+    } finally {
+      setSyncingField(null);
+    }
   };
 
   // Render cell content
@@ -289,6 +326,77 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
           >
             {field.value ? (field.value.length > 400 ? field.value.substring(0, 400) + '...' : field.value) : '(click to add link)'}
           </span>
+        </div>
+      );
+    }
+
+    // Check if this field has a sync button
+    if (field.syncButton?.enabled) {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={() => handleSyncButtonClick(field)}
+            disabled={syncingField === field.key}
+            style={{
+              padding: '4px 8px',
+              backgroundColor: syncingField === field.key ? '#9ca3af' : '#059669',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: syncingField === field.key ? 'not-allowed' : 'pointer',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            {syncingField === field.key ? (
+              <>
+                <span style={{ animation: 'spin 1s linear infinite' }}>⟲</span>
+                SYNCING...
+              </>
+            ) : (
+              'SYNC'
+            )}
+          </button>
+          <div
+            onClick={() => handleFieldClick(field.key, field.value)}
+            style={{
+              cursor: field.editable ? 'pointer' : 'default',
+              padding: '4px',
+              borderRadius: '4px',
+              backgroundColor: field.editable ? 'transparent' : '#f9f9f9',
+              color: field.editable ? '#000' : BENSA_COLORS.gray,
+              minHeight: '20px',
+              maxWidth: '200px',
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
+              flex: 1
+            }}
+            title={field.editable ? 'Click to edit' : 'Read only'}
+          >
+            {field.type === 'timestamp' && field.value
+              ? new Date(field.value as string).toLocaleString()
+              : field.value?.toString() || ''
+            }
+          </div>
+          {syncMessage && syncMessage.field === field.key && (
+            <div style={{
+              padding: '4px 8px',
+              borderRadius: '4px',
+              backgroundColor: syncMessage.success ? '#10b981' : '#ef4444',
+              color: 'white',
+              fontSize: '11px',
+              fontWeight: 'bold',
+              maxWidth: '150px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
+              {syncMessage.message}
+            </div>
+          )}
         </div>
       );
     }

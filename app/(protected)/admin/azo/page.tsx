@@ -335,8 +335,8 @@ export default function AzoPage() {
     utg_id?: string;
     zarno_id?: number;
   }) => {
-    // Preserve current title before navigation
-    const currentTitle = document.title;
+    // Get our correct title from cache before navigation
+    const correctTitle = staticMetadata?.title || 'Azo Page Settings Manager - Snefuru';
     
     const params = new URLSearchParams(searchParams || '');
     
@@ -370,10 +370,11 @@ export default function AzoPage() {
     
     router.push(`/admin/azo?${params.toString()}`);
     
-    // Restore title after navigation to prevent Next.js metadata race condition
-    setTimeout(() => {
-      document.title = currentTitle;
-    }, 0);
+    // Aggressively restore title after navigation - multiple attempts to overcome Next.js metadata
+    setTimeout(() => { document.title = correctTitle; }, 0);
+    setTimeout(() => { document.title = correctTitle; }, 10);
+    setTimeout(() => { document.title = correctTitle; }, 50);
+    setTimeout(() => { document.title = correctTitle; }, 100);
   };
 
   const handleXpageChange = (xpageId: number) => {

@@ -1,56 +1,62 @@
 {
   "3": {
-    "title": "azulp1",
+    "title": "azulp1 - cricket matches",
     "description": "azulp1 - Snefuru Application",
     "url": "/page/3",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
   },
   "4": {
     "title": "mesagen",
     "description": "mesagen - Snefuru Application",
     "url": "/page/4",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
   },
   "5": {
     "title": "tornado - Snefuru",
     "description": "tornado - Snefuru Application",
     "url": "lkjdsflkds",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
   },
   "11": {
     "title": "Snefuru - Home",
     "description": "Home - Snefuru Application",
     "url": "/",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
   },
   "12": {
     "title": "aAzo Page Settings Manager - Snefuru",
     "description": "Azo Page Settings - Snefuru Application",
     "url": "/admin/azo",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
   },
   "13": {
     "title": "UTG Manager - Snefuru",
     "description": "UTG Manager - Snefuru Application",
     "url": "/admin/utg_manager",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
   },
   "14": {
     "title": "dogs",
     "description": "panjar4 - Snefuru Application",
     "url": "/bin31/panjar4",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
   },
   "100": {
     "title": "Page 100",
     "description": "Page - Snefuru Application",
     "url": "/page/100",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
   },
   "101": {
     "title": "Page 101",
     "description": "Page - Snefuru Application",
     "url": "/page/101",
-    "lastSync": "2025-07-10T18:03:04.880Z"
+    "lastSync": "2025-07-10T18:17:41.168Z"
+  },
+  "102": {
+    "title": "X Pages Manager - Snefuru",
+    "description": "X Pages Manager - Snefuru Application",
+    "url": "/admin/xpagesmanager1",
+    "lastSync": "2025-07-10T18:17:41.168Z"
   }
 }

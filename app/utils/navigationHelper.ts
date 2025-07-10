@@ -74,6 +74,10 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         path: '/admin/azo'
       },
       {
+        name: 'Azulp1 - Cricket Matches',
+        path: '/azulp1'
+      },
+      {
         name: 'ColTemp System',
         path: undefined // No link - separator
       },
