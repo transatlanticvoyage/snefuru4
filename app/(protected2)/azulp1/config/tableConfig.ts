@@ -1,45 +1,45 @@
 /**
  * Azul Plantilla Table Configuration
  * 
- * Artichoke Exports by Country Dataset - 30 rows, 30 columns
+ * Cricket Matches Database - Live data with 30 columns
  */
 
 import { TableConfig } from './tableConfig.sample';
 
 export const tableConfig: TableConfig = {
-  tableName: 'artichoke_exports',
+  tableName: 'cricket_matches',
   
   columns: [
-    { field: 'id', header: 'id', width: '60px', sortable: true, searchable: false, editable: false },
-    { field: 'country', header: 'country', width: '120px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'region', header: 'region', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'export_volume_tons', header: 'volume_tons', width: '110px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => v.toLocaleString() },
-    { field: 'export_value_usd', header: 'value_usd', width: '120px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => `$${v.toLocaleString()}` },
-    { field: 'price_per_kg', header: 'price_kg', width: '90px', sortable: true, searchable: false, editable: false, type: 'number', format: (v) => `$${v.toFixed(2)}` },
-    { field: 'market_share_percent', header: 'mark_percentage', width: '80px', sortable: true, searchable: false, editable: false, type: 'number', format: (v) => `${v.toFixed(1)}%` },
-    { field: 'main_destination', header: 'main_destination', width: '120px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'harvest_season', header: 'season', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'production_area_hectares', header: 'area_ha', width: '90px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => v.toLocaleString() },
-    { field: 'yield_per_hectare', header: 'yield_ha', width: '80px', sortable: true, searchable: false, editable: false, type: 'number', format: (v) => `${v.toFixed(1)}t` },
-    { field: 'quality_grade', header: 'grade', width: '70px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'organic_certified', header: 'organic', width: '70px', sortable: true, searchable: false, editable: true, type: 'boolean', format: (v) => v ? 'Yes' : 'No' },
-    { field: 'irrigation_method', header: 'irrigation', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'soil_type', header: 'soil_type', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'climate_zone', header: 'climate', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'transportation_method', header: 'Transport', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'export_port', header: 'Export Port', width: '120px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'tariff_rate_percent', header: 'Tariff %', width: '80px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => `${v.toFixed(1)}%` },
-    { field: 'export_status', header: 'Status', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'gmo_free', header: 'GMO Free', width: '80px', sortable: true, searchable: false, editable: true, type: 'boolean', format: (v) => v ? 'Yes' : 'No' },
-    { field: 'fair_trade_certified', header: 'Fair Trade', width: '90px', sortable: true, searchable: false, editable: true, type: 'boolean', format: (v) => v ? 'Yes' : 'No' },
-    { field: 'pesticide_residue_tested', header: 'Pesticide Test', width: '110px', sortable: true, searchable: false, editable: true, type: 'boolean', format: (v) => v ? 'Yes' : 'No' },
-    { field: 'cold_storage_required', header: 'Cold Storage', width: '100px', sortable: true, searchable: false, editable: true, type: 'boolean', format: (v) => v ? 'Required' : 'Optional' },
-    { field: 'insurance_coverage_percent', header: 'Insurance %', width: '90px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => `${v.toFixed(0)}%` },
-    { field: 'export_frequency_per_year', header: 'Export Freq/yr', width: '110px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => `${v}x` },
-    { field: 'packaging_type', header: 'Packaging', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'shelf_stability_rating', header: 'Stability', width: '80px', sortable: true, searchable: true, editable: true, type: 'text' },
-    { field: 'seasonal_price_volatility', header: 'Price Vol %', width: '90px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => `${v.toFixed(1)}%` },
-    { field: 'export_documentation_score', header: 'Doc Score', width: '80px', sortable: true, searchable: false, editable: true, type: 'number', format: (v) => `${v.toFixed(1)}/10` }
+    { field: 'match_id', header: 'match_id', width: '80px', sortable: true, searchable: false, editable: false },
+    { field: 'match_format', header: 'match_format', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'tournament_name', header: 'tournament_name', width: '150px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'series_name', header: 'series_name', width: '140px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'match_number', header: 'match_number', width: '100px', sortable: true, searchable: false, editable: true, type: 'number' },
+    { field: 'venue_name', header: 'venue_name', width: '150px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'city', header: 'city', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'country', header: 'country', width: '100px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'match_date', header: 'match_date', width: '120px', sortable: true, searchable: false, editable: true, type: 'text' },
+    { field: 'start_time', header: 'start_time', width: '100px', sortable: true, searchable: false, editable: true, type: 'text' },
+    { field: 'team_1', header: 'team_1', width: '120px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'team_2', header: 'team_2', width: '120px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'toss_winner', header: 'toss_winner', width: '120px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'toss_decision', header: 'toss_decision', width: '110px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'winning_team', header: 'winning_team', width: '120px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'losing_team', header: 'losing_team', width: '120px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'match_result', header: 'match_result', width: '110px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'winning_margin_type', header: 'winning_margin_type', width: '140px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'winning_margin_value', header: 'winning_margin_value', width: '150px', sortable: true, searchable: false, editable: true, type: 'number' },
+    { field: 'man_of_match', header: 'man_of_match', width: '140px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'total_runs_scored', header: 'total_runs_scored', width: '140px', sortable: true, searchable: false, editable: true, type: 'number' },
+    { field: 'total_wickets_fallen', header: 'total_wickets_fallen', width: '150px', sortable: true, searchable: false, editable: true, type: 'number' },
+    { field: 'total_overs_bowled', header: 'total_overs_bowled', width: '140px', sortable: true, searchable: false, editable: true, type: 'number' },
+    { field: 'highest_individual_score', header: 'highest_individual_score', width: '170px', sortable: true, searchable: false, editable: true, type: 'number' },
+    { field: 'best_bowling_figures', header: 'best_bowling_figures', width: '150px', sortable: true, searchable: true, editable: true, type: 'text' },
+    { field: 'boundaries_hit', header: 'boundaries_hit', width: '120px', sortable: true, searchable: false, editable: true, type: 'number' },
+    { field: 'sixes_hit', header: 'sixes_hit', width: '100px', sortable: true, searchable: false, editable: true, type: 'number' },
+    { field: 'day_night_match', header: 'day_night_match', width: '130px', sortable: true, searchable: false, editable: true, type: 'boolean', format: (v) => v ? 'Yes' : 'No' },
+    { field: 'rain_affected', header: 'rain_affected', width: '120px', sortable: true, searchable: false, editable: true, type: 'boolean', format: (v) => v ? 'Yes' : 'No' },
+    { field: 'dls_applied', header: 'dls_applied', width: '110px', sortable: true, searchable: false, editable: true, type: 'boolean', format: (v) => v ? 'Yes' : 'No' }
   ],
   
   // Header Rows Configuration (Required: At least 1 row)
@@ -48,80 +48,78 @@ export const tableConfig: TableConfig = {
       id: 'main-header',
       type: 'label',
       cells: [
-        { content: 'id', alignment: 'center' },
+        { content: 'match_id', alignment: 'center' },
+        { content: 'match_format', alignment: 'center' },
+        { content: 'tournament_name', alignment: 'left' },
+        { content: 'series_name', alignment: 'left' },
+        { content: 'match_number', alignment: 'center' },
+        { content: 'venue_name', alignment: 'left' },
+        { content: 'city', alignment: 'left' },
         { content: 'country', alignment: 'left' },
-        { content: 'region', alignment: 'center' },
-        { content: 'volume_tons', alignment: 'right' },
-        { content: 'value_usd', alignment: 'right' },
-        { content: 'price_kg', alignment: 'right' },
-        { content: 'mark_percentage', alignment: 'right' },
-        { content: 'main_destination', alignment: 'left' },
-        { content: 'season', alignment: 'center' },
-        { content: 'area_ha', alignment: 'right' },
-        { content: 'yield_ha', alignment: 'right' },
-        { content: 'grade', alignment: 'center' },
-        { content: 'organic', alignment: 'center' },
-        { content: 'irrigation', alignment: 'center' },
-        { content: 'soil_type', alignment: 'center' },
-        { content: 'climate', alignment: 'center' },
-        { content: 'transport', alignment: 'center' },
-        { content: 'export_port', alignment: 'left' },
-        { content: 'tariff_%', alignment: 'right' },
-        { content: 'status', alignment: 'center' },
-        { content: 'gmo_free', alignment: 'center' },
-        { content: 'fair_trade', alignment: 'center' },
-        { content: 'pesticide_test', alignment: 'center' },
-        { content: 'cold_storage', alignment: 'center' },
-        { content: 'insurance_%', alignment: 'right' },
-        { content: 'export_freq', alignment: 'right' },
-        { content: 'packaging', alignment: 'center' },
-        { content: 'stability', alignment: 'center' },
-        { content: 'price_vol_%', alignment: 'right' },
-        { content: 'doc_score', alignment: 'right' }
+        { content: 'match_date', alignment: 'center' },
+        { content: 'start_time', alignment: 'center' },
+        { content: 'team_1', alignment: 'left' },
+        { content: 'team_2', alignment: 'left' },
+        { content: 'toss_winner', alignment: 'left' },
+        { content: 'toss_decision', alignment: 'center' },
+        { content: 'winning_team', alignment: 'left' },
+        { content: 'losing_team', alignment: 'left' },
+        { content: 'match_result', alignment: 'center' },
+        { content: 'winning_margin_type', alignment: 'center' },
+        { content: 'winning_margin_value', alignment: 'right' },
+        { content: 'man_of_match', alignment: 'left' },
+        { content: 'total_runs_scored', alignment: 'right' },
+        { content: 'total_wickets_fallen', alignment: 'right' },
+        { content: 'total_overs_bowled', alignment: 'right' },
+        { content: 'highest_individual_score', alignment: 'right' },
+        { content: 'best_bowling_figures', alignment: 'center' },
+        { content: 'boundaries_hit', alignment: 'right' },
+        { content: 'sixes_hit', alignment: 'right' },
+        { content: 'day_night_match', alignment: 'center' },
+        { content: 'rain_affected', alignment: 'center' },
+        { content: 'dls_applied', alignment: 'center' }
       ]
     }
   ],
   
   filters: [
     {
-      id: 'region',
-      label: 'Region',
+      id: 'match_format',
+      label: 'Match Format',
       type: 'dropdown',
-      column: 'region',
+      column: 'match_format',
       operator: 'eq',
       options: [
-        { value: 'all', label: 'All Regions' },
-        { value: 'Europe', label: 'Europe' },
-        { value: 'North America', label: 'North America' },
-        { value: 'South America', label: 'South America' },
-        { value: 'Asia', label: 'Asia' },
-        { value: 'Africa', label: 'Africa' },
-        { value: 'Oceania', label: 'Oceania' }
+        { value: 'all', label: 'All Formats' },
+        { value: 'Test', label: 'Test' },
+        { value: 'ODI', label: 'ODI' },
+        { value: 'T20', label: 'T20' },
+        { value: 'IPL', label: 'IPL' }
       ]
     },
     {
-      id: 'export_status',
-      label: 'Export Status',
+      id: 'match_result',
+      label: 'Match Result',
       type: 'dropdown',
-      column: 'export_status',
+      column: 'match_result',
       operator: 'eq',
       options: [
-        { value: 'all', label: 'All Status' },
-        { value: 'Active', label: 'Active' },
-        { value: 'Seasonal', label: 'Seasonal' },
-        { value: 'Suspended', label: 'Suspended' }
+        { value: 'all', label: 'All Results' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'no_result', label: 'No Result' },
+        { value: 'abandoned', label: 'Abandoned' }
       ]
     },
     {
-      id: 'organic_certified',
-      label: 'Organic',
+      id: 'day_night_match',
+      label: 'Day/Night',
       type: 'dropdown',
-      column: 'organic_certified',
+      column: 'day_night_match',
       operator: 'eq',
       options: [
-        { value: 'all', label: 'All Types' },
-        { value: 'true', label: 'Organic' },
-        { value: 'false', label: 'Conventional' }
+        { value: 'all', label: 'All Matches' },
+        { value: 'true', label: 'Day/Night' },
+        { value: 'false', label: 'Day Only' }
       ]
     }
   ],
@@ -133,15 +131,15 @@ export const tableConfig: TableConfig = {
   
   // Default sorting
   defaultSort: {
-    field: 'id',
+    field: 'match_id',
     order: 'asc'
   },
   
   // Search configuration
   enableSearch: true,
-  searchPlaceholder: 'Search countries, destinations, ports...',
+  searchPlaceholder: 'Search teams, venues, tournaments...',
   searchDebounceMs: 300,
-  searchFields: ['country', 'main_destination', 'export_port', 'region'],
+  searchFields: ['team_1', 'team_2', 'venue_name', 'tournament_name', 'city', 'country'],
   
   // Feature flags
   enableInlineEdit: true,

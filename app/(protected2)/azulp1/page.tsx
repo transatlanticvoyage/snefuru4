@@ -1,25 +1,50 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AzMinimalTable from './components/azMinimalTable'
 import AzColumnTemplateControls from './components/azColumnTemplateControls'
 import AzFilterControls from './components/azFilterControls'
 import AzSearchBox from './components/azSearchBox'
 import AzPaginationControls from './components/azPaginationControls'
 import { tableConfig } from './config/tableConfig'
-import artichokeExportData from './data/artichokeData'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import './styles/az-table-template.css'
 
 export default function Azulp1Page() {
+  const [cricketData, setCricketData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClientComponentClient();
+
   useEffect(() => {
-    document.title = 'Artichoke Exports - /azulp1';
+    document.title = 'Cricket Matches - /azulp1';
+    fetchCricketMatches();
   }, []);
+
+  const fetchCricketMatches = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('cricket_matches')
+        .select('*')
+        .order('match_id', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching cricket matches:', error);
+        return;
+      }
+
+      setCricketData(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   // Convert config columns to headers (for backward compatibility)
   const headers = tableConfig.columns.map(col => col.header);
   
-  // Convert artichoke data to table format
-  const data = artichokeExportData.map(row => 
+  // Convert cricket data to table format
+  const data = cricketData.map(row => 
     tableConfig.columns.map(col => {
       const value = row[col.field as keyof typeof row];
       
@@ -32,10 +57,14 @@ export default function Azulp1Page() {
     })
   );
 
-  // Generate tooltips for artichoke data
-  const cellTooltips = artichokeExportData.map(() => 
+  // Generate tooltips for cricket data
+  const cellTooltips = cricketData.map(() => 
     tableConfig.columns.map(col => `${col.header}: ${col.field}`)
   );
+
+  if (loading) {
+    return <div>Loading cricket matches...</div>;
+  }
 
   // Event handlers
   const handleCellClick = (rowIndex: number, colIndex: number, value: any) => {
@@ -52,9 +81,9 @@ export default function Azulp1Page() {
 
   return (
     <>
-      <h1>Global Artichoke Exports by Country</h1>
+      <h1>Cricket Matches Database</h1>
       <p style={{ marginBottom: '20px', color: '#666' }}>
-        30 countries • 30 data columns • Real-time export statistics
+        {cricketData.length} matches • 30 data columns • Live cricket statistics
       </p>
       
       <AzColumnTemplateControls />
@@ -65,7 +94,7 @@ export default function Azulp1Page() {
       <AzMinimalTable 
         headerRows={tableConfig.headerRows}
         data={data}
-        tableClassName="artichoke-export-table"
+        tableClassName="cricket-matches-table"
         theadClassName="table-header"
         tbodyClassName="table-body"
         thClassName="header-cell"

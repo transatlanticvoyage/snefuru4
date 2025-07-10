@@ -253,12 +253,12 @@ export default function AzoPage() {
 
       setUtgs(data || []);
       
-      // Auto-select if only one UTG available
-      if (data && data.length === 1) {
+      // Auto-select if only one UTG available (only if no UTG is currently selected)
+      if (data && data.length === 1 && !selectedUtgId) {
         const singleUtg = data[0];
         setSelectedUtgId(singleUtg.utg_id);
         fetchSelectedUtg(singleUtg.utg_id);
-        updateURLWithCurrentState({ utg_id: singleUtg.utg_id });
+        // Don't update URL immediately to avoid conflicts
       }
     } catch (error) {
       console.error('Error:', error);
@@ -304,12 +304,12 @@ export default function AzoPage() {
 
       setZarnos(data || []);
       
-      // Auto-select if only one Zarno available
-      if (data && data.length === 1) {
+      // Auto-select if only one Zarno available (only if no Zarno is currently selected)
+      if (data && data.length === 1 && !selectedZarnoId) {
         const singleZarno = data[0];
         setSelectedZarnoId(singleZarno.zarno_id);
         fetchSelectedZarno(singleZarno.zarno_id);
-        updateURLWithCurrentState({ zarno_id: singleZarno.zarno_id });
+        // Don't update URL immediately to avoid conflicts
       }
     } catch (error) {
       console.error('Error:', error);
@@ -366,11 +366,13 @@ export default function AzoPage() {
     setSelectedZarnoId(null);
     setSelectedZarnoRecord(null);
     
-    // Fetch related entities (which will auto-select if only one option)
-    fetchRelatedUtgs(xpageId);
-    fetchRelatedZarnos(xpageId);
-    
     updateURLWithCurrentState({ xpage_id: xpageId, utg_id: '', zarno_id: 0 });
+    
+    // Fetch related entities after URL update (which will auto-select if only one option)
+    setTimeout(() => {
+      fetchRelatedUtgs(xpageId);
+      fetchRelatedZarnos(xpageId);
+    }, 100);
   };
 
   const handleUtgChange = (utgId: string) => {
