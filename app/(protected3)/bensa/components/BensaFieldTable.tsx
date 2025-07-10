@@ -21,8 +21,9 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState<BensaEditingState>({ field: null, value: '' });
   const [sort, setSort] = useState<BensaSortState>({ sortBy: 'starred', sortDirection: 'asc' });
+  const [editingChainOfCustody, setEditingChainOfCustody] = useState<{ field: string | null; value: string }>({ field: null, value: '' });
   
-  const { fieldMetadata, toggleFieldStar, toggleFieldFlag } = useBensaFieldMetadata(config.tableName);
+  const { fieldMetadata, toggleFieldStar, toggleFieldFlag, updateChainOfCustody } = useBensaFieldMetadata(config.tableName);
   const supabase = createClientComponentClient();
 
   // Handle sorting
@@ -40,6 +41,7 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
       ...field,
       starred: fieldMetadata[field.key]?.starred || false,
       flagged: fieldMetadata[field.key]?.flagged || false,
+      chain_of_custody_desc: fieldMetadata[field.key]?.chain_of_custody_desc || '',
       value: selectedRecord ? selectedRecord[field.key] : null
     }));
 
@@ -60,6 +62,11 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
           const aVal = a.value?.toString() || '';
           const bVal = b.value?.toString() || '';
           compareResult = aVal.localeCompare(bVal);
+          break;
+        case 'chain_of_custody':
+          const aCoc = a.chain_of_custody_desc || '';
+          const bCoc = b.chain_of_custody_desc || '';
+          compareResult = aCoc.localeCompare(bCoc);
           break;
         default:
           compareResult = 0;
@@ -124,8 +131,24 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
     }
   };
 
+  // Chain of custody editing handlers
+  const handleChainOfCustodyClick = (field: string, currentValue: string) => {
+    setEditingChainOfCustody({ field, value: currentValue || '' });
+  };
+
+  const handleChainOfCustodySave = async () => {
+    if (!editingChainOfCustody.field) return;
+    
+    await updateChainOfCustody(editingChainOfCustody.field, editingChainOfCustody.value);
+    setEditingChainOfCustody({ field: null, value: '' });
+  };
+
+  const handleChainOfCustodyCancel = () => {
+    setEditingChainOfCustody({ field: null, value: '' });
+  };
+
   // Render cell content
-  const renderCell = (field: BensaFieldDefinition & { starred: boolean; flagged: boolean; value: any }) => {
+  const renderCell = (field: BensaFieldDefinition & { starred: boolean; flagged: boolean; chain_of_custody_desc: string; value: any }) => {
     const isEditing = editing.field === field.key;
     const isReadOnly = !field.editable;
 
@@ -361,6 +384,17 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
                 </span>
               )}
             </th>
+            <th 
+              style={BENSA_TABLE_STYLES.headerCell}
+              onClick={() => handleSort('chain_of_custody')}
+            >
+              chain of custody
+              {sort.sortBy === 'chain_of_custody' && (
+                <span style={BENSA_SORT_INDICATOR_STYLES.sortArrow}>
+                  {sort.sortDirection === 'asc' ? '▲' : '▼'}
+                </span>
+              )}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -412,6 +446,43 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
                 </td>
                 <td style={BENSA_TABLE_STYLES.valueCell}>
                   {renderCell(field)}
+                </td>
+                <td style={BENSA_TABLE_STYLES.bodyCell}>
+                  {editingChainOfCustody.field === field.key ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input
+                        type="text"
+                        value={editingChainOfCustody.value}
+                        onChange={(e) => setEditingChainOfCustody(prev => ({ ...prev, value: e.target.value }))}
+                        onBlur={handleChainOfCustodySave}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleChainOfCustodySave();
+                          if (e.key === 'Escape') handleChainOfCustodyCancel();
+                        }}
+                        style={BENSA_INPUT_STYLES.textInput}
+                        placeholder="Enter chain of custody description..."
+                        autoFocus
+                      />
+                      <button onClick={handleChainOfCustodySave} style={BENSA_BUTTON_STYLES.saveButton}>✓</button>
+                      <button onClick={handleChainOfCustodyCancel} style={BENSA_BUTTON_STYLES.cancelButton}>✕</button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => handleChainOfCustodyClick(field.key, field.chain_of_custody_desc)}
+                      style={{
+                        cursor: 'pointer',
+                        padding: '4px',
+                        borderRadius: '4px',
+                        backgroundColor: 'transparent',
+                        color: '#000',
+                        minHeight: '20px',
+                        fontSize: '12px'
+                      }}
+                      title="Click to edit chain of custody description"
+                    >
+                      {field.chain_of_custody_desc || '(click to add)'}
+                    </div>
+                  )}
                 </td>
               </tr>
             );

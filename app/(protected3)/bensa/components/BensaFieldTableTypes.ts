@@ -14,6 +14,7 @@ export interface BensaTableConfig {
 export interface BensaFieldMetadata {
   starred: boolean;
   flagged: boolean;
+  chain_of_custody_desc?: string | null;
 }
 
 export interface BensaTableProps {
