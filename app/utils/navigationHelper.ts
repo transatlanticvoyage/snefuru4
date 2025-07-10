@@ -205,8 +205,8 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
   };
 
   // Debug logging
-  console.log('adminMenuItem children:', adminMenuItem.children.map(c => c.name));
-  console.log('specialFirstItem children:', specialFirstItem.children.map(c => c.name));
+  console.log('adminMenuItem children:', adminMenuItem.children?.map(c => c.name) || []);
+  console.log('specialFirstItem children:', specialFirstItem.children?.map(c => c.name) || []);
   console.log('nonAdminItems:', nonAdminItems.map(item => ({ name: item.name, path: item.path, hasChildren: !!item.children })));
 
   return {
