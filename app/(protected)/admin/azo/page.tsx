@@ -400,8 +400,6 @@ export default function AzoPage() {
   const updateXpageField = async (field: string, value: any) => {
     if (!selectedXpageId) return;
 
-    console.log('Updating field:', field, 'with value:', value, 'for xpage_id:', selectedXpageId);
-
     try {
       const { error } = await supabase
         .from('xpages')
@@ -413,7 +411,6 @@ export default function AzoPage() {
         return;
       }
 
-      console.log('Field updated successfully');
       // Update local state
       setSelectedXpage((prev: XPage | null) => prev ? { ...prev, [field]: value } : null);
     } catch (error) {
@@ -1257,7 +1254,7 @@ export default function AzoPage() {
                     style={{
                       display: 'inline-block',
                       padding: '8px 16px',
-                      backgroundColor: '#3b82f6',
+                      backgroundColor: '#121c67',
                       color: 'white',
                       textDecoration: 'none',
                       borderRadius: '4px',
@@ -1266,7 +1263,7 @@ export default function AzoPage() {
                       cursor: 'pointer'
                     }}
                     onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#121c67'}
                   >
                     View ColTemps For This UTG
                   </a>
