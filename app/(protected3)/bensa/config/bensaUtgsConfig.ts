@@ -23,6 +23,7 @@ export const bensaUtgsConfig: BensaTableConfig = {
     { key: 'header_rows_definition_fantasy', type: 'jsonb', editable: true },
     { key: 'filters_notes', type: 'text', editable: true },
     { key: 'pagination_notes', type: 'text', editable: true },
-    { key: 'searchbox_notes', type: 'text', editable: true }
+    { key: 'searchbox_notes', type: 'text', editable: true },
+    { key: 'utg_columns_definition_file_link', type: 'filelink', editable: true }
   ]
 };

@@ -24,6 +24,7 @@ interface UiTableGrid {
   filters_notes: string | null;
   pagination_notes: string | null;
   searchbox_notes: string | null;
+  utg_columns_definition_file_link: string | null;
 }
 
 interface XPage {
@@ -78,7 +79,8 @@ export default function UiTableGridsTable() {
     header_rows_definition_fantasy: '',
     filters_notes: '',
     pagination_notes: '',
-    searchbox_notes: ''
+    searchbox_notes: '',
+    utg_columns_definition_file_link: ''
   });
   
   const supabase = createClientComponentClient();
@@ -302,7 +304,8 @@ export default function UiTableGridsTable() {
       header_rows_definition_fantasy: record.header_rows_definition_fantasy ? JSON.stringify(record.header_rows_definition_fantasy) : '',
       filters_notes: record.filters_notes || '',
       pagination_notes: record.pagination_notes || '',
-      searchbox_notes: record.searchbox_notes || ''
+      searchbox_notes: record.searchbox_notes || '',
+      utg_columns_definition_file_link: record.utg_columns_definition_file_link || ''
     });
     setIsEditModalOpen(true);
   };
@@ -327,7 +330,8 @@ export default function UiTableGridsTable() {
       header_rows_definition_fantasy: '',
       filters_notes: '',
       pagination_notes: '',
-      searchbox_notes: ''
+      searchbox_notes: '',
+      utg_columns_definition_file_link: ''
     });
   };
 
@@ -449,13 +453,14 @@ export default function UiTableGridsTable() {
     'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage_id', 'rel_xpage',
     'main_db_table', 'sql_view', 'associated_files', 'utg_class', 'created_at', 'updated_at',
     'is_active', 'sort_order', 'horomi_active', 'vertomi_active', 'header_rows_definition_fantasy',
-    'filters_notes', 'pagination_notes', 'searchbox_notes'
+    'filters_notes', 'pagination_notes', 'searchbox_notes', 'utg_columns_definition_file_link'
   ];
 
   // Define which fields can be inline edited (excluding boolean and timestamp fields)
   const inlineEditableFields = [
     'utg_id', 'utg_name', 'utg_columns_definition_location', 'utg_description', 'rel_xpage', 
-    'main_db_table', 'sql_view', 'utg_class', 'filters_notes', 'pagination_notes', 'searchbox_notes'
+    'main_db_table', 'sql_view', 'utg_class', 'filters_notes', 'pagination_notes', 'searchbox_notes',
+    'utg_columns_definition_file_link'
   ];
   
   if (loading) {
@@ -867,6 +872,16 @@ export default function UiTableGridsTable() {
                   placeholder="Notes about search functionality..."
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">utg_columns_definition_file_link</label>
+                <input
+                  type="text"
+                  value={formData.utg_columns_definition_file_link}
+                  onChange={(e) => setFormData({...formData, utg_columns_definition_file_link: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  placeholder="vscode://file/path/to/file"
+                />
+              </div>
             </div>
             
             {/* Bottom save button */}
@@ -1066,6 +1081,16 @@ export default function UiTableGridsTable() {
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
                   rows={3}
                   placeholder="Notes about search functionality..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">utg_columns_definition_file_link</label>
+                <input
+                  type="text"
+                  value={formData.utg_columns_definition_file_link}
+                  onChange={(e) => setFormData({...formData, utg_columns_definition_file_link: e.target.value})}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  placeholder="vscode://file/path/to/file"
                 />
               </div>
             </div>

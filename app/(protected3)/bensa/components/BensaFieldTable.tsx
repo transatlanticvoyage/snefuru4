@@ -201,6 +201,75 @@ export default function BensaFieldTable({ config, selectedRecord, onRecordUpdate
       );
     }
 
+    // Special handling for file link fields
+    if (field.type === 'filelink') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <a
+            href={field.value || '#'}
+            onClick={(e) => {
+              if (!field.value) {
+                e.preventDefault();
+                alert('No file link set');
+              }
+            }}
+            style={{
+              padding: '4px 8px',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              textDecoration: 'none',
+              display: 'inline-block'
+            }}
+          >
+            FILE LINK
+          </a>
+          <button
+            onClick={() => {
+              if (field.value) {
+                navigator.clipboard.writeText(field.value);
+                alert('Link copied to clipboard!');
+              }
+            }}
+            style={{
+              padding: '4px 8px',
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 'bold'
+            }}
+          >
+            COPY
+          </button>
+          <span 
+            onClick={() => handleFieldClick(field.key, field.value)}
+            style={{ 
+              fontSize: '12px', 
+              color: '#666',
+              maxWidth: '400px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              cursor: field.editable ? 'pointer' : 'default',
+              padding: '2px 4px',
+              borderRadius: '4px',
+              backgroundColor: field.editable ? 'transparent' : '#f9f9f9',
+            }}
+            title={field.value || 'Click to edit'}
+          >
+            {field.value ? (field.value.length > 400 ? field.value.substring(0, 400) + '...' : field.value) : '(click to add link)'}
+          </span>
+        </div>
+      );
+    }
+
     return (
       <div
         onClick={() => handleFieldClick(field.key, field.value)}
