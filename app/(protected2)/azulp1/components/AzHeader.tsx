@@ -252,7 +252,7 @@ export default function AzHeader() {
         const rawNavData = await response.json();
         
         // Import and use navigationHelper to create proper structure
-        const { createNavigationStructure } = await import('/app/utils/navigationHelper');
+        const { createNavigationStructure } = await import('@/app/utils/navigationHelper');
         const { adminMenuItem, specialFirstItem, nonAdminItems } = createNavigationStructure(rawNavData);
         
         // Combine into final navigation structure (same as main app)
