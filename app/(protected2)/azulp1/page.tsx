@@ -6,6 +6,7 @@ import AzColumnTemplateControls from './components/azColumnTemplateControls'
 import AzFilterControls from './components/azFilterControls'
 import AzSearchBox from './components/azSearchBox'
 import AzPaginationControls from './components/azPaginationControls'
+import AzBiriDevInfoBox from './azBiriDevInfoBox'
 import AzHeader from './components/AzHeader'
 import AzSidebar from './components/AzSidebar'
 import AzNavToggle from './components/AzNavToggle'
@@ -129,7 +130,10 @@ export default function Azulp1Page() {
         <AzColumnTemplateControls />
         <AzFilterControls />
         <AzSearchBox />
-        <AzPaginationControls />
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+          <AzPaginationControls />
+          <AzBiriDevInfoBox />
+        </div>
         
         <AzMinimalTable 
           headerRows={tableConfig.headerRows}
