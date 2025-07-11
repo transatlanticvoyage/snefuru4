@@ -78,6 +78,10 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         path: '/azulp1'
       },
       {
+        name: 'Azulp SQL Swipes',
+        path: '/admin/azulpsql'
+      },
+      {
         name: 'ColTemp System',
         path: undefined // No link - separator
       },
