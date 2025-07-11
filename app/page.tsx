@@ -4,7 +4,6 @@
 // URL: /
 // Title: Snefuru - Home
 // Last Sync: 2024-01-10T10:30:00Z
-export const XPAGE_ID = 11;
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,11 +11,12 @@ import { useAuth } from './context/AuthContext';
 import xpageCache from '@/app/metadata/xpage-cache.json';
 
 export default function HomePage() {
+  const XPAGE_ID = 11; // Moved inside component to fix Next.js build error
   const router = useRouter();
   const { user, loading } = useAuth();
   
   // Get static metadata from cache
-  const staticMetadata = xpageCache[XPAGE_ID.toString()];
+  const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
 
   useEffect(() => {
     // Use static title from cache, fallback to hardcoded

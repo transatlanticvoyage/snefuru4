@@ -4,7 +4,6 @@
 // URL: /bin31/panjar4
 // Title: panjar4 - Snefuru
 // Last Sync: 2024-01-10T10:30:00Z
-export const XPAGE_ID = 14;
 
 import { useState, useEffect } from 'react';
 import Panjar4UI from './components/panjar4';
@@ -14,6 +13,8 @@ import { useAuth } from '@/app/context/AuthContext';
 import xpageCache from '@/app/metadata/xpage-cache.json';
 
 export default function Panjar4Page() {
+  const XPAGE_ID = 14; // Moved inside component to fix Next.js build error
+  
   const [images, setImages] = useState<ImageRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export default function Panjar4Page() {
   const supabase = createClientComponentClient();
   
   // Get static metadata from cache
-  const staticMetadata = xpageCache[XPAGE_ID.toString()];
+  const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
   console.log('[panjar4] Static metadata from cache:', staticMetadata);
 
   useEffect(() => {

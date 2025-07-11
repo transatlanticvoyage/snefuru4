@@ -4,7 +4,6 @@
 // URL: /admin/xpagesmanager1
 // Title: X Pages Manager - Snefuru
 // Last Sync: 2024-01-10T10:30:00Z
-export const XPAGE_ID = 102; // Use 100+ range for admin-created pages
 
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -31,6 +30,8 @@ interface XPage {
 }
 
 export default function XPagesManager1Page() {
+  const XPAGE_ID = 102; // Moved inside component to fix Next.js build error
+  
   const { user } = useAuth();
   const [xpages, setXpages] = useState<XPage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,7 @@ export default function XPagesManager1Page() {
   const supabase = createClientComponentClient();
   
   // Get static metadata from cache
-  const staticMetadata = xpageCache[XPAGE_ID.toString()];
+  const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
 
   // Define column order and properties
   const columns: Array<{ key: keyof XPage; type: string; width: string }> = [

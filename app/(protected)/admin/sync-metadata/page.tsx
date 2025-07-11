@@ -4,12 +4,12 @@
 // URL: /admin/sync-metadata
 // Title: Sync XPage Metadata - Snefuru Admin
 // Last Sync: 2024-01-10T10:30:00Z
-export const XPAGE_ID = 100; // Use 100+ range for admin-created pages
 
 import { useState } from 'react';
 import { syncXPageMetadataAPI } from '@/app/utils/syncXPageMetadata';
 
 export default function SyncMetadataPage() {
+  const XPAGE_ID = 100; // Moved inside component to fix Next.js build error
   const [isLoading, setIsLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{ success: boolean; message: string; updatedPages: number } | null>(null);
 

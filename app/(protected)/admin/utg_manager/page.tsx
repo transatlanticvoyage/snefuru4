@@ -4,7 +4,6 @@
 // URL: /admin/utg_manager
 // Title: UTG Manager - Snefuru
 // Last Sync: 2024-01-10T10:30:00Z
-export const XPAGE_ID = 13;
 
 import { useAuth } from '@/app/context/AuthContext';
 import Link from 'next/link';
@@ -13,10 +12,11 @@ import { useEffect } from 'react';
 import xpageCache from '@/app/metadata/xpage-cache.json';
 
 export default function UtgManagerPage() {
+  const XPAGE_ID = 13; // Moved inside component to fix Next.js build error
   const { user } = useAuth();
   
   // Get static metadata from cache
-  const staticMetadata = xpageCache[XPAGE_ID.toString()];
+  const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
 
   useEffect(() => {
     // Use static title from cache, fallback to hardcoded

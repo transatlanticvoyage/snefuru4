@@ -4,7 +4,6 @@
 // URL: /admin/azo
 // Title: Azo Page Settings Manager - Snefuru
 // Last Sync: 2024-01-10T10:30:00Z
-export const XPAGE_ID = 12;
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -63,6 +62,8 @@ interface ZarnoDropdownItem {
 }
 
 export default function AzoPage() {
+  const XPAGE_ID = 12; // Moved inside component to fix Next.js build error
+  
   const [activeTab, setActiveTab] = useState<'xpages' | 'utgs' | 'zarnos'>('xpages');
   const [xpages, setXpages] = useState<XPage[]>([]);
   const [utgs, setUtgs] = useState<UTG[]>([]);
@@ -94,7 +95,7 @@ export default function AzoPage() {
   const supabase = createClientComponentClient();
   
   // Get static metadata from cache
-  const staticMetadata = xpageCache[XPAGE_ID.toString()];
+  const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
 
   // Initialize page - only run once
   useEffect(() => {
