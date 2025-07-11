@@ -6,7 +6,9 @@ import AzColumnTemplateControls from './components/azColumnTemplateControls'
 import AzFilterControls from './components/azFilterControls'
 import AzSearchBox from './components/azSearchBox'
 import AzPaginationControls from './components/azPaginationControls'
-import AzNavigation from './components/AzNavigation'
+import AzHeader from './components/AzHeader'
+import AzSidebar from './components/AzSidebar'
+import AzNavToggle from './components/AzNavToggle'
 import { tableConfig } from './config/tableConfig'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import './styles/az-table-template.css'
@@ -101,7 +103,9 @@ export default function Azulp1Page() {
 
   return (
     <>
-      <AzNavigation />
+      <AzNavToggle />
+      <AzHeader />
+      <AzSidebar />
       <div className="az-page-content" style={{ 
         paddingTop: navVisible ? '60px' : '0', 
         paddingLeft: navVisible ? '250px' : '0',

@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import AzNavigation from '../azulp1/components/AzNavigation';
+import AzHeader from '../azulp1/components/AzHeader';
+import AzSidebar from '../azulp1/components/AzSidebar';
+import AzNavToggle from '../azulp1/components/AzNavToggle';
 import '../azulp1/styles/az-navigation.css';
 
 export default function Tornado2Page() {
@@ -30,7 +32,9 @@ export default function Tornado2Page() {
 
   return (
     <>
-      <AzNavigation />
+      <AzNavToggle />
+      <AzHeader />
+      <AzSidebar />
       <div style={{ 
         paddingTop: navVisible ? '60px' : '0', 
         paddingLeft: navVisible ? '250px' : '0',
