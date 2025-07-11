@@ -26530,3 +26530,11 @@ API: Navigation items received: [
  GET /myhub?tab=xpages&xpage_id=3 200 in 36ms
  GET /myhub?tab=billing&xpage_id=0 200 in 46ms
  GET /myhub?tab=general&xpage_id=0 200 in 47ms
+ GET /myhub?tab=billing&xpage_id=0 200 in 42ms
+ GET /myhub?tab=settings&xpage_id=0 200 in 44ms
+ GET /myhub?tab=billing&xpage_id=0 200 in 27ms
+ GET /myhub?tab=general&xpage_id=0 200 in 40ms
+ GET /myhub?tab=billing&xpage_id=0 200 in 35ms
+ GET /myhub?tab=settings&xpage_id=0 200 in 35ms
+ GET /myhub?tab=billing&xpage_id=0 200 in 20ms
+ GET /myhub?tab=general&xpage_id=0 200 in 31ms
