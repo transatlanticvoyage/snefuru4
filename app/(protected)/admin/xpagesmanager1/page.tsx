@@ -25,6 +25,7 @@ interface XPage {
   position_marker: number | null;
   show_in_all_pages_nav_area1: boolean | null;
   broad_parent_container: string | null;
+  has_mutation_observer: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -47,6 +48,8 @@ export default function XPagesManager1Page() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [syncingField, setSyncingField] = useState<number | null>(null);
   const [syncMessage, setSyncMessage] = useState<{ xpage_id: number; message: string; success: boolean } | null>(null);
+  const [directSyncLoading, setDirectSyncLoading] = useState(false);
+  const [directSyncMessage, setDirectSyncMessage] = useState<{ message: string; success: boolean } | null>(null);
   
   const supabase = createClientComponentClient();
   
@@ -68,6 +71,7 @@ export default function XPagesManager1Page() {
     { key: 'position_marker', type: 'integer', width: '120px' },
     { key: 'show_in_all_pages_nav_area1', type: 'boolean', width: '80px' },
     { key: 'broad_parent_container', type: 'text', width: '200px' },
+    { key: 'has_mutation_observer', type: 'text', width: '150px' },
     { key: 'created_at', type: 'text', width: '200px' },
     { key: 'updated_at', type: 'text', width: '200px' }
   ];
@@ -230,6 +234,83 @@ export default function XPagesManager1Page() {
       }, 3000);
     } finally {
       setSyncingField(null);
+    }
+  };
+
+  const PushXPagesMetaTitleDirectToPageComponent = async () => {
+    if (selectedRows.size === 0) {
+      setDirectSyncMessage({
+        message: 'Please select at least one row from the table',
+        success: false
+      });
+      setTimeout(() => setDirectSyncMessage(null), 5000);
+      return;
+    }
+
+    setDirectSyncLoading(true);
+    setDirectSyncMessage(null);
+
+    try {
+      // Get selected xpages data
+      const selectedXPages = xpages.filter(xpage => selectedRows.has(xpage.xpage_id));
+      
+      // Map XPAGE_ID to file paths (testing with gconjar1 and sitejar4)
+      const pageMapping = [
+        { xpage_id: 15, filePath: '/app/(protected)/sitejar4/page.tsx' },
+        { xpage_id: 16, filePath: '/app/(protected)/gconjar1/page.tsx' }
+      ];
+
+      const results = [];
+      
+      for (const xpage of selectedXPages) {
+        const mapping = pageMapping.find(m => m.xpage_id === xpage.xpage_id);
+        
+        if (!mapping) {
+          results.push(`XPAGE_ID ${xpage.xpage_id}: No file mapping found - skipped`);
+          continue;
+        }
+
+        if (!xpage.meta_title) {
+          results.push(`XPAGE_ID ${xpage.xpage_id}: No meta_title set - skipped`);
+          continue;
+        }
+
+        // Call API to update the page component file
+        const response = await fetch('/api/update-page-title', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            filePath: mapping.filePath,
+            newTitle: xpage.meta_title,
+            xpageId: xpage.xpage_id
+          }),
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          results.push(`XPAGE_ID ${xpage.xpage_id}: Updated successfully`);
+        } else {
+          results.push(`XPAGE_ID ${xpage.xpage_id}: ${result.error}`);
+        }
+      }
+
+      setDirectSyncMessage({
+        message: results.join(' | '),
+        success: results.every(r => r.includes('Updated successfully'))
+      });
+
+    } catch (error) {
+      console.error('Direct sync error:', error);
+      setDirectSyncMessage({
+        message: 'Error: Failed to update page components',
+        success: false
+      });
+    } finally {
+      setDirectSyncLoading(false);
+      setTimeout(() => setDirectSyncMessage(null), 8000);
     }
   };
 
@@ -513,6 +594,46 @@ export default function XPagesManager1Page() {
             <option value={50}>50</option>
             <option value={100}>100</option>
           </select>
+        </div>
+      </div>
+
+      {/* Direct Sync Button */}
+      <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-yellow-800 mb-2">sync_button_direct_to_page_component</h3>
+            <p className="text-sm text-yellow-700 mb-3">
+              Select rows below and click to push meta_title directly to page component files. 
+              <strong>Testing only on /gconjar1 and /sitejar4</strong>
+            </p>
+            {directSyncMessage && (
+              <div className={`p-3 rounded-md text-sm ${
+                directSyncMessage.success 
+                  ? 'bg-green-100 text-green-800 border border-green-300' 
+                  : 'bg-red-100 text-red-800 border border-red-300'
+              }`}>
+                {directSyncMessage.message}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={PushXPagesMetaTitleDirectToPageComponent}
+            disabled={directSyncLoading || selectedRows.size === 0}
+            className={`px-6 py-3 rounded-md font-semibold text-white transition-colors ${
+              directSyncLoading || selectedRows.size === 0
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-yellow-600 hover:bg-yellow-700'
+            }`}
+          >
+            {directSyncLoading ? (
+              <span className="flex items-center">
+                <span className="animate-spin mr-2">⟲</span>
+                Pushing...
+              </span>
+            ) : (
+              `Push Direct (${selectedRows.size} selected)`
+            )}
+          </button>
         </div>
       </div>
 

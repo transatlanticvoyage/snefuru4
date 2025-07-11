@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import xpageCache from '@/app/metadata/xpage-cache.json';
 
 export default function Mapping1Page() {
   const [activeTab, setActiveTab] = useState<'overview' | 'spreadsheet'>('overview');
@@ -13,7 +14,11 @@ export default function Mapping1Page() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    document.title = '/admin/mapping1 - Snefuru';
+    const XPAGE_ID = 17;
+    const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
+    
+    // Set document title
+    document.title = staticMetadata?.title || '/admin/mapping1 - Snefuru';
   }, []);
 
   useEffect(() => {

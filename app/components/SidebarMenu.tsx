@@ -301,6 +301,16 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
             {isUserMenuOpen && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 rounded-md shadow-lg py-1 z-50">
                 <Link
+                  href="/myhub"
+                  className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    onToggle();
+                  }}
+                >
+                  MyHub Account Settings
+                </Link>
+                <Link
                   href="/profile"
                   className="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
                   onClick={() => {

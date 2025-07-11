@@ -26,6 +26,7 @@ export const bensaXpagesConfig: BensaTableConfig = {
     { key: 'position_marker', type: 'integer', editable: true },
     { key: 'show_in_all_pages_nav_area1', type: 'boolean', editable: true },
     { key: 'broad_parent_container', type: 'text', editable: true },
+    { key: 'has_mutation_observer', type: 'text', editable: true },
     { key: 'urlparam_total_keys_listed', type: 'jsonb', editable: true },
     { key: 'created_at', type: 'timestamp', editable: false },
     { key: 'updated_at', type: 'timestamp', editable: false }

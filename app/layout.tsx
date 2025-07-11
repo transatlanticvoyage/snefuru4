@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: {
     template: "%s - Snefuru",
-    default: "Snefuru"
+    // default: "Snefuru"  // Commented out to prevent title conflicts with client-side document.title
   },
   description: "Your AI Image Generation Platform",
 };

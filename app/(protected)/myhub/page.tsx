@@ -1,18 +1,14 @@
 'use client';
 
-// @xpage-metadata
-// URL: /admin/azo
-// Title: Azo Page Settings Manager - Snefuru
-// Last Sync: 2024-01-10T10:30:00Z
-
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useAuth } from '@/app/context/AuthContext';
 import BensaFieldTable from '@/app/(protected3)/bensa/components/BensaFieldTable';
 import { bensaUtgsConfig } from '@/app/(protected3)/bensa/config/bensaUtgsConfig';
 import { bensaZarnosConfig } from '@/app/(protected3)/bensa/config/bensaZarnosConfig';
 import { bensaXpagesConfig } from '@/app/(protected3)/bensa/config/bensaXpagesConfig';
-import xpageCache from '@/app/metadata/xpage-cache.json';
+import { bensaUsersConfig } from '@/app/(protected3)/bensa/config/bensaUsersConfig';
 
 interface XPage {
   xpage_id: number;
@@ -62,19 +58,31 @@ interface ZarnoDropdownItem {
   fk_xpage_id: number | null;
 }
 
-export default function AzoPage() {
-  const XPAGE_ID = 12; // Moved inside component to fix Next.js build error
-  
-  const [activeTab, setActiveTab] = useState<'xpages' | 'utgs' | 'zarnos'>('xpages');
+interface User {
+  id: string;
+  email: string | null;
+  is_admin: boolean | null;
+  sidebar_menu_active: boolean | null;
+  ruplin_api_key_1: string | null;
+  background_processing_settings: any;
+  created_at: string;
+  auth_id: string;
+}
+
+export default function MyHubPage() {
+  const [activeTab, setActiveTab] = useState<'general' | 'billing' | 'settings'>('general');
   const [xpages, setXpages] = useState<XPage[]>([]);
   const [utgs, setUtgs] = useState<UTG[]>([]);
   const [zarnos, setZarnos] = useState<ZarnoDropdownItem[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [selectedXpage, setSelectedXpage] = useState<XPage | null>(null);
   const [selectedXpageId, setSelectedXpageId] = useState<number | null>(null);
   const [selectedUtgId, setSelectedUtgId] = useState<string | null>(null);
   const [selectedUtgRecord, setSelectedUtgRecord] = useState<any | null>(null);
   const [selectedZarnoId, setSelectedZarnoId] = useState<number | null>(null);
   const [selectedZarnoRecord, setSelectedZarnoRecord] = useState<Zarno | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserRecord, setSelectedUserRecord] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingUtgs, setLoadingUtgs] = useState(false);
   const [loadingZarnos, setLoadingZarnos] = useState(false);
@@ -90,33 +98,30 @@ export default function AzoPage() {
   const [boxEditorField, setBoxEditorField] = useState<string>('');
   const [boxEditorRecord, setBoxEditorRecord] = useState<any>(null);
   const [boxEditorUpdateHandler, setBoxEditorUpdateHandler] = useState<((field: string, value: any) => Promise<void>) | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClientComponentClient();
-  
-  // Get static metadata from cache
-  const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
+  const { user } = useAuth();
 
   // Initialize page - only run once
   useEffect(() => {
-    // Use static title from cache, fallback to hardcoded
-    const staticTitle = staticMetadata?.title || 'Azo Page Settings Manager - Snefuru';
-    document.title = staticTitle;
+    document.title = 'MyHub Account Settings - Snefuru';
     fetchXpages();
+    fetchUsers();
     fetchFieldMetadata();
-  }, [staticMetadata?.title]);
+  }, []);
 
   // Handle URL parameters - only when searchParams change
   useEffect(() => {
     if (!searchParams) return;
     
-    // Note: document.title is now handled by the initial useEffect with static cache
-    
     // Get tab from URL if present
     const tabParam = searchParams.get('tab');
-    if (tabParam && (tabParam === 'xpages' || tabParam === 'utgs' || tabParam === 'zarnos')) {
-      setActiveTab(tabParam as 'xpages' | 'utgs' | 'zarnos');
+    if (tabParam && (tabParam === 'general' || tabParam === 'billing' || tabParam === 'settings')) {
+      setActiveTab(tabParam as 'general' | 'billing' | 'settings');
     }
     
     // Get xpage_id from URL if present
@@ -204,6 +209,57 @@ export default function AzoPage() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('email', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching users:', error);
+        return;
+      }
+
+      setUsers(data || []);
+      
+      // Find current user and set admin status
+      if (user?.id) {
+        const currentUserRecord = data?.find(u => u.auth_id === user.id);
+        if (currentUserRecord) {
+          setCurrentUser(currentUserRecord);
+          setIsCurrentUserAdmin(currentUserRecord.is_admin || false);
+          // Auto-select current user if no user is selected
+          if (!selectedUserId) {
+            setSelectedUserId(currentUserRecord.id);
+            setSelectedUserRecord(currentUserRecord);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchSelectedUser = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching selected user:', error);
+        return;
+      }
+
+      setSelectedUserRecord(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   const fetchSelectedUtg = async (utgId: string) => {
     try {
       const { data, error } = await supabase
@@ -271,7 +327,6 @@ export default function AzoPage() {
         const singleUtg = data[0];
         setSelectedUtgId(singleUtg.utg_id);
         fetchSelectedUtg(singleUtg.utg_id);
-        // Don't update URL immediately to avoid conflicts
       }
     } catch (error) {
       console.error('Error:', error);
@@ -322,7 +377,6 @@ export default function AzoPage() {
         const singleZarno = data[0];
         setSelectedZarnoId(singleZarno.zarno_id);
         fetchSelectedZarno(singleZarno.zarno_id);
-        // Don't update URL immediately to avoid conflicts
       }
     } catch (error) {
       console.error('Error:', error);
@@ -332,14 +386,11 @@ export default function AzoPage() {
   };
 
   const updateURLWithCurrentState = (updates: {
-    tab?: 'xpages' | 'utgs' | 'zarnos';
+    tab?: 'general' | 'billing' | 'settings';
     xpage_id?: number;
     utg_id?: string;
     zarno_id?: number;
   }) => {
-    // Get our correct title from cache before navigation
-    const correctTitle = staticMetadata?.title || 'Azo Page Settings Manager - Snefuru';
-    
     const params = new URLSearchParams(searchParams || '');
     
     // Update or set tab
@@ -370,13 +421,7 @@ export default function AzoPage() {
       }
     }
     
-    router.push(`/admin/azo?${params.toString()}`);
-    
-    // Aggressively restore title after navigation - multiple attempts to overcome Next.js metadata
-    setTimeout(() => { document.title = correctTitle; }, 0);
-    setTimeout(() => { document.title = correctTitle; }, 10);
-    setTimeout(() => { document.title = correctTitle; }, 50);
-    setTimeout(() => { document.title = correctTitle; }, 100);
+    router.push(`/myhub?${params.toString()}`);
   };
 
   const handleXpageChange = (xpageId: number) => {
@@ -405,6 +450,24 @@ export default function AzoPage() {
       setSelectedUtgRecord(null);
     }
     updateURLWithCurrentState({ utg_id: utgId });
+  };
+
+  const handleUserChange = (userId: string) => {
+    // Security check: non-admin users can only select themselves
+    if (!isCurrentUserAdmin && currentUser) {
+      const selectedUser = users.find(u => u.id === userId);
+      if (selectedUser && selectedUser.auth_id !== currentUser.auth_id) {
+        alert('You can only access your own user record.');
+        return;
+      }
+    }
+    
+    setSelectedUserId(userId);
+    if (userId) {
+      fetchSelectedUser(userId);
+    } else {
+      setSelectedUserRecord(null);
+    }
   };
 
   const handleZarnoChange = (zarnoId: number) => {
@@ -461,6 +524,50 @@ export default function AzoPage() {
       setSelectedXpage((prev: XPage | null) => prev ? { ...prev, [field]: value } : null);
     } catch (error) {
       console.error('Error updating field:', error);
+    }
+  };
+
+  const updateUserField = async (field: string, value: any) => {
+    if (!selectedUserId) return;
+
+    // Security check: non-admin users can only edit their own records
+    if (!isCurrentUserAdmin && selectedUserRecord && selectedUserRecord.auth_id !== currentUser?.auth_id) {
+      alert('You can only edit your own user record.');
+      return;
+    }
+
+    // Additional security check: only admins can edit admin-only fields
+    const adminOnlyFields = ['is_admin', 'ruplin_api_key_1', 'background_processing_settings'];
+    if (adminOnlyFields.includes(field) && !isCurrentUserAdmin) {
+      alert('Only administrators can edit this field.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ [field]: value })
+        .eq('id', selectedUserId);
+
+      if (error) {
+        console.error('Error updating user field:', error);
+        return;
+      }
+
+      // Update local state
+      setSelectedUserRecord((prev: User | null) => prev ? { ...prev, [field]: value } : null);
+      
+      // If updating current user, also update the currentUser state
+      if (selectedUserRecord && selectedUserRecord.auth_id === currentUser?.auth_id) {
+        setCurrentUser((prev: User | null) => prev ? { ...prev, [field]: value } : null);
+        
+        // Update admin status if is_admin was changed
+        if (field === 'is_admin') {
+          setIsCurrentUserAdmin(value);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
@@ -807,7 +914,7 @@ export default function AzoPage() {
   };
 
   // Function to get appropriate tab style based on active tab and position
-  const getTabStyle = (tabName: 'xpages' | 'utgs' | 'zarnos') => {
+  const getTabStyle = (tabName: 'general' | 'billing' | 'settings') => {
     if (tabName === activeTab) {
       return activeTabStyle;
     }
@@ -816,24 +923,24 @@ export default function AzoPage() {
     let style = { ...tabStyle };
     
     // Remove right border if this tab is to the left of active tab
-    if ((tabName === 'xpages' && activeTab === 'utgs') || 
-        (tabName === 'utgs' && activeTab === 'zarnos')) {
+    if ((tabName === 'general' && activeTab === 'billing') || 
+        (tabName === 'billing' && activeTab === 'settings')) {
       style.borderRight = 'none';
     }
     
     // Remove left border if this tab is to the right of active tab
-    if ((tabName === 'utgs' && activeTab === 'xpages') || 
-        (tabName === 'zarnos' && activeTab === 'utgs')) {
+    if ((tabName === 'billing' && activeTab === 'general') || 
+        (tabName === 'settings' && activeTab === 'billing')) {
       style.borderLeft = 'none';
     }
     
     // Handle border doubling between adjacent inactive tabs
     // Remove right border from left tab in inactive pairs
-    if (tabName === 'xpages' && activeTab === 'zarnos') {
-      // xpages and utgs are both inactive, remove right border from xpages
+    if (tabName === 'general' && activeTab === 'settings') {
+      // general and billing are both inactive, remove right border from general
       style.borderRight = 'none';
-    } else if (tabName === 'utgs' && activeTab === 'xpages') {
-      // utgs and zarnos are both inactive, remove right border from utgs
+    } else if (tabName === 'billing' && activeTab === 'general') {
+      // billing and settings are both inactive, remove right border from billing
       style.borderRight = 'none';
     }
     
@@ -843,24 +950,43 @@ export default function AzoPage() {
   return (
     <div>
       <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>
-        <span style={{ fontWeight: 'bold' }}>Azo Page Settings Manager</span>
-        <span style={{ fontWeight: 'normal' }}> (internal snefuru app page creator)</span>
+        <span style={{ fontWeight: 'bold' }}>MyHub Account Settings</span>
       </h1>
 
       <div style={dropdownContainerStyle}>
-        <label style={labelStyle}>Select XPage:</label>
+        <label style={labelStyle}>Select users:</label>
         <select 
           style={selectStyle}
-          value={selectedXpageId || ''}
-          onChange={(e) => handleXpageChange(Number(e.target.value))}
+          value={selectedUserId || ''}
+          onChange={(e) => handleUserChange(e.target.value)}
           disabled={loading}
         >
-          <option value="">-- Select an XPage --</option>
-          {xpages.map((xpage) => (
-            <option key={xpage.xpage_id} value={xpage.xpage_id}>
-              {xpage.xpage_id} - {xpage.title1 || '(No title)'}
+          <option value="">-- Select a User --</option>
+          {users.map((user) => (
+            <option 
+              key={user.id} 
+              value={user.id}
+              disabled={!isCurrentUserAdmin && user.auth_id !== currentUser?.auth_id}
+            >
+              {user.id} - {user.email || '(No email)'} - {user.auth_id === currentUser?.auth_id ? 'CurrentlyLoggedInAccount' : '-'}
             </option>
           ))}
+        </select>
+        
+        <label style={labelStyle}>empty (waiting):</label>
+        <select 
+          style={{...selectStyle, opacity: 0.5, cursor: 'not-allowed'}}
+          disabled={true}
+        >
+          <option value="">-- Coming Soon --</option>
+        </select>
+        
+        <label style={labelStyle}>empty (waiting):</label>
+        <select 
+          style={{...selectStyle, opacity: 0.5, cursor: 'not-allowed'}}
+          disabled={true}
+        >
+          <option value="">-- Coming Soon --</option>
         </select>
 
         <div style={tooltipContainerStyle}>
@@ -871,95 +997,61 @@ export default function AzoPage() {
           >
             ℹ️
           </span>
-          <label style={labelStyle}>Select UTG:</label>
-          <div style={tooltipBoxStyle}>
-            <span>All rows from utgs where rel_xpage_id matches xpages.xpage_id</span>
-            <button style={copyButtonStyle} onClick={copyTooltipText}>Copy</button>
-          </div>
         </div>
-        
-        <select 
-          style={!selectedXpageId ? disabledSelectStyle : selectStyle}
-          value={selectedUtgId || ''}
-          onChange={(e) => handleUtgChange(e.target.value)}
-          disabled={!selectedXpageId || loadingUtgs}
-        >
-          <option value="">-- Select a UTG --</option>
-          {utgs.map((utg) => (
-            <option key={utg.utg_id} value={utg.utg_id}>
-              {utg.utg_id} - {utg.utg_name}
-            </option>
-          ))}
-        </select>
-
-        <label style={labelStyle}>Select Zarno:</label>
-        <select 
-          style={!selectedXpageId ? disabledSelectStyle : selectStyle}
-          value={selectedZarnoId || ''}
-          onChange={(e) => handleZarnoChange(e.target.value ? Number(e.target.value) : 0)}
-          disabled={!selectedXpageId || loadingZarnos}
-        >
-          <option value="">-- Select a Zarno --</option>
-          {zarnos.map((zarno) => (
-            <option key={zarno.zarno_id} value={zarno.zarno_id}>
-              {zarno.zarno_id} - {zarno.zarno_name || '(No name)'}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div style={tabContainerStyle}>
         <ul style={tabListStyle}>
           <li 
-            style={getTabStyle('xpages')}
+            style={getTabStyle('general')}
             onClick={() => {
-              setActiveTab('xpages');
-              updateURLWithCurrentState({ tab: 'xpages' });
+              setActiveTab('general');
+              updateURLWithCurrentState({ tab: 'general' });
             }}
           >
-            {activeTab === 'xpages' ? 
+            {activeTab === 'general' ? 
               <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
               <span style={{ color: 'black', marginRight: '14px' }}>•</span>
             }
-            xpages
+            general
           </li>
           <li 
-            style={getTabStyle('utgs')}
+            style={getTabStyle('billing')}
             onClick={() => {
-              setActiveTab('utgs');
-              updateURLWithCurrentState({ tab: 'utgs' });
+              setActiveTab('billing');
+              updateURLWithCurrentState({ tab: 'billing' });
             }}
           >
-            {activeTab === 'utgs' ? 
+            {activeTab === 'billing' ? 
               <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
               <span style={{ color: 'black', marginRight: '14px' }}>•</span>
             }
-            utgs
+            billing
           </li>
           <li 
-            style={getTabStyle('zarnos')}
+            style={getTabStyle('settings')}
             onClick={() => {
-              setActiveTab('zarnos');
-              updateURLWithCurrentState({ tab: 'zarnos' });
+              setActiveTab('settings');
+              updateURLWithCurrentState({ tab: 'settings' });
             }}
           >
-            {activeTab === 'zarnos' ? 
+            {activeTab === 'settings' ? 
               <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
               <span style={{ color: 'black', marginRight: '14px' }}>•</span>
             }
-            zarnos
+            settings
           </li>
         </ul>
       </div>
 
       <div style={contentStyle}>
-        {!selectedXpageId ? (
+        {!selectedUserId ? (
           <div style={{ textAlign: 'center', color: '#666', marginTop: '50px' }}>
-            <p>Please select an XPage from the dropdown above to manage its settings.</p>
+            <p>Please select a User from the dropdown above to manage account settings.</p>
           </div>
         ) : (
           <>
-            {activeTab === 'xpages' && (
+            {activeTab === 'general' && (
               <div>
                 <div style={{
                   backgroundColor: '#f8f9fa',
@@ -1021,10 +1113,10 @@ export default function AzoPage() {
                     </a>
                   </div>
                 </div>
-                <h2>XPages Settings</h2>
-                <p>Configure main settings for XPage ID: {selectedXpageId}</p>
+                <h2>User Account Settings</h2>
+                <p>Configure account settings for User ID: {selectedUserId}</p>
                 
-                {selectedXpage && (
+                {selectedUserRecord && (
                   <>
                     <div style={{ 
                       backgroundColor: '#b5edbc', 
@@ -1036,98 +1128,75 @@ export default function AzoPage() {
                       color: '#252525' 
                     }}>
                       <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
-                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on xpages, utgs, zarnos, etc.</span>
+                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on users, and other database tables.</span>
                     </div>
                     <BensaFieldTable
-                      config={bensaXpagesConfig}
-                      selectedRecord={selectedXpage}
-                      onRecordUpdate={updateXpageField}
+                      config={bensaUsersConfig}
+                      selectedRecord={selectedUserRecord}
+                      onRecordUpdate={updateUserField}
                       onBoxEditorOpen={handleBoxEditorOpen}
                     />
                   </>
                 )}
               </div>
             )}
-            {activeTab === 'utgs' && (
+            {activeTab === 'billing' && (
               <div>
-                {selectedUtgId && (
-                  <a
-                    href={`/admin/coltempcommand?filter_rel_utg_id=${selectedUtgId}`}
-                    style={{
-                      display: 'inline-block',
-                      padding: '8px 16px',
-                      backgroundColor: '#121c67',
-                      color: 'white',
-                      textDecoration: 'none',
-                      borderRadius: '4px',
-                      fontSize: '16px',
-                      marginBottom: '16px',
-                      cursor: 'pointer'
-                    }}
-                    onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#2563eb'}
-                    onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#121c67'}
-                  >
-                    View ColTemps For This UTG
-                  </a>
-                )}
-                <h2>UTGs Settings</h2>
-                <p>Configure UTG settings for XPage ID: {selectedXpageId}</p>
-                {selectedUtgId && <p>Selected UTG: {selectedUtgId}</p>}
-
-                {/* UTG Table */}
-                {selectedUtgId && selectedUtgRecord && (
-                  <>
-                    <div style={{ 
-                      backgroundColor: '#b5edbc', 
-                      border: '1px solid #273929', 
-                      borderRadius: '7px', 
-                      padding: '4px', 
-                      marginBottom: '15px', 
-                      fontSize: '16px', 
-                      color: '#252525' 
-                    }}>
-                      <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
-                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on xpages, utgs, zarnos, etc.</span>
-                    </div>
-                    <BensaFieldTable
-                    config={bensaUtgsConfig}
-                    selectedRecord={selectedUtgRecord}
-                    onRecordUpdate={handleUtgUpdate}
-                    onBoxEditorOpen={handleBoxEditorOpen}
-                  />
-                  </>
-                )}
+                <h2>Billing Settings</h2>
+                <p>Manage billing preferences and payment methods for User ID: {selectedUserId}</p>
+                
+                <div style={{
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  padding: '20px',
+                  marginTop: '20px'
+                }}>
+                  <h3 style={{ marginTop: '0', color: '#495057' }}>Coming Soon</h3>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Subscription management
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Payment method settings
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Billing history and invoices
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '0' }}>
+                    • Usage tracking and limits
+                  </p>
+                </div>
               </div>
             )}
-            {activeTab === 'zarnos' && (
+            {activeTab === 'settings' && (
               <div>
-                <h2>Zarnos Settings</h2>
-                <p>Configure Zarno settings for XPage ID: {selectedXpageId}</p>
-                {selectedZarnoId && <p>Selected Zarno: {selectedZarnoId}</p>}
-
-                {/* Zarno Table */}
-                {selectedZarnoId && selectedZarnoRecord && (
-                  <>
-                    <div style={{ 
-                      backgroundColor: '#b5edbc', 
-                      border: '1px solid #273929', 
-                      borderRadius: '7px', 
-                      padding: '4px', 
-                      marginBottom: '15px', 
-                      fontSize: '16px', 
-                      color: '#252525' 
-                    }}>
-                      <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
-                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on xpages, utgs, zarnos, etc.</span>
-                    </div>
-                    <BensaFieldTable
-                    config={bensaZarnosConfig}
-                    selectedRecord={selectedZarnoRecord}
-                    onRecordUpdate={handleZarnoUpdate}
-                    onBoxEditorOpen={handleBoxEditorOpen}
-                  />
-                  </>
-                )}
+                <h2>Account Settings</h2>
+                <p>Configure system preferences and security settings for User ID: {selectedUserId}</p>
+                
+                <div style={{
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  padding: '20px',
+                  marginTop: '20px'
+                }}>
+                  <h3 style={{ marginTop: '0', color: '#495057' }}>Coming Soon</h3>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Two-factor authentication
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Password management
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Session management
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Privacy preferences
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '0' }}>
+                    • Notification settings
+                  </p>
+                </div>
               </div>
             )}
           </>

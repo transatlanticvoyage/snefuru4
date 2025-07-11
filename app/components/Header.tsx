@@ -301,6 +301,12 @@ export default function Header() {
                     {user?.email}
                   </div>
                   <Link
+                    href="/myhub"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    MyHub Account Settings
+                  </Link>
+                  <Link
                     href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >

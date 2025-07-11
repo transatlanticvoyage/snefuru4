@@ -35,7 +35,8 @@ export default function Sitejar4Page() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    document.title = 'sitejar4 - Snefuru';
+    // Set document title
+    document.title = 'sitejar';
     
     // Handle URL parameters for popup and tab state
     const urlParams = new URLSearchParams(window.location.search);

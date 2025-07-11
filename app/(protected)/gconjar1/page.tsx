@@ -28,7 +28,8 @@ export default function Gconjar1Page() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    document.title = '/gconjar1 - Snefuru';
+    // Set document title (simplified to avoid MutationObserver conflicts)
+    document.title = 'gconjar1';
     
     // Handle URL parameters for popup and tab state
     const urlParams = new URLSearchParams(window.location.search);
@@ -117,21 +118,23 @@ export default function Gconjar1Page() {
     window.addEventListener('urlchange', handleCustomUrlUpdate);
     
     // Use MutationObserver as fallback
-    const observer = new MutationObserver(() => {
-      if (window.location.href !== currentUrl) {
-        setCurrentUrl(window.location.href);
-      }
-    });
-    
-    observer.observe(document.querySelector('head') || document.documentElement, {
-      childList: true,
-      subtree: true
-    });
+    // COMMENTED OUT: This was causing meta title conflicts - interfering with static title assignments
+    // The popstate and urlchange events are sufficient for tracking URL changes in the popup
+    // const observer = new MutationObserver(() => {
+    //   if (window.location.href !== currentUrl) {
+    //     setCurrentUrl(window.location.href);
+    //   }
+    // });
+    // 
+    // observer.observe(document.querySelector('head') || document.documentElement, {
+    //   childList: true,
+    //   subtree: true
+    // });
     
     return () => {
       window.removeEventListener('popstate', handleUrlChange);
       window.removeEventListener('urlchange', handleCustomUrlUpdate);
-      observer.disconnect();
+      // observer.disconnect(); // Commented out since observer is disabled
     };
   }, [currentUrl]);
 

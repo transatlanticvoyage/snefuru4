@@ -1,8 +1,9 @@
 export interface BensaFieldDefinition {
   key: string;
-  type: 'text' | 'integer' | 'boolean' | 'timestamp' | 'jsonb' | 'filelink';
+  type: 'text' | 'integer' | 'boolean' | 'timestamp' | 'jsonb' | 'filelink' | 'uuid';
   editable: boolean;
   label?: string;
+  adminOnly?: boolean;
   syncButton?: {
     enabled: boolean;
     syncFunction: () => Promise<{ success: boolean; message: string; updatedPages?: number }>;
