@@ -19,15 +19,21 @@ export default function Tornado2Page() {
     }
     
     // Listen for navigation visibility changes
-    const handleStorageChange = () => {
+    const handleVisibilityChange = () => {
       const visibility = localStorage.getItem('az-nav-visible');
       if (visibility !== null) {
         setNavVisible(JSON.parse(visibility));
       }
     };
     
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    // Listen for both storage changes (cross-tab) and custom events (same page)
+    window.addEventListener('storage', handleVisibilityChange);
+    window.addEventListener('az-nav-toggle', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleVisibilityChange);
+      window.removeEventListener('az-nav-toggle', handleVisibilityChange);
+    };
   }, []);
 
   return (
@@ -36,10 +42,13 @@ export default function Tornado2Page() {
       <AzHeader />
       <AzSidebar />
       <div style={{ 
-        paddingTop: navVisible ? '60px' : '0', 
-        paddingLeft: navVisible ? '250px' : '0',
-        padding: '20px',
-        transition: 'padding 0.3s ease'
+        paddingTop: navVisible ? '60px' : '20px', 
+        paddingLeft: navVisible ? '250px' : '20px',
+        paddingRight: '20px',
+        paddingBottom: '20px',
+        transition: 'all 0.3s ease',
+        minHeight: '100vh',
+        boxSizing: 'border-box'
       }}>
         <h1 style={{ marginBottom: '20px', color: '#1e293b' }}>
           Tornado2 Weather Monitoring System
