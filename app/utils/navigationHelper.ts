@@ -90,6 +90,10 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         path: '/admin/coltempcommand'
       },
       {
+        name: 'Denbu Columns Jar',
+        path: '/denbujar'
+      },
+      {
         name: 'Style Rocket',
         path: undefined // No link - separator
       },

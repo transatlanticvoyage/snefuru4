@@ -1,4 +1,62 @@
 export default function AzColumnTemplateControls() {
+  // Data for each category of buttons
+  const coltempData = {
+    range: [
+      { coltemp_id: 15, icon: 'i', color: '#ff6b6b', coltemp_name: 'coltemp1', count_of_columns: 15 },
+      { coltemp_id: 16, icon: 'u', color: '#4ecdc4', coltemp_name: 'coltemp2', count_of_columns: 8 },
+      { coltemp_id: 17, icon: 'x', color: '#45b7d1', coltemp_name: 'coltemp3', count_of_columns: 12 }
+    ],
+    adminpublic: [
+      { coltemp_id: 18, icon: 'a', color: '#f9ca24', coltemp_name: 'admin1', count_of_columns: 5 },
+      { coltemp_id: 19, icon: 'p', color: '#f0932b', coltemp_name: 'public1', count_of_columns: 22 },
+      { coltemp_id: 20, icon: 's', color: '#eb4d4b', coltemp_name: 'shared1', count_of_columns: 7 }
+    ],
+    personal: [
+      { coltemp_id: 21, icon: 'm', color: '#6c5ce7', coltemp_name: 'personal1', count_of_columns: 3 },
+      { coltemp_id: 22, icon: 'n', color: '#a29bfe', coltemp_name: 'personal2', count_of_columns: 18 },
+      { coltemp_id: 23, icon: 'o', color: '#fd79a8', coltemp_name: 'personal3', count_of_columns: 9 }
+    ]
+  };
+
+  // Reusable button component
+  const ColtempButton = ({ 
+    coltemp_id, 
+    icon, 
+    color, 
+    coltemp_name, 
+    count_of_columns, 
+    isFirst = false, 
+    isLast = false, 
+    isMore = false 
+  }) => {
+    const getButtonStyle = () => {
+      if (isMore) return moreButtonStyle;
+      if (isFirst) return coltempButtonFirstStyle;
+      if (isLast) return coltempButtonLastStyle;
+      return coltempButtonStyle;
+    };
+
+    const displayText = isMore ? 'more' : 
+      `${count_of_columns} | ${icon} | ${color} | ${coltemp_name}`;
+
+    return (
+      <button 
+        style={{
+          ...getButtonStyle(), 
+          backgroundColor: isMore ? '#8baaec' : (color || '#ebebeb')
+        }}
+        onClick={() => {
+          if (!isMore) {
+            console.log(`Clicked coltemp_id: ${coltemp_id}`);
+          }
+        }}
+      >
+        {displayText}
+      </button>
+    );
+  };
+
+  // All existing styles
   const boardStyle = {
     width: '100%',
     height: '200px',
@@ -74,38 +132,25 @@ export default function AzColumnTemplateControls() {
       <div style={innerWrapperStyle}>
         <strong>db tables:</strong> coltemps AND denbu_columns
 
-        <span style={separatorStyle}></span>
+        {Object.entries(coltempData).map(([category, buttons]) => (
+          <div key={category} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={separatorStyle}></span>
+            
+            {category}
 
-        range
-
-        <div style={buttonGroupColtempStyle}>
-          <button style={coltempButtonFirstStyle}>15 | i | st | color | coltemp1</button>
-          <button style={coltempButtonStyle}>coltemp2</button>
-          <button style={coltempButtonStyle}>coltemp3</button>
-          <button style={moreButtonStyle}>more</button>
-        </div>
-
-        <span style={separatorStyle}></span>
-
-        adminpublic
-
-        <div style={buttonGroupColtempStyle}>
-          <button style={coltempButtonFirstStyle}>coltemp1</button>
-          <button style={coltempButtonStyle}>coltemp2</button>
-          <button style={coltempButtonStyle}>coltemp3</button>
-          <button style={moreButtonStyle}>more</button>
-        </div>
-
-        <span style={separatorStyle}></span>
-
-        personal
-
-        <div style={buttonGroupColtempStyle}>
-          <button style={coltempButtonFirstStyle}>coltemp1</button>
-          <button style={coltempButtonStyle}>coltemp2</button>
-          <button style={coltempButtonStyle}>coltemp3</button>
-          <button style={moreButtonStyle}>more</button>
-        </div>
+            <div style={buttonGroupColtempStyle}>
+              {buttons.map((btn, index) => (
+                <ColtempButton 
+                  key={btn.coltemp_id}
+                  {...btn}
+                  isFirst={index === 0}
+                  isLast={index === buttons.length - 1}
+                />
+              ))}
+              <ColtempButton isMore={true} />
+            </div>
+          </div>
+        ))}
 
         <span style={separatorStyle}></span>
 
