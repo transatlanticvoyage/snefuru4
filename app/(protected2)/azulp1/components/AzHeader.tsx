@@ -352,7 +352,7 @@ export default function AzHeader() {
                     }
                     if (!e.shiftKey) {
                       e.preventDefault();
-                      handleNavigation(child.path);
+                      child.path && handleNavigation(child.path);
                     }
                   }}
                 >
