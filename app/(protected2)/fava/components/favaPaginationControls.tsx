@@ -1,4 +1,4 @@
-export default function AzPaginationControls() {
+export default function FavaPaginationControls() {
   const wrapperStyle = {
     display: 'flex',
     flexDirection: 'column' as const,

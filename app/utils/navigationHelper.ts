@@ -70,12 +70,12 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         path: undefined // No link - separator
       },
       {
-        name: 'Azo Page Settings Manager',
-        path: '/admin/azo'
+        name: 'Obi Page Settings Manager',
+        path: '/admin/obi'
       },
       {
-        name: 'Azulp1 - Cricket Matches',
-        path: '/azulp1'
+        name: 'Bren1 - Cricket Matches',
+        path: '/bren1'
       },
       {
         name: 'Azulp SQL Swipes',
@@ -156,7 +156,7 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         !page.path?.includes('/admin/xpagesmanager1') &&
         !page.path?.includes('/admin/rstormanager') &&
         !page.path?.includes('/admin/utg_manager') &&
-        !page.path?.includes('/admin/azo')
+        !page.path?.includes('/admin/obi')
       ) // Add any other admin pages found in navigation, excluding duplicates
     ]
   };

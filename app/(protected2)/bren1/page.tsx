@@ -1,39 +1,39 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import AzMinimalTable from './components/azMinimalTable'
-import AzColumnTemplateControls from './components/azColumnTemplateControls'
-import AzFilterControls from './components/azFilterControls'
-import AzSearchBox from './components/azSearchBox'
-import AzPaginationControls from './components/azPaginationControls'
-import AzBiriDevInfoBox from './azBiriDevInfoBox'
-import AzHeader from './components/AzHeader'
-import AzSidebar from './components/AzSidebar'
-import AzNavToggle from './components/AzNavToggle'
-import { tableConfig } from './config/tableConfig'
+import FavaMinimalTable from '../fava/components/favaMinimalTable'
+import FavaColumnTemplateControls from '../fava/components/favaColumnTemplateControls'
+import FavaFilterControls from '../fava/components/favaFilterControls'
+import FavaSearchBox from '../fava/components/favaSearchBox'
+import FavaPaginationControls from '../fava/components/favaPaginationControls'
+import FavaBiriDevInfoBox from '../fava/components/favaBiriDevInfoBox'
+import FavaHeader from '../fava/components/favaHeader'
+import FavaSidebar from '../fava/components/favaSidebar'
+import FavaNavToggle from '../fava/components/favaNavToggle'
+import { tableConfig } from '../fava/config/tableConfig'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import './styles/az-table-template.css'
-import './styles/az-navigation.css'
+import '../fava/styles/fava-table-template.css'
+import '../fava/styles/fava-navigation.css'
 
-export default function Azulp1Page() {
+export default function Bren1Page() {
   const [cricketData, setCricketData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [navVisible, setNavVisible] = useState(true);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    document.title = 'Cricket Matches - /azulp1';
+    document.title = 'Cricket Matches - /bren1';
     fetchCricketMatches();
     
     // Check navigation visibility from localStorage
-    const savedVisibility = localStorage.getItem('az-nav-visible');
+    const savedVisibility = localStorage.getItem('fava-nav-visible');
     if (savedVisibility !== null) {
       setNavVisible(JSON.parse(savedVisibility));
     }
     
     // Listen for navigation visibility changes
     const handleVisibilityChange = () => {
-      const visibility = localStorage.getItem('az-nav-visible');
+      const visibility = localStorage.getItem('fava-nav-visible');
       if (visibility !== null) {
         setNavVisible(JSON.parse(visibility));
       }
@@ -41,11 +41,11 @@ export default function Azulp1Page() {
     
     // Listen for both storage changes (cross-tab) and custom events (same page)
     window.addEventListener('storage', handleVisibilityChange);
-    window.addEventListener('az-nav-toggle', handleVisibilityChange);
+    window.addEventListener('fava-nav-toggle', handleVisibilityChange);
     
     return () => {
       window.removeEventListener('storage', handleVisibilityChange);
-      window.removeEventListener('az-nav-toggle', handleVisibilityChange);
+      window.removeEventListener('fava-nav-toggle', handleVisibilityChange);
     };
   }, []);
 
@@ -110,10 +110,10 @@ export default function Azulp1Page() {
 
   return (
     <>
-      <AzNavToggle />
-      <AzHeader />
-      <AzSidebar />
-      <div className="az-page-content" style={{ 
+      <FavaNavToggle />
+      <FavaHeader />
+      <FavaSidebar />
+      <div className="fava-page-content" style={{ 
         paddingTop: navVisible ? '60px' : '20px', 
         paddingLeft: navVisible ? '250px' : '20px',
         paddingRight: '20px',
@@ -127,15 +127,15 @@ export default function Azulp1Page() {
           {cricketData.length} matches • 30 data columns • Live cricket statistics
         </p>
         
-        <AzColumnTemplateControls />
-        <AzFilterControls />
-        <AzSearchBox />
+        <FavaColumnTemplateControls />
+        <FavaFilterControls />
+        <FavaSearchBox />
         <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-          <AzPaginationControls />
-          <AzBiriDevInfoBox />
+          <FavaPaginationControls />
+          <FavaBiriDevInfoBox />
         </div>
         
-        <AzMinimalTable 
+        <FavaMinimalTable 
           headerRows={tableConfig.headerRows}
           data={data}
           tableClassName="cricket-matches-table"

@@ -1,8 +1,8 @@
 'use client';
 
 // @xpage-metadata
-// URL: /admin/azo
-// Title: Azo Page Settings Manager - Snefuru
+// URL: /admin/obi
+// Title: Obi Page Settings Manager - Snefuru
 // Last Sync: 2024-01-10T10:30:00Z
 
 import { useEffect, useState } from 'react';
@@ -101,7 +101,7 @@ export default function AzoPage() {
   // Initialize page - only run once
   useEffect(() => {
     // Use static title from cache, fallback to hardcoded
-    const staticTitle = staticMetadata?.title || 'Azo Page Settings Manager - Snefuru';
+    const staticTitle = staticMetadata?.title || 'Obi Page Settings Manager - Snefuru';
     document.title = staticTitle;
     fetchXpages();
     fetchFieldMetadata();
@@ -338,7 +338,7 @@ export default function AzoPage() {
     zarno_id?: number;
   }) => {
     // Get our correct title from cache before navigation
-    const correctTitle = staticMetadata?.title || 'Azo Page Settings Manager - Snefuru';
+    const correctTitle = staticMetadata?.title || 'Obi Page Settings Manager - Snefuru';
     
     const params = new URLSearchParams(searchParams || '');
     
@@ -370,7 +370,7 @@ export default function AzoPage() {
       }
     }
     
-    router.push(`/admin/azo?${params.toString()}`);
+    router.push(`/admin/obi?${params.toString()}`);
     
     // Aggressively restore title after navigation - multiple attempts to overcome Next.js metadata
     setTimeout(() => { document.title = correctTitle; }, 0);
@@ -843,7 +843,7 @@ export default function AzoPage() {
   return (
     <div>
       <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>
-        <span style={{ fontWeight: 'bold' }}>Azo Page Settings Manager</span>
+        <span style={{ fontWeight: 'bold' }}>Obi Page Settings Manager</span>
         <span style={{ fontWeight: 'normal' }}> (internal snefuru app page creator)</span>
       </h1>
 
@@ -989,7 +989,7 @@ export default function AzoPage() {
                   }}>
                     <button
                       onClick={() => {
-                        const url = 'vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx';
+                        const url = 'vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/obi/page.tsx';
                         navigator.clipboard.writeText(url);
                       }}
                       style={{
@@ -1010,14 +1010,14 @@ export default function AzoPage() {
                       📋
                     </button>
                     <a 
-                      href="vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx"
+                      href="vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/obi/page.tsx"
                       style={{
                         color: '#0066cc',
                         textDecoration: 'none',
                         flex: 1
                       }}
                     >
-                      vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx
+                      vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/obi/page.tsx
                     </a>
                   </div>
                 </div>

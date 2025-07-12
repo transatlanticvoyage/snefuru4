@@ -1,7 +1,7 @@
-/* Az Navigation Styles - No Tailwind */
+/* Fava Navigation Styles - No Tailwind */
 
 /* Toggle Button - 30x30px */
-.az-nav-toggle {
+.fava-nav-toggle {
   position: fixed;
   top: 10px;
   left: 10px;
@@ -20,18 +20,18 @@
   transition: all 0.2s ease;
 }
 
-.az-nav-toggle:hover {
+.fava-nav-toggle:hover {
   background-color: #334155;
   border-color: #64748b;
 }
 
 /* Navigation Container */
-.az-nav-container {
+.fava-nav-container {
   position: relative;
 }
 
 /* Header */
-.az-nav-header {
+.fava-nav-header {
   position: fixed;
   top: 0;
   left: 0;
@@ -43,27 +43,27 @@
   padding: 0 20px 0 50px; /* Left padding for toggle button */
 }
 
-.az-nav-header-content {
+.fava-nav-header-content {
   display: flex;
   align-items: center;
   height: 100%;
   gap: 40px;
 }
 
-.az-nav-title {
+.fava-nav-title {
   color: #f1f5f9;
   font-size: 20px;
   font-weight: 600;
   margin: 0;
 }
 
-.az-nav-header-menu {
+.fava-nav-header-menu {
   display: flex;
   gap: 20px;
   align-items: center;
 }
 
-.az-nav-header-link {
+.fava-nav-header-link {
   color: #cbd5e1;
   text-decoration: none;
   padding: 8px 12px;
@@ -73,17 +73,17 @@
   transition: all 0.2s ease;
 }
 
-.az-nav-header-link:hover {
+.fava-nav-header-link:hover {
   background-color: #334155;
   color: #f1f5f9;
 }
 
 /* Header Dropdown */
-.az-nav-dropdown {
+.fava-nav-dropdown {
   position: relative;
 }
 
-.az-nav-dropdown-toggle {
+.fava-nav-dropdown-toggle {
   background: none;
   border: none;
   color: #cbd5e1;
@@ -94,12 +94,12 @@
   transition: all 0.2s ease;
 }
 
-.az-nav-dropdown-toggle:hover {
+.fava-nav-dropdown-toggle:hover {
   background-color: #334155;
   color: #f1f5f9;
 }
 
-.az-nav-dropdown-menu {
+.fava-nav-dropdown-menu {
   position: absolute;
   top: 100%;
   left: 0;
@@ -111,7 +111,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-.az-nav-dropdown-item {
+.fava-nav-dropdown-item {
   display: block;
   padding: 10px 16px;
   color: #d1d5db;
@@ -120,13 +120,13 @@
   transition: background-color 0.2s ease;
 }
 
-.az-nav-dropdown-item:hover {
+.fava-nav-dropdown-item:hover {
   background-color: #4b5563;
   color: #f9fafb;
 }
 
 /* Sidebar */
-.az-nav-sidebar {
+.fava-nav-sidebar {
   position: fixed;
   top: 60px;
   left: 0;
@@ -138,18 +138,18 @@
   z-index: 999;
 }
 
-.az-nav-sidebar-menu {
+.fava-nav-sidebar-menu {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.az-nav-sidebar-item {
+.fava-nav-sidebar-item {
   border-bottom: 1px solid #4b5563;
 }
 
-.az-nav-sidebar-toggle,
-.az-nav-sidebar-link {
+.fava-nav-sidebar-toggle,
+.fava-nav-sidebar-link {
   display: block;
   width: 100%;
   padding: 15px 20px;
@@ -163,25 +163,25 @@
   transition: background-color 0.2s ease;
 }
 
-.az-nav-sidebar-toggle:hover,
-.az-nav-sidebar-link:hover {
+.fava-nav-sidebar-toggle:hover,
+.fava-nav-sidebar-link:hover {
   background-color: #4b5563;
   color: #f9fafb;
 }
 
-.az-nav-sidebar-submenu {
+.fava-nav-sidebar-submenu {
   list-style: none;
   margin: 0;
   padding: 0;
   background-color: #2d3748;
 }
 
-.az-nav-sidebar-submenu .az-nav-sidebar-link {
+.fava-nav-sidebar-submenu .fava-nav-sidebar-link {
   padding-left: 40px;
   font-size: 13px;
 }
 
-.az-nav-sidebar-separator {
+.fava-nav-sidebar-separator {
   padding: 8px 20px;
   font-size: 11px;
   font-weight: 600;
@@ -194,12 +194,12 @@
 }
 
 /* Page content adjustment when navigation is visible */
-body.az-nav-active {
+body.fava-nav-active {
   padding-top: 60px;
   padding-left: 250px;
 }
 
 /* Hide navigation elements */
-.az-nav-hidden {
+.fava-nav-hidden {
   display: none;
 }

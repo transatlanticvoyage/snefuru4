@@ -9,7 +9,7 @@ interface NavigationItem {
   children?: NavigationItem[];
 }
 
-export default function AzSidebar() {
+export default function FavaSidebar() {
   const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([]);
   const [isVisible, setIsVisible] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -17,14 +17,14 @@ export default function AzSidebar() {
 
   useEffect(() => {
     // Load visibility state from localStorage
-    const savedVisibility = localStorage.getItem('az-nav-visible');
+    const savedVisibility = localStorage.getItem('fava-nav-visible');
     if (savedVisibility !== null) {
       setIsVisible(JSON.parse(savedVisibility));
     }
 
     // Listen for visibility changes from toggle
     const handleStorageChange = () => {
-      const visibility = localStorage.getItem('az-nav-visible');
+      const visibility = localStorage.getItem('fava-nav-visible');
       if (visibility !== null) {
         setIsVisible(JSON.parse(visibility));
       }
@@ -33,14 +33,14 @@ export default function AzSidebar() {
     window.addEventListener('storage', handleStorageChange);
     
     // Custom event for same-page toggle updates
-    window.addEventListener('az-nav-toggle', handleStorageChange);
+    window.addEventListener('fava-nav-toggle', handleStorageChange);
 
     // Fetch navigation data
     fetchNavigation();
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('az-nav-toggle', handleStorageChange);
+      window.removeEventListener('fava-nav-toggle', handleStorageChange);
     };
   }, []);
 
@@ -58,7 +58,7 @@ export default function AzSidebar() {
         const finalNavigation = [adminMenuItem, specialFirstItem, ...nonAdminItems];
         
         setNavigationItems(finalNavigation);
-        console.log('AzSidebar: Navigation loaded with admin/navgroup1:', finalNavigation.length, 'items');
+        console.log('FavaSidebar: Navigation loaded with admin/navgroup1:', finalNavigation.length, 'items');
       }
     } catch (error) {
       console.error('Failed to fetch navigation:', error);
@@ -84,22 +84,22 @@ export default function AzSidebar() {
     const isExpanded = expandedItems.has(item.name);
 
     return (
-      <li key={item.name} className="az-nav-sidebar-item">
+      <li key={item.name} className="fava-nav-sidebar-item">
         {hasChildren ? (
           <>
             <button
-              className="az-nav-sidebar-toggle"
+              className="fava-nav-sidebar-toggle"
               onClick={() => toggleExpanded(item.name)}
             >
               {item.name} {isExpanded ? '▼' : '▶'}
             </button>
             {isExpanded && (
-              <ul className="az-nav-sidebar-submenu">
+              <ul className="fava-nav-sidebar-submenu">
                 {item.children!.map(child => (
                   <li key={child.name}>
                     {child.path ? (
                       <a
-                        className="az-nav-sidebar-link"
+                        className="fava-nav-sidebar-link"
                         href={child.path}
                         onClick={(e) => {
                           if (e.ctrlKey || e.metaKey || e.button === 1) {
@@ -117,7 +117,7 @@ export default function AzSidebar() {
                         {child.name}
                       </a>
                     ) : (
-                      <div className="az-nav-sidebar-separator">
+                      <div className="fava-nav-sidebar-separator">
                         {child.name}
                       </div>
                     )}
@@ -128,7 +128,7 @@ export default function AzSidebar() {
           </>
         ) : (
           <a
-            className="az-nav-sidebar-link"
+            className="fava-nav-sidebar-link"
             href={item.path}
             onClick={(e) => {
               if (e.ctrlKey || e.metaKey || e.button === 1) {
@@ -151,9 +151,9 @@ export default function AzSidebar() {
   if (!isVisible) return null;
 
   return (
-    <aside className="az-nav-sidebar">
+    <aside className="fava-nav-sidebar">
       <nav>
-        <ul className="az-nav-sidebar-menu">
+        <ul className="fava-nav-sidebar-menu">
           {navigationItems.map(item => renderNavItem(item))}
         </ul>
       </nav>

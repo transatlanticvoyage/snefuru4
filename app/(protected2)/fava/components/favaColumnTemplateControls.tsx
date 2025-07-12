@@ -10,7 +10,7 @@ interface ColtempData {
   count_of_columns: number | null;
 }
 
-export default function AzColumnTemplateControls() {
+export default function FavaColumnTemplateControls() {
   const [coltempData, setColtempData] = useState<{[key: string]: ColtempData[]}>({});
   const [dropdownOpen, setDropdownOpen] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);

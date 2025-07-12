@@ -1,4 +1,4 @@
-export default function AzFilterControls() {
+export default function FavaFilterControls() {
   const wrapperStyle = {
     display: 'flex',
     alignItems: 'center',

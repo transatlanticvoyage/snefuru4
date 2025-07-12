@@ -1,11 +1,11 @@
 /**
  * Advanced Table Configuration Example
  * 
- * Demonstrates using the azHeaderRows system for complex header configurations
+ * Demonstrates using the favaHeaderRows system for complex header configurations
  */
 
 import { TableConfig } from './tableConfig.sample';
-import { HeaderRowGenerators, HeaderRowUtils } from '../components/azHeaderRows';
+import { HeaderRowGenerators, HeaderRowUtils } from '../components/favaHeaderRows';
 
 // Example 1: Financial Report Table with Multiple Header Rows
 export const financialTableConfig: TableConfig = {

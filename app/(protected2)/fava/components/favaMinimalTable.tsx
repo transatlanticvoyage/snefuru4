@@ -1,5 +1,5 @@
 import { HeaderRowDefinition } from '../config/tableConfig.sample';
-import { processHeaderRows, HeaderRowRenderOptions } from './azHeaderRows';
+import { processHeaderRows, HeaderRowRenderOptions } from './favaHeaderRows';
 
 interface MinimalTableProps {
   // Data props
@@ -28,7 +28,7 @@ interface MinimalTableProps {
   cellClasses?: string[][];
 }
 
-export default function AzMinimalTable({
+export default function FavaMinimalTable({
   headers,
   headerRows,
   data,

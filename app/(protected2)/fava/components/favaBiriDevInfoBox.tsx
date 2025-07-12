@@ -1,4 +1,4 @@
-export default function AzBiriDevInfoBox() {
+export default function FavaBiriDevInfoBox() {
   const boxStyle = {
     border: '1px solid #000'
   };

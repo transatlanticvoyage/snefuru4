@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 // Header Styles
 const headerStyles = `
-  .az-header-container {
+  .fava-header-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -21,7 +21,7 @@ const headerStyles = `
     justify-content: space-between;
   }
 
-  .az-header-brand {
+  .fava-header-brand {
     color: #ffffff;
     font-size: 20px;
     font-weight: 700;
@@ -30,21 +30,21 @@ const headerStyles = `
     letter-spacing: 0.5px;
   }
 
-  .az-header-nav {
+  .fava-header-nav {
     display: flex;
     align-items: center;
     gap: 5px;
     height: 100%;
   }
 
-  .az-nav-item {
+  .fava-nav-item {
     position: relative;
     height: 100%;
     display: flex;
     align-items: center;
   }
 
-  .az-nav-link {
+  .fava-nav-link {
     display: flex;
     align-items: center;
     height: 100%;
@@ -61,20 +61,20 @@ const headerStyles = `
     white-space: nowrap;
   }
 
-  .az-nav-link:hover {
+  .fava-nav-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     transform: translateY(-1px);
   }
 
-  .az-nav-dropdown {
+  .fava-nav-dropdown {
     position: relative;
     height: 100%;
     display: flex;
     align-items: center;
   }
 
-  .az-nav-dropdown-btn {
+  .fava-nav-dropdown-btn {
     display: flex;
     align-items: center;
     height: 100%;
@@ -90,28 +90,28 @@ const headerStyles = `
     white-space: nowrap;
   }
 
-  .az-nav-dropdown-btn:hover {
+  .fava-nav-dropdown-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     transform: translateY(-1px);
   }
 
-  .az-nav-dropdown.active .az-nav-dropdown-btn {
+  .fava-nav-dropdown.active .fava-nav-dropdown-btn {
     background-color: rgba(255, 255, 255, 0.15);
     color: #ffffff;
   }
 
-  .az-dropdown-arrow {
+  .fava-dropdown-arrow {
     margin-left: 6px;
     font-size: 10px;
     transition: transform 0.2s ease;
   }
 
-  .az-nav-dropdown.active .az-dropdown-arrow {
+  .fava-nav-dropdown.active .fava-dropdown-arrow {
     transform: rotate(180deg);
   }
 
-  .az-dropdown-menu {
+  .fava-dropdown-menu {
     position: absolute;
     top: 100%;
     left: 0;
@@ -125,7 +125,7 @@ const headerStyles = `
     margin-top: 2px;
   }
 
-  .az-dropdown-item {
+  .fava-dropdown-item {
     display: block;
     padding: 12px 16px;
     color: #374151;
@@ -141,40 +141,40 @@ const headerStyles = `
     text-align: left;
   }
 
-  .az-dropdown-item:last-child {
+  .fava-dropdown-item:last-child {
     border-bottom: none;
   }
 
-  .az-dropdown-item:hover {
+  .fava-dropdown-item:hover {
     background-color: #f8fafc;
     color: #1e40af;
     padding-left: 20px;
   }
 
-  .az-admin-item {
+  .fava-admin-item {
     background-color: #fef3c7;
     border-bottom: 1px solid #fbbf24;
   }
 
-  .az-admin-item:hover {
+  .fava-admin-item:hover {
     background-color: #fde68a;
     color: #92400e;
   }
 
-  .az-dropdown-separator {
+  .fava-dropdown-separator {
     display: flex;
     align-items: center;
     padding: 8px 16px;
     margin: 4px 0;
   }
 
-  .az-separator-line {
+  .fava-separator-line {
     flex: 1;
     height: 1px;
     background-color: #e2e8f0;
   }
 
-  .az-separator-text {
+  .fava-separator-text {
     margin: 0 12px;
     font-size: 11px;
     font-weight: 600;
@@ -184,16 +184,16 @@ const headerStyles = `
   }
 
   @media (max-width: 768px) {
-    .az-header-nav {
+    .fava-header-nav {
       gap: 2px;
     }
     
-    .az-nav-link, .az-nav-dropdown-btn {
+    .fava-nav-link, .fava-nav-dropdown-btn {
       padding: 0 12px;
       font-size: 13px;
     }
     
-    .az-dropdown-menu {
+    .fava-dropdown-menu {
       min-width: 200px;
     }
   }
@@ -205,7 +205,7 @@ interface NavigationItem {
   children?: NavigationItem[];
 }
 
-export default function AzHeader() {
+export default function FavaHeader() {
   const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([]);
   const [isVisible, setIsVisible] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -259,7 +259,7 @@ export default function AzHeader() {
         const finalNavigation = [adminMenuItem, specialFirstItem, ...nonAdminItems];
         
         setNavigationItems(finalNavigation);
-        console.log('AzHeader: Navigation loaded with admin/navgroup1:', finalNavigation.length, 'items');
+        console.log('FavaHeader: Navigation loaded with admin/navgroup1:', finalNavigation.length, 'items');
       }
     } catch (error) {
       console.error('Failed to fetch navigation:', error);
@@ -293,10 +293,10 @@ export default function AzHeader() {
   const renderSeparator = (itemName: string) => {
     // Render separators (items with no path) as dividers
     return (
-      <div key={itemName} className="az-dropdown-separator">
-        <div className="az-separator-line"></div>
-        <span className="az-separator-text">{itemName}</span>
-        <div className="az-separator-line"></div>
+      <div key={itemName} className="fava-dropdown-separator">
+        <div className="fava-separator-line"></div>
+        <span className="fava-separator-text">{itemName}</span>
+        <div className="fava-separator-line"></div>
       </div>
     );
   };
@@ -307,9 +307,9 @@ export default function AzHeader() {
 
     if (!hasChildren) {
       return (
-        <div key={item.name} className="az-nav-item">
+        <div key={item.name} className="fava-nav-item">
           <a
-            className="az-nav-link"
+            className="fava-nav-link"
             href={item.path}
             onClick={(e) => {
               if (e.ctrlKey || e.metaKey || e.button === 1) {
@@ -329,21 +329,21 @@ export default function AzHeader() {
     }
 
     return (
-      <div key={item.name} className={`az-nav-dropdown ${isExpanded ? 'active' : ''}`}>
+      <div key={item.name} className={`fava-nav-dropdown ${isExpanded ? 'active' : ''}`}>
         <button 
-          className="az-nav-dropdown-btn"
+          className="fava-nav-dropdown-btn"
           onClick={() => toggleExpanded(item.name)}
         >
           {item.name}
-          <span className="az-dropdown-arrow">▼</span>
+          <span className="fava-dropdown-arrow">▼</span>
         </button>
         {isExpanded && (
-          <div className="az-dropdown-menu">
+          <div className="fava-dropdown-menu">
             {item.children!.map(child => 
               child.path ? (
                 <a
                   key={child.name}
-                  className={`az-dropdown-item ${isAdminItem(child.name) ? 'az-admin-item' : ''}`}
+                  className={`fava-dropdown-item ${isAdminItem(child.name) ? 'fava-admin-item' : ''}`}
                   href={child.path}
                   onClick={(e) => {
                     if (e.ctrlKey || e.metaKey || e.button === 1) {
@@ -373,9 +373,9 @@ export default function AzHeader() {
   if (!isVisible) return null;
 
   return (
-    <header className="az-header-container">
-      <h1 className="az-header-brand">Snefuru - Azulp1</h1>
-      <nav className="az-header-nav">
+    <header className="fava-header-container">
+      <h1 className="fava-header-brand">Snefuru - Fava</h1>
+      <nav className="fava-header-nav">
         {navigationItems.map(item => renderNavItem(item))}
       </nav>
     </header>

@@ -1,4 +1,4 @@
-export default function AzSearchBox() {
+export default function FavaSearchBox() {
   const wrapperStyle = {
     display: 'flex',
     alignItems: 'center',

@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import AzHeader from '../azulp1/components/AzHeader';
-import AzSidebar from '../azulp1/components/AzSidebar';
-import AzNavToggle from '../azulp1/components/AzNavToggle';
-import '../azulp1/styles/az-navigation.css';
+import FavaHeader from '../fava/components/favaHeader';
+import FavaSidebar from '../fava/components/favaSidebar';
+import FavaNavToggle from '../fava/components/favaNavToggle';
+import '../fava/styles/fava-navigation.css';
 
 export default function Tornado2Page() {
   const [navVisible, setNavVisible] = useState(true);
@@ -13,14 +13,14 @@ export default function Tornado2Page() {
     document.title = 'Tornado2 - Weather Monitor';
     
     // Check navigation visibility from localStorage
-    const savedVisibility = localStorage.getItem('az-nav-visible');
+    const savedVisibility = localStorage.getItem('fava-nav-visible');
     if (savedVisibility !== null) {
       setNavVisible(JSON.parse(savedVisibility));
     }
     
     // Listen for navigation visibility changes
     const handleVisibilityChange = () => {
-      const visibility = localStorage.getItem('az-nav-visible');
+      const visibility = localStorage.getItem('fava-nav-visible');
       if (visibility !== null) {
         setNavVisible(JSON.parse(visibility));
       }
@@ -28,19 +28,19 @@ export default function Tornado2Page() {
     
     // Listen for both storage changes (cross-tab) and custom events (same page)
     window.addEventListener('storage', handleVisibilityChange);
-    window.addEventListener('az-nav-toggle', handleVisibilityChange);
+    window.addEventListener('fava-nav-toggle', handleVisibilityChange);
     
     return () => {
       window.removeEventListener('storage', handleVisibilityChange);
-      window.removeEventListener('az-nav-toggle', handleVisibilityChange);
+      window.removeEventListener('fava-nav-toggle', handleVisibilityChange);
     };
   }, []);
 
   return (
     <>
-      <AzNavToggle />
-      <AzHeader />
-      <AzSidebar />
+      <FavaNavToggle />
+      <FavaHeader />
+      <FavaSidebar />
       <div style={{ 
         paddingTop: navVisible ? '60px' : '20px', 
         paddingLeft: navVisible ? '250px' : '20px',
@@ -115,12 +115,12 @@ export default function Tornado2Page() {
           borderRadius: '8px',
           padding: '20px'
         }}>
-          <h2 style={{ color: '#1e293b', marginBottom: '15px' }}>Simplified Az Navigation Demo</h2>
+          <h2 style={{ color: '#1e293b', marginBottom: '15px' }}>Simplified Fava Navigation Demo</h2>
           <p style={{ color: '#4b5563', marginBottom: '15px' }}>
-            This page now uses the simplified navigation system from azulp1:
+            This page now uses the simplified navigation system from fava:
           </p>
           <ul style={{ color: '#4b5563', paddingLeft: '20px' }}>
-            <li>Imports navigation components from ../azulp1/components/</li>
+            <li>Imports navigation components from ../fava/components/</li>
             <li>Uses the same navigation data from /api/navigation</li>
             <li>Toggle button shows/hides both header and sidebar</li>
             <li>Navigation state is saved in localStorage</li>
