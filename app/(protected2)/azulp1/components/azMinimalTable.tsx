@@ -56,7 +56,13 @@ export default function AzMinimalTable({
   }) : null;
 
   return (
-    <table className={tableClassName}>
+    <table 
+      className={tableClassName}
+      style={{
+        borderCollapse: 'collapse',
+        border: '1px solid #d7d7d7'
+      }}
+    >
       <thead className={theadClassName}>
         {/* Render configured header rows or fallback to simple headers */}
         {processedHeaderRows ? (
@@ -75,7 +81,10 @@ export default function AzMinimalTable({
                   className={cell.className || thClassName}
                   colSpan={cell.colSpan || 1}
                   onClick={cell.onClick}
-                  style={cell.style}
+                  style={{
+                    ...cell.style,
+                    border: '1px solid #d7d7d7'
+                  }}
                 >
                   {cell.content}
                 </th>
@@ -90,7 +99,10 @@ export default function AzMinimalTable({
                 key={colIndex}
                 className={thClassName}
                 onClick={() => onHeaderClick?.(colIndex, header)}
-                style={{ cursor: onHeaderClick ? 'pointer' : 'default' }}
+                style={{ 
+                  cursor: onHeaderClick ? 'pointer' : 'default',
+                  border: '1px solid #d7d7d7'
+                }}
               >
                 {header}
               </th>
@@ -116,7 +128,10 @@ export default function AzMinimalTable({
                   e.stopPropagation(); // Prevent row click when cell is clicked
                   onCellClick?.(rowIndex, colIndex, cell);
                 }}
-                style={{ cursor: onCellClick ? 'pointer' : 'default' }}
+                style={{ 
+                  cursor: onCellClick ? 'pointer' : 'default',
+                  border: '1px solid #d7d7d7'
+                }}
               >
                 {cell}
               </td>
