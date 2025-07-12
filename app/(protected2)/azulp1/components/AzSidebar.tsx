@@ -108,7 +108,9 @@ export default function AzSidebar() {
                           }
                           if (!e.shiftKey) {
                             e.preventDefault();
-                            handleNavigation(child.path);
+                            if (child.path) {
+                              handleNavigation(child.path);
+                            }
                           }
                         }}
                       >
