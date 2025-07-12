@@ -83,7 +83,8 @@ export default function AzMinimalTable({
                   onClick={cell.onClick}
                   style={{
                     ...cell.style,
-                    border: '1px solid #d7d7d7'
+                    border: '1px solid #d7d7d7',
+                    fontSize: '16px'
                   }}
                 >
                   {cell.content}
@@ -101,7 +102,8 @@ export default function AzMinimalTable({
                 onClick={() => onHeaderClick?.(colIndex, header)}
                 style={{ 
                   cursor: onHeaderClick ? 'pointer' : 'default',
-                  border: '1px solid #d7d7d7'
+                  border: '1px solid #d7d7d7',
+                  fontSize: '16px'
                 }}
               >
                 {header}
@@ -130,7 +132,8 @@ export default function AzMinimalTable({
                 }}
                 style={{ 
                   cursor: onCellClick ? 'pointer' : 'default',
-                  border: '1px solid #d7d7d7'
+                  border: '1px solid #d7d7d7',
+                  fontSize: '16px'
                 }}
               >
                 {cell}
