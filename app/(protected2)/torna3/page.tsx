@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import FavaPageMaster from '../fava/components/favaPageMaster';
-import { nemtorTableConfig as tableConfig } from '../fava/config/nemtorTableConfig';
+import { nemtorTableConfig } from '../fava/config/nemtorTableConfig';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-export default function Torna2Page() {
+export default function Torna3Page() {
   const [nemtorData, setNemtorData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClientComponentClient();
@@ -37,7 +37,7 @@ export default function Torna2Page() {
   
   // Convert nemtor data to table format
   const data = nemtorData.map(row => 
-    tableConfig.columns.map(col => {
+    nemtorTableConfig.columns.map(col => {
       const value = row[col.field as keyof typeof row];
       
       // Apply formatting if specified
@@ -51,7 +51,7 @@ export default function Torna2Page() {
 
   // Generate tooltips for nemtor data
   const cellTooltips = nemtorData.map(() => 
-    tableConfig.columns.map(col => `${col.header}: ${col.field}`)
+    nemtorTableConfig.columns.map(col => `${col.header}: ${col.field}`)
   );
 
   // Event handlers
@@ -69,7 +69,7 @@ export default function Torna2Page() {
 
   // Prepare table props
   const tableProps = {
-    headerRows: tableConfig.headerRows,
+    headerRows: nemtorTableConfig.headerRows,
     data: data,
     tableClassName: "nemtor-units-table",
     theadClassName: "table-header",
@@ -90,9 +90,9 @@ export default function Torna2Page() {
 
   return (
     <FavaPageMaster
-      pageTitle="Nemtor Units Database"
-      pageDescription={`${nemtorData.length} units • ${tableConfig.columns.length} data columns • Elementor widget management system`}
-      documentTitle="Nemtor Units - /torna2"
+      pageTitle="Nemtor Units Management System"
+      pageDescription={`${nemtorData.length} units • ${nemtorTableConfig.columns.length} data columns • Elementor widget tracking`}
+      documentTitle="Nemtor Units - /torna3"
       tableProps={tableProps}
       showTable={true}
       showColumnTemplateControls={true}
@@ -105,18 +105,38 @@ export default function Torna2Page() {
       <div style={{ 
         marginTop: '20px', 
         padding: '15px', 
-        backgroundColor: '#f0f9ff', 
+        backgroundColor: '#e6f3ff', 
         borderRadius: '8px',
-        border: '1px solid #bae6fd'
+        border: '1px solid #b3d9ff'
       }}>
-        <h3 style={{ margin: '0 0 10px 0', color: '#0369a1' }}>
-          Nemtor Units Management
+        <h3 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>
+          Nemtor Units Database Overview
         </h3>
-        <p style={{ margin: '0', color: '#0c4a6e', fontSize: '14px' }}>
-          This page displays all Nemtor units from the database. Each unit represents an Elementor widget 
-          or component with its associated settings, styles, and metadata. The table shows all fields 
-          including JSON data, image configurations, and hierarchical relationships.
+        <p style={{ margin: '0 0 10px 0', color: '#004080', fontSize: '14px' }}>
+          This page displays all Nemtor units using the Fava template system. Each unit represents 
+          an Elementor widget or component with comprehensive metadata including settings, styles, 
+          and hierarchical relationships.
         </p>
+        <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: '#003366' }}>
+          <div>
+            <strong>Key Features:</strong>
+            <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+              <li>Complete field visibility (32 columns)</li>
+              <li>Grouped header organization</li>
+              <li>JSON field previews</li>
+              <li>Timestamp formatting</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Data Categories:</strong>
+            <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+              <li>Identifiers & Element Properties</li>
+              <li>Text Content & JSON Data</li>
+              <li>Image Properties & Slots</li>
+              <li>TAR Content Management</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </FavaPageMaster>
   );
