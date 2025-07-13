@@ -32,6 +32,54 @@ export default function ColtempCommandPage() {
   const [data, setData] = useState<Coltemp[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Create new inline entry
+  const createNewInlineEntry = async () => {
+    try {
+      // First, get an existing UTG ID from the current data, or use null if none available
+      const existingUtgIds = getUniqueValues('rel_utg_id');
+      const firstValidUtgId = existingUtgIds.length > 0 ? existingUtgIds[0] : null;
+
+      const { data: newRecord, error } = await supabase
+        .from('coltemps')
+        .insert({
+          rel_utg_id: firstValidUtgId, // Use existing UTG ID or null
+          coltemp_name: null,
+          coltemp_category: null,
+          coltemp_display_name: null,
+          is_default: false,
+          button_text: null,
+          tooltip_text: null,
+          default_header_row_color: null,
+          fk_user_id: null,
+          coltemp_color: null,
+          coltemp_icon: null
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating new inline entry:', error);
+        const errorMessage = error.message || 'Failed to create new entry';
+        const errorDetails = error.details || '';
+        const errorHint = error.hint || '';
+        
+        alert(`Failed to create new entry:\n${errorMessage}\n${errorDetails}\n${errorHint}`.trim());
+        return;
+      }
+
+      // Update local state - add new record at the beginning
+      setData(prev => [newRecord, ...prev]);
+      
+      // Reset to first page to show the new record
+      setCurrentPage(1);
+      updateURLParams({ page: 1 });
+    } catch (error: any) {
+      console.error('Error creating new inline entry:', error);
+      const errorMessage = error.message || 'Failed to create new entry';
+      alert(`Failed to create new entry: ${errorMessage}`);
+    }
+  };
   
   // Initialize state from URL parameters
   const [searchTerm, setSearchTerm] = useState(searchParams?.get('search') || '');
@@ -506,6 +554,12 @@ export default function ColtempCommandPage() {
               >
                 Create New
               </button>
+              <button
+                onClick={createNewInlineEntry}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+              >
+                Create New Entry (Inline)
+              </button>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">Items per page:</span>
@@ -539,7 +593,12 @@ export default function ColtempCommandPage() {
                   setCurrentPage(1);
                   updateURLParams({ filter_rel_utg_id: e.target.value, page: 1 });
                 }}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm"
+                className={`px-3 py-1 border border-gray-300 rounded-md text-sm ${
+                  filters.rel_utg_id !== 'all' 
+                    ? 'font-bold text-white' 
+                    : ''
+                }`}
+                style={filters.rel_utg_id !== 'all' ? { backgroundColor: '#103c0a' } : {}}
               >
                 <option value="all">All</option>
                 {getUniqueValues('rel_utg_id').map(value => (
