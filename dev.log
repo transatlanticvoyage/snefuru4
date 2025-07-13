@@ -3040,3 +3040,663 @@ Found sitespren records: 151
  GET /favicon.ico 200 in 16ms
  GET /favicon.ico 200 in 9ms
  GET /favicon.ico 200 in 9ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 866ms (1200 modules)
+ ✓ Compiled in 0ms (673 modules)
+ ✓ Compiled in 0ms (673 modules)
+ ✓ Compiled in 1ms (673 modules)
+ GET /torna3 200 in 703ms
+ ✓ Compiled in 0ms (673 modules)
+ GET /sitejar4 200 in 469ms
+ GET /torna3 200 in 255ms
+ ✓ Compiled /favicon.ico in 190ms (689 modules)
+ GET /favicon.ico 200 in 345ms
+ GET /favicon.ico 200 in 10ms
+ GET /favicon.ico 200 in 12ms
+ GET /favicon.ico 200 in 9ms
+ GET /favicon.ico 200 in 8ms
+ GET /favicon.ico 200 in 9ms
+ ✓ Compiled in 241ms (1216 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /sitejar4 200 in 131ms
+ GET /torna3 200 in 132ms
+ GET /torna3 200 in 72ms
+ GET /favicon.ico 200 in 115ms
+ GET /favicon.ico 200 in 22ms
+ GET /favicon.ico 200 in 14ms
+ ✓ Compiled /api/navigation in 170ms (695 modules)
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+ GET /favicon.ico 200 in 272ms
+ GET /favicon.ico 200 in 13ms
+ GET /favicon.ico 200 in 14ms
+API: Navigation items received: [
+  { name: '[', children: [ [Object], [Object] ] },
+  { name: 'azulpsql', path: '/admin/azulpsql' },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'J', children: [ [Object], [Object] ] },
+  { name: 'K', children: [ [Object], [Object], [Object] ] },
+  { name: 'M', children: [ [Object], [Object] ] },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+]
+ GET /api/navigation 200 in 319ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: '[', children: [ [Object], [Object] ] },
+  { name: 'azulpsql', path: '/admin/azulpsql' },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'J', children: [ [Object], [Object] ] },
+  { name: 'K', children: [ [Object], [Object], [Object] ] },
+  { name: 'M', children: [ [Object], [Object] ] },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+]
+ GET /api/navigation 200 in 18ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: '[', children: [ [Object], [Object] ] },
+  { name: 'azulpsql', path: '/admin/azulpsql' },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'J', children: [ [Object], [Object] ] },
+  { name: 'K', children: [ [Object], [Object], [Object] ] },
+  { name: 'M', children: [ [Object], [Object] ] },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+]
+ GET /api/navigation 200 in 16ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: '[', children: [ [Object], [Object] ] },
+  { name: 'azulpsql', path: '/admin/azulpsql' },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'J', children: [ [Object], [Object] ] },
+  { name: 'K', children: [ [Object], [Object], [Object] ] },
+  { name: 'M', children: [ [Object], [Object] ] },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+]
+ GET /api/navigation 200 in 19ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: '[', children: [ [Object], [Object] ] },
+  { name: 'azulpsql', path: '/admin/azulpsql' },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'J', children: [ [Object], [Object] ] },
+  { name: 'K', children: [ [Object], [Object], [Object] ] },
+  { name: 'M', children: [ [Object], [Object] ] },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+]
+ GET /api/navigation 200 in 18ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: '[', children: [ [Object], [Object] ] },
+  { name: 'azulpsql', path: '/admin/azulpsql' },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'J', children: [ [Object], [Object] ] },
+  { name: 'K', children: [ [Object], [Object], [Object] ] },
+  { name: 'M', children: [ [Object], [Object] ] },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+]
+ GET /api/navigation 200 in 18ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: '[', children: [ [Object], [Object] ] },
+  { name: 'azulpsql', path: '/admin/azulpsql' },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'J', children: [ [Object], [Object] ] },
+  { name: 'K', children: [ [Object], [Object], [Object] ] },
+  { name: 'M', children: [ [Object], [Object] ] },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+]
+ GET /api/navigation 200 in 17ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: '[', children: [ [Object], [Object] ] },
+  { name: 'azulpsql', path: '/admin/azulpsql' },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'J', children: [ [Object], [Object] ] },
+  { name: 'K', children: [ [Object], [Object], [Object] ] },
+  { name: 'M', children: [ [Object], [Object] ] },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  { name: 'R', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'zarnomanager', path: '/admin/zarnomanager' }
+]
+ GET /api/navigation 200 in 16ms
+ ✓ Compiled in 554ms (1200 modules)
+ ✓ Compiled in 261ms (1200 modules)
+ ✓ Compiled in 300ms (1200 modules)
+ ✓ Compiled in 380ms (1200 modules)
+ ✓ Compiled in 220ms (1200 modules)
+ GET /torna3 200 in 161ms
+ ✓ Compiled /_not-found in 402ms (1190 modules)
+ GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415417361 404 in 584ms
+ GET /_next/static/css/app/layout.css?v=1752415417361 404 in 593ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 583ms
+ GET /_next/static/chunks/app/(protected2)/layout.js 404 in 572ms
+ GET /_next/static/chunks/main-app.js?v=1752415417361 404 in 585ms
+ ✓ Compiled /favicon.ico in 164ms (690 modules)
+ GET /favicon.ico 200 in 228ms
+ GET /torna3 200 in 98ms
+ GET /_next/static/css/app/layout.css?v=1752415423136 404 in 65ms
+ GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415423136 404 in 69ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 49ms
+ GET /_next/static/chunks/main-app.js?v=1752415423136 404 in 49ms
+ GET /_next/static/chunks/app/(protected2)/layout.js 404 in 16ms
+ GET /favicon.ico 200 in 13ms
+ GET /torna3 200 in 48ms
+ GET /_next/static/css/app/layout.css?v=1752415426816 404 in 69ms
+ GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415426816 404 in 71ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 49ms
+ GET /_next/static/chunks/main-app.js?v=1752415426816 404 in 49ms
+ GET /_next/static/chunks/app/(protected2)/layout.js 404 in 16ms
+ GET /favicon.ico 200 in 14ms
+ GET /torna3 200 in 42ms
+ GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415436224 404 in 40ms
+ GET /_next/static/css/app/layout.css?v=1752415436224 404 in 57ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 44ms
+ GET /_next/static/chunks/main-app.js?v=1752415436224 404 in 46ms
+ GET /_next/static/chunks/app/(protected2)/layout.js 404 in 19ms
+ GET /torna2 200 in 50ms
+ GET /_next/static/css/app/layout.css?v=1752415437994 404 in 19ms
+ GET /_next/static/css/app/(protected2)/torna2/page.css?v=1752415437994 404 in 33ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 46ms
+ GET /_next/static/chunks/main-app.js?v=1752415437994 404 in 47ms
+ GET /_next/static/chunks/app/(protected2)/layout.js 404 in 45ms
+ GET /torna3 200 in 27ms
+ GET /_next/static/css/app/layout.css?v=1752415443837 404 in 64ms
+ GET /_next/static/css/app/(protected2)/torna3/page.css?v=1752415443837 404 in 61ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 60ms
+ GET /_next/static/chunks/main-app.js?v=1752415443837 404 in 61ms
+ GET /_next/static/chunks/app/(protected2)/layout.js 404 in 18ms
+ GET /favicon.ico 200 in 13ms
+ GET /torna2 200 in 40ms
+ GET /_next/static/css/app/layout.css?v=1752415445111 404 in 78ms
+ GET /_next/static/css/app/(protected2)/torna2/page.css?v=1752415445111 404 in 78ms
+ GET /_next/static/chunks/main-app.js?v=1752415445111 404 in 44ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 44ms
+ GET /_next/static/chunks/app/(protected2)/layout.js 404 in 43ms
+ GET /favicon.ico 200 in 13ms
