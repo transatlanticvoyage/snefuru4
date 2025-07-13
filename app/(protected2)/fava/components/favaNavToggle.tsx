@@ -63,60 +63,56 @@ export default function FavaNavToggle() {
       <style jsx>{`
         .fava-nav-toggle-container {
           position: fixed;
-          top: 20px;
-          right: 20px;
+          top: 4px;
+          left: 4px;
           z-index: 1002;
           display: flex;
           flex-direction: column;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
         .fava-nav-toggle {
           width: 48px;
           height: 24px;
           border: none;
-          background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+          background: #2563eb;
           color: white;
-          font-size: 14px;
-          font-weight: bold;
+          font-size: 12px;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.15s ease;
           display: flex;
           align-items: center;
           justify-content: center;
-          position: relative;
+          border: 1px solid #1d4ed8;
         }
         
         .fava-header-toggle {
-          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 8px 8px 0 0;
+          border-bottom: none;
+          border-radius: 0;
+          margin-bottom: 1px;
         }
         
         .fava-sidebar-toggle {
-          border-radius: 0 0 8px 8px;
+          border-radius: 0;
         }
         
         .fava-nav-toggle:hover {
-          background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-          transform: scale(1.05);
+          background: #1d4ed8;
         }
         
         .fava-nav-toggle:active {
-          transform: scale(0.95);
+          background: #1e40af;
         }
         
         @media (max-width: 768px) {
           .fava-nav-toggle-container {
-            top: 15px;
-            right: 15px;
+            top: 2px;
+            left: 2px;
           }
           
           .fava-nav-toggle {
             width: 42px;
             height: 21px;
-            font-size: 12px;
+            font-size: 10px;
           }
         }
       `}</style>
