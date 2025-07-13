@@ -192,7 +192,7 @@ export default function Header() {
             }`}>
               {item.children.map((child) => {
                 // Check if this is a separator item (no path)
-                if (!child.path) {
+                if (!child.path && !child.children) {
                   return (
                     <div
                       key={child.name}
@@ -205,18 +205,85 @@ export default function Header() {
                   );
                 }
                 
-                // Regular menu item with link
+                // Check if this child has its own children (sub-dropdown)
+                if (child.children && child.children.length > 0) {
+                  return (
+                    <div
+                      key={child.name}
+                      className="relative group"
+                    >
+                      <button
+                        className={`w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between ${
+                          item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
+                        }`}
+                      >
+                        {child.name}
+                        <svg
+                          className="ml-1 h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                      
+                      {/* Sub-dropdown menu */}
+                      <div className="absolute left-full top-0 ml-1 hidden group-hover:block rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 w-48">
+                        {child.children.map((grandchild) => {
+                          if (!grandchild.path) {
+                            return (
+                              <div
+                                key={grandchild.name}
+                                className="block px-4 py-2 text-sm font-medium bg-black text-white"
+                              >
+                                {grandchild.name}
+                              </div>
+                            );
+                          }
+                          
+                          return (
+                            <Link
+                              key={grandchild.name}
+                              href={grandchild.path}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
+                            >
+                              {grandchild.name}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                }
+                
+                // Regular menu item with link (no children)
+                if (child.path) {
+                  return (
+                    <Link
+                      key={child.name}
+                      href={child.path}
+                      className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
+                        item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
+                      }`}
+                      onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
+                    >
+                      {child.name}
+                    </Link>
+                  );
+                }
+                
+                // Fallback for items without path or children
                 return (
-                  <Link
-                    key={child.path}
-                    href={child.path!}
-                    className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
+                  <span
+                    key={child.name}
+                    className={`block px-4 py-2 text-sm text-gray-500 ${
                       item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
                     }`}
-                    onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
                   >
                     {child.name}
-                  </Link>
+                  </span>
                 );
               })}
             </div>
@@ -224,11 +291,22 @@ export default function Header() {
         </div>
       );
     } else {
-      // Render regular navigation link
+      // Render regular navigation link only if path exists
+      if (!item.path) {
+        return (
+          <span
+            key={item.name}
+            className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-500"
+          >
+            {item.name}
+          </span>
+        );
+      }
+      
       return (
         <Link
-          key={item.path}
-          href={item.path!}
+          key={item.name}
+          href={item.path}
           className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700"
         >
           {item.name}

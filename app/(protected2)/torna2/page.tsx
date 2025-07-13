@@ -1,133 +1,123 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import FavaHeader from '../fava/components/favaHeader';
-import FavaSidebar from '../fava/components/favaSidebar';
-import FavaNavToggle from '../fava/components/favaNavToggle';
-import '../fava/styles/fava-navigation.css';
+import { useEffect, useState } from 'react';
+import FavaPageMaster from '../fava/components/favaPageMaster';
+import { tableConfig } from './tableConfig';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-export default function Tornado2Page() {
-  const [navVisible, setNavVisible] = useState(true);
+export default function Torna2Page() {
+  const [nemtorData, setNemtorData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
-    document.title = 'Tornado2 - Weather Monitor';
-    
-    // Check navigation visibility from localStorage
-    const savedVisibility = localStorage.getItem('fava-nav-visible');
-    if (savedVisibility !== null) {
-      setNavVisible(JSON.parse(savedVisibility));
-    }
-    
-    // Listen for navigation visibility changes
-    const handleVisibilityChange = () => {
-      const visibility = localStorage.getItem('fava-nav-visible');
-      if (visibility !== null) {
-        setNavVisible(JSON.parse(visibility));
-      }
-    };
-    
-    // Listen for both storage changes (cross-tab) and custom events (same page)
-    window.addEventListener('storage', handleVisibilityChange);
-    window.addEventListener('fava-nav-toggle', handleVisibilityChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleVisibilityChange);
-      window.removeEventListener('fava-nav-toggle', handleVisibilityChange);
-    };
+    fetchNemtorUnits();
   }, []);
 
+  const fetchNemtorUnits = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('nemtor_units')
+        .select('*')
+        .order('sort_index', { ascending: true })
+        .order('position_order', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching nemtor units:', error);
+        return;
+      }
+
+      setNemtorData(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Convert nemtor data to table format
+  const data = nemtorData.map(row => 
+    tableConfig.columns.map(col => {
+      const value = row[col.field as keyof typeof row];
+      
+      // Apply formatting if specified
+      if (col.format && typeof col.format === 'function') {
+        return col.format(value);
+      }
+      
+      return value;
+    })
+  );
+
+  // Generate tooltips for nemtor data
+  const cellTooltips = nemtorData.map(() => 
+    tableConfig.columns.map(col => `${col.header}: ${col.field}`)
+  );
+
+  // Event handlers
+  const handleCellClick = (rowIndex: number, colIndex: number, value: any) => {
+    console.log(`Cell clicked: Row ${rowIndex}, Col ${colIndex}, Value: ${value}`);
+  };
+
+  const handleHeaderClick = (colIndex: number, headerName: string) => {
+    console.log(`Header clicked: ${headerName} (Column ${colIndex})`);
+  };
+
+  const handleRowClick = (rowIndex: number, rowData: any[]) => {
+    console.log(`Row clicked: ${rowIndex}`, rowData);
+  };
+
+  // Prepare table props
+  const tableProps = {
+    headerRows: tableConfig.headerRows,
+    data: data,
+    tableClassName: "nemtor-units-table",
+    theadClassName: "table-header",
+    tbodyClassName: "table-body",
+    thClassName: "header-cell",
+    tdClassName: "data-cell",
+    headerTrClassName: "header-row",
+    bodyTrClassName: "body-row",
+    cellTooltips: cellTooltips,
+    onCellClick: handleCellClick,
+    onHeaderClick: handleHeaderClick,
+    onRowClick: handleRowClick
+  };
+
+  if (loading) {
+    return <div>Loading nemtor units...</div>;
+  }
+
   return (
-    <>
-      <FavaNavToggle />
-      <FavaHeader />
-      <FavaSidebar />
+    <FavaPageMaster
+      pageTitle="Nemtor Units Database"
+      pageDescription={`${nemtorData.length} units • ${tableConfig.columns.length} data columns • Elementor widget management system`}
+      documentTitle="Nemtor Units - /torna2"
+      tableProps={tableProps}
+      showTable={true}
+      showColumnTemplateControls={true}
+      showFilterControls={true}
+      showSearchBox={true}
+      showPaginationControls={true}
+      showBiriDevInfoBox={true}
+    >
+      {/* Custom content specific to Nemtor Units */}
       <div style={{ 
-        paddingTop: navVisible ? '60px' : '20px', 
-        paddingLeft: navVisible ? '250px' : '20px',
-        paddingRight: '20px',
-        paddingBottom: '20px',
-        transition: 'all 0.3s ease',
-        minHeight: '100vh',
-        boxSizing: 'border-box'
+        marginTop: '20px', 
+        padding: '15px', 
+        backgroundColor: '#f0f9ff', 
+        borderRadius: '8px',
+        border: '1px solid #bae6fd'
       }}>
-        <h1 style={{ marginBottom: '20px', color: '#1e293b' }}>
-          Tornado2 Weather Monitoring System
-        </h1>
-        
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '20px',
-          marginBottom: '30px'
-        }}>
-          <div style={{
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            borderRadius: '8px',
-            padding: '20px'
-          }}>
-            <h3 style={{ color: '#dc2626', marginBottom: '10px' }}>🌪️ Active Alerts</h3>
-            <p style={{ color: '#991b1b', margin: '0', fontSize: '14px' }}>
-              Monitor real-time tornado warnings and severe weather alerts in your area.
-            </p>
-          </div>
-          
-          <div style={{
-            background: '#eff6ff',
-            border: '1px solid #bfdbfe',
-            borderRadius: '8px',
-            padding: '20px'
-          }}>
-            <h3 style={{ color: '#2563eb', marginBottom: '10px' }}>📡 Weather Radar</h3>
-            <p style={{ color: '#1d4ed8', margin: '0', fontSize: '14px' }}>
-              View live Doppler radar imagery and track storm movement patterns.
-            </p>
-          </div>
-          
-          <div style={{
-            background: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            borderRadius: '8px',
-            padding: '20px'
-          }}>
-            <h3 style={{ color: '#16a34a', marginBottom: '10px' }}>📊 Forecasts</h3>
-            <p style={{ color: '#15803d', margin: '0', fontSize: '14px' }}>
-              Access detailed weather forecasts and probability assessments.
-            </p>
-          </div>
-          
-          <div style={{
-            background: '#fefce8',
-            border: '1px solid #fde68a',
-            borderRadius: '8px',
-            padding: '20px'
-          }}>
-            <h3 style={{ color: '#ca8a04', marginBottom: '10px' }}>🚨 Emergency</h3>
-            <p style={{ color: '#a16207', margin: '0', fontSize: '14px' }}>
-              Quick access to emergency procedures and evacuation information.
-            </p>
-          </div>
-        </div>
-        
-        <div style={{
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          padding: '20px'
-        }}>
-          <h2 style={{ color: '#1e293b', marginBottom: '15px' }}>Simplified Fava Navigation Demo</h2>
-          <p style={{ color: '#4b5563', marginBottom: '15px' }}>
-            This page now uses the simplified navigation system from fava:
-          </p>
-          <ul style={{ color: '#4b5563', paddingLeft: '20px' }}>
-            <li>Imports navigation components from ../fava/components/</li>
-            <li>Uses the same navigation data from /api/navigation</li>
-            <li>Toggle button shows/hides both header and sidebar</li>
-            <li>Navigation state is saved in localStorage</li>
-            <li>No complex template system - just simple, reusable components</li>
-          </ul>
-        </div>
+        <h3 style={{ margin: '0 0 10px 0', color: '#0369a1' }}>
+          Nemtor Units Management
+        </h3>
+        <p style={{ margin: '0', color: '#0c4a6e', fontSize: '14px' }}>
+          This page displays all Nemtor units from the database. Each unit represents an Elementor widget 
+          or component with its associated settings, styles, and metadata. The table shows all fields 
+          including JSON data, image configurations, and hierarchical relationships.
+        </p>
       </div>
-    </>
+    </FavaPageMaster>
   );
 }
