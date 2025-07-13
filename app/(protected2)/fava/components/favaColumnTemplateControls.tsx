@@ -100,6 +100,17 @@ export default function FavaColumnTemplateControls() {
     isMore = false,
     category = '',
     overflowItems = [] as ColtempData[]
+  }: {
+    coltemp_id?: number;
+    coltemp_icon?: string | null;
+    coltemp_color?: string | null;
+    coltemp_name?: string | null;
+    count_of_columns?: number | null;
+    isFirst?: boolean;
+    isLast?: boolean;
+    isMore?: boolean;
+    category?: string;
+    overflowItems?: ColtempData[];
   }) => {
     const getButtonStyle = () => {
       if (isMore) return moreButtonStyle;

@@ -429,7 +429,8 @@ export default function XPagesManager1Page() {
             color: '#666',
             whiteSpace: 'nowrap'
           }}>
-            button borrowed from bensa system
+            button <br></br>
+            de bensa
           </span>
           <button
             onClick={() => handleSyncButtonClick(item.xpage_id)}
