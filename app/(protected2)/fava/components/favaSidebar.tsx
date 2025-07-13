@@ -17,14 +17,14 @@ export default function FavaSidebar() {
 
   useEffect(() => {
     // Load visibility state from localStorage
-    const savedVisibility = localStorage.getItem('fava-nav-visible');
+    const savedVisibility = localStorage.getItem('fava-sidebar-visible');
     if (savedVisibility !== null) {
       setIsVisible(JSON.parse(savedVisibility));
     }
 
     // Listen for visibility changes from toggle
     const handleStorageChange = () => {
-      const visibility = localStorage.getItem('fava-nav-visible');
+      const visibility = localStorage.getItem('fava-sidebar-visible');
       if (visibility !== null) {
         setIsVisible(JSON.parse(visibility));
       }
@@ -33,14 +33,14 @@ export default function FavaSidebar() {
     window.addEventListener('storage', handleStorageChange);
     
     // Custom event for same-page toggle updates
-    window.addEventListener('fava-nav-toggle', handleStorageChange);
+    window.addEventListener('fava-sidebar-toggle', handleStorageChange);
 
     // Fetch navigation data
     fetchNavigation();
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('fava-nav-toggle', handleStorageChange);
+      window.removeEventListener('fava-sidebar-toggle', handleStorageChange);
     };
   }, []);
 

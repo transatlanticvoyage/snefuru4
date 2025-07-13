@@ -218,28 +218,28 @@ export default function FavaHeader() {
     document.head.appendChild(styleElement);
 
     // Load visibility state from localStorage
-    const savedVisibility = localStorage.getItem('az-nav-visible');
+    const savedVisibility = localStorage.getItem('fava-header-visible');
     if (savedVisibility !== null) {
       setIsVisible(JSON.parse(savedVisibility));
     }
 
     // Listen for visibility changes from toggle
     const handleStorageChange = () => {
-      const visibility = localStorage.getItem('az-nav-visible');
+      const visibility = localStorage.getItem('fava-header-visible');
       if (visibility !== null) {
         setIsVisible(JSON.parse(visibility));
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('az-nav-toggle', handleStorageChange);
+    window.addEventListener('fava-header-toggle', handleStorageChange);
 
     // Fetch navigation data
     fetchNavigation();
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('az-nav-toggle', handleStorageChange);
+      window.removeEventListener('fava-header-toggle', handleStorageChange);
       // Clean up styles
       document.head.removeChild(styleElement);
     };
