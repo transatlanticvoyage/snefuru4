@@ -35,7 +35,7 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
   const [navigationStructure, setNavigationStructure] = useState<{
     adminMenuItem: NavItem;
     specialFirstItem: NavItem;
-    nonAdminItems: NavItem[];
+    oldAllGroupItem: NavItem;
   } | null>(null);
 
   useEffect(() => {
@@ -217,10 +217,8 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
   const getAllNavItems = () => {
     if (!navigationStructure) return [];
     
-    const items = [navigationStructure.adminMenuItem, navigationStructure.specialFirstItem];
+    const items = [navigationStructure.adminMenuItem, navigationStructure.specialFirstItem, navigationStructure.oldAllGroupItem];
     
-    // Add other nav items from the structure
-    items.push(...navigationStructure.nonAdminItems);
     return items;
   };
 

@@ -216,14 +216,20 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
     ]
   };
 
+  // Create the new oldallgroup dropdown containing all nonAdminItems
+  const oldAllGroupItem: NavItem = {
+    name: 'oldallgroup',
+    children: nonAdminItems
+  };
+
   // Debug logging
   console.log('adminMenuItem children:', adminMenuItem.children?.map(c => c.name) || []);
   console.log('specialFirstItem children:', specialFirstItem.children?.map(c => c.name) || []);
-  console.log('nonAdminItems:', nonAdminItems.map(item => ({ name: item.name, path: item.path, hasChildren: !!item.children })));
+  console.log('oldAllGroupItem children:', oldAllGroupItem.children?.map(c => c.name) || []);
 
   return {
     adminMenuItem,
     specialFirstItem,
-    nonAdminItems
+    oldAllGroupItem
   };
 };
