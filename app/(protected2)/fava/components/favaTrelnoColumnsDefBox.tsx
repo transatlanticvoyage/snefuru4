@@ -33,7 +33,9 @@
     return (
       <div className="trelno_columns_def_box" style={boxStyle}>
         <strong>trelno_columns_def_box</strong><br></br>
-        lorem ipsum dolor<br></br>
+        admin_random_stroage.rstor_id<br></br>
+        admin_random_stroage.rstor_name<br></br>
+        admin_random_stroage.rstor_substance<br></br>
 
         <div className="trelno_textarea_wrapper_div" style={trelnoTextareaWrapperStyle}>
          <textarea className="trelno_textarea" style={trelnoTextareaStyle}>

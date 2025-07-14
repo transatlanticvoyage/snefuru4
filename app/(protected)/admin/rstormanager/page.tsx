@@ -6,9 +6,10 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Link from 'next/link';
 
 interface AdminRandomStorage {
-  rstor_id: string;
+  rstor_id: number;
   rstor_body: any;
   rstor_substance: string | null;
+  rstor_name: string | null;
   fk_app_page: string | null;
   created_at: string;
   updated_at: string;
@@ -33,6 +34,10 @@ export default function RstorManagerPage() {
   const [pageFilter, setPageFilter] = useState('all');
   const [uniquePages, setUniquePages] = useState<string[]>([]);
   
+  // Inline editing state
+  const [editingCell, setEditingCell] = useState<{rowId: number, field: string} | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
+  
   // Sort state
   const [sortField, setSortField] = useState<keyof AdminRandomStorage>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -50,7 +55,7 @@ export default function RstorManagerPage() {
 
       // Apply search filter
       if (searchTerm) {
-        query = query.or(`rstor_substance.ilike.%${searchTerm}%,fk_app_page.ilike.%${searchTerm}%,rstor_body::text.ilike.%${searchTerm}%`);
+        query = query.or(`rstor_substance.ilike.%${searchTerm}%,rstor_name.ilike.%${searchTerm}%,fk_app_page.ilike.%${searchTerm}%,rstor_body::text.ilike.%${searchTerm}%`);
       }
 
       // Apply page filter
@@ -96,6 +101,67 @@ export default function RstorManagerPage() {
       setUniquePages(unique.sort());
     } catch (err) {
       console.error('Error fetching unique pages:', err);
+    }
+  };
+
+  // Create new entry
+  const createNewEntry = async () => {
+    try {
+      const { data: newEntry, error } = await supabase
+        .from('admin_random_storage')
+        .insert({
+          rstor_name: 'New Entry',
+          rstor_substance: '',
+          fk_app_page: null,
+          rstor_body: {}
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add to current data
+      setData(prevData => [newEntry, ...prevData]);
+      setTotalCount(prev => prev + 1);
+    } catch (err) {
+      console.error('Error creating new entry:', err);
+      setError('Failed to create new entry');
+    }
+  };
+
+  // Handle inline editing
+  const startEditing = (rowId: number, field: string, currentValue: string) => {
+    setEditingCell({ rowId, field });
+    setEditingValue(currentValue || '');
+  };
+
+  const cancelEditing = () => {
+    setEditingCell(null);
+    setEditingValue('');
+  };
+
+  const saveEdit = async (rowId: number, field: string) => {
+    try {
+      const { error } = await supabase
+        .from('admin_random_storage')
+        .update({ [field]: editingValue })
+        .eq('rstor_id', rowId);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(prevData =>
+        prevData.map(item =>
+          item.rstor_id === rowId
+            ? { ...item, [field]: editingValue }
+            : item
+        )
+      );
+
+      cancelEditing();
+    } catch (err) {
+      console.error('Error saving edit:', err);
+      setError('Failed to save changes');
     }
   };
 
