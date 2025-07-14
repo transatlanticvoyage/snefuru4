@@ -411,6 +411,15 @@ export default function FavaColumnTemplateControls() {
     marginRight: '8px'
   };
 
+  const shendoLinkStyle = {
+    color: '#dc2626',
+    fontSize: '12px',
+    textDecoration: 'underline',
+    marginLeft: '8px',
+    marginRight: '8px',
+    cursor: 'pointer'
+  };
+
   return (
     <div style={boardStyle}>
       <div style={topLabelStyle}>div.coltemp_board</div>
@@ -438,6 +447,22 @@ export default function FavaColumnTemplateControls() {
                 >
                   open cj
                 </Link>
+                
+                <span
+                  style={shendoLinkStyle}
+                  onClick={() => {
+                    // Emit custom event for shendo bar
+                    const event = new CustomEvent('fava-shendo-show-category', {
+                      detail: { 
+                        category: category,
+                        categoryData: coltempData[category] || []
+                      }
+                    });
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  shendo
+                </span>
 
                 <div style={buttonGroupColtempStyle}>
                   {slots.map((slot, index) => (

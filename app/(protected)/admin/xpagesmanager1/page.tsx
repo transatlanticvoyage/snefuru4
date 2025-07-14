@@ -13,6 +13,7 @@ import { syncXPageMetadataAPI } from '@/app/utils/syncXPageMetadata';
 
 interface XPage {
   xpage_id: number;
+  goal_for_meta_title_system: string | null;
   title1: string | null;
   main_url: string | null;
   meta_title: string | null;
@@ -26,6 +27,10 @@ interface XPage {
   show_in_all_pages_nav_area1: boolean | null;
   broad_parent_container: string | null;
   has_mutation_observer: string | null;
+  starred: boolean | null;
+  flagged: boolean | null;
+  penatgoned: boolean | null;
+  circled: boolean | null;
   created_at: string;
   updated_at: string;
 }
@@ -57,8 +62,9 @@ export default function XPagesManager1Page() {
   const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
 
   // Define column order and properties
-  const columns: Array<{ key: keyof XPage; type: string; width: string }> = [
+  const columns: Array<{ key: keyof XPage; type: string; width: string; group?: string }> = [
     { key: 'xpage_id', type: 'integer', width: '80px' },
+    { key: 'goal_for_meta_title_system', type: 'text', width: '200px' },
     { key: 'title1', type: 'text', width: '200px' },
     { key: 'main_url', type: 'text', width: '200px' },
     { key: 'meta_title', type: 'text', width: '200px' },
@@ -72,6 +78,10 @@ export default function XPagesManager1Page() {
     { key: 'show_in_all_pages_nav_area1', type: 'boolean', width: '80px' },
     { key: 'broad_parent_container', type: 'text', width: '200px' },
     { key: 'has_mutation_observer', type: 'text', width: '150px' },
+    { key: 'starred', type: 'boolean-icon', width: '50px', group: 'icons' },
+    { key: 'flagged', type: 'boolean-icon', width: '50px', group: 'icons' },
+    { key: 'penatgoned', type: 'boolean-icon', width: '50px', group: 'icons' },
+    { key: 'circled', type: 'boolean-icon', width: '50px', group: 'icons' },
     { key: 'created_at', type: 'text', width: '200px' },
     { key: 'updated_at', type: 'text', width: '200px' }
   ];
@@ -109,6 +119,7 @@ export default function XPagesManager1Page() {
       const { data, error } = await supabase
         .from('xpages')
         .insert({
+          goal_for_meta_title_system: null,
           title1: null,
           main_url: null,
           meta_title: null,
@@ -120,7 +131,11 @@ export default function XPagesManager1Page() {
           pagepath_short: null,
           position_marker: null,
           show_in_all_pages_nav_area1: null,
-          broad_parent_container: null
+          broad_parent_container: null,
+          starred: false,
+          flagged: false,
+          penatgoned: false,
+          circled: false
         })
         .select()
         .single();
@@ -164,6 +179,13 @@ export default function XPagesManager1Page() {
   const handleCellClick = (id: number, field: string, currentValue: any) => {
     if (field === 'xpage_id' || field === 'created_at' || field === 'updated_at') {
       return; // Don't allow editing these fields
+    }
+    
+    // Handle boolean-icon fields with direct toggle
+    const column = columns.find(col => col.key === field);
+    if (column?.type === 'boolean-icon') {
+      handleBooleanToggle(id, field as keyof XPage, currentValue as boolean | null);
+      return;
     }
     
     setEditingCell({ id, field });
@@ -364,10 +386,83 @@ export default function XPagesManager1Page() {
     }
   };
 
+  // Icon rendering functions
+  const renderIcon = (iconType: string, isActive: boolean | null) => {
+    const baseStyle = {
+      width: '20px',
+      height: '20px',
+      display: 'inline-block',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    };
+
+    const activeStyle = {
+      ...baseStyle,
+      backgroundColor: '#000',
+      border: '1px solid #000'
+    };
+
+    const inactiveStyle = {
+      ...baseStyle,
+      backgroundColor: 'transparent',
+      border: '1px solid #666'
+    };
+
+    switch (iconType) {
+      case 'starred':
+        return (
+          <div style={isActive ? activeStyle : inactiveStyle}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={isActive ? '#fff' : 'none'} stroke={isActive ? '#fff' : '#666'} strokeWidth="2">
+              <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+            </svg>
+          </div>
+        );
+      case 'flagged':
+        return (
+          <div style={isActive ? activeStyle : inactiveStyle}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={isActive ? '#fff' : 'none'} stroke={isActive ? '#fff' : '#666'} strokeWidth="2">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+              <line x1="4" y1="22" x2="4" y2="15" />
+            </svg>
+          </div>
+        );
+      case 'penatgoned':
+        return (
+          <div style={isActive ? activeStyle : inactiveStyle}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={isActive ? '#fff' : 'none'} stroke={isActive ? '#fff' : '#666'} strokeWidth="2">
+              <polygon points="12,2 18.9,8.6 15.5,18.1 8.5,18.1 5.1,8.6" />
+            </svg>
+          </div>
+        );
+      case 'circled':
+        return (
+          <div style={isActive ? activeStyle : inactiveStyle}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={isActive ? '#fff' : 'none'} stroke={isActive ? '#fff' : '#666'} strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   const renderCell = (item: XPage, column: typeof columns[0]) => {
     const value = item[column.key];
     const isEditing = editingCell?.id === item.xpage_id && editingCell?.field === column.key;
     const isReadOnly = column.key === 'xpage_id' || column.key === 'created_at' || column.key === 'updated_at';
+
+    // Handle boolean-icon fields
+    if (column.type === 'boolean-icon' && !isReadOnly) {
+      return (
+        <div 
+          className="flex items-center justify-center"
+          onClick={() => handleBooleanToggle(item.xpage_id, column.key as keyof XPage, value as boolean | null)}
+        >
+          {renderIcon(column.key, value as boolean | null)}
+        </div>
+      );
+    }
 
     if (column.type === 'boolean' && !isReadOnly) {
       return (
@@ -663,12 +758,17 @@ export default function XPagesManager1Page() {
                     }}
                   />
                 </th>
-                {columns.map((column) => {
+                {columns.map((column, index) => {
                   const isReadOnly = column.key === 'xpage_id' || column.key === 'created_at' || column.key === 'updated_at';
+                  const isFirstInGroup = column.group === 'icons' && (index === 0 || columns[index - 1].group !== 'icons');
+                  const isLastInGroup = column.group === 'icons' && (index === columns.length - 1 || columns[index + 1].group !== 'icons');
+                  
                   return (
                     <th
                       key={column.key}
-                      className="px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border border-gray-200"
+                      className={`px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border border-gray-200 ${
+                        isFirstInGroup ? 'border-l-4 border-l-black' : ''
+                      } ${isLastInGroup ? 'border-r-4 border-r-black' : ''}`}
                       style={{ width: column.width }}
                       onClick={() => handleSort(column.key)}
                     >
@@ -676,7 +776,7 @@ export default function XPagesManager1Page() {
                         <span className={`font-bold text-xs lowercase ${isReadOnly ? 'text-gray-500' : 'text-gray-900'}`}>
                           {column.key}
                         </span>
-                        {!isReadOnly && (
+                        {!isReadOnly && column.type !== 'boolean-icon' && (
                           <span className="text-blue-500 text-xs" title="Click cells to edit">
                             ✎
                           </span>
@@ -710,15 +810,22 @@ export default function XPagesManager1Page() {
                       }}
                     />
                   </td>
-                  {columns.map((column) => (
-                    <td
-                      key={column.key}
-                      className="px-4 py-3 text-sm border border-gray-200"
-                      style={{ width: column.width }}
-                    >
-                      {renderCell(item, column)}
-                    </td>
-                  ))}
+                  {columns.map((column, index) => {
+                    const isFirstInGroup = column.group === 'icons' && (index === 0 || columns[index - 1].group !== 'icons');
+                    const isLastInGroup = column.group === 'icons' && (index === columns.length - 1 || columns[index + 1].group !== 'icons');
+                    
+                    return (
+                      <td
+                        key={column.key}
+                        className={`px-4 py-3 text-sm border border-gray-200 ${
+                          isFirstInGroup ? 'border-l-4 border-l-black' : ''
+                        } ${isLastInGroup ? 'border-r-4 border-r-black' : ''}`}
+                        style={{ width: column.width }}
+                      >
+                        {renderCell(item, column)}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>

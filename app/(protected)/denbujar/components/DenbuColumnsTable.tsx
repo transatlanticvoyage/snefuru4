@@ -48,6 +48,9 @@ export default function DenbuColumnsTable() {
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   
+  // Checkbox selection states
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  
   const supabase = createClientComponentClient();
 
   // Create new denbu column
@@ -237,6 +240,27 @@ export default function DenbuColumnsTable() {
     setEditingValue('');
   };
 
+  // Handle checkbox selection
+  const toggleRowSelection = (rowId: number) => {
+    setSelectedRows(prev => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(rowId)) {
+        newSelection.delete(rowId);
+      } else {
+        newSelection.add(rowId);
+      }
+      return newSelection;
+    });
+  };
+
+  const toggleAllRowsSelection = () => {
+    if (selectedRows.size === paginatedData.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(paginatedData.map(row => row.column_id)));
+    }
+  };
+
   // Define which fields can be inline edited (varchar/text fields)
   const inlineEditableFields = [
     'rel_utg_id', 'column_name', 'display_name', 'data_type', 'denbucol_width'
@@ -345,6 +369,21 @@ export default function DenbuColumnsTable() {
         <table className="min-w-full border-collapse border border-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              {/* Checkbox header column */}
+              <th className="px-2 py-3 text-center border border-gray-200 w-12">
+                <div 
+                  className="w-full h-full flex items-center justify-center cursor-pointer"
+                  onClick={toggleAllRowsSelection}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+                    onChange={() => {}} // Handled by parent div onClick
+                    className="w-4 h-4 cursor-pointer"
+                    style={{ pointerEvents: 'none' }}
+                  />
+                </div>
+              </th>
               {getColumnHeaders().map((column) => (
                 <th
                   key={column}
@@ -364,6 +403,21 @@ export default function DenbuColumnsTable() {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.map((row) => (
               <tr key={row.column_id} className="hover:bg-gray-50">
+                {/* Checkbox cell */}
+                <td 
+                  className="px-2 py-4 border border-gray-200 cursor-pointer text-center w-12"
+                  onClick={() => toggleRowSelection(row.column_id)}
+                >
+                  <div className="w-full h-full flex items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.has(row.column_id)}
+                      onChange={() => {}} // Handled by parent td onClick
+                      className="w-4 h-4 cursor-pointer"
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  </div>
+                </td>
                 {getColumnHeaders().map((key) => {
                   const value = (row as any)[key];
                   return (

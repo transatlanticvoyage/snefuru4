@@ -184,6 +184,7 @@ export default function Torna3Page() {
       tableProps={tableProps}
       showTable={true}
       showColumnTemplateControls={true}
+      showShendoBar={true}
       showFilterControls={true}
       showSearchBox={true}
       showPaginationControls={true}
