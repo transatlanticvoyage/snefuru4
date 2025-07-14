@@ -8,10 +8,41 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 export default function Torna3Page() {
   const [nemtorData, setNemtorData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeColumns, setActiveColumns] = useState<string[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
     fetchNemtorUnits();
+    
+    // Listen for template selection events
+    const handleTemplateSelected = async (event: any) => {
+      const { coltemp_id } = event.detail;
+      await applyTemplate(coltemp_id);
+    };
+    
+    const handleTemplateLoaded = async (event: any) => {
+      const { coltemp_id } = event.detail;
+      await applyTemplate(coltemp_id);
+    };
+    
+    window.addEventListener('fava-template-selected', handleTemplateSelected);
+    window.addEventListener('fava-template-loaded', handleTemplateLoaded);
+    
+    // Check URL for initial template
+    const url = new URL(window.location.href);
+    const coltempId = url.searchParams.get('coltemp_id');
+    if (coltempId) {
+      applyTemplate(parseInt(coltempId));
+    } else {
+      // Load all columns by default
+      setActiveColumns(torna3TableConfig.columns.map(col => col.field));
+    }
+    
+    return () => {
+      window.removeEventListener('fava-template-selected', handleTemplateSelected);
+      window.removeEventListener('fava-template-loaded', handleTemplateLoaded);
+    };
   }, []);
 
   const fetchNemtorUnits = async () => {
@@ -35,9 +66,46 @@ export default function Torna3Page() {
     }
   };
   
-  // Convert nemtor data to table format
+  const applyTemplate = async (coltempId: number) => {
+    try {
+      // Fetch columns for this template from junction table
+      const { data, error } = await supabase
+        .from('coltemp_denbu_relations')
+        .select(`
+          fk_denbu_column_id,
+          denbu_columns (
+            column_name
+          )
+        `)
+        .eq('fk_coltemp_id', coltempId)
+        .eq('is_visible', true)
+        .order('column_position', { ascending: true });
+        
+      if (error) {
+        console.error('Error fetching template columns:', error);
+        return;
+      }
+      
+      // Extract column names
+      const columnNames = data?.map(item => 
+        (item.denbu_columns as any)?.column_name
+      ).filter(Boolean) || [];
+      
+      setActiveColumns(columnNames);
+      setSelectedTemplateId(coltempId);
+    } catch (error) {
+      console.error('Error applying template:', error);
+    }
+  };
+  
+  // Filter columns based on active template
+  const visibleColumns = activeColumns.length > 0 
+    ? torna3TableConfig.columns.filter(col => activeColumns.includes(col.field))
+    : torna3TableConfig.columns;
+    
+  // Convert nemtor data to table format with only visible columns
   const data = nemtorData.map(row => 
-    torna3TableConfig.columns.map(col => {
+    visibleColumns.map(col => {
       const value = row[col.field as keyof typeof row];
       
       // Apply formatting if specified
@@ -49,9 +117,9 @@ export default function Torna3Page() {
     })
   );
 
-  // Generate tooltips for nemtor data
+  // Generate tooltips for visible columns only
   const cellTooltips = nemtorData.map(() => 
-    torna3TableConfig.columns.map(col => `${col.header}: ${col.field}`)
+    visibleColumns.map(col => `${col.header}: ${col.field}`)
   );
 
   // Event handlers
@@ -67,9 +135,21 @@ export default function Torna3Page() {
     console.log(`Row clicked: ${rowIndex}`, rowData);
   };
 
+  // Create header rows for visible columns
+  const filteredHeaderRows = [{
+    id: 'main-header',
+    type: 'label',
+    cells: visibleColumns.map(col => ({
+      content: col.header,
+      alignment: col.field.includes('id') || col.field.includes('_at') || col.field.includes('position') || 
+                col.field.includes('level') || col.field.includes('index') || col.field.includes('slot') || 
+                col.field.includes('qty') ? 'center' : 'left'
+    }))
+  }];
+  
   // Prepare table props
   const tableProps = {
-    headerRows: torna3TableConfig.headerRows,
+    headerRows: filteredHeaderRows,
     data: data,
     tableClassName: "nemtor-units-table",
     theadClassName: "table-header",
@@ -91,7 +171,7 @@ export default function Torna3Page() {
   return (
     <FavaPageMaster
       pageTitle="Nemtor Units Management System"
-      pageDescription={`${nemtorData.length} units • ${torna3TableConfig.columns.length} data columns • Elementor widget tracking`}
+      pageDescription={`${nemtorData.length} units • ${visibleColumns.length} of ${torna3TableConfig.columns.length} columns shown • Elementor widget tracking`}
       documentTitle="Nemtor Units - /torna3"
       tableProps={tableProps}
       showTable={true}

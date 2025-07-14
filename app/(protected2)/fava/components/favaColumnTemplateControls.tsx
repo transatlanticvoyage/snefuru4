@@ -21,6 +21,17 @@ export default function FavaColumnTemplateControls() {
 
   useEffect(() => {
     fetchColtempData();
+    
+    // Check URL for selected template on mount
+    const url = new URL(window.location.href);
+    const coltempId = url.searchParams.get('coltemp_id');
+    if (coltempId) {
+      // Emit event for initial template load
+      const event = new CustomEvent('fava-template-loaded', {
+        detail: { coltemp_id: parseInt(coltempId) }
+      });
+      window.dispatchEvent(event);
+    }
   }, []);
 
   const fetchColtempData = async () => {
@@ -136,6 +147,16 @@ export default function FavaColumnTemplateControls() {
               toggleDropdown(category);
             } else if (coltemp_id !== -1) {
               console.log(`Clicked coltemp_id: ${coltemp_id}`);
+              // Emit custom event for template selection
+              const event = new CustomEvent('fava-template-selected', {
+                detail: { coltemp_id, coltemp_name }
+              });
+              window.dispatchEvent(event);
+              
+              // Update URL with selected template
+              const url = new URL(window.location.href);
+              url.searchParams.set('coltemp_id', coltemp_id.toString());
+              window.history.pushState({}, '', url);
             }
           }}
         >
@@ -168,6 +189,20 @@ export default function FavaColumnTemplateControls() {
                 onClick={() => {
                   console.log(`Clicked dropdown coltemp_id: ${item.coltemp_id}`);
                   setDropdownOpen(prev => ({ ...prev, [category]: false }));
+                  
+                  // Emit custom event for template selection
+                  const event = new CustomEvent('fava-template-selected', {
+                    detail: { 
+                      coltemp_id: item.coltemp_id, 
+                      coltemp_name: item.coltemp_name 
+                    }
+                  });
+                  window.dispatchEvent(event);
+                  
+                  // Update URL with selected template
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('coltemp_id', item.coltemp_id.toString());
+                  window.history.pushState({}, '', url);
                 }}
               >
                 {`${item.count_of_columns || ''} | ${item.coltemp_icon || ''} | ${item.coltemp_color || ''} | ${item.coltemp_name}`}
