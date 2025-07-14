@@ -6,7 +6,7 @@
 
 import { TableConfig } from './tableConfig.sample';
 
-export const nemtorTableConfig: TableConfig = {
+export const torna2TableConfig: TableConfig = {
   tableName: 'nemtor_units',
   
   columns: [
@@ -200,4 +200,4 @@ export const nemtorTableConfig: TableConfig = {
 };
 
 // Export as default for easy import
-export default nemtorTableConfig;
+export default torna2TableConfig;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import FavaPageMaster from '../fava/components/favaPageMaster';
-import { nemtorTableConfig } from '../fava/config/nemtorTableConfig';
+import { torna3TableConfig } from '../fava/config/torna3TableConfig';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function Torna3Page() {
@@ -37,7 +37,7 @@ export default function Torna3Page() {
   
   // Convert nemtor data to table format
   const data = nemtorData.map(row => 
-    nemtorTableConfig.columns.map(col => {
+    torna3TableConfig.columns.map(col => {
       const value = row[col.field as keyof typeof row];
       
       // Apply formatting if specified
@@ -51,7 +51,7 @@ export default function Torna3Page() {
 
   // Generate tooltips for nemtor data
   const cellTooltips = nemtorData.map(() => 
-    nemtorTableConfig.columns.map(col => `${col.header}: ${col.field}`)
+    torna3TableConfig.columns.map(col => `${col.header}: ${col.field}`)
   );
 
   // Event handlers
@@ -69,7 +69,7 @@ export default function Torna3Page() {
 
   // Prepare table props
   const tableProps = {
-    headerRows: nemtorTableConfig.headerRows,
+    headerRows: torna3TableConfig.headerRows,
     data: data,
     tableClassName: "nemtor-units-table",
     theadClassName: "table-header",
@@ -91,7 +91,7 @@ export default function Torna3Page() {
   return (
     <FavaPageMaster
       pageTitle="Nemtor Units Management System"
-      pageDescription={`${nemtorData.length} units • ${nemtorTableConfig.columns.length} data columns • Elementor widget tracking`}
+      pageDescription={`${nemtorData.length} units • ${torna3TableConfig.columns.length} data columns • Elementor widget tracking`}
       documentTitle="Nemtor Units - /torna3"
       tableProps={tableProps}
       showTable={true}
