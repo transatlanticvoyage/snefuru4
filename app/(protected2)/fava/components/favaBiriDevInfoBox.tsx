@@ -11,7 +11,7 @@ export default function FavaBiriDevInfoBox() {
       xpages.meta_title INSERT<br></br>
       xpages.main_url INSERT<br></br>
       xpages.main_url INSERT<br></br>
-      LINK TO /AZO W XPAGE SELECTED<br></br>
+      LINK TO /obi W XPAGE SELECTED<br></br>
       ========================<br></br>
       xpages.view_info<br></br>
       xapges.column count qty<br></br>

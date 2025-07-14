@@ -7394,3 +7394,15 @@ API: Navigation items received: [
  GET /admin/xpagesmanager1 200 in 181ms
  GET /admin/utg_manager 200 in 182ms
  ✓ Compiled /favicon.ico in 156ms (711 modules)
+ GET /favicon.ico 200 in 242ms
+ GET /favicon.ico 200 in 10ms
+ GET /favicon.ico 200 in 11ms
+ GET /favicon.ico 200 in 9ms
+ GET /favicon.ico 200 in 8ms
+ GET /favicon.ico 200 in 10ms
+ GET /favicon.ico 200 in 8ms
+ GET /favicon.ico 200 in 9ms
+ GET /favicon.ico 200 in 10ms
+ GET /favicon.ico 200 in 8ms
+ GET /favicon.ico 200 in 11ms
+ GET /favicon.ico 200 in 10ms
