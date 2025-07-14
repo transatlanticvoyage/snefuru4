@@ -14,6 +14,7 @@ export default function FavaColumnTemplateControls() {
   const [coltempData, setColtempData] = useState<{[key: string]: ColtempData[]}>({});
   const [dropdownOpen, setDropdownOpen] = useState<{[key: string]: boolean}>({});
   const [loading, setLoading] = useState(true);
+  const [activeTemplateId, setActiveTemplateId] = useState<number | null>(null);
   const supabase = createClientComponentClient();
 
   // Define the 3 categories
@@ -26,11 +27,14 @@ export default function FavaColumnTemplateControls() {
     const url = new URL(window.location.href);
     const coltempId = url.searchParams.get('coltemp_id');
     if (coltempId) {
+      setActiveTemplateId(parseInt(coltempId));
       // Emit event for initial template load
       const event = new CustomEvent('fava-template-loaded', {
         detail: { coltemp_id: parseInt(coltempId) }
       });
       window.dispatchEvent(event);
+    } else {
+      setActiveTemplateId(-999); // Set hardcoded "all" as active by default
     }
   }, []);
 
@@ -177,10 +181,21 @@ export default function FavaColumnTemplateControls() {
         <button 
           style={{
             ...getButtonStyle(), 
-            backgroundColor: isMore ? '#8baaec' : '#ebebeb',
+            backgroundColor: isMore ? '#8baaec' : 
+                           (coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb'),
             display: 'flex',
             alignItems: 'center',
             gap: '6px'
+          }}
+          onMouseEnter={(e) => {
+            if (!isMore && coltemp_id !== activeTemplateId) {
+              e.currentTarget.style.backgroundColor = '#f1e9b6';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isMore) {
+              e.currentTarget.style.backgroundColor = coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb';
+            }
           }}
           onClick={() => {
             if (isMore) {
@@ -190,6 +205,7 @@ export default function FavaColumnTemplateControls() {
               
               // Special handling for hardcoded "all" button
               if (coltemp_id === -999) {
+                setActiveTemplateId(-999);
                 // Emit custom event for showing all columns
                 const event = new CustomEvent('fava-template-show-all', {
                   detail: { action: 'show_all' }
@@ -201,6 +217,7 @@ export default function FavaColumnTemplateControls() {
                 url.searchParams.delete('coltemp_id');
                 window.history.pushState({}, '', url);
               } else {
+                setActiveTemplateId(coltemp_id);
                 // Regular template selection
                 const event = new CustomEvent('fava-template-selected', {
                   detail: { coltemp_id, coltemp_name }
@@ -209,7 +226,7 @@ export default function FavaColumnTemplateControls() {
                 
                 // Update URL with selected template
                 const url = new URL(window.location.href);
-                url.searchParams.set('coltemp_id', coltemp_id.toString());
+                url.searchParams.set('coltemp_id', coltemp_id?.toString() || '');
                 window.history.pushState({}, '', url);
               }
             }
@@ -249,14 +266,23 @@ export default function FavaColumnTemplateControls() {
                   width: '100%',
                   borderRadius: '0',
                   borderRight: '1px solid #595959',
-                  backgroundColor: '#ebebeb',
+                  backgroundColor: item.coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px'
                 }}
+                onMouseEnter={(e) => {
+                  if (item.coltemp_id !== activeTemplateId) {
+                    e.currentTarget.style.backgroundColor = '#f1e9b6';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = item.coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb';
+                }}
                 onClick={() => {
                   console.log(`Clicked dropdown coltemp_id: ${item.coltemp_id}`);
                   setDropdownOpen(prev => ({ ...prev, [category]: false }));
+                  setActiveTemplateId(item.coltemp_id);
                   
                   // Emit custom event for template selection
                   const event = new CustomEvent('fava-template-selected', {
