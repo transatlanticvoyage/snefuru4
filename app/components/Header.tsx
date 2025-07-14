@@ -190,12 +190,12 @@ export default function Header() {
             <div className={`absolute left-0 mt-1 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 ${
               item.name === 'navgroup1' ? 'w-auto min-w-96' : 'w-48'
             }`}>
-              {item.children.map((child) => {
+              {item.children.map((child, childIndex) => {
                 // Check if this is a separator item (no path)
                 if (!child.path && !child.children) {
                   return (
                     <div
-                      key={child.name}
+                      key={`${item.name}-${child.name}-${childIndex}`}
                       className={`block px-4 py-2 text-sm font-medium bg-black text-white ${
                         item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
                       }`}
@@ -209,7 +209,7 @@ export default function Header() {
                 if (child.children && child.children.length > 0) {
                   return (
                     <div
-                      key={child.name}
+                      key={`${item.name}-${child.name}-${childIndex}`}
                       className="relative group"
                     >
                       <button
@@ -230,11 +230,11 @@ export default function Header() {
                       
                       {/* Sub-dropdown menu */}
                       <div className="absolute left-full top-0 ml-1 hidden group-hover:block rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 w-48">
-                        {child.children.map((grandchild) => {
+                        {child.children.map((grandchild, grandchildIndex) => {
                           if (!grandchild.path) {
                             return (
                               <div
-                                key={grandchild.name}
+                                key={`${child.name}-${grandchild.name}-${grandchildIndex}`}
                                 className="block px-4 py-2 text-sm font-medium bg-black text-white"
                               >
                                 {grandchild.name}
@@ -244,7 +244,7 @@ export default function Header() {
                           
                           return (
                             <Link
-                              key={grandchild.name}
+                              key={`${child.name}-${grandchild.name}-${grandchildIndex}`}
                               href={grandchild.path}
                               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                               onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
@@ -262,7 +262,7 @@ export default function Header() {
                 if (child.path) {
                   return (
                     <Link
-                      key={child.name}
+                      key={`${item.name}-${child.name}-${childIndex}`}
                       href={child.path}
                       className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
                         item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
@@ -277,7 +277,7 @@ export default function Header() {
                 // Fallback for items without path or children
                 return (
                   <span
-                    key={child.name}
+                    key={`${item.name}-${child.name}-${childIndex}`}
                     className={`block px-4 py-2 text-sm text-gray-500 ${
                       item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
                     }`}

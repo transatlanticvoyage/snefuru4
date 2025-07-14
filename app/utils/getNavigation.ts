@@ -149,8 +149,11 @@ export async function getNavigation() {
       pagePath = `/${parts[0]}`; // Simple root path
     }
     
-    // Only add to main navigation if not excluded and has valid name/path
-    if (pageName && pagePath && !excludedPaths.includes(pagePath)) {
+    // Filter out dynamic routes (paths containing brackets like [id])
+    const isDynamicRoute = pagePath.includes('[') && pagePath.includes(']');
+    
+    // Only add to main navigation if not excluded, has valid name/path, and is not dynamic
+    if (pageName && pagePath && !excludedPaths.includes(pagePath) && !isDynamicRoute) {
       navItems.push({ name: pageName, path: pagePath });
     }
   }
@@ -159,10 +162,12 @@ export async function getNavigation() {
   Object.values(NAVIGATION_GROUPS).forEach(group => {
     navItems.push({
       name: group.name,
-      children: group.children.map(child => ({
-        name: child.name,
-        path: child.path
-      }))
+      children: group.children
+        .filter(child => !(child.path.includes('[') && child.path.includes(']'))) // Filter out dynamic routes
+        .map(child => ({
+          name: child.name,
+          path: child.path
+        }))
     });
   });
 
