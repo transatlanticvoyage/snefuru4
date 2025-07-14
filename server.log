@@ -11952,3 +11952,12 @@ API: Navigation items received: [
  GET /torna3 200 in 38ms
  GET /favicon.ico 200 in 12ms
  GET /favicon.ico 200 in 10ms
+ ✓ Compiled in 282ms (538 modules)
+ ✓ Compiled in 161ms (538 modules)
+ ✓ Compiled in 169ms (538 modules)
+ ✓ Compiled in 187ms (538 modules)
+ ✓ Compiled in 193ms (538 modules)
+ ✓ Compiled in 278ms (538 modules)
+ ✓ Compiled in 170ms (538 modules)
+ ✓ Compiled in 165ms (538 modules)
+ ✓ Compiled in 168ms (538 modules)
