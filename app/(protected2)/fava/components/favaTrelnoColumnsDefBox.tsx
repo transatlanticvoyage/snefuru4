@@ -4,9 +4,10 @@ export default function FavaTrelnoColumnsDefBox() {
   };
 
   return (
-    <div className="biri_dev_info_box" style={boxStyle}>
-      <strong>biri_dev_info_box</strong><br></br>
+    <div className="trelno_columns_def_box" style={boxStyle}>
+      <strong>trelno_columns_def_box</strong><br></br>
       xpages.xpage_id INSERT<br></br>
+      
       xpages.main_url INSERT<br></br>
       xpages.meta_title INSERT<br></br>
       xpages.main_url INSERT<br></br>

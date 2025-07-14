@@ -9,6 +9,7 @@ import FavaFilterControls from './favaFilterControls';
 import FavaSearchBox from './favaSearchBox';
 import FavaPaginationControls from './favaPaginationControls';
 import FavaBiriDevInfoBox from './favaBiriDevInfoBox';
+import FavaTrelnoColumnsDefBox from './favaTrelnoColumnsDefBox';
 import FavaMinimalTable from './favaMinimalTable';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
@@ -25,6 +26,7 @@ interface FavaPageMasterProps {
   showSearchBox?: boolean;
   showPaginationControls?: boolean;
   showBiriDevInfoBox?: boolean;
+  showTrelnoColumnsDefBox?: boolean;
   showTable?: boolean;
   
   // Table configuration
@@ -50,6 +52,7 @@ export default function FavaPageMaster({
   showSearchBox = true,
   showPaginationControls = true,
   showBiriDevInfoBox = true,
+  showTrelnoColumnsDefBox = true,
   showTable = true,
   tableProps,
   children,
@@ -129,11 +132,12 @@ export default function FavaPageMaster({
           {showFilterControls && <FavaFilterControls />}
           {showSearchBox && <FavaSearchBox />}
           
-          {/* Pagination and Dev Info Box Container */}
-          {(showPaginationControls || showBiriDevInfoBox) && (
+          {/* Pagination and Dev Info Boxes Container */}
+          {(showPaginationControls || showBiriDevInfoBox || showTrelnoColumnsDefBox) && (
             <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
               {showPaginationControls && <FavaPaginationControls />}
               {showBiriDevInfoBox && <FavaBiriDevInfoBox />}
+              {showTrelnoColumnsDefBox && <FavaTrelnoColumnsDefBox />}
             </div>
           )}
           
@@ -176,5 +180,6 @@ export {
   FavaSearchBox,
   FavaPaginationControls,
   FavaBiriDevInfoBox,
+  FavaTrelnoColumnsDefBox,
   FavaMinimalTable
 };

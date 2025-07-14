@@ -188,6 +188,7 @@ export default function Torna3Page() {
       showSearchBox={true}
       showPaginationControls={true}
       showBiriDevInfoBox={true}
+      showTrelnoColumnsDefBox={true}
     >
       {/* Custom content specific to Nemtor Units */}
       <div style={{ 
