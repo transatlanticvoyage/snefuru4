@@ -283,6 +283,16 @@ export default function RstorManagerPage() {
         </div>
       </div>
 
+      {/* Create New Button */}
+      <div className="mb-4">
+        <button
+          onClick={createNewEntry}
+          className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+        >
+          Create New Entry
+        </button>
+      </div>
+
       {/* Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-lg">
         <table className="min-w-full border-collapse border border-gray-200">
@@ -295,6 +305,19 @@ export default function RstorManagerPage() {
                 <div className="flex items-center gap-1">
                   <span>rstor_id</span>
                   {sortField === 'rstor_id' && (
+                    <span className="text-blue-600">
+                      {sortOrder === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
+              </th>
+              <th
+                onClick={() => handleSort('rstor_name')}
+                className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 border border-gray-200"
+              >
+                <div className="flex items-center gap-1">
+                  <span>rstor_name</span>
+                  {sortField === 'rstor_name' && (
                     <span className="text-blue-600">
                       {sortOrder === 'asc' ? '↑' : '↓'}
                     </span>
@@ -365,16 +388,83 @@ export default function RstorManagerPage() {
               <tr key={row.rstor_id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   <div className="font-mono text-xs">
-                    {row.rstor_id.substring(0, 8)}...
+                    {row.rstor_id}
                   </div>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-900 border border-gray-200">
+                  {editingCell?.rowId === row.rstor_id && editingCell?.field === 'rstor_name' ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={editingValue}
+                        onChange={(e) => setEditingValue(e.target.value)}
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveEdit(row.rstor_id, 'rstor_name');
+                          if (e.key === 'Escape') cancelEditing();
+                        }}
+                      />
+                      <button
+                        onClick={() => saveEdit(row.rstor_id, 'rstor_name')}
+                        className="text-green-600 hover:text-green-800 text-xs"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        onClick={cancelEditing}
+                        className="text-red-600 hover:text-red-800 text-xs"
+                      >
+                        ✗
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className="max-w-xs truncate cursor-pointer hover:bg-gray-100 p-1 rounded"
+                      onClick={() => startEditing(row.rstor_id, 'rstor_name', row.rstor_name || '')}
+                    >
+                      {row.rstor_name || '-'}
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
                   {row.fk_app_page || '-'}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 border border-gray-200">
-                  <div className="max-w-xs truncate">
-                    {row.rstor_substance || '-'}
-                  </div>
+                  {editingCell?.rowId === row.rstor_id && editingCell?.field === 'rstor_substance' ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={editingValue}
+                        onChange={(e) => setEditingValue(e.target.value)}
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveEdit(row.rstor_id, 'rstor_substance');
+                          if (e.key === 'Escape') cancelEditing();
+                        }}
+                      />
+                      <button
+                        onClick={() => saveEdit(row.rstor_id, 'rstor_substance')}
+                        className="text-green-600 hover:text-green-800 text-xs"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        onClick={cancelEditing}
+                        className="text-red-600 hover:text-red-800 text-xs"
+                      >
+                        ✗
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className="max-w-xs truncate cursor-pointer hover:bg-gray-100 p-1 rounded"
+                      onClick={() => startEditing(row.rstor_id, 'rstor_substance', row.rstor_substance || '')}
+                    >
+                      {row.rstor_substance || '-'}
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 border border-gray-200">
                   <div className="max-w-md">

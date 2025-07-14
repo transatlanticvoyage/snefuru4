@@ -30,18 +30,29 @@
       transition: 'background-color 0.3s'
     };
 
+    const trelnoLinkStyle = {
+      color: '#2563eb',
+      textDecoration: 'underline',
+      fontSize: '14px',
+      fontWeight: '500',
+      transition: 'color 0.2s'
+    };
+
     return (
       <div className="trelno_columns_def_box" style={boxStyle}>
         <strong>trelno_columns_def_box</strong><br></br>
-        admin_random_stroage.rstor_id<br></br>
-        admin_random_stroage.rstor_name<br></br>
-        admin_random_stroage.rstor_substance<br></br>
+        <a className="trelno_link" style={trelnoLinkStyle} href="/admin/rstormanager">/admin/rstormanager</a><br></br>
+        admin_random_storage.rstor_id<br></br>
+        admin_random_storage.rstor_name<br></br>
+        admin_random_storage.rstor_substance<br></br>
 
         <div className="trelno_textarea_wrapper_div" style={trelnoTextareaWrapperStyle}>
          <textarea className="trelno_textarea" style={trelnoTextareaStyle}>
           ff
          </textarea>
         </div>
+
+        
 
         <button className="trelno_refresh_button" style={trelnoButtonStyle}>Refresh Cache</button>
 
