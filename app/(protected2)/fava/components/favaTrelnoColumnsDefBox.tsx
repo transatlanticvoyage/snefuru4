@@ -8,8 +8,11 @@ export default function FavaTrelnoColumnsDefBox() {
       <strong>trelno_columns_def_box</strong><br></br>
       xpages.xpage_id INSERT<br></br>
 
-      <div className="trelno_text_input_holder">
+      <div className="trelno_textarea_wrapper_div">
+       <textarea className="trelno_textarea">
+        ff
 
+       </textarea>
       </div>
     </div>
   );
