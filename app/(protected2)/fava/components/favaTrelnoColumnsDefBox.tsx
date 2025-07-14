@@ -9,7 +9,7 @@
     };
 
     const trelnoTextareaStyle = {
-      width: '150px',
+      width: '250px',
       height: '100px',
       border: '1px solid #9e9e9e',
       resize: 'vertical'
@@ -44,11 +44,14 @@
         <a className="trelno_link" style={trelnoLinkStyle} href="/admin/rstormanager">/admin/rstormanager</a><br></br>
         admin_random_storage.rstor_id<br></br>
         admin_random_storage.rstor_name<br></br>
+        columns_definition_<br></br>
         admin_random_storage.rstor_substance<br></br>
 
         <div className="trelno_textarea_wrapper_div" style={trelnoTextareaWrapperStyle}>
          <textarea className="trelno_textarea" style={trelnoTextareaStyle}>
-          ff
+          /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/config/torna3TableConfig.ts
+
+          torna3TableConfig.ts
          </textarea>
         </div>
 
