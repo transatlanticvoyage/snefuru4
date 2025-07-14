@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 interface ColtempData {
   coltemp_id: number;
@@ -16,6 +18,18 @@ export default function FavaColumnTemplateControls() {
   const [loading, setLoading] = useState(true);
   const [activeTemplateId, setActiveTemplateId] = useState<number | null>(null);
   const supabase = createClientComponentClient();
+  const pathname = usePathname();
+  
+  // Mapping from page paths to UTG IDs
+  // This could be moved to a config file or passed as a prop
+  const getUtgIdForPath = (path: string): string => {
+    const pathToUtgMap: Record<string, string> = {
+      '/torna3': 'utg_torna3',
+      '/torna2': 'utg_torna2',
+      // Add more mappings as needed
+    };
+    return pathToUtgMap[path] || 'utg_default';
+  };
 
   // Define the 3 categories
   const categories = ['range', 'adminpublic', 'personal'];
@@ -389,6 +403,14 @@ export default function FavaColumnTemplateControls() {
     cursor: 'pointer'
   };
 
+  const openCjLinkStyle = {
+    color: '#2563eb',
+    fontSize: '12px',
+    textDecoration: 'underline',
+    marginLeft: '8px',
+    marginRight: '8px'
+  };
+
   return (
     <div style={boardStyle}>
       <div style={topLabelStyle}>div.coltemp_board</div>
@@ -408,6 +430,14 @@ export default function FavaColumnTemplateControls() {
                 <span style={separatorStyle}></span>
                 
                 {category}
+                
+                <Link 
+                  href={`/admin/coltempcommand?rel_utg_id=${getUtgIdForPath(pathname)}&page=1&coltemp_category=${category}`}
+                  style={openCjLinkStyle}
+                  target="_blank"
+                >
+                  open cj
+                </Link>
 
                 <div style={buttonGroupColtempStyle}>
                   {slots.map((slot, index) => (

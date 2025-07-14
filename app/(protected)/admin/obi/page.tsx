@@ -1052,7 +1052,7 @@ export default function AzoPage() {
               <div>
                 {selectedUtgId && (
                   <a
-                    href={`/admin/coltempcommand?filter_rel_utg_id=${selectedUtgId}`}
+                    href={`/admin/coltempcommand?rel_utg_id=${selectedUtgId}`}
                     style={{
                       display: 'inline-block',
                       padding: '8px 16px',

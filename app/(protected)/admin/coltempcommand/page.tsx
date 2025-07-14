@@ -94,8 +94,8 @@ export default function ColtempCommandPage() {
   
   // Filter states from URL parameters
   const [filters, setFilters] = useState({
-    rel_utg_id: searchParams?.get('filter_rel_utg_id') || 'all',
-    coltemp_category: searchParams?.get('filter_coltemp_category') || 'all',
+    rel_utg_id: searchParams?.get('rel_utg_id') || 'all',
+    coltemp_category: searchParams?.get('coltemp_category') || 'all',
     is_default: searchParams?.get('filter_is_default') || 'all'
   });
   
@@ -591,7 +591,7 @@ export default function ColtempCommandPage() {
                 onChange={(e) => {
                   setFilters({...filters, rel_utg_id: e.target.value});
                   setCurrentPage(1);
-                  updateURLParams({ filter_rel_utg_id: e.target.value, page: 1 });
+                  updateURLParams({ rel_utg_id: e.target.value, page: 1 });
                 }}
                 className={`px-3 py-1 border border-gray-300 rounded-md text-sm ${
                   filters.rel_utg_id !== 'all' 
@@ -615,7 +615,7 @@ export default function ColtempCommandPage() {
                 onChange={(e) => {
                   setFilters({...filters, coltemp_category: e.target.value});
                   setCurrentPage(1);
-                  updateURLParams({ filter_coltemp_category: e.target.value, page: 1 });
+                  updateURLParams({ coltemp_category: e.target.value, page: 1 });
                 }}
                 className="px-3 py-1 border border-gray-300 rounded-md text-sm"
               >
