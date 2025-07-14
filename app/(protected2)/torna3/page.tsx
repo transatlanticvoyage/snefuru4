@@ -26,8 +26,15 @@ export default function Torna3Page() {
       await applyTemplate(coltemp_id);
     };
     
+    const handleShowAll = () => {
+      // Show all columns from the original config
+      setActiveColumns(torna3TableConfig.columns.map(col => col.field));
+      setSelectedTemplateId(null);
+    };
+    
     window.addEventListener('fava-template-selected', handleTemplateSelected);
     window.addEventListener('fava-template-loaded', handleTemplateLoaded);
+    window.addEventListener('fava-template-show-all', handleShowAll);
     
     // Check URL for initial template
     const url = new URL(window.location.href);
@@ -42,6 +49,7 @@ export default function Torna3Page() {
     return () => {
       window.removeEventListener('fava-template-selected', handleTemplateSelected);
       window.removeEventListener('fava-template-loaded', handleTemplateLoaded);
+      window.removeEventListener('fava-template-show-all', handleShowAll);
     };
   }, []);
 

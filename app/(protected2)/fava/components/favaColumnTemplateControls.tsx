@@ -66,28 +66,65 @@ export default function FavaColumnTemplateControls() {
   };
 
   // Create 3 slots per category with empty slot handling
-  const createSlots = (categoryData: ColtempData[]) => {
+  const createSlots = (categoryData: ColtempData[], category: string) => {
     const slots = [];
-    for (let i = 0; i < 3; i++) {
-      if (categoryData[i]) {
-        slots.push(categoryData[i]);
-      } else {
-        // Empty slot
-        slots.push({
-          coltemp_id: -1,
-          coltemp_name: null,
-          coltemp_category: null,
-          coltemp_color: null,
-          coltemp_icon: null,
-          count_of_columns: null
-        });
+    
+    // Special handling for range category - hardcode "all" as first slot
+    if (category === 'range') {
+      // First slot: hardcoded "all" button
+      slots.push({
+        coltemp_id: -999, // Special ID for hardcoded all button
+        coltemp_name: 'all',
+        coltemp_category: 'range',
+        coltemp_color: '#4CAF50',
+        coltemp_icon: '🔍',
+        count_of_columns: 32
+      });
+      
+      // Fill remaining 2 slots with database data
+      for (let i = 0; i < 2; i++) {
+        if (categoryData[i]) {
+          slots.push(categoryData[i]);
+        } else {
+          // Empty slot
+          slots.push({
+            coltemp_id: -1,
+            coltemp_name: null,
+            coltemp_category: null,
+            coltemp_color: null,
+            coltemp_icon: null,
+            count_of_columns: null
+          });
+        }
+      }
+    } else {
+      // Regular handling for other categories
+      for (let i = 0; i < 3; i++) {
+        if (categoryData[i]) {
+          slots.push(categoryData[i]);
+        } else {
+          // Empty slot
+          slots.push({
+            coltemp_id: -1,
+            coltemp_name: null,
+            coltemp_category: null,
+            coltemp_color: null,
+            coltemp_icon: null,
+            count_of_columns: null
+          });
+        }
       }
     }
+    
     return slots;
   };
 
   // Get overflow items (4th item onwards)
-  const getOverflowItems = (categoryData: ColtempData[]) => {
+  const getOverflowItems = (categoryData: ColtempData[], category: string) => {
+    // For range category, overflow starts from 3rd item (since first slot is hardcoded)
+    if (category === 'range') {
+      return categoryData.slice(2);
+    }
     return categoryData.slice(3);
   };
 
@@ -132,34 +169,63 @@ export default function FavaColumnTemplateControls() {
 
     const displayText = isMore ? 'more' : 
       coltemp_name ? 
-        `${count_of_columns || ''} | ${coltemp_icon || ''} | ${coltemp_color || ''} | ${coltemp_name}` :
-        `| | | (empty)`;
+        `${count_of_columns || ''} | ${coltemp_icon || ''} | ${coltemp_name}` :
+        `| | (empty)`;
 
     return (
       <div style={{ position: 'relative', display: 'inline-block' }}>
         <button 
           style={{
             ...getButtonStyle(), 
-            backgroundColor: isMore ? '#8baaec' : (coltemp_color || '#ebebeb')
+            backgroundColor: isMore ? '#8baaec' : '#ebebeb',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
           }}
           onClick={() => {
             if (isMore) {
               toggleDropdown(category);
             } else if (coltemp_id !== -1) {
               console.log(`Clicked coltemp_id: ${coltemp_id}`);
-              // Emit custom event for template selection
-              const event = new CustomEvent('fava-template-selected', {
-                detail: { coltemp_id, coltemp_name }
-              });
-              window.dispatchEvent(event);
               
-              // Update URL with selected template
-              const url = new URL(window.location.href);
-              url.searchParams.set('coltemp_id', coltemp_id.toString());
-              window.history.pushState({}, '', url);
+              // Special handling for hardcoded "all" button
+              if (coltemp_id === -999) {
+                // Emit custom event for showing all columns
+                const event = new CustomEvent('fava-template-show-all', {
+                  detail: { action: 'show_all' }
+                });
+                window.dispatchEvent(event);
+                
+                // Remove template from URL to show default view
+                const url = new URL(window.location.href);
+                url.searchParams.delete('coltemp_id');
+                window.history.pushState({}, '', url);
+              } else {
+                // Regular template selection
+                const event = new CustomEvent('fava-template-selected', {
+                  detail: { coltemp_id, coltemp_name }
+                });
+                window.dispatchEvent(event);
+                
+                // Update URL with selected template
+                const url = new URL(window.location.href);
+                url.searchParams.set('coltemp_id', coltemp_id.toString());
+                window.history.pushState({}, '', url);
+              }
             }
           }}
         >
+          {!isMore && coltemp_color && (
+            <div 
+              className="coltemp_button_colorbox1"
+              style={{
+                width: '8px',
+                height: '8px',
+                backgroundColor: coltemp_color,
+                display: 'inline-block'
+              }}
+            />
+          )}
           {displayText}
         </button>
         
@@ -183,8 +249,10 @@ export default function FavaColumnTemplateControls() {
                   width: '100%',
                   borderRadius: '0',
                   borderRight: '1px solid #595959',
-                  backgroundColor: item.coltemp_color || '#ebebeb',
-                  display: 'block'
+                  backgroundColor: '#ebebeb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
                 }}
                 onClick={() => {
                   console.log(`Clicked dropdown coltemp_id: ${item.coltemp_id}`);
@@ -205,7 +273,18 @@ export default function FavaColumnTemplateControls() {
                   window.history.pushState({}, '', url);
                 }}
               >
-                {`${item.count_of_columns || ''} | ${item.coltemp_icon || ''} | ${item.coltemp_color || ''} | ${item.coltemp_name}`}
+                {item.coltemp_color && (
+                  <div 
+                    className="coltemp_button_colorbox1"
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      backgroundColor: item.coltemp_color,
+                      display: 'inline-block'
+                    }}
+                  />
+                )}
+                {`${item.count_of_columns || ''} | ${item.coltemp_icon || ''} | ${item.coltemp_name}`}
               </button>
             ))}
           </div>
@@ -247,7 +326,7 @@ export default function FavaColumnTemplateControls() {
     borderRadius: '0',
     padding: '0px 10px',
     border: '1px solid #595959',
-    borderRight: 'none',
+    borderRight: '3px solid #595959',
     cursor: 'pointer',
     fontSize: '14px',
     margin: '0'
@@ -295,8 +374,8 @@ export default function FavaColumnTemplateControls() {
         ) : (
           categories.map((category) => {
             const categoryData = coltempData[category] || [];
-            const slots = createSlots(categoryData);
-            const overflowItems = getOverflowItems(categoryData);
+            const slots = createSlots(categoryData, category);
+            const overflowItems = getOverflowItems(categoryData, category);
             
             return (
               <div key={category} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
