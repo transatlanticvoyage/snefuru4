@@ -266,7 +266,7 @@ export default function FavaColumnTemplateControls() {
                 url.searchParams.delete('coltemp_id');
                 window.history.pushState({}, '', url);
               } else {
-                setActiveTemplateId(coltemp_id);
+                setActiveTemplateId(coltemp_id || null);
                 // Regular template selection
                 const event = new CustomEvent('fava-template-selected', {
                   detail: { coltemp_id, coltemp_name }

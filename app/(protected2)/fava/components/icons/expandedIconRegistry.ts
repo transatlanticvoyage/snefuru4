@@ -1,7 +1,7 @@
 import { 
   // Basic Shapes
   Circle, Square, Triangle, Star, Heart, Diamond, Hexagon, Pentagon, Octagon,
-  RoundedRect, Ellipsis, Infinity, Hash, AtSign, Percent,
+  /* RoundedRect, */ Ellipsis, Infinity, Hash, AtSign, Percent,
   
   // Arrows & Navigation
   ArrowUp, ArrowDown, ArrowLeft, ArrowRight, ArrowUpDown, ArrowLeftRight,
@@ -13,9 +13,9 @@ import {
   ArrowBigUp, ArrowBigDown, ArrowBigLeft, ArrowBigRight,
   
   // Actions & Controls
-  Play, Pause, Stop, SkipForward, SkipBack, FastForward, Rewind,
+  Play, Pause, /* Stop, */ SkipForward, SkipBack, FastForward, Rewind,
   Edit, Edit2, Edit3, Pen, PenTool, Pencil, Eraser,
-  Copy, Cut, Paste, Clipboard, ClipboardCopy, ClipboardPaste, ClipboardCheck,
+  Copy, /* Cut, */ /* Paste, */ Clipboard, ClipboardCopy, ClipboardPaste, ClipboardCheck,
   Save, Download, Upload, Share, Share2, Send, SendHorizontal,
   Search, Filter, FilterX, Shuffle, Repeat, Repeat1,
   Undo, Redo, RefreshCw, RefreshCcw,
@@ -92,7 +92,7 @@ import {
   Brain, Ear, Hand, Footprints,
   
   // Sports & Recreation
-  Football, Basketball, Tennis, Golf, Baseball,
+  Football, Basketball, Tennis, /* Golf, */ /* Baseball, */
   Dumbbell, Music, Dice1
 } from 'lucide-react';
 
@@ -102,7 +102,7 @@ export const EXPANDED_ICON_MAP = {
   // Basic Shapes
   'circle': Circle, 'square': Square, 'triangle': Triangle, 'star': Star, 'heart': Heart,
   'diamond': Diamond, 'hexagon': Hexagon, 'pentagon': Pentagon, 'octagon': Octagon,
-  'rounded-rect': RoundedRect, 'ellipsis': Ellipsis, 'infinity': Infinity, 'hash': Hash,
+  /* 'rounded-rect': RoundedRect, */ 'ellipsis': Ellipsis, 'infinity': Infinity, 'hash': Hash,
   'at-sign': AtSign, 'percent': Percent,
   
   // Arrows & Navigation
@@ -122,11 +122,11 @@ export const EXPANDED_ICON_MAP = {
   'arrow-big-left': ArrowBigLeft, 'arrow-big-right': ArrowBigRight,
   
   // Actions & Controls
-  'play': Play, 'pause': Pause, 'stop': Stop, 'skip-forward': SkipForward, 'skip-back': SkipBack,
+  'play': Play, 'pause': Pause, /* 'stop': Stop, */ 'skip-forward': SkipForward, 'skip-back': SkipBack,
   'fast-forward': FastForward, 'rewind': Rewind,
   'edit': Edit, 'edit-2': Edit2, 'edit-3': Edit3, 'pen': Pen, 'pen-tool': PenTool,
   'pencil': Pencil, 'eraser': Eraser,
-  'copy': Copy, 'cut': Cut, 'paste': Paste, 'clipboard': Clipboard,
+  'copy': Copy, /* 'cut': Cut, */ /* 'paste': Paste, */ 'clipboard': Clipboard,
   'clipboard-copy': ClipboardCopy, 'clipboard-paste': ClipboardPaste, 'clipboard-check': ClipboardCheck,
   'save': Save, 'download': Download, 'upload': Upload, 'share': Share, 'share-2': Share2,
   'send': Send, 'send-horizontal': SendHorizontal,
@@ -231,7 +231,7 @@ export const EXPANDED_ICON_MAP = {
   'bandage': Bandage, 'cross': Cross, 'brain': Brain, 'ear': Ear, 'hand': Hand, 'footprints': Footprints,
   
   // Sports & Recreation
-  'football': Football, 'basketball': Basketball, 'tennis': Tennis, 'golf': Golf, 'baseball': Baseball,
+  'football': Football, 'basketball': Basketball, 'tennis': Tennis, /* 'golf': Golf, */ /* 'baseball': Baseball, */
   'dumbbell': Dumbbell, 'music': Music, 'gamepad': Gamepad2, 'dice-1': Dice1
 } as const;
 
