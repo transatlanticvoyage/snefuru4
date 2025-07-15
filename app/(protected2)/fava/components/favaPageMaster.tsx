@@ -12,6 +12,11 @@ import FavaBiriDevInfoBox from './favaBiriDevInfoBox';
 import FavaTrelnoColumnsDefBox from './favaTrelnoColumnsDefBox';
 import FavaShendoBar from './favaShendoBar';
 import FavaMinimalTable from './favaMinimalTable';
+import PureFavaPageMaster from './pureFavaPageMaster';
+import FavaTaniConditionalProvider from './favaTaniPopup/favaTaniConditionalProvider';
+import { FavaTaniButtonConditional, FavaTaniPopupConditional } from './favaTaniPopup/favaTaniConditionalComponents';
+import { FavaTaniFeatureFlags, FAVA_TANI_PRESETS } from '../config/favaTaniFeatureFlags';
+import { FavaTaniConfig, FAVA_TANI_DEFAULT_CONFIG } from './favaTaniPopup/types';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
 
@@ -43,6 +48,13 @@ interface FavaPageMasterProps {
   // Layout configuration
   contentPadding?: string;
   contentStyle?: React.CSSProperties;
+  
+  // FavaTani Configuration
+  taniEnabled?: boolean;
+  taniConfig?: Partial<FavaTaniConfig>;
+  taniFlags?: Partial<FavaTaniFeatureFlags>;
+  taniPreset?: keyof typeof FAVA_TANI_PRESETS;
+  taniContent?: ReactNode; // Deprecated - use taniConfig.contentSlots instead
 }
 
 export default function FavaPageMaster({
@@ -63,114 +75,85 @@ export default function FavaPageMaster({
   toolbarContent,
   footerContent,
   contentPadding = '20px',
-  contentStyle = {}
+  contentStyle = {},
+  
+  // FavaTani props
+  taniEnabled = true,
+  taniConfig = {},
+  taniFlags = {},
+  taniPreset = 'standard',
+  taniContent
 }: FavaPageMasterProps) {
-  const [navVisible, setNavVisible] = useState(true);
-
-  useEffect(() => {
-    // Set document title if provided
-    if (documentTitle) {
-      document.title = documentTitle;
-    }
-    
-    // Check navigation visibility from localStorage
-    const savedVisibility = localStorage.getItem('fava-nav-visible');
-    if (savedVisibility !== null) {
-      setNavVisible(JSON.parse(savedVisibility));
-    }
-    
-    // Listen for navigation visibility changes
-    const handleVisibilityChange = () => {
-      const visibility = localStorage.getItem('fava-nav-visible');
-      if (visibility !== null) {
-        setNavVisible(JSON.parse(visibility));
-      }
-    };
-    
-    // Listen for both storage changes (cross-tab) and custom events (same page)
-    window.addEventListener('storage', handleVisibilityChange);
-    window.addEventListener('fava-nav-toggle', handleVisibilityChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleVisibilityChange);
-      window.removeEventListener('fava-nav-toggle', handleVisibilityChange);
-    };
-  }, [documentTitle]);
-
-  return (
-    <>
-      <FavaNavToggle />
-      <FavaHeader />
-      <FavaSidebar />
-      
-      <div 
-        className="fava-page-content" 
-        style={{ 
-          paddingTop: navVisible ? '60px' : '20px', 
-          paddingLeft: navVisible ? '250px' : '20px',
-          paddingRight: contentPadding,
-          paddingBottom: contentPadding,
-          transition: 'all 0.3s ease',
-          minHeight: '100vh',
-          boxSizing: 'border-box',
-          ...contentStyle
-        }}
+  // Determine final Tani configuration
+  const resolvedTaniFlags = taniPreset ? FAVA_TANI_PRESETS[taniPreset] : { ...FAVA_TANI_PRESETS.standard, ...taniFlags };
+  const resolvedTaniConfig: FavaTaniConfig = {
+    ...FAVA_TANI_DEFAULT_CONFIG,
+    id: `fava-tani-${pageTitle?.toLowerCase().replace(/\s+/g, '-') || 'default'}`,
+    title: pageTitle || 'Functions',
+    ...taniConfig
+  };
+  
+  // If Tani is disabled, use pure Fava component
+  if (!taniEnabled || resolvedTaniFlags.enabled === false) {
+    return (
+      <PureFavaPageMaster
+        pageTitle={pageTitle}
+        pageDescription={pageDescription}
+        documentTitle={documentTitle}
+        showColumnTemplateControls={showColumnTemplateControls}
+        showFilterControls={showFilterControls}
+        showSearchBox={showSearchBox}
+        showPaginationControls={showPaginationControls}
+        showBiriDevInfoBox={showBiriDevInfoBox}
+        showTrelnoColumnsDefBox={showTrelnoColumnsDefBox}
+        showShendoBar={showShendoBar}
+        showTable={showTable}
+        tableProps={tableProps}
+        headerContent={headerContent}
+        toolbarContent={toolbarContent}
+        footerContent={footerContent}
+        contentPadding={contentPadding}
+        contentStyle={contentStyle}
       >
-        {/* Page Header Section */}
-        {(pageTitle || pageDescription || headerContent) && (
-          <div className="fava-page-header" style={{ marginBottom: '20px' }}>
-            {pageTitle && (
-              <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>{pageTitle}</h1>
-            )}
-            {pageDescription && (
-              <p style={{ marginBottom: '20px', color: '#666' }}>{pageDescription}</p>
-            )}
-            {headerContent}
-          </div>
-        )}
-        
-        {/* Controls Section */}
-        <div className="fava-controls-section" style={{ marginBottom: '20px' }}>
-          {showColumnTemplateControls && <FavaColumnTemplateControls />}
-          {showShendoBar && <FavaShendoBar />}
-          {showFilterControls && <FavaFilterControls />}
-          {showSearchBox && <FavaSearchBox />}
-          
-          {/* Pagination and Dev Info Boxes Container */}
-          {(showPaginationControls || showBiriDevInfoBox || showTrelnoColumnsDefBox) && (
-            <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-              {showPaginationControls && <FavaPaginationControls />}
-              {showBiriDevInfoBox && <FavaBiriDevInfoBox />}
-              {showTrelnoColumnsDefBox && <FavaTrelnoColumnsDefBox />}
-            </div>
-          )}
-          
-          {/* Custom toolbar content */}
-          {toolbarContent}
-        </div>
-        
-        {/* Table Section */}
-        {showTable && tableProps && (
-          <div className="fava-table-section" style={{ marginBottom: '20px' }}>
-            <FavaMinimalTable {...tableProps} />
-          </div>
-        )}
-        
-        {/* Main Content Section */}
-        {children && (
-          <div className="fava-content-section">
-            {children}
-          </div>
-        )}
-        
-        {/* Footer Section */}
-        {footerContent && (
-          <div className="fava-footer-section" style={{ marginTop: '40px' }}>
-            {footerContent}
-          </div>
-        )}
-      </div>
-    </>
+        {children}
+      </PureFavaPageMaster>
+    );
+  }
+  
+  // Enhanced Fava with Tani integration
+  return (
+    <FavaTaniConditionalProvider
+      config={resolvedTaniConfig}
+      flags={resolvedTaniFlags}
+    >
+      <PureFavaPageMaster
+        pageTitle={pageTitle}
+        pageDescription={pageDescription}
+        documentTitle={documentTitle}
+        showColumnTemplateControls={showColumnTemplateControls}
+        showFilterControls={showFilterControls}
+        showSearchBox={showSearchBox}
+        showPaginationControls={showPaginationControls}
+        showBiriDevInfoBox={showBiriDevInfoBox}
+        showTrelnoColumnsDefBox={showTrelnoColumnsDefBox}
+        showShendoBar={showShendoBar}
+        showTable={showTable}
+        tableProps={tableProps}
+        headerContent={headerContent}
+        toolbarContent={toolbarContent}
+        footerContent={footerContent}
+        contentPadding={contentPadding}
+        contentStyle={contentStyle}
+      >
+        {children}
+      </PureFavaPageMaster>
+      
+      {/* Tani Popup System */}
+      <FavaTaniButtonConditional />
+      <FavaTaniPopupConditional>
+        {/* Content is handled internally by FavaTaniModal - no custom content allowed */}
+      </FavaTaniPopupConditional>
+    </FavaTaniConditionalProvider>
   );
 }
 
@@ -186,5 +169,11 @@ export {
   FavaBiriDevInfoBox,
   FavaTrelnoColumnsDefBox,
   FavaShendoBar,
-  FavaMinimalTable
+  FavaMinimalTable,
+  PureFavaPageMaster,
+  FavaTaniConditionalProvider
 };
+
+// Export Tani types and configs for advanced usage
+export type { FavaPageMasterProps, FavaTaniConfig, FavaTaniFeatureFlags };
+export { FAVA_TANI_PRESETS, FAVA_TANI_DEFAULT_CONFIG };

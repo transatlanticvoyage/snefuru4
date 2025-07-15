@@ -336,7 +336,7 @@ export default function FavaColumnTemplateControls() {
   // All existing styles
   const boardStyle = {
     width: '100%',
-    height: '200px',
+    height: '400px',
     border: '1px solid #000',
     backgroundColor: '#5a0e15'
   };
@@ -420,6 +420,173 @@ export default function FavaColumnTemplateControls() {
     cursor: 'pointer'
   };
 
+  // Double Deck Button Component (Option 3: Container Div with Clickable Divs)
+  const DoubleDeckButton = ({ 
+    coltemp_id, 
+    coltemp_icon, 
+    coltemp_color, 
+    coltemp_name, 
+    count_of_columns, 
+    activeTemplateId, 
+    setActiveTemplateId, 
+    isFirst = false, 
+    isLast = false 
+  }: {
+    coltemp_id: number;
+    coltemp_icon: string | null;
+    coltemp_color: string | null;
+    coltemp_name: string | null;
+    count_of_columns: number | null;
+    activeTemplateId: number | null;
+    setActiveTemplateId: (id: number) => void;
+    isFirst?: boolean;
+    isLast?: boolean;
+  }) => {
+    const containerStyle = {
+      width: '80px',
+      height: '50px',
+      border: '1px solid #595959',
+      borderRight: '3px solid #595959',
+      borderRadius: isFirst ? '4px 0 0 4px' : isLast ? '0 4px 4px 0' : '0',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      overflow: 'hidden'
+    };
+
+    const topDeckStyle = {
+      height: '25px',
+      display: 'flex',
+      backgroundColor: '#e8e8e8',
+      borderBottom: '1px solid #aaa'
+    };
+
+    const bottomDeckStyle = {
+      height: '25px',
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 4px',
+      backgroundColor: coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb',
+      cursor: 'pointer',
+      gap: '4px'
+    };
+
+    const actionAreaStyle = {
+      width: '26px',
+      height: '25px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      fontSize: '9px',
+      fontWeight: 'bold',
+      borderRight: '1px solid #aaa'
+    };
+
+    const handleDenbujarClick = () => {
+      // Open denbujar page in new tab
+      window.open('/denbujar', '_blank');
+    };
+
+    const handleAction2Click = () => {
+      console.log('Action 2 clicked for coltemp_id:', coltemp_id);
+      // Add your action 2 logic here
+    };
+
+    const handleAction3Click = () => {
+      console.log('Action 3 clicked for coltemp_id:', coltemp_id);
+      // Add your action 3 logic here
+    };
+
+    const handleMainTemplateClick = () => {
+      console.log(`Template clicked: ${coltemp_id}`);
+      
+      if (coltemp_id === -999) {
+        setActiveTemplateId(-999);
+        const event = new CustomEvent('fava-template-show-all', {
+          detail: { action: 'show_all' }
+        });
+        window.dispatchEvent(event);
+        
+        const url = new URL(window.location.href);
+        url.searchParams.delete('coltemp_id');
+        window.history.pushState({}, '', url);
+      } else {
+        setActiveTemplateId(coltemp_id);
+        const event = new CustomEvent('fava-template-selected', {
+          detail: { coltemp_id, coltemp_name }
+        });
+        window.dispatchEvent(event);
+        
+        const url = new URL(window.location.href);
+        url.searchParams.set('coltemp_id', coltemp_id.toString());
+        window.history.pushState({}, '', url);
+      }
+    };
+
+    return (
+      <div style={containerStyle}>
+        {/* Top Deck - Action Areas */}
+        <div style={topDeckStyle}>
+          <div 
+            style={{...actionAreaStyle, backgroundColor: '#d4d4d4'}}
+            onClick={handleDenbujarClick}
+            title="Open Denbujar"
+          >
+            DB
+          </div>
+          <div 
+            style={{...actionAreaStyle, backgroundColor: '#c4c4c4'}}
+            onClick={handleAction2Click}
+            title="Action 2"
+          >
+            A2
+          </div>
+          <div 
+            style={{...actionAreaStyle, backgroundColor: '#b4b4b4', borderRight: 'none'}}
+            onClick={handleAction3Click}
+            title="Action 3"
+          >
+            A3
+          </div>
+        </div>
+
+        {/* Bottom Deck - Main Template Selection */}
+        <div 
+          style={bottomDeckStyle}
+          onClick={handleMainTemplateClick}
+          onMouseEnter={(e) => {
+            if (coltemp_id !== activeTemplateId) {
+              e.currentTarget.style.backgroundColor = '#f1e9b6';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb';
+          }}
+          title={`Template: ${coltemp_name}`}
+        >
+          {coltemp_color && (
+            <div style={{
+              width: '6px',
+              height: '6px',
+              backgroundColor: coltemp_color,
+              borderRadius: '1px',
+              flexShrink: 0
+            }} />
+          )}
+          <span style={{
+            fontSize: '8px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            lineHeight: '1'
+          }}>
+            {count_of_columns}|{coltemp_icon}|{coltemp_name}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={boardStyle}>
       <div style={topLabelStyle}>div.coltemp_board</div>
@@ -489,6 +656,101 @@ export default function FavaColumnTemplateControls() {
         <button style={openJarButtonStyle}>Open /coltempcommand</button>
         <button style={openJarButtonStyle}>Open /coltempjar</button>
       </div>
+
+    
+      <div className="area2" style={{
+        marginTop: '20px',
+        padding: '16px',
+        backgroundColor: '#fff3cd',
+        border: '2px solid #ffeaa7',
+        borderRadius: '8px'
+      }}>
+        <h3 style={{
+          margin: '0 0 16px 0',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          color: '#856404'
+        }}>
+          NEW DOUBLE-DECKER SYSTEM (Testing Area)
+        </h3>
+        
+        {loading ? (
+          <div>Loading coltemp data...</div>
+        ) : (
+          categories.map((category) => {
+            const categoryData = coltempData[category] || [];
+            const slots = createSlots(categoryData, category);
+            
+            return (
+              <div key={`area2-${category}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <span style={separatorStyle}></span>
+                
+                {category}
+                
+                <Link 
+                  href={`/admin/coltempcommand?rel_utg_id=${getUtgIdForPath(pathname)}&page=1&coltemp_category=${category}`}
+                  style={openCjLinkStyle}
+                  target="_blank"
+                >
+                  open cj
+                </Link>
+                
+                <span
+                  style={shendoLinkStyle}
+                  onClick={() => {
+                    const event = new CustomEvent('fava-shendo-show-category', {
+                      detail: { 
+                        category: category,
+                        categoryData: coltempData[category] || []
+                      }
+                    });
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  shendo
+                </span>
+
+                <div style={{ display: 'flex', gap: '2px' }}>
+                  {slots.map((slot, index) => (
+                    <div key={slot.coltemp_id !== -1 ? slot.coltemp_id : `empty-${category}-${index}`}>
+                      {slot.coltemp_id !== -1 ? (
+                        <DoubleDeckButton 
+                          coltemp_id={slot.coltemp_id}
+                          coltemp_icon={slot.coltemp_icon}
+                          coltemp_color={slot.coltemp_color}
+                          coltemp_name={slot.coltemp_name}
+                          count_of_columns={slot.count_of_columns}
+                          activeTemplateId={activeTemplateId}
+                          setActiveTemplateId={setActiveTemplateId}
+                          isFirst={index === 0}
+                          isLast={index === slots.length - 1}
+                        />
+                      ) : (
+                        <div style={{
+                          width: '80px',
+                          height: '50px',
+                          border: '1px solid #ccc',
+                          backgroundColor: '#f5f5f5',
+                          borderRadius: index === 0 ? '4px 0 0 4px' : 
+                                       index === slots.length - 1 ? '0 4px 4px 0' : '0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#999',
+                          fontSize: '10px'
+                        }}>
+                          empty
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
     </div>
   );
 }

@@ -253,10 +253,10 @@ export default function FavaHeader() {
         
         // Import and use navigationHelper to create proper structure
         const { createNavigationStructure } = await import('@/app/utils/navigationHelper');
-        const { adminMenuItem, specialFirstItem, oldAllGroupItem } = createNavigationStructure(rawNavData);
+        const { adminMenuItem, specialFirstItem, oldAllGroupItem, hardcodedNavItems } = createNavigationStructure(rawNavData);
         
         // Combine into final navigation structure (same as main app)
-        const finalNavigation = [adminMenuItem, specialFirstItem, oldAllGroupItem];
+        const finalNavigation = [adminMenuItem, specialFirstItem, oldAllGroupItem, ...hardcodedNavItems];
         
         setNavigationItems(finalNavigation);
         console.log('FavaHeader: Navigation loaded with admin/navgroup1:', finalNavigation.length, 'items');

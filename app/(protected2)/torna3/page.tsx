@@ -1,15 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useFavaTaniSafe } from '../fava/components/favaTaniPopup/favaTaniConditionalProvider';
 import FavaPageMaster from '../fava/components/favaPageMaster';
 import { torna3TableConfig } from '../fava/config/torna3TableConfig';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createTorna3TaniConfig } from './taniContent';
 
 export default function Torna3Page() {
   const [nemtorData, setNemtorData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeColumns, setActiveColumns] = useState<string[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+  const taniState = useFavaTaniSafe()?.state;
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -190,6 +193,15 @@ export default function Torna3Page() {
       showPaginationControls={true}
       showBiriDevInfoBox={true}
       showTrelnoColumnsDefBox={true}
+      
+      // FavaTani Popup Configuration
+      taniEnabled={true}
+      taniPreset="standard"
+      taniConfig={createTorna3TaniConfig(
+        nemtorData,
+        visibleColumns,
+        torna3TableConfig.columns.length
+      )}
     >
       {/* Custom content specific to Nemtor Units */}
       <div style={{ 
@@ -199,9 +211,26 @@ export default function Torna3Page() {
         borderRadius: '8px',
         border: '1px solid #b3d9ff'
       }}>
-        <h3 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>
-          Nemtor Units Database Overview
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div style={{ flex: 1 }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>
+              Nemtor Units Database Overview
+            </h3>
+          </div>
+          <div style={{ marginLeft: '20px', marginTop: '-5px' }}>
+            <div className="font-bold text-white rounded" style={{
+              backgroundColor: '#800000',
+              fontSize: '16px',
+              paddingLeft: '12px',
+              paddingRight: '12px',
+              paddingTop: '8px',
+              paddingBottom: '8px',
+              display: 'inline-block'
+            }}>
+              Tani Popup Available
+            </div>
+          </div>
+        </div>
         <p style={{ margin: '0 0 10px 0', color: '#004080', fontSize: '14px' }}>
           This page displays all Nemtor units using the Fava template system. Each unit represents 
           an Elementor widget or component with comprehensive metadata including settings, styles, 

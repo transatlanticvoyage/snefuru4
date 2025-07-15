@@ -36,6 +36,7 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
     adminMenuItem: NavItem;
     specialFirstItem: NavItem;
     oldAllGroupItem: NavItem;
+    hardcodedNavItems: NavItem[];
   } | null>(null);
 
   useEffect(() => {
@@ -217,7 +218,12 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
   const getAllNavItems = () => {
     if (!navigationStructure) return [];
     
-    const items = [navigationStructure.adminMenuItem, navigationStructure.specialFirstItem, navigationStructure.oldAllGroupItem];
+    const items = [
+      navigationStructure.adminMenuItem, 
+      navigationStructure.specialFirstItem, 
+      navigationStructure.oldAllGroupItem,
+      ...navigationStructure.hardcodedNavItems
+    ];
     
     return items;
   };

@@ -222,6 +222,15 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
     children: nonAdminItems
   };
 
+  // Create hardcoded navigation items
+  const hardcodedNavItems: NavItem[] = [
+    { name: 'torna3', path: '/torna3' },
+    { name: 'bren1', path: '/bren1' },
+    { name: 'sitejar4', path: '/sitejar4' },
+    { name: 'gconjar1', path: '/gconjar1' },
+    { name: 'nwjar1', path: '/nwjar1' }
+  ];
+
   // Debug logging
   console.log('adminMenuItem children:', adminMenuItem.children?.map(c => c.name) || []);
   console.log('specialFirstItem children:', specialFirstItem.children?.map(c => c.name) || []);
@@ -230,6 +239,7 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
   return {
     adminMenuItem,
     specialFirstItem,
-    oldAllGroupItem
+    oldAllGroupItem,
+    hardcodedNavItems
   };
 };

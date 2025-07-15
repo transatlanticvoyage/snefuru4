@@ -13,6 +13,7 @@ import { syncXPageMetadataAPI } from '@/app/utils/syncXPageMetadata';
 
 interface XPage {
   xpage_id: number;
+  current_state_of_meta_title_system: string | null;
   goal_for_meta_title_system: string | null;
   title1: string | null;
   main_url: string | null;
@@ -62,12 +63,17 @@ export default function XPagesManager1Page() {
   const staticMetadata = (xpageCache as any)[XPAGE_ID.toString()];
 
   // Define column order and properties
-  const columns: Array<{ key: keyof XPage; type: string; width: string; group?: string }> = [
+  const columns: Array<{ key: keyof XPage; type: string; width: string; group?: string; separator?: 'right' }> = [
     { key: 'xpage_id', type: 'integer', width: '80px' },
-    { key: 'goal_for_meta_title_system', type: 'text', width: '200px' },
-    { key: 'title1', type: 'text', width: '200px' },
-    { key: 'main_url', type: 'text', width: '200px' },
+    { key: 'starred', type: 'boolean-icon', width: '30px', group: 'icons' },
+    { key: 'flagged', type: 'boolean-icon', width: '30px', group: 'icons' },
+    { key: 'penatgoned', type: 'boolean-icon', width: '30px', group: 'icons' },
+    { key: 'circled', type: 'boolean-icon', width: '30px', group: 'icons' },
+    { key: 'current_state_of_meta_title_system', type: 'text', width: '200px' },
+    { key: 'goal_for_meta_title_system', type: 'text', width: '200px', separator: 'right' },
     { key: 'meta_title', type: 'text', width: '200px' },
+    { key: 'main_url', type: 'text', width: '200px', separator: 'right' },
+    { key: 'title1', type: 'text', width: '200px' },
     { key: 'title2', type: 'text', width: '200px' },
     { key: 'desc1', type: 'text', width: '200px' },
     { key: 'caption', type: 'text', width: '200px' },
@@ -78,10 +84,6 @@ export default function XPagesManager1Page() {
     { key: 'show_in_all_pages_nav_area1', type: 'boolean', width: '80px' },
     { key: 'broad_parent_container', type: 'text', width: '200px' },
     { key: 'has_mutation_observer', type: 'text', width: '150px' },
-    { key: 'starred', type: 'boolean-icon', width: '50px', group: 'icons' },
-    { key: 'flagged', type: 'boolean-icon', width: '50px', group: 'icons' },
-    { key: 'penatgoned', type: 'boolean-icon', width: '50px', group: 'icons' },
-    { key: 'circled', type: 'boolean-icon', width: '50px', group: 'icons' },
     { key: 'created_at', type: 'text', width: '200px' },
     { key: 'updated_at', type: 'text', width: '200px' }
   ];
@@ -119,6 +121,7 @@ export default function XPagesManager1Page() {
       const { data, error } = await supabase
         .from('xpages')
         .insert({
+          current_state_of_meta_title_system: null,
           goal_for_meta_title_system: null,
           title1: null,
           main_url: null,
@@ -456,8 +459,9 @@ export default function XPagesManager1Page() {
     if (column.type === 'boolean-icon' && !isReadOnly) {
       return (
         <div 
-          className="flex items-center justify-center"
+          className="flex items-center justify-center p-0 m-0"
           onClick={() => handleBooleanToggle(item.xpage_id, column.key as keyof XPage, value as boolean | null)}
+          style={{ padding: 0, margin: 0 }}
         >
           {renderIcon(column.key, value as boolean | null)}
         </div>
@@ -762,18 +766,40 @@ export default function XPagesManager1Page() {
                   const isReadOnly = column.key === 'xpage_id' || column.key === 'created_at' || column.key === 'updated_at';
                   const isFirstInGroup = column.group === 'icons' && (index === 0 || columns[index - 1].group !== 'icons');
                   const isLastInGroup = column.group === 'icons' && (index === columns.length - 1 || columns[index + 1].group !== 'icons');
+                  const isIconColumn = column.type === 'boolean-icon';
+                  const hasRightSeparator = column.separator === 'right';
                   
                   return (
                     <th
                       key={column.key}
-                      className={`px-4 py-3 text-left cursor-pointer hover:bg-gray-100 border border-gray-200 ${
-                        isFirstInGroup ? 'border-l-4 border-l-black' : ''
-                      } ${isLastInGroup ? 'border-r-4 border-r-black' : ''}`}
-                      style={{ width: column.width }}
+                      className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 ${
+                        isIconColumn ? 'p-0' : 'px-4 py-3'
+                      } ${isFirstInGroup ? 'border-l-4 border-l-black' : ''} ${isLastInGroup ? 'border-r-4 border-r-black' : ''} ${hasRightSeparator ? 'border-r-4 border-r-black' : ''}`}
+                      style={{ 
+                        width: column.width,
+                        minWidth: column.width,
+                        maxWidth: column.width,
+                        ...(isIconColumn && { 
+                          verticalAlign: 'top',
+                          height: 'auto'
+                        })
+                      }}
                       onClick={() => handleSort(column.key)}
                     >
-                      <div className="flex items-center space-x-1">
-                        <span className={`font-bold text-xs lowercase ${isReadOnly ? 'text-gray-500' : 'text-gray-900'}`}>
+                      <div className={`${isIconColumn ? 'p-0' : 'flex items-center space-x-1'}`}>
+                        <span 
+                          className={`font-bold text-xs lowercase ${isReadOnly ? 'text-gray-500' : 'text-gray-900'}`}
+                          style={isIconColumn ? {
+                            wordBreak: 'break-all',
+                            lineHeight: '1.1',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxHeight: '3.3em'
+                          } : {}}
+                        >
                           {column.key}
                         </span>
                         {!isReadOnly && column.type !== 'boolean-icon' && (
@@ -813,13 +839,15 @@ export default function XPagesManager1Page() {
                   {columns.map((column, index) => {
                     const isFirstInGroup = column.group === 'icons' && (index === 0 || columns[index - 1].group !== 'icons');
                     const isLastInGroup = column.group === 'icons' && (index === columns.length - 1 || columns[index + 1].group !== 'icons');
+                    const isIconColumn = column.type === 'boolean-icon';
+                    const hasRightSeparator = column.separator === 'right';
                     
                     return (
                       <td
                         key={column.key}
-                        className={`px-4 py-3 text-sm border border-gray-200 ${
-                          isFirstInGroup ? 'border-l-4 border-l-black' : ''
-                        } ${isLastInGroup ? 'border-r-4 border-r-black' : ''}`}
+                        className={`text-sm border border-gray-200 ${
+                          isIconColumn ? 'p-0' : 'px-4 py-3'
+                        } ${isFirstInGroup ? 'border-l-4 border-l-black' : ''} ${isLastInGroup ? 'border-r-4 border-r-black' : ''} ${hasRightSeparator ? 'border-r-4 border-r-black' : ''}`}
                         style={{ width: column.width }}
                       >
                         {renderCell(item, column)}

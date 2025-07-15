@@ -126,10 +126,10 @@ export default function Header() {
 
   // Split navigation items into 2 rows, with break after panjar3
   const splitNavItems = () => {
-    const { adminMenuItem, specialFirstItem, oldAllGroupItem } = createNavigationStructure(navItems);
+    const { adminMenuItem, specialFirstItem, oldAllGroupItem, hardcodedNavItems } = createNavigationStructure(navItems);
 
-    // Create the final nav items array with admin first, then special item, then the rest (non-admin items)
-    const finalNavItems = [adminMenuItem, specialFirstItem, oldAllGroupItem];
+    // Create the final nav items array with admin first, then special item, then oldallgroup, then hardcoded items
+    const finalNavItems = [adminMenuItem, specialFirstItem, oldAllGroupItem, ...hardcodedNavItems];
 
     const panjar3Index = finalNavItems.findIndex(item => item.name === 'panjar3');
     if (panjar3Index === -1) {
