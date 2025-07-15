@@ -796,7 +796,7 @@ export default function FavaColumnTemplateControls() {
                         />
                       ) : (
                         <div style={{
-                          width: '80px',
+                          width: '130px',
                           height: '50px',
                           border: '1px solid #ccc',
                           backgroundColor: '#f5f5f5',
