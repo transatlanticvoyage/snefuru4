@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import IconPreview from './iconPreview';
+import IconPreview from './icons/iconPreview';
 
 export interface FavaMultiDeckButtonProps {
   coltemp_id: number;
