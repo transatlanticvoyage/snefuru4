@@ -468,8 +468,8 @@ export default function FavaColumnTemplateControls() {
     cursor: 'pointer'
   };
 
-  // Double Deck Button Component (Option 3: Container Div with Clickable Divs)
-  const DoubleDeckButton = ({ 
+  // Multi Deck Button Component (Option 3: Container Div with Clickable Divs)
+  const MultiDeckButton = ({ 
     coltemp_id, 
     coltemp_icon, 
     icon_name,
@@ -505,14 +505,14 @@ export default function FavaColumnTemplateControls() {
       overflow: 'hidden'
     };
 
-    const topDeckStyle = {
+    const deckLevel1Style = {
       height: '25px',
       display: 'flex',
       backgroundColor: '#e8e8e8',
       borderBottom: '1px solid #aaa'
     };
 
-    const bottomDeckStyle = {
+    const deckLevel2Style = {
       height: '25px',
       display: 'flex',
       alignItems: 'center',
@@ -577,8 +577,8 @@ export default function FavaColumnTemplateControls() {
 
     return (
       <div style={containerStyle}>
-        {/* Top Deck - Action Areas */}
-        <div style={topDeckStyle}>
+        {/* Deck Level 1 - Action Areas */}
+        <div style={deckLevel1Style}>
           <div 
             style={{...actionAreaStyle, backgroundColor: '#d4d4d4'}}
             onClick={handleDenbujarClick}
@@ -602,9 +602,9 @@ export default function FavaColumnTemplateControls() {
           </div>
         </div>
 
-        {/* Bottom Deck - Main Template Selection */}
+        {/* Deck Level 2 - Main Template Selection */}
         <div 
-          style={bottomDeckStyle}
+          style={deckLevel2Style}
           onClick={handleMainTemplateClick}
           onMouseEnter={(e) => {
             if (coltemp_id !== activeTemplateId) {
@@ -738,7 +738,7 @@ export default function FavaColumnTemplateControls() {
           fontWeight: 'bold',
           color: '#856404'
         }}>
-          NEW DOUBLE-DECKER SYSTEM (Testing Area)
+          NEW MULTI-DECKER SYSTEM (Testing Area)
         </h3>
         
         {loading ? (
@@ -781,7 +781,7 @@ export default function FavaColumnTemplateControls() {
                   {slots.map((slot, index) => (
                     <div key={slot.coltemp_id !== -1 ? slot.coltemp_id : `empty-${category}-${index}`}>
                       {slot.coltemp_id !== -1 ? (
-                        <DoubleDeckButton 
+                        <MultiDeckButton 
                           coltemp_id={slot.coltemp_id}
                           coltemp_icon={slot.coltemp_icon}
                           icon_name={slot.icon_name}
