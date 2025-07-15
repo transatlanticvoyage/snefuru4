@@ -34,6 +34,7 @@ interface FavaPageMasterProps {
   showBiriDevInfoBox?: boolean;
   showTrelnoColumnsDefBox?: boolean;
   showShendoBar?: boolean;
+  showColumnVisibilityMatrix?: boolean;
   showTable?: boolean;
   
   // Table configuration
@@ -68,6 +69,7 @@ export default function FavaPageMaster({
   showBiriDevInfoBox = true,
   showTrelnoColumnsDefBox = true,
   showShendoBar = true,
+  showColumnVisibilityMatrix = true,
   showTable = true,
   tableProps,
   children,
@@ -107,6 +109,7 @@ export default function FavaPageMaster({
         showBiriDevInfoBox={showBiriDevInfoBox}
         showTrelnoColumnsDefBox={showTrelnoColumnsDefBox}
         showShendoBar={showShendoBar}
+        showColumnVisibilityMatrix={showColumnVisibilityMatrix}
         showTable={showTable}
         tableProps={tableProps}
         headerContent={headerContent}
@@ -142,6 +145,7 @@ export default function FavaPageMaster({
         showBiriDevInfoBox={showBiriDevInfoBox}
         showTrelnoColumnsDefBox={showTrelnoColumnsDefBox}
         showShendoBar={showShendoBar}
+        showColumnVisibilityMatrix={showColumnVisibilityMatrix}
         showTable={showTable}
         tableProps={tableProps}
         headerContent={headerContent}

@@ -26,6 +26,16 @@ export default function FavaFilterControls() {
   return (
     <div style={wrapperStyle}>
       <span style={labelStyle}>Filter:</span>
+
+ {/* ------------------------------------------------------------------ */}
+      <div>
+  {/* ------------------------------------------------------------------ */}
+<div>
+  <div>
+
+    <div>
+      dbtable.<strong>dbfield</strong>
+    </div>
       <select style={selectStyle}>
         <option>All Categories</option>
         <option>Layout</option>
@@ -33,6 +43,10 @@ export default function FavaFilterControls() {
         <option>Content</option>
         <option>Forms</option>
       </select>
+  </div>
+</div>
+{/* ------------------------------------------------------------------ */}
+      </div>
       <select style={selectStyle}>
         <option>All Status</option>
         <option>True</option>
