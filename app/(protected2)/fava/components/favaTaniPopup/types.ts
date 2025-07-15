@@ -167,7 +167,7 @@ export const FAVA_TANI_DEFAULT_CONFIG: Omit<FavaTaniConfig, 'id'> = {
     }
   ],
   button: {
-    text: 'Functions',
+    text: 'tani popup',
     position: 'bottom-right',
     hotkey: 'f'
   },

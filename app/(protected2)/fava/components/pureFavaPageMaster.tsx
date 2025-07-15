@@ -18,7 +18,7 @@ import '../styles/fava-navigation.css';
 interface PureFavaPageMasterProps {
   // Page configuration
   pageTitle?: string;
-  pageDescription?: string;
+  pageDescription?: string | ReactNode;
   documentTitle?: string;
   
   // Component visibility
@@ -132,7 +132,13 @@ export default function PureFavaPageMaster({
               <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>{pageTitle}</h1>
             )}
             {pageDescription && (
-              <p style={{ marginBottom: '20px', color: '#666' }}>{pageDescription}</p>
+              <div style={{ marginBottom: '20px' }}>
+                {typeof pageDescription === 'string' ? (
+                  <p style={{ color: '#666', margin: 0 }}>{pageDescription}</p>
+                ) : (
+                  pageDescription
+                )}
+              </div>
             )}
             {headerContent}
           </div>

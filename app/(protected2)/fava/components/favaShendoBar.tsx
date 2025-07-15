@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
+import IconPreview from './icons/iconPreview';
 
 interface ColtempData {
   coltemp_id: number;
   coltemp_name: string | null;
   coltemp_category: string | null;
   coltemp_color: string | null;
-  coltemp_icon: string | null;
+  coltemp_icon: string | null; // deprecated
+  icon_name: string | null;
+  icon_color: string | null;
   count_of_columns: number | null;
 }
 
@@ -137,7 +140,17 @@ export default function FavaShendoBar() {
                     }}
                   />
                 )}
-                {`${template.count_of_columns || ''} | ${template.coltemp_icon || ''} | ${template.coltemp_name}`}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  {template.count_of_columns || ''} | 
+                  {template.icon_name ? (
+                    <IconPreview 
+                      iconName={template.icon_name} 
+                      iconColor={template.icon_color || '#666666'} 
+                      size={10} 
+                    />
+                  ) : template.coltemp_icon} | 
+                  {template.coltemp_name}
+                </span>
               </button>
             ))}
           </div>

@@ -23,7 +23,7 @@ import '../styles/fava-navigation.css';
 interface FavaPageMasterProps {
   // Page configuration
   pageTitle?: string;
-  pageDescription?: string;
+  pageDescription?: string | ReactNode;
   documentTitle?: string;
   
   // Component visibility
@@ -128,7 +128,12 @@ export default function FavaPageMaster({
     >
       <PureFavaPageMaster
         pageTitle={pageTitle}
-        pageDescription={pageDescription}
+        pageDescription={
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ color: '#666' }}>{pageDescription}</span>
+            <FavaTaniButtonConditional />
+          </div>
+        }
         documentTitle={documentTitle}
         showColumnTemplateControls={showColumnTemplateControls}
         showFilterControls={showFilterControls}
@@ -149,7 +154,6 @@ export default function FavaPageMaster({
       </PureFavaPageMaster>
       
       {/* Tani Popup System */}
-      <FavaTaniButtonConditional />
       <FavaTaniPopupConditional>
         {/* Content is handled internally by FavaTaniModal - no custom content allowed */}
       </FavaTaniPopupConditional>

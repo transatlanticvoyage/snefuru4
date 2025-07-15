@@ -45,32 +45,23 @@ export function FavaTaniButtonConditional({ fallback = null }: { fallback?: Reac
   const { openPopup } = tani.actions;
   
   const buttonConfig = config.button || {};
-  const position = buttonConfig.position || 'bottom-right';
-  const text = buttonConfig.text || 'Functions';
-  
-  const positionStyles = {
-    'bottom-right': { bottom: '20px', right: '20px' },
-    'bottom-left': { bottom: '20px', left: '20px' },
-    'top-right': { top: '20px', right: '20px' },
-    'top-left': { top: '20px', left: '20px' }
-  };
+  const text = buttonConfig.text || 'tani popup';
   
   return (
     <button
       onClick={openPopup}
       className={`fava-tani-trigger-button font-bold text-white rounded ${buttonConfig.className || ''}`}
       style={{
-        position: 'fixed',
-        zIndex: 9998,
         backgroundColor: '#800000', // maroon color like nwjar1
-        fontSize: '20px',
-        paddingLeft: '14px',
-        paddingRight: '14px',
-        paddingTop: '10px',
-        paddingBottom: '10px',
+        fontSize: '16px',
+        paddingLeft: '12px',
+        paddingRight: '12px',
+        paddingTop: '8px',
+        paddingBottom: '8px',
         border: 'none',
         cursor: 'pointer',
-        ...positionStyles[position],
+        marginLeft: '20px',
+        display: 'inline-block',
         ...buttonConfig.style
       }}
       title={buttonConfig.hotkey ? `${text} (Press ${buttonConfig.hotkey.toUpperCase()})` : text}

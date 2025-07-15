@@ -71,7 +71,7 @@ export default function XPagesManager1Page() {
     { key: 'circled', type: 'boolean-icon', width: '30px', group: 'icons' },
     { key: 'current_state_of_meta_title_system', type: 'text', width: '200px' },
     { key: 'goal_for_meta_title_system', type: 'text', width: '200px', separator: 'right' },
-    { key: 'meta_title', type: 'text', width: '200px' },
+    { key: 'meta_title', type: 'text', width: '400px' },
     { key: 'main_url', type: 'text', width: '200px', separator: 'right' },
     { key: 'title1', type: 'text', width: '200px' },
     { key: 'title2', type: 'text', width: '200px' },
@@ -554,7 +554,7 @@ export default function XPagesManager1Page() {
                 SYNCING...
               </>
             ) : (
-              'SYNC'
+              'sync1'
             )}
           </button>
           <div
@@ -731,7 +731,7 @@ export default function XPagesManager1Page() {
                 Pushing...
               </span>
             ) : (
-              `Push Direct (${selectedRows.size} selected)`
+              'push_direct_function'
             )}
           </button>
         </div>
@@ -768,12 +768,13 @@ export default function XPagesManager1Page() {
                   const isLastInGroup = column.group === 'icons' && (index === columns.length - 1 || columns[index + 1].group !== 'icons');
                   const isIconColumn = column.type === 'boolean-icon';
                   const hasRightSeparator = column.separator === 'right';
+                  const isMetaTitleSystemColumn = column.key === 'current_state_of_meta_title_system' || column.key === 'goal_for_meta_title_system';
                   
                   return (
                     <th
                       key={column.key}
                       className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 ${
-                        isIconColumn ? 'p-0' : 'px-4 py-3'
+                        isIconColumn ? 'p-0' : isMetaTitleSystemColumn ? 'p-0.5' : 'px-4 py-3'
                       } ${isFirstInGroup ? 'border-l-4 border-l-black' : ''} ${isLastInGroup ? 'border-r-4 border-r-black' : ''} ${hasRightSeparator ? 'border-r-4 border-r-black' : ''}`}
                       style={{ 
                         width: column.width,
@@ -789,7 +790,7 @@ export default function XPagesManager1Page() {
                       <div className={`${isIconColumn ? 'p-0' : 'flex items-center space-x-1'}`}>
                         <span 
                           className={`font-bold text-xs lowercase ${isReadOnly ? 'text-gray-500' : 'text-gray-900'}`}
-                          style={isIconColumn ? {
+                          style={isIconColumn || isMetaTitleSystemColumn ? {
                             wordBreak: 'break-all',
                             lineHeight: '1.1',
                             display: '-webkit-box',

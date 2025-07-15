@@ -2,13 +2,16 @@ import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import IconPreview from './icons/iconPreview';
 
 interface ColtempData {
   coltemp_id: number;
   coltemp_name: string | null;
   coltemp_category: string | null;
   coltemp_color: string | null;
-  coltemp_icon: string | null;
+  coltemp_icon: string | null; // deprecated
+  icon_name: string | null;
+  icon_color: string | null;
   count_of_columns: number | null;
 }
 
@@ -56,7 +59,7 @@ export default function FavaColumnTemplateControls() {
     try {
       const { data, error } = await supabase
         .from('coltemps')
-        .select('coltemp_id, coltemp_name, coltemp_category, coltemp_color, coltemp_icon, count_of_columns')
+        .select('coltemp_id, coltemp_name, coltemp_category, coltemp_color, coltemp_icon, icon_name, icon_color, count_of_columns')
         .order('coltemp_id', { ascending: true });
 
       if (error) throw error;
@@ -95,7 +98,9 @@ export default function FavaColumnTemplateControls() {
         coltemp_name: 'all',
         coltemp_category: 'range',
         coltemp_color: '#4CAF50',
-        coltemp_icon: '🔍',
+        coltemp_icon: '🔍', // deprecated
+        icon_name: 'search',
+        icon_color: '#4CAF50',
         count_of_columns: 32
       });
       
@@ -110,7 +115,9 @@ export default function FavaColumnTemplateControls() {
             coltemp_name: null,
             coltemp_category: null,
             coltemp_color: null,
-            coltemp_icon: null,
+            coltemp_icon: null, // deprecated
+            icon_name: null,
+            icon_color: null,
             count_of_columns: null
           });
         }
@@ -127,7 +134,9 @@ export default function FavaColumnTemplateControls() {
             coltemp_name: null,
             coltemp_category: null,
             coltemp_color: null,
-            coltemp_icon: null,
+            coltemp_icon: null, // deprecated
+            icon_name: null,
+            icon_color: null,
             count_of_columns: null
           });
         }
@@ -158,6 +167,8 @@ export default function FavaColumnTemplateControls() {
   const ColtempButton = ({ 
     coltemp_id, 
     coltemp_icon, 
+    icon_name,
+    icon_color,
     coltemp_color, 
     coltemp_name, 
     count_of_columns, 
@@ -168,7 +179,9 @@ export default function FavaColumnTemplateControls() {
     overflowItems = [] as ColtempData[]
   }: {
     coltemp_id?: number;
-    coltemp_icon?: string | null;
+    coltemp_icon?: string | null; // deprecated
+    icon_name?: string | null;
+    icon_color?: string | null;
     coltemp_color?: string | null;
     coltemp_name?: string | null;
     count_of_columns?: number | null;
@@ -185,10 +198,31 @@ export default function FavaColumnTemplateControls() {
       return coltempButtonStyle;
     };
 
-    const displayText = isMore ? 'more' : 
-      coltemp_name ? 
-        `${count_of_columns || ''} | ${coltemp_icon || ''} | ${coltemp_name}` :
-        `| | (empty)`;
+    const renderContent = () => {
+      if (isMore) {
+        return 'more';
+      }
+      if (!coltemp_name) {
+        return '| | (empty)';
+      }
+      return (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+          <span>{count_of_columns || ''}</span>
+          <span>|</span>
+          {icon_name ? (
+            <IconPreview 
+              iconName={icon_name} 
+              iconColor={icon_color || '#666666'} 
+              size={12} 
+            />
+          ) : (
+            <span>{coltemp_icon || ''}</span>
+          )}
+          <span>|</span>
+          <span>{coltemp_name}</span>
+        </span>
+      );
+    };
 
     return (
       <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -257,7 +291,7 @@ export default function FavaColumnTemplateControls() {
               }}
             />
           )}
-          {displayText}
+          {renderContent()}
         </button>
         
         {/* Dropdown for overflow items */}
@@ -324,7 +358,21 @@ export default function FavaColumnTemplateControls() {
                     }}
                   />
                 )}
-                {`${item.count_of_columns || ''} | ${item.coltemp_icon || ''} | ${item.coltemp_name}`}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  <span>{item.count_of_columns || ''}</span>
+                  <span>|</span>
+                  {item.icon_name ? (
+                    <IconPreview 
+                      iconName={item.icon_name} 
+                      iconColor={item.icon_color || '#666666'} 
+                      size={12} 
+                    />
+                  ) : (
+                    <span>{item.coltemp_icon || ''}</span>
+                  )}
+                  <span>|</span>
+                  <span>{item.coltemp_name}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -424,6 +472,8 @@ export default function FavaColumnTemplateControls() {
   const DoubleDeckButton = ({ 
     coltemp_id, 
     coltemp_icon, 
+    icon_name,
+    icon_color,
     coltemp_color, 
     coltemp_name, 
     count_of_columns, 
@@ -433,7 +483,9 @@ export default function FavaColumnTemplateControls() {
     isLast = false 
   }: {
     coltemp_id: number;
-    coltemp_icon: string | null;
+    coltemp_icon: string | null; // deprecated
+    icon_name: string | null;
+    icon_color: string | null;
     coltemp_color: string | null;
     coltemp_name: string | null;
     count_of_columns: number | null;
@@ -578,9 +630,24 @@ export default function FavaColumnTemplateControls() {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            lineHeight: '1'
+            lineHeight: '1',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px'
           }}>
-            {count_of_columns}|{coltemp_icon}|{coltemp_name}
+            <span>{count_of_columns}</span>
+            <span>|</span>
+            {icon_name ? (
+              <IconPreview 
+                iconName={icon_name} 
+                iconColor={icon_color || '#666666'} 
+                size={10} 
+              />
+            ) : (
+              <span>{coltemp_icon || ''}</span>
+            )}
+            <span>|</span>
+            <span>{coltemp_name}</span>
           </span>
         </div>
       </div>
@@ -717,6 +784,8 @@ export default function FavaColumnTemplateControls() {
                         <DoubleDeckButton 
                           coltemp_id={slot.coltemp_id}
                           coltemp_icon={slot.coltemp_icon}
+                          icon_name={slot.icon_name}
+                          icon_color={slot.icon_color}
                           coltemp_color={slot.coltemp_color}
                           coltemp_name={slot.coltemp_name}
                           count_of_columns={slot.count_of_columns}

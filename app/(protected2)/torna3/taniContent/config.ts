@@ -16,7 +16,7 @@ export const createTorna3TaniConfig = (
   id: 'torna3-nemtor-functions',
   title: 'Nemtor Functions',
   button: {
-    text: 'functions popup',
+    text: 'tani popup',
     position: 'bottom-right',
     hotkey: 'f'
   },

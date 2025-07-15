@@ -20,7 +20,9 @@ interface Coltemp {
   default_header_row_color: string | null;
   fk_user_id: string | null;
   coltemp_color: string | null;
-  coltemp_icon: string | null;
+  coltemp_icon: string | null; // deprecated
+  icon_name: string | null;
+  icon_color: string | null;
 }
 
 export default function ColtempCommandPage() {
@@ -53,7 +55,9 @@ export default function ColtempCommandPage() {
           default_header_row_color: null,
           fk_user_id: null,
           coltemp_color: null,
-          coltemp_icon: null
+          coltemp_icon: null, // deprecated
+          icon_name: null,
+          icon_color: '#666666'
         })
         .select()
         .single();
@@ -122,7 +126,9 @@ export default function ColtempCommandPage() {
     default_header_row_color: '',
     fk_user_id: '',
     coltemp_color: '',
-    coltemp_icon: ''
+    coltemp_icon: '', // deprecated
+    icon_name: '',
+    icon_color: '#666666'
   });
   
   const [formData, setFormData] = useState<any>(getEmptyFormData());
@@ -378,7 +384,7 @@ export default function ColtempCommandPage() {
   const inlineEditableFields = [
     'rel_utg_id', 'coltemp_name', 'coltemp_category', 'coltemp_display_name',
     'button_text', 'tooltip_text', 'default_header_row_color', 'fk_user_id',
-    'coltemp_color', 'coltemp_icon'
+    'coltemp_color', 'coltemp_icon', 'icon_name', 'icon_color'
   ];
 
   // Render form fields
@@ -480,13 +486,33 @@ export default function ColtempCommandPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">coltemp_icon</label>
+          <label className="block text-sm font-medium text-gray-700">coltemp_icon (deprecated)</label>
           <input
             type="text"
             value={formData.coltemp_icon}
             onChange={(e) => setFormData({...formData, coltemp_icon: e.target.value})}
             className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
             placeholder="e.g. home, user, settings"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">icon_name</label>
+          <input
+            type="text"
+            value={formData.icon_name}
+            onChange={(e) => setFormData({...formData, icon_name: e.target.value})}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+            placeholder="e.g. star, circle, arrow-up"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">icon_color</label>
+          <input
+            type="text"
+            value={formData.icon_color}
+            onChange={(e) => setFormData({...formData, icon_color: e.target.value})}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+            placeholder="e.g. #FF5733"
           />
         </div>
       </div>
