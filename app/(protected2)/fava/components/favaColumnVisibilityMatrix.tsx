@@ -218,23 +218,13 @@ export function useColumnVisibilityData() {
           return;
         }
         
-        // Map column names to their positions in the 32-column baseline
-        // This needs to match the order in torna3TableConfig.columns
-        const columnNameToPosition: { [key: string]: number } = {
-          'unit_id': 1, 'fk_gcon_piece_id': 2, 'unit_marker': 3, 'el_id': 4, 'el_type': 5,
-          'widget_type': 6, 'parent_el_id': 7, 'position_order': 8, 'depth_level': 9, 'sort_index': 10,
-          'summary_text': 11, 'unit_label': 12, 'settings_json': 13, 'style_json': 14, 'globals_json': 15,
-          'raw_json': 16, 'created_at': 17, 'updated_at': 18, 'full_text_cached': 19, 'full_text_edits': 20,
-          'image_type': 21, 'image_id': 22, 'image_url': 23, 'image_alt': 24, 'image_size': 25,
-          'image_source': 26, 'carousel_position': 27, 'image_context': 28, 'has_img_slot': 29,
-          'img_slot_qty': 30, 'tar_description_text': 31, 'tar_description_text_edits': 32
-        };
-        
-        // Extract column positions based on the column names
+        // Extract column positions directly from denbu_columns.default_position
         const positions = data?.map(item => {
-          const columnName = (item.denbu_columns as any)?.column_name;
-          return columnNameToPosition[columnName];
-        }).filter(Boolean) || [];
+          const defaultPosition = (item.denbu_columns as any)?.default_position;
+          return parseInt(defaultPosition);
+        }).filter(pos => pos && pos >= 1 && pos <= 32) || [];
+        
+        console.log(`Template ${coltempId} (${templateName}): positions =`, positions);
         
         setMatrixData({
           totalColumns: 32,
