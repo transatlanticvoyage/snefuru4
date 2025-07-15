@@ -23,6 +23,8 @@ interface Coltemp {
   coltemp_icon: string | null; // deprecated
   icon_name: string | null;
   icon_color: string | null;
+  cached_denbu_count: number | null;
+  cached_denbu_json: any | null;
 }
 
 export default function ColtempCommandPage() {
@@ -34,6 +36,7 @@ export default function ColtempCommandPage() {
   const [data, setData] = useState<Coltemp[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [liveCounts, setLiveCounts] = useState<Record<number, number>>({});
 
   // Create new inline entry
   const createNewInlineEntry = async () => {
@@ -150,11 +153,53 @@ export default function ColtempCommandPage() {
 
       if (error) throw error;
       setData(coltemps || []);
+      
+      // Fetch live counts for all coltemps
+      await fetchLiveCounts(coltemps || []);
     } catch (err) {
       console.error('Error fetching data:', err);
       setError('Failed to load column templates');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLiveCounts = async (coltemps: Coltemp[]) => {
+    try {
+      const counts: Record<number, number> = {};
+      
+      // Fetch live count for each coltemp
+      for (const coltemp of coltemps) {
+        const { count, error } = await supabase
+          .from('coltemp_denbu_relations')
+          .select('*', { count: 'exact', head: true })
+          .eq('fk_coltemp_id', coltemp.coltemp_id)
+          .eq('is_visible', true);
+          
+        if (!error && count !== null) {
+          counts[coltemp.coltemp_id] = count;
+        }
+      }
+      
+      setLiveCounts(counts);
+    } catch (err) {
+      console.error('Error fetching live counts:', err);
+    }
+  };
+
+  const refreshCache = async () => {
+    try {
+      // Trigger the cache update function
+      const { error } = await supabase.rpc('update_denbu_coltemp_cache');
+      if (error) throw error;
+      
+      // Refresh the data
+      await fetchData();
+      
+      console.log('Cache refreshed successfully');
+    } catch (err) {
+      console.error('Error refreshing cache:', err);
+      alert('Failed to refresh cache');
     }
   };
 
@@ -586,6 +631,12 @@ export default function ColtempCommandPage() {
               >
                 Create New Entry (Inline)
               </button>
+              <button
+                onClick={refreshCache}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+              >
+                update_denbu_coltemp_cache
+              </button>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">Items per page:</span>
@@ -681,7 +732,7 @@ export default function ColtempCommandPage() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
-                  {Object.keys(data[0] || {}).map(key => (
+                  {Object.keys(data[0] || {}).filter(key => key !== 'cached_denbu_count' && key !== 'cached_denbu_json').map(key => (
                     <th
                       key={key}
                       className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider cursor-pointer hover:bg-gray-100"
@@ -697,6 +748,12 @@ export default function ColtempCommandPage() {
                       </div>
                     </th>
                   ))}
+                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider">
+                    <span style={{ fontWeight: 'bold' }}>cached_denbu_count (json)</span>
+                  </th>
+                  <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider">
+                    <span style={{ fontWeight: 'bold' }}>live_denbu_count (db)</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -738,7 +795,7 @@ export default function ColtempCommandPage() {
                         )}
                       </div>
                     </td>
-                    {Object.entries(row).map(([key, value]) => {
+                    {Object.entries(row).filter(([key]) => key !== 'cached_denbu_count' && key !== 'cached_denbu_json').map(([key, value]) => {
                       const isEditing = editingCell?.id === row.coltemp_id && editingCell?.field === key;
                       const isEditable = inlineEditableFields.includes(key);
                       
@@ -772,6 +829,21 @@ export default function ColtempCommandPage() {
                         </td>
                       );
                     })}
+                    <td className="px-3 py-2 text-sm text-gray-900">
+                      {(() => {
+                        try {
+                          const jsonData = typeof row.cached_denbu_json === 'string' 
+                            ? JSON.parse(row.cached_denbu_json) 
+                            : row.cached_denbu_json;
+                          return Array.isArray(jsonData) ? jsonData.length : 0;
+                        } catch {
+                          return 0;
+                        }
+                      })()}
+                    </td>
+                    <td className="px-3 py-2 text-sm text-gray-900">
+                      {liveCounts[row.coltemp_id] || 0}
+                    </td>
                   </tr>
                 ))}
               </tbody>

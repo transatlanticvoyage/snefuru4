@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import IconPreview from './icons/iconPreview';
+import FavaColVisMatTooltip from './favaColVisMatTooltip';
 
 export interface FavaMultiDeckButtonProps {
   coltemp_id: number;
@@ -30,8 +31,9 @@ export default function FavaMultiDeckButton({
   isFirst = false, 
   isLast = false 
 }: FavaMultiDeckButtonProps) {
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const containerStyle = {
-    width: '80px',
+    width: '160px',
     height: '50px',
     border: '1px solid #595959',
     borderRight: '3px solid #595959',
@@ -65,7 +67,7 @@ export default function FavaMultiDeckButton({
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    fontSize: '9px',
+    fontSize: '16px',
     fontWeight: 'bold',
     borderRight: '1px solid #aaa'
   };
@@ -123,11 +125,19 @@ export default function FavaMultiDeckButton({
           DB
         </div>
         <div 
-          style={{...actionAreaStyle, backgroundColor: '#c4c4c4'}}
+          style={{...actionAreaStyle, backgroundColor: '#c4c4c4', position: 'relative'}}
           onClick={handleAction2Click}
-          title="Action 2"
+          onMouseEnter={() => setIsTooltipVisible(true)}
+          onMouseLeave={() => setIsTooltipVisible(false)}
+          title="View column visibility matrix"
         >
           A2
+          <FavaColVisMatTooltip
+            coltempId={coltemp_id}
+            isVisible={isTooltipVisible}
+            onMouseEnter={() => setIsTooltipVisible(true)}
+            onMouseLeave={() => setIsTooltipVisible(false)}
+          />
         </div>
         <div 
           style={{...actionAreaStyle, backgroundColor: '#b4b4b4', borderRight: 'none'}}
@@ -162,7 +172,7 @@ export default function FavaMultiDeckButton({
           }} />
         )}
         <span style={{
-          fontSize: '8px',
+          fontSize: '16px',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',

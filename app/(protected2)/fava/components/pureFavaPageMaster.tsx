@@ -11,7 +11,7 @@ import FavaPaginationControls from './favaPaginationControls';
 import FavaBiriDevInfoBox from './favaBiriDevInfoBox';
 import FavaTrelnoColumnsDefBox from './favaTrelnoColumnsDefBox';
 import FavaShendoBar from './favaShendoBar';
-import FavaColumnVisibilityMatrix, { useColumnVisibilityData } from './favaColumnVisibilityMatrix';
+import FavaColVisMatMainBar, { useColumnVisibilityData } from './favaColVisMatMainBar';
 import FavaMinimalTable from './favaMinimalTable';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
@@ -151,7 +151,7 @@ export default function PureFavaPageMaster({
         <div className="fava-controls-section" style={{ marginBottom: '20px' }}>
           {showColumnTemplateControls && <FavaColumnTemplateControls />}
           {showShendoBar && <FavaShendoBar />}
-          {showColumnVisibilityMatrix && <FavaColumnVisibilityMatrix {...useColumnVisibilityData()} />}
+          {showColumnVisibilityMatrix && <FavaColVisMatMainBar />}
           {showFilterControls && <FavaFilterControls />}
           {showSearchBox && <FavaSearchBox />}
           
