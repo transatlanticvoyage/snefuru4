@@ -216,7 +216,7 @@ export default function FavaCTCButtonsClassic({
   // All existing styles
   const boardStyle = {
     width: '100%',
-    height: '400px',
+    height: '200px',
     border: '1px solid #000',
     backgroundColor: '#5a0e15'
   };
