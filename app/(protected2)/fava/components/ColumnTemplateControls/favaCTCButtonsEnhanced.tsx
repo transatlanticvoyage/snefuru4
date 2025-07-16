@@ -257,72 +257,78 @@ export default function FavaCTCButtonsEnhanced({
         Enhanced Buttons
       </h3>
       
-      {CATEGORIES.map((category) => {
-        const categoryData = templates[category] || [];
-        const slots = createSlots(categoryData, category);
-        
-        return (
-          <div key={`area2-${category}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <span style={separatorStyle}></span>
-            
-            {category}
-            
-            <Link 
-              href={`/admin/coltempcommand?rel_utg_id=${utg_id}&page=1&coltemp_category=${category}`}
-              style={openCjLinkStyle}
-              target="_blank"
-            >
-              open cj
-            </Link>
-            
-            <span
-              style={shendoLinkStyle}
-              onClick={() => onShendoClick(category)}
-            >
-              shendo
-            </span>
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '8px'
+      }}>
+        {CATEGORIES.map((category) => {
+          const categoryData = templates[category] || [];
+          const slots = createSlots(categoryData, category);
+          
+          return (
+            <div key={`area2-${category}`} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={separatorStyle}></span>
+              
+              {category}
+              
+              <Link 
+                href={`/admin/coltempcommand?rel_utg_id=${utg_id}&page=1&coltemp_category=${category}`}
+                style={openCjLinkStyle}
+                target="_blank"
+              >
+                open cj
+              </Link>
+              
+              <span
+                style={shendoLinkStyle}
+                onClick={() => onShendoClick(category)}
+              >
+                shendo
+              </span>
 
-            <div style={{ display: 'flex', gap: '2px' }}>
-              {slots.map((slot: ColtempData, index: number) => (
-                <div key={slot.coltemp_id !== -1 ? slot.coltemp_id : `empty-${category}-${index}`}>
-                  {slot.coltemp_id !== -1 ? (
-                    <FavaMultiDeckButton 
-                      coltemp_id={slot.coltemp_id}
-                      coltemp_icon={slot.coltemp_icon}
-                      icon_name={slot.icon_name}
-                      icon_color={slot.icon_color}
-                      coltemp_color={slot.coltemp_color}
-                      coltemp_name={slot.coltemp_name}
-                      count_of_columns={slot.count_of_columns}
-                      activeTemplateId={activeTemplateId}
-                      onTemplateSelect={onTemplateSelect}
-                      onTemplatePreview={onTemplatePreview}
-                      isFirst={index === 0}
-                      isLast={index === slots.length - 1}
-                    />
-                  ) : (
-                    <div style={{
-                      width: '130px',
-                      height: '50px',
-                      border: '1px solid #ccc',
-                      backgroundColor: '#f5f5f5',
-                      borderRadius: index === 0 ? '4px 0 0 4px' : 
-                                   index === slots.length - 1 ? '0 4px 4px 0' : '0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#999',
-                      fontSize: '10px'
-                    }}>
-                      empty
-                    </div>
-                  )}
-                </div>
-              ))}
+              <div style={{ display: 'flex', gap: '2px' }}>
+                {slots.map((slot: ColtempData, index: number) => (
+                  <div key={slot.coltemp_id !== -1 ? slot.coltemp_id : `empty-${category}-${index}`}>
+                    {slot.coltemp_id !== -1 ? (
+                      <FavaMultiDeckButton 
+                        coltemp_id={slot.coltemp_id}
+                        coltemp_icon={slot.coltemp_icon}
+                        icon_name={slot.icon_name}
+                        icon_color={slot.icon_color}
+                        coltemp_color={slot.coltemp_color}
+                        coltemp_name={slot.coltemp_name}
+                        count_of_columns={slot.count_of_columns}
+                        activeTemplateId={activeTemplateId}
+                        onTemplateSelect={onTemplateSelect}
+                        onTemplatePreview={onTemplatePreview}
+                        isFirst={index === 0}
+                        isLast={index === slots.length - 1}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '130px',
+                        height: '50px',
+                        border: '1px solid #ccc',
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: index === 0 ? '4px 0 0 4px' : 
+                                     index === slots.length - 1 ? '0 4px 4px 0' : '0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#999',
+                        fontSize: '10px'
+                      }}>
+                        empty
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

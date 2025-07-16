@@ -6,7 +6,6 @@ import {
   CTCMasterState, 
   CTCMasterHandlers, 
   CTCMasterProps, 
-  ALL_COLUMNS_TEMPLATE,
   CATEGORIES 
 } from './favaCTCTypes';
 import { CTCEventEmitter } from './favaCTCEvents';
@@ -45,7 +44,7 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
       // Emit event for initial template load
       CTCEventEmitter.emitTemplateLoaded(parseInt(coltempId), currentUtgId);
     } else {
-      setActiveTemplateId(-999); // Set hardcoded "all" as active by default
+      setActiveTemplateId(null); // No template active by default
     }
   }, []);
 
@@ -66,8 +65,8 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
       };
 
       data?.forEach(item => {
-        const category = item.coltemp_category?.toLowerCase() || 'range';
-        if (groupedData[category]) {
+        const category = item.coltemp_category?.toLowerCase();
+        if (category && groupedData[category]) {
           groupedData[category].push(item);
         }
       });
@@ -84,47 +83,22 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
   const createSlots = (categoryData: ColtempData[], category: string) => {
     const slots = [];
     
-    // Special handling for range category - hardcode "all" as first slot
-    if (category === 'range') {
-      // First slot: hardcoded "all" button
-      slots.push(ALL_COLUMNS_TEMPLATE);
-      
-      // Fill remaining 2 slots with database data
-      for (let i = 0; i < 2; i++) {
-        if (categoryData[i]) {
-          slots.push(categoryData[i]);
-        } else {
-          // Empty slot
-          slots.push({
-            coltemp_id: -1,
-            coltemp_name: null,
-            coltemp_category: null,
-            coltemp_color: null,
-            coltemp_icon: null,
-            icon_name: null,
-            icon_color: null,
-            count_of_columns: null
-          });
-        }
-      }
-    } else {
-      // Regular handling for other categories
-      for (let i = 0; i < 3; i++) {
-        if (categoryData[i]) {
-          slots.push(categoryData[i]);
-        } else {
-          // Empty slot
-          slots.push({
-            coltemp_id: -1,
-            coltemp_name: null,
-            coltemp_category: null,
-            coltemp_color: null,
-            coltemp_icon: null,
-            icon_name: null,
-            icon_color: null,
-            count_of_columns: null
-          });
-        }
+    // Fill 3 slots with database data for all categories
+    for (let i = 0; i < 3; i++) {
+      if (categoryData[i]) {
+        slots.push(categoryData[i]);
+      } else {
+        // Empty slot
+        slots.push({
+          coltemp_id: -1,
+          coltemp_name: null,
+          coltemp_category: null,
+          coltemp_color: null,
+          coltemp_icon: null,
+          icon_name: null,
+          icon_color: null,
+          count_of_columns: null
+        });
       }
     }
     
@@ -133,10 +107,7 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
 
   // Get overflow items (4th item onwards)
   const getOverflowItems = (categoryData: ColtempData[], category: string) => {
-    // For range category, overflow starts from 3rd item (since first slot is hardcoded)
-    if (category === 'range') {
-      return categoryData.slice(2);
-    }
+    // All categories now start overflow from 4th item (index 3)
     return categoryData.slice(3);
   };
 
@@ -165,16 +136,12 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
     } else {
       // Find the template data
       let template: ColtempData | null = null;
-      if (templateId === -999) {
-        template = ALL_COLUMNS_TEMPLATE;
-      } else {
-        // Search through all categories for the template
-        for (const category of CATEGORIES) {
-          const found = templates[category]?.find(t => t.coltemp_id === templateId);
-          if (found) {
-            template = found;
-            break;
-          }
+      // Search through all categories for the template
+      for (const category of CATEGORIES) {
+        const found = templates[category]?.find(t => t.coltemp_id === templateId);
+        if (found) {
+          template = found;
+          break;
         }
       }
       
