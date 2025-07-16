@@ -181,7 +181,7 @@ export default function Torna3Page() {
 
   return (
     <FavaPageMaster
-      pageTitle="Nemtor Units Management System"
+      pageTitle="Tornado Page Editor System"
       pageDescription={`${nemtorData.length} units • ${visibleColumns.length} of ${torna3TableConfig.columns.length} columns shown • Elementor widget tracking`}
       documentTitle="Nemtor Units - /torna3"
       tableProps={tableProps}

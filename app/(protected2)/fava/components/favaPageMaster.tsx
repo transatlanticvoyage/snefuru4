@@ -4,13 +4,18 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import FavaNavToggle from './favaNavToggle';
 import FavaHeader from './favaHeader';
 import FavaSidebar from './favaSidebar';
-import FavaColumnTemplateControls from './favaColumnTemplateControls';
+import {
+  FavaCTCMaster,
+  FavaCTCButtonsClassic,
+  FavaCTCButtonsEnhanced,
+  FavaCTCShendoActive,
+  FavaCTCShendoPreview
+} from './ColumnTemplateControls';
 import FavaFilterControls from './favaFilterControls';
 import FavaSearchBox from './favaSearchBox';
 import FavaPaginationControls from './favaPaginationControls';
 import FavaBiriDevInfoBox from './favaBiriDevInfoBox';
 import FavaTrelnoColumnsDefBox from './favaTrelnoColumnsDefBox';
-import FavaShendoBar from './favaShendoBar';
 import FavaMinimalTable from './favaMinimalTable';
 import PureFavaPageMaster from './pureFavaPageMaster';
 import FavaTaniConditionalProvider from './favaTaniPopup/favaTaniConditionalProvider';
@@ -170,13 +175,16 @@ export {
   FavaNavToggle,
   FavaHeader,
   FavaSidebar,
-  FavaColumnTemplateControls,
+  FavaCTCMaster,
+  FavaCTCButtonsClassic,
+  FavaCTCButtonsEnhanced,
+  FavaCTCShendoActive,
+  FavaCTCShendoPreview,
   FavaFilterControls,
   FavaSearchBox,
   FavaPaginationControls,
   FavaBiriDevInfoBox,
   FavaTrelnoColumnsDefBox,
-  FavaShendoBar,
   FavaMinimalTable,
   PureFavaPageMaster,
   FavaTaniConditionalProvider

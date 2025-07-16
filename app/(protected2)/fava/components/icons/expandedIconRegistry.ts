@@ -52,7 +52,7 @@ import {
   
   // User & People
   User, Users, UserPlus, UserMinus, UserX, UserCheck,
-  Contact, Contacts, Users2, Crown, UserCircle, UserSquare, BadgeCheck,
+  /* Contact, */ /* Contacts, */ Users2, Crown, UserCircle, UserSquare, BadgeCheck,
   
   // Business & Finance
   Briefcase, Building, Building2, Store, ShoppingCart, ShoppingBag,
@@ -65,7 +65,7 @@ import {
   Luggage, Backpack, Tent, Mountain, TreePine, Waves,
   
   // Home & Living
-  Home, Door, DoorOpen, DoorClosed, Key, Bed, Chair, Armchair,
+  Home, /* Door, */ DoorOpen, DoorClosed, Key, Bed, Chair, Armchair,
   Lamp, LampDesk, Lightbulb, Coffee, Cup, Utensils,
   Flower, Sun, Moon,
   
@@ -181,7 +181,7 @@ export const EXPANDED_ICON_MAP = {
   
   // User & People
   'user': User, 'users': Users, 'user-plus': UserPlus, 'user-minus': UserMinus,
-  'user-x': UserX, 'user-check': UserCheck, 'contact': Contact, 'contacts': Contacts,
+  'user-x': UserX, 'user-check': UserCheck, /* 'contact': Contact, */ /* 'contacts': Contacts, */
   'users-2': Users2, 'crown': Crown, 'user-circle': UserCircle, 'user-square': UserSquare,
   'badge-check': BadgeCheck,
   
@@ -199,7 +199,7 @@ export const EXPANDED_ICON_MAP = {
   'tent': Tent, 'mountain': Mountain, 'tree-pine': TreePine, 'waves': Waves,
   
   // Home & Living
-  'home': Home, 'door': Door, 'door-open': DoorOpen, 'door-closed': DoorClosed, 'key': Key,
+  'home': Home, /* 'door': Door, */ 'door-open': DoorOpen, 'door-closed': DoorClosed, 'key': Key,
   'bed': Bed, 'chair': Chair, 'armchair': Armchair, 'lamp': Lamp, 'lamp-desk': LampDesk,
   'lightbulb': Lightbulb, 'coffee': Coffee, 'cup': Cup, 'utensils': Utensils,
   'flower': Flower, 'sun': Sun, 'moon': Moon,
