@@ -4,6 +4,7 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import FavaNavToggle from './favaNavToggle';
 import FavaHeader from './favaHeader';
 import FavaSidebar from './favaSidebar';
+import { FavaCTCMaster, FavaCTCButtonsClassic } from './ColumnTemplateControls';
 import FavaColumnTemplateControls from './favaColumnTemplateControls';
 import FavaShendoBar from './favaShendoBar';
 import FavaFilterControls from './favaFilterControls';

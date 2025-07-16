@@ -206,10 +206,12 @@ function FavaMultiDeckButton({
 export default function FavaCTCButtonsEnhanced({
   templates,
   activeTemplateId,
+  dropdownOpen,
   onTemplateSelect,
   onTemplatePreview,
   onShendoClick,
   onOpenCJ,
+  onToggleDropdown,
   utg_id,
   createSlots,
   getOverflowItems
