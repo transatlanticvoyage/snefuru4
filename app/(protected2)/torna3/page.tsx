@@ -20,13 +20,13 @@ export default function Torna3Page() {
     
     // Listen for template selection events
     const handleTemplateSelected = async (event: any) => {
-      const { coltemp_id } = event.detail;
-      await applyTemplate(coltemp_id);
+      const { templateId } = event.detail;
+      await applyTemplate(templateId);
     };
     
     const handleTemplateLoaded = async (event: any) => {
-      const { coltemp_id } = event.detail;
-      await applyTemplate(coltemp_id);
+      const { templateId } = event.detail;
+      await applyTemplate(templateId);
     };
     
     const handleShowAll = () => {
@@ -79,6 +79,14 @@ export default function Torna3Page() {
   
   const applyTemplate = async (coltempId: number) => {
     try {
+      // Special handling for "all" template
+      if (coltempId === -999) {
+        // Show all columns from the original config
+        setActiveColumns(torna3TableConfig.columns.map(col => col.field));
+        setSelectedTemplateId(-999);
+        return;
+      }
+      
       // Fetch columns for this template from junction table
       const { data, error } = await supabase
         .from('coltemp_denbu_relations')

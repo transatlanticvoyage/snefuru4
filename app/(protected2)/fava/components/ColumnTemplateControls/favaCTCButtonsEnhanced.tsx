@@ -254,7 +254,7 @@ export default function FavaCTCButtonsEnhanced({
         fontWeight: 'bold',
         color: '#856404'
       }}>
-        NEW MULTI-DECKER SYSTEM (Testing Area)
+        Enhanced Buttons
       </h3>
       
       {CATEGORIES.map((category) => {

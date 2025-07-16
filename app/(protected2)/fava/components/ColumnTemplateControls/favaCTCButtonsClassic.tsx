@@ -304,6 +304,14 @@ export default function FavaCTCButtonsClassic({
     <div style={boardStyle}>
       <div style={topLabelStyle}>div.coltemp_board</div>
       <div style={innerWrapperStyle}>
+        <div style={{
+          fontSize: '16px',
+          fontWeight: 'bold',
+          marginBottom: '8px',
+          width: '100%'
+        }}>
+          Classic Buttons
+        </div>
         <strong>db tables:</strong> coltemps AND denbu_columns
 
         {CATEGORIES.map((category) => {
