@@ -333,7 +333,7 @@ export default function FavaCTCButtonsClassic({
               </span>
 
               <div style={buttonGroupColtempStyle}>
-                {slots.map((slot, index) => (
+                {slots.map((slot: ColtempData, index: number) => (
                   <ColtempButton 
                     key={slot.coltemp_id !== -1 ? slot.coltemp_id : `empty-${category}-${index}`}
                     {...slot}

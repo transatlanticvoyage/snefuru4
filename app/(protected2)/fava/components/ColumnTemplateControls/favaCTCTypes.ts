@@ -35,6 +35,9 @@ export interface CTCMasterHandlers {
   openCJ: (category: string) => void;
   toggleDropdown: (category: string) => void;
   handleShendoClick: (category: string) => void;
+  createSlots: (categoryData: ColtempData[], category: string) => ColtempData[];
+  getOverflowItems: (categoryData: ColtempData[], category: string) => ColtempData[];
+  currentUtgId: string;
 }
 
 export interface CTCMasterProps {

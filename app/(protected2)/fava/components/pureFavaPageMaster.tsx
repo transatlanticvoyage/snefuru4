@@ -4,13 +4,8 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import FavaNavToggle from './favaNavToggle';
 import FavaHeader from './favaHeader';
 import FavaSidebar from './favaSidebar';
-import {
-  FavaCTCMaster,
-  FavaCTCButtonsClassic,
-  FavaCTCButtonsEnhanced,
-  FavaCTCShendoActive,
-  FavaCTCShendoPreview
-} from './ColumnTemplateControls';
+import FavaColumnTemplateControls from './favaColumnTemplateControls';
+import FavaShendoBar from './favaShendoBar';
 import FavaFilterControls from './favaFilterControls';
 import FavaSearchBox from './favaSearchBox';
 import FavaPaginationControls from './favaPaginationControls';
@@ -154,62 +149,9 @@ export default function PureFavaPageMaster({
         
         {/* Controls Section */}
         <div className="fava-controls-section" style={{ marginBottom: '20px' }}>
-          {showColumnTemplateControls && (
-            <FavaCTCMaster>
-              {({ state, handlers }) => (
-                <>
-                  {/* Classic buttons - same position as current */}
-                  <FavaCTCButtonsClassic 
-                    templates={state.templates}
-                    activeTemplateId={state.activeTemplateId}
-                    dropdownOpen={state.dropdownOpen}
-                    onTemplateSelect={handlers.selectTemplate}
-                    onShendoClick={handlers.showShendoCategory}
-                    onOpenCJ={handlers.openCJ}
-                    onToggleDropdown={handlers.toggleDropdown}
-                    utg_id={handlers.currentUtgId}
-                    createSlots={handlers.createSlots}
-                    getOverflowItems={handlers.getOverflowItems}
-                  />
-                  
-                  {/* Enhanced buttons - same position as current */}
-                  <FavaCTCButtonsEnhanced
-                    templates={state.templates}
-                    activeTemplateId={state.activeTemplateId}
-                    dropdownOpen={state.dropdownOpen}
-                    onTemplateSelect={handlers.selectTemplate}
-                    onTemplatePreview={handlers.previewTemplate}
-                    onShendoClick={handlers.showShendoCategory}
-                    onOpenCJ={handlers.openCJ}
-                    onToggleDropdown={handlers.toggleDropdown}
-                    utg_id={handlers.currentUtgId}
-                    createSlots={handlers.createSlots}
-                    getOverflowItems={handlers.getOverflowItems}
-                  />
-                </>
-              )}
-            </FavaCTCMaster>
-          )}
-          
-          {showShendoBar && (
-            <div className="shendo-bars-container">
-              {/* NEW: Preview bar (hidden until hover) */}
-              <FavaCTCShendoPreview 
-                templateId={null}
-                template={null}
-                utg_id="default"
-              />
-              
-              {/* Existing active bar */}
-              <FavaCTCShendoActive 
-                category={null}
-                templates={{}}
-                activeTemplateId={null}
-                onTemplateSelect={() => {}}
-                utg_id="default"
-              />
-            </div>
-          )}
+          {/* TEMPORARILY DISABLED FOR TESTING */}
+          {/* {showColumnTemplateControls && <FavaColumnTemplateControls />}
+          {showShendoBar && <FavaShendoBar />} */}
           
           {showColumnVisibilityMatrix && <FavaColVisMatMainBar />}
           {showFilterControls && <FavaFilterControls />}

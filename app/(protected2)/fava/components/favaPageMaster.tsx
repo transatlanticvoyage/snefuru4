@@ -4,13 +4,8 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import FavaNavToggle from './favaNavToggle';
 import FavaHeader from './favaHeader';
 import FavaSidebar from './favaSidebar';
-import {
-  FavaCTCMaster,
-  FavaCTCButtonsClassic,
-  FavaCTCButtonsEnhanced,
-  FavaCTCShendoActive,
-  FavaCTCShendoPreview
-} from './ColumnTemplateControls';
+import FavaColumnTemplateControls from './favaColumnTemplateControls';
+import FavaShendoBar from './favaShendoBar';
 import FavaFilterControls from './favaFilterControls';
 import FavaSearchBox from './favaSearchBox';
 import FavaPaginationControls from './favaPaginationControls';
@@ -164,7 +159,7 @@ export default function FavaPageMaster({
       
       {/* Tani Popup System */}
       <FavaTaniPopupConditional>
-        {/* Content is handled internally by FavaTaniModal - no custom content allowed */}
+        <div></div>
       </FavaTaniPopupConditional>
     </FavaTaniConditionalProvider>
   );
@@ -175,11 +170,8 @@ export {
   FavaNavToggle,
   FavaHeader,
   FavaSidebar,
-  FavaCTCMaster,
-  FavaCTCButtonsClassic,
-  FavaCTCButtonsEnhanced,
-  FavaCTCShendoActive,
-  FavaCTCShendoPreview,
+  FavaColumnTemplateControls,
+  FavaShendoBar,
   FavaFilterControls,
   FavaSearchBox,
   FavaPaginationControls,

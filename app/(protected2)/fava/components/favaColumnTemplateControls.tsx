@@ -491,7 +491,7 @@ export default function FavaColumnTemplateControls() {
                 {category}
                 
                 <Link 
-                  href={`/admin/coltempcommand?rel_utg_id=${getUtgIdForPath(pathname)}&page=1&coltemp_category=${category}`}
+                  href={`/admin/coltempcommand?rel_utg_id=${getUtgIdForPath(pathname || '')}&page=1&coltemp_category=${category}`}
                   style={openCjLinkStyle}
                   target="_blank"
                 >
@@ -571,7 +571,7 @@ export default function FavaColumnTemplateControls() {
                 {category}
                 
                 <Link 
-                  href={`/admin/coltempcommand?rel_utg_id=${getUtgIdForPath(pathname)}&page=1&coltemp_category=${category}`}
+                  href={`/admin/coltempcommand?rel_utg_id=${getUtgIdForPath(pathname || '')}&page=1&coltemp_category=${category}`}
                   style={openCjLinkStyle}
                   target="_blank"
                 >

@@ -281,7 +281,7 @@ export default function FavaCTCButtonsEnhanced({
             </span>
 
             <div style={{ display: 'flex', gap: '2px' }}>
-              {slots.map((slot, index) => (
+              {slots.map((slot: ColtempData, index: number) => (
                 <div key={slot.coltemp_id !== -1 ? slot.coltemp_id : `empty-${category}-${index}`}>
                   {slot.coltemp_id !== -1 ? (
                     <FavaMultiDeckButton 

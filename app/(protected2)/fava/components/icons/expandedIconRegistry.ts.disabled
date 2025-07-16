@@ -65,12 +65,12 @@ import {
   Luggage, Backpack, Tent, Mountain, TreePine, Waves,
   
   // Home & Living
-  Home, /* Door, */ DoorOpen, DoorClosed, Key, Bed, Chair, Armchair,
-  Lamp, LampDesk, Lightbulb, Coffee, Cup, Utensils,
+  Home, /* Door, */ DoorOpen, DoorClosed, Key, Bed, /* Chair, */ Armchair,
+  Lamp, LampDesk, Lightbulb, Coffee, /* Cup, */ Utensils,
   Flower, Sun, Moon,
   
   // Tools & Objects
-  Wrench, Hammer, Screwdriver, Scissors, PaintBucket, Brush,
+  Wrench, Hammer, /* Screwdriver, */ Scissors, PaintBucket, Brush,
   Palette, Pipette, Magnet, Microscope, Telescope, Glasses,
   Watch, Calendar, CalendarDays, AlarmClock, Trash, Trash2,
   Recycle, Boxes,
@@ -81,18 +81,18 @@ import {
   
   // Food & Drink
   Wine, Beer, Pizza, Cake, Apple, Cherry, Grape, IceCream,
-  Cookie, UtensilsCrossed, ChefHat, Restaurant,
+  Cookie, UtensilsCrossed, ChefHat, /* Restaurant, */
   
   // Weather & Nature
   CloudRain, CloudSnow, CloudLightning, Rainbow, Umbrella,
-  Wind, Tornado, Volcano, Flower2, Leaf,
+  Wind, Tornado, /* Volcano, */ Flower2, Leaf,
   
   // Medical & Health
   HeartPulse, Pill, Stethoscope, Bandage, Cross,
   Brain, Ear, Hand, Footprints,
   
   // Sports & Recreation
-  Football, Basketball, Tennis, /* Golf, */ /* Baseball, */
+  /* Football, */ /* Basketball, */ /* Tennis, */ /* Golf, */ /* Baseball, */
   Dumbbell, Music, Dice1
 } from 'lucide-react';
 
@@ -200,12 +200,12 @@ export const EXPANDED_ICON_MAP = {
   
   // Home & Living
   'home': Home, /* 'door': Door, */ 'door-open': DoorOpen, 'door-closed': DoorClosed, 'key': Key,
-  'bed': Bed, 'chair': Chair, 'armchair': Armchair, 'lamp': Lamp, 'lamp-desk': LampDesk,
-  'lightbulb': Lightbulb, 'coffee': Coffee, 'cup': Cup, 'utensils': Utensils,
+  'bed': Bed, /* 'chair': Chair, */ 'armchair': Armchair, 'lamp': Lamp, 'lamp-desk': LampDesk,
+  'lightbulb': Lightbulb, 'coffee': Coffee, /* 'cup': Cup, */ 'utensils': Utensils,
   'flower': Flower, 'sun': Sun, 'moon': Moon,
   
   // Tools & Objects
-  'wrench': Wrench, 'hammer': Hammer, 'screwdriver': Screwdriver, 'scissors': Scissors,
+  'wrench': Wrench, 'hammer': Hammer, /* 'screwdriver': Screwdriver, */ 'scissors': Scissors,
   'paint-bucket': PaintBucket, 'brush': Brush, 'palette': Palette, 'pipette': Pipette,
   'magnet': Magnet, 'microscope': Microscope, 'telescope': Telescope, 'glasses': Glasses,
   'watch': Watch, 'calendar': Calendar, 'calendar-days': CalendarDays, 'alarm-clock': AlarmClock,
@@ -219,11 +219,11 @@ export const EXPANDED_ICON_MAP = {
   // Food & Drink
   'wine': Wine, 'beer': Beer, 'pizza': Pizza, 'cake': Cake,
   'apple': Apple, 'cherry': Cherry, 'grape': Grape, 'ice-cream': IceCream, 'cookie': Cookie,
-  'utensils-crossed': UtensilsCrossed, 'chef-hat': ChefHat, 'restaurant': Restaurant,
+  'utensils-crossed': UtensilsCrossed, 'chef-hat': ChefHat, /* 'restaurant': Restaurant, */
   
   // Weather & Nature
   'cloud-rain': CloudRain, 'cloud-snow': CloudSnow, 'cloud-lightning': CloudLightning,
-  'rainbow': Rainbow, 'umbrella': Umbrella, 'wind': Wind, 'tornado': Tornado, 'volcano': Volcano,
+  'rainbow': Rainbow, 'umbrella': Umbrella, 'wind': Wind, 'tornado': Tornado, /* 'volcano': Volcano, */
   'flower-2': Flower2, 'leaf': Leaf,
   
   // Medical & Health
@@ -231,7 +231,7 @@ export const EXPANDED_ICON_MAP = {
   'bandage': Bandage, 'cross': Cross, 'brain': Brain, 'ear': Ear, 'hand': Hand, 'footprints': Footprints,
   
   // Sports & Recreation
-  'football': Football, 'basketball': Basketball, 'tennis': Tennis, /* 'golf': Golf, */ /* 'baseball': Baseball, */
+  /* 'football': Football, */ /* 'basketball': Basketball, */ /* 'tennis': Tennis, */ /* 'golf': Golf, */ /* 'baseball': Baseball, */
   'dumbbell': Dumbbell, 'music': Music, 'gamepad': Gamepad2, 'dice-1': Dice1
 } as const;
 

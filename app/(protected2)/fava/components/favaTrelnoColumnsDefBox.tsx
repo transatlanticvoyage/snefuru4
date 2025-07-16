@@ -12,7 +12,7 @@
       width: '250px',
       height: '100px',
       border: '1px solid #9e9e9e',
-      resize: 'vertical'
+      resize: 'vertical' as const
     };
 
     const trelnoButtonStyle = {

@@ -32,7 +32,7 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
     return pathToUtgMap[path] || 'utg_default';
   };
 
-  const currentUtgId = utg_id || getUtgIdForPath(pathname);
+  const currentUtgId = utg_id || getUtgIdForPath(pathname || '');
 
   useEffect(() => {
     fetchColtempData();
@@ -218,12 +218,7 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
     showShendoCategory,
     openCJ,
     toggleDropdown,
-    handleShendoClick
-  };
-
-  // Add utility functions to handlers for button components
-  const extendedHandlers = {
-    ...handlers,
+    handleShendoClick,
     createSlots,
     getOverflowItems,
     currentUtgId
@@ -231,7 +226,7 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
 
   return (
     <>
-      {children({ state, handlers: extendedHandlers })}
+      {children({ state, handlers })}
     </>
   );
 }

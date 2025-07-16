@@ -1,8 +1,17 @@
 'use client';
 
 import React from 'react';
-import { LUCIDE_ICON_MAP, LucideIconName } from './iconRegistry';
-import { IconPreviewProps } from './types/iconTypes';
+// TEMPORARILY DISABLED: Icon system imports to avoid compilation errors
+// import { LUCIDE_ICON_MAP, LucideIconName } from './iconRegistry';
+// import { IconPreviewProps } from './types/iconTypes';
+
+interface IconPreviewProps {
+  iconName?: string;
+  iconColor?: string;
+  size?: number;
+  showLabel?: boolean;
+  className?: string;
+}
 
 export default function IconPreview({ 
   iconName, 
@@ -11,56 +20,49 @@ export default function IconPreview({
   showLabel = false,
   className = ''
 }: IconPreviewProps) {
-  if (!iconName || !(iconName in LUCIDE_ICON_MAP)) {
-    return showLabel ? (
-      <div className={className} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <div 
-          style={{ 
-            width: size, 
-            height: size, 
-            backgroundColor: '#f0f0f0',
-            border: '1px dashed #ccc',
-            borderRadius: '2px'
-          }} 
-        />
-        {showLabel && <span style={{ fontSize: '14px', color: '#666' }}>No icon</span>}
-      </div>
-    ) : (
+  // TEMPORARILY DISABLED: Always use fallback mode to avoid icon compilation errors
+  // This preserves UI spacing while avoiding problematic icon imports
+  // TODO: Re-enable icon system once import issues are resolved
+  
+  return showLabel ? (
+    <div className={className} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <div 
-        className={className}
         style={{ 
           width: size, 
           height: size, 
-          backgroundColor: '#f0f0f0',
-          border: '1px dashed #ccc',
-          borderRadius: '2px'
-        }} 
-      />
-    );
-  }
-
-  const IconComponent = LUCIDE_ICON_MAP[iconName as LucideIconName];
-
-  if (showLabel) {
-    return (
-      <div className={className} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <IconComponent 
-          size={size} 
-          color={iconColor}
-          style={{ flexShrink: 0 }}
-        />
-        <span style={{ fontSize: '14px', color: '#666' }}>
-          {iconName}
-        </span>
+          backgroundColor: '#e8e8e8',
+          border: '1px solid #ccc',
+          borderRadius: '2px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: Math.max(8, size * 0.4),
+          color: '#666'
+        }}
+        title={`Icon: ${iconName || 'none'}`}
+      >
+        ⚪
       </div>
-    );
-  }
-
-  return (
-    <IconComponent 
+      {showLabel && <span style={{ fontSize: '14px', color: '#666' }}>{iconName || 'No icon'}</span>}
+    </div>
+  ) : (
+    <div 
       className={className}
-      size={size} 
-      color={iconColor}
-    />
+      style={{ 
+        width: size, 
+        height: size, 
+        backgroundColor: '#e8e8e8',
+        border: '1px solid #ccc',
+        borderRadius: '2px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: Math.max(8, size * 0.4),
+        color: '#666'
+      }}
+      title={`Icon: ${iconName || 'none'}`}
+    >
+      ⚪
+    </div>
   );
 }
