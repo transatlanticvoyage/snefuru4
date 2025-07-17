@@ -47,7 +47,7 @@ export default function FavaColumnVisibilityMatrix({
           height: '100%',
           backgroundColor: 'rgba(0, 0, 0, 0.05)',
           zIndex: 1
-        }}></div>
+        }}>Darpon</div>
 
 
       {/* Background grid lines for each column */}
