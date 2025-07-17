@@ -18,11 +18,13 @@ export default function FavaShendoBar() {
   const [activeTemplateId, setActiveTemplateId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Listen for shendo events
+    // Listen for shendo events - temporarily simplified to test
     const handleShendoShowCategory = (event: any) => {
-      const { category, categoryData } = event.detail;
+      const { category, utg_id } = event.detail;
       setSelectedCategory(category);
-      setCategoryData(categoryData);
+      
+      // Temporarily use empty array to isolate the issue
+      setCategoryData([]);
     };
 
     window.addEventListener('fava-shendo-show-category', handleShendoShowCategory);
@@ -79,16 +81,27 @@ export default function FavaShendoBar() {
   const handleTemplateClick = (coltemp_id: number, coltemp_name: string | null) => {
     setActiveTemplateId(coltemp_id);
     
-    // Emit the same events as column template controls
+    // Emit the same events as column template controls with new event structure
+    const template = {
+      coltemp_id,
+      coltemp_name,
+      coltemp_category: selectedCategory,
+      coltemp_color: null,
+      coltemp_icon: null,
+      icon_name: null,
+      icon_color: null,
+      count_of_columns: null
+    };
+    
     const event = new CustomEvent('fava-template-selected', {
-      detail: { coltemp_id, coltemp_name }
+      detail: { templateId: coltemp_id, template, utg_id: 'utg_torna3' }
     });
     window.dispatchEvent(event);
     
     // Update URL with selected template
     const url = new URL(window.location.href);
     url.searchParams.set('coltemp_id', coltemp_id.toString());
-    window.history.pushState({}, '', url);
+    window.history.replaceState({}, '', url);
   };
 
   const getButtonStyle = (index: number, totalLength: number) => {
