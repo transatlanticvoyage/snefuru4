@@ -85,16 +85,7 @@ function FavaMultiDeckButton({
 
   const handleAction3Click = () => {
     console.log('Action 3 clicked for coltemp_id:', coltemp_id);
-    // This is where we'll trigger the preview functionality
-    onTemplatePreview(coltemp_id);
-  };
-
-  const handleAction3MouseEnter = () => {
-    onTemplatePreview(coltemp_id);
-  };
-
-  const handleAction3MouseLeave = () => {
-    onTemplatePreview(null);
+    // A3 functionality will be used for something else later
   };
 
   const handleMainTemplateClick = () => {
@@ -112,6 +103,25 @@ function FavaMultiDeckButton({
     };
     
     onTemplateSelect(coltemp_id, template);
+  };
+
+  const handleMainTemplateHover = () => {
+    // Emit hover event for preview bar
+    const template: ColtempData = {
+      coltemp_id,
+      coltemp_name,
+      coltemp_category: null,
+      coltemp_color,
+      coltemp_icon,
+      icon_name,
+      icon_color,
+      count_of_columns
+    };
+    
+    const event = new CustomEvent('fava-template-hover', {
+      detail: { templateId: coltemp_id, template }
+    });
+    window.dispatchEvent(event);
   };
 
   return (
@@ -143,9 +153,7 @@ function FavaMultiDeckButton({
         <div 
           style={{...actionAreaStyle, backgroundColor: '#b4b4b4', borderRight: 'none'}}
           onClick={handleAction3Click}
-          onMouseEnter={handleAction3MouseEnter}
-          onMouseLeave={handleAction3MouseLeave}
-          title="Preview Template"
+          title="Action 3"
         >
           A3
         </div>
@@ -159,6 +167,7 @@ function FavaMultiDeckButton({
           if (coltemp_id !== activeTemplateId) {
             e.currentTarget.style.backgroundColor = '#f1e9b6';
           }
+          handleMainTemplateHover();
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb';

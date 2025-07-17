@@ -104,6 +104,27 @@ export default function FavaCTCButtonsClassic({
       }
     };
 
+    const handleHover = () => {
+      if (!isMore && coltemp_id !== -1 && coltemp_id !== undefined) {
+        // Emit hover event for preview bar
+        const template: ColtempData = {
+          coltemp_id: coltemp_id,
+          coltemp_name: coltemp_name || null,
+          coltemp_category: category,
+          coltemp_color: coltemp_color || null,
+          coltemp_icon: coltemp_icon || null,
+          icon_name: icon_name || null,
+          icon_color: icon_color || null,
+          count_of_columns: count_of_columns || null
+        };
+        
+        const event = new CustomEvent('fava-template-hover', {
+          detail: { templateId: coltemp_id, template }
+        });
+        window.dispatchEvent(event);
+      }
+    };
+
     return (
       <div style={{ position: 'relative', display: 'inline-block' }}>
         <button 
@@ -119,6 +140,7 @@ export default function FavaCTCButtonsClassic({
             if (!isMore && coltemp_id !== activeTemplateId) {
               e.currentTarget.style.backgroundColor = '#f1e9b6';
             }
+            handleHover();
           }}
           onMouseLeave={(e) => {
             if (!isMore) {
@@ -170,6 +192,11 @@ export default function FavaCTCButtonsClassic({
                   if (item.coltemp_id !== activeTemplateId) {
                     e.currentTarget.style.backgroundColor = '#f1e9b6';
                   }
+                  // Emit hover event for dropdown items
+                  const event = new CustomEvent('fava-template-hover', {
+                    detail: { templateId: item.coltemp_id, template: item }
+                  });
+                  window.dispatchEvent(event);
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = item.coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb';

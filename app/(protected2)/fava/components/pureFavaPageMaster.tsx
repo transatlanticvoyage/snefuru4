@@ -5,7 +5,8 @@ import FavaNavToggle from './favaNavToggle';
 import FavaHeader from './favaHeader';
 import FavaSidebar from './favaSidebar';
 import { FavaCTCMaster, FavaCTCButtonsClassic, FavaCTCButtonsEnhanced } from './ColumnTemplateControls';
-import FavaShendoBar from './favaShendoBar';
+import FavaCTCShendoActive from './ColumnTemplateControls/favaCTCShendoActive';
+import FavaColVisMatPreviewBar from './favaColVisMatPreviewBar';
 import FavaFilterControls from './favaFilterControls';
 import FavaSearchBox from './favaSearchBox';
 import FavaPaginationControls from './favaPaginationControls';
@@ -178,13 +179,26 @@ export default function PureFavaPageMaster({
                     createSlots={handlers.createSlots}
                     getOverflowItems={handlers.getOverflowItems}
                   />
+                  {showShendoBar && (
+                    <FavaCTCShendoActive
+                      category={state.shendoCategory || ''}
+                      templates={state.templates}
+                      activeTemplateId={state.activeTemplateId}
+                      onTemplateSelect={handlers.selectTemplate}
+                      utg_id={handlers.currentUtgId}
+                    />
+                  )}
                 </div>
               )}
             </FavaCTCMaster>
           )}
-          {showShendoBar && <FavaShendoBar />}
           
-          {showColumnVisibilityMatrix && <FavaColVisMatMainBar />}
+          {showColumnVisibilityMatrix && (
+            <>
+              <FavaColVisMatPreviewBar />
+              <FavaColVisMatMainBar />
+            </>
+          )}
           {showFilterControls && <FavaFilterControls />}
           {showSearchBox && <FavaSearchBox />}
           

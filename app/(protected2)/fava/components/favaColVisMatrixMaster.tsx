@@ -116,10 +116,18 @@ export function useColumnVisibilityData() {
       }
     };
 
-    // Listen for column template events
+    // Listen for column template events (support both old and new formats)
     const handleTemplateChange = async (event: any) => {
-      const { coltemp_id, coltemp_name } = event.detail;
-      await fetchTemplateData(coltemp_id, coltemp_name);
+      const { coltemp_id, coltemp_name, templateId, template } = event.detail;
+      
+      // Support new CTC event format
+      if (templateId && template) {
+        await fetchTemplateData(templateId, template.coltemp_name);
+      }
+      // Support old event format for backward compatibility
+      else if (coltemp_id) {
+        await fetchTemplateData(coltemp_id, coltemp_name);
+      }
     };
 
     const handleShowAll = () => {
@@ -131,10 +139,18 @@ export function useColumnVisibilityData() {
       });
     };
 
+    // Handle template loaded event (different structure)
+    const handleTemplateLoaded = async (event: any) => {
+      const { templateId, utg_id } = event.detail;
+      if (templateId) {
+        await fetchTemplateData(templateId);
+      }
+    };
+
     // Listen for template selection events
     window.addEventListener('fava-template-selected', handleTemplateChange);
     window.addEventListener('fava-template-show-all', handleShowAll);
-    window.addEventListener('fava-template-loaded', handleTemplateChange);
+    window.addEventListener('fava-template-loaded', handleTemplateLoaded);
 
     // Initialize with default state (show all columns)
     handleShowAll();
@@ -142,11 +158,96 @@ export function useColumnVisibilityData() {
     return () => {
       window.removeEventListener('fava-template-selected', handleTemplateChange);
       window.removeEventListener('fava-template-show-all', handleShowAll);
-      window.removeEventListener('fava-template-loaded', handleTemplateChange);
+      window.removeEventListener('fava-template-loaded', handleTemplateLoaded);
     };
   }, []);
 
   return matrixData;
+}
+
+// Shared logic hook for preview column template data
+export function useColumnVisibilityPreviewData() {
+  const [previewData, setPreviewData] = useState({
+    totalColumns: 32,
+    visibleColumnPositions: [] as number[],
+    activeTemplateName: '',
+    visibleColumnCount: 0,
+    isVisible: false // Track if preview should be shown
+  });
+  
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    // Function to fetch preview template data from database
+    const fetchPreviewTemplateData = async (templateId: number, template: any) => {
+      if (templateId === -999) {
+        // "All" template - all 32 columns
+        setPreviewData({
+          totalColumns: 32,
+          visibleColumnPositions: Array.from({ length: 32 }, (_, i) => i + 1),
+          activeTemplateName: 'all',
+          visibleColumnCount: 32,
+          isVisible: true
+        });
+        return;
+      }
+
+      try {
+        // Fetch columns for this template from junction table
+        const { data, error } = await supabase
+          .from('coltemp_denbu_relations')
+          .select(`
+            fk_denbu_column_id,
+            column_position,
+            denbu_columns (
+              column_name,
+              default_position
+            )
+          `)
+          .eq('fk_coltemp_id', templateId)
+          .eq('is_visible', true)
+          .order('column_position', { ascending: true });
+          
+        if (error) {
+          console.error('Error fetching preview template columns:', error);
+          return;
+        }
+        
+        // Extract column positions directly from denbu_columns.default_position
+        const positions = data?.map(item => {
+          const defaultPosition = (item.denbu_columns as any)?.default_position;
+          return parseInt(defaultPosition);
+        }).filter(pos => pos && pos >= 1 && pos <= 32) || [];
+        
+        setPreviewData({
+          totalColumns: 32,
+          visibleColumnPositions: positions,
+          activeTemplateName: template?.coltemp_name || `Template ${templateId}`,
+          visibleColumnCount: positions.length,
+          isVisible: true
+        });
+      } catch (error) {
+        console.error('Error fetching preview template data:', error);
+      }
+    };
+
+    // Listen for template hover events (triggered by any template button hover)
+    const handleTemplateHover = async (event: any) => {
+      const { templateId, template } = event.detail;
+      if (templateId && template) {
+        await fetchPreviewTemplateData(templateId, template);
+      }
+    };
+
+    // Listen for hover events
+    window.addEventListener('fava-template-hover', handleTemplateHover);
+
+    return () => {
+      window.removeEventListener('fava-template-hover', handleTemplateHover);
+    };
+  }, []);
+
+  return previewData;
 }
 
 // Hook to fetch specific coltemp data (for tooltips)
@@ -243,13 +344,36 @@ export function MatrixCore({
       height,
       backgroundColor: MATRIX_STYLES.colors.background,
       border: `1px solid ${MATRIX_STYLES.colors.border}`,
-      position: 'relative',
       display: 'flex',
       alignItems: 'center',
       marginBottom: compact ? '0' : '8px',
       overflow: 'hidden'
     }}>
-      {/* Background grid lines for each column */}
+      {/* Label div - sizes to content */}
+      <div 
+        className="harpoon_label_div"
+        style={{
+          height: '100%',
+          backgroundColor: '#e9ecef',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          flexShrink: 0,
+          padding: '0 8px'
+        }}
+      >
+        harpoon_colvismat_active
+      </div>
+      
+      {/* Matrix visualization - takes remaining space */}
+      <div style={{
+        flex: 1,
+        height: '100%',
+        position: 'relative'
+      }}>
+        {/* Background grid lines for each column */}
       {allColumns.map((columnIndex) => {
         const isHighlighted = visibleColumnPositions.includes(columnIndex);
         return (
@@ -322,65 +446,7 @@ export function MatrixCore({
         );
       })}
 
-      {/* Info overlay */}
-      {showInfoOverlay && (
-        <div style={{
-          position: 'absolute',
-          top: '2px',
-          left: '4px',
-          fontSize: compact ? '9px' : '11px',
-          color: MATRIX_STYLES.colors.textPrimary,
-          backgroundColor: MATRIX_STYLES.colors.infoBackground,
-          padding: '2px 6px',
-          borderRadius: '3px',
-          zIndex: 4,
-          pointerEvents: 'none',
-          fontWeight: '500',
-          border: '1px solid rgba(0,0,0,0.1)'
-        }}>
-          {visibleColumnCount > 0 && visibleColumnCount < totalColumns
-            ? `${visibleColumnCount}/${totalColumns} columns${activeTemplateName ? ` (${activeTemplateName})` : ''}`
-            : visibleColumnCount === totalColumns
-            ? `All ${totalColumns} columns`
-            : `${totalColumns} total columns`
-          }
-        </div>
-      )}
-
-      {/* Legend on the right */}
-      {showLegend && (
-        <div style={{
-          position: 'absolute',
-          top: '2px',
-          right: '4px',
-          fontSize: compact ? '8px' : '10px',
-          color: MATRIX_STYLES.colors.textSecondary,
-          backgroundColor: MATRIX_STYLES.colors.legendBackground,
-          padding: '1px 4px',
-          borderRadius: '2px',
-          zIndex: 4,
-          pointerEvents: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px'
-        }}>
-          <div style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: MATRIX_STYLES.colors.visibleDot
-          }} />
-          <span>visible</span>
-          <div style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: MATRIX_STYLES.colors.hiddenDot,
-            marginLeft: '8px'
-          }} />
-          <span>hidden</span>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
