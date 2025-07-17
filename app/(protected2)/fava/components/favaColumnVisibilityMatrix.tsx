@@ -40,6 +40,16 @@ export default function FavaColumnVisibilityMatrix({
       marginBottom: '8px',
       overflow: 'hidden'
     }}>
+
+        <div style={{
+        //  position: 'absolute',
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.05)',
+          zIndex: 1
+        }}></div>
+
+
       {/* Background grid lines for each column */}
       {allColumns.map((columnIndex) => {
         const isHighlighted = visibleColumnPositions.includes(columnIndex);
