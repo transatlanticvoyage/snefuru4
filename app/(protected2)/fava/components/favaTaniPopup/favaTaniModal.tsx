@@ -5,6 +5,7 @@ import { useFavaTaniSafe } from './favaTaniConditionalProvider';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import FavaBiriDevInfoBox from '../favaBiriDevInfoBox';
 import FavaTrelnoColumnsDefBox from '../favaTrelnoColumnsDefBox';
+import PlutoShowHideInstrument from '../plutoShowHideInstrument';
 
 interface FavaTaniModalProps {
   children?: React.ReactNode;
@@ -97,7 +98,19 @@ export default function FavaTaniModal({ children }: FavaTaniModalProps) {
           </div>
         );
       case 'tani2':
-        return contentSlots?.tani2 || defaultContent;
+        return (
+          <div>
+            {/* Pluto Show/Hide Instrument - always in ptab2 */}
+            <PlutoShowHideInstrument utg_id={config.utg_id} />
+            
+            {/* Custom content for tani2 (if provided) or default content */}
+            {contentSlots?.tani2 && (
+              <div style={{ marginTop: '20px' }}>
+                {contentSlots.tani2}
+              </div>
+            )}
+          </div>
+        );
       case 'tani3':
         return contentSlots?.tani3 || defaultContent;
       case 'tani4':

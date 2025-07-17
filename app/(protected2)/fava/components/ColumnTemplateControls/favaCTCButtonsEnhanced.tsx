@@ -17,6 +17,9 @@ interface FavaMultiDeckButtonProps {
   onTemplatePreview: (templateId: number | null) => void;
   isFirst?: boolean;
   isLast?: boolean;
+  isMore?: boolean;
+  overflowCount?: number;
+  onToggleDropdown?: () => void;
 }
 
 function FavaMultiDeckButton({ 
@@ -31,7 +34,10 @@ function FavaMultiDeckButton({
   onTemplateSelect,
   onTemplatePreview,
   isFirst = false, 
-  isLast = false 
+  isLast = false,
+  isMore = false,
+  overflowCount = 0,
+  onToggleDropdown
 }: FavaMultiDeckButtonProps) {
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   
@@ -89,23 +95,30 @@ function FavaMultiDeckButton({
   };
 
   const handleMainTemplateClick = () => {
-    console.log(`Template clicked: ${coltemp_id}`);
-    
-    const template: ColtempData = {
-      coltemp_id,
-      coltemp_name,
-      coltemp_category: null, // Will be set by parent
-      coltemp_color,
-      coltemp_icon,
-      icon_name,
-      icon_color,
-      count_of_columns
-    };
-    
-    onTemplateSelect(coltemp_id, template);
+    if (isMore && onToggleDropdown) {
+      onToggleDropdown();
+    } else {
+      console.log(`Template clicked: ${coltemp_id}`);
+      
+      const template: ColtempData = {
+        coltemp_id,
+        coltemp_name,
+        coltemp_category: null, // Will be set by parent
+        coltemp_color,
+        coltemp_icon,
+        icon_name,
+        icon_color,
+        count_of_columns
+      };
+      
+      onTemplateSelect(coltemp_id, template);
+    }
   };
 
   const handleMainTemplateHover = () => {
+    // Don't emit hover events for more button
+    if (isMore) return;
+    
     // Emit hover event for preview bar
     const template: ColtempData = {
       coltemp_id,
@@ -126,37 +139,56 @@ function FavaMultiDeckButton({
 
   return (
     <div style={containerStyle}>
-      {/* Deck Level 1 - Action Areas */}
+      {/* Deck Level 1 - Action Areas or Count */}
       <div style={deckLevel1Style}>
-        <div 
-          style={{...actionAreaStyle, backgroundColor: '#d4d4d4'}}
-          onClick={handleDenbujarClick}
-          title="Open Denbujar"
-        >
-          DB
-        </div>
-        <div 
-          style={{...actionAreaStyle, backgroundColor: '#c4c4c4', position: 'relative'}}
-          onClick={handleAction2Click}
-          onMouseEnter={() => setIsTooltipVisible(true)}
-          onMouseLeave={() => setIsTooltipVisible(false)}
-          title="View column visibility matrix"
-        >
-          A2
-          <FavaColVisMatTooltip
-            coltempId={coltemp_id}
-            isVisible={isTooltipVisible}
-            onMouseEnter={() => setIsTooltipVisible(true)}
-            onMouseLeave={() => setIsTooltipVisible(false)}
-          />
-        </div>
-        <div 
-          style={{...actionAreaStyle, backgroundColor: '#b4b4b4', borderRight: 'none'}}
-          onClick={handleAction3Click}
-          title="Action 3"
-        >
-          A3
-        </div>
+        {isMore ? (
+          /* More button shows count */
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            backgroundColor: '#e8e8e8'
+          }}>
+            {overflowCount}
+          </div>
+        ) : (
+          /* Regular button shows action areas */
+          <>
+            <div 
+              style={{...actionAreaStyle, backgroundColor: '#d4d4d4'}}
+              onClick={handleDenbujarClick}
+              title="Open Denbujar"
+            >
+              DB
+            </div>
+            <div 
+              style={{...actionAreaStyle, backgroundColor: '#c4c4c4', position: 'relative'}}
+              onClick={handleAction2Click}
+              onMouseEnter={() => setIsTooltipVisible(true)}
+              onMouseLeave={() => setIsTooltipVisible(false)}
+              title="View column visibility matrix"
+            >
+              A2
+              <FavaColVisMatTooltip
+                coltempId={coltemp_id}
+                isVisible={isTooltipVisible}
+                onMouseEnter={() => setIsTooltipVisible(true)}
+                onMouseLeave={() => setIsTooltipVisible(false)}
+              />
+            </div>
+            <div 
+              style={{...actionAreaStyle, backgroundColor: '#b4b4b4', borderRight: 'none'}}
+              onClick={handleAction3Click}
+              title="Action 3"
+            >
+              A3
+            </div>
+          </>
+        )}
       </div>
 
       {/* Deck Level 2 - Main Template Selection */}
@@ -172,41 +204,58 @@ function FavaMultiDeckButton({
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb';
         }}
-        title={`Template: ${coltemp_name}`}
+        title={isMore ? "More templates" : `Template: ${coltemp_name}`}
       >
-        {coltemp_color && (
-          <div style={{
-            width: '6px',
-            height: '6px',
-            backgroundColor: coltemp_color,
-            borderRadius: '1px',
-            flexShrink: 0
-          }} />
+        {isMore ? (
+          /* More button shows "more" text */
+          <span style={{
+            fontSize: '16px',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%'
+          }}>
+            more
+          </span>
+        ) : (
+          /* Regular button shows template info */
+          <>
+            {coltemp_color && (
+              <div style={{
+                width: '6px',
+                height: '6px',
+                backgroundColor: coltemp_color,
+                borderRadius: '1px',
+                flexShrink: 0
+              }} />
+            )}
+            <span style={{
+              fontSize: '16px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              lineHeight: '1',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '2px'
+            }}>
+              <span>{count_of_columns}</span>
+              <span>|</span>
+              {icon_name ? (
+                <IconPreview 
+                  iconName={icon_name} 
+                  iconColor={icon_color || '#666666'} 
+                  size={10} 
+                />
+              ) : (
+                <span>{coltemp_icon || ''}</span>
+              )}
+              <span>|</span>
+              <span>{coltemp_name}</span>
+            </span>
+          </>
         )}
-        <span style={{
-          fontSize: '16px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          lineHeight: '1',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '2px'
-        }}>
-          <span>{count_of_columns}</span>
-          <span>|</span>
-          {icon_name ? (
-            <IconPreview 
-              iconName={icon_name} 
-              iconColor={icon_color || '#666666'} 
-              size={10} 
-            />
-          ) : (
-            <span>{coltemp_icon || ''}</span>
-          )}
-          <span>|</span>
-          <span>{coltemp_name}</span>
-        </span>
       </div>
     </div>
   );
@@ -249,6 +298,26 @@ export default function FavaCTCButtonsEnhanced({
     cursor: 'pointer'
   };
 
+  const categorySymbols = {
+    'range': 'C1',
+    'adminpublic': 'C2', 
+    'personal': 'C3'
+  };
+
+  const circleStyle = {
+    width: '20px',
+    height: '20px',
+    borderRadius: '50%',
+    backgroundColor: '#d3d3d3', // light gray
+    color: '#4a4a4a', // dark gray
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '12px',
+    fontWeight: 'bold',
+    marginRight: '6px'
+  };
+
   return (
     <div style={{
       marginTop: '20px',
@@ -279,7 +348,10 @@ export default function FavaCTCButtonsEnhanced({
             <div key={`area2-${category}`} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={separatorStyle}></span>
               
-              {category}
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={circleStyle}>{categorySymbols[category]}</div>
+                <span>{category}</span>
+              </div>
               
               <Link 
                 href={`/admin/coltempcommand?rel_utg_id=${utg_id}&page=1&coltemp_category=${category}`}
@@ -296,7 +368,7 @@ export default function FavaCTCButtonsEnhanced({
                 shendo
               </span>
 
-              <div style={{ display: 'flex', gap: '2px' }}>
+              <div style={{ display: 'flex', gap: '2px', position: 'relative' }}>
                 {slots.map((slot: ColtempData, index: number) => (
                   <div key={slot.coltemp_id !== -1 ? slot.coltemp_id : `empty-${category}-${index}`}>
                     {slot.coltemp_id !== -1 ? (
@@ -333,6 +405,92 @@ export default function FavaCTCButtonsEnhanced({
                     )}
                   </div>
                 ))}
+                
+                {/* More button */}
+                {(() => {
+                  const overflowItems = getOverflowItems(categoryData, category);
+                  if (overflowItems.length > 0) {
+                    return (
+                      <div style={{ position: 'relative' }}>
+                        <FavaMultiDeckButton 
+                          coltemp_id={-1}
+                          coltemp_icon={null}
+                          icon_name={null}
+                          icon_color={null}
+                          coltemp_color={null}
+                          coltemp_name={null}
+                          count_of_columns={null}
+                          activeTemplateId={activeTemplateId}
+                          onTemplateSelect={onTemplateSelect}
+                          onTemplatePreview={onTemplatePreview}
+                          isMore={true}
+                          overflowCount={overflowItems.length}
+                          onToggleDropdown={() => onToggleDropdown(category)}
+                        />
+                        
+                        {/* Dropdown for overflow items */}
+                        {dropdownOpen[category] && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: '0',
+                            backgroundColor: '#fff',
+                            border: '1px solid #595959',
+                            borderRadius: '4px',
+                            zIndex: 1000,
+                            minWidth: '160px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                          }}>
+                            {overflowItems.map((item) => (
+                              <div key={item.coltemp_id} style={{ margin: '4px' }}>
+                                <FavaMultiDeckButton 
+                                  coltemp_id={item.coltemp_id}
+                                  coltemp_icon={item.coltemp_icon}
+                                  icon_name={item.icon_name}
+                                  icon_color={item.icon_color}
+                                  coltemp_color={item.coltemp_color}
+                                  coltemp_name={item.coltemp_name}
+                                  count_of_columns={item.count_of_columns}
+                                  activeTemplateId={activeTemplateId}
+                                  onTemplateSelect={(templateId, template) => {
+                                    onToggleDropdown(category); // Close dropdown
+                                    onTemplateSelect(templateId, template);
+                                  }}
+                                  onTemplatePreview={onTemplatePreview}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                
+                {/* Actively selected button from overflow (appears to the right of more button) */}
+                {(() => {
+                  const overflowItems = getOverflowItems(categoryData, category);
+                  const selectedOverflowItem = overflowItems.find(item => item.coltemp_id === activeTemplateId);
+                  
+                  if (selectedOverflowItem) {
+                    return (
+                      <FavaMultiDeckButton 
+                        coltemp_id={selectedOverflowItem.coltemp_id}
+                        coltemp_icon={selectedOverflowItem.coltemp_icon}
+                        icon_name={selectedOverflowItem.icon_name}
+                        icon_color={selectedOverflowItem.icon_color}
+                        coltemp_color={selectedOverflowItem.coltemp_color}
+                        coltemp_name={selectedOverflowItem.coltemp_name}
+                        count_of_columns={selectedOverflowItem.count_of_columns}
+                        activeTemplateId={activeTemplateId}
+                        onTemplateSelect={onTemplateSelect}
+                        onTemplatePreview={onTemplatePreview}
+                      />
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
           );

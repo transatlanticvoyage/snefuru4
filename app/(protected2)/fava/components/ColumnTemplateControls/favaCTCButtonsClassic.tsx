@@ -130,7 +130,7 @@ export default function FavaCTCButtonsClassic({
         <button 
           style={{
             ...getButtonStyle(), 
-            backgroundColor: isMore ? '#8baaec' : 
+            backgroundColor: isMore ? '#ebebeb' : 
                            (coltemp_id === activeTemplateId ? '#86a5e9' : '#ebebeb'),
             display: 'flex',
             alignItems: 'center',
@@ -292,7 +292,7 @@ export default function FavaCTCButtonsClassic({
 
   const moreButtonStyle = {
     ...coltempButtonLastStyle,
-    backgroundColor: '#8baaec'
+    backgroundColor: '#ebebeb'
   };
 
   const separatorStyle = {
@@ -327,6 +327,26 @@ export default function FavaCTCButtonsClassic({
     cursor: 'pointer'
   };
 
+  const categorySymbols = {
+    'range': 'C1',
+    'adminpublic': 'C2', 
+    'personal': 'C3'
+  };
+
+  const circleStyle = {
+    width: '20px',
+    height: '20px',
+    borderRadius: '50%',
+    backgroundColor: '#d3d3d3', // light gray
+    color: '#4a4a4a', // dark gray
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '12px',
+    fontWeight: 'bold',
+    marginRight: '6px'
+  };
+
   return (
     <div style={boardStyle}>
       <div style={topLabelStyle}>div.coltemp_board</div>
@@ -350,7 +370,10 @@ export default function FavaCTCButtonsClassic({
             <div key={category} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={separatorStyle}></span>
               
-              {category}
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={circleStyle}>{categorySymbols[category]}</div>
+                <span>{category}</span>
+              </div>
               
               <Link 
                 href={`/admin/coltempcommand?rel_utg_id=${utg_id}&page=1&coltemp_category=${category}`}
@@ -389,6 +412,25 @@ export default function FavaCTCButtonsClassic({
                   onTemplateSelect={onTemplateSelect}
                   onToggleDropdown={onToggleDropdown}
                 />
+                
+                {/* Actively selected button from overflow */}
+                {(() => {
+                  const selectedOverflowItem = overflowItems.find(item => item.coltemp_id === activeTemplateId);
+                  
+                  if (selectedOverflowItem) {
+                    return (
+                      <ColtempButton 
+                        key={`active-${selectedOverflowItem.coltemp_id}`}
+                        {...selectedOverflowItem}
+                        activeTemplateId={activeTemplateId}
+                        dropdownOpen={dropdownOpen}
+                        onTemplateSelect={onTemplateSelect}
+                        onToggleDropdown={onToggleDropdown}
+                      />
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
           );
