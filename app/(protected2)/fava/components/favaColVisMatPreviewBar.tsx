@@ -67,14 +67,13 @@ export default function FavaColVisMatPreviewBar(props: ColumnVisibilityMatrixPro
           return (
             <div
               key={`preview-segment-${columnIndex}`}
-              className={isHighlighted ? 'harpoon_preview_segment' : ''}
               style={{
                 position: 'absolute',
                 left: `${(columnIndex - 1) * segmentWidth}%`,
                 top: '0',
                 width: `${segmentWidth}%`,
                 height: '100%',
-                backgroundColor: isHighlighted ? '#bd9aec' : 'transparent',
+                backgroundColor: isHighlighted ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
                 borderRight: columnIndex < finalProps.totalColumns ? '1px solid #dee2e6' : 'none',
                 zIndex: 1
               }}
@@ -101,7 +100,6 @@ export default function FavaColVisMatPreviewBar(props: ColumnVisibilityMatrixPro
           return (
             <div
               key={`preview-dot-${position}`}
-              className={isVisible ? 'harpoon_preview_dot' : ''}
               style={{
                 position: 'absolute',
                 left: `${(position - 1) * segmentWidth + segmentWidth / 2}%`,
@@ -109,8 +107,8 @@ export default function FavaColVisMatPreviewBar(props: ColumnVisibilityMatrixPro
                 width: '8px',
                 height: '8px',
                 borderRadius: '50%',
-                backgroundColor: isVisible ? '#a776e8' : '#9ca3af',
-                border: `2px solid ${isVisible ? '#9966d9' : '#6b7280'}`,
+                backgroundColor: isVisible ? '#8b5cf6' : '#9ca3af',
+                border: `2px solid ${isVisible ? '#6d28d9' : '#6b7280'}`,
                 transform: 'translate(-50%, -50%)',
                 zIndex: 3,
                 cursor: 'pointer',

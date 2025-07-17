@@ -6,15 +6,19 @@
   width: 190px !important;
 }
 
+
+
+
+
 /* harpoon_colvismat_preview_marked_dot_color */
 .harpoon_preview_dot {
-  background-color: #a776e8 !important;
-  border-color: #9966d9 !important;
+ /* background-color: #a776e8 !important; */
+ /* border-color: #9966d9 !important; */
 }
 
 /* harpoon_colvismat_preview_segment_highlight_color */
 .harpoon_preview_segment {
-  background-color: #dbcbf1 !important;
+  /* background-color: #dbcbf1 !important; */
 }
 
 /* Add your custom table styles here */
