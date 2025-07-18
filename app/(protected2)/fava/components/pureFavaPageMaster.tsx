@@ -15,7 +15,7 @@ import FavaTrelnoColumnsDefBox from './favaTrelnoColumnsDefBox';
 import FavaColVisMatMainBar, { useColumnVisibilityData } from './favaColVisMatMainBar';
 import FavaMinimalTable from './favaMinimalTable';
 import { FavaPaginationProvider } from './pagination/favaPaginationProvider';
-import FavaPaginationControlsFunctional from './pagination/favaPaginationControlsFunctional';
+import FavaPaginationControlsWorking from './pagination/favaPaginationControlsWorking';
 import FavaMinimalTablePaginated from './pagination/favaMinimalTablePaginated';
 import { FavaPaginationConfig } from './pagination/favaPaginationTypes';
 import '../styles/fava-table-template.css';
@@ -218,7 +218,7 @@ export default function PureFavaPageMaster({
           {toolbarContent}
         </div>
         
-        {/* Table Section - with automatic functional pagination */}
+        {/* Table Section - with automatic working pagination */}
         {showTable && tableProps && (
           <div className="fava-table-section" style={{ marginBottom: '20px' }}>
             {/* Wrap table with pagination provider if data is provided */}
@@ -230,7 +230,7 @@ export default function PureFavaPageMaster({
               >
                 <FavaMinimalTablePaginated {...tableProps} />
                 {showPaginationControls && (
-                  <FavaPaginationControlsFunctional data={tableProps.data} />
+                  <FavaPaginationControlsWorking data={tableProps.data} />
                 )}
               </FavaPaginationProvider>
             ) : (

@@ -4,9 +4,9 @@ import { useFavaPagination, usePaginatedData } from './favaPaginationProvider';
 import { getVisiblePageNumbers } from './favaPaginationUtils';
 
 /**
- * Functional pagination hook with additional utilities
+ * Working pagination hook with additional utilities
  */
-export function useFunctionalPagination<T = any>(data: T[]) {
+export function useWorkingPagination<T = any>(data: T[]) {
   const pagination = useFavaPagination();
   const paginatedData = usePaginatedData(data);
   

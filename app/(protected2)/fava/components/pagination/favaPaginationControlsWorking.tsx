@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import { useFunctionalPagination } from './useFavaPagination';
+import { useWorkingPagination } from './useFavaPagination';
 
-interface FavaPaginationControlsFunctionalProps {
+interface FavaPaginationControlsWorkingProps {
   data: any[];
 }
 
-export default function FavaPaginationControlsFunctional({ 
+export default function FavaPaginationControlsWorking({ 
   data 
-}: FavaPaginationControlsFunctionalProps) {
+}: FavaPaginationControlsWorkingProps) {
   const {
     state,
     actions,
@@ -19,7 +19,7 @@ export default function FavaPaginationControlsFunctional({
     isLastPage,
     getPageInfoText,
     getPageRange
-  } = useFunctionalPagination(data);
+  } = useWorkingPagination(data);
 
   // Styles based on existing fava pagination controls
   const containerStyle = {
