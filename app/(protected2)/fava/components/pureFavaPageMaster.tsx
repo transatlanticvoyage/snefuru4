@@ -14,6 +14,10 @@ import FavaBiriDevInfoBox from './favaBiriDevInfoBox';
 import FavaTrelnoColumnsDefBox from './favaTrelnoColumnsDefBox';
 import FavaColVisMatMainBar, { useColumnVisibilityData } from './favaColVisMatMainBar';
 import FavaMinimalTable from './favaMinimalTable';
+import { FavaPaginationProvider } from './pagination/favaPaginationProvider';
+import FavaPaginationControlsFunctional from './pagination/favaPaginationControlsFunctional';
+import FavaMinimalTablePaginated from './pagination/favaMinimalTablePaginated';
+import { FavaPaginationConfig } from './pagination/favaPaginationTypes';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
 
@@ -36,6 +40,10 @@ interface PureFavaPageMasterProps {
   
   // Table configuration
   tableProps?: any;
+  
+  // Pagination configuration
+  paginationConfig?: FavaPaginationConfig;
+  pageKey?: string; // For localStorage pagination preferences
   
   // Custom content slots
   children?: ReactNode;
@@ -71,6 +79,8 @@ export default function PureFavaPageMaster({
   showColumnVisibilityMatrix = true,
   showTable = true,
   tableProps,
+  paginationConfig,
+  pageKey = 'default',
   children,
   headerContent,
   toolbarContent,
@@ -202,21 +212,38 @@ export default function PureFavaPageMaster({
           {showFilterControls && <FavaFilterControls />}
           {showSearchBox && <FavaSearchBox />}
           
-          {/* Pagination Controls */}
-          {showPaginationControls && (
-            <div style={{ marginBottom: '20px' }}>
-              <FavaPaginationControls />
-            </div>
-          )}
+          {/* Note: Pagination controls are now integrated with the table section */}
           
           {/* Custom toolbar content */}
           {toolbarContent}
         </div>
         
-        {/* Table Section */}
+        {/* Table Section - with automatic functional pagination */}
         {showTable && tableProps && (
           <div className="fava-table-section" style={{ marginBottom: '20px' }}>
-            <FavaMinimalTable {...tableProps} />
+            {/* Wrap table with pagination provider if data is provided */}
+            {tableProps.data && Array.isArray(tableProps.data) ? (
+              <FavaPaginationProvider 
+                data={tableProps.data}
+                config={paginationConfig}
+                pageKey={pageKey}
+              >
+                <FavaMinimalTablePaginated {...tableProps} />
+                {showPaginationControls && (
+                  <FavaPaginationControlsFunctional data={tableProps.data} />
+                )}
+              </FavaPaginationProvider>
+            ) : (
+              /* Fallback to non-paginated table for backward compatibility */
+              <>
+                <FavaMinimalTable {...tableProps} />
+                {showPaginationControls && (
+                  <div style={{ marginBottom: '20px' }}>
+                    <FavaPaginationControls />
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
         
