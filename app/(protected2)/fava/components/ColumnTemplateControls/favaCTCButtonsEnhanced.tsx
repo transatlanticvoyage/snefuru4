@@ -332,7 +332,7 @@ export default function FavaCTCButtonsEnhanced({
         fontWeight: 'bold',
         color: '#856404'
       }}>
-        Enhanced Buttons
+        Enhanced Buttons Ocean
       </h3>
       
       <div style={{

@@ -357,7 +357,7 @@ export default function FavaCTCButtonsClassic({
           marginBottom: '8px',
           width: '100%'
         }}>
-          Classic Buttons
+          Classic Buttons Ocean
         </div>
         <strong>db tables:</strong> coltemps AND denbu_columns
 
