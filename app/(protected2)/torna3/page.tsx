@@ -230,60 +230,6 @@ export default function Torna3Page() {
         torna3TableConfig.columns.length
       )}
     >
-      {/* Custom content specific to Nemtor Units */}
-      <div style={{ 
-        marginTop: '20px', 
-        padding: '15px', 
-        backgroundColor: '#e6f3ff', 
-        borderRadius: '8px',
-        border: '1px solid #b3d9ff'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <div style={{ flex: 1 }}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>
-              Nemtor Units Database Overview
-            </h3>
-          </div>
-          <div style={{ marginLeft: '20px', marginTop: '-5px' }}>
-            <div className="font-bold text-white rounded" style={{
-              backgroundColor: '#800000',
-              fontSize: '16px',
-              paddingLeft: '12px',
-              paddingRight: '12px',
-              paddingTop: '8px',
-              paddingBottom: '8px',
-              display: 'inline-block'
-            }}>
-              Tani Popup Available
-            </div>
-          </div>
-        </div>
-        <p style={{ margin: '0 0 10px 0', color: '#004080', fontSize: '14px' }}>
-          This page displays all Nemtor units using the Fava template system. Each unit represents 
-          an Elementor widget or component with comprehensive metadata including settings, styles, 
-          and hierarchical relationships.
-        </p>
-        <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: '#003366' }}>
-          <div>
-            <strong>Key Features:</strong>
-            <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
-              <li>Complete field visibility (32 columns)</li>
-              <li>Grouped header organization</li>
-              <li>JSON field previews</li>
-              <li>Timestamp formatting</li>
-            </ul>
-          </div>
-          <div>
-            <strong>Data Categories:</strong>
-            <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
-              <li>Identifiers & Element Properties</li>
-              <li>Text Content & JSON Data</li>
-              <li>Image Properties & Slots</li>
-              <li>TAR Content Management</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </FavaPageMasterWithPagination>
   );
 }

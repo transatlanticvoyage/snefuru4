@@ -69,7 +69,8 @@ export default function FavaPaginationControlsOriginal() {
   const qtyOptions = config.pageSizeOptions || [10, 25, 50, 100, 200];
   const showAll = state.totalItems <= 500; // Only show "All" for reasonable data sizes
 
-  const handleQuantityChange = (qty: number | 'all') => {
+  const handleQuantityChange = (qty: number | 'all', event: React.MouseEvent) => {
+    event.preventDefault();
     if (qty === 'all') {
       actions.setItemsPerPage(state.totalItems);
     } else {
@@ -87,7 +88,7 @@ export default function FavaPaginationControlsOriginal() {
           <button
             key={qty}
             style={qtyButtonStyle(state.itemsPerPage === qty)}
-            onClick={() => handleQuantityChange(qty)}
+            onClick={(event) => handleQuantityChange(qty, event)}
           >
             {qty}
           </button>
@@ -95,7 +96,7 @@ export default function FavaPaginationControlsOriginal() {
         {showAll && (
           <button
             style={qtyButtonStyle(state.itemsPerPage === state.totalItems)}
-            onClick={() => handleQuantityChange('all')}
+            onClick={(event) => handleQuantityChange('all', event)}
           >
             All
           </button>
@@ -106,7 +107,10 @@ export default function FavaPaginationControlsOriginal() {
       <div style={buttonBarStyle}>
         <button
           style={navButtonStyle(!state.hasPreviousPage)}
-          onClick={() => actions.goToPreviousPage()}
+          onClick={(event) => {
+            event.preventDefault();
+            actions.goToPreviousPage();
+          }}
           disabled={!state.hasPreviousPage}
         >
           «
@@ -116,7 +120,10 @@ export default function FavaPaginationControlsOriginal() {
           <button
             key={pageNum}
             style={pageButtonStyle(state.currentPage === pageNum)}
-            onClick={() => actions.goToPage(pageNum)}
+            onClick={(event) => {
+              event.preventDefault();
+              actions.goToPage(pageNum);
+            }}
           >
             {pageNum}
           </button>
@@ -124,7 +131,10 @@ export default function FavaPaginationControlsOriginal() {
         
         <button
           style={navButtonStyle(!state.hasNextPage)}
-          onClick={() => actions.goToNextPage()}
+          onClick={(event) => {
+            event.preventDefault();
+            actions.goToNextPage();
+          }}
           disabled={!state.hasNextPage}
         >
           »

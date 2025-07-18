@@ -75,7 +75,7 @@ export default function FavaPageMasterWithPagination({
     Object.entries(params).forEach(([key, value]) => {
       urlParams.set(key, value.toString());
     });
-    router.push(`${window.location.pathname}?${urlParams.toString()}`);
+    router.replace(`${window.location.pathname}?${urlParams.toString()}`, { scroll: false });
   };
 
   // Enhanced pagination config with URL support
@@ -98,9 +98,21 @@ export default function FavaPageMasterWithPagination({
           onPageChange={(page) => handleURLChange({ page })}
           onItemsPerPageChange={(itemsPerPage) => handleURLChange({ itemsPerPage, page: 1 })}
         >
-          <FavaMinimalTablePaginated {...tableProps} />
+          {/* Pagination controls above table */}
           {showPaginationControls && (
-            <FavaPaginationControlsOriginal />
+            <div style={{ marginBottom: '15px' }}>
+              <FavaPaginationControlsOriginal />
+            </div>
+          )}
+          
+          {/* Table */}
+          <FavaMinimalTablePaginated {...tableProps} />
+          
+          {/* Pagination controls below table */}
+          {showPaginationControls && (
+            <div style={{ marginTop: '15px' }}>
+              <FavaPaginationControlsOriginal />
+            </div>
           )}
         </FavaPaginationProvider>
       </div>

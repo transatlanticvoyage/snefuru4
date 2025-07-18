@@ -227,9 +227,21 @@ export default function PureFavaPageMaster({
               config={paginationConfig}
               pageKey={pageKey}
             >
-              <FavaMinimalTablePaginated {...tableProps} />
+              {/* Pagination controls above table */}
               {showPaginationControls && (
-                <FavaPaginationControlsOriginal />
+                <div style={{ marginBottom: '15px' }}>
+                  <FavaPaginationControlsOriginal />
+                </div>
+              )}
+              
+              {/* Table */}
+              <FavaMinimalTablePaginated {...tableProps} />
+              
+              {/* Pagination controls below table */}
+              {showPaginationControls && (
+                <div style={{ marginTop: '15px' }}>
+                  <FavaPaginationControlsOriginal />
+                </div>
               )}
             </FavaPaginationProvider>
           </div>
