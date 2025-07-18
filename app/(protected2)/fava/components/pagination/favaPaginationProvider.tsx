@@ -23,7 +23,10 @@ export function FavaPaginationProvider({
   children,
   data,
   config = {},
-  pageKey = 'default'
+  pageKey = 'default',
+  initialPage,
+  onPageChange,
+  onItemsPerPageChange
 }: FavaPaginationProviderProps) {
   const mergedConfig: FavaPaginationConfig = { ...DEFAULT_PAGINATION_CONFIG, ...config };
   
@@ -34,7 +37,7 @@ export function FavaPaginationProvider({
     mergedConfig.defaultItemsPerPage!
   );
   
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage || 1);
   const [itemsPerPage, setItemsPerPageState] = useState(savedItemsPerPage);
   
   // Calculate pagination state
@@ -54,26 +57,33 @@ export function FavaPaginationProvider({
     goToPage: (page: number) => {
       const validPage = validatePageNumber(page, state.totalPages);
       setCurrentPage(validPage);
+      onPageChange?.(validPage);
     },
 
     goToNextPage: () => {
       if (state.hasNextPage) {
-        setCurrentPage(currentPage + 1);
+        const nextPage = currentPage + 1;
+        setCurrentPage(nextPage);
+        onPageChange?.(nextPage);
       }
     },
 
     goToPreviousPage: () => {
       if (state.hasPreviousPage) {
-        setCurrentPage(currentPage - 1);
+        const prevPage = currentPage - 1;
+        setCurrentPage(prevPage);
+        onPageChange?.(prevPage);
       }
     },
 
     goToFirstPage: () => {
       setCurrentPage(1);
+      onPageChange?.(1);
     },
 
     goToLastPage: () => {
       setCurrentPage(state.totalPages);
+      onPageChange?.(state.totalPages);
     },
 
     setItemsPerPage: (newItemsPerPage: number) => {
@@ -82,6 +92,9 @@ export function FavaPaginationProvider({
       
       // Save preference to localStorage
       savePaginationPreference(pageKey, 'itemsPerPage', newItemsPerPage);
+      
+      // Call the callback
+      onItemsPerPageChange?.(newItemsPerPage);
     },
 
     setTotalItems: (totalItems: number) => {

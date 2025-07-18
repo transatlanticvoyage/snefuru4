@@ -18,6 +18,7 @@ import FavaTaniConditionalProvider from './favaTaniPopup/favaTaniConditionalProv
 import { FavaTaniButtonConditional, FavaTaniPopupConditional } from './favaTaniPopup/favaTaniConditionalComponents';
 import { FavaTaniFeatureFlags, FAVA_TANI_PRESETS } from '../config/favaTaniFeatureFlags';
 import { FavaTaniConfig, FAVA_TANI_DEFAULT_CONFIG } from './favaTaniPopup/types';
+import { FavaPaginationConfig } from './pagination/favaPaginationTypes';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
 
@@ -40,6 +41,10 @@ interface FavaPageMasterProps {
   
   // Table configuration
   tableProps?: any;
+  
+  // Pagination configuration
+  paginationConfig?: FavaPaginationConfig;
+  pageKey?: string; // For localStorage pagination preferences
   
   // Custom content slots
   children?: ReactNode;
@@ -73,6 +78,8 @@ export default function FavaPageMaster({
   showColumnVisibilityMatrix = true,
   showTable = true,
   tableProps,
+  paginationConfig,
+  pageKey = 'default',
   children,
   headerContent,
   toolbarContent,
@@ -113,6 +120,8 @@ export default function FavaPageMaster({
         showColumnVisibilityMatrix={showColumnVisibilityMatrix}
         showTable={showTable}
         tableProps={tableProps}
+        paginationConfig={paginationConfig}
+        pageKey={pageKey}
         headerContent={headerContent}
         toolbarContent={toolbarContent}
         footerContent={footerContent}
@@ -149,6 +158,8 @@ export default function FavaPageMaster({
         showColumnVisibilityMatrix={showColumnVisibilityMatrix}
         showTable={showTable}
         tableProps={tableProps}
+        paginationConfig={paginationConfig}
+        pageKey={pageKey}
         headerContent={headerContent}
         toolbarContent={toolbarContent}
         footerContent={footerContent}

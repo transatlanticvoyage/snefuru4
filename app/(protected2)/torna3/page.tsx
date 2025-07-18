@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useFavaTaniSafe } from '../fava/components/favaTaniPopup/favaTaniConditionalProvider';
-import FavaPageMaster from '../fava/components/favaPageMaster';
+import FavaPageMasterWithPagination from '../fava/components/favaPageMasterWithPagination';
 import { torna3TableConfig } from '../fava/config/torna3TableConfig';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { createTorna3TaniConfig } from './taniContent';
@@ -136,6 +136,12 @@ export default function Torna3Page() {
     })
   );
 
+  // Debug logging for pagination issue
+  console.log('TORNA3 - activeColumns.length:', activeColumns.length);
+  console.log('TORNA3 - visibleColumns.length:', visibleColumns.length);
+  console.log('TORNA3 - data.length:', data.length);
+  console.log('TORNA3 - data structure:', data.slice(0, 2)); // Show first 2 rows
+
   // Generate tooltips for visible columns only
   const cellTooltips = nemtorData.map(() => 
     visibleColumns.map(col => `${col.header}: ${col.field}`)
@@ -187,8 +193,9 @@ export default function Torna3Page() {
     return <div>Loading nemtor units...</div>;
   }
 
+
   return (
-    <FavaPageMaster
+    <FavaPageMasterWithPagination
       pageTitle="Tornado Page Editor System"
       pageDescription={`${nemtorData.length} units • ${visibleColumns.length} of ${torna3TableConfig.columns.length} columns shown • Elementor widget tracking`}
       documentTitle="Nemtor Units - /torna3"
@@ -201,6 +208,18 @@ export default function Torna3Page() {
       showPaginationControls={true}
       showBiriDevInfoBox={true}
       showTrelnoColumnsDefBox={true}
+      
+      // Pagination configuration
+      enableURLParams={true}
+      paginationPosition="bottom"
+      pageKey="torna3"
+      paginationConfig={{
+        defaultItemsPerPage: 20,
+        pageSizeOptions: [10, 20, 50, 100],
+        showPageSizeSelector: true,
+        showPageInfo: true,
+        showNavigationButtons: true
+      }}
       
       // FavaTani Popup Configuration
       taniEnabled={true}
@@ -265,6 +284,6 @@ export default function Torna3Page() {
           </div>
         </div>
       </div>
-    </FavaPageMaster>
+    </FavaPageMasterWithPagination>
   );
 }

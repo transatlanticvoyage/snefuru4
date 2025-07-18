@@ -39,6 +39,9 @@ export interface FavaPaginationProviderProps {
   data: any[];
   config?: FavaPaginationConfig;
   pageKey?: string; // For localStorage keys
+  initialPage?: number; // For URL-based initial page
+  onPageChange?: (page: number) => void; // Callback for page changes
+  onItemsPerPageChange?: (itemsPerPage: number) => void; // Callback for items per page changes
 }
 
 export interface PaginatedData<T = any> {
