@@ -11,10 +11,12 @@ import Torna3Ptab7Content from './ptab7Content';
 export const createTorna3TaniConfig = (
   nemtorData: any[],
   visibleColumns: any[],
-  totalColumns: number
+  totalColumns: number,
+  utg_id?: string | number
 ): Partial<FavaTaniConfig> => ({
   id: 'torna3-nemtor-functions',
   title: 'Nemtor Functions',
+  utg_id: utg_id,
   button: {
     text: 'tani popup',
     position: 'bottom-right',

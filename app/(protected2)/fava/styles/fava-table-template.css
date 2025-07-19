@@ -22,3 +22,100 @@
 }
 
 /* Add your custom table styles here */
+
+/* ==========================================
+   PLUTO CONTROL SYSTEM - CHAMBER CLASSES
+   ========================================== */
+
+/* Base pluto control classes */
+.pluto-controlled {
+  position: relative;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.pluto-visible {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+  /* Debug: This should show the element */
+  border: 3px solid green !important;
+}
+
+.pluto-hidden {
+  display: none !important;
+  opacity: 0;
+  transform: scale(0.95);
+  /* Debug: This should hide the element */
+  background-color: red !important;
+}
+
+/* Chamber-specific classes */
+.ocean-classic-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0; /* Let parent handle spacing */
+}
+
+.ocean-enhanced-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+.shendo-classic-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+.shendo-enhanced-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+.harpoon-preview-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+.harpoon-active-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+.rowfilters-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+.searchbox-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+.pagination-specific-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+.pagination-qty-chamber {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
+/* Optional: Debug mode to visualize all pluto-controlled components */
+.pluto-debug .pluto-controlled {
+  outline: 2px dashed #007bff;
+  outline-offset: 2px;
+}
+
+.pluto-debug .pluto-controlled:hover {
+  outline-color: #ff6b6b;
+}

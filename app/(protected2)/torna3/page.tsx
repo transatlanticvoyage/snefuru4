@@ -12,6 +12,7 @@ export default function Torna3Page() {
   const [loading, setLoading] = useState(true);
   const [activeColumns, setActiveColumns] = useState<string[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+  const [utg_id, setUtgId] = useState<string | null>(null);
   const taniState = useFavaTaniSafe()?.state;
   const supabase = createClientComponentClient();
 
@@ -43,6 +44,7 @@ export default function Torna3Page() {
     const url = new URL(window.location.href);
     const coltempId = url.searchParams.get('coltemp_id');
     if (coltempId) {
+      setUtgId(coltempId);
       applyTemplate(parseInt(coltempId));
     } else {
       // Load all columns by default
@@ -227,8 +229,10 @@ export default function Torna3Page() {
       taniConfig={createTorna3TaniConfig(
         nemtorData,
         visibleColumns,
-        torna3TableConfig.columns.length
+        torna3TableConfig.columns.length,
+        utg_id
       )}
+      utg_id={utg_id}
     >
     </FavaPageMasterWithPagination>
   );

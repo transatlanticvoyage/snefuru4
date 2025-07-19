@@ -84,6 +84,7 @@ export interface FavaTaniConfig {
   colorScheme?: string;                 // Default color scheme key
   flags?: Partial<FavaTaniFeatureFlags>; // Feature overrides
   contentSlots?: FavaTaniContentSlots;  // Per-page custom content
+  utg_id?: string | number;             // User/template group ID for pluto settings
 }
 
 export interface FavaTaniContentMap {

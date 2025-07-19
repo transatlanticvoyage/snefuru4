@@ -62,6 +62,9 @@ interface FavaPageMasterProps {
   taniFlags?: Partial<FavaTaniFeatureFlags>;
   taniPreset?: keyof typeof FAVA_TANI_PRESETS;
   taniContent?: ReactNode; // Deprecated - use taniConfig.contentSlots instead
+  
+  // Pluto settings
+  utg_id?: string | number;
 }
 
 export default function FavaPageMaster({
@@ -92,7 +95,10 @@ export default function FavaPageMaster({
   taniConfig = {},
   taniFlags = {},
   taniPreset = 'standard',
-  taniContent
+  taniContent,
+  
+  // Pluto settings
+  utg_id
 }: FavaPageMasterProps) {
   // Determine final Tani configuration
   const resolvedTaniFlags = taniPreset ? FAVA_TANI_PRESETS[taniPreset] : { ...FAVA_TANI_PRESETS.standard, ...taniFlags };
@@ -127,6 +133,7 @@ export default function FavaPageMaster({
         footerContent={footerContent}
         contentPadding={contentPadding}
         contentStyle={contentStyle}
+        utg_id={utg_id}
       >
         {children}
       </PureFavaPageMaster>
@@ -165,6 +172,7 @@ export default function FavaPageMaster({
         footerContent={footerContent}
         contentPadding={contentPadding}
         contentStyle={contentStyle}
+        utg_id={utg_id}
       >
         {children}
       </PureFavaPageMaster>

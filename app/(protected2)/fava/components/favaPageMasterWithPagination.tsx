@@ -42,6 +42,9 @@ interface FavaPageMasterWithPaginationProps {
   paginationPosition?: 'top' | 'bottom' | 'both';
   paginationConfig?: FavaPaginationConfig;
   pageKey?: string;
+  
+  // Pluto settings
+  utg_id?: string | number;
 }
 
 export default function FavaPageMasterWithPagination({
