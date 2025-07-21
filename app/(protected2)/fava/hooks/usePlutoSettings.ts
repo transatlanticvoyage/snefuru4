@@ -14,7 +14,6 @@ export interface PlutoSettings {
   rowfilters_chamber: boolean;
   searchbox: boolean;
   pagination_specificbar: boolean;
-  pagination_qtybar: boolean;
 }
 
 // Default settings - all chambers visible by default
@@ -28,8 +27,7 @@ export const DEFAULT_PLUTO_SETTINGS: PlutoSettings = {
   harpoon_active: true,
   rowfilters_chamber: true,
   searchbox: true,
-  pagination_specificbar: true,
-  pagination_qtybar: true
+  pagination_specificbar: true
 };
 
 /**

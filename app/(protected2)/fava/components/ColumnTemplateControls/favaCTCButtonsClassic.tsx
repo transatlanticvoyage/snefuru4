@@ -32,8 +32,9 @@ export default function FavaCTCButtonsClassic({
   utg_id,
   createSlots,
   getOverflowItems,
-  title
-}: CTCButtonsProps & { createSlots: any, getOverflowItems: any, title?: string }) {
+  title,
+  plutoClasses
+}: CTCButtonsProps & { createSlots: any, getOverflowItems: any, title?: string, plutoClasses?: string }) {
 
   // Reusable button component
   const ColtempButton = ({ 
@@ -242,19 +243,15 @@ export default function FavaCTCButtonsClassic({
   };
 
   // All existing styles
-  const topLabelStyle = {
-    color: '#fff',
-    width: '100px',
-    flexShrink: 0
-  };
-
   const innerWrapperStyle = {
     display: 'flex',
     flexWrap: 'wrap' as const,
     padding: '16px',
     gap: '8px',
     backgroundColor: '#fff',
-    flex: 1
+    flex: 1,
+    alignItems: 'flex-start',
+    alignContent: 'flex-start'
   };
 
   const buttonGroupColtempStyle = {
@@ -291,7 +288,7 @@ export default function FavaCTCButtonsClassic({
 
   const separatorStyle = {
     borderLeft: '3px solid #ccc',
-    height: '100%',
+    height: '24px',
     margin: '0 8px'
   };
 
@@ -342,14 +339,14 @@ export default function FavaCTCButtonsClassic({
   };
 
   return (
-    <div style={{
-      width: '100%',
-      height: '200px',
-      border: '1px solid #000',
-      backgroundColor: '#5a0e15',
-      display: 'flex'
-    }}>
-      <div style={topLabelStyle}>div.coltemp_board</div>
+    <div 
+      className={plutoClasses || ''}
+      style={{
+        width: '100%',
+        border: '1px solid #000',
+        backgroundColor: '#5a0e15',
+        display: 'flex'
+      }}>
       <div style={innerWrapperStyle}>
         <div className="chamber-label-box chamber-1" style={{ marginBottom: '8px' }}>
           {title || 'Classic Buttons Ocean'}
@@ -362,7 +359,7 @@ export default function FavaCTCButtonsClassic({
           const overflowItems = getOverflowItems(categoryData, category);
           
           return (
-            <div key={category} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div key={category} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
               <span style={separatorStyle}></span>
               
               <div style={{ display: 'flex', alignItems: 'center' }}>

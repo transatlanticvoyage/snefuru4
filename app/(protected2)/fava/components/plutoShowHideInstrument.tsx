@@ -13,7 +13,6 @@ interface PlutoSettings {
   rowfilters_chamber: boolean;
   searchbox: boolean;
   pagination_specificbar: boolean;
-  pagination_qtybar: boolean;
 }
 
 const DEFAULT_SETTINGS: PlutoSettings = {
@@ -25,8 +24,7 @@ const DEFAULT_SETTINGS: PlutoSettings = {
   harpoon_active: true,
   rowfilters_chamber: true,
   searchbox: true,
-  pagination_specificbar: true,
-  pagination_qtybar: true
+  pagination_specificbar: true
 };
 
 const CHAMBER_LABELS = [
@@ -38,8 +36,7 @@ const CHAMBER_LABELS = [
   'harpoon_active',
   'rowfilters_chamber',
   'searchbox',
-  'pagination_specificbar',
-  'pagination_qtybar'
+  'pagination_specificbar'
 ];
 
 // Mapping from internal chamber keys to CSS class names
@@ -52,8 +49,7 @@ const CHAMBER_CSS_CLASSES = {
   'harpoon_active': '.harpoon-active-chamber',
   'rowfilters_chamber': '.rowfilters-chamber',
   'searchbox': '.searchbox-chamber',
-  'pagination_specificbar': '.pagination-specific-chamber',
-  'pagination_qtybar': '.pagination-qty-chamber'
+  'pagination_specificbar': '.pagination-chief-chamber'
 };
 
 interface PlutoShowHideInstrumentProps {

@@ -11,7 +11,20 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
   const [currentSettings, setCurrentSettings] = useState<PlutoSettings | null>(null);
   const [effectiveSettings, setEffectiveSettings] = useState<PlutoSettings>(DEFAULT_PLUTO_SETTINGS);
   const [storageKey, setStorageKey] = useState<string>('');
-  const [isMinimized, setIsMinimized] = useState<boolean>(false);
+  const [isMinimized, setIsMinimized] = useState<boolean>(true); // Default to minimized
+
+  // Load minimized state from localStorage on mount
+  useEffect(() => {
+    const savedState = localStorage.getItem('pluto_debug_monitor_minimized');
+    if (savedState !== null) {
+      setIsMinimized(savedState === 'true');
+    }
+  }, []);
+
+  // Save minimized state when it changes
+  useEffect(() => {
+    localStorage.setItem('pluto_debug_monitor_minimized', isMinimized.toString());
+  }, [isMinimized]);
 
   useEffect(() => {
     const key = `fava_pluto_settings_${utg_id || 'default'}`;

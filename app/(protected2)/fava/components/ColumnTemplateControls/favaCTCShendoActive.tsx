@@ -30,44 +30,24 @@ export default function FavaCTCShendoActive({
     return unsubscribe;
   }, [templates, utg_id]);
 
-  // Render both classic and enhanced shendo bars with independent chamber control
+  // Render both classic and enhanced shendo bars with pluto classes applied directly
   return (
     <>
-      <div 
-        className={getChamberClasses(plutoSettings, 'ctc_shendo_classic', 'shendo-classic-chamber')}
-        data-debug-utg-id={utg_id}
-        data-debug-visible={plutoSettings.ctc_shendo_classic}
-        style={{
-          border: '2px solid darkgreen',
-          padding: '5px',
-          margin: '5px 0'
-        }}
-      >
-        <FavaCTCShendoClassic
-          category={selectedCategory}
-          categoryData={categoryData}
-          activeTemplateId={activeTemplateId}
-          onTemplateSelect={onTemplateSelect}
-        />
-      </div>
+      <FavaCTCShendoClassic
+        category={selectedCategory}
+        categoryData={categoryData}
+        activeTemplateId={activeTemplateId}
+        onTemplateSelect={onTemplateSelect}
+        plutoClasses={getChamberClasses(plutoSettings, 'ctc_shendo_classic', 'shendo-classic-chamber')}
+      />
       
-      <div 
-        className={getChamberClasses(plutoSettings, 'ctc_shendo_enhanced', 'shendo-enhanced-chamber')}
-        data-debug-utg-id={utg_id}
-        data-debug-visible={plutoSettings.ctc_shendo_enhanced}
-        style={{
-          border: '2px solid green',
-          padding: '5px',
-          margin: '5px 0'
-        }}
-      >
-        <FavaCTCShendoEnhanced
-          category={selectedCategory}
-          categoryData={categoryData}
-          activeTemplateId={activeTemplateId}
-          onTemplateSelect={onTemplateSelect}
-        />
-      </div>
+      <FavaCTCShendoEnhanced
+        category={selectedCategory}
+        categoryData={categoryData}
+        activeTemplateId={activeTemplateId}
+        onTemplateSelect={onTemplateSelect}
+        plutoClasses={getChamberClasses(plutoSettings, 'ctc_shendo_enhanced', 'shendo-enhanced-chamber')}
+      />
     </>
   );
 }

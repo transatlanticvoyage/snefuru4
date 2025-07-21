@@ -185,23 +185,22 @@ export default function PureFavaPageMaster({
         {/* Controls Section */}
         <div className="fava-controls-section" style={{ marginBottom: '20px' }}>
           {showColumnTemplateControls && (
-            <FavaCTCMaster>
+            <FavaCTCMaster utg_id={String(utg_id || '')}>
               {({ state, handlers }) => (
                 <div>
-                  <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic', 'ocean-classic-chamber')}>
-                    <FavaCTCButtonsClassic
-                      templates={state.templates}
-                      activeTemplateId={state.activeTemplateId}
-                      dropdownOpen={state.dropdownOpen}
-                      onTemplateSelect={handlers.selectTemplate}
-                      onShendoClick={handlers.handleShendoClick}
-                      onOpenCJ={handlers.openCJ}
-                      onToggleDropdown={handlers.toggleDropdown}
-                      utg_id={handlers.currentUtgId}
-                      createSlots={handlers.createSlots}
-                      getOverflowItems={handlers.getOverflowItems}
-                    />
-                  </div>
+                  <FavaCTCButtonsClassic
+                    templates={state.templates}
+                    activeTemplateId={state.activeTemplateId}
+                    dropdownOpen={state.dropdownOpen}
+                    onTemplateSelect={handlers.selectTemplate}
+                    onShendoClick={handlers.handleShendoClick}
+                    onOpenCJ={handlers.openCJ}
+                    onToggleDropdown={handlers.toggleDropdown}
+                    utg_id={String(utg_id || '')}
+                    createSlots={handlers.createSlots}
+                    getOverflowItems={handlers.getOverflowItems}
+                    plutoClasses={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic', 'ocean-classic-chamber')}
+                  />
                   <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic_2', 'ocean-classic-chamber-2')}>
                     <FavaCTCButtonsClassic
                       templates={state.templates}
@@ -211,7 +210,7 @@ export default function PureFavaPageMaster({
                       onShendoClick={handlers.handleShendoClick}
                       onOpenCJ={handlers.openCJ}
                       onToggleDropdown={handlers.toggleDropdown}
-                      utg_id={handlers.currentUtgId}
+                      utg_id={String(utg_id || '')}
                       createSlots={handlers.createSlots}
                       getOverflowItems={handlers.getOverflowItems}
                       title="Classic Buttons Ocean 2"
@@ -227,7 +226,7 @@ export default function PureFavaPageMaster({
                       onShendoClick={handlers.handleShendoClick}
                       onOpenCJ={handlers.openCJ}
                       onToggleDropdown={handlers.toggleDropdown}
-                      utg_id={handlers.currentUtgId}
+                      utg_id={String(utg_id || '')}
                       createSlots={handlers.createSlots}
                       getOverflowItems={handlers.getOverflowItems}
                     />
@@ -238,7 +237,7 @@ export default function PureFavaPageMaster({
                       templates={state.templates}
                       activeTemplateId={state.activeTemplateId}
                       onTemplateSelect={handlers.selectTemplate}
-                      utg_id={String(utg_id || '')}
+                      utg_id={utg_id}
                     />
                   )}
                 </div>
@@ -283,7 +282,7 @@ export default function PureFavaPageMaster({
               {/* Pagination controls above table */}
               {showPaginationControls && (
                 <div 
-                  className={getChamberClasses(plutoSettings, 'pagination_specificbar', 'pagination-specific-chamber')}
+                  className={getChamberClasses(plutoSettings, 'pagination_specificbar', 'pagination-chief-chamber')}
                   data-debug-utg-id={utg_id}
                   data-debug-visible={plutoSettings.pagination_specificbar}
                   style={{
@@ -298,22 +297,6 @@ export default function PureFavaPageMaster({
               
               {/* Table */}
               <FavaMinimalTablePaginated {...tableProps} />
-              
-              {/* Pagination controls below table */}
-              {showPaginationControls && (
-                <div 
-                  className={getChamberClasses(plutoSettings, 'pagination_qtybar', 'pagination-qty-chamber')}
-                  data-debug-utg-id={utg_id}
-                  data-debug-visible={plutoSettings.pagination_qtybar}
-                  style={{
-                    border: '2px dashed navy',
-                    padding: '5px',
-                    marginTop: '15px'
-                  }}
-                >
-                  <FavaPaginationControlsOriginal />
-                </div>
-              )}
             </FavaPaginationProvider>
           </div>
         )}

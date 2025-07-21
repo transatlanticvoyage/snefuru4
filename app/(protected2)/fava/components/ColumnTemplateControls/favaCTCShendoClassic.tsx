@@ -6,13 +6,15 @@ interface FavaCTCShendoClassicProps {
   categoryData: ColtempData[];
   activeTemplateId: number | null;
   onTemplateSelect: (templateId: number, template: ColtempData) => void;
+  plutoClasses?: string;
 }
 
 export default function FavaCTCShendoClassic({
   category,
   categoryData,
   activeTemplateId,
-  onTemplateSelect
+  onTemplateSelect,
+  plutoClasses
 }: FavaCTCShendoClassicProps) {
   
   // Button styles (same as column template controls)
@@ -70,7 +72,7 @@ export default function FavaCTCShendoClassic({
   };
 
   return (
-    <div className="shendo_bar_div_classic" style={shendoBarDivStyle}>
+    <div className={`shendo_bar_div_classic${plutoClasses ? ' ' + plutoClasses : ''}`} style={shendoBarDivStyle}>
       <div style={{ ...buttonGroupStyle, alignItems: 'center' }}>
         <div className="chamber-label-box chamber-3" style={{ marginRight: '8px' }}>
           Shendo Classic

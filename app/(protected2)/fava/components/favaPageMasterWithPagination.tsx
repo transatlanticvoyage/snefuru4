@@ -108,7 +108,7 @@ export default function FavaPageMasterWithPagination({
           {/* Pagination controls above table */}
           {showPaginationControls && (
             <div 
-              className={getChamberClasses(plutoSettings, 'pagination_specificbar', 'pagination-specific-chamber')}
+              className={getChamberClasses(plutoSettings, 'pagination_specificbar', 'pagination-chief-chamber')}
               data-debug-utg-id={favaProps.utg_id}
               data-debug-visible={plutoSettings.pagination_specificbar}
               style={{
@@ -123,22 +123,6 @@ export default function FavaPageMasterWithPagination({
           
           {/* Table */}
           <FavaMinimalTablePaginated {...tableProps} />
-          
-          {/* Pagination controls below table */}
-          {showPaginationControls && (
-            <div 
-              className={getChamberClasses(plutoSettings, 'pagination_qtybar', 'pagination-qty-chamber')}
-              data-debug-utg-id={favaProps.utg_id}
-              data-debug-visible={plutoSettings.pagination_qtybar}
-              style={{
-                border: '2px dashed navy',
-                padding: '5px',
-                marginTop: '15px'
-              }}
-            >
-              <FavaPaginationControlsOriginal />
-            </div>
-          )}
         </FavaPaginationProvider>
       </div>
     );

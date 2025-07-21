@@ -7,6 +7,7 @@ interface FavaCTCShendoEnhancedProps {
   categoryData: ColtempData[];
   activeTemplateId: number | null;
   onTemplateSelect: (templateId: number, template: ColtempData) => void;
+  plutoClasses?: string;
 }
 
 interface FavaMultiDeckButtonProps {
@@ -177,7 +178,8 @@ export default function FavaCTCShendoEnhanced({
   category,
   categoryData,
   activeTemplateId,
-  onTemplateSelect
+  onTemplateSelect,
+  plutoClasses
 }: FavaCTCShendoEnhancedProps) {
   
   const shendoBarDivStyle = {
@@ -196,7 +198,7 @@ export default function FavaCTCShendoEnhanced({
   };
 
   return (
-    <div className="shendo_bar_div_enhanced" style={shendoBarDivStyle}>
+    <div className={`shendo_bar_div_enhanced${plutoClasses ? ' ' + plutoClasses : ''}`} style={shendoBarDivStyle}>
       <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap', alignItems: 'center' }}>
         <div className="chamber-label-box chamber-4" style={{ marginRight: '8px' }}>
           Shendo Enhanced
