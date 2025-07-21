@@ -213,7 +213,7 @@ export default function PureFavaPageMaster({
                       utg_id={String(utg_id || '')}
                       createSlots={handlers.createSlots}
                       getOverflowItems={handlers.getOverflowItems}
-                      title="Classic Buttons Ocean 2"
+                      title="Classic Buttons Ocean 2 (remove later)"
                     />
                   </div>
                   <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_enhanced', 'ocean-enhanced-chamber')}>
@@ -237,7 +237,7 @@ export default function PureFavaPageMaster({
                       templates={state.templates}
                       activeTemplateId={state.activeTemplateId}
                       onTemplateSelect={handlers.selectTemplate}
-                      utg_id={utg_id}
+                      utg_id={String(utg_id || '')}
                     />
                   )}
                 </div>

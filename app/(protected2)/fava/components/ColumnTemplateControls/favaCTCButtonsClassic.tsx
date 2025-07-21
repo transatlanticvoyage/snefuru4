@@ -348,7 +348,7 @@ export default function FavaCTCButtonsClassic({
         display: 'flex'
       }}>
       <div style={innerWrapperStyle}>
-        <div className="chamber-label-box chamber-1" style={{ marginBottom: '8px' }}>
+        <div className="chamber-label-box clb-ocean-classic" style={{ marginBottom: '8px' }}>
           {title || 'Classic Buttons Ocean'}
         </div>
         <strong>db tables:</strong> coltemps AND denbu_columns

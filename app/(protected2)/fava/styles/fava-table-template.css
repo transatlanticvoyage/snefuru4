@@ -134,17 +134,16 @@
   line-height: 1.2;
 }
 
-/* Alternating colors for different chambers */
-.chamber-label-box.chamber-1 { border-color: lightblue; color: #0066cc; }
-.chamber-label-box.chamber-2 { border-color: gray; color: #555; }
-.chamber-label-box.chamber-3 { border-color: lightblue; color: #0066cc; }
-.chamber-label-box.chamber-4 { border-color: gray; color: #555; }
-.chamber-label-box.chamber-5 { border-color: lightblue; color: #0066cc; }
-.chamber-label-box.chamber-6 { border-color: gray; color: #555; }
-.chamber-label-box.chamber-7 { border-color: lightblue; color: #0066cc; }
-.chamber-label-box.chamber-8 { border-color: gray; color: #555; }
-.chamber-label-box.chamber-9 { border-color: lightblue; color: #0066cc; }
-.chamber-label-box.chamber-10 { border-color: gray; color: #555; }
+/* Semantic chamber label box colors */
+.chamber-label-box.clb-ocean-classic { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.clb-ocean-enhanced { border-color: gray; color: #555; }
+.chamber-label-box.clb-shendo-classic { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.clb-shendo-enhanced { border-color: gray; color: #555; }
+.chamber-label-box.clb-harpoon-preview { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.clb-harpoon-active { border-color: gray; color: #555; }
+.chamber-label-box.clb-rowfilters { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.clb-searchbox { border-color: gray; color: #555; }
+.chamber-label-box.clb-pagination-chief { border-color: lightblue; color: #0066cc; }
 
 /* Flex layout for chamber with label box */
 .chamber-with-label {

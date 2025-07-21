@@ -157,3 +157,106 @@ export const getChamberClasses = (
   
   return classes;
 };
+
+/**
+ * Enhanced hook that provides both settings and control methods
+ * @param utg_id - User/template group ID for scoped settings
+ * @returns Object with settings and control methods
+ */
+export const usePlutoInstrumentControls = (utg_id?: string | number) => {
+  const settings = usePlutoSettings(utg_id);
+  
+  // Generate storage key
+  const getStorageKey = () => {
+    return `fava_pluto_settings_${utg_id || 'default'}`;
+  };
+
+  // Save settings to localStorage
+  const saveSettings = (newSettings: PlutoSettings) => {
+    try {
+      const storageKey = getStorageKey();
+      console.log('🔍 usePlutoInstrumentControls - Saving to localStorage:', {
+        storageKey,
+        settings: newSettings,
+        stringified: JSON.stringify(newSettings)
+      });
+      
+      localStorage.setItem(storageKey, JSON.stringify(newSettings));
+      
+      // Verify the save worked
+      const verification = localStorage.getItem(storageKey);
+      console.log('🔍 usePlutoInstrumentControls - Verification after save:', verification);
+      
+      // Dispatch a storage event for cross-component communication
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: storageKey,
+        newValue: JSON.stringify(newSettings),
+        oldValue: null,
+        storageArea: localStorage
+      }));
+      
+      // Dispatch custom event for same-tab communication
+      window.dispatchEvent(new CustomEvent('pluto-settings-changed', {
+        detail: {
+          utg_id: utg_id,
+          settings: newSettings,
+          storageKey: storageKey
+        }
+      }));
+      
+    } catch (error) {
+      console.error('Error saving pluto settings to localStorage:', error);
+    }
+  };
+
+  // Handle toggle change
+  const handleToggleChange = (chamber: keyof PlutoSettings, value: boolean) => {
+    console.log('🔍 usePlutoInstrumentControls - Toggle changed:', {
+      chamber,
+      oldValue: settings[chamber],
+      newValue: value,
+      utg_id,
+      storageKey: getStorageKey()
+    });
+    
+    const newSettings = { ...settings, [chamber]: value };
+    console.log('🔍 usePlutoInstrumentControls - New settings to save:', newSettings);
+    
+    saveSettings(newSettings);
+  };
+
+  // Handle master toggle (show all / hide all)
+  const handleMasterToggle = (showAll: boolean) => {
+    console.log('🔍 usePlutoInstrumentControls - Master toggle:', showAll ? 'SHOW ALL' : 'HIDE ALL');
+    
+    const newSettings: PlutoSettings = {
+      ctc_buttons_ocean_classic: showAll,
+      ctc_buttons_ocean_classic_2: showAll,
+      ctc_buttons_ocean_enhanced: showAll,
+      ctc_shendo_classic: showAll,
+      ctc_shendo_enhanced: showAll,
+      harpoon_preview: showAll,
+      harpoon_active: showAll,
+      rowfilters_chamber: showAll,
+      searchbox: showAll,
+      pagination_specificbar: showAll
+    };
+    
+    console.log('🔍 usePlutoInstrumentControls - Master toggle new settings:', newSettings);
+    saveSettings(newSettings);
+  };
+
+  // Check if all chambers are currently visible
+  const areAllVisible = Object.values(settings).every(value => value === true);
+  
+  // Check if all chambers are currently hidden
+  const areAllHidden = Object.values(settings).every(value => value === false);
+
+  return {
+    settings,
+    handleToggleChange,
+    handleMasterToggle,
+    areAllVisible,
+    areAllHidden
+  };
+};

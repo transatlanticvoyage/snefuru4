@@ -1,17 +1,35 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlutoSettings, DEFAULT_PLUTO_SETTINGS } from '../hooks/usePlutoSettings';
+import { PlutoSettings, DEFAULT_PLUTO_SETTINGS, usePlutoInstrumentControls } from '../hooks/usePlutoSettings';
+import PlutoControlTable from './PlutoControlTable';
 
 interface PlutoDebugMonitorProps {
   utg_id?: string | number;
 }
+
+type TabId = 'debug' | 'instrument' | 'sarno';
+
+interface Tab {
+  id: TabId;
+  label: string;
+}
+
+const TABS: Tab[] = [
+  { id: 'debug', label: 'Debug' },
+  { id: 'instrument', label: 'Instrument' },
+  { id: 'sarno', label: 'Utensil' }
+];
 
 export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
   const [currentSettings, setCurrentSettings] = useState<PlutoSettings | null>(null);
   const [effectiveSettings, setEffectiveSettings] = useState<PlutoSettings>(DEFAULT_PLUTO_SETTINGS);
   const [storageKey, setStorageKey] = useState<string>('');
   const [isMinimized, setIsMinimized] = useState<boolean>(true); // Default to minimized
+  const [activeTab, setActiveTab] = useState<TabId>('debug');
+  
+  // Get instrument controls at the top level (hooks must be called at component top level)
+  const instrumentControls = usePlutoInstrumentControls(utg_id);
 
   // Load minimized state from localStorage on mount
   useEffect(() => {
@@ -104,6 +122,73 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
     );
   }
 
+  const renderDebugContent = () => (
+    <>
+      <div><strong>Storage Key:</strong> {storageKey}</div>
+      <div><strong>Current Settings:</strong></div>
+      <pre style={{ 
+        background: '#f5f5f5', 
+        padding: '5px', 
+        borderRadius: '3px',
+        fontSize: '10px',
+        maxHeight: '200px',
+        overflow: 'auto'
+      }}>
+        {currentSettings ? JSON.stringify(currentSettings, null, 2) : 'No settings found'}
+      </pre>
+      <div style={{ marginTop: '10px' }}>
+        <strong>Chamber States:</strong>
+        <div style={{ fontSize: '11px', marginTop: '5px' }}>
+          <div>Ocean Classic: {effectiveSettings.ctc_buttons_ocean_classic ? '✅' : '❌'}</div>
+          <div>Ocean Enhanced: {effectiveSettings.ctc_buttons_ocean_enhanced ? '✅' : '❌'}</div>
+          <div>Shendo Classic: {effectiveSettings.ctc_shendo_classic ? '✅' : '❌'}</div>
+          <div>Shendo Enhanced: {effectiveSettings.ctc_shendo_enhanced ? '✅' : '❌'}</div>
+          <div>Harpoon Preview: {effectiveSettings.harpoon_preview ? '✅' : '❌'}</div>
+          <div>Harpoon Active: {effectiveSettings.harpoon_active ? '✅' : '❌'}</div>
+          <div>Row Filters: {effectiveSettings.rowfilters_chamber ? '✅' : '❌'}</div>
+          <div>Search Box: {effectiveSettings.searchbox ? '✅' : '❌'}</div>
+          <div>Pagination Chief: {effectiveSettings.pagination_specificbar ? '✅' : '❌'}</div>
+        </div>
+      </div>
+      <div style={{ marginTop: '10px', fontSize: '10px', color: '#666' }}>
+        Auto-refreshes every second
+      </div>
+    </>
+  );
+
+  const renderInstrumentContent = () => {
+    return (
+      <div style={{ padding: '0' }}> {/* Remove padding to let PlutoControlTable handle its own spacing */}
+        <PlutoControlTable
+          settings={instrumentControls.settings}
+          onToggleChange={instrumentControls.handleToggleChange}
+          onMasterToggle={instrumentControls.handleMasterToggle}
+          areAllVisible={instrumentControls.areAllVisible}
+          areAllHidden={instrumentControls.areAllHidden}
+        />
+      </div>
+    );
+  };
+
+  const renderSarnoContent = () => (
+    <div style={{ padding: '10px', textAlign: 'center', color: '#666' }}>
+      Utensil content will be implemented here
+    </div>
+  );
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'debug':
+        return renderDebugContent();
+      case 'instrument':
+        return renderInstrumentContent();
+      case 'sarno':
+        return renderSarnoContent();
+      default:
+        return renderDebugContent();
+    }
+  };
+
   // Full view - top right corner
   return (
     <div style={{ 
@@ -112,9 +197,9 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
       right: '10px', 
       background: '#fff', 
       border: '2px solid #007bff', 
-      padding: '10px',
       borderRadius: '5px',
-      maxWidth: '400px',
+      maxWidth: '500px',
+      minWidth: '450px',
       zIndex: 9999,
       fontSize: '12px'
     }}>
@@ -155,36 +240,55 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
         −
       </button>
       
-      <h4 style={{ margin: '0 0 10px 0', color: '#007bff', paddingRight: '30px' }}>🔍 Pluto Debug Monitor</h4>
-      <div><strong>Storage Key:</strong> {storageKey}</div>
-      <div><strong>Current Settings:</strong></div>
-      <pre style={{ 
-        background: '#f5f5f5', 
-        padding: '5px', 
-        borderRadius: '3px',
-        fontSize: '10px',
-        maxHeight: '200px',
-        overflow: 'auto'
+      {/* Header */}
+      <div style={{ 
+        padding: '10px', 
+        paddingRight: '40px',
+        borderBottom: '1px solid #e0e0e0' 
       }}>
-        {currentSettings ? JSON.stringify(currentSettings, null, 2) : 'No settings found'}
-      </pre>
-      <div style={{ marginTop: '10px' }}>
-        <strong>Chamber States:</strong>
-        <div style={{ fontSize: '11px', marginTop: '5px' }}>
-          <div>Ocean Classic: {effectiveSettings.ctc_buttons_ocean_classic ? '✅' : '❌'}</div>
-          <div>Ocean Enhanced: {effectiveSettings.ctc_buttons_ocean_enhanced ? '✅' : '❌'}</div>
-          <div>Shendo Classic: {effectiveSettings.ctc_shendo_classic ? '✅' : '❌'}</div>
-          <div>Shendo Enhanced: {effectiveSettings.ctc_shendo_enhanced ? '✅' : '❌'}</div>
-          <div>Harpoon Preview: {effectiveSettings.harpoon_preview ? '✅' : '❌'}</div>
-          <div>Harpoon Active: {effectiveSettings.harpoon_active ? '✅' : '❌'}</div>
-          <div>Row Filters: {effectiveSettings.rowfilters_chamber ? '✅' : '❌'}</div>
-          <div>Search Box: {effectiveSettings.searchbox ? '✅' : '❌'}</div>
-          <div>Pagination Specific: {effectiveSettings.pagination_specificbar ? '✅' : '❌'}</div>
-          <div>Pagination Qty: {effectiveSettings.pagination_qtybar ? '✅' : '❌'}</div>
-        </div>
+        <h4 style={{ margin: '0', color: '#007bff' }}>🔍 Pluto Debug Monitor</h4>
       </div>
-      <div style={{ marginTop: '10px', fontSize: '10px', color: '#666' }}>
-        Auto-refreshes every second
+
+      {/* Tab Bar */}
+      <div style={{ 
+        display: 'flex',
+        borderBottom: '1px solid #e0e0e0',
+        background: '#f8f9fa'
+      }}>
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              flex: 1,
+              padding: '8px 16px',
+              border: 'none',
+              background: activeTab === tab.id ? '#007bff' : 'transparent',
+              color: activeTab === tab.id ? '#fff' : '#007bff',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: activeTab === tab.id ? 'bold' : 'normal',
+              borderBottom: activeTab === tab.id ? '2px solid #007bff' : 'none'
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== tab.id) {
+                e.currentTarget.style.background = '#e3f2fd';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== tab.id) {
+                e.currentTarget.style.background = 'transparent';
+              }
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div style={{ padding: '10px' }}>
+        {renderTabContent()}
       </div>
     </div>
   );
