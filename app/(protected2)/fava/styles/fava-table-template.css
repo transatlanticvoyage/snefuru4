@@ -52,6 +52,12 @@
   margin-bottom: 0; /* Let parent handle spacing */
 }
 
+.ocean-classic-chamber-2 {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+}
+
 .ocean-enhanced-chamber {
   position: relative;
   display: block;

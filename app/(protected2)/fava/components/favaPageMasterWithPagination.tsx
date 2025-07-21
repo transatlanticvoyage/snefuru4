@@ -71,14 +71,14 @@ export default function FavaPageMasterWithPagination({
   const tableData = tableProps?.data || [];
   
   // URL state management
-  const urlPage = enableURLParams ? parseInt(searchParams.get('page') || '1') : 1;
-  const urlItemsPerPage = enableURLParams ? parseInt(searchParams.get('itemsPerPage') || '10') : 10;
+  const urlPage = enableURLParams ? parseInt(searchParams?.get('page') || '1') : 1;
+  const urlItemsPerPage = enableURLParams ? parseInt(searchParams?.get('itemsPerPage') || '10') : 10;
 
   // Handle URL updates
   const handleURLChange = (params: Record<string, any>) => {
     if (!enableURLParams) return;
     
-    const urlParams = new URLSearchParams(searchParams.toString());
+    const urlParams = new URLSearchParams(searchParams?.toString() || '');
     Object.entries(params).forEach(([key, value]) => {
       urlParams.set(key, value.toString());
     });
@@ -117,9 +117,6 @@ export default function FavaPageMasterWithPagination({
                 marginBottom: '15px'
               }}
             >
-              <div style={{ background: 'lightcyan', padding: '5px', marginBottom: '5px' }}>
-                DEBUG: Pagination Specific Chamber (Top) - Should be {plutoSettings.pagination_specificbar ? 'VISIBLE' : 'HIDDEN'}
-              </div>
               <FavaPaginationControlsOriginal />
             </div>
           )}
@@ -139,9 +136,6 @@ export default function FavaPageMasterWithPagination({
                 marginTop: '15px'
               }}
             >
-              <div style={{ background: 'lightsteelblue', padding: '5px', marginBottom: '5px' }}>
-                DEBUG: Pagination Qty Chamber (Bottom) - Should be {plutoSettings.pagination_qtybar ? 'VISIBLE' : 'HIDDEN'}
-              </div>
               <FavaPaginationControlsOriginal />
             </div>
           )}

@@ -31,8 +31,9 @@ export default function FavaCTCButtonsClassic({
   onToggleDropdown,
   utg_id,
   createSlots,
-  getOverflowItems
-}: CTCButtonsProps & { createSlots: any, getOverflowItems: any }) {
+  getOverflowItems,
+  title
+}: CTCButtonsProps & { createSlots: any, getOverflowItems: any, title?: string }) {
 
   // Reusable button component
   const ColtempButton = ({ 
@@ -241,17 +242,10 @@ export default function FavaCTCButtonsClassic({
   };
 
   // All existing styles
-  const boardStyle = {
-    width: '100%',
-    height: '200px',
-    border: '1px solid #000',
-    backgroundColor: '#5a0e15'
-  };
-
   const topLabelStyle = {
     color: '#fff',
-    float: 'left' as const,
-    width: '100px'
+    width: '100px',
+    flexShrink: 0
   };
 
   const innerWrapperStyle = {
@@ -260,7 +254,7 @@ export default function FavaCTCButtonsClassic({
     padding: '16px',
     gap: '8px',
     backgroundColor: '#fff',
-    float: 'left' as const
+    flex: 1
   };
 
   const buttonGroupColtempStyle = {
@@ -348,11 +342,17 @@ export default function FavaCTCButtonsClassic({
   };
 
   return (
-    <div style={boardStyle}>
+    <div style={{
+      width: '100%',
+      height: '200px',
+      border: '1px solid #000',
+      backgroundColor: '#5a0e15',
+      display: 'flex'
+    }}>
       <div style={topLabelStyle}>div.coltemp_board</div>
       <div style={innerWrapperStyle}>
         <div className="chamber-label-box chamber-1" style={{ marginBottom: '8px' }}>
-          Classic Buttons Ocean
+          {title || 'Classic Buttons Ocean'}
         </div>
         <strong>db tables:</strong> coltemps AND denbu_columns
 
@@ -410,7 +410,7 @@ export default function FavaCTCButtonsClassic({
                 
                 {/* Actively selected button from overflow */}
                 {(() => {
-                  const selectedOverflowItem = overflowItems.find(item => item.coltemp_id === activeTemplateId);
+                  const selectedOverflowItem = overflowItems.find((item: ColtempData) => item.coltemp_id === activeTemplateId);
                   
                   if (selectedOverflowItem) {
                     return (

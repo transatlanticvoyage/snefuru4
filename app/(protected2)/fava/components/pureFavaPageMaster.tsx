@@ -202,6 +202,21 @@ export default function PureFavaPageMaster({
                       getOverflowItems={handlers.getOverflowItems}
                     />
                   </div>
+                  <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic_2', 'ocean-classic-chamber-2')}>
+                    <FavaCTCButtonsClassic
+                      templates={state.templates}
+                      activeTemplateId={state.activeTemplateId}
+                      dropdownOpen={state.dropdownOpen}
+                      onTemplateSelect={handlers.selectTemplate}
+                      onShendoClick={handlers.handleShendoClick}
+                      onOpenCJ={handlers.openCJ}
+                      onToggleDropdown={handlers.toggleDropdown}
+                      utg_id={handlers.currentUtgId}
+                      createSlots={handlers.createSlots}
+                      getOverflowItems={handlers.getOverflowItems}
+                      title="Classic Buttons Ocean 2"
+                    />
+                  </div>
                   <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_enhanced', 'ocean-enhanced-chamber')}>
                     <FavaCTCButtonsEnhanced
                       templates={state.templates}
@@ -223,7 +238,7 @@ export default function PureFavaPageMaster({
                       templates={state.templates}
                       activeTemplateId={state.activeTemplateId}
                       onTemplateSelect={handlers.selectTemplate}
-                      utg_id={utg_id}
+                      utg_id={String(utg_id || '')}
                     />
                   )}
                 </div>
@@ -234,14 +249,20 @@ export default function PureFavaPageMaster({
           {showColumnVisibilityMatrix && (
             <>
               <FavaColVisMatPreviewBar plutoSettings={plutoSettings} />
-              <FavaColVisMatMainBar plutoSettings={plutoSettings} />
+              <div className={getChamberClasses(plutoSettings, 'harpoon_active', 'harpoon-active-chamber')}>
+                <FavaColVisMatMainBar />
+              </div>
             </>
           )}
           {showFilterControls && (
-            <FavaFilterControls plutoSettings={plutoSettings} />
+            <div className={getChamberClasses(plutoSettings, 'rowfilters_chamber', 'rowfilters-chamber')}>
+              <FavaFilterControls />
+            </div>
           )}
           {showSearchBox && (
-            <FavaSearchBox plutoSettings={plutoSettings} />
+            <div className={getChamberClasses(plutoSettings, 'searchbox', 'searchbox-chamber')}>
+              <FavaSearchBox />
+            </div>
           )}
           
           {/* Note: Pagination controls are now integrated with the table section */}
@@ -271,9 +292,6 @@ export default function PureFavaPageMaster({
                     marginBottom: '15px'
                   }}
                 >
-                  <div style={{ background: 'lightcyan', padding: '5px', marginBottom: '5px' }}>
-                    DEBUG: Pagination Specific Chamber (Top) - Should be {plutoSettings.pagination_specificbar ? 'VISIBLE' : 'HIDDEN'}
-                  </div>
                   <FavaPaginationControlsOriginal />
                 </div>
               )}
@@ -293,9 +311,6 @@ export default function PureFavaPageMaster({
                     marginTop: '15px'
                   }}
                 >
-                  <div style={{ background: 'lightsteelblue', padding: '5px', marginBottom: '5px' }}>
-                    DEBUG: Pagination Qty Chamber (Bottom) - Should be {plutoSettings.pagination_qtybar ? 'VISIBLE' : 'HIDDEN'}
-                  </div>
                   <FavaPaginationControlsOriginal />
                 </div>
               )}

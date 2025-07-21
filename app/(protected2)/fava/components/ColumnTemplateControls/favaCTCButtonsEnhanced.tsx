@@ -437,7 +437,7 @@ export default function FavaCTCButtonsEnhanced({
                             minWidth: '160px',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
                           }}>
-                            {overflowItems.map((item) => (
+                            {overflowItems.map((item: any) => (
                               <div key={item.coltemp_id} style={{ margin: '4px' }}>
                                 <FavaMultiDeckButton 
                                   coltemp_id={item.coltemp_id}
@@ -467,7 +467,7 @@ export default function FavaCTCButtonsEnhanced({
                 {/* Actively selected button from overflow (appears to the right of more button) */}
                 {(() => {
                   const overflowItems = getOverflowItems(categoryData, category);
-                  const selectedOverflowItem = overflowItems.find(item => item.coltemp_id === activeTemplateId);
+                  const selectedOverflowItem = overflowItems.find((item: any) => item.coltemp_id === activeTemplateId);
                   
                   if (selectedOverflowItem) {
                     return (

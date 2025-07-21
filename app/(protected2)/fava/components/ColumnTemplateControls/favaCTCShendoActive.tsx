@@ -43,9 +43,6 @@ export default function FavaCTCShendoActive({
           margin: '5px 0'
         }}
       >
-        <div style={{ background: 'palegreen', padding: '5px', marginBottom: '5px' }}>
-          DEBUG: Shendo Classic Chamber - Should be {plutoSettings.ctc_shendo_classic ? 'VISIBLE' : 'HIDDEN'}
-        </div>
         <FavaCTCShendoClassic
           category={selectedCategory}
           categoryData={categoryData}
@@ -64,9 +61,6 @@ export default function FavaCTCShendoActive({
           margin: '5px 0'
         }}
       >
-        <div style={{ background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-          DEBUG: Shendo Enhanced Chamber - Should be {plutoSettings.ctc_shendo_enhanced ? 'VISIBLE' : 'HIDDEN'}
-        </div>
         <FavaCTCShendoEnhanced
           category={selectedCategory}
           categoryData={categoryData}

@@ -230,9 +230,9 @@ export default function Torna3Page() {
         nemtorData,
         visibleColumns,
         torna3TableConfig.columns.length,
-        utg_id
+        utg_id || undefined
       )}
-      utg_id={utg_id}
+      utg_id={utg_id || undefined}
     >
     </FavaPageMasterWithPagination>
   );
