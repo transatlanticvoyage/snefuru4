@@ -11,6 +11,7 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
   const [currentSettings, setCurrentSettings] = useState<PlutoSettings | null>(null);
   const [effectiveSettings, setEffectiveSettings] = useState<PlutoSettings>(DEFAULT_PLUTO_SETTINGS);
   const [storageKey, setStorageKey] = useState<string>('');
+  const [isMinimized, setIsMinimized] = useState<boolean>(false);
 
   useEffect(() => {
     const key = `fava_pluto_settings_${utg_id || 'default'}`;
@@ -49,6 +50,48 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
     };
   }, [utg_id]);
 
+  // Minimized view - top left corner
+  if (isMinimized) {
+    return (
+      <button
+        onClick={() => setIsMinimized(false)}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = '#0056b3';
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = '#007bff';
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
+        style={{
+          position: 'fixed',
+          top: '10px',
+          left: '36px', // 10px + 26px margin to avoid overlap with nav toggle
+          width: '26px',
+          height: '26px',
+          background: '#007bff',
+          border: 'none',
+          borderRadius: '4px',
+          color: '#fff',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          zIndex: 9999,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+          transition: 'all 0.2s ease',
+          transform: 'scale(1)'
+        }}
+        title="Restore Pluto Debug Monitor"
+      >
+        🔍
+      </button>
+    );
+  }
+
+  // Full view - top right corner
   return (
     <div style={{ 
       position: 'fixed', 
@@ -62,7 +105,44 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
       zIndex: 9999,
       fontSize: '12px'
     }}>
-      <h4 style={{ margin: '0 0 10px 0', color: '#007bff' }}>🔍 Pluto Debug Monitor</h4>
+      {/* Minimize button in top right corner */}
+      <button
+        onClick={() => setIsMinimized(true)}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = '#0056b3';
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = '#007bff';
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
+        style={{
+          position: 'absolute',
+          top: '5px',
+          right: '5px',
+          width: '26px',
+          height: '26px',
+          background: '#007bff',
+          border: 'none',
+          borderRadius: '4px',
+          color: '#fff',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '18px',
+          fontWeight: 'bold',
+          lineHeight: '1',
+          padding: '0',
+          transition: 'all 0.2s ease',
+          transform: 'scale(1)'
+        }}
+        title="Minimize Pluto Debug Monitor"
+      >
+        −
+      </button>
+      
+      <h4 style={{ margin: '0 0 10px 0', color: '#007bff', paddingRight: '30px' }}>🔍 Pluto Debug Monitor</h4>
       <div><strong>Storage Key:</strong> {storageKey}</div>
       <div><strong>Current Settings:</strong></div>
       <pre style={{ 

@@ -188,20 +188,7 @@ export default function PureFavaPageMaster({
             <FavaCTCMaster>
               {({ state, handlers }) => (
                 <div>
-                  <div 
-                    className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic', 'ocean-classic-chamber')}
-                    data-debug-utg-id={utg_id}
-                    data-debug-visible={plutoSettings.ctc_buttons_ocean_classic}
-                    data-debug-classes={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic', 'ocean-classic-chamber')}
-                    style={{
-                      border: '2px dashed red',
-                      padding: '5px',
-                      margin: '5px 0'
-                    }}
-                  >
-                    <div style={{ background: 'yellow', padding: '5px', marginBottom: '5px' }}>
-                      DEBUG: Ocean Classic Chamber - Should be {plutoSettings.ctc_buttons_ocean_classic ? 'VISIBLE' : 'HIDDEN'}
-                    </div>
+                  <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic', 'ocean-classic-chamber')}>
                     <FavaCTCButtonsClassic
                       templates={state.templates}
                       activeTemplateId={state.activeTemplateId}
@@ -215,19 +202,7 @@ export default function PureFavaPageMaster({
                       getOverflowItems={handlers.getOverflowItems}
                     />
                   </div>
-                  <div 
-                    className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_enhanced', 'ocean-enhanced-chamber')}
-                    data-debug-utg-id={utg_id}
-                    data-debug-visible={plutoSettings.ctc_buttons_ocean_enhanced}
-                    style={{
-                      border: '2px dashed blue',
-                      padding: '5px',
-                      margin: '5px 0'
-                    }}
-                  >
-                    <div style={{ background: 'lightblue', padding: '5px', marginBottom: '5px' }}>
-                      DEBUG: Ocean Enhanced Chamber - Should be {plutoSettings.ctc_buttons_ocean_enhanced ? 'VISIBLE' : 'HIDDEN'}
-                    </div>
+                  <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_enhanced', 'ocean-enhanced-chamber')}>
                     <FavaCTCButtonsEnhanced
                       templates={state.templates}
                       activeTemplateId={state.activeTemplateId}
@@ -243,27 +218,13 @@ export default function PureFavaPageMaster({
                     />
                   </div>
                   {showShendoBar && (
-                    <div 
-                      className={getChamberClasses(plutoSettings, 'ctc_shendo_enhanced', 'shendo-enhanced-chamber')}
-                      data-debug-utg-id={utg_id}
-                      data-debug-visible={plutoSettings.ctc_shendo_enhanced}
-                      style={{
-                        border: '2px dashed green',
-                        padding: '5px',
-                        margin: '5px 0'
-                      }}
-                    >
-                      <div style={{ background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-                        DEBUG: Shendo Enhanced Chamber - Should be {plutoSettings.ctc_shendo_enhanced ? 'VISIBLE' : 'HIDDEN'}
-                      </div>
-                      <FavaCTCShendoActive
-                        category={state.shendoCategory || ''}
-                        templates={state.templates}
-                        activeTemplateId={state.activeTemplateId}
-                        onTemplateSelect={handlers.selectTemplate}
-                        utg_id={handlers.currentUtgId}
-                      />
-                    </div>
+                    <FavaCTCShendoActive
+                      category={state.shendoCategory || ''}
+                      templates={state.templates}
+                      activeTemplateId={state.activeTemplateId}
+                      onTemplateSelect={handlers.selectTemplate}
+                      utg_id={utg_id}
+                    />
                   )}
                 </div>
               )}
@@ -272,71 +233,15 @@ export default function PureFavaPageMaster({
           
           {showColumnVisibilityMatrix && (
             <>
-              <div 
-                className={getChamberClasses(plutoSettings, 'harpoon_preview', 'harpoon-preview-chamber')}
-                data-debug-utg-id={utg_id}
-                data-debug-visible={plutoSettings.harpoon_preview}
-                style={{
-                  border: '2px dashed purple',
-                  padding: '5px',
-                  margin: '5px 0'
-                }}
-              >
-                <div style={{ background: 'lavender', padding: '5px', marginBottom: '5px' }}>
-                  DEBUG: Harpoon Preview Chamber - Should be {plutoSettings.harpoon_preview ? 'VISIBLE' : 'HIDDEN'}
-                </div>
-                <FavaColVisMatPreviewBar />
-              </div>
-              <div 
-                className={getChamberClasses(plutoSettings, 'harpoon_active', 'harpoon-active-chamber')}
-                data-debug-utg-id={utg_id}
-                data-debug-visible={plutoSettings.harpoon_active}
-                style={{
-                  border: '2px dashed orange',
-                  padding: '5px',
-                  margin: '5px 0'
-                }}
-              >
-                <div style={{ background: 'peachpuff', padding: '5px', marginBottom: '5px' }}>
-                  DEBUG: Harpoon Active Chamber - Should be {plutoSettings.harpoon_active ? 'VISIBLE' : 'HIDDEN'}
-                </div>
-                <FavaColVisMatMainBar />
-              </div>
+              <FavaColVisMatPreviewBar plutoSettings={plutoSettings} />
+              <FavaColVisMatMainBar plutoSettings={plutoSettings} />
             </>
           )}
           {showFilterControls && (
-            <div 
-              className={getChamberClasses(plutoSettings, 'rowfilters_chamber', 'rowfilters-chamber')}
-              data-debug-utg-id={utg_id}
-              data-debug-visible={plutoSettings.rowfilters_chamber}
-              style={{
-                border: '2px dashed brown',
-                padding: '5px',
-                margin: '5px 0'
-              }}
-            >
-              <div style={{ background: 'wheat', padding: '5px', marginBottom: '5px' }}>
-                DEBUG: Row Filters Chamber - Should be {plutoSettings.rowfilters_chamber ? 'VISIBLE' : 'HIDDEN'}
-              </div>
-              <FavaFilterControls />
-            </div>
+            <FavaFilterControls plutoSettings={plutoSettings} />
           )}
           {showSearchBox && (
-            <div 
-              className={getChamberClasses(plutoSettings, 'searchbox', 'searchbox-chamber')}
-              data-debug-utg-id={utg_id}
-              data-debug-visible={plutoSettings.searchbox}
-              style={{
-                border: '2px dashed pink',
-                padding: '5px',
-                margin: '5px 0'
-              }}
-            >
-              <div style={{ background: 'mistyrose', padding: '5px', marginBottom: '5px' }}>
-                DEBUG: Search Box Chamber - Should be {plutoSettings.searchbox ? 'VISIBLE' : 'HIDDEN'}
-              </div>
-              <FavaSearchBox />
-            </div>
+            <FavaSearchBox plutoSettings={plutoSettings} />
           )}
           
           {/* Note: Pagination controls are now integrated with the table section */}

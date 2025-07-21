@@ -349,6 +349,11 @@ export function MatrixCore({
       marginBottom: compact ? '0' : '8px',
       overflow: 'hidden'
     }}>
+      {/* Chamber label box */}
+      <div className="chamber-label-box chamber-6" style={{ marginRight: '8px' }}>
+        Harpoon Active
+      </div>
+      
       {/* Label div - sizes to content */}
       <div 
         className="harpoon_label_div"

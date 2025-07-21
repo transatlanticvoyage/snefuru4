@@ -351,12 +351,7 @@ export default function FavaCTCButtonsClassic({
     <div style={boardStyle}>
       <div style={topLabelStyle}>div.coltemp_board</div>
       <div style={innerWrapperStyle}>
-        <div style={{
-          fontSize: '16px',
-          fontWeight: 'bold',
-          marginBottom: '8px',
-          width: '100%'
-        }}>
+        <div className="chamber-label-box chamber-1" style={{ marginBottom: '8px' }}>
           Classic Buttons Ocean
         </div>
         <strong>db tables:</strong> coltemps AND denbu_columns

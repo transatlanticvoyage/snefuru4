@@ -326,26 +326,22 @@ export default function FavaCTCButtonsEnhanced({
       border: '2px solid #ffeaa7',
       borderRadius: '8px'
     }}>
-      <h3 style={{
-        margin: '0 0 16px 0',
-        fontSize: '14px',
-        fontWeight: 'bold',
-        color: '#856404'
-      }}>
-        Enhanced Buttons Ocean
-      </h3>
-      
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
         gap: '8px'
       }}>
-        {CATEGORIES.map((category) => {
+        {CATEGORIES.map((category, categoryIndex) => {
           const categoryData = templates[category] || [];
           const slots = createSlots(categoryData, category);
           
           return (
             <div key={`area2-${category}`} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {categoryIndex === 0 && (
+                <div className="chamber-label-box chamber-2" style={{ marginRight: '8px' }}>
+                  Enhanced Buttons Ocean
+                </div>
+              )}
               <span style={separatorStyle}></span>
               
               <div style={{ display: 'flex', alignItems: 'center' }}>

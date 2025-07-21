@@ -37,16 +37,12 @@
   display: block;
   opacity: 1;
   transform: scale(1);
-  /* Debug: This should show the element */
-  border: 3px solid green !important;
 }
 
 .pluto-hidden {
   display: none !important;
   opacity: 0;
   transform: scale(0.95);
-  /* Debug: This should hide the element */
-  background-color: red !important;
 }
 
 /* Chamber-specific classes */
@@ -118,4 +114,47 @@
 
 .pluto-debug .pluto-controlled:hover {
   outline-color: #ff6b6b;
+}
+
+/* ==========================================
+   CHAMBER LABEL BOX SYSTEM
+   ========================================== */
+
+/* Chamber label box inline system */
+.chamber-label-box {
+  display: inline-block;
+  padding: 5px 7px;
+  border: 4px dashed;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 8px;
+  vertical-align: top;
+  min-width: 120px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Alternating colors for different chambers */
+.chamber-label-box.chamber-1 { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.chamber-2 { border-color: gray; color: #555; }
+.chamber-label-box.chamber-3 { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.chamber-4 { border-color: gray; color: #555; }
+.chamber-label-box.chamber-5 { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.chamber-6 { border-color: gray; color: #555; }
+.chamber-label-box.chamber-7 { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.chamber-8 { border-color: gray; color: #555; }
+.chamber-label-box.chamber-9 { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.chamber-10 { border-color: gray; color: #555; }
+
+/* Flex layout for chamber with label box */
+.chamber-with-label {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+.chamber-content {
+  flex: 1;
+  min-width: 0; /* Allow content to shrink */
 }

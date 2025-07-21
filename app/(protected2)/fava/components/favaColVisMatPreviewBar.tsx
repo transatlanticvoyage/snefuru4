@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { MatrixCore, useColumnVisibilityPreviewData, ColumnVisibilityMatrixProps } from './favaColVisMatrixMaster';
+import { getChamberClasses } from '../hooks/usePlutoSettings';
 
-export default function FavaColVisMatPreviewBar(props: ColumnVisibilityMatrixProps) {
+export default function FavaColVisMatPreviewBar(props: ColumnVisibilityMatrixProps & { plutoSettings?: any }) {
   const previewData = useColumnVisibilityPreviewData();
 
   // Always render the preview bar - use default gray dots if no data
@@ -27,16 +28,24 @@ export default function FavaColVisMatPreviewBar(props: ColumnVisibilityMatrixPro
   const allColumns = Array.from({ length: finalProps.totalColumns }, (_, i) => i + 1);
 
   return (
-    <div style={{
-      width: finalProps.width,
-      height: finalProps.height,
-      backgroundColor: '#f8f9fa',
-      border: '1px solid #e9ecef',
-      display: 'flex',
-      alignItems: 'center',
-      marginBottom: '8px',
-      overflow: 'hidden'
-    }}>
+    <div 
+      style={{
+        width: finalProps.width,
+        height: finalProps.height,
+        backgroundColor: '#f8f9fa',
+        border: '1px solid #e9ecef',
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '8px',
+        overflow: 'hidden'
+      }}
+      className={props.plutoSettings ? getChamberClasses(props.plutoSettings, 'harpoon_preview', 'harpoon-preview-chamber') : ''}
+    >
+      {/* Chamber label box */}
+      <div className="chamber-label-box chamber-5" style={{ marginRight: '8px' }}>
+        Harpoon Preview
+      </div>
+      
       {/* Preview label div */}
       <div 
         className="harpoon_label_div"

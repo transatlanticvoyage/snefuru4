@@ -197,16 +197,14 @@ export default function FavaCTCShendoEnhanced({
 
   return (
     <div className="shendo_bar_div_enhanced" style={shendoBarDivStyle}>
-      <div style={titleStyle}>shendo_bar_div_enhanced</div>
-      
-      {category && categoryData.length > 0 ? (
-        <div>
-          <p style={{ marginBottom: '12px', fontSize: '14px' }}>
-            Showing all templates for category: <strong>{category}</strong> ({categoryData.length} templates)
-          </p>
-          
-          <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap' }}>
-            {categoryData.map((template, index) => (
+      <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="chamber-label-box chamber-4" style={{ marginRight: '8px' }}>
+          Shendo Enhanced
+        </div>
+        <div style={{ marginRight: '8px', fontSize: '14px' }}>
+          category: {category || '(none)'}
+        </div>
+        {category && categoryData.length > 0 && categoryData.map((template, index) => (
               <FavaMultiDeckButton
                 key={template.coltemp_id}
                 coltemp_id={template.coltemp_id}
@@ -221,14 +219,8 @@ export default function FavaCTCShendoEnhanced({
                 isFirst={index === 0}
                 isLast={index === categoryData.length - 1}
               />
-            ))}
-          </div>
-        </div>
-      ) : (
-        <p style={{ color: '#666', fontSize: '14px' }}>
-          Click a "shendo" link above to view all templates for that category
-        </p>
-      )}
+        ))}
+      </div>
     </div>
   );
 }

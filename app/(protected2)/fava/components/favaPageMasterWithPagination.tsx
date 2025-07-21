@@ -7,6 +7,7 @@ import { FavaPaginationProvider } from './pagination/favaPaginationProvider';
 import FavaPaginationControlsOriginal from './pagination/favaPaginationControlsOriginal';
 import FavaMinimalTablePaginated from './pagination/favaMinimalTablePaginated';
 import { FavaPaginationConfig } from './pagination/favaPaginationTypes';
+import { usePlutoSettings, getChamberClasses } from '../hooks/usePlutoSettings';
 
 // Extend the existing FavaPageMaster props
 interface FavaPageMasterWithPaginationProps {
@@ -63,6 +64,9 @@ export default function FavaPageMasterWithPagination({
   const searchParams = useSearchParams();
   const router = useRouter();
   
+  // Get pluto settings for chamber control
+  const plutoSettings = usePlutoSettings(favaProps.utg_id);
+  
   // Extract data from tableProps
   const tableData = tableProps?.data || [];
   
@@ -103,7 +107,19 @@ export default function FavaPageMasterWithPagination({
         >
           {/* Pagination controls above table */}
           {showPaginationControls && (
-            <div style={{ marginBottom: '15px' }}>
+            <div 
+              className={getChamberClasses(plutoSettings, 'pagination_specificbar', 'pagination-specific-chamber')}
+              data-debug-utg-id={favaProps.utg_id}
+              data-debug-visible={plutoSettings.pagination_specificbar}
+              style={{
+                border: '2px dashed teal',
+                padding: '5px',
+                marginBottom: '15px'
+              }}
+            >
+              <div style={{ background: 'lightcyan', padding: '5px', marginBottom: '5px' }}>
+                DEBUG: Pagination Specific Chamber (Top) - Should be {plutoSettings.pagination_specificbar ? 'VISIBLE' : 'HIDDEN'}
+              </div>
               <FavaPaginationControlsOriginal />
             </div>
           )}
@@ -113,7 +129,19 @@ export default function FavaPageMasterWithPagination({
           
           {/* Pagination controls below table */}
           {showPaginationControls && (
-            <div style={{ marginTop: '15px' }}>
+            <div 
+              className={getChamberClasses(plutoSettings, 'pagination_qtybar', 'pagination-qty-chamber')}
+              data-debug-utg-id={favaProps.utg_id}
+              data-debug-visible={plutoSettings.pagination_qtybar}
+              style={{
+                border: '2px dashed navy',
+                padding: '5px',
+                marginTop: '15px'
+              }}
+            >
+              <div style={{ background: 'lightsteelblue', padding: '5px', marginBottom: '5px' }}>
+                DEBUG: Pagination Qty Chamber (Bottom) - Should be {plutoSettings.pagination_qtybar ? 'VISIBLE' : 'HIDDEN'}
+              </div>
               <FavaPaginationControlsOriginal />
             </div>
           )}

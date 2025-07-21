@@ -25,6 +25,9 @@ export default function FavaFilterControls() {
 
   return (
     <div style={wrapperStyle}>
+      <div className="chamber-label-box chamber-7" style={{ marginRight: '12px' }}>
+        Row Filters
+      </div>
       <span style={labelStyle}>Filter:</span>
 
  {/* ------------------------------------------------------------------ */}

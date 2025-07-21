@@ -71,16 +71,14 @@ export default function FavaCTCShendoClassic({
 
   return (
     <div className="shendo_bar_div_classic" style={shendoBarDivStyle}>
-      <div style={titleStyle}>shendo_bar_div_classic</div>
-      
-      {category && categoryData.length > 0 ? (
-        <div>
-          <p style={{ marginBottom: '12px', fontSize: '14px' }}>
-            Showing all templates for category: <strong>{category}</strong> ({categoryData.length} templates)
-          </p>
-          
-          <div style={buttonGroupStyle}>
-            {categoryData.map((template, index) => (
+      <div style={{ ...buttonGroupStyle, alignItems: 'center' }}>
+        <div className="chamber-label-box chamber-3" style={{ marginRight: '8px' }}>
+          Shendo Classic
+        </div>
+        <div style={{ marginRight: '8px', fontSize: '14px' }}>
+          category: {category || '(none)'}
+        </div>
+        {category && categoryData.length > 0 && categoryData.map((template, index) => (
               <button
                 key={template.coltemp_id}
                 style={{
@@ -123,14 +121,8 @@ export default function FavaCTCShendoClassic({
                   {template.coltemp_name}
                 </span>
               </button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <p style={{ color: '#666', fontSize: '14px' }}>
-          Click a "shendo" link above to view all templates for that category
-        </p>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
