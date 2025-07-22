@@ -1,11 +1,18 @@
 import { HeaderRowDefinition } from '../config/tableConfig.sample';
 import { processHeaderRows, HeaderRowRenderOptions } from './favaHeaderRows';
+import MoonRowsHeader from '../moonrowslots/MoonRowsHeader';
+import { useMoonRows } from '../moonrowslots/useMoonRows';
 
 interface MinimalTableProps {
   // Data props
   headers?: string[]; // Made optional for backward compatibility
   headerRows?: HeaderRowDefinition[]; // New header row configuration support
   data: any[][];
+  
+  // Moon Rows system props
+  useMoonRows?: boolean; // Enable moon rows system
+  moonRowsPageKey?: string; // Page key for moon rows config
+  moonRowsUtgId?: string | number; // UTG ID for moon rows scoping
   
   // Base element styling props
   tableClassName?: string;
@@ -32,6 +39,9 @@ export default function FavaMinimalTable({
   headers,
   headerRows,
   data,
+  useMoonRows: enableMoonRows = false,
+  moonRowsPageKey,
+  moonRowsUtgId,
   tableClassName,
   theadClassName,
   tbodyClassName,
@@ -47,7 +57,13 @@ export default function FavaMinimalTable({
   cellIds,
   cellClasses
 }: MinimalTableProps) {
-  // Process header rows if provided
+  // Moon Rows system integration
+  const moonRowsResult = useMoonRows(
+    enableMoonRows ? moonRowsPageKey : undefined,
+    enableMoonRows ? moonRowsUtgId : undefined
+  );
+
+  // Process header rows if provided (existing system)
   const processedHeaderRows = headerRows ? processHeaderRows(headerRows, {
     onHeaderClick,
     defaultThClassName: thClassName,
@@ -63,9 +79,16 @@ export default function FavaMinimalTable({
         border: '1px solid #d7d7d7'
       }}
     >
-      <thead className={theadClassName}>
-        {/* Render configured header rows or fallback to simple headers */}
-        {processedHeaderRows ? (
+      {/* Priority order: Moon Rows > Header Rows > Simple Headers */}
+      {enableMoonRows ? (
+        <MoonRowsHeader 
+          config={moonRowsResult.config}
+          loading={moonRowsResult.isLoading}
+        />
+      ) : (
+        <thead className={theadClassName}>
+          {/* Render configured header rows or fallback to simple headers */}
+          {processedHeaderRows ? (
           processedHeaderRows.map((headerRow) => (
             <tr 
               key={headerRow.id}
@@ -111,7 +134,8 @@ export default function FavaMinimalTable({
             ))}
           </tr>
         )}
-      </thead>
+        </thead>
+      )}
       <tbody className={tbodyClassName}>
         {data.map((row, rowIndex) => (
           <tr 
