@@ -69,7 +69,6 @@ export default function Torna3Page() {
     const url = new URL(window.location.href);
     const coltempId = url.searchParams.get('coltemp_id');
     if (coltempId) {
-      setUtgId(coltempId);
       applyTemplate(parseInt(coltempId));
     } else {
       // Load all columns by default
