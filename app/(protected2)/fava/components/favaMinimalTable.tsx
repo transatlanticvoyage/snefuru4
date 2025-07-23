@@ -160,7 +160,9 @@ export default function FavaMinimalTable({
                   fontSize: '16px'
                 }}
               >
-                {cell}
+                <div className="senlo-td-inner-wrapper-div">
+                  {cell}
+                </div>
               </td>
             ))}
           </tr>

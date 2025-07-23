@@ -47,3 +47,19 @@
   width: var(--beralis-col-wide, 300px); 
   max-width: var(--beralis-col-wide, 300px); 
 }
+
+/* Inner wrapper div for table cells */
+.main-beralis-table td .senlo-td-inner-wrapper-div {
+  /* Inherit cell dimensions */
+  height: 100%;
+  width: 100%;
+  
+  /* Maintain text overflow behavior */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  /* Flexbox for better content control */
+  display: flex;
+  align-items: center;
+}
