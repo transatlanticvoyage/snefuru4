@@ -29,6 +29,7 @@ interface FavaPageMasterWithPaginationProps {
   headerContent?: React.ReactNode;
   toolbarContent?: React.ReactNode;
   footerContent?: React.ReactNode;
+  zarnoContent?: React.ReactNode;
   contentPadding?: string;
   contentStyle?: React.CSSProperties;
   
@@ -133,6 +134,7 @@ export default function FavaPageMasterWithPagination({
       {...favaProps}
       showTable={false}  // We handle table rendering ourselves
       showPaginationControls={false}  // We handle pagination ourselves
+      zarnoContent={favaProps.zarnoContent}  // Pass through zarnoContent
     >
       {/* Render table at top if requested */}
       {(paginationPosition === 'top' || paginationPosition === 'both') && renderPaginatedTable()}

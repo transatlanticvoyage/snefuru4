@@ -51,6 +51,7 @@ interface FavaPageMasterProps {
   headerContent?: ReactNode;
   toolbarContent?: ReactNode;
   footerContent?: ReactNode;
+  zarnoContent?: ReactNode;
   
   // Layout configuration
   contentPadding?: string;
@@ -87,6 +88,7 @@ export default function FavaPageMaster({
   headerContent,
   toolbarContent,
   footerContent,
+  zarnoContent,
   contentPadding = '20px',
   contentStyle = {},
   
@@ -131,6 +133,7 @@ export default function FavaPageMaster({
         headerContent={headerContent}
         toolbarContent={toolbarContent}
         footerContent={footerContent}
+        zarnoContent={zarnoContent}
         contentPadding={contentPadding}
         contentStyle={contentStyle}
         utg_id={utg_id}
@@ -170,6 +173,7 @@ export default function FavaPageMaster({
         headerContent={headerContent}
         toolbarContent={toolbarContent}
         footerContent={footerContent}
+        zarnoContent={zarnoContent}
         contentPadding={contentPadding}
         contentStyle={contentStyle}
         utg_id={utg_id}

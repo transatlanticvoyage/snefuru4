@@ -52,6 +52,7 @@ interface PureFavaPageMasterProps {
   headerContent?: ReactNode;
   toolbarContent?: ReactNode;
   footerContent?: ReactNode;
+  zarnoContent?: ReactNode;
   
   // Layout configuration
   contentPadding?: string;
@@ -90,6 +91,7 @@ export default function PureFavaPageMaster({
   headerContent,
   toolbarContent,
   footerContent,
+  zarnoContent,
   contentPadding = '20px',
   contentStyle = {},
   utg_id
@@ -179,6 +181,13 @@ export default function PureFavaPageMaster({
               </div>
             )}
             {headerContent}
+          </div>
+        )}
+        
+        {/* Zarno Section - Between Header and Controls */}
+        {zarnoContent && (
+          <div className="fava-zarno-section" style={{ marginBottom: '20px' }}>
+            {zarnoContent}
           </div>
         )}
         

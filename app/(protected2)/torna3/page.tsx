@@ -297,22 +297,17 @@ export default function Torna3Page() {
         utg_id || undefined
       )}
       utg_id={utg_id || undefined}
-    >
-      {/* Custom Zarno Section - Outside Fava System */}
-      {gconPieceId && gconPiece && (
-        <div style={{ 
-          marginTop: '20px',
-          marginBottom: '20px',
-          padding: '0 20px' 
-        }}>
+      zarnoContent={
+        gconPieceId && gconPiece ? (
           <Torna3ZarnoAccordion 
             gconPiece={gconPiece}
             gconPieceId={gconPieceId}
             isOpen={isZarnoOpen}
             onToggle={handleZarnoToggle}
           />
-        </div>
-      )}
+        ) : undefined
+      }
+    >
     </FavaPageMasterWithPagination>
   );
 }
