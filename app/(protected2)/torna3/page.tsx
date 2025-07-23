@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useAuth } from '@/app/context/AuthContext';
 import { useFavaTaniSafe } from '../fava/components/favaTaniPopup/favaTaniConditionalProvider';
 import FavaPageMasterWithPagination from '../fava/components/favaPageMasterWithPagination';
 import { torna3TableConfig } from '../fava/config/torna3TableConfig';
@@ -22,7 +21,6 @@ export default function Torna3Page() {
   const taniState = useFavaTaniSafe()?.state;
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
 
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
@@ -147,24 +145,15 @@ export default function Torna3Page() {
 
   // Refresh gcon_piece data after F22 completion
   const refreshGconPiece = async () => {
-    if (user?.id && gconPieceId) {
-      const { data: userData } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
+    if (gconPieceId) {
+      const { data: refreshedData, error } = await supabase
+        .from('gcon_pieces')
+        .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits, asn_image_plan_batch_id, post_name, pageslug, pageurl')
+        .eq('id', gconPieceId)
         .single();
 
-      if (userData) {
-        const { data: refreshedData } = await supabase
-          .from('gcon_pieces')
-          .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits, asn_image_plan_batch_id, post_name, pageslug, pageurl')
-          .eq('id', gconPieceId)
-          .eq('fk_users_id', userData.id)
-          .single();
-
-        if (refreshedData) {
-          setGconPiece(refreshedData);
-        }
+      if (!error && refreshedData) {
+        setGconPiece(refreshedData);
       }
     }
   };
@@ -323,17 +312,17 @@ export default function Torna3Page() {
         utg_id || undefined
       )}
       utg_id={utg_id || undefined}
-      zarnoContent={
-        gconPieceId && gconPiece ? (
-          <Torna3ZarnoAccordion 
-            gconPiece={gconPiece}
-            gconPieceId={gconPieceId}
-            isOpen={isZarnoOpen}
-            onToggle={handleZarnoToggle}
-            onRefreshData={refreshGconPiece}
-          />
-        ) : undefined
-      }
+      // zarnoContent={
+      //   gconPieceId && gconPiece ? (
+      //     <Torna3ZarnoAccordion 
+      //       gconPiece={gconPiece}
+      //       gconPieceId={gconPieceId}
+      //       isOpen={isZarnoOpen}
+      //       onToggle={handleZarnoToggle}
+      //       onRefreshData={refreshGconPiece}
+      //     />
+      //   ) : undefined
+      // }
     >
     </FavaPageMasterWithPagination>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import '../styles/zarno-accordion.css';
+// import '../styles/zarno-accordion.css';
 
 interface Torna3ZarnoAccordionProps {
   gconPiece: any;
