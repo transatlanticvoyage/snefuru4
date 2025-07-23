@@ -136,6 +136,7 @@
 
 /* Semantic chamber label box colors */
 .chamber-label-box.clb-ocean-classic { border-color: lightblue; color: #0066cc; }
+.chamber-label-box.clb-ocean-classic-2 { border-color: lightblue; color: #0066cc; }
 .chamber-label-box.clb-ocean-enhanced { border-color: gray; color: #555; }
 .chamber-label-box.clb-shendo-classic { border-color: lightblue; color: #0066cc; }
 .chamber-label-box.clb-shendo-enhanced { border-color: gray; color: #555; }
