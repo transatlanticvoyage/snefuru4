@@ -22,6 +22,7 @@ import { usePlutoSettings, getChamberClasses } from '../hooks/usePlutoSettings';
 import PlutoDebugMonitor from './plutoDebugMonitor';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
+import '../styles/fava-beralis-table-grid.css';
 
 interface PureFavaPageMasterProps {
   // Page configuration

@@ -8,6 +8,7 @@ import { torna3TableConfig } from '../fava/config/torna3TableConfig';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { createTorna3TaniConfig } from './taniContent';
 import Torna3ZarnoAccordion from './components/Torna3ZarnoAccordion';
+import './styles/beralis-table-overrides.css';
 
 export default function Torna3Page() {
   const [nemtorData, setNemtorData] = useState<any[]>([]);

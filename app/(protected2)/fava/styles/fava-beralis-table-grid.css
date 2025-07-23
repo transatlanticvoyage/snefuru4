@@ -51,7 +51,7 @@
 /* Inner wrapper div for table cells */
 .main-beralis-table td .senlo-td-inner-wrapper-div {
   /* Inherit cell dimensions */
-  height: 100%;
+  height: 26px;
   width: 100%;
   
   /* Maintain text overflow behavior */

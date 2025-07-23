@@ -21,6 +21,7 @@ import { FavaTaniConfig, FAVA_TANI_DEFAULT_CONFIG } from './favaTaniPopup/types'
 import { FavaPaginationConfig } from './pagination/favaPaginationTypes';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
+import '../styles/fava-beralis-table-grid.css';
 
 interface FavaPageMasterProps {
   // Page configuration
