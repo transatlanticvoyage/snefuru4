@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import '../styles/zarno-accordion.css';
 
 interface Torna3ZarnoAccordionProps {
   gconPiece: any;
@@ -91,78 +92,63 @@ export default function Torna3ZarnoAccordion({
     return JSON.stringify(jsonString, null, 2);
   };
 
-  // Tornado-style container with transition
+  // Tornado-style container with custom CSS
   return (
-    <div 
-      style={{ 
-        backgroundColor: '#fefef8', 
-        marginBottom: '20px',
-        borderRadius: '8px',
-        border: '1px solid #e5e7eb',
-        overflow: 'hidden',
-        transition: 'all 0.3s ease'
-      }}
-    >
+    <div className="torna3-zarno-container">
       {!isOpen ? (
         // Tornado-style collapsed state
         <div 
-          className="flex items-center justify-between px-4 hover:bg-yellow-50 cursor-pointer transition-colors"
-          style={{ width: '200px', height: '60px' }}
+          className="torna3-zarno-collapsed"
           onClick={() => onToggle(true)}
         >
-          <span className="text-sm font-medium text-gray-700 flex-1">
+          <span className="torna3-zarno-collapsed-text">
             📂 Open Top Area Manager
           </span>
-          <span className="text-xs text-gray-500 ml-2">zarno1</span>
+          <span className="torna3-zarno-collapsed-label">zarno1</span>
         </div>
       ) : (
         <>
           {/* Tornado-style expanded header */}
-          <div className="flex items-center justify-between px-4 border-b border-gray-200" 
-               style={{ height: '60px', backgroundColor: '#fefef8' }}>
+          <div className="torna3-zarno-header">
             <button 
               onClick={() => onToggle(false)}
-              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+              className="torna3-zarno-header-button"
             >
               📁 Compact
             </button>
-            <span className="text-xs text-gray-500">zarno1</span>
+            <span className="torna3-zarno-header-label">zarno1</span>
           </div>
 
           {/* Tornado-style horizontal 3-column layout */}
-          <div className="p-4">
-            <div className="flex items-start justify-between gap-6">
+          <div className="torna3-zarno-content">
+            <div className="torna3-zarno-columns">
               
               {/* pelementor_cached section - 500px width */}
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
-                  gcon_pieces.<span className="font-bold">pelementor_cached</span>
+              <div className="torna3-zarno-column">
+                <label className="torna3-zarno-label">
+                  gcon_pieces.<span className="torna3-zarno-label-bold">pelementor_cached</span>
                 </label>
-                <div className="flex gap-2">
+                <div className="torna3-zarno-textarea-group">
                   <textarea
                     readOnly
                     value={gconPiece?.pelementor_cached ? formatJsonString(gconPiece.pelementor_cached) : ''}
-                    style={{ 
-                      width: '500px', 
-                      height: '300px',
-                      resize: 'none'
-                    }}
+                    className="torna3-zarno-textarea"
                   />
-                  <div className="flex flex-col gap-2">
+                  <div className="torna3-zarno-button-group">
                     <button
                       onClick={handleCopyPelementorCached}
-                      className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                      className="torna3-zarno-button torna3-zarno-button-copy"
                     >
                       📋 Copy
                     </button>
                     <button
                       onClick={() => {
-                        const textarea = document.querySelector('textarea[style*="500px"]') as HTMLTextAreaElement;
+                        const textarea = document.querySelector('.torna3-zarno-textarea') as HTMLTextAreaElement;
                         if (textarea) {
-                          textarea.style.height = textarea.style.height === '300px' ? '500px' : '300px';
+                          textarea.style.height = textarea.style.height === '500px' ? '300px' : '500px';
                         }
                       }}
-                      className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
+                      className="torna3-zarno-button torna3-zarno-button-expand"
                     >
                       ↕️ Expand
                     </button>
@@ -171,36 +157,32 @@ export default function Torna3ZarnoAccordion({
               </div>
 
               {/* pelementor_edits section - 500px width */}
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-700 mb-2">
-                  gcon_pieces.<span className="font-bold">pelementor_edits</span>
+              <div className="torna3-zarno-column">
+                <label className="torna3-zarno-label">
+                  gcon_pieces.<span className="torna3-zarno-label-bold">pelementor_edits</span>
                 </label>
-                <div className="flex gap-2">
+                <div className="torna3-zarno-textarea-group">
                   <textarea
                     readOnly
                     value={gconPiece?.pelementor_edits ? formatJsonString(gconPiece.pelementor_edits) : ''}
-                    style={{ 
-                      width: '500px', 
-                      height: '300px',
-                      resize: 'none'
-                    }}
+                    className="torna3-zarno-textarea"
                   />
-                  <div className="flex flex-col gap-2">
+                  <div className="torna3-zarno-button-group">
                     <button
                       onClick={handleCopyPelementorEdits}
-                      className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                      className="torna3-zarno-button torna3-zarno-button-copy"
                     >
                       📋 Copy
                     </button>
                     <button
                       onClick={() => {
-                        const textareas = document.querySelectorAll('textarea[style*="500px"]');
+                        const textareas = document.querySelectorAll('.torna3-zarno-textarea');
                         const textarea = textareas[1] as HTMLTextAreaElement;
                         if (textarea) {
-                          textarea.style.height = textarea.style.height === '300px' ? '500px' : '300px';
+                          textarea.style.height = textarea.style.height === '500px' ? '300px' : '500px';
                         }
                       }}
-                      className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
+                      className="torna3-zarno-button torna3-zarno-button-expand"
                     >
                       ↕️ Expand
                     </button>
@@ -209,20 +191,20 @@ export default function Torna3ZarnoAccordion({
               </div>
 
               {/* F22 section - right side */}
-              <div className="flex flex-col items-end gap-3">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-gray-700">F22 Function Report:</label>
+              <div className="torna3-zarno-f22-section">
+                <div className="torna3-zarno-f22-controls">
+                  <label className="torna3-zarno-f22-label">F22 Function Report:</label>
                   <button
                     onClick={handleCopyF22Report}
-                    className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
                     disabled={!f22Report}
+                    className="torna3-zarno-button torna3-zarno-button-copy torna3-zarno-button-copy-small"
                   >
                     📋 Copy Report
                   </button>
                   <button
                     onClick={handleRunF22}
                     disabled={isRunningF22}
-                    className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors disabled:bg-gray-400"
+                    className="torna3-zarno-button torna3-zarno-button-f22"
                   >
                     {isRunningF22 ? 'Running...' : '🔍 Full Diagnostic'}
                   </button>
@@ -231,12 +213,7 @@ export default function Torna3ZarnoAccordion({
                 <textarea
                   readOnly
                   value={f22Report || 'F22 function reports will appear here after execution...\n\nLook for:\n- TontoNormalizationProcess1 results\n- mud_title and mud_content processing\n- Database verification results\n- Any error messages\n\nCheck browser console (F12) for detailed debug logs.'}
-                  style={{ 
-                    width: '500px', 
-                    height: '200px',
-                    resize: 'none'
-                  }}
-                  className="border border-gray-300 rounded p-3 text-sm font-mono bg-white"
+                  className="torna3-zarno-textarea-f22"
                 />
               </div>
             </div>
