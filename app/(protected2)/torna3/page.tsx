@@ -7,6 +7,7 @@ import FavaPageMasterWithPagination from '../fava/components/favaPageMasterWithP
 import { torna3TableConfig } from '../fava/config/torna3TableConfig';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { createTorna3TaniConfig } from './taniContent';
+import Torna3ZarnoAccordion from './components/Torna3ZarnoAccordion';
 
 export default function Torna3Page() {
   const [nemtorData, setNemtorData] = useState<any[]>([]);
@@ -15,6 +16,8 @@ export default function Torna3Page() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
   const [utg_id, setUtgId] = useState<string | null>(null);
   const [gconPieceId, setGconPieceId] = useState<string | null>(null);
+  const [gconPiece, setGconPiece] = useState<any>(null);
+  const [isZarnoOpen, setIsZarnoOpen] = useState<boolean>(false);
   const taniState = useFavaTaniSafe()?.state;
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
@@ -24,7 +27,22 @@ export default function Torna3Page() {
     const gconPieceIdParam = searchParams?.get('gcon_piece_id');
     setGconPieceId(gconPieceIdParam);
     
+    // Get zarno state from URL parameters
+    const zarnoState = searchParams?.get('zarno1');
+    setIsZarnoOpen(zarnoState === 'open');
+    
+    // Load zarno state from localStorage if not in URL
+    if (!zarnoState) {
+      const savedZarnoState = localStorage.getItem('torna3_zarno1_state');
+      setIsZarnoOpen(savedZarnoState === 'open');
+    }
+    
     fetchNemtorUnits(gconPieceIdParam);
+    
+    // Fetch gcon_piece data if gconPieceId exists
+    if (gconPieceIdParam) {
+      fetchGconPiece(gconPieceIdParam);
+    }
     
     // Listen for template selection events
     const handleTemplateSelected = async (event: any) => {
@@ -65,6 +83,19 @@ export default function Torna3Page() {
     };
   }, [searchParams]);
 
+  // Zarno toggle handler
+  const handleZarnoToggle = (open: boolean) => {
+    setIsZarnoOpen(open);
+    
+    // Save to localStorage
+    localStorage.setItem('torna3_zarno1_state', open ? 'open' : 'closed');
+    
+    // Update URL parameter
+    const url = new URL(window.location.href);
+    url.searchParams.set('zarno1', open ? 'open' : 'closed');
+    window.history.replaceState({}, '', url.toString());
+  };
+
   const fetchNemtorUnits = async (gconPieceId?: string | null) => {
     try {
       let query = supabase
@@ -90,6 +121,25 @@ export default function Torna3Page() {
       console.error('Error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const fetchGconPiece = async (gconPieceId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('gcon_pieces')
+        .select('id, asn_sitespren_base, mud_title, h1title, pelementor_cached, pelementor_edits, asn_image_plan_batch_id, post_name, pageslug, pageurl')
+        .eq('id', gconPieceId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching gcon piece:', error);
+        return;
+      }
+
+      setGconPiece(data);
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
   
@@ -248,6 +298,21 @@ export default function Torna3Page() {
       )}
       utg_id={utg_id || undefined}
     >
+      {/* Custom Zarno Section - Outside Fava System */}
+      {gconPieceId && gconPiece && (
+        <div style={{ 
+          marginTop: '20px',
+          marginBottom: '20px',
+          padding: '0 20px' 
+        }}>
+          <Torna3ZarnoAccordion 
+            gconPiece={gconPiece}
+            gconPieceId={gconPieceId}
+            isOpen={isZarnoOpen}
+            onToggle={handleZarnoToggle}
+          />
+        </div>
+      )}
     </FavaPageMasterWithPagination>
   );
 }
