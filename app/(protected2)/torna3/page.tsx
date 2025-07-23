@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useUser } from '@supabase/auth-helpers-react';
+import { useAuth } from '@/app/context/AuthContext';
 import { useFavaTaniSafe } from '../fava/components/favaTaniPopup/favaTaniConditionalProvider';
 import FavaPageMasterWithPagination from '../fava/components/favaPageMasterWithPagination';
 import { torna3TableConfig } from '../fava/config/torna3TableConfig';
@@ -22,7 +22,7 @@ export default function Torna3Page() {
   const taniState = useFavaTaniSafe()?.state;
   const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
-  const user = useUser();
+  const { user } = useAuth();
 
   useEffect(() => {
     // Get gcon_piece_id from URL parameters
