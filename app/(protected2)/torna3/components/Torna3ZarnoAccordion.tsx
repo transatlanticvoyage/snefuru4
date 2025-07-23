@@ -17,9 +17,6 @@ export default function Torna3ZarnoAccordion({
 }: Torna3ZarnoAccordionProps) {
   const [isRunningF22, setIsRunningF22] = useState(false);
   const [f22Report, setF22Report] = useState<string>('');
-  const [expandedCached, setExpandedCached] = useState(false);
-  const [expandedEdits, setExpandedEdits] = useState(false);
-  const [expandedF22, setExpandedF22] = useState(false);
 
   // Handle F22 function
   const handleRunF22 = async () => {
@@ -94,265 +91,157 @@ export default function Torna3ZarnoAccordion({
     return JSON.stringify(jsonString, null, 2);
   };
 
-  // Toggle accordion
-  const handleToggleAccordion = () => {
-    onToggle(!isOpen);
-  };
-
+  // Tornado-style container with transition
   return (
-    <div style={{
-      backgroundColor: '#fefef8',
-      border: '1px solid #e0e0e0',
-      borderRadius: '8px',
-      marginBottom: '20px',
-      overflow: 'hidden',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-    }}>
-      {/* Accordion Header */}
-      <div
-        onClick={handleToggleAccordion}
-        style={{
-          padding: '16px 20px',
-          backgroundColor: '#f8f9fa',
-          borderBottom: isOpen ? '1px solid #e0e0e0' : 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          transition: 'background-color 0.2s ease'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#e9ecef';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#f8f9fa';
-        }}
-      >
-        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#333' }}>
-          Zarno Area - Pelementor Data Inspector
-        </h3>
-        <span style={{ fontSize: '20px', color: '#666' }}>
-          {isOpen ? '▼' : '▶'}
-        </span>
-      </div>
-
-      {/* Accordion Content */}
-      {isOpen && (
-        <div style={{ padding: '20px' }}>
-          {/* Pelementor Cached Section */}
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              marginBottom: '10px' 
-            }}>
-              <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>
-                Pelementor Cached
-              </h4>
-              <div>
-                <button
-                  onClick={handleCopyPelementorCached}
-                  style={{
-                    padding: '6px 12px',
-                    marginRight: '8px',
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
-                  Copy
-                </button>
-                <button
-                  onClick={() => setExpandedCached(!expandedCached)}
-                  style={{
-                    padding: '6px 12px',
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
-                  {expandedCached ? 'Collapse' : 'Expand'}
-                </button>
-              </div>
-            </div>
-            <textarea
-              readOnly
-              value={gconPiece?.pelementor_cached ? formatJsonString(gconPiece.pelementor_cached) : ''}
-              style={{
-                width: '100%',
-                height: expandedCached ? '400px' : '100px',
-                padding: '10px',
-                backgroundColor: '#f8f9fa',
-                border: '1px solid #dee2e6',
-                borderRadius: '4px',
-                fontFamily: 'monospace',
-                fontSize: '12px',
-                resize: 'vertical'
-              }}
-            />
+    <div 
+      style={{ 
+        backgroundColor: '#fefef8', 
+        marginBottom: '20px',
+        borderRadius: '8px',
+        border: '1px solid #e5e7eb',
+        overflow: 'hidden',
+        transition: 'all 0.3s ease'
+      }}
+    >
+      {!isOpen ? (
+        // Tornado-style collapsed state
+        <div 
+          className="flex items-center justify-between px-4 hover:bg-yellow-50 cursor-pointer transition-colors"
+          style={{ width: '200px', height: '60px' }}
+          onClick={() => onToggle(true)}
+        >
+          <span className="text-sm font-medium text-gray-700 flex-1">
+            📂 Open Top Area Manager
+          </span>
+          <span className="text-xs text-gray-500 ml-2">zarno1</span>
+        </div>
+      ) : (
+        <>
+          {/* Tornado-style expanded header */}
+          <div className="flex items-center justify-between px-4 border-b border-gray-200" 
+               style={{ height: '60px', backgroundColor: '#fefef8' }}>
+            <button 
+              onClick={() => onToggle(false)}
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              📁 Compact
+            </button>
+            <span className="text-xs text-gray-500">zarno1</span>
           </div>
 
-          {/* Pelementor Edits Section */}
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              marginBottom: '10px' 
-            }}>
-              <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>
-                Pelementor Edits
-              </h4>
-              <div>
-                <button
-                  onClick={handleCopyPelementorEdits}
-                  style={{
-                    padding: '6px 12px',
-                    marginRight: '8px',
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
-                  Copy
-                </button>
-                <button
-                  onClick={() => setExpandedEdits(!expandedEdits)}
-                  style={{
-                    padding: '6px 12px',
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
-                  {expandedEdits ? 'Collapse' : 'Expand'}
-                </button>
-              </div>
-            </div>
-            <textarea
-              readOnly
-              value={gconPiece?.pelementor_edits ? formatJsonString(gconPiece.pelementor_edits) : ''}
-              style={{
-                width: '100%',
-                height: expandedEdits ? '400px' : '100px',
-                padding: '10px',
-                backgroundColor: '#f8f9fa',
-                border: '1px solid #dee2e6',
-                borderRadius: '4px',
-                fontFamily: 'monospace',
-                fontSize: '12px',
-                resize: 'vertical'
-              }}
-            />
-          </div>
-
-          {/* F22 Function Section */}
-          <div style={{ 
-            padding: '16px',
-            backgroundColor: '#e3f2fd',
-            borderRadius: '8px',
-            border: '1px solid #90caf9'
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              marginBottom: '16px' 
-            }}>
-              <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>
-                F22 Function - NWPI to GCON Pusher
-              </h4>
-              <button
-                onClick={handleRunF22}
-                disabled={isRunningF22}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: isRunningF22 ? '#6c757d' : '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: isRunningF22 ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
-                  fontWeight: 'bold'
-                }}
-              >
-                {isRunningF22 ? 'Running...' : 'Run F22'}
-              </button>
-            </div>
-
-            {f22Report && (
-              <div style={{ marginTop: '16px' }}>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  marginBottom: '10px' 
-                }}>
-                  <h5 style={{ margin: 0, fontSize: '14px', fontWeight: 'bold' }}>
-                    F22 Report:
-                  </h5>
-                  <div>
+          {/* Tornado-style horizontal 3-column layout */}
+          <div className="p-4">
+            <div className="flex items-start justify-between gap-6">
+              
+              {/* pelementor_cached section - 500px width */}
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-700 mb-2">
+                  gcon_pieces.<span className="font-bold">pelementor_cached</span>
+                </label>
+                <div className="flex gap-2">
+                  <textarea
+                    readOnly
+                    value={gconPiece?.pelementor_cached ? formatJsonString(gconPiece.pelementor_cached) : ''}
+                    style={{ 
+                      width: '500px', 
+                      height: '300px',
+                      resize: 'none'
+                    }}
+                  />
+                  <div className="flex flex-col gap-2">
                     <button
-                      onClick={handleCopyF22Report}
-                      style={{
-                        padding: '4px 8px',
-                        marginRight: '8px',
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px'
-                      }}
+                      onClick={handleCopyPelementorCached}
+                      className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
                     >
-                      Copy Report
+                      📋 Copy
                     </button>
                     <button
-                      onClick={() => setExpandedF22(!expandedF22)}
-                      style={{
-                        padding: '4px 8px',
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px'
+                      onClick={() => {
+                        const textarea = document.querySelector('textarea[style*="500px"]') as HTMLTextAreaElement;
+                        if (textarea) {
+                          textarea.style.height = textarea.style.height === '300px' ? '500px' : '300px';
+                        }
                       }}
+                      className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
                     >
-                      {expandedF22 ? 'Collapse' : 'Expand'}
+                      ↕️ Expand
                     </button>
                   </div>
                 </div>
-                <div style={{
-                  padding: '12px',
-                  backgroundColor: '#fff',
-                  border: '1px solid #dee2e6',
-                  borderRadius: '4px',
-                  fontFamily: 'monospace',
-                  fontSize: '12px',
-                  whiteSpace: 'pre-wrap',
-                  maxHeight: expandedF22 ? 'none' : '100px',
-                  overflow: expandedF22 ? 'visible' : 'auto'
-                }}>
-                  {f22Report}
+              </div>
+
+              {/* pelementor_edits section - 500px width */}
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-700 mb-2">
+                  gcon_pieces.<span className="font-bold">pelementor_edits</span>
+                </label>
+                <div className="flex gap-2">
+                  <textarea
+                    readOnly
+                    value={gconPiece?.pelementor_edits ? formatJsonString(gconPiece.pelementor_edits) : ''}
+                    style={{ 
+                      width: '500px', 
+                      height: '300px',
+                      resize: 'none'
+                    }}
+                  />
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={handleCopyPelementorEdits}
+                      className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                    >
+                      📋 Copy
+                    </button>
+                    <button
+                      onClick={() => {
+                        const textareas = document.querySelectorAll('textarea[style*="500px"]');
+                        const textarea = textareas[1] as HTMLTextAreaElement;
+                        if (textarea) {
+                          textarea.style.height = textarea.style.height === '300px' ? '500px' : '300px';
+                        }
+                      }}
+                      className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
+                    >
+                      ↕️ Expand
+                    </button>
+                  </div>
                 </div>
               </div>
-            )}
+
+              {/* F22 section - right side */}
+              <div className="flex flex-col items-end gap-3">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700">F22 Function Report:</label>
+                  <button
+                    onClick={handleCopyF22Report}
+                    className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                    disabled={!f22Report}
+                  >
+                    📋 Copy Report
+                  </button>
+                  <button
+                    onClick={handleRunF22}
+                    disabled={isRunningF22}
+                    className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors disabled:bg-gray-400"
+                  >
+                    {isRunningF22 ? 'Running...' : '🔍 Full Diagnostic'}
+                  </button>
+                </div>
+                
+                <textarea
+                  readOnly
+                  value={f22Report || 'F22 function reports will appear here after execution...\n\nLook for:\n- TontoNormalizationProcess1 results\n- mud_title and mud_content processing\n- Database verification results\n- Any error messages\n\nCheck browser console (F12) for detailed debug logs.'}
+                  style={{ 
+                    width: '500px', 
+                    height: '200px',
+                    resize: 'none'
+                  }}
+                  className="border border-gray-300 rounded p-3 text-sm font-mono bg-white"
+                />
+              </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
