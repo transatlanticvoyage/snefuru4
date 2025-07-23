@@ -320,7 +320,7 @@ export default function FavaCTCButtonsEnhanced({
 
   return (
     <div style={{
-      marginTop: '20px',
+      marginTop: '0px',
       padding: '16px',
       backgroundColor: '#fff3cd',
       border: '2px solid #ffeaa7',

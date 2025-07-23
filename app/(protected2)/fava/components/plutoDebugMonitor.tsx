@@ -18,7 +18,7 @@ interface Tab {
 const TABS: Tab[] = [
   { id: 'debug', label: 'Debug' },
   { id: 'instrument', label: 'Instrument' },
-  { id: 'sarno', label: 'Utensil' }
+  { id: 'sarno', label: 'Utensil (Jetstream)' }
 ];
 
 export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
@@ -81,7 +81,7 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
     };
   }, [utg_id]);
 
-  // Minimized view - top left corner
+  // Minimized view - top right corner
   if (isMinimized) {
     return (
       <button
@@ -97,7 +97,7 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
         style={{
           position: 'fixed',
           top: '10px',
-          left: '36px', // 10px + 26px margin to avoid overlap with nav toggle
+          right: '10px', // Positioned in upper right corner
           width: '26px',
           height: '26px',
           background: '#007bff',
@@ -172,7 +172,7 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
 
   const renderSarnoContent = () => (
     <div style={{ padding: '10px', textAlign: 'center', color: '#666' }}>
-      Utensil content will be implemented here
+      Utensil (Jetstream) content will be implemented here
     </div>
   );
 
