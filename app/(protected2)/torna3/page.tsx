@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useFavaTaniSafe } from '../fava/components/favaTaniPopup/favaTaniConditionalProvider';
 import FavaPageMasterWithPagination from '../fava/components/favaPageMasterWithPagination';
 import { torna3TableConfig } from '../fava/config/torna3TableConfig';
@@ -13,11 +14,17 @@ export default function Torna3Page() {
   const [activeColumns, setActiveColumns] = useState<string[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
   const [utg_id, setUtgId] = useState<string | null>(null);
+  const [gconPieceId, setGconPieceId] = useState<string | null>(null);
   const taniState = useFavaTaniSafe()?.state;
   const supabase = createClientComponentClient();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    fetchNemtorUnits();
+    // Get gcon_piece_id from URL parameters
+    const gconPieceIdParam = searchParams?.get('gcon_piece_id');
+    setGconPieceId(gconPieceIdParam);
+    
+    fetchNemtorUnits(gconPieceIdParam);
     
     // Listen for template selection events
     const handleTemplateSelected = async (event: any) => {
@@ -56,13 +63,20 @@ export default function Torna3Page() {
       window.removeEventListener('fava-template-loaded', handleTemplateLoaded);
       window.removeEventListener('fava-template-show-all', handleShowAll);
     };
-  }, []);
+  }, [searchParams]);
 
-  const fetchNemtorUnits = async () => {
+  const fetchNemtorUnits = async (gconPieceId?: string | null) => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('nemtor_units')
-        .select('*')
+        .select('*');
+      
+      // Filter by gcon_piece_id if provided
+      if (gconPieceId) {
+        query = query.eq('fk_gcon_piece_id', gconPieceId);
+      }
+      
+      const { data, error } = await query
         .order('sort_index', { ascending: true })
         .order('position_order', { ascending: true });
 
