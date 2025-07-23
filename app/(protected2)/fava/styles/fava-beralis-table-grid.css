@@ -1,2 +1,49 @@
 /* Beralis - Default Fava Table Grid System */
 /* This file contains the default UI table grid styling for all pages using the fava system */
+
+/* Main fava UI table grid - base styles */
+.main-beralis-table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.main-beralis-table th,
+.main-beralis-table td {
+  height: var(--beralis-row-height, 40px);
+  max-height: var(--beralis-row-height, 40px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 8px 12px;
+  border: 1px solid #dee2e6;
+}
+
+.main-beralis-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.main-beralis-table td {
+  background-color: #ffffff;
+}
+
+/* Width control classes */
+.main-beralis-table .col-narrow { 
+  width: var(--beralis-col-narrow, 100px); 
+  max-width: var(--beralis-col-narrow, 100px); 
+}
+
+.main-beralis-table .col-medium { 
+  width: var(--beralis-col-medium, 200px); 
+  max-width: var(--beralis-col-medium, 200px); 
+}
+
+.main-beralis-table .col-wide { 
+  width: var(--beralis-col-wide, 300px); 
+  max-width: var(--beralis-col-wide, 300px); 
+}

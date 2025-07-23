@@ -1,0 +1,27 @@
+/* Torna3 Beralis Table Grid Overrides */
+/* This file contains page-specific table styling that overrides/extends the default Beralis styles */
+/* Filename pattern for fava system pages: beralis-table-overrides.css */
+
+/* Torna3-specific overrides for main table */
+.main-beralis-table.nemtor-units-table {
+  --beralis-row-height: 45px; /* Taller rows for torna3 */
+  --beralis-col-narrow: 120px; /* Wider narrow columns */
+  background-color: #fefef8; /* Torna3 theme color */
+  border-radius: 8px;
+}
+
+.main-beralis-table.nemtor-units-table th {
+  background-color: #e8f4f8; /* Torna3 header color */
+  font-size: 14px;
+  color: #2c5282;
+}
+
+.main-beralis-table.nemtor-units-table td {
+  font-size: 13px;
+  color: #2d3748;
+}
+
+/* Hover effects for torna3 */
+.main-beralis-table.nemtor-units-table tbody tr:hover {
+  background-color: #f0f8ff;
+}

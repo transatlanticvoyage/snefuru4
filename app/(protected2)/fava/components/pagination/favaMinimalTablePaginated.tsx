@@ -61,7 +61,7 @@ export default function FavaMinimalTablePaginated({
 
   return (
     <table 
-      className={tableClassName}
+      className={`main-beralis-table ${tableClassName || ''}`}
       style={{
         borderCollapse: 'collapse',
         border: '1px solid #d7d7d7'
