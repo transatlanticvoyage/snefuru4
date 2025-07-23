@@ -8,13 +8,15 @@ interface Torna3ZarnoAccordionProps {
   gconPieceId: string;
   isOpen: boolean;
   onToggle: (open: boolean) => void;
+  onRefreshData?: () => Promise<void>;
 }
 
 export default function Torna3ZarnoAccordion({ 
   gconPiece, 
   gconPieceId, 
   isOpen, 
-  onToggle 
+  onToggle,
+  onRefreshData 
 }: Torna3ZarnoAccordionProps) {
   const [isRunningF22, setIsRunningF22] = useState(false);
   const [f22Report, setF22Report] = useState<string>('');
@@ -44,6 +46,11 @@ export default function Torna3ZarnoAccordion({
 
       if (response.ok) {
         setF22Report(result.message || 'F22 function completed successfully');
+        
+        // Refresh the gcon_piece data to get updated values
+        if (onRefreshData) {
+          await onRefreshData();
+        }
       } else {
         setF22Report(`Error: ${result.error || 'F22 function failed'}`);
       }
@@ -192,6 +199,14 @@ export default function Torna3ZarnoAccordion({
 
               {/* F22 section - right side */}
               <div className="torna3-zarno-f22-section">
+                <button
+                  onClick={handleRunF22}
+                  disabled={isRunningF22}
+                  className="torna3-zarno-button torna3-zarno-button-f22-main"
+                >
+                  {isRunningF22 ? 'Running f22...' : 'Run f22 on this gcon_pieces row'}
+                </button>
+                
                 <div className="torna3-zarno-f22-controls">
                   <label className="torna3-zarno-f22-label">F22 Function Report:</label>
                   <button

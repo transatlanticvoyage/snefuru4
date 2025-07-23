@@ -209,6 +209,26 @@
   gap: 12px;
 }
 
+/* F22 Main Button */
+.torna3-zarno-button-f22-main {
+  padding: 8px 16px;
+  background-color: #7c3aed;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.torna3-zarno-button-f22-main:hover {
+  background-color: #6d28d9;
+}
+
+.torna3-zarno-button-f22-main:disabled {
+  background-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
 .torna3-zarno-f22-controls {
   display: flex;
   align-items: center;
