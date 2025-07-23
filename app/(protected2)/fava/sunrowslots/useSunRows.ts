@@ -1,37 +1,37 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MoonRowsConfig, MoonRowsHookResult, PageMoonRowsConfig } from './moonRowsTypes';
-import { DEFAULT_MOON_ROWS_CONFIG } from './MoonRowsDefaultConfig';
+import { SunRowsConfig, SunRowsHookResult, PageSunRowsConfig } from './sunRowsTypes';
+import { DEFAULT_SUN_ROWS_CONFIG } from './SunRowsDefaultConfig';
 
 /**
- * Hook to manage Moon Row Slots configuration
+ * Hook to manage Sun Row Slots configuration
  * @param pageKey - Unique identifier for the page (e.g., 'torna3', 'admin_favaconfigman')
  * @param utg_id - User/template group ID for scoped settings
- * @returns Moon rows configuration and state
+ * @returns Sun rows configuration and state
  */
-export const useMoonRows = (pageKey?: string, utg_id?: string | number): MoonRowsHookResult => {
-  const [config, setConfig] = useState<MoonRowsConfig>(DEFAULT_MOON_ROWS_CONFIG);
+export const useSunRows = (pageKey?: string, utg_id?: string | number): SunRowsHookResult => {
+  const [config, setConfig] = useState<SunRowsConfig>(DEFAULT_SUN_ROWS_CONFIG);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    const loadMoonRowsConfig = async () => {
+    const loadSunRowsConfig = async () => {
       try {
         setIsLoading(true);
         setError(undefined);
 
         // Start with default configuration
-        let finalConfig: MoonRowsConfig = { ...DEFAULT_MOON_ROWS_CONFIG };
+        let finalConfig: SunRowsConfig = { ...DEFAULT_SUN_ROWS_CONFIG };
 
         // If pageKey is provided, try to load page-specific configuration
         if (pageKey) {
           finalConfig.pageKey = pageKey;
           
           try {
-            // Attempt to load page-specific config from moonrowpageconfigs folder
-            const pageConfigModule = await import(`./moonrowpageconfigs/${pageKey}Config`);
-            const pageConfig: PageMoonRowsConfig = pageConfigModule.default || pageConfigModule[pageKey + 'Config'];
+            // Attempt to load page-specific config from sunrowpageconfigs folder
+            const pageConfigModule = await import(`./sunrowpageconfigs/${pageKey}Config`);
+            const pageConfig: PageSunRowsConfig = pageConfigModule.default || pageConfigModule[pageKey + 'Config'];
             
             if (pageConfig) {
               // Merge page-specific config with default
@@ -43,13 +43,13 @@ export const useMoonRows = (pageKey?: string, utg_id?: string | number): MoonRow
             }
           } catch (importError) {
             // Page-specific config doesn't exist, use default
-            console.log(`🌙 No custom config found for page '${pageKey}', using default configuration`);
+            console.log(`☀️ No custom config found for page '${pageKey}', using default configuration`);
           }
         }
 
         // Check for user customizations in localStorage (scoped by utg_id)
         if (utg_id) {
-          const storageKey = `fava_moon_rows_${pageKey || 'default'}_${utg_id}`;
+          const storageKey = `fava_sun_rows_${pageKey || 'default'}_${utg_id}`;
           const storedCustomizations = localStorage.getItem(storageKey);
           
           if (storedCustomizations) {
@@ -60,26 +60,26 @@ export const useMoonRows = (pageKey?: string, utg_id?: string | number): MoonRow
                 ...customizations,
                 rows: customizations.rows || finalConfig.rows
               };
-              console.log(`🌙 Loaded user customizations for ${pageKey} (${utg_id})`);
+              console.log(`☀️ Loaded user customizations for ${pageKey} (${utg_id})`);
             } catch (parseError) {
-              console.error('🌙 Error parsing stored moon rows customizations:', parseError);
+              console.error('☀️ Error parsing stored sun rows customizations:', parseError);
             }
           }
         }
 
         setConfig(finalConfig);
-        console.log(`🌙 Moon rows config loaded for page '${pageKey}':`, finalConfig);
+        console.log(`☀️ Sun rows config loaded for page '${pageKey}':`, finalConfig);
         
       } catch (loadError) {
-        console.error('🌙 Error loading moon rows configuration:', loadError);
-        setError('Failed to load moon rows configuration');
-        setConfig(DEFAULT_MOON_ROWS_CONFIG);
+        console.error('☀️ Error loading sun rows configuration:', loadError);
+        setError('Failed to load sun rows configuration');
+        setConfig(DEFAULT_SUN_ROWS_CONFIG);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadMoonRowsConfig();
+    loadSunRowsConfig();
   }, [pageKey, utg_id]);
 
   return {
@@ -91,27 +91,27 @@ export const useMoonRows = (pageKey?: string, utg_id?: string | number): MoonRow
 
 /**
  * Utility function to save user customizations to localStorage
- * @param config - Moon rows configuration to save
+ * @param config - Sun rows configuration to save
  * @param pageKey - Page identifier
  * @param utg_id - User/template group ID
  */
-export const saveMoonRowsCustomization = (
-  config: Partial<MoonRowsConfig>,
+export const saveSunRowsCustomization = (
+  config: Partial<SunRowsConfig>,
   pageKey: string,
   utg_id?: string | number
 ): void => {
   if (!utg_id) return;
 
   try {
-    const storageKey = `fava_moon_rows_${pageKey}_${utg_id}`;
+    const storageKey = `fava_sun_rows_${pageKey}_${utg_id}`;
     localStorage.setItem(storageKey, JSON.stringify(config));
-    console.log(`🌙 Saved moon rows customization for ${pageKey} (${utg_id})`);
+    console.log(`☀️ Saved sun rows customization for ${pageKey} (${utg_id})`);
     
     // Dispatch custom event for real-time updates
-    window.dispatchEvent(new CustomEvent('moon-rows-changed', {
+    window.dispatchEvent(new CustomEvent('sun-rows-changed', {
       detail: { pageKey, utg_id, config }
     }));
   } catch (error) {
-    console.error('🌙 Error saving moon rows customization:', error);
+    console.error('☀️ Error saving sun rows customization:', error);
   }
 };

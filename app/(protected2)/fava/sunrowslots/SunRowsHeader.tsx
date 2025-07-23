@@ -1,27 +1,27 @@
 'use client';
 
 import React from 'react';
-import { MoonRowsConfig, MoonRowConfig, MoonRowCellConfig } from './moonRowsTypes';
+import { SunRowsConfig, SunRowConfig, SunRowCellConfig } from './sunRowsTypes';
 
-interface MoonRowsHeaderProps {
-  config: MoonRowsConfig;
+interface SunRowsHeaderProps {
+  config: SunRowsConfig;
   loading?: boolean;
 }
 
-export default function MoonRowsHeader({ config, loading = false }: MoonRowsHeaderProps) {
+export default function SunRowsHeader({ config, loading = false }: SunRowsHeaderProps) {
   if (loading) {
     return (
       <thead>
         <tr>
           <th style={{ padding: '8px', textAlign: 'center', color: '#666' }}>
-            Loading moon rows...
+            Loading sun rows...
           </th>
         </tr>
       </thead>
     );
   }
 
-  const renderCell = (cell: MoonRowCellConfig, rowIndex: number, cellIndex: number) => {
+  const renderCell = (cell: SunRowCellConfig, rowIndex: number, cellIndex: number) => {
     const cellStyle: React.CSSProperties = {
       padding: '8px',
       border: '1px solid #ddd',
@@ -46,7 +46,7 @@ export default function MoonRowsHeader({ config, loading = false }: MoonRowsHead
     );
   };
 
-  const renderRow = (row: MoonRowConfig, index: number) => {
+  const renderRow = (row: SunRowConfig, index: number) => {
     const rowStyle: React.CSSProperties = {
       height: row.height || 'auto',
       ...row.style
@@ -54,7 +54,7 @@ export default function MoonRowsHeader({ config, loading = false }: MoonRowsHead
 
     return (
       <tr 
-        key={row.id || `moon-row-${index}`}
+        key={row.id || `sun-row-${index}`}
         className={row.className || ''}
         style={rowStyle}
       >

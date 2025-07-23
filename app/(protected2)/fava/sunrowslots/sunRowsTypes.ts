@@ -1,6 +1,6 @@
-// TypeScript interfaces for Moon Row Slots system
+// TypeScript interfaces for Sun Row Slots system
 
-export interface MoonRowCellConfig {
+export interface SunRowCellConfig {
   id: string;
   content: string | React.ReactNode;
   colspan?: number;
@@ -12,16 +12,16 @@ export interface MoonRowCellConfig {
   style?: React.CSSProperties;
 }
 
-export interface MoonRowConfig {
+export interface SunRowConfig {
   id: string;
-  cells: MoonRowCellConfig[];
+  cells: SunRowCellConfig[];
   height?: number;
   className?: string;
   style?: React.CSSProperties;
 }
 
-export interface MoonRowsConfig {
-  rows: MoonRowConfig[];
+export interface SunRowsConfig {
+  rows: SunRowConfig[];
   defaultRowCount: number;
   stickyHeader?: boolean;
   pageKey?: string;
@@ -29,14 +29,14 @@ export interface MoonRowsConfig {
   style?: React.CSSProperties;
 }
 
-export interface MoonRowsHookResult {
-  config: MoonRowsConfig;
+export interface SunRowsHookResult {
+  config: SunRowsConfig;
   isLoading: boolean;
   error?: string;
 }
 
 // Page-specific configuration override interface
-export interface PageMoonRowsConfig extends Partial<MoonRowsConfig> {
+export interface PageSunRowsConfig extends Partial<SunRowsConfig> {
   pageKey: string;
   extends?: 'default' | string; // Which config to extend from
 }

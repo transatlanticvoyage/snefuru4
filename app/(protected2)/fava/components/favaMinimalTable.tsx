@@ -1,7 +1,7 @@
 import { HeaderRowDefinition } from '../config/tableConfig.sample';
 import { processHeaderRows, HeaderRowRenderOptions } from './favaHeaderRows';
-import MoonRowsHeader from '../moonrowslots/MoonRowsHeader';
-import { useMoonRows } from '../moonrowslots/useMoonRows';
+import SunRowsHeader from '../sunrowslots/SunRowsHeader';
+import { useSunRows } from '../sunrowslots/useSunRows';
 
 interface MinimalTableProps {
   // Data props
@@ -9,10 +9,10 @@ interface MinimalTableProps {
   headerRows?: HeaderRowDefinition[]; // New header row configuration support
   data: any[][];
   
-  // Moon Rows system props
-  useMoonRows?: boolean; // Enable moon rows system
-  moonRowsPageKey?: string; // Page key for moon rows config
-  moonRowsUtgId?: string | number; // UTG ID for moon rows scoping
+  // Sun Rows system props
+  useSunRows?: boolean; // Enable sun rows system
+  sunRowsPageKey?: string; // Page key for sun rows config
+  sunRowsUtgId?: string | number; // UTG ID for sun rows scoping
   
   // Base element styling props
   tableClassName?: string;
@@ -39,9 +39,9 @@ export default function FavaMinimalTable({
   headers,
   headerRows,
   data,
-  useMoonRows: enableMoonRows = false,
-  moonRowsPageKey,
-  moonRowsUtgId,
+  useSunRows: enableSunRows = false,
+  sunRowsPageKey,
+  sunRowsUtgId,
   tableClassName,
   theadClassName,
   tbodyClassName,
@@ -57,10 +57,10 @@ export default function FavaMinimalTable({
   cellIds,
   cellClasses
 }: MinimalTableProps) {
-  // Moon Rows system integration
-  const moonRowsResult = useMoonRows(
-    enableMoonRows ? moonRowsPageKey : undefined,
-    enableMoonRows ? moonRowsUtgId : undefined
+  // Sun Rows system integration
+  const sunRowsResult = useSunRows(
+    enableSunRows ? sunRowsPageKey : undefined,
+    enableSunRows ? sunRowsUtgId : undefined
   );
 
   // Process header rows if provided (existing system)
@@ -79,11 +79,11 @@ export default function FavaMinimalTable({
         border: '1px solid #d7d7d7'
       }}
     >
-      {/* Priority order: Moon Rows > Header Rows > Simple Headers */}
-      {enableMoonRows ? (
-        <MoonRowsHeader 
-          config={moonRowsResult.config}
-          loading={moonRowsResult.isLoading}
+      {/* Priority order: Sun Rows > Header Rows > Simple Headers */}
+      {enableSunRows ? (
+        <SunRowsHeader 
+          config={sunRowsResult.config}
+          loading={sunRowsResult.isLoading}
         />
       ) : (
         <thead className={theadClassName}>
