@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-// import '../styles/zarno-accordion.css';
+import '../styles/zarno-accordion.css';
 
 interface Torna3ZarnoAccordionProps {
   gconPiece: any;
@@ -32,7 +32,7 @@ export default function Torna3ZarnoAccordion({
     setF22Report('Starting F22 processing...');
 
     try {
-      const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
+      const response = await fetch('/api/f22-gcon-piece-processor', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

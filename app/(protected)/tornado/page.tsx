@@ -304,7 +304,7 @@ export default function TornadoPage() {
     setF22Report('Starting F22 processing...');
 
     try {
-      const response = await fetch('/api/f22-nwpi-to-gcon-pusher', {
+      const response = await fetch('/api/f22-gcon-piece-processor', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

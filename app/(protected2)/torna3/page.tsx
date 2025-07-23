@@ -312,17 +312,17 @@ export default function Torna3Page() {
         utg_id || undefined
       )}
       utg_id={utg_id || undefined}
-      // zarnoContent={
-      //   gconPieceId && gconPiece ? (
-      //     <Torna3ZarnoAccordion 
-      //       gconPiece={gconPiece}
-      //       gconPieceId={gconPieceId}
-      //       isOpen={isZarnoOpen}
-      //       onToggle={handleZarnoToggle}
-      //       onRefreshData={refreshGconPiece}
-      //     />
-      //   ) : undefined
-      // }
+      zarnoContent={
+        gconPieceId && gconPiece ? (
+          <Torna3ZarnoAccordion 
+            gconPiece={gconPiece}
+            gconPieceId={gconPieceId}
+            isOpen={isZarnoOpen}
+            onToggle={handleZarnoToggle}
+            onRefreshData={refreshGconPiece}
+          />
+        ) : undefined
+      }
     >
     </FavaPageMasterWithPagination>
   );
