@@ -25,7 +25,7 @@ import '../styles/fava-beralis-table-grid.css';
 
 interface FavaPageMasterProps {
   // Page configuration
-  pageTitle?: string;
+  pageTitle?: string | ReactNode;
   pageDescription?: string | ReactNode;
   documentTitle?: string;
   
@@ -107,7 +107,7 @@ export default function FavaPageMaster({
   const resolvedTaniFlags = taniPreset ? FAVA_TANI_PRESETS[taniPreset] : { ...FAVA_TANI_PRESETS.standard, ...taniFlags };
   const resolvedTaniConfig: FavaTaniConfig = {
     ...FAVA_TANI_DEFAULT_CONFIG,
-    id: `fava-tani-${pageTitle?.toLowerCase().replace(/\s+/g, '-') || 'default'}`,
+    id: `fava-tani-${typeof pageTitle === 'string' ? pageTitle.toLowerCase().replace(/\s+/g, '-') : 'default'}`,
     title: pageTitle || 'Functions',
     ...taniConfig
   };

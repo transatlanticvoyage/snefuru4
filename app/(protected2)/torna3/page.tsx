@@ -277,7 +277,16 @@ export default function Torna3Page() {
 
   return (
     <FavaPageMasterWithPagination
-      pageTitle="Tornado Page Editor System"
+      pageTitle={
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img 
+            src="/images_of_app/tornado-logo-1.jpg" 
+            alt="Tornado Logo" 
+            style={{ height: '40px', width: 'auto' }}
+          />
+          <span>Tornado Page Editor System</span>
+        </div>
+      }
       pageDescription={`${nemtorData.length} units • ${visibleColumns.length} of ${torna3TableConfig.columns.length} columns shown • Elementor widget tracking`}
       documentTitle="Nemtor Units - /torna3"
       tableProps={tableProps}

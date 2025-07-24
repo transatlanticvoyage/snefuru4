@@ -26,7 +26,7 @@ import '../styles/fava-beralis-table-grid.css';
 
 interface PureFavaPageMasterProps {
   // Page configuration
-  pageTitle?: string;
+  pageTitle?: string | ReactNode;
   pageDescription?: string | ReactNode;
   documentTitle?: string;
   

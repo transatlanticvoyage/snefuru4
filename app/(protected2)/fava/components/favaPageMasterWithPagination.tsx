@@ -12,7 +12,7 @@ import { usePlutoSettings, getChamberClasses } from '../hooks/usePlutoSettings';
 // Extend the existing FavaPageMaster props
 interface FavaPageMasterWithPaginationProps {
   // All FavaPageMaster props
-  pageTitle?: string;
+  pageTitle?: string | React.ReactNode;
   pageDescription?: string | React.ReactNode;
   documentTitle?: string;
   showColumnTemplateControls?: boolean;
