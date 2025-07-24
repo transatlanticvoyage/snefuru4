@@ -8,6 +8,16 @@
   border-collapse: collapse;
 }
 
+
+  /* Fixed column width for all table columns */
+  .main-beralis-table th,
+  .main-beralis-table td {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+  }
+
+
 .main-beralis-table th,
 .main-beralis-table td {
   height: var(--beralis-row-height, 40px);
@@ -16,7 +26,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: middle;
-  padding: 8px 12px;
   border: 1px solid #dee2e6;
 }
 
@@ -32,7 +41,26 @@
   background-color: #ffffff;
 }
 
-/* Width control classes */
+
+/* Inner wrapper div for table cells */
+.main-beralis-table td .senlo-td-inner-wrapper-div {
+  /* Inherit cell dimensions */
+  height: 26px;
+  width: 100%;
+  padding: 8px 12px;
+  
+  /* Maintain text overflow behavior */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  /* Flexbox for better content control */
+  display: flex;
+  align-items: center;
+}
+
+
+/* Width control classes 
 .main-beralis-table .col-narrow { 
   width: var(--beralis-col-narrow, 100px); 
   max-width: var(--beralis-col-narrow, 100px); 
@@ -47,19 +75,7 @@
   width: var(--beralis-col-wide, 300px); 
   max-width: var(--beralis-col-wide, 300px); 
 }
+*/
 
-/* Inner wrapper div for table cells */
-.main-beralis-table td .senlo-td-inner-wrapper-div {
-  /* Inherit cell dimensions */
-  height: 26px;
-  width: 100%;
-  
-  /* Maintain text overflow behavior */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  
-  /* Flexbox for better content control */
-  display: flex;
-  align-items: center;
-}
+
+
