@@ -87,6 +87,14 @@ export default function FavaMinimalTable({
         />
       ) : (
         <thead className={theadClassName}>
+          {/* Horomi row - always first row in thead */}
+          <tr className="horomi-row">
+            <th className="dawncell">dawncell (horomi row + vertomi column origin)</th>
+            {(headers || processedHeaderRows?.[0]?.processedCells || []).map((_, colIndex) => (
+              <th key={`horomi-${colIndex}`} className="horomi-cell"></th>
+            ))}
+          </tr>
+          
           {/* Render configured header rows or fallback to simple headers */}
           {processedHeaderRows ? (
           processedHeaderRows.map((headerRow) => (
@@ -98,6 +106,8 @@ export default function FavaMinimalTable({
                 ...(headerRow.type === 'label' ? { fontWeight: 'bold' } : {})
               }}
             >
+              {/* Vertomi column cell */}
+              <th className="vertomi-column"></th>
               {headerRow.processedCells.map((cell) => (
                 <th 
                   key={cell.key}
@@ -118,6 +128,8 @@ export default function FavaMinimalTable({
         ) : (
           /* Fallback to simple headers for backward compatibility */
           <tr className={headerTrClassName || trClassName}>
+            {/* Vertomi column cell */}
+            <th className="vertomi-column"></th>
             {headers?.map((header, colIndex) => (
               <th 
                 key={colIndex}
@@ -144,6 +156,8 @@ export default function FavaMinimalTable({
             onClick={() => onRowClick?.(rowIndex, row)}
             style={{ cursor: onRowClick ? 'pointer' : 'default' }}
           >
+            {/* Vertomi column cell */}
+            <td className="vertomi-column"></td>
             {row.map((cell, colIndex) => (
               <td 
                 key={colIndex}

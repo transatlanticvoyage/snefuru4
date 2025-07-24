@@ -59,6 +59,46 @@
   align-items: center;
 }
 
+/* Horomi row styling (top row) */
+.main-beralis-table .horomi-row {
+  background-color: #f0f8ff;
+  border-bottom: 2px solid #4a90e2;
+}
+
+.main-beralis-table .horomi-cell {
+  height: 30px;
+  min-height: 30px;
+  background-color: #f0f8ff;
+  border: 1px solid #4a90e2;
+  font-weight: normal;
+}
+
+/* Vertomi column styling (far left column) */
+.main-beralis-table .vertomi-column {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+  background-color: #f8f0ff;
+  border: 1px solid #8e44ad;
+  font-weight: normal;
+}
+
+/* Dawncell styling (intersection of horomi row and vertomi column) */
+.main-beralis-table .dawncell {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+  height: 30px;
+  min-height: 30px;
+  background-color: #fff8dc;
+  border: 2px solid #ff6b35;
+  font-weight: bold;
+  font-size: 10px;
+  text-align: center;
+  vertical-align: middle;
+  color: #d2691e;
+}
+
 
 /* Width control classes 
 .main-beralis-table .col-narrow { 
