@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlutoSettings, DEFAULT_PLUTO_SETTINGS, usePlutoInstrumentControls } from '../hooks/usePlutoSettings';
 import PlutoControlTable from './PlutoControlTable';
+import JetstreamUtensilTable from './JetstreamUtensilTable';
 
 interface PlutoDebugMonitorProps {
   utg_id?: string | number;
@@ -98,17 +99,17 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
           position: 'fixed',
           top: '10px',
           right: '10px', // Positioned in upper right corner
-          width: '26px',
-          height: '26px',
+          width: '52px',
+          height: '52px',
           background: '#007bff',
           border: 'none',
-          borderRadius: '4px',
+          borderRadius: '8px',
           color: '#fff',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '14px',
+          fontSize: '28px',
           fontWeight: 'bold',
           zIndex: 9999,
           boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
@@ -170,11 +171,13 @@ export default function PlutoDebugMonitor({ utg_id }: PlutoDebugMonitorProps) {
     );
   };
 
-  const renderSarnoContent = () => (
-    <div style={{ padding: '10px', textAlign: 'center', color: '#666' }}>
-      Utensil (Jetstream) content will be implemented here
-    </div>
-  );
+  const renderSarnoContent = () => {
+    return (
+      <div style={{ padding: '0' }}> {/* Remove padding to let JetstreamUtensilTable handle its own spacing */}
+        <JetstreamUtensilTable />
+      </div>
+    );
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
