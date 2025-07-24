@@ -1,7 +1,7 @@
 import { HeaderRowDefinition } from '../config/tableConfig.sample';
 import { processHeaderRows, HeaderRowRenderOptions } from './favaHeaderRows';
-import SunRowsHeader from '../sunrowslots/SunRowsHeader';
-import { useSunRows } from '../sunrowslots/useSunRows';
+import SunRowsHeader from './jetstream/sunrowslots/SunRowsHeader';
+import { useSunRows } from './jetstream/sunrowslots/useSunRows';
 
 interface MinimalTableProps {
   // Data props
