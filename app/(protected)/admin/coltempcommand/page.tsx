@@ -23,8 +23,8 @@ interface Coltemp {
   coltemp_icon: string | null; // deprecated
   icon_name: string | null;
   icon_color: string | null;
-  cached_denbu_count: number | null;
-  cached_denbu_json: any | null;
+  cached_rackui_count: number | null;
+  cached_rackui_json: any | null;
 }
 
 export default function ColtempCommandPage() {
@@ -171,7 +171,7 @@ export default function ColtempCommandPage() {
       // Fetch live count for each coltemp
       for (const coltemp of coltemps) {
         const { count, error } = await supabase
-          .from('coltemp_denbu_relations')
+          .from('coltemp_rackui_relations')
           .select('*', { count: 'exact', head: true })
           .eq('fk_coltemp_id', coltemp.coltemp_id)
           .eq('is_visible', true);
@@ -190,7 +190,7 @@ export default function ColtempCommandPage() {
   const refreshCache = async () => {
     try {
       // Trigger the cache update function
-      const { error } = await supabase.rpc('update_denbu_coltemp_cache');
+      const { error } = await supabase.rpc('update_rackui_coltemp_cache');
       if (error) throw error;
       
       // Refresh the data
@@ -635,7 +635,7 @@ export default function ColtempCommandPage() {
                 onClick={refreshCache}
                 className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
               >
-                update_denbu_coltemp_cache
+                update_rackui_coltemp_cache
               </button>
             </div>
             <div className="flex items-center gap-2">
@@ -732,7 +732,7 @@ export default function ColtempCommandPage() {
                   <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
-                  {Object.keys(data[0] || {}).filter(key => key !== 'cached_denbu_count' && key !== 'cached_denbu_json').map(key => (
+                  {Object.keys(data[0] || {}).filter(key => key !== 'cached_rackui_count' && key !== 'cached_rackui_json').map(key => (
                     <th
                       key={key}
                       className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider cursor-pointer hover:bg-gray-100"
@@ -749,10 +749,10 @@ export default function ColtempCommandPage() {
                     </th>
                   ))}
                   <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider">
-                    <span style={{ fontWeight: 'bold' }}>cached_denbu_count (json)</span>
+                    <span style={{ fontWeight: 'bold' }}>cached_rackui_count (json)</span>
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 tracking-wider">
-                    <span style={{ fontWeight: 'bold' }}>live_denbu_count (db)</span>
+                    <span style={{ fontWeight: 'bold' }}>live_rackui_count (db)</span>
                   </th>
                 </tr>
               </thead>
@@ -795,7 +795,7 @@ export default function ColtempCommandPage() {
                         )}
                       </div>
                     </td>
-                    {Object.entries(row).filter(([key]) => key !== 'cached_denbu_count' && key !== 'cached_denbu_json').map(([key, value]) => {
+                    {Object.entries(row).filter(([key]) => key !== 'cached_rackui_count' && key !== 'cached_rackui_json').map(([key, value]) => {
                       const isEditing = editingCell?.id === row.coltemp_id && editingCell?.field === key;
                       const isEditable = inlineEditableFields.includes(key);
                       
@@ -832,9 +832,9 @@ export default function ColtempCommandPage() {
                     <td className="px-3 py-2 text-sm text-gray-900">
                       {(() => {
                         try {
-                          const jsonData = typeof row.cached_denbu_json === 'string' 
-                            ? JSON.parse(row.cached_denbu_json) 
-                            : row.cached_denbu_json;
+                          const jsonData = typeof row.cached_rackui_json === 'string' 
+                            ? JSON.parse(row.cached_rackui_json) 
+                            : row.cached_rackui_json;
                           return Array.isArray(jsonData) ? jsonData.length : 0;
                         } catch {
                           return 0;

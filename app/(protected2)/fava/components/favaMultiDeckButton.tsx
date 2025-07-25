@@ -72,9 +72,9 @@ export default function FavaMultiDeckButton({
     borderRight: '1px solid #aaa'
   };
 
-  const handleDenbujarClick = () => {
-    // Open denbujar page in new tab
-    window.open('/denbujar', '_blank');
+  const handleRackuijarClick = () => {
+    // Open rackuijar page in new tab
+    window.open('/rackuijar', '_blank');
   };
 
   const handleAction2Click = () => {
@@ -119,7 +119,7 @@ export default function FavaMultiDeckButton({
       <div style={deckLevel1Style}>
         <div 
           style={{...actionAreaStyle, backgroundColor: '#d4d4d4'}}
-          onClick={handleDenbujarClick}
+          onClick={handleRackuijarClick}
           title="Open Denbujar"
         >
           DB

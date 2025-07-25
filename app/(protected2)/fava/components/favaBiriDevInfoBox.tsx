@@ -17,7 +17,7 @@ export default function FavaBiriDevInfoBox() {
       xapges.column count qty<br></br>
       columns definition w vscode link<br></br>
       -- link to /coltempcommand --<br></br>
-      -- link to /denbujar --<br></br>
+      -- link to /rackuijar --<br></br>
     </div>
   );
 }

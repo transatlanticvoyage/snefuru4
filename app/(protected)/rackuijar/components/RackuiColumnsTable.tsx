@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-interface DenbuColumns {
+interface RackuiColumns {
   column_id: number;
   rel_utg_id: string;
   column_name: string;
@@ -14,15 +14,15 @@ interface DenbuColumns {
   default_position: number | null;
   created_at: string;
   updated_at: string;
-  denbucol_width: string | null;
+  rackuicol_width: string | null;
   user_id: string;
 }
 
-export default function DenbuColumnsTable() {
+export default function RackuiColumnsTable() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const [data, setData] = useState<DenbuColumns[]>([]);
+  const [data, setData] = useState<RackuiColumns[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -30,8 +30,8 @@ export default function DenbuColumnsTable() {
   const [searchTerm, setSearchTerm] = useState(searchParams?.get('search') || '');
   const [currentPage, setCurrentPage] = useState(Number(searchParams?.get('page')) || 1);
   const [itemsPerPage, setItemsPerPage] = useState(Number(searchParams?.get('perPage')) || 200);
-  const [sortField, setSortField] = useState<keyof DenbuColumns | null>(
-    (searchParams?.get('sortField') as keyof DenbuColumns) || null
+  const [sortField, setSortField] = useState<keyof RackuiColumns | null>(
+    (searchParams?.get('sortField') as keyof RackuiColumns) || null
   );
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
     (searchParams?.get('sortOrder') as 'asc' | 'desc') || 'asc'
@@ -53,11 +53,11 @@ export default function DenbuColumnsTable() {
   
   const supabase = createClientComponentClient();
 
-  // Create new denbu column
-  const createNewDenbuColumn = async () => {
+  // Create new rackui column
+  const createNewRackuiColumn = async () => {
     try {
       const { data: newRecord, error } = await supabase
-        .from('denbu_columns')
+        .from('rackui_columns')
         .insert({
           rel_utg_id: null,
           column_name: null,
@@ -65,14 +65,14 @@ export default function DenbuColumnsTable() {
           data_type: 'text',
           is_available: true,
           default_position: null,
-          denbucol_width: null,
+          rackuicol_width: null,
           user_id: null
         })
         .select()
         .single();
 
       if (error) {
-        console.error('Error creating new denbu column:', error);
+        console.error('Error creating new rackui column:', error);
         alert('Failed to create new record');
         return;
       }
@@ -84,7 +84,7 @@ export default function DenbuColumnsTable() {
       setCurrentPage(1);
       updateURLParams({ page: 1 });
     } catch (error) {
-      console.error('Error creating new denbu column:', error);
+      console.error('Error creating new rackui column:', error);
       alert('Failed to create new record');
     }
   };
@@ -105,7 +105,7 @@ export default function DenbuColumnsTable() {
   };
   
   // Get unique values for filters
-  const getUniqueValues = (field: keyof DenbuColumns) => {
+  const getUniqueValues = (field: keyof RackuiColumns) => {
     const values = data.map(item => item[field]).filter(val => val !== null && val !== undefined);
     return ['all', ...Array.from(new Set(values.map(v => String(v)))).sort()];
   };
@@ -119,7 +119,7 @@ export default function DenbuColumnsTable() {
     try {
       setLoading(true);
       const { data: tableData, error: fetchError } = await supabase
-        .from('denbu_columns')
+        .from('rackui_columns')
         .select('*')
         .order('created_at', { ascending: false });
         
@@ -141,9 +141,9 @@ export default function DenbuColumnsTable() {
     Object.entries(filters).forEach(([field, value]) => {
       if (value !== 'all') {
         if (field === 'is_available') {
-          filtered = filtered.filter(row => String(row[field as keyof DenbuColumns]) === value);
+          filtered = filtered.filter(row => String(row[field as keyof RackuiColumns]) === value);
         } else {
-          filtered = filtered.filter(row => row[field as keyof DenbuColumns] === value);
+          filtered = filtered.filter(row => row[field as keyof RackuiColumns] === value);
         }
       }
     });
@@ -188,7 +188,7 @@ export default function DenbuColumnsTable() {
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   
   // Handle sorting
-  const handleSort = (field: keyof DenbuColumns) => {
+  const handleSort = (field: keyof RackuiColumns) => {
     const newOrder = sortField === field ? (sortOrder === 'asc' ? 'desc' : 'asc') : 'asc';
     setSortField(field);
     setSortOrder(newOrder);
@@ -212,7 +212,7 @@ export default function DenbuColumnsTable() {
     try {
       const updates = { [editingCell.field]: editingValue || null };
       const { error } = await supabase
-        .from('denbu_columns')
+        .from('rackui_columns')
         .update(updates)
         .eq('column_id', editingCell.id);
 
@@ -263,7 +263,7 @@ export default function DenbuColumnsTable() {
 
   // Define which fields can be inline edited (varchar/text fields)
   const inlineEditableFields = [
-    'rel_utg_id', 'column_name', 'display_name', 'data_type', 'denbucol_width'
+    'rel_utg_id', 'column_name', 'display_name', 'data_type', 'rackuicol_width'
   ];
   
   // Get column headers in the order they appear in the interface
@@ -271,7 +271,7 @@ export default function DenbuColumnsTable() {
     return [
       'column_id', 'rel_utg_id', 'column_name', 'display_name', 'data_type',
       'is_available', 'default_position', 'created_at', 'updated_at', 
-      'denbucol_width', 'user_id'
+      'rackuicol_width', 'user_id'
     ];
   };
   
@@ -288,7 +288,7 @@ export default function DenbuColumnsTable() {
       {/* Create New Button */}
       <div className="mb-4">
         <button
-          onClick={createNewDenbuColumn}
+          onClick={createNewRackuiColumn}
           className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md transition-colors"
         >
           Create New Column
@@ -315,7 +315,7 @@ export default function DenbuColumnsTable() {
                 value !== 'all' ? 'bg-blue-900 text-white' : ''
               }`}
             >
-              {getUniqueValues(field as keyof DenbuColumns).map(option => (
+              {getUniqueValues(field as keyof RackuiColumns).map(option => (
                 <option key={option} value={option}>
                   {option === 'all' ? 'All' : option}
                 </option>
@@ -387,7 +387,7 @@ export default function DenbuColumnsTable() {
               {getColumnHeaders().map((column) => (
                 <th
                   key={column}
-                  onClick={() => handleSort(column as keyof DenbuColumns)}
+                  onClick={() => handleSort(column as keyof RackuiColumns)}
                   className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100 whitespace-nowrap border border-gray-200"
                 >
                   {column}

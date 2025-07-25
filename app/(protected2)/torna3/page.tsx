@@ -170,10 +170,10 @@ export default function Torna3Page() {
       
       // Fetch columns for this template from junction table
       const { data, error } = await supabase
-        .from('coltemp_denbu_relations')
+        .from('coltemp_rackui_relations')
         .select(`
-          fk_denbu_column_id,
-          denbu_columns (
+          fk_rackui_column_id,
+          rackui_columns (
             column_name
           )
         `)
@@ -188,7 +188,7 @@ export default function Torna3Page() {
       
       // Extract column names
       const columnNames = data?.map(item => 
-        (item.denbu_columns as any)?.column_name
+        (item.rackui_columns as any)?.column_name
       ).filter(Boolean) || [];
       
       setActiveColumns(columnNames);

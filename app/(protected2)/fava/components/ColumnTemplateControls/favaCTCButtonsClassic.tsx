@@ -351,7 +351,7 @@ export default function FavaCTCButtonsClassic({
         <div className="chamber-label-box clb-ocean-classic" style={{ marginBottom: '8px' }}>
           {title || 'Classic Buttons Ocean'}
         </div>
-        <strong>db tables:</strong> coltemps AND denbu_columns
+        <strong>db tables:</strong> coltemps AND rackui_columns
 
         {CATEGORIES.map((category) => {
           const categoryData = templates[category] || [];

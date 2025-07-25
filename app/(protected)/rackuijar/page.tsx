@@ -2,14 +2,14 @@
 
 import { useAuth } from '@/app/context/AuthContext';
 import Link from 'next/link';
-import DenbuColumnsTable from './components/DenbuColumnsTable';
+import RackuiColumnsTable from './components/RackuiColumnsTable';
 import { useEffect } from 'react';
 
-export default function DenbujarPage() {
+export default function RackuijarPage() {
   const { user } = useAuth();
 
   useEffect(() => {
-    document.title = "Denbu Columns Manager - Snefuru";
+    document.title = "Rackui Columns Manager - Snefuru";
   }, []);
 
   if (!user) {
@@ -31,14 +31,14 @@ export default function DenbujarPage() {
         
         <div className="mb-6">
           <div className="flex items-center gap-4 mb-2">
-            <h1 className="text-2xl font-bold">Denbu Columns Manager</h1>
+            <h1 className="text-2xl font-bold">Rackui Columns Manager</h1>
           </div>
           <p className="text-gray-600" style={{ fontSize: '16px' }}>
-            <span className="font-bold">main db table:</span> denbu_columns
+            <span className="font-bold">main db table:</span> rackui_columns
           </p>
         </div>
         
-        <DenbuColumnsTable />
+        <RackuiColumnsTable />
       </div>
     </div>
   );

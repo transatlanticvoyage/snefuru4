@@ -214,7 +214,7 @@ export function useColumnVisibilityData() {
           .select(`
             fk_denbu_column_id,
             column_position,
-            denbu_columns (
+            rackui_columns (
               column_name,
               default_position
             )
@@ -228,9 +228,9 @@ export function useColumnVisibilityData() {
           return;
         }
         
-        // Extract column positions directly from denbu_columns.default_position
+        // Extract column positions directly from rackui_columns.default_position
         const positions = data?.map(item => {
-          const defaultPosition = (item.denbu_columns as any)?.default_position;
+          const defaultPosition = (item.rackui_columns as any)?.default_position;
           return parseInt(defaultPosition);
         }).filter(pos => pos && pos >= 1 && pos <= 32) || [];
         
