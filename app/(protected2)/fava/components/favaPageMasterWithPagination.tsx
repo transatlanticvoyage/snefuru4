@@ -113,7 +113,6 @@ export default function FavaPageMasterWithPagination({
               data-debug-utg-id={favaProps.utg_id}
               data-debug-visible={plutoSettings.pagination_specificbar}
               style={{
-                border: '2px dashed teal',
                 padding: '5px',
                 marginBottom: '15px'
               }}

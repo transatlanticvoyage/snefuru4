@@ -1,0 +1,34 @@
+/* =============================================
+   FAVA PLUTO CONTROLIX STYLE SYSTEM
+   ============================================= */
+
+/* Main container div style for chambers */
+.controlix-chamber-main-container-div {
+  padding: 3px;
+  background-color: #fff;
+  border: 1px solid #3b3b3b;
+  border-radius: 0;
+  margin-top: 0px;
+}
+
+/* Apply to specific chambers when needed */
+.ocean-enhanced-chamber.controlix-chamber-main-container-div,
+.shendo-enhanced-chamber.controlix-chamber-main-container-div,
+.harpoon-preview-chamber.controlix-chamber-main-container-div,
+.harpoon-active-chamber.controlix-chamber-main-container-div,
+.rowfilters-chamber.controlix-chamber-main-container-div,
+.searchbox-chamber.controlix-chamber-main-container-div,
+.pagination-chief-chamber.controlix-chamber-main-container-div {
+  /* Inherits all controlix-chamber-main-container-div styles */
+}
+
+/* Override for classic chambers if different styling needed */
+.ocean-classic-chamber.controlix-chamber-main-container-div,
+.ocean-classic-chamber-2.controlix-chamber-main-container-div,
+.shendo-classic-chamber.controlix-chamber-main-container-div {
+  /* Add any classic-specific overrides here */
+}
+
+/* Future style types can be added below */
+/* .controlix-chambers-style-type-2 { } */
+/* .controlix-chambers-style-type-3 { } */

@@ -33,7 +33,6 @@ export default function FavaColVisMatPreviewBar(props: ColumnVisibilityMatrixPro
         width: finalProps.width,
         height: finalProps.height,
         backgroundColor: '#f8f9fa',
-        border: '1px solid #e9ecef',
         display: 'flex',
         alignItems: 'center',
         marginBottom: '8px',

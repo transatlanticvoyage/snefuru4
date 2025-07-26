@@ -23,6 +23,7 @@ import PlutoDebugMonitor from './plutoDebugMonitor';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
 import '../styles/fava-beralis-table-grid.css';
+import '../styles/fava-pluto-controlix.css';
 
 interface PureFavaPageMasterProps {
   // Page configuration
@@ -296,7 +297,6 @@ export default function PureFavaPageMaster({
                   data-debug-utg-id={utg_id}
                   data-debug-visible={plutoSettings.pagination_specificbar}
                   style={{
-                    border: '2px dashed teal',
                     padding: '5px',
                     marginBottom: '15px'
                   }}

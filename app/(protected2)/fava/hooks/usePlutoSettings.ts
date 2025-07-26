@@ -145,7 +145,7 @@ export const getChamberClasses = (
   chamberClassName: string
 ): string => {
   const isVisible = isChamberVisible(settings, chamberKey);
-  const classes = `${chamberClassName} pluto-controlled ${isVisible ? 'pluto-visible' : 'pluto-hidden'}`;
+  const classes = `${chamberClassName} pluto-controlled controlix-chamber-main-container-div ${isVisible ? 'pluto-visible' : 'pluto-hidden'}`;
   
   console.log('🔍 getChamberClasses - Generating classes:', {
     chamberKey,

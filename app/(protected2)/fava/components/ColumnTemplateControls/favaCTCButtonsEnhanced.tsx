@@ -319,13 +319,7 @@ export default function FavaCTCButtonsEnhanced({
   };
 
   return (
-    <div style={{
-      marginTop: '0px',
-      padding: '3px',
-      backgroundColor: '#fff',
-      border: '1px solid #3b3b3b',
-      borderRadius: '0'
-    }}>
+    <div>
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',

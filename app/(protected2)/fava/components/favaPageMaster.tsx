@@ -22,6 +22,7 @@ import { FavaPaginationConfig } from './pagination/favaPaginationTypes';
 import '../styles/fava-table-template.css';
 import '../styles/fava-navigation.css';
 import '../styles/fava-beralis-table-grid.css';
+import '../styles/fava-pluto-controlix.css';
 
 interface FavaPageMasterProps {
   // Page configuration
