@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 // PlutoSettings interface to match the one in plutoShowHideInstrument
 export interface PlutoSettings {
   ctc_buttons_ocean_classic: boolean;
-  ctc_buttons_ocean_classic_2: boolean;
   ctc_buttons_ocean_enhanced: boolean;
   ctc_shendo_classic: boolean;
   ctc_shendo_enhanced: boolean;
@@ -19,7 +18,6 @@ export interface PlutoSettings {
 // Default settings - all chambers visible by default
 export const DEFAULT_PLUTO_SETTINGS: PlutoSettings = {
   ctc_buttons_ocean_classic: true,
-  ctc_buttons_ocean_classic_2: true,
   ctc_buttons_ocean_enhanced: true,
   ctc_shendo_classic: true,
   ctc_shendo_enhanced: true,
@@ -231,7 +229,6 @@ export const usePlutoInstrumentControls = (utg_id?: string | number) => {
     
     const newSettings: PlutoSettings = {
       ctc_buttons_ocean_classic: showAll,
-      ctc_buttons_ocean_classic_2: showAll,
       ctc_buttons_ocean_enhanced: showAll,
       ctc_shendo_classic: showAll,
       ctc_shendo_enhanced: showAll,

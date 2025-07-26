@@ -18,7 +18,7 @@ interface Tab {
 
 const TABS: Tab[] = [
   { id: 'debug', label: 'Debug Pane 1' },
-  { id: 'instrument', label: 'Instrument (GenControl Chambers)' },
+  { id: 'instrument', label: 'Instrument (Controlix Chambers)' },
   { id: 'sarno', label: 'Utensil (Jetstream)' }
 ];
 

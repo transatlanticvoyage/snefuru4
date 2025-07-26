@@ -24,7 +24,6 @@
 
 /* Override for classic chambers if different styling needed */
 .ocean-classic-chamber.controlix-chamber-main-container-div,
-.ocean-classic-chamber-2.controlix-chamber-main-container-div,
 .shendo-classic-chamber.controlix-chamber-main-container-div {
   /* Add any classic-specific overrides here */
 }

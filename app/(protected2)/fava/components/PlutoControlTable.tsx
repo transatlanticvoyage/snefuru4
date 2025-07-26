@@ -7,7 +7,6 @@ import { PlutoSettings } from '../hooks/usePlutoSettings';
 // Mapping from internal chamber keys to CSS class names
 const CHAMBER_CSS_CLASSES = {
   'ctc_buttons_ocean_classic': '.ocean-classic-chamber',
-  'ctc_buttons_ocean_classic_2': '.ocean-classic-chamber-2',
   'ctc_buttons_ocean_enhanced': '.ocean-enhanced-chamber',
   'ctc_shendo_classic': '.shendo-classic-chamber',
   'ctc_shendo_enhanced': '.shendo-enhanced-chamber',
@@ -20,7 +19,6 @@ const CHAMBER_CSS_CLASSES = {
 
 const CHAMBER_LABELS = [
   'ctc_buttons_ocean_classic',
-  'ctc_buttons_ocean_classic_2',
   'ctc_buttons_ocean_enhanced',
   'ctc_shendo_classic',
   'ctc_shendo_enhanced',

@@ -171,7 +171,27 @@ export default function PureFavaPageMaster({
         {(pageTitle || pageDescription || headerContent) && (
           <div className="fava-page-header" style={{ marginBottom: '20px' }}>
             {pageTitle && (
-              <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>{pageTitle}</h1>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '16px', 
+                marginBottom: '10px',
+                flexWrap: 'wrap'
+              }}>
+                <h1 style={{ fontSize: '24px', margin: '0' }}>{pageTitle}</h1>
+                
+                {/* PlutoGrid Technology branded div */}
+                <div style={{
+                  backgroundColor: '#000',
+                  color: '#fff',
+                  fontSize: '16px',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  flexShrink: 0
+                }}>
+                  PlutoGrid Technology
+                </div>
+              </div>
             )}
             {pageDescription && (
               <div style={{ marginBottom: '20px' }}>
@@ -212,21 +232,6 @@ export default function PureFavaPageMaster({
                     getOverflowItems={handlers.getOverflowItems}
                     plutoClasses={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic', 'ocean-classic-chamber')}
                   />
-                  <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_classic_2', 'ocean-classic-chamber-2')}>
-                    <FavaCTCButtonsClassic
-                      templates={state.templates}
-                      activeTemplateId={state.activeTemplateId}
-                      dropdownOpen={state.dropdownOpen}
-                      onTemplateSelect={handlers.selectTemplate}
-                      onShendoClick={handlers.handleShendoClick}
-                      onOpenCJ={handlers.openCJ}
-                      onToggleDropdown={handlers.toggleDropdown}
-                      utg_id={String(utg_id || '')}
-                      createSlots={handlers.createSlots}
-                      getOverflowItems={handlers.getOverflowItems}
-                      title="Classic Buttons Ocean 2 (remove later)"
-                    />
-                  </div>
                   <div className={getChamberClasses(plutoSettings, 'ctc_buttons_ocean_enhanced', 'ocean-enhanced-chamber')}>
                     <FavaCTCButtonsEnhanced
                       templates={state.templates}
