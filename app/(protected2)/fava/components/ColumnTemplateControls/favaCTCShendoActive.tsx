@@ -19,11 +19,18 @@ export default function FavaCTCShendoActive({
   const plutoSettings = usePlutoSettings(utg_id);
 
   useEffect(() => {
+    console.log('🔍 DEBUG: FavaCTCShendoActive setting up event listener for utg_id:', utg_id);
+    
     // Listen for shendo events
     const unsubscribe = CTCEventListener.onShendoShowCategory(({ category, utg_id: eventUtgId }) => {
+      console.log('🔍 DEBUG: FavaCTCShendoActive received event - category:', category, 'eventUtgId:', eventUtgId, 'myUtgId:', utg_id);
+      
       if (eventUtgId === utg_id) {
+        console.log('🔍 DEBUG: UTG IDs match! Setting category:', category, 'templates for category:', templates[category]?.length || 0);
         setSelectedCategory(category);
         setCategoryData(templates[category] || []);
+      } else {
+        console.log('🔍 DEBUG: UTG IDs do not match, ignoring event');
       }
     });
 

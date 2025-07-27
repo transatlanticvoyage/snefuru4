@@ -219,6 +219,41 @@ export default function PureFavaPageMaster({
             <FavaCTCMaster utg_id={String(utg_id || '')}>
               {({ state, handlers }) => (
                 <div>
+                  {/* DEBUG LOGGING AREA */}
+                  <div style={{
+                    backgroundColor: '#f0f8ff',
+                    border: '2px solid #0066cc',
+                    padding: '10px',
+                    marginBottom: '10px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    fontFamily: 'monospace'
+                  }}>
+                    <strong>🔍 SHENDO DEBUG LOG</strong><br/>
+                    <strong>State:</strong> shendoCategory = "{state.shendoCategory || 'null'}"<br/>
+                    <strong>Templates:</strong> {Object.keys(state.templates).join(', ')}<br/>
+                    <strong>Handler Available:</strong> {typeof handlers.handleShendoClick === 'function' ? 'YES' : 'NO'}<br/>
+                    <strong>UTG ID:</strong> {String(utg_id || 'undefined')}<br/>
+                    <button 
+                      onClick={() => {
+                        console.log('🔍 DEBUG: Testing handleShendoClick with "range"');
+                        handlers.handleShendoClick('range');
+                      }}
+                      style={{
+                        marginTop: '5px',
+                        padding: '3px 8px',
+                        fontSize: '11px',
+                        backgroundColor: '#0066cc',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '3px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      TEST SHENDO CLICK (range)
+                    </button>
+                  </div>
+                  
                   <FavaCTCButtonsClassic
                     templates={state.templates}
                     activeTemplateId={state.activeTemplateId}
@@ -253,7 +288,7 @@ export default function PureFavaPageMaster({
                       templates={state.templates}
                       activeTemplateId={state.activeTemplateId}
                       onTemplateSelect={handlers.selectTemplate}
-                      utg_id={String(utg_id || '')}
+                      utg_id={handlers.currentUtgId}
                     />
                   )}
                 </div>

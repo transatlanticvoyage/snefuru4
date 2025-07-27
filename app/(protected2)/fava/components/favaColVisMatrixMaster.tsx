@@ -79,9 +79,9 @@ export function useColumnVisibilityData() {
       try {
         // Fetch columns for this template from junction table
         const { data, error } = await supabase
-          .from('coltemp_denbu_relations')
+          .from('coltemp_rackui_relations')
           .select(`
-            fk_denbu_column_id,
+            fk_rackui_column_id,
             column_position,
             rackui_columns (
               column_name,
@@ -195,9 +195,9 @@ export function useColumnVisibilityPreviewData() {
       try {
         // Fetch columns for this template from junction table
         const { data, error } = await supabase
-          .from('coltemp_denbu_relations')
+          .from('coltemp_rackui_relations')
           .select(`
-            fk_denbu_column_id,
+            fk_rackui_column_id,
             column_position,
             rackui_columns (
               column_name,
@@ -277,9 +277,9 @@ export function useSpecificColtempData(coltempId: number) {
       try {
         // Fetch columns for this template from junction table
         const { data, error } = await supabase
-          .from('coltemp_denbu_relations')
+          .from('coltemp_rackui_relations')
           .select(`
-            fk_denbu_column_id,
+            fk_rackui_column_id,
             column_position,
             rackui_columns (
               column_name,

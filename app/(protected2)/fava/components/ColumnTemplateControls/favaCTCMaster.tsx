@@ -150,8 +150,11 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
   };
 
   const showShendoCategory = (category: string) => {
+    console.log('🔍 DEBUG: showShendoCategory called with category:', category, 'utg_id:', currentUtgId);
     setShendoCategory(category);
+    console.log('🔍 DEBUG: setShendoCategory called, now emitting event...');
     CTCEventEmitter.emitShendoShowCategory(category, currentUtgId);
+    console.log('🔍 DEBUG: CTCEventEmitter.emitShendoShowCategory completed');
   };
 
   const openCJ = (category: string) => {
@@ -167,6 +170,7 @@ export default function FavaCTCMaster({ utg_id, children }: CTCMasterProps) {
   };
 
   const handleShendoClick = (category: string) => {
+    console.log('🔍 DEBUG: handleShendoClick called with category:', category);
     showShendoCategory(category);
   };
 
