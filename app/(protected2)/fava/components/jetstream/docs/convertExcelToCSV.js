@@ -36,7 +36,7 @@ function convertExcelToCSV(excelFilePath, csvFilePath) {
 }
 
 // Convert the specific file
-const excelFile = path.join(__dirname, '412 mockup for zug yeg 8.xlsx');
-const csvFile = path.join(__dirname, '412_mockup_for_zug_yeg_8.csv');
+const excelFile = path.join(__dirname, '412 jetstream xls mockup 9.xlsx');
+const csvFile = path.join(__dirname, '412_jetstream_xls_mockup_9.csv');
 
 convertExcelToCSV(excelFile, csvFile);

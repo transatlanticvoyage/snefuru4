@@ -45,6 +45,7 @@ export default function Header() {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
   const [navItems, setNavItems] = useState<NavItem[]>([]);
+  const [isNeptuneNavOpen, setIsNeptuneNavOpen] = useState(false);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
 
@@ -124,12 +125,41 @@ export default function Header() {
     }));
   };
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const copyFullUrlToClipboard = async (path: string) => {
+    try {
+      const fullUrl = `${getBaseUrl()}${path}`;
+      await navigator.clipboard.writeText(fullUrl);
+    } catch (err) {
+      console.error('Failed to copy full URL: ', err);
+    }
+  };
+
   // Split navigation items into 2 rows, with break after panjar3
   const splitNavItems = () => {
-    const { adminMenuItem, specialFirstItem, oldAllGroupItem, hardcodedNavItems } = createNavigationStructure(navItems);
+    const { adminMenuItem, specialFirstItem, oldAllGroupItem, plutoJetstreamItem, hardcodedNavItems } = createNavigationStructure(navItems);
 
-    // Create the final nav items array with admin first, then special item, then oldallgroup, then hardcoded items
-    const finalNavItems = [adminMenuItem, specialFirstItem, oldAllGroupItem, ...hardcodedNavItems];
+    // Create the OPEN FULL NAV button item
+    const openFullNavButton: NavItem = {
+      name: 'OPEN FULL NAV',
+      path: undefined // No path - this will be handled as a button
+    };
+
+    // Create the recents menu item
+    const recentsMenuItem: NavItem = {
+      name: 'recents',
+      children: [] // Empty for now
+    };
+
+    // Create the final nav items array with OPEN FULL NAV button first, then recents, then admin, pluto jetstream, then special item, then oldallgroup, then hardcoded items
+    const finalNavItems = [openFullNavButton, recentsMenuItem, adminMenuItem, plutoJetstreamItem, specialFirstItem, oldAllGroupItem, ...hardcodedNavItems];
 
     const panjar3Index = finalNavItems.findIndex(item => item.name === 'panjar3');
     if (panjar3Index === -1) {
@@ -161,7 +191,7 @@ export default function Header() {
             onClick={() => toggleNavDropdown(item.name)}
             className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700 focus:outline-none"
           >
-            {(item.name === 'admin' || item.name === 'navgroup1') && (
+            {item.name === 'admin' && (
               <svg 
                 className="w-4 h-4 mr-1 text-black" 
                 style={{ 
@@ -171,6 +201,46 @@ export default function Header() {
                 viewBox="0 0 20 20"
               >
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            )}
+            {item.name === 'navgroup1' && (
+              <svg 
+                className="w-4 h-4 mr-1 text-black" 
+                style={{ 
+                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+                }}
+                fill="currentColor" 
+                stroke="white"
+                strokeWidth="1"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 3l7 14H3z" />
+              </svg>
+            )}
+            {item.name === 'recents' && (
+              <svg 
+                className="w-4 h-4 mr-1 text-black" 
+                style={{ 
+                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+                }}
+                fill="currentColor" 
+                stroke="white"
+                strokeWidth="1"
+                viewBox="0 0 20 20"
+              >
+                <rect x="4" y="4" width="12" height="12" />
+              </svg>
+            )}
+            {item.name === 'pluto jetstream' && (
+              <svg 
+                className="w-4 h-4 mr-1 text-black" 
+                style={{ 
+                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+                }}
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <circle cx="10" cy="10" r="8" />
               </svg>
             )}
             {item.name}
@@ -193,6 +263,19 @@ export default function Header() {
               {item.children.map((child, childIndex) => {
                 // Check if this is a separator item (no path)
                 if (!child.path && !child.children) {
+                  // Special handling for pluto jetstream separators
+                  if (item.name === 'pluto jetstream' && (child.name === '---separator---' || child.name === '---separator2---' || child.name === '---separator3---' || child.name === '---separator4---')) {
+                    return (
+                      <div
+                        key={`${item.name}-${child.name}-${childIndex}`}
+                        className="block my-1"
+                        style={{ height: '6px', backgroundColor: '#000000', width: '100%' }}
+                      >
+                      </div>
+                    );
+                  }
+                  
+                  // Regular separator (for other dropdowns)
                   return (
                     <div
                       key={`${item.name}-${child.name}-${childIndex}`}
@@ -260,6 +343,59 @@ export default function Header() {
                 
                 // Regular menu item with link (no children)
                 if (child.path) {
+                  // Special handling for pluto jetstream items - add copy button
+                  if (item.name === 'pluto jetstream') {
+                    return (
+                      <div
+                        key={`${item.name}-${child.name}-${childIndex}`}
+                        className="flex items-center hover:bg-gray-100"
+                      >
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            copyFullUrlToClipboard(child.path);
+                          }}
+                          className="ml-4 mr-1 bg-gray-300 hover:bg-yellow-400 transition-colors duration-200 flex items-center justify-center"
+                          style={{
+                            width: '12px',
+                            height: '12px',
+                            minWidth: '12px',
+                            minHeight: '12px',
+                            fontSize: '9px',
+                            fontWeight: 'bold'
+                          }}
+                          title={`Copy full URL "${getBaseUrl()}${child.path}"`}
+                        >
+                          F
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            copyToClipboard(child.name);
+                          }}
+                          className="mr-2 bg-gray-300 hover:bg-yellow-400 transition-colors duration-200"
+                          style={{
+                            width: '12px',
+                            height: '12px',
+                            minWidth: '12px',
+                            minHeight: '12px'
+                          }}
+                          title={`Copy "${child.name}"`}
+                        />
+                        <Link
+                          href={child.path}
+                          className="flex-1 pr-4 py-2 text-sm text-gray-700 block"
+                          onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
+                        >
+                          {child.name}
+                        </Link>
+                      </div>
+                    );
+                  }
+                  
+                  // Regular menu item for other dropdowns
                   return (
                     <Link
                       key={`${item.name}-${child.name}-${childIndex}`}
@@ -293,6 +429,27 @@ export default function Header() {
     } else {
       // Render regular navigation link only if path exists
       if (!item.path) {
+        // Special handling for OPEN FULL NAV button
+        if (item.name === 'OPEN FULL NAV') {
+          return (
+            <button
+              key={item.name}
+              onClick={() => setIsNeptuneNavOpen(true)}
+              className="text-gray-900 hover:text-gray-700"
+              style={{
+                fontSize: '14px',
+                padding: '4px',
+                borderRadius: '4px',
+                border: '1px solid #9ca3af',
+                display: 'inline-flex',
+                alignItems: 'center'
+              }}
+            >
+              {item.name}
+            </button>
+          );
+        }
+        
         return (
           <span
             key={item.name}
@@ -318,6 +475,7 @@ export default function Header() {
   const { firstRow, secondRow } = splitNavItems();
 
   return (
+    <>
     <header 
       className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
       style={{ 
@@ -421,5 +579,25 @@ export default function Header() {
         </div>
       </div>
     </header>
+    
+    {/* Neptune Nav Popup */}
+    {isNeptuneNavOpen && (
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+        onClick={() => setIsNeptuneNavOpen(false)}
+      >
+        <div 
+          className="bg-white rounded shadow-lg flex items-center justify-center"
+          style={{
+            width: '200px',
+            height: '200px'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span className="text-black font-medium">Neptune Nav Popup</span>
+        </div>
+      </div>
+    )}
+    </>
   );
 } 

@@ -90,8 +90,8 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         path: '/admin/coltempcommand'
       },
       {
-        name: 'Rackui Columns Jar',
-        path: '/rackuijar'
+        name: 'rackjar',
+        path: '/admin/rackjar'
       },
       {
         name: 'Style Rocket',
@@ -222,6 +222,61 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
     children: nonAdminItems
   };
 
+  // Create the pluto jetstream menu item
+  const plutoJetstreamItem: NavItem = {
+    name: 'pluto jetstream',
+    children: [
+      {
+        name: 'sunjar',
+        path: '/admin/sunjar'
+      },
+      {
+        name: 'moonjar',
+        path: '/admin/moonjar'
+      },
+      {
+        name: '---separator2---',
+        path: undefined // No link - separator
+      },
+      {
+        name: 'rackjar',
+        path: '/admin/rackjar'
+      },
+      {
+        name: '---separator4---',
+        path: undefined // No link - separator
+      },
+      {
+        name: 'yegjar',
+        path: '/admin/yegjar'
+      },
+      {
+        name: 'zugjar',
+        path: '/admin/zugjar'
+      },
+      {
+        name: '---separator3---',
+        path: undefined // No link - separator
+      },
+      {
+        name: 'cfdefjar',
+        path: '/cfdefjar'
+      },
+      {
+        name: 'cfvaljar',
+        path: '/cfvaljar'
+      },
+      {
+        name: '---separator---',
+        path: undefined // No link - separator
+      },
+      {
+        name: 'favaconfignow',
+        path: '/admin/favaconfignow'
+      }
+    ]
+  };
+
   // Create hardcoded navigation items
   const hardcodedNavItems: NavItem[] = [
     { name: 'torna3', path: '/torna3' },
@@ -235,11 +290,13 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
   console.log('adminMenuItem children:', adminMenuItem.children?.map(c => c.name) || []);
   console.log('specialFirstItem children:', specialFirstItem.children?.map(c => c.name) || []);
   console.log('oldAllGroupItem children:', oldAllGroupItem.children?.map(c => c.name) || []);
+  console.log('plutoJetstreamItem children:', plutoJetstreamItem.children?.map(c => c.name) || []);
 
   return {
     adminMenuItem,
     specialFirstItem,
     oldAllGroupItem,
+    plutoJetstreamItem,
     hardcodedNavItems
   };
 };

@@ -5,8 +5,8 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const EXCEL_FILE = '412 mockup for zug yeg 8.xlsx';
-const CSV_FILE = '412_mockup_for_zug_yeg_8.csv';
+const EXCEL_FILE = '412 jetstream xls mockup 9.xlsx';
+const CSV_FILE = '412_jetstream_xls_mockup_9.csv';
 
 // Colors for console output
 const colors = {

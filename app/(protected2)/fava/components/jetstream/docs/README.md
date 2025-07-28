@@ -6,7 +6,7 @@ This folder contains the Jetstream system documentation and conversion tools.
 
 ### Quick Update
 
-After updating the Excel file (`412 mockup for zug yeg 8.xlsx`), run one of these commands:
+After updating the Excel file (`412 jetstream xls mockup 9.xlsx`), run one of these commands:
 
 #### Option 1: Direct script execution
 ```bash
@@ -26,8 +26,8 @@ npm run update-jetstream-csv
 - Color-coded console output for easy reading
 
 ### Files:
-- `412 mockup for zug yeg 8.xlsx` - Source Excel file (your working document)
-- `412_mockup_for_zug_yeg_8.csv` - Generated CSV file (for programmatic access)
+- `412 jetstream xls mockup 9.xlsx` - Source Excel file (your working document)
+- `412_jetstream_xls_mockup_9.csv` - Generated CSV file (for programmatic access)
 - `updateCSV.js` - Conversion script
 - `convertExcelToCSV.js` - Original conversion script (can be removed)
 

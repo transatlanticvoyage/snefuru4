@@ -1,0 +1,74 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
+import Link from 'next/link';
+
+export default function FavaConfigNowPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user } = useAuth();
+  const supabase = createClientComponentClient();
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check authentication
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    
+    // Set loading to false after initial setup
+    setLoading(false);
+  }, [user, router]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center items-center h-64">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <Link href="/admin" className="text-blue-600 hover:text-blue-800">
+            ← Back to Admin
+          </Link>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">Fava Config Now</h1>
+        <p className="text-gray-600" style={{ fontSize: '16px' }}>
+          <span className="font-bold">Configure specific pages using the fava template system</span>
+        </p>
+      </div>
+
+      {/* Main content area - currently blank as requested */}
+      <div className="bg-white p-8 rounded-lg shadow">
+        <div className="text-center text-gray-500">
+          {/* Content area intentionally left blank */}
+        </div>
+      </div>
+    </div>
+  );
+}
