@@ -101,29 +101,25 @@ export default function Torna3ZarnoAccordion({
 
   // Tornado-style container with custom CSS
   return (
-    <div className="torna3-zarno-container">
+    <div className={`torna3-zarno-container ${!isOpen ? 'torna3-zarno-container-closed' : ''}`}>
       {!isOpen ? (
-        // Tornado-style collapsed state
-        <div 
-          className="torna3-zarno-collapsed"
+        // Single button for collapsed state
+        <button 
+          className="torna3-zarno-main-button"
           onClick={() => onToggle(true)}
         >
-          <span className="torna3-zarno-collapsed-text">
-            📂 Open Top Area Manager
-          </span>
-          <span className="torna3-zarno-collapsed-label">zarno1</span>
-        </div>
+          expand zarno1
+        </button>
       ) : (
         <>
-          {/* Tornado-style expanded header */}
+          {/* Single button for expanded header */}
           <div className="torna3-zarno-header">
             <button 
               onClick={() => onToggle(false)}
-              className="torna3-zarno-header-button"
+              className="torna3-zarno-main-button"
             >
-              📁 Compact
+              close zarno1
             </button>
-            <span className="torna3-zarno-header-label">zarno1</span>
           </div>
 
           {/* Tornado-style horizontal 3-column layout */}

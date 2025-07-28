@@ -2,12 +2,34 @@
 
 /* Container */
 .torna3-zarno-container {
-  background-color: #fefef8;
+  background-color: #aef7c3;
   margin-bottom: 20px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   overflow: hidden;
   transition: all 0.3s ease;
+}
+
+/* Container when closed - light gray background */
+.torna3-zarno-container-closed {
+  background-color: #f0f0f0;
+}
+
+/* Main Button - Single button with custom styling */
+.torna3-zarno-main-button {
+  background-color: #000;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #808080;
+  border-radius: 5px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.torna3-zarno-main-button:hover {
+  background-color: #333;
 }
 
 /* Collapsed State */
@@ -42,7 +64,7 @@
 /* Expanded Header */
 .torna3-zarno-header {
   height: 60px;
-  background-color: #fefef8;
+  background-color: #aef7c3;
   display: flex;
   align-items: center;
   justify-content: space-between;
