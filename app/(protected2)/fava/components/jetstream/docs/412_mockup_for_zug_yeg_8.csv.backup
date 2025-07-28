@@ -1,0 +1,577 @@
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+JUNCTION,,,SUNS,,,MOONS,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,create new db table,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,sunrowslots,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,srs_id,,,,,,,value of rackuic.rcolumn_id where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,srs_domestic_Id,,,,,,,value of rackuic.rcolumn_name where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,srs_id_from_1,,,,,,,value of rackuic.default_position where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,value of zugdbt.ztable_id where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,create new db table,,,,,,,value of zugdbt.ztable_name where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,moonrowmodules,,,,,,,value of zugdbt.ztable_color where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,mrm_id,,,,,,,value of yegdbc.ycolumn_id where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,value of yegdbc.ytable_name where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,value of yegdbc.ycolumn_name where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,create new db table system for,,,,,,,value of yegdbc.ycolumn_color where ???,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,custom fields for user,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,srss.srs_id,,mrms.mrm_id,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,suns.srs_id,,moons.mrm_id,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,unit_id,fk_gcon_piece_id,unit_marker,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,cusf_definitions,,,,,,,,,,
+,,,,sunslots.srs_id,,moonmodules.mrm_id,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,dawncell (horomi row + vertomi column origin),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+LOGIC DESCRIPTION SECTION BELOW,,F,LOGIC DESCRIPTION SECTION BELOW,,F,LOGIC DESCRIPTION SECTION BELOW,,F,LOGIC DESCRIPTION SECTION BELOW,F,LOGIC DESCRIPTION SECTION BELOW,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+JETSTREAM JUNCTION POINT,,,SUN ROW SLOTS,,,MOON ROW MODULES,,,DB TABLES DEFINITION (NEED NEW WORD HERE BRAND WORD ETC),f,NATIVE FIELDS,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,CUSTOM FIELDS,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,srs16,sunrowslot16,,mrm16,moonrowmodule16,,(checkbox),,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,srs15,sunrowslot15,,mrm15,moonrowmodule15,,rackuic.rcolumn_id,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,value of rackuic.rcolumn_id where ??? rackuic.r_is_cusf = TRUE,,,,,,,,,,
+,,,srs14,sunrowslot14,,mrm14,moonrowmodule14,,rackuic.rcolumn_name,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,value of rackuic.rcolumn_name where ??? rackuic.r_is_cusf = TRUE,,,,,,,,,,
+,,,srs13,sunrowslot13,,mrm13,moonrowmodule13,,rackuic.default_position(new name needed like position in base column array or something),,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,,,value of rackuic.default_position where ??? rackuic.r_is_cusf = TRUE,,,,,,,,,,
+,,,srs12,sunrowslot12,,mrm12,moonrowmodule12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,srs11,sunrowslot11,,mrm11,moonrowmodule11,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,srs10,sunrowslot10,,mrm10,moonrowmodule10,,zugdbt.ztable_id,,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,,,value of zugdbt.ztable_id where ??? IMPORTANT zugdbt.z_is_cusf = TRUE,,,,,,,,,,
+jetstream nexus junction,,,srs9,sunrowslot9,,mrm9,moonrowmodule9,,zugdbt.ztable_name,,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,,,value of zugdbt.ztable_name where ??? IMPORTANT zugdbt.z_is_cusf = TRUE,,,,,,,,,,
+mrm_primary-headers-nexus,,,srs8,sunrowslot8,,mrm8,moonrowmodule8,,zugdbt.ztable_color,,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,,,value of zugdbt.ztable_color where ???  IMPORTANT zugdbt.z_is_cusf = TRUE,,,,,,,,,,
+,,,srs7,sunrowslot7,,mrm7,moonrowmodule7,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+we have an existing code that I think says,,,srs6,sunrowslot6,,mrm6,moonrowmodule6,,yegdbc.ycolumn_id,,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,,,,,,,,,,,,,,,,,,value of yegdbc.ycolumn_id where ??? yegdbc.y_is_cusf = TRUE,,,,,,,,,,
+mrm_primary-headers,,f,srs5,sunrowslot5,f,mrm5,moonrowmodule5,f,yegdbc.ytable_name,f,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,,,,,,,,,,,,,,,,f,f,value of yegdbc.ytable_name where ??? yegdbc.y_is_cusf = TRUE,,,,,f,f,f,f,f,f
+,,f,srs4,sunrowslot4,f,mrm4,moonrowmodule4,f,yegdbc.ycolumn_name,f,unit_id,fk_gcon_piece_id,unit_marker,el_id,el_type,widget_type,parent_el_id,position_order,depth_level,sort_index,summary_text,unit_label,settings_json,style_json,globals_json,raw_json,created_at,updated_at,full_text_cached,full_text_edits,image_type,image_id,image_url,image_alt,image_size,image_source,carousel_position,image_context,has_img_slot,img_slot_qty,tar_description_text,tar_description_text_edits,f,f,value of yegdbc.ycolumn_name where ??? yegdbc.y_is_cusf = TRUE,,,,,f,f,f,f,f,f
+,,f,srs3,sunrowslot3,f,mrm3,moonrowmodule3,f,yegdbc.ycolumn_color,f,#A83F7B  ,#42D9E4  ,#FFB347  ,#1A2B3C  ,#77DD77  ,#D7263D  ,#FFD700  ,#6A5ACD  ,#F67280  ,#2ECC71  ,#E9967A  ,#3498DB  ,#8E44AD  ,#00CED1  ,#F4A460,,,,,,,,,,,,,,,,,,f,f,value of yegdbc.ycolumn_color where ??? yegdbc.y_is_cusf = TRUE,,,,,f,f,f,f,f,f
+,,f,srs2,sunrowslot2,f,mrm2,moonrowmodule2,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+jetstream nexus junction,,f,srs1,sunrowslot1,f,mrm1,moonrowmodule1,f,,f,unit_id,fk_gcon_piece_id,unit_marker,el_id,el_type,widget_type,parent_el_id,position_order,depth_level,sort_index,summary_text,unit_label,settings_json,style_json,globals_json,raw_json,created_at,updated_at,full_text_cached,full_text_edits,image_type,image_id,image_url,image_alt,image_size,image_source,carousel_position,image_context,has_img_slot,img_slot_qty,tar_description_text,tar_description_text_edits,f,f,info_about_turtles,info_about_crocs,,,,f,f,f,f,f,f
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+DUMMY DATA SECTION BELOW,,,DUMMY DATA SECTION BELOW,,,DUMMY DATA SECTION BELOW,,,DUMMY DATA SECTION BELOW,,DUMMY DATA SECTION BELOW,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+JETSTREAM JUNCTION POINT,,,SUN ROW SLOTS,,,MOON ROW MODULES,,,DB TABLES DEFINITION (NEED NEW WORD HERE BRAND WORD ETC),f,NATIVE FIELDS,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,CUSTOM FIELDS,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,srs16,sunrowslot16,,mrm16,moonrowmodule16,,(checkbox),,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,☐,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,srs15,sunrowslot15,,mrm15,moonrowmodule15,,rackuic.rcolumn_id,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,value of rackuic.rcolumn_id where ??? rackuic.r_is_cusf = TRUE,,,,,,,,,,
+,,,srs14,sunrowslot14,,mrm14,moonrowmodule14,,rackuic.rcolumn_name,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,value of rackuic.rcolumn_name where ??? rackuic.r_is_cusf = TRUE,,,,,,,,,,
+,,,srs13,sunrowslot13,,mrm13,moonrowmodule13,,rackuic.default_position(new name needed like position in base column array or something),,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,,,value of rackuic.default_position where ??? rackuic.r_is_cusf = TRUE,,,,,,,,,,
+,,,srs12,sunrowslot12,,mrm12,moonrowmodule12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,srs11,sunrowslot11,,mrm11,moonrowmodule11,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,srs10,sunrowslot10,,mrm10,moonrowmodule10,,zugdbt.ztable_id,,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,,,value of zugdbt.ztable_id where ??? IMPORTANT zugdbt.z_is_cusf = TRUE,,,,,,,,,,
+jetstream nexus junction,,,srs9,sunrowslot9,,mrm9,moonrowmodule9,,zugdbt.ztable_name,,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,,,value of zugdbt.ztable_name where ??? IMPORTANT zugdbt.z_is_cusf = TRUE,,,,,,,,,,
+mrm_primary-headers-nexus,,,srs8,sunrowslot8,,mrm8,moonrowmodule8,,zugdbt.ztable_color,,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,#1562sf,,,value of zugdbt.ztable_color where ???  IMPORTANT zugdbt.z_is_cusf = TRUE,,,,,,,,,,
+,,,srs7,sunrowslot7,,mrm7,moonrowmodule7,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+we have an existing code that I think says,,,srs6,sunrowslot6,,mrm6,moonrowmodule6,,yegdbc.ycolumn_id,,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,,,,,,,,,,,,,,,,,,value of yegdbc.ycolumn_id where ??? yegdbc.y_is_cusf = TRUE,,,,,,,,,,
+mrm_primary-headers,,f,srs5,sunrowslot5,f,mrm5,moonrowmodule5,f,yegdbc.ytable_name,f,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,nemtor_units,,,,,,,,,,,,,,,,f,f,value of yegdbc.ytable_name where ??? yegdbc.y_is_cusf = TRUE,,,,,f,f,f,f,f,f
+,,f,srs4,sunrowslot4,f,mrm4,moonrowmodule4,f,yegdbc.ycolumn_name,f,unit_id,fk_gcon_piece_id,unit_marker,el_id,el_type,widget_type,parent_el_id,position_order,depth_level,sort_index,summary_text,unit_label,settings_json,style_json,globals_json,raw_json,created_at,updated_at,full_text_cached,full_text_edits,image_type,image_id,image_url,image_alt,image_size,image_source,carousel_position,image_context,has_img_slot,img_slot_qty,tar_description_text,tar_description_text_edits,f,f,value of yegdbc.ycolumn_name where ??? yegdbc.y_is_cusf = TRUE,,,,,f,f,f,f,f,f
+,,f,srs3,sunrowslot3,f,mrm3,moonrowmodule3,f,yegdbc.ycolumn_color,f,#A83F7B  ,#42D9E4  ,#FFB347  ,#1A2B3C  ,#77DD77  ,#D7263D  ,#FFD700  ,#6A5ACD  ,#F67280  ,#2ECC71  ,#E9967A  ,#3498DB  ,#8E44AD  ,#00CED1  ,#F4A460,,,,,,,,,,,,,,,,,,f,f,value of yegdbc.ycolumn_color where ??? yegdbc.y_is_cusf = TRUE,,,,,f,f,f,f,f,f
+,,f,srs2,sunrowslot2,f,mrm2,moonrowmodule2,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+jetstream nexus junction,,f,srs1,sunrowslot1,f,mrm1,moonrowmodule1,f, ☐  JETSTREAM JUNCTION TREBBLE ROW,f,unit_id,fk_gcon_piece_id,unit_marker,el_id,el_type,widget_type,parent_el_id,position_order,depth_level,sort_index,summary_text,unit_label,settings_json,style_json,globals_json,raw_json,created_at,updated_at,full_text_cached,full_text_edits,image_type,image_id,image_url,image_alt,image_size,image_source,carousel_position,image_context,has_img_slot,img_slot_qty,tar_description_text,tar_description_text_edits,f,f,info_about_turtles,info_about_crocs,,,,f,f,f,f,f,f
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,f,,,f,,,f,☐,f,55f157dc-9fa4-47b3-98be-0f1d0d626010,35a4f084-4f51-4493-b49b-d90e8f32e376,container_begin,39b3102e,container,,,0,0,0,,Container Start: 39b3102e,"{""link"":{""url"":""#"",""nofollow"":"""",""is_external"":"""",...",{}...,{}...,"{""id"":""39b3102e"",""elType"":""container"",""isInner"":fa...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,background,,,mold removal murfreesboro,,library,,"{""background_size"":""cover"",""background_position"":""center right"",""background_repeat"":""no-repeat""}",Yes,1,,,f,f,value of cusf_values.field_value  /  where cusf_values.entity_id equals nemtor_units.unit_id,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,88f697e7-da5b-4472-a760-490e6c5ab585,35a4f084-4f51-4493-b49b-d90e8f32e376,container_core,39b3102e,container,,,0,0,1,,Container Core: 39b3102e,"{""link"":{""url"":""#"",""nofollow"":"""",""is_external"":"""",...",{}...,{}...,"{""id"":""39b3102e"",""elType"":""container"",""isInner"":fa...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,background,,,mold removal murfreesboro,,library,,"{""background_size"":""cover"",""background_position"":""center right"",""background_repeat"":""no-repeat""}",Yes,1,,,f,f,value of cusf_values.field_value  /  where cusf_values.entity_id equals nemtor_units.unit_id,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,fdfe7f2e-dcd6-4534-8fdd-6939fd0aa469,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,7135770b,widget,heading,39b3102e,0,1,2,y_hero1_heading,Widget: heading (7135770b),"{""align"":""center"",""title"":""y_hero1_heading"",""_padd...",{}...,{}...,"{""id"":""7135770b"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",y_hero1_heading,y_hero1_heading,,,,,,,,,No,0,,,f,f,value of cusf_values.field_value  /  where cusf_values.entity_id equals nemtor_units.unit_id,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,1a860877-bfdf-4f38-8103-518824f77b79,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,39e00e39,widget,heading,39b3102e,1,1,3,y_hero1_main,Widget: heading (39e00e39),"{""align"":""center"",""title"":""y_hero1_main"",""__global...",{}...,{}...,"{""id"":""39e00e39"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",y_hero1_main,y_hero1_main,,,,,,,,,No,0,,,f,f,value of cusf_values.field_value  /  where cusf_values.entity_id equals nemtor_units.unit_id,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,f54c7412-ec2f-4ea0-894f-46c3cc36cbb5,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,1d79a52f,widget,button,39b3102e,2,1,4,Contact us,Widget: button (1d79a52f),"{""link"":{""url"":""https://library.elementor.com/loca...",{}...,{}...,"{""id"":""1d79a52f"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",Contact us,Contact us,,,,,,,,,No,0,,,f,f,value of cusf_values.field_value  /  where cusf_values.entity_id equals nemtor_units.unit_id,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,f91c09a6-d28f-41ac-a014-1564f251589b,35a4f084-4f51-4493-b49b-d90e8f32e376,container_end,39b3102e,container,,,0,0,5,,Container End: 39b3102e,"{""link"":{""url"":""#"",""nofollow"":"""",""is_external"":"""",...",{}...,{}...,"{""id"":""39b3102e"",""elType"":""container"",""isInner"":fa...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,background,,,mold removal murfreesboro,,library,,"{""background_size"":""cover"",""background_position"":""center right"",""background_repeat"":""no-repeat""}",Yes,1,,,f,f,value of cusf_values.field_value  /  where cusf_values.entity_id equals nemtor_units.unit_id,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,a98ad798-a2e1-452d-847a-7ef7b81a91fd,35a4f084-4f51-4493-b49b-d90e8f32e376,container_begin,2b2beba8,container,,,1,0,6,,Container Start: 2b2beba8,"{""_title"":""Services"",""layout"":""full_width"",""margin...",{}...,{}...,"{""id"":""2b2beba8"",""elType"":""container"",""isInner"":fa...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,,,,,,,,,No,0,,,f,f,value of cusf_values.field_value  /  where cusf_values.entity_id equals nemtor_units.unit_id,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,d41e0de0-127e-490b-a98d-6067c9bf1a01,35a4f084-4f51-4493-b49b-d90e8f32e376,container_core,2b2beba8,container,,,1,0,7,,Container Core: 2b2beba8,"{""_title"":""Services"",""layout"":""full_width"",""margin...",{}...,{}...,"{""id"":""2b2beba8"",""elType"":""container"",""isInner"":fa...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,,,,,,,,,No,0,,,f,f,value of cusf_values.field_value  /  where cusf_values.entity_id equals nemtor_units.unit_id,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,1406d3e6-f421-45e4-aa4f-5ecdb656c3ba,35a4f084-4f51-4493-b49b-d90e8f32e376,container_begin,25b3a2c5,container,,2b2beba8,0,1,8,,Container Start: 25b3a2c5,"{""flex_gap"":{""row"":""0"",""size"":0,""unit"":""px"",""sizes...",{}...,{}...,"{""id"":""25b3a2c5"",""elType"":""container"",""isInner"":tr...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,,,,,,,,,No,0,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,6231b2d7-38e9-46c7-ae9c-e295f7acd66c,35a4f084-4f51-4493-b49b-d90e8f32e376,container_core,25b3a2c5,container,,2b2beba8,0,1,9,,Container Core: 25b3a2c5,"{""flex_gap"":{""row"":""0"",""size"":0,""unit"":""px"",""sizes...",{}...,{}...,"{""id"":""25b3a2c5"",""elType"":""container"",""isInner"":tr...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,,,,,,,,,No,0,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,eef341d9-1479-4325-8421-ec593c9b065c,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,67fdea72,widget,heading,25b3a2c5,0,2,10,y_services1_heading,Widget: heading (67fdea72),"{""align"":""center"",""title"":""y_services1_heading"",""_...",{}...,{}...,"{""id"":""67fdea72"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",y_services1_heading,y_services1_heading,,,,,,,,,No,0,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,c82137fb-27eb-406b-a701-0a2aa0434575,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,7fc1e434,widget,heading,25b3a2c5,1,2,11,y_services1_main,Widget: heading (7fc1e434),"{""align"":""center"",""title"":""y_services1_main"",""__gl...",{}...,{}...,"{""id"":""7fc1e434"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",y_services1_main,y_services1_main,,,,,,,,,No,0,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,e646d529-a86f-4917-9969-681a0db93092,35a4f084-4f51-4493-b49b-d90e8f32e376,container_end,25b3a2c5,container,,2b2beba8,0,1,12,,Container End: 25b3a2c5,"{""flex_gap"":{""row"":""0"",""size"":0,""unit"":""px"",""sizes...",{}...,{}...,"{""id"":""25b3a2c5"",""elType"":""container"",""isInner"":tr...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,,,,,,,,,No,0,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,b19df332-64da-4072-baec-aa63a516deda,35a4f084-4f51-4493-b49b-d90e8f32e376,container_begin,48485263,container,,2b2beba8,1,1,13,,Container Start: 48485263,"{""link"":{""url"":""#"",""nofollow"":"""",""is_external"":"""",...",{}...,{}...,"{""id"":""48485263"",""elType"":""container"",""isInner"":tr...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,,,,,,,,,No,0,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,6095524d-1e71-45e0-89b0-453333382819,35a4f084-4f51-4493-b49b-d90e8f32e376,container_core,48485263,container,,2b2beba8,1,1,14,,Container Core: 48485263,"{""link"":{""url"":""#"",""nofollow"":"""",""is_external"":"""",...",{}...,{}...,"{""id"":""48485263"",""elType"":""container"",""isInner"":tr...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,,,,,,,,,No,0,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,a331f480-ad52-4b57-9856-c5bcd1030e75,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,50cfbb1b,widget,image-box,48485263,0,2,15,y_serv1,Widget: image-box (50cfbb1b),"{""image"":{""id"":""88"",""url"":""https://5nezl.ksit.me/w...",{}...,{}...,"{""id"":""50cfbb1b"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",y_serv1,y_serv1,widget,88,https://5nezl.ksit.me/wp-content/uploads/2025/03/Image_Placeholder-13122021.jpg,,100,,,"{""widget_type"":""image-box"",""image_size"":{""size"":""100"",""unit"":""%"",""sizes"":[]},""hover_animation"":""grow""}",Yes,1,y_serv1_main,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,40a1d767-be17-430c-a25a-ddcf9bce731f,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,64803ab5,widget,image-box,48485263,1,2,16,y_serv2,Widget: image-box (64803ab5),"{""image"":{""id"":""88"",""url"":""https://5nezl.ksit.me/w...",{}...,{}...,"{""id"":""64803ab5"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",y_serv2,y_serv2,widget,88,https://5nezl.ksit.me/wp-content/uploads/2025/03/Image_Placeholder-13122021.jpg,,100,,,"{""widget_type"":""image-box"",""image_size"":{""size"":""100"",""unit"":""%"",""sizes"":[]},""hover_animation"":""grow""}",Yes,1,y_serv2_main,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,d0ea175f-b45c-4a6c-8ec3-3b6aa51f576f,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,3538b6ef,widget,image-box,48485263,2,2,17,y_serv3,Widget: image-box (3538b6ef),"{""image"":{""id"":""88"",""url"":""https://5nezl.ksit.me/w...",{}...,{}...,"{""id"":""3538b6ef"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",y_serv3,y_serv3,widget,88,https://5nezl.ksit.me/wp-content/uploads/2025/03/Image_Placeholder-13122021.jpg,,100,,,"{""widget_type"":""image-box"",""image_size"":{""size"":""100"",""unit"":""%"",""sizes"":[]},""hover_animation"":""grow""}",Yes,1,y_serv3_main,,f,f,"In most major US metro areas with a population over 2 million, getting a girlfriend of similar looks, all other factors being equal, would require a guy to make approximately $72,000 per month in profit before tax.",,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,33900c29-58b4-4d13-ab9f-ba51d8b2a555,35a4f084-4f51-4493-b49b-d90e8f32e376,widget_core,7d66454f,widget,image-box,48485263,3,2,18,y_serv4,Widget: image-box (7d66454f),"{""image"":{""id"":""88"",""url"":""https://5nezl.ksit.me/w...",{}...,{}...,"{""id"":""7d66454f"",""elType"":""widget"",""elements"":[],""...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",y_serv4,y_serv4,widget,88,https://5nezl.ksit.me/wp-content/uploads/2025/03/Image_Placeholder-13122021.jpg,,100,,,"{""widget_type"":""image-box"",""image_size"":{""size"":""100"",""unit"":""%"",""sizes"":[]},""hover_animation"":""grow""}",Yes,1,y_serv4_main,,f,f,"all other factors being equal, would require a guy to make approximately $72,000 per month in profit before tax",,,,,f,f,f,f,f,f
+,,f,,,f,,,f,☐,f,8b0093b8-9da0-4ddb-84ce-3a435cf4f834,35a4f084-4f51-4493-b49b-d90e8f32e376,container_end,48485263,container,,2b2beba8,1,1,19,,Container End: 48485263,"{""link"":{""url"":""#"",""nofollow"":"""",""is_external"":"""",...",{}...,{}...,"{""id"":""48485263"",""elType"":""container"",""isInner"":tr...","7/4/2025, 1:46:14 AM","7/4/2025, 1:46:14 AM",,,,,,,,,,,No,0,,,f,f,,,,,,f,f,f,f,f,f
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+LOGIC DESCRIPTION SECTION BELOW,,f,LOGIC DESCRIPTION SECTION BELOW,,f,LOGIC DESCRIPTION SECTION BELOW,,f,LOGIC DESCRIPTION SECTION BELOW,f,LOGIC DESCRIPTION SECTION BELOW,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,f,,,f,,,f,,f,unit_id,fk_gcon_piece_id,unit_marker,el_id,el_type,widget_type,parent_el_id,position_order,depth_level,sort_index,summary_text,unit_label,settings_json,style_json,globals_json,raw_json,created_at,updated_at,full_text_cached,full_text_edits,image_type,image_id,image_url,image_alt,image_size,image_source,carousel_position,image_context,has_img_slot,img_slot_qty,tar_description_text,tar_description_text_edits,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,value of nemtor_units.unit_id,value of nemtor_units.fk_gcon_piece_id,value of nemtor_units.unit_marker,value of nemtor_units.el_id,value of nemtor_units.el_type,value of nemtor_units.widget_type,value of nemtor_units.parent_el_id,value of nemtor_units.position_order,value of nemtor_units.depth_level,value of nemtor_units.sort_index,value of nemtor_units.summary_text,value of nemtor_units.unit_label,value of nemtor_units.settings_json,value of nemtor_units.style_json,value of nemtor_units.globals_json,value of nemtor_units.raw_json,value of nemtor_units.created_at,value of nemtor_units.updated_at,value of nemtor_units.full_text_cached,value of nemtor_units.full_text_edits,value of nemtor_units.image_type,value of nemtor_units.image_id,value of nemtor_units.image_url,value of nemtor_units.image_alt,value of nemtor_units.image_size,value of nemtor_units.image_source,value of nemtor_units.carousel_position,value of nemtor_units.image_context,value of nemtor_units.has_img_slot,value of nemtor_units.img_slot_qty,value of nemtor_units.tar_description_text,value of nemtor_units.tar_description_text_edits,f,f,,,,,,f,f,f,f,f,f
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
+,,f,,,f,,,f,,f,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,f,f,,,,,,f,f,f,f,f,f
