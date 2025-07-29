@@ -8,6 +8,7 @@ interface FilegunColumnViewProps {
   initialPath: string;
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string) => Promise<void>;
+  onPinStatusChange?: () => void;
 }
 
 interface ColumnData {
@@ -19,13 +20,15 @@ interface ColumnData {
 export default function FilegunColumnView({
   initialPath,
   onRename,
-  onDelete
+  onDelete,
+  onPinStatusChange
 }: FilegunColumnViewProps) {
   const [columns, setColumns] = useState<ColumnData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [renamingItem, setRenamingItem] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; item: FilegunItem } | null>(null);
+  const [pinnedFolders, setPinnedFolders] = useState<Set<string>>(new Set());
 
   // Load directory contents
   const loadDirectory = async (path: string): Promise<FilegunItem[]> => {
@@ -55,13 +58,88 @@ export default function FilegunColumnView({
     initializeColumns();
   }, [initialPath]);
 
+  // Fetch pinned folders on component mount
+  useEffect(() => {
+    fetchPinnedFolders();
+  }, []);
+
+  const fetchPinnedFolders = async () => {
+    try {
+      const response = await fetch('/api/filegun/pin');
+      const result = await response.json();
+      if (result.success) {
+        const pinnedPaths = new Set(result.data.map((folder: any) => folder.folder_path));
+        setPinnedFolders(pinnedPaths);
+      }
+    } catch (error) {
+      console.error('Error fetching pinned folders:', error);
+    }
+  };
+
+  const handlePinToggle = async (item: FilegunItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (item.type !== 'folder') return;
+
+    const isPinned = pinnedFolders.has(item.path);
+    const newPinnedState = !isPinned;
+
+    try {
+      const response = await fetch('/api/filegun/pin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: item.path,
+          isPinned: newPinnedState
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        const newPinnedFolders = new Set(pinnedFolders);
+        if (newPinnedState) {
+          newPinnedFolders.add(item.path);
+        } else {
+          newPinnedFolders.delete(item.path);
+        }
+        setPinnedFolders(newPinnedFolders);
+        
+        // Notify parent component that pin status changed
+        if (onPinStatusChange) {
+          onPinStatusChange();
+        }
+      } else {
+        alert(`Error ${newPinnedState ? 'pinning' : 'unpinning'} folder: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error toggling pin status:', error);
+      alert('Error updating pin status');
+    }
+  };
+
   // Handle item selection in a column
   const handleItemSelect = async (columnIndex: number, item: FilegunItem) => {
     if (item.type === 'file') {
-      // For files, just update selection
+      // For files, update selection and open file using custom URL protocol
       const newColumns = [...columns];
       newColumns[columnIndex].selectedItem = item.path;
       setColumns(newColumns);
+      
+      // Download file to open it locally
+      const encodedPath = encodeURIComponent(item.path);
+      const downloadUrl = `/api/filegun/download?path=${encodedPath}`;
+      console.log('Downloading file with URL:', downloadUrl);
+      console.log('Original path:', item.path);
+      
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = item.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       return;
     }
 
@@ -235,6 +313,20 @@ export default function FilegunColumnView({
                         </div>
                       )}
                     </div>
+
+                    {/* Pin Button for folders */}
+                    {item.type === 'folder' && (
+                      <div 
+                        className={`flex items-center justify-center cursor-pointer mr-1 ${
+                          pinnedFolders.has(item.path) ? 'bg-lime-400' : 'bg-gray-200'
+                        }`}
+                        style={{ width: '20px', height: '100%' }}
+                        onClick={(e) => handlePinToggle(item, e)}
+                        title={pinnedFolders.has(item.path) ? 'Unpin folder' : 'Pin folder'}
+                      >
+                        <span className="text-xs font-bold text-gray-700">p</span>
+                      </div>
+                    )}
 
                     {/* Arrow for folders */}
                     {item.type === 'folder' && (

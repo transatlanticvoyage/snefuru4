@@ -16,6 +16,7 @@ export default function FilegunPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'list' | 'column'>('column'); // Default to column view
+  const [toolbarKey, setToolbarKey] = useState(0); // Force toolbar refresh
   
   const {
     currentPath,
@@ -25,7 +26,7 @@ export default function FilegunPage() {
     navigateToPath,
     navigateUp,
     refresh
-  } = useFilegunDirectory('/app');
+  } = useFilegunDirectory('/');
 
   const {
     operations,
@@ -83,6 +84,11 @@ export default function FilegunPage() {
     refresh();
   };
 
+  const handlePinStatusChange = () => {
+    // Force toolbar to refresh by changing its key
+    setToolbarKey(prev => prev + 1);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -104,6 +110,7 @@ export default function FilegunPage() {
 
       {/* Toolbar */}
       <FilegunToolbar
+        key={toolbarKey}
         currentPath={currentPath}
         onNavigateUp={navigateUp}
         onRefresh={refresh}
@@ -112,6 +119,8 @@ export default function FilegunPage() {
         canNavigateUp={currentPath !== '/'}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        onNavigateToPath={navigateToPath}
+        onPinStatusChange={handlePinStatusChange}
       />
 
       {/* Sentinel Control Panel */}
@@ -141,6 +150,7 @@ export default function FilegunPage() {
                 initialPath={currentPath}
                 onRename={handleRename}
                 onDelete={handleDelete}
+                onPinStatusChange={handlePinStatusChange}
               />
             ) : (
               <div className="h-full overflow-auto">
@@ -150,6 +160,7 @@ export default function FilegunPage() {
                   onNavigate={navigateToPath}
                   onRename={handleRename}
                   onDelete={handleDelete}
+                  onPinStatusChange={handlePinStatusChange}
                 />
               </div>
             )}

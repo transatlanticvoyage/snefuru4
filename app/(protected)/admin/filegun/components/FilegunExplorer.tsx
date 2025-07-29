@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FilegunItem } from '../types/filegun.types';
 import { getFileIcon, formatFileSize, formatDate } from '@/app/utils/filegun/filegunClientUtils';
 
@@ -10,6 +10,7 @@ interface FilegunExplorerProps {
   onNavigate: (path: string) => void;
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string) => Promise<void>;
+  onPinStatusChange?: () => void;
 }
 
 export default function FilegunExplorer({
@@ -17,16 +18,93 @@ export default function FilegunExplorer({
   isLoading,
   onNavigate,
   onRename,
-  onDelete
+  onDelete,
+  onPinStatusChange
 }: FilegunExplorerProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [renamingItem, setRenamingItem] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; item: FilegunItem } | null>(null);
+  const [pinnedFolders, setPinnedFolders] = useState<Set<string>>(new Set());
+
+  // Fetch pinned folders on component mount
+  useEffect(() => {
+    fetchPinnedFolders();
+  }, []);
+
+  const fetchPinnedFolders = async () => {
+    try {
+      const response = await fetch('/api/filegun/pin');
+      const result = await response.json();
+      if (result.success) {
+        const pinnedPaths = new Set(result.data.map((folder: any) => folder.folder_path));
+        setPinnedFolders(pinnedPaths);
+      }
+    } catch (error) {
+      console.error('Error fetching pinned folders:', error);
+    }
+  };
+
+  const handlePinToggle = async (item: FilegunItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (item.type !== 'folder') return;
+
+    const isPinned = pinnedFolders.has(item.path);
+    const newPinnedState = !isPinned;
+
+    try {
+      const response = await fetch('/api/filegun/pin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: item.path,
+          isPinned: newPinnedState
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        const newPinnedFolders = new Set(pinnedFolders);
+        if (newPinnedState) {
+          newPinnedFolders.add(item.path);
+        } else {
+          newPinnedFolders.delete(item.path);
+        }
+        setPinnedFolders(newPinnedFolders);
+        
+        // Notify parent component that pin status changed
+        if (onPinStatusChange) {
+          onPinStatusChange();
+        }
+      } else {
+        alert(`Error ${newPinnedState ? 'pinning' : 'unpinning'} folder: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error toggling pin status:', error);
+      alert('Error updating pin status');
+    }
+  };
 
   const handleItemClick = (item: FilegunItem) => {
     if (item.type === 'folder') {
       onNavigate(item.path);
+    } else if (item.type === 'file') {
+      // Download file to open it locally
+      const encodedPath = encodeURIComponent(item.path);
+      const downloadUrl = `/api/filegun/download?path=${encodedPath}`;
+      console.log('Downloading file with URL:', downloadUrl);
+      console.log('Original path:', item.path);
+      
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = item.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 
@@ -164,6 +242,20 @@ export default function FilegunExplorer({
               <div className="w-32 text-right text-xs text-gray-500">
                 {formatDate(new Date(item.modified))}
               </div>
+
+              {/* Pin Button - Only for folders */}
+              {item.type === 'folder' && (
+                <div 
+                  className={`flex items-center justify-center cursor-pointer ml-1 ${
+                    pinnedFolders.has(item.path) ? 'bg-lime-400' : 'bg-gray-200'
+                  }`}
+                  style={{ width: '20px', height: '100%' }}
+                  onClick={(e) => handlePinToggle(item, e)}
+                  title={pinnedFolders.has(item.path) ? 'Unpin folder' : 'Pin folder'}
+                >
+                  <span className="text-xs font-bold text-gray-700">p</span>
+                </div>
+              )}
             </div>
           ))}
         </div>

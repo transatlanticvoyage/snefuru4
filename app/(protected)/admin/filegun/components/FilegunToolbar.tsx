@@ -1,6 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+interface PinnedFolder {
+  folder_path: string;
+  folder_name: string;
+  is_pinned: boolean;
+}
 
 interface FilegunToolbarProps {
   currentPath: string;
@@ -11,6 +17,8 @@ interface FilegunToolbarProps {
   canNavigateUp: boolean;
   viewMode: 'list' | 'column';
   onViewModeChange: (mode: 'list' | 'column') => void;
+  onNavigateToPath?: (path: string) => void;
+  onPinStatusChange?: () => void;
 }
 
 export default function FilegunToolbar({
@@ -21,10 +29,45 @@ export default function FilegunToolbar({
   onCreateFile,
   canNavigateUp,
   viewMode,
-  onViewModeChange
+  onViewModeChange,
+  onNavigateToPath,
+  onPinStatusChange
 }: FilegunToolbarProps) {
   const [showCreateDialog, setShowCreateDialog] = useState<'folder' | 'file' | null>(null);
   const [newItemName, setNewItemName] = useState('');
+  const [pinnedFolders, setPinnedFolders] = useState<PinnedFolder[]>([]);
+  const [showPinnedDropdown, setShowPinnedDropdown] = useState(false);
+
+  // Fetch pinned folders on component mount
+  useEffect(() => {
+    fetchPinnedFolders();
+  }, []);
+
+  // Listen for pin status changes
+  useEffect(() => {
+    if (onPinStatusChange) {
+      fetchPinnedFolders();
+    }
+  }, [onPinStatusChange]);
+
+  const fetchPinnedFolders = async () => {
+    try {
+      const response = await fetch('/api/filegun/pin');
+      const result = await response.json();
+      if (result.success) {
+        setPinnedFolders(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching pinned folders:', error);
+    }
+  };
+
+  const handlePinnedFolderSelect = (folderPath: string) => {
+    if (onNavigateToPath) {
+      onNavigateToPath(folderPath);
+    }
+    setShowPinnedDropdown(false);
+  };
 
   const handleCreate = async () => {
     if (!newItemName.trim() || !showCreateDialog) return;
@@ -85,6 +128,42 @@ export default function FilegunToolbar({
             <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">
               {currentPath}
             </code>
+          </div>
+
+          {/* Pinned Folders Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowPinnedDropdown(!showPinnedDropdown)}
+              className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 flex items-center"
+              title="Navigate to pinned folders"
+            >
+              📌 Pinned Folders
+              <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showPinnedDropdown && (
+              <div className="absolute left-0 mt-1 w-64 bg-white border border-gray-300 rounded shadow-lg py-1 z-50">
+                {pinnedFolders.length === 0 ? (
+                  <div className="px-4 py-2 text-sm text-gray-500">
+                    No pinned folders yet
+                  </div>
+                ) : (
+                  pinnedFolders.map((folder) => (
+                    <button
+                      key={folder.folder_path}
+                      onClick={() => handlePinnedFolderSelect(folder.folder_path)}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center"
+                      title={folder.folder_path}
+                    >
+                      <span className="text-green-600 mr-2">📁</span>
+                      <span className="truncate">{folder.folder_name}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
 

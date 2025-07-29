@@ -502,7 +502,27 @@ export default function Header() {
                           className="flex-1 pr-4 py-2 text-sm text-gray-700 block"
                           onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
                         >
-                          {child.name}
+                          <span className="flex items-center justify-between">
+                            <span>{child.name}</span>
+                            {/* Database table mapping */}
+                            {(() => {
+                              const dbTableMap: { [key: string]: string } = {
+                                'sunjar': 'suns',
+                                'moonjar': 'moons',
+                                'rackjar': 'rackuic',
+                                'yegjar': 'yegdbc',
+                                'zugjar': 'zugdbt',
+                                'cfdefjar': 'cfdef',
+                                'cfvaljar': 'cfval'
+                              };
+                              const tableName = dbTableMap[child.name];
+                              return tableName ? (
+                                <span className="kremnav_utg_box text-gray-500 text-sm ml-2">
+                                  {tableName}
+                                </span>
+                              ) : null;
+                            })()}
+                          </span>
                         </Link>
                       </div>
                     );

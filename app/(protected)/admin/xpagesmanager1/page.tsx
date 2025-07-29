@@ -10,6 +10,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
 import xpageCache from '@/app/metadata/xpage-cache.json';
 import { syncXPageMetadataAPI } from '@/app/utils/syncXPageMetadata';
+import { NubraTablefaceKite } from '@/app/utils/nubra-tableface-kite';
 
 interface XPage {
   xpage_id: number;
@@ -742,6 +743,9 @@ export default function XPagesManager1Page() {
         Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} items
         {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
       </div>
+
+      {/* Nubra Tableface Kite Label */}
+      <NubraTablefaceKite />
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
