@@ -57,7 +57,7 @@ export default function FilejarPage() {
           <div className="text-center text-gray-500">
             <div className="text-4xl mb-4">📄</div>
             <div className="text-lg">FileGun Files</div>
-            <div className="text-sm">UI coming soon...</div>
+            <div className="text-sm">UI coming soon</div>
           </div>
         </div>
       </div>
