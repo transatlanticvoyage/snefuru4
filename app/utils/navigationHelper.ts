@@ -149,6 +149,10 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         name: 'Download Plugin',
         path: '/downloadplugin'
       },
+      {
+        name: 'Filegun Manager',
+        path: '/admin/filegun'
+      },
       ...adminPages.filter(page => 
         !page.path?.includes('/admin/ketch_manager') &&
         !page.path?.includes('/admin/columnrobot') &&

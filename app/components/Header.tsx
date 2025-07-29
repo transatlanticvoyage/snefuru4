@@ -9,6 +9,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useCustomColors } from '@/app/hooks/useCustomColors';
 import { createNavigationStructure } from '@/app/utils/navigationHelper';
+import { useRecentPages } from '@/app/hooks/useRecentPages';
 
 interface NavItem {
   name: string;
@@ -48,6 +49,7 @@ export default function Header() {
   const [isNeptuneNavOpen, setIsNeptuneNavOpen] = useState(false);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+  const { recentPages, clearRecents } = useRecentPages();
 
   // Fetch custom colors for headers
   const { colors } = useCustomColors([
@@ -153,13 +155,55 @@ export default function Header() {
     };
 
     // Create the recents menu item
+    const recentsChildren: NavItem[] = [];
+    
+    // Add recent pages
+    recentPages.forEach((page, index) => {
+      recentsChildren.push({
+        name: page.title,
+        path: page.path
+      });
+    });
+    
+    // Add separator and clear option if there are recent pages
+    if (recentPages.length > 0) {
+      recentsChildren.push({
+        name: '---recents-separator---',
+        path: undefined // No link - separator
+      });
+      recentsChildren.push({
+        name: 'Clear All',
+        path: undefined, // Special handling for clear action
+        clearAction: true
+      } as NavItem & { clearAction?: boolean });
+    }
+    
+    // If no recent pages, show message
+    if (recentPages.length === 0) {
+      recentsChildren.push({
+        name: 'No recent pages',
+        path: undefined
+      });
+    }
+
     const recentsMenuItem: NavItem = {
       name: 'recents',
-      children: [] // Empty for now
+      children: recentsChildren
     };
 
-    // Create the final nav items array with OPEN FULL NAV button first, then recents, then admin, pluto jetstream, then special item, then oldallgroup, then hardcoded items
-    const finalNavItems = [openFullNavButton, recentsMenuItem, adminMenuItem, plutoJetstreamItem, specialFirstItem, oldAllGroupItem, ...hardcodedNavItems];
+    // Create the favorites menu item
+    const favoritesMenuItem: NavItem = {
+      name: 'favorites',
+      children: [
+        {
+          name: 'No favorites yet',
+          path: undefined
+        }
+      ]
+    };
+
+    // Create the final nav items array with OPEN FULL NAV button first, then recents, then favorites, then admin, pluto jetstream, then special item, then oldallgroup, then hardcoded items
+    const finalNavItems = [openFullNavButton, recentsMenuItem, favoritesMenuItem, adminMenuItem, plutoJetstreamItem, specialFirstItem, oldAllGroupItem, ...hardcodedNavItems];
 
     const panjar3Index = finalNavItems.findIndex(item => item.name === 'panjar3');
     if (panjar3Index === -1) {
@@ -231,6 +275,20 @@ export default function Header() {
                 <rect x="4" y="4" width="12" height="12" />
               </svg>
             )}
+            {item.name === 'favorites' && (
+              <svg 
+                className="w-4 h-4 mr-1 text-black" 
+                style={{ 
+                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+                }}
+                fill="currentColor" 
+                stroke="white"
+                strokeWidth="1"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 3l6.18 4.5-2.36 7.26h-7.64L3.82 7.5z" />
+              </svg>
+            )}
             {item.name === 'pluto jetstream' && (
               <svg 
                 className="w-4 h-4 mr-1 text-black" 
@@ -272,6 +330,36 @@ export default function Header() {
                         style={{ height: '6px', backgroundColor: '#000000', width: '100%' }}
                       >
                       </div>
+                    );
+                  }
+                  
+                  // Special handling for recents separators
+                  if (item.name === 'recents' && child.name === '---recents-separator---') {
+                    return (
+                      <div
+                        key={`${item.name}-${child.name}-${childIndex}`}
+                        className="block my-1"
+                        style={{ height: '6px', backgroundColor: '#000000', width: '100%' }}
+                      >
+                      </div>
+                    );
+                  }
+                  
+                  // Special handling for "Clear All" action in recents
+                  if (item.name === 'recents' && child.name === 'Clear All') {
+                    return (
+                      <button
+                        key={`${item.name}-${child.name}-${childIndex}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          clearRecents();
+                          setNavDropdowns(prev => ({ ...prev, [item.name]: false }));
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium"
+                      >
+                        {child.name}
+                      </button>
                     );
                   }
                   
@@ -350,6 +438,31 @@ export default function Header() {
                         key={`${item.name}-${child.name}-${childIndex}`}
                         className="flex items-center hover:bg-gray-100"
                       >
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // TODO: Add to favorites functionality
+                          }}
+                          className="ml-4 mr-1 bg-white hover:bg-yellow-100 transition-colors duration-200 flex items-center justify-center border border-gray-400"
+                          style={{
+                            width: '12px',
+                            height: '12px',
+                            minWidth: '12px',
+                            minHeight: '12px'
+                          }}
+                          title={`Add "${child.name}" to favorites`}
+                        >
+                          <svg
+                            className="w-2 h-2 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </button>
                         <button
                           onClick={(e) => {
                             e.preventDefault();

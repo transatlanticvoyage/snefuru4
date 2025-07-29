@@ -48,14 +48,6 @@ export default function MoonjarPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <Link href="/admin" className="text-blue-600 hover:text-blue-800">
-            ← Back to Admin
-          </Link>
-        </div>
-      </div>
-
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">Moonjar</h1>
         <p className="text-gray-600" style={{ fontSize: '16px' }}>
