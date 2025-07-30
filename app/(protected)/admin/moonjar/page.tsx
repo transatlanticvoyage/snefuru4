@@ -371,7 +371,17 @@ export default function MoonjarPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Moonjar</h1>
+        <h1 className="text-2xl font-bold mb-2 flex items-center">
+          <svg 
+            className="w-8 h-8 mr-3 text-slate-600" 
+            fill="currentColor" 
+            viewBox="0 0 24 24"
+            style={{ width: '30px', height: '30px' }}
+          >
+            <path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+          </svg>
+          Moonjar
+        </h1>
         <p className="text-gray-600 text-base">
           <span className="font-bold">Moon Row Modules Management System</span>
         </p>
