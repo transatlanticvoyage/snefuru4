@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FilegunItem, FilegunApiResponse } from '../types/filegun.types';
 import { getFileIcon, formatFileSize, formatDate } from '@/app/utils/filegun/filegunClientUtils';
+import { getFilegunBridge } from '@/app/utils/filegun/websocketBridge';
 
 interface FilegunColumnViewProps {
   initialPath: string;
@@ -122,24 +123,29 @@ export default function FilegunColumnView({
   // Handle item selection in a column
   const handleItemSelect = async (columnIndex: number, item: FilegunItem) => {
     if (item.type === 'file') {
-      // For files, update selection and open file using custom URL protocol
+      // For files, update selection and open file using WebSocket bridge
       const newColumns = [...columns];
       newColumns[columnIndex].selectedItem = item.path;
       setColumns(newColumns);
       
-      // Download file to open it locally
-      const encodedPath = encodeURIComponent(item.path);
-      const downloadUrl = `/api/filegun/download?path=${encodedPath}`;
-      console.log('Downloading file with URL:', downloadUrl);
-      console.log('Original path:', item.path);
+      // Open file using WebSocket bridge
+      console.log('Opening file via WebSocket bridge:', item.path);
       
-      // Create a temporary anchor element to trigger download
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = item.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        const bridge = getFilegunBridge();
+        const success = await bridge.openFile(item.path);
+        
+        if (success) {
+          console.log('✅ File opened successfully');
+        } else {
+          console.error('❌ Failed to open file');
+          alert('Failed to open file. Make sure the Filegun Bridge server is running.');
+        }
+      } catch (error) {
+        console.error('Error opening file:', error);
+        alert('Error connecting to Filegun Bridge. Make sure the bridge server is running.');
+      }
+      
       return;
     }
 
