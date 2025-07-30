@@ -54,6 +54,10 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
         path: '/admin/drahiman'
       },
       {
+        name: 'choptext',
+        path: '/choptext'
+      },
+      {
         name: 'Code Range Jar',
         path: '/admin/coderangejar'
       },
