@@ -399,7 +399,7 @@ export default function MoonjarPage() {
       </div>
 
       {/* Upper pagination controls */}
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex justify-start">
         <PaginationControls />
       </div>
 
@@ -410,13 +410,19 @@ export default function MoonjarPage() {
             <thead className="bg-gray-50">
               <tr>
                 {/* Checkbox column */}
-                <th className="text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-4 py-3 w-12">
-                  <input
-                    type="checkbox"
-                    checked={selectedRows.size === paginatedMoons.length && paginatedMoons.length > 0}
-                    onChange={handleSelectAll}
-                    className="rounded"
-                  />
+                <th 
+                  className="text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-4 py-3 w-12"
+                  onClick={handleSelectAll}
+                >
+                  <div className="flex items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.size === paginatedMoons.length && paginatedMoons.length > 0}
+                      onChange={() => {}} // Handled by th onClick
+                      className="w-5 h-5 rounded pointer-events-none"
+                      style={{ width: '20px', height: '20px' }}
+                    />
+                  </div>
                 </th>
                 
                 {columns.map((column) => {
@@ -459,13 +465,19 @@ export default function MoonjarPage() {
               {paginatedMoons.map((moon) => (
                 <tr key={moon.mrm_id} className="hover:bg-gray-50">
                   {/* Checkbox column */}
-                  <td className="border border-gray-200 px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedRows.has(moon.mrm_id)}
-                      onChange={() => handleRowSelect(moon.mrm_id)}
-                      className="rounded"
-                    />
+                  <td 
+                    className="border border-gray-200 px-4 py-3 cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleRowSelect(moon.mrm_id)}
+                  >
+                    <div className="flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.has(moon.mrm_id)}
+                        onChange={() => {}} // Handled by td onClick
+                        className="w-5 h-5 rounded pointer-events-none"
+                        style={{ width: '20px', height: '20px' }}
+                      />
+                    </div>
                   </td>
                   
                   {columns.map((column) => {
@@ -493,7 +505,7 @@ export default function MoonjarPage() {
       </div>
 
       {/* Lower pagination controls */}
-      <div className="mt-4 flex justify-end">
+      <div className="mt-4 flex justify-start">
         <PaginationControls />
       </div>
 
