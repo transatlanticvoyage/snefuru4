@@ -87,6 +87,7 @@ export default function SentinelControl({ currentPath }: SentinelControlProps) {
     if (currentPath) {
       calculateMeadCraterNumber(currentPath);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPath, selectedIncrement, customIncrement]);
 
   const handleStart = async () => {
@@ -160,6 +161,7 @@ export default function SentinelControl({ currentPath }: SentinelControlProps) {
                   {fileType}
                 </button>
               ))}
+              </div>
             </div>
             
             <div className="flex items-center">
