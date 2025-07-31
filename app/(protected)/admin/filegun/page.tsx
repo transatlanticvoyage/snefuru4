@@ -96,7 +96,9 @@ export default function FilegunPage() {
       <div className="bg-white border-b px-6 py-2">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">🔫 Filegun</h1>
+            <h1 className="text-2xl font-bold text-gray-800">
+              <span style={{ color: '#650d0d' }}>🔫</span> Filegun
+            </h1>
           </div>
           <div className="flex items-center space-x-6">
             <MenjariButtonBarFileGunLinks />
@@ -126,7 +128,7 @@ export default function FilegunPage() {
 
       {/* Sentinel Control Panel */}
       <div className="px-6">
-        <SentinelControl />
+        <SentinelControl currentPath={currentPath} />
       </div>
 
       {/* Main Content */}

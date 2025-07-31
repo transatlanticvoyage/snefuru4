@@ -26,7 +26,7 @@ export default function ProtectedLayout({
         
         <div className="snefuru-content-wrapper">
           <Header />
-          <main className="py-6 px-4">
+          <main className="pt-0 pb-6 px-4">
             {children}
           </main>
         </div>

@@ -30,6 +30,10 @@ export default function FilegunColumnView({
   const [renameValue, setRenameValue] = useState('');
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; item: FilegunItem } | null>(null);
   const [pinnedFolders, setPinnedFolders] = useState<Set<string>>(new Set());
+  const [emptyColumnCount, setEmptyColumnCount] = useState(0);
+  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(new Set());
+  const [lastClickTime, setLastClickTime] = useState<number>(0);
+  const [lastClickedItem, setLastClickedItem] = useState<string | null>(null);
 
   // Load directory contents
   const loadDirectory = async (path: string): Promise<FilegunItem[]> => {
@@ -63,6 +67,27 @@ export default function FilegunColumnView({
   useEffect(() => {
     fetchPinnedFolders();
   }, []);
+
+  // Calculate how many empty columns we need to fill the screen
+  const calculateEmptyColumns = () => {
+    const containerWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const columnWidth = 256; // 64 * 4 = 256px (w-64 in Tailwind)
+    const usedWidth = columns.length * columnWidth;
+    const remainingWidth = containerWidth - usedWidth;
+    const emptyColumnsNeeded = Math.max(0, Math.floor(remainingWidth / columnWidth));
+    return emptyColumnsNeeded;
+  };
+
+  // Update empty column count on window resize
+  useEffect(() => {
+    const updateEmptyColumns = () => {
+      setEmptyColumnCount(calculateEmptyColumns());
+    };
+
+    updateEmptyColumns();
+    window.addEventListener('resize', updateEmptyColumns);
+    return () => window.removeEventListener('resize', updateEmptyColumns);
+  }, [columns.length]);
 
   const fetchPinnedFolders = async () => {
     try {
@@ -120,15 +145,32 @@ export default function FilegunColumnView({
     }
   };
 
-  // Handle item selection in a column
+  // Handle item selection in a column with double-click for files only
   const handleItemSelect = async (columnIndex: number, item: FilegunItem) => {
+    // Always update selection on click
+    const newColumns = [...columns];
+    newColumns[columnIndex].selectedItem = item.path;
+    setColumns(newColumns);
+    
     if (item.type === 'file') {
-      // For files, update selection and open file using WebSocket bridge
-      const newColumns = [...columns];
-      newColumns[columnIndex].selectedItem = item.path;
-      setColumns(newColumns);
+      // Files require double-click to open
+      const currentTime = Date.now();
+      const DOUBLE_CLICK_THRESHOLD = 400; // milliseconds
       
-      // Open file using WebSocket bridge
+      // Check if this is a double-click
+      const isDoubleClick = lastClickedItem === item.path && 
+                           (currentTime - lastClickTime) < DOUBLE_CLICK_THRESHOLD;
+      
+      // Update click tracking
+      setLastClickTime(currentTime);
+      setLastClickedItem(item.path);
+      
+      // Only open file on double-click
+      if (!isDoubleClick) {
+        return; // Just select, don't open
+      }
+      
+      // Double-click detected - open file
       console.log('Opening file via WebSocket bridge:', item.path);
       
       try {
@@ -149,14 +191,9 @@ export default function FilegunColumnView({
       return;
     }
 
-    // For folders, load contents and create new columns
+    // For folders, open immediately on single click
     setIsLoading(true);
     const items = await loadDirectory(item.path);
-    
-    const newColumns = [...columns];
-    
-    // Update selection in current column
-    newColumns[columnIndex].selectedItem = item.path;
     
     // Remove any columns to the right
     newColumns.splice(columnIndex + 1);
@@ -249,6 +286,22 @@ export default function FilegunColumnView({
     }
   };
 
+  // Handle column selection - only allow single selection of columns with content
+  const handleColumnSelect = (columnId: string, hasContent: boolean) => {
+    // Don't allow selection of empty columns
+    if (!hasContent) return;
+    
+    const newSelectedColumns = new Set<string>();
+    // If clicking on already selected column, deselect it
+    if (selectedColumns.has(columnId)) {
+      // Leave set empty (deselect)
+    } else {
+      // Select only this column (single selection)
+      newSelectedColumns.add(columnId);
+    }
+    setSelectedColumns(newSelectedColumns);
+  };
+
   if (isLoading && columns.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -266,8 +319,31 @@ export default function FilegunColumnView({
             key={`${column.path}-${columnIndex}`}
             className="flex-shrink-0 w-64 border-r border-gray-200 bg-white"
           >
+            {/* Additional Header Row - with selection functionality */}
+            <div 
+              className={`kz_filegun_colview_header_level2 border-b border-t border-gray-400 px-3 py-2 ${
+                column.items.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed'
+              } ${
+                selectedColumns.has(`${column.path}-${columnIndex}`) ? '' : 'bg-gray-50'
+              }`}
+              style={{
+                backgroundColor: selectedColumns.has(`${column.path}-${columnIndex}`) ? '#b0cce7' : ''
+              }}
+              onClick={() => handleColumnSelect(`${column.path}-${columnIndex}`, column.items.length > 0)}
+            >
+              <div className="flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={selectedColumns.has(`${column.path}-${columnIndex}`)}
+                  onChange={() => {}} // Handled by parent div onClick
+                  className="pointer-events-none"
+                  disabled={column.items.length === 0}
+                />
+              </div>
+            </div>
+
             {/* Column Header */}
-            <div className="bg-gray-50 border-b px-3 py-2">
+            <div className="kz_filegun_colview_header_level1 bg-gray-50 border-b border-t border-gray-400 px-3 py-2">
               <div className="text-xs text-gray-600 truncate" title={column.path}>
                 {column.path === '/' ? 'Root' : column.path.split('/').pop() || column.path}
               </div>
@@ -343,6 +419,41 @@ export default function FilegunColumnView({
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        ))}
+
+        {/* Empty columns to fill screen */}
+        {Array.from({ length: emptyColumnCount }, (_, index) => (
+          <div
+            key={`empty-${index}`}
+            className="flex-shrink-0 w-64 border-r border-gray-200 bg-white"
+          >
+            {/* Additional Empty Header Row - disabled since no content */}
+            <div 
+              className={`kz_filegun_colview_header_level2 border-b border-t border-gray-400 px-3 py-2 cursor-not-allowed bg-gray-50`}
+              onClick={() => handleColumnSelect(`empty-${index}`, false)}
+            >
+              <div className="flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={false}
+                  onChange={() => {}} // Handled by parent div onClick
+                  className="pointer-events-none"
+                  disabled={true}
+                />
+              </div>
+            </div>
+
+            {/* Empty Column Header */}
+            <div className="kz_filegun_colview_header_level1 bg-gray-50 border-b border-t border-gray-400 px-3 py-2">
+              <div className="text-xs text-gray-600 truncate">
+                &nbsp;
+              </div>
+            </div>
+            {/* Empty Column Content */}
+            <div className="overflow-y-auto h-full">
+              {/* Empty content area */}
             </div>
           </div>
         ))}
