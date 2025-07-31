@@ -18,6 +18,8 @@ export default function FilegunPage() {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'list' | 'column'>('column'); // Default to column view
   const [toolbarKey, setToolbarKey] = useState(0); // Force toolbar refresh
+  const [selectedItemPath, setSelectedItemPath] = useState<string | null>(null);
+  const [selectedItemIsFile, setSelectedItemIsFile] = useState(false);
   
   const {
     currentPath,
@@ -90,6 +92,11 @@ export default function FilegunPage() {
     setToolbarKey(prev => prev + 1);
   };
 
+  const handleSelectedItemChange = (selectedPath: string | null, isFile: boolean) => {
+    setSelectedItemPath(selectedPath);
+    setSelectedItemIsFile(isFile);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -128,7 +135,11 @@ export default function FilegunPage() {
 
       {/* Sentinel Control Panel */}
       <div className="px-6">
-        <SentinelControl currentPath={currentPath} />
+        <SentinelControl 
+          currentPath={currentPath} 
+          selectedItemPath={selectedItemPath}
+          selectedItemIsFile={selectedItemIsFile}
+        />
       </div>
 
       {/* Main Content */}
@@ -154,6 +165,7 @@ export default function FilegunPage() {
                 onRename={handleRename}
                 onDelete={handleDelete}
                 onPinStatusChange={handlePinStatusChange}
+                onSelectedItemChange={handleSelectedItemChange}
               />
             ) : (
               <div className="h-full overflow-auto">

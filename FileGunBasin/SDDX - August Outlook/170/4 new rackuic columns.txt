@@ -1,0 +1,31 @@
+
+
+# New columns rack stuff
+
+How to accomodate situation s with multiple dB columns in the rack ui column?
+
+rel_db_column
+rel_db_table
+
+
+rcrel_dbtable
+rcrel_dbcolumn
+
+
+rackuicol_dbtable
+rackuicol_dbcolumn
+
+rcol_dbtable
+rcol_dbcolumn
+
+
+We need option of workaround system
+
+create new fields in db table rackuic (boolean)
+
+BOOLEAN FIELDS
+holds_multiple_db_columns
+is_special_ui_cell_output
+
+JSON FIELDS
+rackuic_special_db_config

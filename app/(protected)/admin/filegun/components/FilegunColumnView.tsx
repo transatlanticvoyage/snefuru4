@@ -10,6 +10,7 @@ interface FilegunColumnViewProps {
   onRename: (oldPath: string, newName: string) => Promise<void>;
   onDelete: (path: string) => Promise<void>;
   onPinStatusChange?: () => void;
+  onSelectedItemChange?: (selectedPath: string | null, isFile: boolean) => void;
 }
 
 interface ColumnData {
@@ -22,7 +23,8 @@ export default function FilegunColumnView({
   initialPath,
   onRename,
   onDelete,
-  onPinStatusChange
+  onPinStatusChange,
+  onSelectedItemChange
 }: FilegunColumnViewProps) {
   const [columns, setColumns] = useState<ColumnData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -151,6 +153,11 @@ export default function FilegunColumnView({
     const newColumns = [...columns];
     newColumns[columnIndex].selectedItem = item.path;
     setColumns(newColumns);
+    
+    // Notify parent of selection change
+    if (onSelectedItemChange) {
+      onSelectedItemChange(item.path, item.type === 'file');
+    }
     
     if (item.type === 'file') {
       // Files require double-click to open

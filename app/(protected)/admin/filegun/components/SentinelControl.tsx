@@ -5,9 +5,11 @@ import { useSentinel } from '../hooks/useSentinel';
 
 interface SentinelControlProps {
   currentPath: string;
+  selectedItemPath: string | null;
+  selectedItemIsFile: boolean;
 }
 
-export default function SentinelControl({ currentPath }: SentinelControlProps) {
+export default function SentinelControl({ currentPath, selectedItemPath, selectedItemIsFile }: SentinelControlProps) {
   const {
     status,
     operations,
@@ -32,6 +34,7 @@ export default function SentinelControl({ currentPath }: SentinelControlProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [selectedHousing, setSelectedHousing] = useState('create in end-selected folder');
   const [selectedRawFileSource, setSelectedRawFileSource] = useState('use blank file from scratch');
+  const [filenameInput, setFilenameInput] = useState('');
 
   // Calculate MeadCraterNumber based on current folder's numbered subfolders + increment
   const calculateMeadCraterNumber = async (currentPath: string) => {
@@ -82,13 +85,178 @@ export default function SentinelControl({ currentPath }: SentinelControlProps) {
     }
   };
 
-  // Recalculate MeadCraterNumber when currentPath or increment settings change
+  // Recalculate MeadCraterNumber when target path changes
   useEffect(() => {
-    if (currentPath) {
-      calculateMeadCraterNumber(currentPath);
+    // Determine the actual target path that will be used for creation
+    let targetPath = currentPath;
+    
+    if (selectedHousing === 'create in end-selected folder' && selectedItemPath) {
+      if (selectedItemIsFile) {
+        // If file is selected, use its parent directory
+        targetPath = selectedItemPath.substring(0, selectedItemPath.lastIndexOf('/')) || '/';
+      } else {
+        // If folder is selected, use the folder itself
+        targetPath = selectedItemPath;
+      }
+    }
+    
+    if (targetPath) {
+      calculateMeadCraterNumber(targetPath);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPath, selectedIncrement, customIncrement]);
+  }, [currentPath, selectedIncrement, customIncrement, selectedItemPath, selectedItemIsFile, selectedHousing]);
+
+  // Get current mead configuration from UI state
+  const getMeadConfig = () => {
+    const incrementValue = selectedIncrement === 'Custom' 
+      ? parseInt(customIncrement || '0', 10) 
+      : parseInt(selectedIncrement, 10);
+    
+    return {
+      action: selectedAction as 'create new folder' | '+ folder and file' | '+open',
+      fileType: selectedFileType as 'none' | 'xls' | 'csv' | 'ts' | 'tsx' | 'txt' | 'html' | 'php' | 'docx',
+      filename: filenameInput.trim() || 'untitled project',
+      increment: incrementValue,
+      housingStrategy: selectedHousing,
+      currentPath: currentPath,
+      meadCraterNumber: parseInt(meadCraterNumber, 10),
+      rawFileSource: selectedRawFileSource
+    };
+  };
+
+  // Execute mead function based on button clicked
+  const executeMeadFunction = async (action: 'create new folder' | '+ folder and file' | '+open') => {
+    try {
+      const config = getMeadConfig();
+      config.action = action; // Override action with button clicked
+      
+      console.log('Executing mead function:', config);
+      
+      // Determine target path based on housing strategy
+      let targetPath = '';
+      switch (config.housingStrategy) {
+        case 'create in end-selected folder':
+          if (selectedItemPath) {
+            if (selectedItemIsFile) {
+              // If file is selected, use its parent directory
+              targetPath = selectedItemPath.substring(0, selectedItemPath.lastIndexOf('/')) || '/';
+            } else {
+              // If folder is selected, use the folder itself
+              targetPath = selectedItemPath;
+            }
+          } else {
+            // No selection, use current path
+            targetPath = config.currentPath;
+          }
+          break;
+        case 'create in cauldron vat paradigm':
+          targetPath = '/app/cauldron';
+          break;
+        case 'create in selected column':
+          // TODO: Get selected column path
+          targetPath = config.currentPath;
+          break;
+        case 'create in selected column\'s active folder':
+          // TODO: Get selected column's active folder
+          targetPath = config.currentPath;
+          break;
+        default:
+          targetPath = config.currentPath;
+      }
+      
+      // Generate full name with crater number
+      const baseName = `${config.meadCraterNumber} ${config.filename}`;
+      
+      if (action === 'create new folder') {
+        // Create folder only
+        const response = await fetch('/api/filegun/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: targetPath,
+            name: baseName,
+            type: 'folder'
+          })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert(`✅ Folder created: ${baseName}`);
+          // Refresh crater number and view
+          await calculateMeadCraterNumber(currentPath);
+        } else {
+          alert(`❌ Error creating folder: ${result.error}`);
+        }
+      } 
+      else if (action === '+ folder and file' || action === '+open') {
+        // First create the folder
+        const folderResponse = await fetch('/api/filegun/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: targetPath,
+            name: baseName,
+            type: 'folder'
+          })
+        });
+        
+        const folderResult = await folderResponse.json();
+        if (!folderResult.success) {
+          alert(`❌ Error creating folder: ${folderResult.error}`);
+          return;
+        }
+        
+        // Then create the file inside the folder
+        const extension = config.fileType === 'none' ? '' : `.${config.fileType}`;
+        const fileName = `${baseName}${extension}`;
+        const folderPath = `${targetPath}/${baseName}`;
+        
+        const fileResponse = await fetch('/api/filegun/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: folderPath,
+            name: fileName,
+            type: 'file',
+            content: '' // Empty file for now
+          })
+        });
+        
+        const fileResult = await fileResponse.json();
+        if (fileResult.success) {
+          alert(`✅ Folder and file created: ${baseName}/${fileName}`);
+          
+          // If +open action, also open the file
+          if (action === '+open') {
+            try {
+              const { getFilegunBridge } = await import('@/app/utils/filegun/websocketBridge');
+              const bridge = getFilegunBridge();
+              const filePath = `${folderPath}/${fileName}`;
+              const opened = await bridge.openFile(filePath);
+              
+              if (opened) {
+                console.log('✅ File opened successfully');
+              } else {
+                alert('⚠️ File created but failed to open. Check Filegun Bridge connection.');
+              }
+            } catch (error) {
+              console.error('Error opening file:', error);
+              alert('⚠️ File created but failed to open. Filegun Bridge error.');
+            }
+          }
+          
+          // Refresh crater number and view
+          await calculateMeadCraterNumber(currentPath);
+        } else {
+          alert(`❌ Error creating file: ${fileResult.error}`);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Mead function error:', error);
+      alert(`❌ Mead function failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
 
   const handleStart = async () => {
     await startSentinel(syncPath);
@@ -165,10 +333,10 @@ export default function SentinelControl({ currentPath }: SentinelControlProps) {
             </div>
             
             <div className="flex items-center">
-              {['create new folder', '+ new file', '+open'].map((action, index) => (
+              {['create new folder', '+ folder and file', '+open'].map((action, index) => (
                 <button
                   key={action}
-                  onClick={() => {/* Future functionality will go here */}}
+                  onClick={() => executeMeadFunction(action as 'create new folder' | '+ folder and file' | '+open')}
                   className={`px-2 py-1 text-sm border border-gray-400 transition-colors ${
                     index === 0 ? 'rounded-l' : ''
                   } ${
@@ -194,22 +362,22 @@ export default function SentinelControl({ currentPath }: SentinelControlProps) {
               ))}
             </div>
             
-            <div className="flex items-center space-x-2">
-              <span className="font-bold text-sm">housing</span>
-              <select
-                value={selectedHousing}
-                onChange={(e) => setSelectedHousing(e.target.value)}
-                className="border border-gray-300 px-2 py-1 text-sm rounded bg-white hover:bg-gray-50"
-              >
-                <option value="create in end-selected folder">create in end-selected folder</option>
-                <option value="create in cauldron vat paradigm" disabled className="text-gray-400">create in cauldron vat paradigm</option>
-                <option value="create in selected column">create in selected column</option>
-                <option value="create in selected column's active folder">create in selected column's active folder</option>
-              </select>
-            </div>
           </div>
           <div className="mt-2">
             <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <span className="font-bold text-sm">housing</span>
+                <select
+                  value={selectedHousing}
+                  onChange={(e) => setSelectedHousing(e.target.value)}
+                  className="border border-gray-300 px-2 py-1 text-sm rounded bg-white hover:bg-gray-50"
+                >
+                  <option value="create in end-selected folder">create in end-selected folder</option>
+                  <option value="create in cauldron vat paradigm" disabled className="text-gray-400">create in cauldron vat paradigm</option>
+                  <option value="create in selected column">create in selected column</option>
+                  <option value="create in selected column's active folder">create in selected column's active folder</option>
+                </select>
+              </div>
               <div className="relative">
                 <div className="flex items-center">
                   <div
@@ -224,6 +392,8 @@ export default function SentinelControl({ currentPath }: SentinelControlProps) {
                   </div>
                   <input
                     type="text"
+                    value={filenameInput}
+                    onChange={(e) => setFilenameInput(e.target.value)}
                     placeholder="Enter filename here... 'top lettuce brands'"
                     className="border border-gray-300 px-3 py-1 text-sm rounded-r -ml-px"
                     style={{ width: '420px' }}
@@ -234,12 +404,20 @@ export default function SentinelControl({ currentPath }: SentinelControlProps) {
                     MeadCraterNumber
                   </div>
                 )}
-                <div className="flex mt-1">
+              </div>
+            </div>
+            <div className="flex mt-1 space-x-4">
+              <div className="flex items-center space-x-2">
+                <span className="font-bold text-sm text-transparent">housing</span>
+                <div className="text-transparent text-sm">placeholder</div>
+              </div>
+              <div>
+                <div className="flex">
                   <div style={{ width: '80px' }} className="text-center">
                     <span className="font-bold text-sm">crater</span>
                   </div>
                   <div style={{ width: '420px' }} className="pl-3">
-                    <span className="font-bold text-sm">fobject_name_core</span>
+                    <span className="font-bold text-sm">fitem_name_core</span>
                   </div>
                 </div>
               </div>
