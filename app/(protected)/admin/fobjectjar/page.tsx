@@ -4,9 +4,9 @@ import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import MenjariButtonBarFileGunLinks from '@/app/components/MenjariButtonBarFileGunLinks';
-import FolderjarTable from './components/FolderjarTable';
+import FobjectjarTable from './components/FobjectjarTable';
 
-export default function FolderjarPage() {
+export default function FobjectjarPage() {
   const { user } = useAuth();
   const router = useRouter();
 
@@ -22,7 +22,7 @@ export default function FolderjarPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">FileGun Folders</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">FileGun Fobjects</h1>
           <p className="text-gray-600">This page is only available in development mode</p>
         </div>
       </div>
@@ -48,7 +48,7 @@ export default function FolderjarPage() {
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">📁 FileGun Folders</h1>
+            <h1 className="text-2xl font-bold text-gray-800">🔧 FileGun Fobjects</h1>
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-500">Environment: Development Only</div>
@@ -57,9 +57,9 @@ export default function FolderjarPage() {
         </div>
       </div>
 
-      {/* Main Content - Full Width FolderjarTable */}
+      {/* Main Content - Full Width FobjectjarTable */}
       <div className="flex-1 overflow-hidden">
-        <FolderjarTable />
+        <FobjectjarTable />
       </div>
     </div>
   );

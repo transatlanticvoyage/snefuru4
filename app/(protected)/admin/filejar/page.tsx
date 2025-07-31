@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import MenjariButtonBarFileGunLinks from '@/app/components/MenjariButtonBarFileGunLinks';
+import FilejarTable from './components/FilejarTable';
 
 export default function FilejarPage() {
   const { user } = useAuth();
@@ -36,30 +38,28 @@ export default function FilejarPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Menjari Button Bar */}
+      <div className="px-6 pb-0">
+        <MenjariButtonBarFileGunLinks />
+      </div>
+      
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">📄 FileGun Files</h1>
-            <p className="text-sm text-gray-600">Database File Management</p>
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-500">Environment: Development Only</div>
-            <div className="text-xs text-gray-400">Project: Snefuru4</div>
+            <div className="text-xs text-gray-400">Project: Tregnar</div>
           </div>
         </div>
       </div>
 
-      {/* Main Content - Blank for now */}
+      {/* Main Content - Full Width FilejarTable */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full flex items-center justify-center">
-          <div className="text-center text-gray-500">
-            <div className="text-4xl mb-4">📄</div>
-            <div className="text-lg">FileGun Files</div>
-            <div className="text-sm">UI coming soon</div>
-          </div>
-        </div>
+        <FilejarTable />
       </div>
     </div>
   );

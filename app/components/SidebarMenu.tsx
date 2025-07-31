@@ -253,17 +253,23 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <Link href="/" className="flex items-center space-x-3">
             <div className="relative h-8 w-8 flex-shrink-0">
-              <Image
-                src="/assets/images/snefuru-logo.png"
-                alt="Snefuru Logo"
-                width={32}
-                height={32}
-                className="object-contain"
-                priority
-              />
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="16"
+                  cy="16"
+                  r="14"
+                  fill="#87CEEB"
+                />
+              </svg>
             </div>
             <span className="text-lg font-semibold text-white">
-              Snefuru4
+              Tregnar
             </span>
           </Link>
           <button

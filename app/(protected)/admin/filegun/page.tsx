@@ -11,6 +11,7 @@ import SentinelControl from './components/SentinelControl';
 import SentinelStatus from './components/SentinelStatus';
 import { useFilegunDirectory } from './hooks/useFilegunDirectory';
 import { useFilegunOperations } from './hooks/useFilegunOperations';
+import MenjariButtonBarFileGunLinks from '@/app/components/MenjariButtonBarFileGunLinks';
 
 export default function FilegunPage() {
   const { user } = useAuth();
@@ -92,17 +93,17 @@ export default function FilegunPage() {
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
+      <div className="bg-white border-b px-6 py-2">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">🔫 Filegun</h1>
-            <p className="text-sm text-gray-600">Local Development File Manager</p>
           </div>
           <div className="flex items-center space-x-6">
+            <MenjariButtonBarFileGunLinks />
             <SentinelStatus />
             <div className="text-right">
               <div className="text-sm text-gray-500">Environment: Development Only</div>
-              <div className="text-xs text-gray-400">Project: Snefuru4</div>
+              <div className="text-xs text-gray-400">Project: Tregnar</div>
             </div>
           </div>
         </div>

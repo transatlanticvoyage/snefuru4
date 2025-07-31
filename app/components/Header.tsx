@@ -624,20 +624,26 @@ export default function Header() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center space-x-3">
-                {/* Logo Image */}
+                {/* Logo - Planet */}
                 <div className="relative h-10 w-10 flex-shrink-0">
-                  <Image
-                    src="/assets/images/snefuru-logo.png"
-                    alt="Snefuru Logo"
-                    width={40}
-                    height={40}
-                    className="object-contain"
-                    priority
-                  />
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 40 40"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="20"
+                      cy="20"
+                      r="18"
+                      fill="#87CEEB"
+                    />
+                  </svg>
                 </div>
                 {/* App Name */}
                 <span className="text-xl font-bold text-indigo-600">
-                  Snefuru4
+                  Tregnar
                 </span>
               </Link>
             </div>
