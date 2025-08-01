@@ -100,6 +100,7 @@ export default function FilegunToolbar({
         <div className="flex items-center space-x-4">
           {/* Navigation Controls */}
           <div className="flex items-center space-x-2">
+            <span className="font-bold text-sm">toolbar25</span>
             <button
               onClick={onNavigateUp}
               disabled={!canNavigateUp}
@@ -165,6 +166,15 @@ export default function FilegunToolbar({
               </div>
             )}
           </div>
+
+          {/* Hailstorm Technology Button */}
+          <button
+            className="px-4 py-2 bg-black text-white font-bold rounded"
+            style={{ fontSize: '16px' }}
+            title="Hailstorm Technology"
+          >
+            Hailstorm Technology
+          </button>
         </div>
 
         {/* View Controls and Create Controls */}

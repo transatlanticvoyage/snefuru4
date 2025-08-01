@@ -1,8 +1,32 @@
 
+pleaes prepare the sql according to these new updates for rackuic: (we are still in planning phase)
+———————————————————————
+we must change the names of these fields in rackuic from current:
+source_table
+rcolumn_name
 
-# New columns rack stuff
+to now be:
+rcolumn_dbtable
+rcolumn_dbcolumn
 
-How to accomodate situation s with multiple dB columns in the rack ui column?
+(respectively)
+
+———————————————————————
+create new fields in db table rackuic (boolean)
+
+BOOLEAN FIELDS
+rcolumn_holds_multiple_db_columns
+rcolumn_is_special_ui_cell_output
+
+JSON FIELDS
+rcolumn_special_db_config
+
+
+
+==========================================================
+============== SEPARATOR =================================
+==========================================================
+———————————————————————
 
 rel_db_column
 rel_db_table
@@ -15,17 +39,9 @@ rcrel_dbcolumn
 rackuicol_dbtable
 rackuicol_dbcolumn
 
-rcol_dbtable
-rcol_dbcolumn
+rcolumn_dbtable
+rcolumn_dbcolumn
 
 
 We need option of workaround system
 
-create new fields in db table rackuic (boolean)
-
-BOOLEAN FIELDS
-holds_multiple_db_columns
-is_special_ui_cell_output
-
-JSON FIELDS
-rackuic_special_db_config

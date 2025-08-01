@@ -19,6 +19,11 @@
   }
 }
 
+/* Hide main navigation header when on filegun page with hide setting */
+body.filegun-hide-main-header .snefuru-content-wrapper > header:first-child {
+  display: none !important;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
