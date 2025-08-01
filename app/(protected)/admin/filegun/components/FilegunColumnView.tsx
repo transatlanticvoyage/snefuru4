@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FilegunItem, FilegunApiResponse } from '../types/filegun.types';
 import { getFileIcon, formatFileSize, formatDate } from '@/app/utils/filegun/filegunClientUtils';
 import { getFilegunBridge } from '@/app/utils/filegun/websocketBridge';
@@ -11,6 +11,10 @@ interface FilegunColumnViewProps {
   onDelete: (path: string) => Promise<void>;
   onPinStatusChange?: () => void;
   onSelectedItemChange?: (selectedPath: string | null, isFile: boolean) => void;
+  isMultiSelectEnabled?: boolean;
+  selectedItemPaths?: string[];
+  showTurtleBar?: boolean;
+  onColumnSelectionChange?: (hasSelection: boolean) => void;
 }
 
 interface ColumnData {
@@ -24,7 +28,11 @@ export default function FilegunColumnView({
   onRename,
   onDelete,
   onPinStatusChange,
-  onSelectedItemChange
+  onSelectedItemChange,
+  isMultiSelectEnabled = false,
+  selectedItemPaths = [],
+  showTurtleBar = false,
+  onColumnSelectionChange
 }: FilegunColumnViewProps) {
   const [columns, setColumns] = useState<ColumnData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -149,12 +157,12 @@ export default function FilegunColumnView({
 
   // Handle item selection in a column with double-click for files only
   const handleItemSelect = async (columnIndex: number, item: FilegunItem) => {
-    // Always update selection on click
+    // Always update selection on click (for single-select compatibility)
     const newColumns = [...columns];
     newColumns[columnIndex].selectedItem = item.path;
     setColumns(newColumns);
     
-    // Notify parent of selection change
+    // Notify parent of selection change (handles both single and multi-select logic)
     if (onSelectedItemChange) {
       onSelectedItemChange(item.path, item.type === 'file');
     }
@@ -307,6 +315,11 @@ export default function FilegunColumnView({
       newSelectedColumns.add(columnId);
     }
     setSelectedColumns(newSelectedColumns);
+    
+    // Notify parent about column selection change
+    if (onColumnSelectionChange) {
+      onColumnSelectionChange(newSelectedColumns.size > 0);
+    }
   };
 
   if (isLoading && columns.length === 0) {
@@ -321,11 +334,14 @@ export default function FilegunColumnView({
     <div className="h-full relative" onClick={closeContextMenu}>
       {/* Column Container */}
       <div className="flex h-full overflow-x-auto">
-        {columns.map((column, columnIndex) => (
-          <div
-            key={`${column.path}-${columnIndex}`}
-            className="flex-shrink-0 w-64 border-r border-gray-200 bg-white"
-          >
+        {columns.map((column, columnIndex) => {
+          const columnId = `${column.path}-${columnIndex}`;
+          const isSelectedColumn = selectedColumns.has(columnId);
+          
+          return (
+            <React.Fragment key={columnId}>
+              {/* Regular Column */}
+              <div className="flex-shrink-0 w-64 border-r border-gray-200 bg-white">
             {/* Additional Header Row - with selection functionality */}
             <div 
               className={`kz_filegun_colview_header_level2 border-b border-t border-gray-400 px-3 py-2 ${
@@ -334,7 +350,8 @@ export default function FilegunColumnView({
                 selectedColumns.has(`${column.path}-${columnIndex}`) ? '' : 'bg-gray-50'
               }`}
               style={{
-                backgroundColor: selectedColumns.has(`${column.path}-${columnIndex}`) ? '#b0cce7' : ''
+                backgroundColor: selectedColumns.has(`${column.path}-${columnIndex}`) ? '#b0cce7' : '',
+                height: '30px'
               }}
               onClick={() => handleColumnSelect(`${column.path}-${columnIndex}`, column.items.length > 0)}
             >
@@ -367,7 +384,11 @@ export default function FilegunColumnView({
                   <div
                     key={item.path}
                     className={`flex items-center p-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 ${
-                      column.selectedItem === item.path ? 'bg-blue-100' : ''
+                      isMultiSelectEnabled && selectedItemPaths.includes(item.path) 
+                        ? 'bg-blue-100' 
+                        : !isMultiSelectEnabled && column.selectedItem === item.path 
+                        ? 'bg-blue-100' 
+                        : ''
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -428,7 +449,51 @@ export default function FilegunColumnView({
               )}
             </div>
           </div>
-        ))}
+          
+          {/* Turtle Bar Column - appears immediately after selected column */}
+          {showTurtleBar && isSelectedColumn && (
+            <div className="flex-shrink-0 w-64 border-r border-gray-200 bg-white">
+              {/* Turtle Bar Header Row */}
+              <div className="kz_filegun_colview_header_level2 border-b border-t border-gray-400 px-3 py-2 bg-gray-50" style={{ height: '30px' }}>
+                <div className="flex items-center justify-center">
+                  <span className="text-xs text-gray-600">turtle bar</span>
+                </div>
+              </div>
+
+              {/* Turtle Bar Column Header */}
+              <div className="kz_filegun_colview_header_level1 bg-gray-50 border-b border-t border-gray-400 px-3 py-2">
+                <div className="text-xs text-gray-600 truncate">
+                  Database Info
+                </div>
+              </div>
+              
+              {/* Turtle Bar Items - corresponding to items in selected column */}
+              <div className="overflow-y-auto h-full">
+                {column.items.map((item, itemIndex) => (
+                  <div
+                    key={`turtle-${item.path}`}
+                    className="flex items-center p-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100"
+                  >
+                    {/* Turtle Icon */}
+                    <div className="w-5 text-center mr-2 flex-shrink-0">
+                      🐢
+                    </div>
+
+                    {/* Turtle Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-gray-600 truncate">
+                        coming soon turtle
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+            
+        </React.Fragment>
+          );
+        })}
 
         {/* Empty columns to fill screen */}
         {Array.from({ length: emptyColumnCount }, (_, index) => (
@@ -439,6 +504,7 @@ export default function FilegunColumnView({
             {/* Additional Empty Header Row - disabled since no content */}
             <div 
               className={`kz_filegun_colview_header_level2 border-b border-t border-gray-400 px-3 py-2 cursor-not-allowed bg-gray-50`}
+              style={{ height: '30px' }}
               onClick={() => handleColumnSelect(`empty-${index}`, false)}
             >
               <div className="flex items-center justify-center">
@@ -464,6 +530,7 @@ export default function FilegunColumnView({
             </div>
           </div>
         ))}
+
 
         {/* Preview Panel (for selected file) */}
         {columns.length > 0 && (() => {

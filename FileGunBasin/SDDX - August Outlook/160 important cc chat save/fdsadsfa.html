@@ -1,0 +1,73 @@
+
+
+NoteToSelfKyle:
+review new boolean fields and see if i even like them
+
+such as:
+is_special_notsimplyonedbcolumn
+
+===========================================================
+pleaes create an outline of the overall project we are working regarding the rack zug and yeg db tables. i want to see if you remember what we're doing accurately
+
+==========================================================
+
+CREATE TABLE public.rackuic (
+	rcolumn_id SERIAL NOT NULL,
+	rcolumn_name TEXT NOT NULL,
+	rcolumn_handle TEXT NOT NULL,
+	rel_utg_id TEXT NULL,   -- changed to text from varchar - also changed to not null from null
+	rcolumn_dbcolumn TEXT NOT NULL,  --CHANGE AND TALK TO CC
+	rcolumn_dbtable TEXT NULL, --CHANGE AND TALK TO CC - TEXT NULL OR NOT NULL - REMOVAL OF ALL VARCHARR , etc
+	rcolumn_display_name TEXT NULL,
+	rcolumn_data_type TEXT NOT NULL,
+	rcolumn_default_position INTEGER NULL,
+	is_available BOOLEAN NULL DEFAULT TRUE,
+	created_at TIMESTAMPTZ NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMPTZ NULL DEFAULT CURRENT_TIMESTAMP,
+	rcolumn_group TEXT NULL, -- changed to text from varchar
+	rcolumn_width TEXT NULL,
+	user_id UUID NULL,
+	is_sortable BOOLEAN NULL DEFAULT TRUE,
+	is_searchable BOOLEAN NULL DEFAULT TRUE,
+	is_editable BOOLEAN NULL DEFAULT FALSE,
+	cached_coltemp_ids TEXT[] NULL,
+
+	-- New boolean fields
+    is_special_notsimplyonedbcolumn BOOLEAN NULL DEFAULT FALSE,
+	
+	-- New JSON field
+	rcolumn_special_cell_config JSONB NULL
+  ) TABLESPACE pg_default;
+  
+  
+==========================================================
+rcolumn_dbcolumn
+
+changing field to NULL instead of NOT NULL
+
+NOTE: this generally corresponds to functionality in existing code for old deprecated/deleted db column:rackui_columns.column_name
+==========================================================
+rcolumn_dbtable
+
+changing field to TEXT instead of VARCHAR
+
+NOTE: this generally corresponds to functionality in existing code for old deprecated/deleted db column:rackui_columns.source_table
+
+
+==========================================================
+rcolumn_name
+
+new field that does NOT correspond to any previous code
+
+———————————————————————
+
+if i add a new column named rcolumn_name to rackuic db table, is it possible for you to not get it confused with the previous column by this name (or by a similar name)?
+
+when we change the files i don't want this new column to be incorporated into any existing code
+
+
+the previous column we had has become rcolumn_dbcolumn (I think if i remember correctly)
+
+
+
+==========================================================

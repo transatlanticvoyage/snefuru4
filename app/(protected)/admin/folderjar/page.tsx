@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import MenjariButtonBarFileGunLinks from '@/app/components/MenjariButtonBarFileGunLinks';
-import FolderjarTable from './components/FolderjarTable';
+import FilegunFoldersTable from '@/app/components/shared/FilegunFoldersTable';
 
 export default function FolderjarPage() {
   const { user } = useAuth();
@@ -57,9 +57,17 @@ export default function FolderjarPage() {
         </div>
       </div>
 
-      {/* Main Content - Full Width FolderjarTable */}
+      {/* Main Content - Full Width FilegunFoldersTable */}
       <div className="flex-1 overflow-hidden">
-        <FolderjarTable />
+        <FilegunFoldersTable config={{
+          showHeader: false, // We already have the header above
+          showCreateButtons: true,
+          showNubraKite: true,
+          enableInlineEdit: true,
+          enableRowSelection: true,
+          showPagination: true,
+          showSearch: true
+        }} />
       </div>
     </div>
   );

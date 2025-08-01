@@ -13,6 +13,7 @@ import MeadControl from './components/MeadControl';
 import { useFilegunDirectory } from './hooks/useFilegunDirectory';
 import { useFilegunOperations } from './hooks/useFilegunOperations';
 import MenjariButtonBarFileGunLinks from '@/app/components/MenjariButtonBarFileGunLinks';
+import FilegunFoldersTable from '@/app/components/shared/FilegunFoldersTable';
 
 export default function FilegunPage() {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ export default function FilegunPage() {
   const [toolbarKey, setToolbarKey] = useState(0); // Force toolbar refresh
   const [selectedItemPath, setSelectedItemPath] = useState<string | null>(null);
   const [selectedItemIsFile, setSelectedItemIsFile] = useState(false);
+  const [selectedItemPaths, setSelectedItemPaths] = useState<string[]>([]);
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(() => {
     // Initialize from localStorage
     if (typeof window !== 'undefined') {
@@ -39,6 +41,16 @@ export default function FilegunPage() {
     hemlockViewerPane: true,
     ravineEditor: false
   });
+  
+  // Layout mode for maple/trench panes
+  const [paneLayout, setPaneLayout] = useState<'horizontal-50-50' | 'horizontal-70-30' | 'vertical-50-50'>('horizontal-70-30');
+  
+  // Multi-select state
+  const [isMultiSelectEnabled, setIsMultiSelectEnabled] = useState(false);
+  
+  // Turtle bar state
+  const [showTurtleBar, setShowTurtleBar] = useState(false);
+  const [hasSelectedColumn, setHasSelectedColumn] = useState(false);
   
   const {
     currentPath,
@@ -129,8 +141,34 @@ export default function FilegunPage() {
   };
 
   const handleSelectedItemChange = (selectedPath: string | null, isFile: boolean) => {
-    setSelectedItemPath(selectedPath);
-    setSelectedItemIsFile(isFile);
+    if (isMultiSelectEnabled && selectedPath) {
+      // Multi-select mode: toggle selection
+      setSelectedItemPaths(prev => {
+        if (prev.includes(selectedPath)) {
+          // Item already selected, remove it
+          return prev.filter(path => path !== selectedPath);
+        } else {
+          // Item not selected, add it
+          return [...prev, selectedPath];
+        }
+      });
+      // Keep the single selection for compatibility
+      setSelectedItemPath(selectedPath);
+      setSelectedItemIsFile(isFile);
+    } else {
+      // Single select mode: clear multi-selection and set single selection
+      setSelectedItemPaths([]);
+      setSelectedItemPath(selectedPath);
+      setSelectedItemIsFile(isFile);
+    }
+  };
+
+  const handleColumnSelectionChange = (hasSelection: boolean) => {
+    setHasSelectedColumn(hasSelection);
+    // Hide turtle bar if no columns are selected
+    if (!hasSelection) {
+      setShowTurtleBar(false);
+    }
   };
 
   const toggleChamber = (chamber: keyof typeof chambersVisible) => {
@@ -268,7 +306,7 @@ export default function FilegunPage() {
 
       {/* Main Content */}
       {chambersVisible.hemlockViewerPane && (
-        <div className="flex-1 overflow-hidden hemlock_viewer_pane border border-black">
+        <div className="overflow-hidden hemlock_viewer_pane border border-black" style={{ height: '80vh' }}>
           {error ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -284,15 +322,81 @@ export default function FilegunPage() {
             </div>
           ) : (
             <div className="h-full flex flex-col">
-              <div className="px-6">
+              <div className="px-6 py-2 flex items-center justify-between">
                 <span className="font-bold text-sm">.hemlock_viewer_pane</span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setPaneLayout('horizontal-50-50')}
+                    className={`px-3 py-1 text-sm rounded transition-colors ${
+                      paneLayout === 'horizontal-50-50' ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    horizontal 50-50
+                  </button>
+                  <button
+                    onClick={() => setPaneLayout('horizontal-70-30')}
+                    className={`px-3 py-1 text-sm rounded transition-colors ${
+                      paneLayout === 'horizontal-70-30' ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    horizontal 70-30
+                  </button>
+                  <button
+                    onClick={() => setPaneLayout('vertical-50-50')}
+                    className={`px-3 py-1 text-sm rounded transition-colors ${
+                      paneLayout === 'vertical-50-50' ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    vertical 50-50
+                  </button>
+                </div>
               </div>
               
-              <div className="flex-1 overflow-hidden flex flex-col">
+              <div className={`flex-1 overflow-hidden flex ${paneLayout === 'vertical-50-50' ? 'flex-col' : 'flex-row'}`}>
                 {/* Maple Viewer Pane */}
-                <div className="flex-1 maple_viewer_pane border border-black">
-                  <div className="px-6 py-2">
-                    <span className="font-bold text-sm">.maple_viewer_pane</span>
+                <div className={`maple_viewer_pane border border-black overflow-hidden flex flex-col ${
+                  paneLayout === 'horizontal-50-50' ? 'w-1/2' :
+                  paneLayout === 'horizontal-70-30' ? 'w-[70%]' :
+                  'h-1/2'
+                }`}>
+                  <div className="px-6 py-2 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-bold text-sm">.maple_viewer_pane</span>
+                      <button
+                        onClick={() => setShowTurtleBar(!showTurtleBar)}
+                        disabled={!hasSelectedColumn}
+                        className={`px-3 py-1 text-sm rounded transition-colors ${
+                          !hasSelectedColumn 
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                            : showTurtleBar 
+                            ? 'bg-blue-200 hover:bg-blue-300' 
+                            : 'bg-gray-200 hover:bg-gray-300'
+                        }`}
+                      >
+                        {showTurtleBar ? 'hide turtle bar' : 'show turtle bar'}
+                      </button>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => {
+                          setIsMultiSelectEnabled(!isMultiSelectEnabled);
+                          // Clear selections when toggling multi-select
+                          if (isMultiSelectEnabled) {
+                            setSelectedItemPaths([]);
+                          }
+                        }}
+                        className={`px-3 py-1 text-sm rounded transition-colors ${
+                          isMultiSelectEnabled ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                        }`}
+                      >
+                        {isMultiSelectEnabled ? 'disable multi select' : 'enable multi select'}
+                      </button>
+                      {isMultiSelectEnabled && selectedItemPaths.length > 0 && (
+                        <span className="text-sm text-gray-600">
+                          ({selectedItemPaths.length} selected)
+                        </span>
+                      )}
+                    </div>
                   </div>
                   
                   {/* Status Information */}
@@ -314,6 +418,10 @@ export default function FilegunPage() {
                         onDelete={handleDelete}
                         onPinStatusChange={handlePinStatusChange}
                         onSelectedItemChange={handleSelectedItemChange}
+                        isMultiSelectEnabled={isMultiSelectEnabled}
+                        selectedItemPaths={selectedItemPaths}
+                        showTurtleBar={showTurtleBar}
+                        onColumnSelectionChange={handleColumnSelectionChange}
                       />
                     ) : (
                       <div className="h-full overflow-auto">
@@ -331,12 +439,28 @@ export default function FilegunPage() {
                 </div>
 
                 {/* Trench Viewer Pane */}
-                <div className="trench_viewer_pane border border-black">
+                <div className={`trench_viewer_pane border border-black overflow-hidden ${
+                  paneLayout === 'horizontal-50-50' ? 'w-1/2' :
+                  paneLayout === 'horizontal-70-30' ? 'w-[30%]' :
+                  'h-1/2'
+                }`}>
                   <div className="px-6 py-2">
                     <span className="font-bold text-sm">.trench_viewer_pane</span>
                   </div>
-                  <div className="px-6 py-4 text-gray-500">
-                    Trench viewer content will be placed here...
+                  <div className="flex-1 overflow-hidden">
+                    <FilegunFoldersTable config={{
+                      showHeader: false,
+                      showCreateButtons: false,
+                      showNubraKite: true,
+                      enableInlineEdit: false,
+                      enableRowSelection: false,
+                      showPagination: true,
+                      showSearch: true,
+                      defaultItemsPerPage: 50,
+                      filterFolderPaths: selectedItemPaths.length > 0 ? selectedItemPaths : undefined,
+                      containerClassName: 'h-full',
+                      tableClassName: 'text-xs'
+                    }} />
                   </div>
                 </div>
               </div>
