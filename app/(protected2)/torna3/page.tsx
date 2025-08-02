@@ -173,8 +173,8 @@ export default function Torna3Page() {
         .from('coltemp_rackui_relations')
         .select(`
           fk_rackui_column_id,
-          rackui_columns (
-            column_name
+          rackuic (
+            rcolumn_dbcolumn
           )
         `)
         .eq('fk_coltemp_id', coltempId)
@@ -188,7 +188,7 @@ export default function Torna3Page() {
       
       // Extract column names
       const columnNames = data?.map(item => 
-        (item.rackui_columns as any)?.column_name
+        (item.rackuic as any)?.rcolumn_dbcolumn
       ).filter(Boolean) || [];
       
       setActiveColumns(columnNames);

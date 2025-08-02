@@ -7,24 +7,28 @@ such as:
 is_special_notsimplyonedbcolumn
 
 ===========================================================
-pleaes create an outline of the overall project we are working regarding the rack zug and yeg db tables. i want to see if you remember what we're doing accurately
+pleaes create an outline of the overall project we are working regarding the rack zug and yeg db tables. i want to see if you remember what we're doing accurately. please just answer and do not change any of our code right now.  obvously we are still debating the sql to create a new rackuic db table. but plese tell me an outline of what our next steps to proceed to after that will be 
 
+
+
+	rcolumn_utg_id TEXT NULL,  
+	rel_utg_id TEXT NULL,  
 ==========================================================
 
 CREATE TABLE public.rackuic (
 	rcolumn_id SERIAL NOT NULL,
 	rcolumn_name TEXT NOT NULL,
 	rcolumn_handle TEXT NOT NULL,
-	rel_utg_id TEXT NULL,   -- changed to text from varchar - also changed to not null from null
-	rcolumn_dbcolumn TEXT NOT NULL,  --CHANGE AND TALK TO CC
-	rcolumn_dbtable TEXT NULL, --CHANGE AND TALK TO CC - TEXT NULL OR NOT NULL - REMOVAL OF ALL VARCHARR , etc
+	rcolumn_utg_id TEXT NULL,  
+	rcolumn_dbcolumn TEXT NULL, 
+	rcolumn_dbtable TEXT NULL, 
 	rcolumn_display_name TEXT NULL,
 	rcolumn_data_type TEXT NOT NULL,
 	rcolumn_default_position INTEGER NULL,
 	is_available BOOLEAN NULL DEFAULT TRUE,
 	created_at TIMESTAMPTZ NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMPTZ NULL DEFAULT CURRENT_TIMESTAMP,
-	rcolumn_group TEXT NULL, -- changed to text from varchar
+	rcolumn_group TEXT NULL, 
 	rcolumn_width TEXT NULL,
 	user_id UUID NULL,
 	is_sortable BOOLEAN NULL DEFAULT TRUE,

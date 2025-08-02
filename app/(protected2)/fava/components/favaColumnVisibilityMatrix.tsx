@@ -214,9 +214,9 @@ export function useColumnVisibilityData() {
           .select(`
             fk_rackui_column_id,
             column_position,
-            rackui_columns (
-              column_name,
-              default_position
+            rackuic (
+              rcolumn_dbcolumn,
+              rcolumn_default_position
             )
           `)
           .eq('fk_coltemp_id', coltempId)
@@ -228,9 +228,9 @@ export function useColumnVisibilityData() {
           return;
         }
         
-        // Extract column positions directly from rackui_columns.default_position
+        // Extract column positions directly from rackuic.rcolumn_default_position
         const positions = data?.map(item => {
-          const defaultPosition = (item.rackui_columns as any)?.default_position;
+          const defaultPosition = (item.rackuic as any)?.rcolumn_default_position;
           return parseInt(defaultPosition);
         }).filter(pos => pos && pos >= 1 && pos <= 32) || [];
         

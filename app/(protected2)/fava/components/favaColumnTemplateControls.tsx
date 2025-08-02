@@ -474,7 +474,7 @@ export default function FavaColumnTemplateControls() {
     <div style={boardStyle}>
       <div style={topLabelStyle}>div.coltemp_board</div>
       <div style={innerWrapperStyle}>
-        <strong>db tables:</strong> coltemps AND rackui_columns
+        <strong>db tables:</strong> coltemps AND rackuic
 
         {loading ? (
           <div>Loading coltemp data...</div>

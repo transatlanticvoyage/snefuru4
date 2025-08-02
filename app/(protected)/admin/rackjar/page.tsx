@@ -38,7 +38,7 @@ export default function RackuijarPage() {
             </h1>
           </div>
           <p className="text-gray-600" style={{ fontSize: '16px' }}>
-            <span className="font-bold">main db table:</span> rackui_columns
+            <span className="font-bold">main db table:</span> rackuic
           </p>
         </div>
         
