@@ -47,13 +47,13 @@ export default function Torna3Page() {
     
     // Listen for template selection events
     const handleTemplateSelected = async (event: any) => {
-      const { templateId } = event.detail;
-      await applyTemplate(templateId);
+      const { coltemp_id } = event.detail;
+      await applyTemplate(coltemp_id);
     };
     
     const handleTemplateLoaded = async (event: any) => {
-      const { templateId } = event.detail;
-      await applyTemplate(templateId);
+      const { coltemp_id } = event.detail;
+      await applyTemplate(coltemp_id);
     };
     
     const handleShowAll = () => {
@@ -159,12 +159,14 @@ export default function Torna3Page() {
   };
   
   const applyTemplate = async (coltempId: number) => {
+    console.log('TORNA3 - applyTemplate called with coltempId:', coltempId);
     try {
       // Special handling for "all" template
       if (coltempId === -999) {
         // Show all columns from the original config
         setActiveColumns(torna3TableConfig.columns.map(col => col.field));
         setSelectedTemplateId(-999);
+        console.log('TORNA3 - Applied "all" template');
         return;
       }
       
@@ -186,13 +188,18 @@ export default function Torna3Page() {
         return;
       }
       
+      console.log('TORNA3 - Template data from DB:', data);
+      
       // Extract column names
       const columnNames = data?.map(item => 
         (item.rackuic as any)?.rcolumn_dbcolumn
       ).filter(Boolean) || [];
       
+      console.log('TORNA3 - Extracted column names:', columnNames);
+      
       setActiveColumns(columnNames);
       setSelectedTemplateId(coltempId);
+      console.log('TORNA3 - activeColumns set to:', columnNames);
     } catch (error) {
       console.error('Error applying template:', error);
     }
