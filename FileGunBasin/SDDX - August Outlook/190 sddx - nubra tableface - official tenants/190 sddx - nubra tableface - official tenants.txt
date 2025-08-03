@@ -1,0 +1,24 @@
+please read these tenants and store them in your memory.
+
+please create a div that appears like a button and says
+nubra tableface
+
+it should have a border of 1 px solid with radius corners of 9 px
+
+the text should be
+
+we will name this
+nubra-tableface-kite in our code somewhere for reference and then i will tell you which pages to add it to
+
+mostly we will be looking at a lot of pages in the app that have a certain type of ui table grid on them
+and then i will be having you put this label there just above the top of the ui table grid on that page
+
+background color should be 83e09d and text should be 16 px black with bold
+
+padding of div should be 5 px on all sides
+
+you can start by adding this to the xpagesmanager1 page in the frontend ui then later i will feed you more pages
+
+———————————————————————
+
+then please create an additional set of tenants that i can add to the bottom of this set to form a complete set that will ensure that:
