@@ -45,6 +45,7 @@ interface FilegunFile {
   importance_level: number | null;
   sync_status: string | null;
   last_sync_at: string | null;
+  is_zepulus_docs: boolean | null;
 }
 
 export default function FilejarTable() {
@@ -101,7 +102,8 @@ export default function FilejarTable() {
     color_label: '',
     importance_level: 1,
     sync_status: '',
-    last_sync_at: ''
+    last_sync_at: '',
+    is_zepulus_docs: false
   });
   
   const supabase = createClientComponentClient();
@@ -119,6 +121,7 @@ export default function FilejarTable() {
     { key: 'file_name', type: 'text', width: '200px', label: 'file_name' },
     { key: 'file_path', type: 'text', width: '300px', label: 'file_path' },
     { key: 'file_parent_path', type: 'text', width: '250px', label: 'file_parent_path' },
+    { key: 'is_zepulus_docs', type: 'boolean', width: '120px', label: 'is_zeplus_docs' },
     { key: 'extension', type: 'text', width: '80px', label: 'extension' },
     { key: 'mime_type', type: 'text', width: '150px', label: 'mime_type' },
     { key: 'file_size', type: 'integer', width: '100px', label: 'file_size', separator: 'right' },

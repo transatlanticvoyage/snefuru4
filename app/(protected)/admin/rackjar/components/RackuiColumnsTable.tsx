@@ -5,27 +5,28 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface RackuiColumns {
-  rcolumn_id: number;
+  rcolumn_global_id: number;
   rel_utg_id: string;
+  rcolumn_packet_id: number;
+  rcolumn_default_position: number | null;
   rcolumn_name: string;
   rcolumn_handle: string;
   rcolumn_dbcolumn: string;
   rcolumn_dbtable: string;
   rcolumn_display_name: string;
   rcolumn_data_type: string;
-  is_available: boolean;
-  rcolumn_default_position: number | null;
-  created_at: string;
-  updated_at: string;
   rcolumn_group: string | null;
   rcolumn_width: string | null;
-  user_id: string;
+  is_available: boolean;
   is_sortable: boolean;
   is_searchable: boolean;
   is_editable: boolean;
-  cached_coltemp_ids: string[] | null;
   is_special_notsimplyonedbcolumn: boolean;
   rcolumn_special_cell_config: any;
+  cached_coltemp_ids: string[] | null;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export default function RackuiColumnsTable() {
@@ -70,23 +71,24 @@ export default function RackuiColumnsTable() {
         .from('rackuic')
         .insert({
           rel_utg_id: null,
+          rcolumn_packet_id: 1,
+          rcolumn_default_position: null,
           rcolumn_name: 'New Column',
           rcolumn_handle: 'new_handle',
           rcolumn_dbcolumn: null,
           rcolumn_dbtable: null,
           rcolumn_display_name: null,
           rcolumn_data_type: 'text',
-          is_available: true,
-          rcolumn_default_position: null,
           rcolumn_group: null,
           rcolumn_width: null,
-          user_id: null,
+          is_available: true,
           is_sortable: true,
           is_searchable: true,
           is_editable: false,
-          cached_coltemp_ids: null,
           is_special_notsimplyonedbcolumn: false,
-          rcolumn_special_cell_config: null
+          rcolumn_special_cell_config: null,
+          cached_coltemp_ids: null,
+          user_id: null
         })
         .select()
         .single();
@@ -236,14 +238,14 @@ export default function RackuiColumnsTable() {
       const { error } = await supabase
         .from('rackuic')
         .update(updates)
-        .eq('rcolumn_id', editingCell.id);
+        .eq('rcolumn_global_id', editingCell.id);
 
       if (error) throw error;
 
       // Update local data
       setData(prevData => 
         prevData.map(item => 
-          item.rcolumn_id === editingCell.id 
+          item.rcolumn_global_id === editingCell.id 
             ? { ...item, [editingCell.field]: editingValue || null }
             : item
         )
@@ -279,24 +281,26 @@ export default function RackuiColumnsTable() {
     if (selectedRows.size === paginatedData.length) {
       setSelectedRows(new Set());
     } else {
-      setSelectedRows(new Set(paginatedData.map(row => row.rcolumn_id)));
+      setSelectedRows(new Set(paginatedData.map(row => row.rcolumn_global_id)));
     }
   };
 
   // Define which fields can be inline edited (varchar/text fields)
   const inlineEditableFields = [
-    'rel_utg_id', 'rcolumn_name', 'rcolumn_handle', 'rcolumn_dbcolumn', 'rcolumn_dbtable', 
-    'rcolumn_display_name', 'rcolumn_data_type', 'rcolumn_group', 'rcolumn_width'
+    'rel_utg_id', 'rcolumn_packet_id', 'rcolumn_default_position', 'rcolumn_name', 'rcolumn_handle', 
+    'rcolumn_dbcolumn', 'rcolumn_dbtable', 'rcolumn_display_name', 'rcolumn_data_type', 
+    'rcolumn_group', 'rcolumn_width'
   ];
   
-  // Get column headers in the order they appear in the interface
+  // Get column headers in the order they appear in the interface (matching database field order)
   const getColumnHeaders = () => {
     return [
-      'rcolumn_id', 'rel_utg_id', 'rcolumn_name', 'rcolumn_handle', 'rcolumn_dbcolumn', 
-      'rcolumn_dbtable', 'rcolumn_display_name', 'rcolumn_data_type', 'is_available', 
-      'rcolumn_default_position', 'created_at', 'updated_at', 'rcolumn_group', 
-      'rcolumn_width', 'user_id', 'is_sortable', 'is_searchable', 'is_editable',
-      'cached_coltemp_ids', 'is_special_notsimplyonedbcolumn', 'rcolumn_special_cell_config'
+      'rcolumn_global_id', 'rel_utg_id', 'rcolumn_packet_id', 'rcolumn_default_position',
+      'rcolumn_name', 'rcolumn_handle', 'rcolumn_dbcolumn', 'rcolumn_dbtable', 
+      'rcolumn_display_name', 'rcolumn_data_type', 'rcolumn_group', 'rcolumn_width',
+      'is_available', 'is_sortable', 'is_searchable', 'is_editable', 
+      'is_special_notsimplyonedbcolumn', 'rcolumn_special_cell_config', 'cached_coltemp_ids',
+      'user_id', 'created_at', 'updated_at'
     ];
   };
   
@@ -427,16 +431,16 @@ export default function RackuiColumnsTable() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.map((row) => (
-              <tr key={row.rcolumn_id} className="hover:bg-gray-50">
+              <tr key={row.rcolumn_global_id} className="hover:bg-gray-50">
                 {/* Checkbox cell */}
                 <td 
                   className="px-2 py-4 border border-gray-200 cursor-pointer text-center w-12"
-                  onClick={() => toggleRowSelection(row.rcolumn_id)}
+                  onClick={() => toggleRowSelection(row.rcolumn_global_id)}
                 >
                   <div className="w-full h-full flex items-center justify-center">
                     <input
                       type="checkbox"
-                      checked={selectedRows.has(row.rcolumn_id)}
+                      checked={selectedRows.has(row.rcolumn_global_id)}
                       onChange={() => {}} // Handled by parent td onClick
                       className="w-4 h-4 cursor-pointer"
                       style={{ pointerEvents: 'none' }}
@@ -451,7 +455,7 @@ export default function RackuiColumnsTable() {
                     className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200"
                   >
                     {inlineEditableFields.includes(key) ? (
-                      editingCell?.id === row.rcolumn_id && editingCell?.field === key ? (
+                      editingCell?.id === row.rcolumn_global_id && editingCell?.field === key ? (
                         <input
                           type="text"
                           value={editingValue}
@@ -470,7 +474,7 @@ export default function RackuiColumnsTable() {
                       ) : (
                         <div
                           className="min-w-[30px] min-h-[1.25rem] cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded"
-                          onClick={() => startInlineEdit(row.rcolumn_id, key, value)}
+                          onClick={() => startInlineEdit(row.rcolumn_global_id, key, value)}
                           title="Click to edit"
                         >
                           {value === null ? '' : String(value)}
