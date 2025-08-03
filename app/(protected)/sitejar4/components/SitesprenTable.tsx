@@ -25,6 +25,7 @@ interface SitesprenRecord {
   fk_domreg_hostaccount: string | null;
   is_wp_site: boolean | null;
   is_starred1: string | null;
+  is_bulldozer: boolean | null;
   // New joined columns from sitespren_large_view_1
   registrar_username: string | null;
   registrar_company_id: string | null;
@@ -100,7 +101,8 @@ const allColumns = [
   'wp_rest_app_pass',  // 19
   'wp_plugin_installed1', // 20
   'wp_plugin_connected2', // 21
-  'is_wp_site'         // 22
+  'is_wp_site',        // 22
+  'is_bulldozer'       // 23
 ];
 
 export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, onTagsUpdate }: SitesprenTableProps) {
@@ -111,6 +113,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   const [filterWpSite, setFilterWpSite] = useState<string>('');
   const [filterTag, setFilterTag] = useState<string>('');
   const [tagFilteredSiteIds, setTagFilteredSiteIds] = useState<string[]>([]);
+  const [filterBulldozer, setFilterBulldozer] = useState<string>('');
   const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
   const [syncLoading, setSyncLoading] = useState<Set<string>>(new Set());
   const [syncResults, setSyncResults] = useState<{[key: string]: {type: 'success' | 'error', message: string}}>({});
@@ -324,9 +327,14 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       // Tag filter
       const matchesTagFilter = filterTag === '' || tagFilteredSiteIds.includes(item.id);
 
-      return matchesWpFilter && matchesTagFilter;
+      // Bulldozer filter
+      const matchesBulldozerFilter = filterBulldozer === '' ||
+        (filterBulldozer === 'true' && item.is_bulldozer === true) ||
+        (filterBulldozer === 'false' && (item.is_bulldozer === false || item.is_bulldozer === null));
+
+      return matchesWpFilter && matchesTagFilter && matchesBulldozerFilter;
     });
-  }, [data, filterWpSite, filterTag, tagFilteredSiteIds]);
+  }, [data, filterWpSite, filterTag, tagFilteredSiteIds, filterBulldozer]);
 
   // Sort logic
   const sortedData = useMemo(() => {
@@ -1002,6 +1010,46 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       
     } catch (error) {
       console.error('Error in star click handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // Bulldozer toggle handler
+  const handleBulldozerToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_bulldozer`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      // Update database
+      const { error } = await supabase
+        .from('sitespren')
+        .update({ is_bulldozer: newValue })
+        .eq('id', siteId);
+
+      if (error) {
+        console.error('Error updating bulldozer:', error);
+        return;
+      }
+
+      // Update local data without page refresh
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_bulldozer: newValue }
+          : site
+      );
+      
+      // Call parent component to update the data
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in bulldozer toggle handler:', error);
     } finally {
       setUpdatingStars(prev => {
         const newSet = new Set(prev);
@@ -1869,6 +1917,24 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
               <option value="null">Unknown Type</option>
             </select>
           </div>
+          <div>
+            <label htmlFor="bulldozer-filter" className="block text-sm font-bold text-gray-700 mb-2">
+              is_bulldozer
+            </label>
+            <select
+              id="bulldozer-filter"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              value={filterBulldozer}
+              onChange={(e) => {
+                setFilterBulldozer(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="">All</option>
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -2203,7 +2269,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         'tool_buttons'
                       ) : (
                         <>
-                          {col === 'is_starred1' ? '•str1' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
+                          {col === 'is_starred1' ? '•str1' : col === 'is_bulldozer' ? 'is_bulldozer' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
                         </>
                       )}
                       {hasRightSeparator && (
@@ -2576,6 +2642,28 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                               >
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
+                            )}
+                          </div>
+                        ) : col === 'is_bulldozer' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_bulldozer`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleBulldozerToggle(item.id, !item.is_bulldozer)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_bulldozer ? 'bg-blue-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_bulldozer ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
                             )}
                           </div>
                         ) : (

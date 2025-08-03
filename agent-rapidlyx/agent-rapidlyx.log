@@ -1,0 +1,32 @@
+[32minfo[39m: 🔧 Initializing Rapidlyx Agent... {"timestamp":"2025-08-03T15:21:27.264Z"}
+[32minfo[39m: ✅ Database handler connected to Supabase {"timestamp":"2025-08-03T15:21:27.273Z"}
+[32minfo[39m: ✅ database handler initialized {"timestamp":"2025-08-03T15:21:27.273Z"}
+[32minfo[39m: ✅ Knowledge handler initialized {"timestamp":"2025-08-03T15:21:27.276Z"}
+[32minfo[39m: ✅ knowledge handler initialized {"timestamp":"2025-08-03T15:21:27.276Z"}
+[32minfo[39m: ✅ Workflow handler initialized {"timestamp":"2025-08-03T15:21:27.278Z"}
+[32minfo[39m: ✅ workflow handler initialized {"timestamp":"2025-08-03T15:21:27.278Z"}
+[32minfo[39m: 💬 Loaded 0 conversations {"timestamp":"2025-08-03T15:21:27.279Z"}
+[32minfo[39m: 🔧 Initializing Rapidlyx Agent... {"timestamp":"2025-08-03T15:31:14.835Z"}
+[32minfo[39m: ✅ Database handler connected to Supabase {"timestamp":"2025-08-03T15:31:14.845Z"}
+[32minfo[39m: ✅ database handler initialized {"timestamp":"2025-08-03T15:31:14.845Z"}
+[32minfo[39m: ✅ Knowledge handler initialized {"timestamp":"2025-08-03T15:31:14.849Z"}
+[32minfo[39m: ✅ knowledge handler initialized {"timestamp":"2025-08-03T15:31:14.849Z"}
+[32minfo[39m: ✅ Workflow handler initialized {"timestamp":"2025-08-03T15:31:14.851Z"}
+[32minfo[39m: ✅ workflow handler initialized {"timestamp":"2025-08-03T15:31:14.851Z"}
+[32minfo[39m: 💬 Loaded 0 conversations {"timestamp":"2025-08-03T15:31:14.851Z"}
+[32minfo[39m: 🔧 Initializing Rapidlyx Agent... {"timestamp":"2025-08-03T15:32:48.491Z"}
+[32minfo[39m: ✅ Database handler connected to Supabase {"timestamp":"2025-08-03T15:32:48.501Z"}
+[32minfo[39m: ✅ database handler initialized {"timestamp":"2025-08-03T15:32:48.501Z"}
+[32minfo[39m: ✅ Knowledge handler initialized {"timestamp":"2025-08-03T15:32:48.505Z"}
+[32minfo[39m: ✅ knowledge handler initialized {"timestamp":"2025-08-03T15:32:48.505Z"}
+[32minfo[39m: ✅ Workflow handler initialized {"timestamp":"2025-08-03T15:32:48.505Z"}
+[32minfo[39m: ✅ workflow handler initialized {"timestamp":"2025-08-03T15:32:48.505Z"}
+[32minfo[39m: 💬 Loaded 0 conversations {"timestamp":"2025-08-03T15:32:48.507Z"}
+[32minfo[39m: ✅ Conversation handler initialized {"timestamp":"2025-08-03T15:32:48.507Z"}
+[32minfo[39m: ✅ conversation handler initialized {"timestamp":"2025-08-03T15:32:48.507Z"}
+[32minfo[39m: ✅ File system handler initialized {"timestamp":"2025-08-03T15:32:48.507Z"}
+[32minfo[39m: ✅ filesystem handler initialized {"timestamp":"2025-08-03T15:32:48.507Z"}
+[32minfo[39m: 📋 Registered 19 tools {"timestamp":"2025-08-03T15:32:48.508Z"}
+[32minfo[39m: ✅ Rapidlyx Agent initialized successfully {"timestamp":"2025-08-03T15:32:48.508Z"}
+[32minfo[39m: 🚀 Rapidlyx Agent started successfully {"timestamp":"2025-08-03T15:32:48.508Z"}
+[32minfo[39m: 📡 MCP Server connected via stdio transport {"timestamp":"2025-08-03T15:32:48.508Z"}
