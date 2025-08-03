@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "zephix": {
+      "command": "node",
+      "args": ["/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/src/index.js"]
+    }
+  }
+}
+EOF < /dev/null
