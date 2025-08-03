@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 
 export class SupabaseCRUD {
   constructor({ url, serviceKey }) {
+    this.supabaseUrl = url;
+    this.supabaseKey = serviceKey;
     this.supabase = createClient(url, serviceKey, {
       auth: {
         autoRefreshToken: false,
@@ -263,15 +265,57 @@ export class SupabaseCRUD {
 
   // Utility Operations
   async listTables({ schema = 'public', includeViews = false }) {
-    const { data, error } = await this.supabase
-      .from('information_schema.tables')
-      .select('table_name, table_type')
-      .eq('table_schema', schema)
-      .in('table_type', includeViews ? ['BASE TABLE', 'VIEW'] : ['BASE TABLE'])
-      .order('table_name');
-
-    if (error) throw this.formatError(error);
-    return data;
+    try {
+      // In Supabase, we need to discover tables by making REST calls
+      // This is a workaround since information_schema is not exposed via PostgREST
+      
+      const url = this.supabaseUrl;
+      const headers = {
+        'apikey': this.supabaseKey,
+        'Authorization': `Bearer ${this.supabaseKey}`,
+        'Content-Type': 'application/json'
+      };
+      
+      // Make a request to the PostgREST introspection endpoint
+      const response = await fetch(`${url}/rest/v1/`, { headers });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch table list: ${response.statusText}`);
+      }
+      
+      const openApiSchema = await response.json();
+      
+      // Extract table names from the OpenAPI schema
+      const tables = [];
+      
+      if (openApiSchema.paths) {
+        for (const path in openApiSchema.paths) {
+          // Paths are like '/table_name' for tables
+          if (path.startsWith('/') && !path.includes('{') && path !== '/rpc/') {
+            const tableName = path.substring(1); // Remove leading slash
+            
+            // Skip internal PostgREST tables, empty names, and RPC functions
+            if (!tableName.startsWith('_') && 
+                tableName !== 'rpc' && 
+                !tableName.startsWith('rpc/') && 
+                tableName.length > 0) {
+              tables.push({
+                table_name: tableName,
+                table_type: 'BASE TABLE'
+              });
+            }
+          }
+        }
+      }
+      
+      // Sort tables by name
+      tables.sort((a, b) => a.table_name.localeCompare(b.table_name));
+      
+      return tables;
+      
+    } catch (err) {
+      throw this.formatError(err);
+    }
   }
 
   async describeTable({ table }) {
