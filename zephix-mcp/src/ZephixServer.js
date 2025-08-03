@@ -2,6 +2,7 @@ import { SupabaseCRUD } from './handlers/SupabaseCRUD.js';
 import { AuditLogger } from './utils/AuditLogger.js';
 import { ErrorHandler } from './utils/ErrorHandler.js';
 import { TOOLS_REGISTRY } from './config/tools.js';
+import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 export class ZephixServer {
   constructor(mcpServer) {
@@ -36,24 +37,22 @@ export class ZephixServer {
   }
 
   registerTools() {
-    // Register each tool from the registry
-    for (const [toolName, toolConfig] of Object.entries(TOOLS_REGISTRY)) {
-      this.mcpServer.setRequestHandler(
-        `tools/list`,
-        async () => ({
-          tools: Object.entries(TOOLS_REGISTRY).map(([name, config]) => ({
-            name,
-            description: config.description,
-            inputSchema: config.inputSchema,
-          })),
-        })
-      );
-    }
+    // Register the tools/list handler
+    this.mcpServer.setRequestHandler(
+      ListToolsRequestSchema,
+      async () => ({
+        tools: Object.entries(TOOLS_REGISTRY).map(([name, config]) => ({
+          name,
+          description: config.description,
+          inputSchema: config.inputSchema,
+        })),
+      })
+    );
   }
 
   setupHandlers() {
     // Handle tool calls
-    this.mcpServer.setRequestHandler('tools/call', async (request) => {
+    this.mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
       
       try {
