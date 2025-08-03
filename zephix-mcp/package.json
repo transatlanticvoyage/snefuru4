@@ -1,0 +1,32 @@
+{
+  "name": "@snefuru/zephix-mcp",
+  "version": "1.0.0",
+  "description": "Zephix MCP Server for Supabase CRUD operations",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "zephix-mcp": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "mcp",
+    "supabase",
+    "crud",
+    "database",
+    "snefuru"
+  ],
+  "author": "Snefuru Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@supabase/supabase-js": "^2.47.10",
+    "dotenv": "^16.4.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
