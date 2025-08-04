@@ -97,6 +97,12 @@ export default function TshelljarPage() {
 
       setTableshells(prev => [data, ...prev]);
       setCurrentPage(1);
+      
+      // Automatically activate inline editing for the tableshell_name field
+      setTimeout(() => {
+        setEditingCell({ id: data.tableshell_id, field: 'tableshell_name' });
+        setEditValue('');
+      }, 100);
     } catch (error) {
       console.error('Error creating new tableshell:', error);
     }
