@@ -43,6 +43,7 @@ interface SitesprenSite {
   driggs_phone1_platform_id: number | null;
   driggs_cgig_id: number | null;
   driggs_special_note_for_ai_tool: string | null;
+  driggs_revenue_goal: number | null;
   ns_full: string | null;
   ip_address: string | null;
   is_starred1: string | null;
@@ -139,6 +140,12 @@ export default function DriggsmanTable() {
   const [tagsDropdownOpen, setTagsDropdownOpen] = useState(false);
   const [taggedSites, setTaggedSites] = useState<SitesprenSite[]>([]);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
+  const [tagCounts, setTagCounts] = useState<Map<number, number>>(new Map());
+  
+  // Filtering mechanism states
+  const [useDaylightFilter, setUseDaylightFilter] = useState(false);
+  const [useRainFilter, setUseRainFilter] = useState(false);
+  const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
   
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -175,6 +182,7 @@ export default function DriggsmanTable() {
     { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
     { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
     { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
+    { key: 'driggs_revenue_goal', type: 'number', label: 'driggs_revenue_goal', group: 'business' },
     { key: 'id', type: 'text', label: 'id', group: 'system' },
     { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
     { key: 'updated_at', type: 'timestamp', label: 'updated_at', group: 'system' },
@@ -216,10 +224,11 @@ export default function DriggsmanTable() {
     fetchSitesprenTags();
   }, []);
 
-  // Re-filter sites when manual sites change
+  // Re-filter sites when manual sites change or filtering states change
   useEffect(() => {
     if (allSites.length > 0) {
-      if (manualSites.length > 0) {
+      if (useDaylightFilter && manualSites.length > 0) {
+        // Use daylight chamber filtering (manual sites)
         const filteredSites = allSites.filter(site => 
           manualSites.some(manualSite => 
             site.sitespren_base?.toLowerCase().includes(manualSite.toLowerCase()) ||
@@ -227,11 +236,15 @@ export default function DriggsmanTable() {
           )
         );
         setSites(filteredSites);
+      } else if (useRainFilter && taggedSites.length > 0) {
+        // Use rain chamber filtering (tagged sites)
+        setSites(taggedSites);
       } else {
+        // No filtering - show all sites
         setSites(allSites);
       }
     }
-  }, [manualSites, allSites]);
+  }, [manualSites, allSites, useDaylightFilter, useRainFilter, taggedSites]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -395,6 +408,41 @@ export default function DriggsmanTable() {
   };
 
   // Fetch sitespren tags
+  const fetchTagCounts = async (userInternalId: string, tags: SitesprenTag[]) => {
+    const counts = new Map<number, number>();
+    
+    try {
+      // Fetch counts for all tags at once
+      const { data: tagRelations, error } = await supabase
+        .from('sitespren_tags_relations')
+        .select('fk_tag_id')
+        .eq('fk_user_id', userInternalId);
+      
+      if (error) {
+        console.error('Error fetching tag counts:', error);
+        return counts;
+      }
+      
+      // Count sites per tag
+      tagRelations?.forEach(relation => {
+        const tagId = relation.fk_tag_id;
+        counts.set(tagId, (counts.get(tagId) || 0) + 1);
+      });
+      
+      // Ensure all tags have a count (even if 0)
+      tags.forEach(tag => {
+        if (!counts.has(tag.tag_id)) {
+          counts.set(tag.tag_id, 0);
+        }
+      });
+      
+    } catch (err) {
+      console.error('Error in fetchTagCounts:', err);
+    }
+    
+    return counts;
+  };
+
   const fetchSitesprenTags = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -419,7 +467,12 @@ export default function DriggsmanTable() {
       const result = await response.json();
       
       if (result.success) {
-        setSitesprenTags(result.data || []);
+        const tags = result.data || [];
+        setSitesprenTags(tags);
+        
+        // Fetch counts for the tags
+        const counts = await fetchTagCounts(userData.id, tags);
+        setTagCounts(counts);
       } else {
         console.error('Error fetching tags:', result.error);
       }
@@ -656,9 +709,43 @@ export default function DriggsmanTable() {
       .filter(s => s.length > 0);
   };
 
+  // Checkbox filter handlers
+  const handleDaylightFilterChange = (checked: boolean) => {
+    setUseDaylightFilter(checked);
+    if (checked) {
+      setUseRainFilter(false);
+      setActiveRainChamber(false);
+      // Restore stored manual sites
+      if (storedManualSites.length > 0) {
+        setManualSites(storedManualSites);
+      }
+    } else {
+      // No filtering - show all sites
+      setManualSites([]);
+    }
+  };
+
+  const handleRainFilterChange = (checked: boolean) => {
+    setUseRainFilter(checked);
+    if (checked) {
+      setUseDaylightFilter(false);
+      // Don't clear storedManualSites, just hide them from current view
+      setManualSites([]);
+      // If a tag is selected, activate rain chamber
+      if (selectedTagId) {
+        setActiveRainChamber(true);
+      }
+    } else {
+      // No filtering - show all sites
+      setActiveRainChamber(false);
+      setManualSites([]);
+    }
+  };
+
   const handleManualSiteSubmit = () => {
     const sites = parseManualSites(manualSiteInput);
     setManualSites(sites);
+    setStoredManualSites(sites); // Store permanently for toggle between chambers
     
     // Update URL parameter only in browser environment
     if (typeof window !== 'undefined') {
@@ -697,6 +784,7 @@ export default function DriggsmanTable() {
 
   const clearAllManualSites = () => {
     setManualSites([]);
+    setStoredManualSites([]);
     setManualSiteInput('');
     
     // Remove URL parameter only in browser environment
@@ -1083,6 +1171,94 @@ export default function DriggsmanTable() {
     </div>
   );
 
+  // Rain chamber handler functions
+  const fetchSitesByTag = async (tagId: number) => {
+    if (!userInternalId) return;
+    
+    try {
+      // Use the existing working API from sitejar4
+      const response = await fetch(`/api/get_sites_by_tag?user_internal_id=${userInternalId}&tag_id=${tagId}`);
+      const result = await response.json();
+      
+      if (!result.success) {
+        console.error('Error fetching tagged sites:', result.error);
+        setTaggedSites([]);
+        return;
+      }
+      
+      const siteIds = result.data?.site_ids || [];
+      
+      if (siteIds.length === 0) {
+        console.log('No sites found for this tag');
+        setTaggedSites([]);
+        return;
+      }
+      
+      // Filter allSites to only include tagged sites
+      const filteredTaggedSites = allSites.filter(site => siteIds.includes(site.id));
+      setTaggedSites(filteredTaggedSites);
+      
+      console.log(`Found ${filteredTaggedSites.length} sites with tag ${tagId}`);
+      
+    } catch (err) {
+      console.error('Error in fetchSitesByTag:', err);
+      setTaggedSites([]);
+    }
+  };
+
+  const handleTagSelection = async (tagId: number) => {
+    if (!userInternalId) return;
+    
+    setSelectedTagId(tagId);
+    setTagsDropdownOpen(false);
+    
+    // Update URL parameter only in browser environment
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('sitespren_tag', tagId.toString());
+      const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    // Fetch sites for this tag immediately when selected
+    await fetchSitesByTag(tagId);
+    console.log('Selected tag:', tagId);
+    
+    // Note: We'll need to implement the sitespren_site_tags relationship table
+    // and fetch tagged sites here
+  };
+
+  const handleRainChamberSubmit = async () => {
+    if (!selectedTagId) return;
+    
+    // Switch to rain chamber mode and enable rain filter
+    setActiveRainChamber(true);
+    setUseRainFilter(true);
+    setUseDaylightFilter(false);
+    
+    // Fetch sites that have the selected tag
+    await fetchSitesByTag(selectedTagId);
+  };
+
+  // Initialize URL parameters and tag selection on load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tagParam = urlParams.get('sitespren_tag');
+      if (tagParam && parseInt(tagParam)) {
+        const tagId = parseInt(tagParam);
+        setSelectedTagId(tagId);
+        setActiveRainChamber(true);
+        setUseRainFilter(true);
+        setUseDaylightFilter(false);
+        // Fetch sites for this tag when component loads with URL parameter
+        if (userInternalId && allSites.length > 0) {
+          fetchSitesByTag(tagId);
+        }
+      }
+    }
+  }, [userInternalId, allSites]); // Dependencies to ensure data is loaded
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -1099,51 +1275,6 @@ export default function DriggsmanTable() {
     );
   }
 
-  // Rain chamber handler functions
-  const handleTagSelection = async (tagId: number) => {
-    if (!userInternalId) return;
-    
-    setSelectedTagId(tagId);
-    setTagsDropdownOpen(false);
-    
-    // Update URL parameter only in browser environment
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set('sitespren_tag', tagId.toString());
-      const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
-      window.history.replaceState({}, '', newUrl);
-    }
-    
-    // Fetch sites with this tag (we'll need to implement the relationship)
-    // For now, we'll just get all sites and filter later when we implement tagging
-    console.log('Selected tag:', tagId);
-    
-    // Note: We'll need to implement the sitespren_site_tags relationship table
-    // and fetch tagged sites here
-  };
-
-  const handleRainChamberSubmit = () => {
-    if (!selectedTagId) return;
-    
-    // Switch to rain chamber mode and gray out daylight chamber  
-    setActiveRainChamber(true);
-    
-    // Filter sites based on selected tag
-    // For now, show all sites as placeholder
-    setTaggedSites(allSites);
-  };
-
-  // Initialize URL parameters and tag selection on load
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const tagParam = urlParams.get('sitespren_tag');
-      if (tagParam && parseInt(tagParam)) {
-        setSelectedTagId(parseInt(tagParam));
-        setActiveRainChamber(true);
-      }
-    }
-  }, [searchParams]);
 
   return (
     <div className="px-6 py-4">
@@ -1224,9 +1355,19 @@ export default function DriggsmanTable() {
       </div>
 
       {/* Daylight Chamber */}
-      <div className={`daylight-chamber mb-4 border border-gray-700 rounded-lg ${activeRainChamber ? 'opacity-50 pointer-events-none' : ''}`}>
+      <div className={`daylight-chamber mb-4 border border-gray-700 rounded-lg ${useRainFilter ? 'opacity-50 pointer-events-none' : ''}`}>
         <div className="p-4 bg-gray-50">
-          <div className="font-bold text-sm text-gray-800 mb-3">daylight_chamber</div>
+          <div className="flex items-center mb-3">
+            <div className="font-bold text-sm text-gray-800">daylight_chamber</div>
+            <input
+              type="checkbox"
+              checked={useDaylightFilter}
+              onChange={(e) => handleDaylightFilterChange(e.target.checked)}
+              className="ml-3 w-4 h-4"
+              style={{ width: '16px', height: '16px' }}
+            />
+            <span className="ml-2 text-sm text-gray-600">Use to filter</span>
+          </div>
         {/* Manual Site Input */}
         <div className="mb-3">
           <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -1295,7 +1436,17 @@ export default function DriggsmanTable() {
       {/* Rain Chamber */}
       <div className={`rain-chamber mb-4 border border-gray-700 rounded-lg ${activeRainChamber ? 'border-blue-500 bg-blue-50' : ''}`}>
         <div className="p-4 bg-gray-50">
-          <div className="font-bold text-sm text-gray-800 mb-3">rain_chamber</div>
+          <div className="flex items-center mb-3">
+            <div className="font-bold text-sm text-gray-800">rain_chamber</div>
+            <input
+              type="checkbox"
+              checked={useRainFilter}
+              onChange={(e) => handleRainFilterChange(e.target.checked)}
+              className="ml-3 w-4 h-4"
+              style={{ width: '16px', height: '16px' }}
+            />
+            <span className="ml-2 text-sm text-gray-600">Use to filter</span>
+          </div>
           
           {/* Sitespren Tags Dropdown */}
           <div className="mb-4">
@@ -1333,6 +1484,9 @@ export default function DriggsmanTable() {
                                 <th className="px-2 py-1 text-left font-medium text-gray-700">tag_id</th>
                                 <th className="px-2 py-1 text-left font-medium text-gray-700">tag_name</th>
                                 <th className="px-2 py-1 text-left font-medium text-gray-700">tag_order</th>
+                                <th className="px-2 py-1 text-left font-medium text-gray-700">
+                                  dynamic count<br/>sites per tag
+                                </th>
                                 <th className="px-2 py-1 text-left font-medium text-gray-700">fk_user_id</th>
                               </tr>
                             </thead>
@@ -1346,6 +1500,9 @@ export default function DriggsmanTable() {
                                   <td className="px-2 py-1 text-gray-600">{tag.tag_id}</td>
                                   <td className="px-2 py-1 font-medium text-gray-900">{tag.tag_name}</td>
                                   <td className="px-2 py-1 text-gray-600">{tag.tag_order}</td>
+                                  <td className="px-2 py-1 text-center font-bold text-blue-600">
+                                    {tagCounts.get(tag.tag_id) || 0}
+                                  </td>
                                   <td className="px-2 py-1 text-gray-600">{tag.fk_user_id}</td>
                                 </tr>
                               ))}

@@ -33,6 +33,28 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# Security files - API keys, secrets, credentials
+*.key
+*.pem
+*.p12
+*.pfx
+secret*
+*secret*
+*_key
+*_keys
+*_secret
+*_secrets
+api_key*
+supabase_key*
+service_key*
+service_role_key*
+
+# Temporary files that might contain secrets
+temp_*
+tmp_*
+*_temp
+*_tmp
+
 # vercel
 .vercel
 

@@ -2,10 +2,15 @@
 		============== SEPARATOR =================================
 		==========================================================
 		
+for our page at
+OR
+please create a new page at
+
+
 		NUBRA TABLEFACES - MAIN TENANTS
 		==========================================================
-		for our page at 
-        /callplatjar
+		please create a new page at
+        /aspejar
 		
 		———————————————————————
 		please create a robust ui table grid system, and build something similar to what is on our current page at /xpagesmanager1
@@ -13,7 +18,7 @@
 		———————————————————————
     		
         please make sure that this ui table lists every db column from this db table:
-		call_platforms
+		address_species
 
 
 		———————————————————————

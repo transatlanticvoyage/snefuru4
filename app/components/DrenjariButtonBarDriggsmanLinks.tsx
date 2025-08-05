@@ -22,9 +22,15 @@ export default function DrenjariButtonBarDriggsmanLinks() {
           </Link>
           <Link
             href="/callplatjar"
-            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
           >
             <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/callplatjar</span>
+          </Link>
+          <Link
+            href="/aspejar"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+          >
+            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/aspejar</span>
           </Link>
         </div>
       </div>
