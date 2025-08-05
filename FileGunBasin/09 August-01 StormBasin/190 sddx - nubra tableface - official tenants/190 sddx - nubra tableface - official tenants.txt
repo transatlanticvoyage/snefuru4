@@ -14,7 +14,7 @@
 		
 		
 		please make sure that every column in this ui table contains every db column from db table:
-        yegdbc
+        citation_gigs
 		
 		———————————————————————
 		please make sure there is a checkbox in the far left column of this ui table
@@ -103,6 +103,6 @@
 		
 		———————————————————————
 
-PAGE TO MIMMICK IN YOUR IMPLEMENTATION OF STYLES ETC 
+PAGE TO MIMMICK IN YOUR IMPLEMENTATION OF STYLES ETC (important)
 
         please view our page /filejar in order to see the implementation of exact styling that is desired for both the ui table grid itself and the other elements on the page, such as control systems appearing on the page above the ui table grid, etc.
