@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
+import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
@@ -67,8 +68,7 @@ export default function CgigjarTable() {
   const [editingValue, setEditingValue] = useState<string>('');
   
   // Expand popup states
-  const [expandPopup, setExpandPopup] = useState<{ id: number; field: string; value: string } | null>(null);
-  const [expandPopupValue, setExpandPopupValue] = useState<string>('');
+  const [expandPopup, setExpandPopup] = useState<{ id: number; field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3'; value: string } | null>(null);
   
   // Form data for creating/editing
   const [formData, setFormData] = useState({
@@ -302,48 +302,43 @@ export default function CgigjarTable() {
   };
 
   // Handle expand popup
-  const handleExpandClick = (id: number, field: string, value: string) => {
-    setExpandPopup({ id, field, value });
-    setExpandPopupValue(value || '');
+  const handleExpandClick = (id: number, field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3', value: string) => {
+    setExpandPopup({ id, field, value: value || '' });
   };
 
-  const handleExpandSave = async () => {
+  const handleExpandSave = async (newValue: string) => {
     if (!expandPopup) return;
 
-    try {
-      const { id, field } = expandPopup;
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) throw new Error('User not authenticated');
+    const { id, field } = expandPopup;
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) throw new Error('User not authenticated');
 
-      // Get internal user ID
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
+    // Get internal user ID
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', user.id)
+      .single();
 
-      if (userError || !userData) throw new Error('User not found');
-      
-      const { error } = await supabase
-        .from('citation_gigs')
-        .update({ [field]: expandPopupValue })
-        .eq('cgig_id', id)
-        .eq('user_id', userData.id);
+    if (userError || !userData) throw new Error('User not found');
+    
+    const { error } = await supabase
+      .from('citation_gigs')
+      .update({ [field]: newValue })
+      .eq('cgig_id', id)
+      .eq('user_id', userData.id);
 
-      if (error) throw error;
+    if (error) throw error;
 
-      // Update local data
-      setData(data.map(item => 
-        item.cgig_id === id ? { ...item, [field]: expandPopupValue } : item
-      ));
+    // Update local data
+    setData(data.map(item => 
+      item.cgig_id === id ? { ...item, [field]: newValue } : item
+    ));
+  };
 
-      setExpandPopup(null);
-      setExpandPopupValue('');
-    } catch (err) {
-      console.error('Error updating field:', err);
-      alert('Failed to update field');
-    }
+  const handleExpandClose = () => {
+    setExpandPopup(null);
   };
 
   const handleBooleanToggle = async (id: number, field: keyof CitationGig, currentValue: boolean) => {
@@ -851,49 +846,13 @@ export default function CgigjarTable() {
       </div>
 
       {/* Expand Popup Modal */}
-      {expandPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div 
-            className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col"
-            style={{ width: '800px', height: '100vh' }}
-          >
-            {/* Header with Save button */}
-            <div className="px-6 py-4 border-b bg-gray-50 flex items-center justify-between">
-              <h2 className="text-xl font-bold">
-                {expandPopup.field.replace('_', ' ').toUpperCase()}
-              </h2>
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleExpandSave}
-                  className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-800 transition-colors font-medium"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => {
-                    setExpandPopup(null);
-                    setExpandPopupValue('');
-                  }}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-            
-            {/* Content area */}
-            <div className="flex-1 p-6">
-              <textarea
-                value={expandPopupValue}
-                onChange={(e) => setExpandPopupValue(e.target.value)}
-                className="w-full h-full resize-none border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder={`Enter ${expandPopup.field.replace('_', ' ')} content...`}
-                style={{ minHeight: 'calc(100vh - 140px)' }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <InputsExpandEditor
+        isOpen={!!expandPopup}
+        fieldName={expandPopup?.field || 'inputs_v1'}
+        initialValue={expandPopup?.value || ''}
+        onSave={handleExpandSave}
+        onClose={handleExpandClose}
+      />
 
       {/* Create/Edit Modal */}
       {(isCreateModalOpen || isEditModalOpen) && (

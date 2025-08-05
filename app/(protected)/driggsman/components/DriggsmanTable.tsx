@@ -5,6 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
@@ -69,8 +70,17 @@ interface CitationGig {
   marketplace: string;
   base_price: number;
   currency: string;
+  cgig_url: string;
+  citations_included: number;
   is_active: boolean;
   user_id: string;
+}
+
+interface SitesprenTag {
+  tag_id: number;
+  tag_name: string;
+  tag_order: number;
+  fk_user_id: string;
 }
 
 type SitesprenField = keyof SitesprenSite;
@@ -109,11 +119,26 @@ export default function DriggsmanTable() {
   const [citationGigs, setCitationGigs] = useState<CitationGig[]>([]);
   const [cgigDropdownOpen, setCgigDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
   
+  // Inputs expand editor states
+  const [inputsExpandPopup, setInputsExpandPopup] = useState<{ 
+    cgigId: number; 
+    field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3'; 
+    value: string 
+  } | null>(null);
+  
   // Verification column toggle
   const [showVerificationColumn, setShowVerificationColumn] = useState(false);
   
   // Competitor sites toggle
   const [showCompetitorSites, setShowCompetitorSites] = useState(false);
+  
+  // Rain chamber states
+  const [activeRainChamber, setActiveRainChamber] = useState(false);
+  const [sitesprenTags, setSitesprenTags] = useState<SitesprenTag[]>([]);
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
+  const [tagsDropdownOpen, setTagsDropdownOpen] = useState(false);
+  const [taggedSites, setTaggedSites] = useState<SitesprenSite[]>([]);
+  const [userInternalId, setUserInternalId] = useState<string | null>(null);
   
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -188,6 +213,7 @@ export default function DriggsmanTable() {
     fetchSites();
     fetchCallPlatforms();
     fetchCitationGigs();
+    fetchSitesprenTags();
   }, []);
 
   // Re-filter sites when manual sites change
@@ -210,11 +236,12 @@ export default function DriggsmanTable() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (platformDropdownOpen || cgigDropdownOpen) {
+      if (platformDropdownOpen || cgigDropdownOpen || tagsDropdownOpen) {
         const target = event.target as HTMLElement;
         if (!target.closest('.relative')) {
           setPlatformDropdownOpen(null);
           setCgigDropdownOpen(null);
+          setTagsDropdownOpen(false);
         }
       }
     };
@@ -223,7 +250,7 @@ export default function DriggsmanTable() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [platformDropdownOpen, cgigDropdownOpen]);
+  }, [platformDropdownOpen, cgigDropdownOpen, tagsDropdownOpen]);
   
   const fetchSites = async () => {
     try {
@@ -351,7 +378,7 @@ export default function DriggsmanTable() {
 
       const { data: gigsData, error: gigsError } = await supabase
         .from('citation_gigs')
-        .select('cgig_id, cgig_title, seller_name, marketplace, base_price, currency, is_active, user_id')
+        .select('cgig_id, cgig_title, seller_name, marketplace, base_price, currency, cgig_url, is_active, user_id, citations_included')
         .eq('user_id', userData.id)
         .eq('is_active', true)
         .order('cgig_title');
@@ -364,6 +391,40 @@ export default function DriggsmanTable() {
       setCitationGigs(gigsData || []);
     } catch (err) {
       console.error('Error in fetchCitationGigs:', err);
+    }
+  };
+
+  // Fetch sitespren tags
+  const fetchSitesprenTags = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('User not found:', userError);
+        return;
+      }
+
+      setUserInternalId(userData.id);
+
+      // Fetch tags using the API route
+      const response = await fetch(`/api/sitespren_tags?user_internal_id=${userData.id}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setSitesprenTags(result.data || []);
+      } else {
+        console.error('Error fetching tags:', result.error);
+      }
+    } catch (err) {
+      console.error('Error in fetchSitesprenTags:', err);
     }
   };
   
@@ -599,14 +660,16 @@ export default function DriggsmanTable() {
     const sites = parseManualSites(manualSiteInput);
     setManualSites(sites);
     
-    // Update URL parameter
-    const url = new URL(window.location.href);
-    if (sites.length > 0) {
-      url.searchParams.set('sitesentered', sites.join(','));
-    } else {
-      url.searchParams.delete('sitesentered');
+    // Update URL parameter only in browser environment
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (sites.length > 0) {
+        url.searchParams.set('sitesentered', sites.join(','));
+      } else {
+        url.searchParams.delete('sitesentered');
+      }
+      router.replace(url.pathname + url.search, { scroll: false });
     }
-    router.replace(url.pathname + url.search, { scroll: false });
   };
 
   const handleManualSiteKeyPress = (e: React.KeyboardEvent) => {
@@ -620,24 +683,28 @@ export default function DriggsmanTable() {
     setManualSites(updatedSites);
     setManualSiteInput(updatedSites.join(', '));
     
-    // Update URL parameter
-    const url = new URL(window.location.href);
-    if (updatedSites.length > 0) {
-      url.searchParams.set('sitesentered', updatedSites.join(','));
-    } else {
-      url.searchParams.delete('sitesentered');
+    // Update URL parameter only in browser environment
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (updatedSites.length > 0) {
+        url.searchParams.set('sitesentered', updatedSites.join(','));
+      } else {
+        url.searchParams.delete('sitesentered');
+      }
+      router.replace(url.pathname + url.search, { scroll: false });
     }
-    router.replace(url.pathname + url.search, { scroll: false });
   };
 
   const clearAllManualSites = () => {
     setManualSites([]);
     setManualSiteInput('');
     
-    // Remove URL parameter
-    const url = new URL(window.location.href);
-    url.searchParams.delete('sitesentered');
-    router.replace(url.pathname + url.search, { scroll: false });
+    // Remove URL parameter only in browser environment
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('sitesentered');
+      router.replace(url.pathname + url.search, { scroll: false });
+    }
   };
 
   // Platform dropdown functions
@@ -723,7 +790,7 @@ export default function DriggsmanTable() {
       ? gig.cgig_title.substring(0, 15) + '..'
       : gig.cgig_title;
     
-    return `${truncatedTitle} -- ${gig.seller_name} -- $${gig.base_price} -- ${gig.citations_included || 0} cites`;
+    return `${truncatedTitle} -- ${gig.seller_name} -- $${gig.base_price} -- ${gig.citations_included || 0} citations`;
   };
 
   const handleCgigDropdownClick = (field: string, siteId: string) => {
@@ -734,6 +801,48 @@ export default function DriggsmanTable() {
       // Close platform dropdown if open
       setPlatformDropdownOpen(null);
     }
+  };
+
+  // Handle inputs expand editor
+  const handleInputsExpandClick = (cgigId: number, field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3') => {
+    const gig = citationGigs.find(g => g.cgig_id === cgigId);
+    const currentValue = gig?.[field] || '';
+    setInputsExpandPopup({ cgigId, field, value: currentValue });
+  };
+
+  const handleInputsExpandSave = async (newValue: string) => {
+    if (!inputsExpandPopup) return;
+
+    const { cgigId, field } = inputsExpandPopup;
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) throw new Error('User not authenticated');
+
+    // Get internal user ID
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', user.id)
+      .single();
+
+    if (userError || !userData) throw new Error('User not found');
+    
+    const { error } = await supabase
+      .from('citation_gigs')
+      .update({ [field]: newValue })
+      .eq('cgig_id', cgigId)
+      .eq('user_id', userData.id);
+
+    if (error) throw error;
+
+    // Update local citation gigs data
+    setCitationGigs(citationGigs.map(gig => 
+      gig.cgig_id === cgigId ? { ...gig, [field]: newValue } : gig
+    ));
+  };
+
+  const handleInputsExpandClose = () => {
+    setInputsExpandPopup(null);
   };
 
   const handleCgigSelect = async (cgigId: number, field: string, siteId: string) => {
@@ -990,6 +1099,52 @@ export default function DriggsmanTable() {
     );
   }
 
+  // Rain chamber handler functions
+  const handleTagSelection = async (tagId: number) => {
+    if (!userInternalId) return;
+    
+    setSelectedTagId(tagId);
+    setTagsDropdownOpen(false);
+    
+    // Update URL parameter only in browser environment
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('sitespren_tag', tagId.toString());
+      const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    // Fetch sites with this tag (we'll need to implement the relationship)
+    // For now, we'll just get all sites and filter later when we implement tagging
+    console.log('Selected tag:', tagId);
+    
+    // Note: We'll need to implement the sitespren_site_tags relationship table
+    // and fetch tagged sites here
+  };
+
+  const handleRainChamberSubmit = () => {
+    if (!selectedTagId) return;
+    
+    // Switch to rain chamber mode and gray out daylight chamber  
+    setActiveRainChamber(true);
+    
+    // Filter sites based on selected tag
+    // For now, show all sites as placeholder
+    setTaggedSites(allSites);
+  };
+
+  // Initialize URL parameters and tag selection on load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tagParam = urlParams.get('sitespren_tag');
+      if (tagParam && parseInt(tagParam)) {
+        setSelectedTagId(parseInt(tagParam));
+        setActiveRainChamber(true);
+      }
+    }
+  }, [searchParams]);
+
   return (
     <div className="px-6 py-4">
       {/* Drenjari Navigation Links */}
@@ -1068,8 +1223,10 @@ export default function DriggsmanTable() {
         </div>
       </div>
 
-      {/* Manual Site Entry Section */}
-      <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+      {/* Daylight Chamber */}
+      <div className={`daylight-chamber mb-4 border border-gray-700 rounded-lg ${activeRainChamber ? 'opacity-50 pointer-events-none' : ''}`}>
+        <div className="p-4 bg-gray-50">
+          <div className="font-bold text-sm text-gray-800 mb-3">daylight_chamber</div>
         {/* Manual Site Input */}
         <div className="mb-3">
           <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -1132,6 +1289,117 @@ export default function DriggsmanTable() {
             </div>
           </div>
         )}
+        </div>
+      </div>
+
+      {/* Rain Chamber */}
+      <div className={`rain-chamber mb-4 border border-gray-700 rounded-lg ${activeRainChamber ? 'border-blue-500 bg-blue-50' : ''}`}>
+        <div className="p-4 bg-gray-50">
+          <div className="font-bold text-sm text-gray-800 mb-3">rain_chamber</div>
+          
+          {/* Sitespren Tags Dropdown */}
+          <div className="mb-4">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+              select from sitespren_tags
+            </label>
+            <div className="relative">
+              <button
+                onClick={() => setTagsDropdownOpen(!tagsDropdownOpen)}
+                className="w-full px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {selectedTagId ? 
+                  sitesprenTags.find(tag => tag.tag_id === selectedTagId)?.tag_name || 'Select a tag'
+                  : 'Select a tag'
+                }
+                <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </span>
+              </button>
+              
+              {/* Dropdown Menu */}
+              {tagsDropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                  <div className="p-3">
+                    <div className="text-xs font-medium text-gray-700 mb-2">Select Sitespren Tag:</div>
+                    
+                    {sitesprenTags.length > 0 ? (
+                      <div className="border border-gray-200 rounded">
+                        <div className="max-h-64 overflow-y-auto">
+                          <table className="w-full text-xs">
+                            <thead className="bg-gray-50 sticky top-0">
+                              <tr>
+                                <th className="px-2 py-1 text-left font-medium text-gray-700">tag_id</th>
+                                <th className="px-2 py-1 text-left font-medium text-gray-700">tag_name</th>
+                                <th className="px-2 py-1 text-left font-medium text-gray-700">tag_order</th>
+                                <th className="px-2 py-1 text-left font-medium text-gray-700">fk_user_id</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {sitesprenTags.map((tag) => (
+                                <tr
+                                  key={tag.tag_id}
+                                  className="hover:bg-blue-50 cursor-pointer border-t border-gray-100"
+                                  onClick={() => handleTagSelection(tag.tag_id)}
+                                >
+                                  <td className="px-2 py-1 text-gray-600">{tag.tag_id}</td>
+                                  <td className="px-2 py-1 font-medium text-gray-900">{tag.tag_name}</td>
+                                  <td className="px-2 py-1 text-gray-600">{tag.tag_order}</td>
+                                  <td className="px-2 py-1 text-gray-600">{tag.fk_user_id}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-500 py-2">No tags found</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Submit Button */}
+          <div className="mb-4">
+            <button
+              onClick={handleRainChamberSubmit}
+              disabled={!selectedTagId}
+              className={`px-4 py-2 rounded font-medium transition-colors ${
+                selectedTagId 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              Submit
+            </button>
+          </div>
+          
+          {/* Tagged Sites Horizontal Button Bar */}
+          {activeRainChamber && taggedSites.length > 0 && (
+            <div>
+              <div className="text-sm font-medium text-gray-700 mb-2">
+                Tagged Sites ({taggedSites.length}):
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {taggedSites.map((site) => (
+                  <button
+                    key={site.id}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 transition-colors"
+                    onClick={() => {
+                      // TODO: Add functionality to focus on this site in the table
+                      console.log('Clicked site:', site.sitespren_base);
+                    }}
+                  >
+                    {site.sitespren_base || site.true_root_domain || 'Unknown Site'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Matrix Table */}
@@ -1139,6 +1407,21 @@ export default function DriggsmanTable() {
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-300">
             <thead className="bg-gray-50">
+              {/* Additional header row - empty for now */}
+              <tr className="border-b border-gray-300">
+                <td className="w-12 h-8 border-r border-gray-300"></td>
+                <td className="w-64 h-8 border-r border-gray-300"></td>
+                {paginatedSites.map((site, index) => (
+                  <td
+                    key={`empty-${site.id}`}
+                    className={`h-8 ${
+                      index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                    }`}
+                  ></td>
+                ))}
+              </tr>
+              
+              {/* Main header row with column identifiers */}
               <tr>
                 {/* Field selection checkbox */}
                 <th 
@@ -1374,7 +1657,7 @@ export default function DriggsmanTable() {
                                   : ''
                               }`}
                               style={{
-                                width: '350px',
+                                width: '450px',
                                 ...(value && getCitationGigName(value as number) !== 'None'
                                   ? { 
                                       backgroundColor: '#f8d1f5',
@@ -1412,7 +1695,73 @@ export default function DriggsmanTable() {
                                     </Link>
                                   );
                                 }
+
+                                if (num === 2) {
+                                  // Get the citation gig ID from the site's driggs_cgig_id field
+                                  const cgigId = site[field.key as keyof typeof site] as number;
+                                  const assignedGig = cgigId ? citationGigs.find(g => g.cgig_id === cgigId) : null;
+                                  const cgigUrl = assignedGig?.cgig_url || '#';
+                                  
+                                  console.log('Button 2 debug:', { cgigId, assignedGig, cgigUrl, siteName: site.sitespren_base });
+                                  
+                                  return (
+                                    <Link
+                                      key={num}
+                                      href={cgigUrl !== '#' ? cgigUrl : '#'}
+                                      target={cgigUrl !== '#' ? "_blank" : "_self"}
+                                      rel={cgigUrl !== '#' ? "noopener noreferrer" : undefined}
+                                      className="bg-gray-200 border border-gray-400 rounded text-xs font-medium text-gray-700 flex items-center justify-center transition-colors cursor-pointer hover:bg-yellow-300 px-1 py-1"
+                                      style={{ 
+                                        minWidth: 'fit-content',
+                                        height: '32px',
+                                        hover: { backgroundColor: '#f1dcab' } 
+                                      }}
+                                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1dcab'}
+                                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
+                                      onClick={(e) => {
+                                        if (cgigUrl === '#') {
+                                          e.preventDefault();
+                                          alert('No citation gig assigned to this site yet.');
+                                        }
+                                      }}
+                                    >
+                                      2-open cgig_url
+                                    </Link>
+                                  );
+                                }
                                 
+                                // Handle buttons 3, 4, 5 for inputs_v1, v2, v3
+                                if (num >= 3 && num <= 5) {
+                                  const cgigId = site[field.key as keyof typeof site] as number;
+                                  const fieldMap: { [key: number]: 'inputs_v1' | 'inputs_v2' | 'inputs_v3' } = {
+                                    3: 'inputs_v1',
+                                    4: 'inputs_v2',
+                                    5: 'inputs_v3'
+                                  };
+                                  const inputField = fieldMap[num];
+                                  const buttonText = `iv${num - 2}`;
+                                  
+                                  return (
+                                    <button
+                                      key={num}
+                                      onClick={() => {
+                                        if (cgigId) {
+                                          handleInputsExpandClick(cgigId, inputField);
+                                        } else {
+                                          alert('No citation gig assigned to this site yet.');
+                                        }
+                                      }}
+                                      className="bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded text-xs font-medium text-gray-700 flex items-center justify-center transition-colors px-1 py-1"
+                                      style={{ 
+                                        minWidth: 'fit-content',
+                                        height: '32px'
+                                      }}
+                                    >
+                                      {buttonText}
+                                    </button>
+                                  );
+                                }
+
                                 return (
                                   <button
                                     key={num}
@@ -1686,6 +2035,15 @@ export default function DriggsmanTable() {
           </div>
         </div>
       )}
+
+      {/* Inputs Expand Editor */}
+      <InputsExpandEditor
+        isOpen={!!inputsExpandPopup}
+        fieldName={inputsExpandPopup?.field || 'inputs_v1'}
+        initialValue={inputsExpandPopup?.value || ''}
+        onSave={handleInputsExpandSave}
+        onClose={handleInputsExpandClose}
+      />
     </div>
   );
 }
