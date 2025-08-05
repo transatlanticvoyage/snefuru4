@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
@@ -64,7 +65,28 @@ export default function DriggsmanTable() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<SitesprenSite>>({});
   
+  // Manual site entry states
+  const [manualSiteInput, setManualSiteInput] = useState('');
+  const [manualSites, setManualSites] = useState<string[]>([]);
+  const [allSites, setAllSites] = useState<SitesprenSite[]>([]); // Store all fetched sites
+  
   const supabase = createClientComponentClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Phone number formatting functions
+  const normalizePhoneNumber = (phone: string): string => {
+    // Remove all non-digit characters
+    return phone.replace(/\D/g, '');
+  };
+
+  const formatPhoneNumber = (phone: string): string => {
+    const normalized = normalizePhoneNumber(phone);
+    if (normalized.length === 10) {
+      return `(${normalized.slice(0, 3)}) ${normalized.slice(3, 6)}-${normalized.slice(6)}`;
+    }
+    return phone; // Return original if not 10 digits
+  };
   
   // Define all sitespren fields with their types
   const fieldDefinitions: Array<{ 
@@ -73,6 +95,7 @@ export default function DriggsmanTable() {
     label: string;
     group?: string;
   }> = [
+    { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
     { key: 'id', type: 'text', label: 'id', group: 'system' },
     { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
     { key: 'updated_at', type: 'timestamp', label: 'updated_at', group: 'system' },
@@ -96,7 +119,6 @@ export default function DriggsmanTable() {
     { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
     { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
     { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
-    { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
     { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
     { key: 'is_starred1', type: 'text', label: 'is_starred1', group: 'meta' },
     { key: 'icon_name', type: 'text', label: 'icon_name', group: 'display' },
@@ -104,27 +126,106 @@ export default function DriggsmanTable() {
     { key: 'is_bulldozer', type: 'boolean', label: 'is_bulldozer', group: 'meta' }
   ];
   
-  // Fetch sites data
+  // Initialize manual sites from URL parameter
+  useEffect(() => {
+    const sitesEnteredParam = searchParams?.get('sitesentered');
+    if (sitesEnteredParam) {
+      const sitesFromUrl = sitesEnteredParam.split(',').map(s => s.trim()).filter(s => s);
+      setManualSites(sitesFromUrl);
+      setManualSiteInput(sitesFromUrl.join(', '));
+    }
+  }, [searchParams]);
+
+  // Fetch sites data and re-filter when manual sites change
   useEffect(() => {
     fetchSites();
   }, []);
+
+  // Re-filter sites when manual sites change
+  useEffect(() => {
+    if (allSites.length > 0) {
+      if (manualSites.length > 0) {
+        const filteredSites = allSites.filter(site => 
+          manualSites.some(manualSite => 
+            site.sitespren_base?.toLowerCase().includes(manualSite.toLowerCase()) ||
+            site.true_root_domain?.toLowerCase().includes(manualSite.toLowerCase())
+          )
+        );
+        setSites(filteredSites);
+      } else {
+        setSites(allSites);
+      }
+    }
+  }, [manualSites, allSites]);
   
   const fetchSites = async () => {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       
+      if (!user?.id) {
+        setError('User not authenticated');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Supabase auth user ID:', user.id);
+      
+      // First get the internal user ID from users table (same as /sitejar4)
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('User lookup error:', userError);
+        setError('User not found in users table');
+        setLoading(false);
+        return;
+      }
+
+      const userInternalId = userData.id;
+      console.log('Internal user ID:', userInternalId);
+      
+      // Now get user's sites using the internal user ID
       const { data: sitesData, error: fetchError } = await supabase
         .from('sitespren')
         .select('*')
-        .eq('fk_users_id', user?.id)
+        .eq('fk_users_id', userInternalId)
         .order('created_at', { ascending: false });
         
-      if (fetchError) throw fetchError;
-      setSites(sitesData || []);
+      console.log('Sites found for internal user ID:', sitesData?.length || 0);
+      
+      if (sitesData && sitesData.length > 0) {
+        console.log('First site data:', sitesData[0]);
+        console.log('Site has these driggs fields populated:', 
+          Object.keys(sitesData[0]).filter(key => key.startsWith('driggs_') && sitesData[0][key])
+        );
+      }
+        
+      if (fetchError) {
+        console.error('Fetch error:', fetchError);
+        throw fetchError;
+      }
+      
+      setAllSites(sitesData || []); // Store all sites
+      
+      // Filter sites based on manual entries or show all
+      if (manualSites.length > 0) {
+        const filteredSites = sitesData?.filter(site => 
+          manualSites.some(manualSite => 
+            site.sitespren_base?.toLowerCase().includes(manualSite.toLowerCase()) ||
+            site.true_root_domain?.toLowerCase().includes(manualSite.toLowerCase())
+          )
+        ) || [];
+        setSites(filteredSites);
+      } else {
+        setSites(sitesData || []);
+      }
     } catch (err) {
       console.error('Error fetching sites:', err);
-      setError('Failed to fetch sites');
+      setError('Failed to fetch sites: ' + (err as any).message);
     } finally {
       setLoading(false);
     }
@@ -174,7 +275,13 @@ export default function DriggsmanTable() {
     if (fieldDef?.type === 'boolean') return; // Don't edit booleans via click
     
     setEditingCell({ field, siteId });
-    setEditingValue(value?.toString() || '');
+    
+    // For phone numbers, show formatted version for editing
+    if (field === 'driggs_phone_1' && value) {
+      setEditingValue(formatPhoneNumber(value.toString()));
+    } else {
+      setEditingValue(value?.toString() || '');
+    }
   };
 
   const handleCellSave = async () => {
@@ -189,15 +296,28 @@ export default function DriggsmanTable() {
       // Process value based on type
       if (fieldDef?.type === 'boolean') {
         processedValue = editingValue === 'true';
+      } else if (field === 'driggs_phone_1') {
+        // Normalize phone number for storage
+        processedValue = normalizePhoneNumber(editingValue);
       }
 
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) throw new Error('User not found');
       
       const { error } = await supabase
         .from('sitespren')
         .update({ [field]: processedValue })
         .eq('id', siteId)
-        .eq('fk_users_id', user?.id);
+        .eq('fk_users_id', userData.id);
 
       if (error) throw error;
 
@@ -217,6 +337,16 @@ export default function DriggsmanTable() {
   const handleBooleanToggle = async (field: SitesprenField, siteId: string, currentValue: boolean | null) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) throw new Error('User not found');
       
       const newValue = !currentValue;
       
@@ -224,7 +354,7 @@ export default function DriggsmanTable() {
         .from('sitespren')
         .update({ [field]: newValue })
         .eq('id', siteId)
-        .eq('fk_users_id', user?.id);
+        .eq('fk_users_id', userData.id);
 
       if (error) throw error;
 
@@ -242,14 +372,23 @@ export default function DriggsmanTable() {
   const handleCreateInline = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) throw new Error('User not found');
       
       const newSite = {
-        fk_users_id: user?.id,
+        fk_users_id: userData.id,
         sitespren_base: 'newsite.com',
         true_root_domain: 'newsite.com',
         webproperty_type: 'website',
-        is_wp_site: false,
-        is_active: true
+        is_wp_site: false
       };
 
       const { data: createdData, error } = await supabase
@@ -285,10 +424,20 @@ export default function DriggsmanTable() {
   const handleCreateSubmit = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) throw new Error('User not found');
       
       const { data: createdData, error } = await supabase
         .from('sitespren')
-        .insert([{ ...formData, fk_users_id: user?.id }])
+        .insert([{ ...formData, fk_users_id: userData.id }])
         .select()
         .single();
 
@@ -300,6 +449,59 @@ export default function DriggsmanTable() {
       console.error('Error creating site:', err);
       alert('Failed to create site');
     }
+  };
+
+  // Manual site entry functions
+  const parseManualSites = (input: string): string[] => {
+    return input
+      .split(/[\s,\n]+/) // Split by spaces, commas, or newlines
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+  };
+
+  const handleManualSiteSubmit = () => {
+    const sites = parseManualSites(manualSiteInput);
+    setManualSites(sites);
+    
+    // Update URL parameter
+    const url = new URL(window.location.href);
+    if (sites.length > 0) {
+      url.searchParams.set('sitesentered', sites.join(','));
+    } else {
+      url.searchParams.delete('sitesentered');
+    }
+    router.replace(url.pathname + url.search, { scroll: false });
+  };
+
+  const handleManualSiteKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleManualSiteSubmit();
+    }
+  };
+
+  const removeManualSite = (siteToRemove: string) => {
+    const updatedSites = manualSites.filter(site => site !== siteToRemove);
+    setManualSites(updatedSites);
+    setManualSiteInput(updatedSites.join(', '));
+    
+    // Update URL parameter
+    const url = new URL(window.location.href);
+    if (updatedSites.length > 0) {
+      url.searchParams.set('sitesentered', updatedSites.join(','));
+    } else {
+      url.searchParams.delete('sitesentered');
+    }
+    router.replace(url.pathname + url.search, { scroll: false });
+  };
+
+  const clearAllManualSites = () => {
+    setManualSites([]);
+    setManualSiteInput('');
+    
+    // Remove URL parameter
+    const url = new URL(window.location.href);
+    url.searchParams.delete('sitesentered');
+    router.replace(url.pathname + url.search, { scroll: false });
   };
 
   // Pagination controls component
@@ -522,6 +724,24 @@ export default function DriggsmanTable() {
         <NubraTablefaceKite tableType="driggsman-site-matrix" />
       </div>
 
+      {/* Debug Info */}
+      {sites.length === 0 && !loading && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h3 className="text-sm font-medium text-yellow-800 mb-2">No Sites Found</h3>
+          <p className="text-sm text-yellow-700">
+            No sites were found for your account. This could mean:
+          </p>
+          <ul className="text-sm text-yellow-700 mt-1 ml-4 list-disc">
+            <li>You haven't created any sites yet</li>
+            <li>Sites exist but under a different user ID</li>
+            <li>Database connection issue</li>
+          </ul>
+          <p className="text-xs text-yellow-600 mt-2">
+            Check the browser console for debugging information.
+          </p>
+        </div>
+      )}
+
       {/* Top Controls */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-2">
@@ -542,11 +762,80 @@ export default function DriggsmanTable() {
               {selectedFields.size} fields selected
             </span>
           )}
+          <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded text-sm">
+            {sites.length} sites loaded
+          </span>
         </div>
         <div className="flex flex-col space-y-2">
           <PaginationControls />
           <ColumnPaginationControls />
         </div>
+      </div>
+
+      {/* Manual Site Entry Section */}
+      <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+        {/* Manual Site Input */}
+        <div className="mb-3">
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            enter sites manually
+          </label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={manualSiteInput}
+              onChange={(e) => setManualSiteInput(e.target.value)}
+              onKeyPress={handleManualSiteKeyPress}
+              placeholder="dogs.com, cats.com facebook.com/group example.net"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <button
+              onClick={handleManualSiteSubmit}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              Submit
+            </button>
+            {manualSites.length > 0 && (
+              <button
+                onClick={clearAllManualSites}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Separate sites with spaces, commas, or line breaks. Sites will be matched against your database.
+          </p>
+        </div>
+
+        {/* Currently Entered Sites Display */}
+        {manualSites.length > 0 && (
+          <div>
+            <div className="text-sm font-medium text-gray-700 mb-2">
+              Currently viewing sites ({manualSites.length}):
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {manualSites.map((site, index) => (
+                <div
+                  key={index}
+                  className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200"
+                >
+                  <span className="mr-2">{site}</span>
+                  <button
+                    onClick={() => removeManualSite(site)}
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-200 hover:bg-blue-300 text-blue-600 hover:text-blue-800 transition-colors"
+                    title="Remove this site"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 text-xs text-gray-500">
+              Showing {sites.length} matching sites from your database out of {allSites.length} total sites.
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Matrix Table */}
@@ -557,7 +846,7 @@ export default function DriggsmanTable() {
               <tr>
                 {/* Field selection checkbox */}
                 <th 
-                  className="w-12 px-2 py-3 text-left cursor-pointer hover:bg-gray-100"
+                  className="w-12 px-2 py-3 text-left cursor-pointer hover:bg-gray-100 border-r border-gray-300"
                   onClick={handleSelectAllFields}
                 >
                   <div className="flex items-center justify-center">
@@ -571,19 +860,21 @@ export default function DriggsmanTable() {
                 </th>
                 
                 {/* Field name column */}
-                <th className="px-3 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider w-64">
+                <th className="px-3 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider w-64 border-r border-gray-300">
                   field name
                 </th>
 
                 {/* Site columns */}
-                {paginatedSites.map((site) => (
+                {paginatedSites.map((site, index) => (
                   <th
                     key={site.id}
-                    className="px-3 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider w-48"
+                    className={`px-3 py-3 text-left text-xs font-bold text-gray-900 w-48 ${
+                      index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                    }`}
                     title={site.sitespren_base || site.id}
                   >
                     <div className="truncate">
-                      {site.sitespren_base || `Site ${site.id.slice(0, 8)}`}
+                      {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
                     </div>
                   </th>
                 ))}
@@ -594,7 +885,7 @@ export default function DriggsmanTable() {
                 <tr key={field.key} className="hover:bg-gray-50">
                   {/* Field selection checkbox */}
                   <td 
-                    className="w-12 px-2 py-2 cursor-pointer"
+                    className="w-12 px-2 py-2 cursor-pointer border-r border-gray-300"
                     onClick={() => handleFieldSelect(field.key)}
                   >
                     <div className="flex items-center justify-center">
@@ -608,23 +899,23 @@ export default function DriggsmanTable() {
                   </td>
 
                   {/* Field name */}
-                  <td className="px-3 py-2 text-sm font-medium text-gray-900 w-64">
-                    <div className="flex flex-col">
-                      <span>{field.label}</span>
-                      {field.group && (
-                        <span className="text-xs text-gray-500">{field.group}</span>
-                      )}
-                    </div>
+                  <td className="px-3 py-2 text-sm font-medium text-gray-900 w-64 border-r border-gray-300">
+                    <span>{field.label}</span>
                   </td>
 
                   {/* Site value cells */}
-                  {paginatedSites.map((site) => {
+                  {paginatedSites.map((site, index) => {
                     const value = site[field.key];
                     const isEditing = editingCell?.field === field.key && editingCell?.siteId === site.id;
 
                     if (field.type === 'boolean') {
                       return (
-                        <td key={`${field.key}-${site.id}`} className="px-3 py-2 text-sm text-gray-900 w-48">
+                        <td 
+                          key={`${field.key}-${site.id}`} 
+                          className={`px-3 py-2 text-sm text-gray-900 w-48 ${
+                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                          }`}
+                        >
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input
                               type="checkbox"
@@ -641,7 +932,9 @@ export default function DriggsmanTable() {
                     return (
                       <td
                         key={`${field.key}-${site.id}`}
-                        className="px-3 py-2 text-sm text-gray-900 cursor-pointer w-48"
+                        className={`px-3 py-2 text-sm text-gray-900 cursor-pointer w-48 ${
+                          index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                        }`}
                         onClick={() => !isEditing && handleCellClick(field.key, site.id, value)}
                       >
                         {isEditing ? (
@@ -664,6 +957,8 @@ export default function DriggsmanTable() {
                           <div className="truncate">
                             {field.type === 'timestamp' && value
                               ? new Date(value).toLocaleString()
+                              : field.key === 'driggs_phone_1' && value
+                              ? formatPhoneNumber(value.toString())
                               : value?.toString() || '-'}
                           </div>
                         )}
@@ -681,6 +976,10 @@ export default function DriggsmanTable() {
       <div className="mt-4 flex justify-between items-center">
         <div className="text-sm text-gray-600">
           Showing {paginatedFields.length} fields × {paginatedSites.length} sites
+          <br />
+          <span className="text-xs text-gray-500">
+            Total sites: {sites.length} | Column page: {currentColumnPage}/{totalColumnPages}
+          </span>
         </div>
         <div className="flex flex-col space-y-2">
           <PaginationControls />
