@@ -5,24 +5,17 @@
 		NUBRA TABLEFACES - MAIN TENANTS
 		==========================================================
 		for our page at 
-        /driggsman
+        /callplatjar
 		
 		———————————————————————
 		please create a robust ui table grid system, and build something similar to what is on our current page at /xpagesmanager1
 		(in terms of general styling, etc.)
 		———————————————————————
-		
-		here's the kicker for this specific ui table implementation, however
+    		
+        please make sure that this ui table lists every db column from this db table:
+		call_platforms
 
-		the left column will contain all of the fields from db table 
-		sitespren
 
-	    and then every ui column in the table after that will contain a "site" in this specific user account (so it must pull all rows from db table sitespren where user id(of currently logged in user), and then list each site as a "column")
-
-		because there are hundreds of sites in a single user account usually
-
-		we need to also add an additional pagination system (in addition to what is described in my instructions below, which is pagintion system for rows) for the columns to somehow control in chunks a "range" that can be shown of columns at a time (so as not to bog down the screen too much with too many ui columns)
-		
 		———————————————————————
 		please make sure there is a checkbox in the far left column of this ui table
 		———————————————————————
