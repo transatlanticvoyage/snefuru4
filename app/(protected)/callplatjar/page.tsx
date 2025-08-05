@@ -3,9 +3,9 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import DriggsmanTable from './components/DriggsmanTable';
+import CallPlatjarTable from './components/CallPlatjarTable';
 
-export default function DriggsmanPage() {
+export default function CallPlatjarPage() {
   const { user } = useAuth();
   const router = useRouter();
 
@@ -30,21 +30,18 @@ export default function DriggsmanPage() {
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Driggs Manager 
-              <span className="text-xl font-normal text-gray-600 ml-3">Phone Numbers, Addresses, and Citations</span>
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-800">Call Platforms</h1>
           </div>
           <div className="text-right">
-            <div className="text-sm text-gray-500">Site Field Management</div>
-            <div className="text-xs text-gray-400">Cross-reference all site fields</div>
+            <div className="text-sm text-gray-500">Platform Management</div>
+            <div className="text-xs text-gray-400">Manage call tracking platforms</div>
           </div>
         </div>
       </div>
 
-      {/* Main Content - Full Width DriggsmanTable */}
+      {/* Main Content - Full Width CallPlatjarTable */}
       <div className="flex-1 overflow-hidden">
-        <DriggsmanTable />
+        <CallPlatjarTable />
       </div>
     </div>
   );

@@ -4,9 +4,15 @@ import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+  { ssr: false }
+);
+
+const DrenjariButtonBarDriggsmanLinks = dynamic(
+  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
   { ssr: false }
 );
 
@@ -33,6 +39,8 @@ interface SitesprenSite {
   driggs_email_1: string | null;
   driggs_address_full: string | null;
   driggs_phone_1: string | null;
+  driggs_phone1_platform_id: number | null;
+  driggs_cgig_id: number | null;
   driggs_special_note_for_ai_tool: string | null;
   ns_full: string | null;
   ip_address: string | null;
@@ -40,6 +48,29 @@ interface SitesprenSite {
   icon_name: string | null;
   icon_color: string | null;
   is_bulldozer: boolean | null;
+}
+
+interface CallPlatform {
+  platform_id: number;
+  platform_name: string;
+  platform_url: string | null;
+  api_endpoint: string | null;
+  api_key_encrypted: string | null;
+  is_active: boolean;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CitationGig {
+  cgig_id: number;
+  cgig_title: string;
+  seller_name: string;
+  marketplace: string;
+  base_price: number;
+  currency: string;
+  is_active: boolean;
+  user_id: string;
 }
 
 type SitesprenField = keyof SitesprenSite;
@@ -70,6 +101,20 @@ export default function DriggsmanTable() {
   const [manualSites, setManualSites] = useState<string[]>([]);
   const [allSites, setAllSites] = useState<SitesprenSite[]>([]); // Store all fetched sites
   
+  // Call platform dropdown states
+  const [callPlatforms, setCallPlatforms] = useState<CallPlatform[]>([]);
+  const [platformDropdownOpen, setPlatformDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+  
+  // Citation gig dropdown states
+  const [citationGigs, setCitationGigs] = useState<CitationGig[]>([]);
+  const [cgigDropdownOpen, setCgigDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+  
+  // Verification column toggle
+  const [showVerificationColumn, setShowVerificationColumn] = useState(false);
+  
+  // Competitor sites toggle
+  const [showCompetitorSites, setShowCompetitorSites] = useState(false);
+  
   const supabase = createClientComponentClient();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -95,7 +140,16 @@ export default function DriggsmanTable() {
     label: string;
     group?: string;
   }> = [
+    { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
     { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
+    { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
+    { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
+    { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
+    { key: 'driggs_city', type: 'text', label: 'driggs_city', group: 'business' },
+    { key: 'driggs_brand_name', type: 'text', label: 'driggs_brand_name', group: 'business' },
+    { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
+    { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
+    { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
     { key: 'id', type: 'text', label: 'id', group: 'system' },
     { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
     { key: 'updated_at', type: 'timestamp', label: 'updated_at', group: 'system' },
@@ -113,13 +167,6 @@ export default function DriggsmanTable() {
     { key: 'wp_plugin_connected2', type: 'boolean', label: 'wp_plugin_connected2', group: 'wordpress' },
     { key: 'wp_rest_app_pass', type: 'text', label: 'wp_rest_app_pass', group: 'wordpress' },
     { key: 'fk_domreg_hostaccount', type: 'text', label: 'fk_domreg_hostaccount', group: 'hosting' },
-    { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
-    { key: 'driggs_city', type: 'text', label: 'driggs_city', group: 'business' },
-    { key: 'driggs_brand_name', type: 'text', label: 'driggs_brand_name', group: 'business' },
-    { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
-    { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
-    { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
-    { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
     { key: 'is_starred1', type: 'text', label: 'is_starred1', group: 'meta' },
     { key: 'icon_name', type: 'text', label: 'icon_name', group: 'display' },
     { key: 'icon_color', type: 'text', label: 'icon_color', group: 'display' },
@@ -139,6 +186,8 @@ export default function DriggsmanTable() {
   // Fetch sites data and re-filter when manual sites change
   useEffect(() => {
     fetchSites();
+    fetchCallPlatforms();
+    fetchCitationGigs();
   }, []);
 
   // Re-filter sites when manual sites change
@@ -157,6 +206,24 @@ export default function DriggsmanTable() {
       }
     }
   }, [manualSites, allSites]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (platformDropdownOpen || cgigDropdownOpen) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.relative')) {
+          setPlatformDropdownOpen(null);
+          setCgigDropdownOpen(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [platformDropdownOpen, cgigDropdownOpen]);
   
   const fetchSites = async () => {
     try {
@@ -228,6 +295,75 @@ export default function DriggsmanTable() {
       setError('Failed to fetch sites: ' + (err as any).message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch call platforms
+  const fetchCallPlatforms = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) return;
+
+      const { data: platformsData, error: fetchError } = await supabase
+        .from('call_platforms')
+        .select('*')
+        .eq('user_id', userData.id)
+        .eq('is_active', true)
+        .order('platform_name', { ascending: true });
+
+      if (fetchError) {
+        console.error('Error fetching call platforms:', fetchError);
+        return;
+      }
+
+      setCallPlatforms(platformsData || []);
+    } catch (err) {
+      console.error('Error in fetchCallPlatforms:', err);
+    }
+  };
+
+  // Fetch citation gigs
+  const fetchCitationGigs = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('User not found:', userError);
+        return;
+      }
+
+      const { data: gigsData, error: gigsError } = await supabase
+        .from('citation_gigs')
+        .select('cgig_id, cgig_title, seller_name, marketplace, base_price, currency, is_active, user_id')
+        .eq('user_id', userData.id)
+        .eq('is_active', true)
+        .order('cgig_title');
+
+      if (gigsError) {
+        console.error('Error fetching citation gigs:', gigsError);
+        return;
+      }
+
+      setCitationGigs(gigsData || []);
+    } catch (err) {
+      console.error('Error in fetchCitationGigs:', err);
     }
   };
   
@@ -504,6 +640,143 @@ export default function DriggsmanTable() {
     router.replace(url.pathname + url.search, { scroll: false });
   };
 
+  // Platform dropdown functions
+  const handlePlatformDropdownClick = (field: string, siteId: string) => {
+    if (platformDropdownOpen?.field === field && platformDropdownOpen?.siteId === siteId) {
+      setPlatformDropdownOpen(null);
+    } else {
+      setPlatformDropdownOpen({ field, siteId });
+    }
+  };
+
+  const handlePlatformSelect = async (siteId: string, platformId: number | null) => {
+    try {
+      console.log('Attempting to update platform:', { siteId, platformId });
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('User lookup error:', userError);
+        throw new Error('User not found');
+      }
+
+      console.log('Updating site:', siteId, 'with platform:', platformId, 'for user:', userData.id);
+
+      const { data, error } = await supabase
+        .from('sitespren')
+        .update({ driggs_phone1_platform_id: platformId })
+        .eq('id', siteId)
+        .eq('fk_users_id', userData.id)
+        .select('id, driggs_phone1_platform_id');
+
+      if (error) {
+        console.error('Supabase update error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw error;
+      }
+
+      console.log('Update successful:', data);
+
+      // Update local data
+      setSites(sites.map(site => 
+        site.id === siteId ? { ...site, driggs_phone1_platform_id: platformId } : site
+      ));
+
+      setPlatformDropdownOpen(null);
+    } catch (err) {
+      console.error('Error updating platform:', err);
+      alert(`Failed to update platform: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
+  const getPlatformName = (platformId: number | null): string => {
+    if (!platformId) return 'None';
+    const platform = callPlatforms.find(p => p.platform_id === platformId);
+    return platform ? platform.platform_name : `Platform ${platformId}`;
+  };
+
+  const getCitationGigName = (cgigId: number | null): string => {
+    if (!cgigId) return 'None';
+    const gig = citationGigs.find(g => g.cgig_id === cgigId);
+    return gig ? gig.cgig_title : `Gig ${cgigId}`;
+  };
+
+  const getCitationGigDetails = (cgigId: number | null): string => {
+    if (!cgigId) return 'None';
+    const gig = citationGigs.find(g => g.cgig_id === cgigId);
+    if (!gig) return `Gig ${cgigId}`;
+    
+    const truncatedTitle = gig.cgig_title.length > 15 
+      ? gig.cgig_title.substring(0, 15) + '..'
+      : gig.cgig_title;
+    
+    return `${truncatedTitle} -- ${gig.seller_name} -- $${gig.base_price} -- ${gig.citations_included || 0} cites`;
+  };
+
+  const handleCgigDropdownClick = (field: string, siteId: string) => {
+    if (cgigDropdownOpen?.field === field && cgigDropdownOpen?.siteId === siteId) {
+      setCgigDropdownOpen(null);
+    } else {
+      setCgigDropdownOpen({ field, siteId });
+      // Close platform dropdown if open
+      setPlatformDropdownOpen(null);
+    }
+  };
+
+  const handleCgigSelect = async (cgigId: number, field: string, siteId: string) => {
+    try {
+      console.log('Updating citation gig:', { cgigId, field, siteId });
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) throw new Error('User not found');
+
+      const { data: updateData, error: updateError } = await supabase
+        .from('sitespren')
+        .update({ [field]: cgigId })
+        .eq('id', siteId)
+        .eq('fk_users_id', userData.id)
+        .select();
+
+      console.log('Update response:', { updateData, updateError });
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      setSites(sites.map(site => 
+        site.id === siteId 
+          ? { ...site, [field]: cgigId }
+          : site
+      ));
+
+      setCgigDropdownOpen(null);
+    } catch (err) {
+      console.error('Error updating citation gig:', err);
+      alert(`Failed to update citation gig: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
   // Pagination controls component
   const PaginationControls = () => (
     <div className="flex items-center space-x-4">
@@ -719,9 +992,32 @@ export default function DriggsmanTable() {
 
   return (
     <div className="px-6 py-4">
-      {/* Nubra Tableface Kite */}
-      <div className="mb-2">
-        <NubraTablefaceKite tableType="driggsman-site-matrix" />
+      {/* Drenjari Navigation Links */}
+      <DrenjariButtonBarDriggsmanLinks />
+      
+      {/* Nubra Tableface Kite with Control Buttons */}
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <NubraTablefaceKite tableType="driggsman-site-matrix" />
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setShowVerificationColumn(!showVerificationColumn)}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              showVerificationColumn ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+            }`}
+          >
+            show verification column
+          </button>
+          <button
+            onClick={() => setShowCompetitorSites(!showCompetitorSites)}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              showCompetitorSites ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+            }`}
+          >
+            show competitor sites
+          </button>
+        </div>
       </div>
 
       {/* Debug Info */}
@@ -882,7 +1178,20 @@ export default function DriggsmanTable() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedFields.map((field) => (
-                <tr key={field.key} className="hover:bg-gray-50">
+                <tr 
+                  key={field.key} 
+                  className={`hover:bg-gray-50 ${
+                    field.key === 'driggs_phone_1' ? 'border-b-4 border-b-black' : ''
+                  } ${
+                    field.key === 'driggs_address_full' ? 'border-b-4 border-b-black' : ''
+                  } ${
+                    field.key === 'driggs_cgig_id' ? 'border-b-4 border-b-black' : ''
+                  } ${
+                    field.key === 'driggs_industry' ? 'border-t-4 border-t-black' : ''
+                  } ${
+                    field.key === 'driggs_special_note_for_ai_tool' ? 'border-b-4 border-b-black' : ''
+                  }`}
+                >
                   {/* Field selection checkbox */}
                   <td 
                     className="w-12 px-2 py-2 cursor-pointer border-r border-gray-300"
@@ -907,6 +1216,7 @@ export default function DriggsmanTable() {
                   {paginatedSites.map((site, index) => {
                     const value = site[field.key];
                     const isEditing = editingCell?.field === field.key && editingCell?.siteId === site.id;
+                    const isDropdownOpen = platformDropdownOpen?.field === field.key && platformDropdownOpen?.siteId === site.id;
 
                     if (field.type === 'boolean') {
                       return (
@@ -929,38 +1239,356 @@ export default function DriggsmanTable() {
                       );
                     }
 
+                    if (field.type === 'platform_dropdown') {
+                      return (
+                        <td
+                          key={`${field.key}-${site.id}`}
+                          className={`px-3 py-2 text-sm text-gray-900 relative w-80 ${
+                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                          }`}
+                        >
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={() => handlePlatformDropdownClick(field.key, site.id)}
+                              className={`px-2 py-1 text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                                !value || getPlatformName(value as number) === 'None' 
+                                  ? 'bg-gray-50 hover:bg-gray-100 text-gray-900' 
+                                  : ''
+                              }`}
+                              style={{
+                                width: '180px',
+                                ...(value && getPlatformName(value as number) !== 'None'
+                                  ? { 
+                                      backgroundColor: '#2c7633',
+                                      color: '#fff',
+                                      fontWeight: 'bold'
+                                    }
+                                  : {})
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="truncate">{getPlatformName(value as number)}</span>
+                                <span className="ml-1">▼</span>
+                              </div>
+                            </button>
+                            
+                            {/* Square buttons 1-5 */}
+                            <div className="flex space-x-1">
+                              {[1, 2, 3, 4, 5].map((num) => (
+                                <button
+                                  key={num}
+                                  onClick={() => {
+                                    // TODO: Add functionality later
+                                    console.log(`Button ${num} clicked for site ${site.id}`);
+                                  }}
+                                  className="w-8 h-8 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded text-xs font-medium text-gray-700 flex items-center justify-center transition-colors"
+                                >
+                                  {num}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Dropdown Menu */}
+                          {isDropdownOpen && (
+                            <div className="absolute top-full left-0 mt-1 w-96 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                              <div className="p-3">
+                                <div className="text-xs font-medium text-gray-700 mb-2">Select Call Platform:</div>
+                                
+                                {/* None Option */}
+                                <button
+                                  onClick={() => handlePlatformSelect(site.id, null)}
+                                  className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded mb-1"
+                                >
+                                  <div className="font-medium text-gray-600">None</div>
+                                  <div className="text-xs text-gray-500">No platform assigned</div>
+                                </button>
+
+                                {/* Platform Table */}
+                                {callPlatforms.length > 0 ? (
+                                  <div className="border border-gray-200 rounded">
+                                    <div className="max-h-64 overflow-y-auto">
+                                      <table className="w-full text-xs">
+                                        <thead className="bg-gray-50 sticky top-0">
+                                          <tr>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Name</th>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">URL</th>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">API</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {callPlatforms.map((platform) => (
+                                            <tr
+                                              key={platform.platform_id}
+                                              className="hover:bg-blue-50 cursor-pointer border-t border-gray-100"
+                                              onClick={() => handlePlatformSelect(site.id, platform.platform_id)}
+                                            >
+                                              <td className="px-2 py-2">
+                                                <div className="font-medium text-gray-900">{platform.platform_name}</div>
+                                                <div className="text-gray-500">ID: {platform.platform_id}</div>
+                                              </td>
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-24" title={platform.platform_url || ''}>
+                                                  {platform.platform_url || '-'}
+                                                </div>
+                                              </td>
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-24" title={platform.api_endpoint || ''}>
+                                                  {platform.api_endpoint || '-'}
+                                                </div>
+                                              </td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="text-center py-4 text-gray-500">
+                                    <div>No call platforms found</div>
+                                    <div className="text-xs mt-1">Add platforms in /callplatjar</div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      );
+                    }
+
+                    if (field.type === 'cgig_dropdown') {
+                      const isCgigDropdownOpen = cgigDropdownOpen?.field === field.key && cgigDropdownOpen?.siteId === site.id;
+                      return (
+                        <td
+                          key={`${field.key}-${site.id}`}
+                          className={`px-3 py-2 text-sm text-gray-900 relative w-96 ${
+                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                          }`}
+                        >
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={() => handleCgigDropdownClick(field.key, site.id)}
+                              className={`px-2 py-1 text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                                !value || getCitationGigName(value as number) === 'None' 
+                                  ? 'bg-gray-50 hover:bg-gray-100 text-gray-900' 
+                                  : ''
+                              }`}
+                              style={{
+                                width: '350px',
+                                ...(value && getCitationGigName(value as number) !== 'None'
+                                  ? { 
+                                      backgroundColor: '#f8d1f5',
+                                      color: '#1d1d1d',
+                                      fontWeight: 'bold'
+                                    }
+                                  : {})
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="truncate">
+                                  {value && getCitationGigName(value as number) !== 'None' 
+                                    ? getCitationGigDetails(value as number)
+                                    : getCitationGigName(value as number)
+                                  }
+                                </span>
+                                <span className="ml-1">▼</span>
+                              </div>
+                            </button>
+                            
+                            {/* Square buttons 1-5 for citation gigs */}
+                            <div className="flex space-x-1">
+                              {[1, 2, 3, 4, 5].map((num) => {
+                                if (num === 1) {
+                                  return (
+                                    <Link
+                                      key={num}
+                                      href="/cgigjar"
+                                      className="w-8 h-8 bg-gray-200 border border-gray-400 rounded text-xs font-medium text-gray-700 flex items-center justify-center transition-colors cursor-pointer hover:bg-yellow-300"
+                                      style={{ hover: { backgroundColor: '#f1dcab' } }}
+                                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1dcab'}
+                                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
+                                    >
+                                      {num}
+                                    </Link>
+                                  );
+                                }
+                                
+                                return (
+                                  <button
+                                    key={num}
+                                    onClick={() => {
+                                      // TODO: Add functionality later
+                                      console.log(`Citation gig button ${num} clicked for site ${site.id}`);
+                                    }}
+                                    className="w-8 h-8 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded text-xs font-medium text-gray-700 flex items-center justify-center transition-colors"
+                                  >
+                                    {num}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Citation Gig Dropdown Menu */}
+                          {isCgigDropdownOpen && (
+                            <div className="absolute top-full left-0 mt-1 w-96 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                              <div className="p-3">
+                                <div className="text-sm font-medium text-gray-700 mb-2">Select Citation Gig</div>
+                                
+                                {/* None Option */}
+                                <button
+                                  onClick={() => handleCgigSelect(null, field.key, site.id)}
+                                  className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded mb-1"
+                                >
+                                  <div className="font-medium text-gray-600">None</div>
+                                  <div className="text-xs text-gray-500">No citation gig assigned</div>
+                                </button>
+
+                                {/* Citation Gigs Table */}
+                                {citationGigs.length > 0 ? (
+                                  <div className="border border-gray-200 rounded">
+                                    <div className="max-h-64 overflow-y-auto">
+                                      <table className="w-full text-xs">
+                                        <thead className="bg-gray-50 sticky top-0">
+                                          <tr>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Title</th>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Seller</th>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Price</th>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Citations</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {citationGigs.map((gig) => (
+                                            <tr
+                                              key={gig.cgig_id}
+                                              onClick={() => handleCgigSelect(gig.cgig_id, field.key, site.id)}
+                                              className="hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            >
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-32" title={gig.cgig_title}>
+                                                  {gig.cgig_title}
+                                                </div>
+                                              </td>
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-24" title={gig.seller_name}>
+                                                  {gig.seller_name}
+                                                </div>
+                                              </td>
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-16" title={`${gig.base_price} ${gig.currency}`}>
+                                                  ${gig.base_price}
+                                                </div>
+                                              </td>
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-16" title={`${gig.citations_included || 0} citations`}>
+                                                  {gig.citations_included || 0}
+                                                </div>
+                                              </td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="text-center py-4 text-gray-500">
+                                    <div>No citation gigs found</div>
+                                    <div className="text-xs mt-1">Add gigs in /cgigjar</div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      );
+                    }
+
                     return (
                       <td
                         key={`${field.key}-${site.id}`}
-                        className={`px-3 py-2 text-sm text-gray-900 cursor-pointer w-48 ${
+                        className={`px-3 py-2 text-sm text-gray-900 ${
+                          field.key === 'driggs_phone_1' ? 'w-80' : 'cursor-pointer w-48'
+                        } ${
                           index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
                         }`}
-                        onClick={() => !isEditing && handleCellClick(field.key, site.id, value)}
+                        onClick={() => field.key !== 'driggs_phone_1' && !isEditing && handleCellClick(field.key, site.id, value)}
                       >
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            value={editingValue}
-                            onChange={(e) => setEditingValue(e.target.value)}
-                            onBlur={handleCellSave}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') handleCellSave();
-                              if (e.key === 'Escape') {
-                                setEditingCell(null);
-                                setEditingValue('');
-                              }
-                            }}
-                            className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            autoFocus
-                          />
-                        ) : (
-                          <div className="truncate">
-                            {field.type === 'timestamp' && value
-                              ? new Date(value).toLocaleString()
-                              : field.key === 'driggs_phone_1' && value
-                              ? formatPhoneNumber(value.toString())
-                              : value?.toString() || '-'}
+                        {field.key === 'driggs_phone_1' ? (
+                          <div className="flex items-center space-x-1">
+                            <div 
+                              className="cursor-pointer"
+                              onClick={() => !isEditing && handleCellClick(field.key, site.id, value)}
+                              style={{ width: '180px' }}
+                            >
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={editingValue}
+                                  onChange={(e) => setEditingValue(e.target.value)}
+                                  onBlur={handleCellSave}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleCellSave();
+                                    if (e.key === 'Escape') {
+                                      setEditingCell(null);
+                                      setEditingValue('');
+                                    }
+                                  }}
+                                  className={`w-full px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                                    editingValue ? 'bg-[#cfebf9]' : ''
+                                  }`}
+                                  autoFocus
+                                />
+                              ) : (
+                                <div className={`truncate ${
+                                  value ? 'bg-[#cfebf9] px-2 py-1 rounded' : ''
+                                }`}>
+                                  {value ? formatPhoneNumber(value.toString()) : '-'}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Square buttons 1-5 for phone */}
+                            <div className="flex space-x-1">
+                              {[1, 2, 3, 4, 5].map((num) => (
+                                <button
+                                  key={num}
+                                  onClick={() => {
+                                    // TODO: Add functionality later
+                                    console.log(`Phone button ${num} clicked for site ${site.id}`);
+                                  }}
+                                  className="w-8 h-8 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded text-xs font-medium text-gray-700 flex items-center justify-center transition-colors"
+                                >
+                                  {num}
+                                </button>
+                              ))}
+                            </div>
                           </div>
+                        ) : (
+                          <>
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onBlur={handleCellSave}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleCellSave();
+                                  if (e.key === 'Escape') {
+                                    setEditingCell(null);
+                                    setEditingValue('');
+                                  }
+                                }}
+                                className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                autoFocus
+                              />
+                            ) : (
+                              <div className="truncate">
+                                {field.type === 'timestamp' && value
+                                  ? new Date(value).toLocaleString()
+                                  : value?.toString() || '-'}
+                              </div>
+                            )}
+                          </>
                         )}
                       </td>
                     );

@@ -14,127 +14,63 @@ const DrenjariButtonBarDriggsmanLinks = dynamic(
   { ssr: false }
 );
 
-interface CitationGig {
-  cgig_id: number;
-  user_id: string | null;
-  cgig_title: string;
-  cgig_description: string | null;
-  seller_name: string;
-  seller_profile_url: string | null;
-  cgig_url: string;
-  marketplace: string;
-  marketplace_category: string | null;
-  inputs_v1: string | null;
-  inputs_v2: string | null;
-  inputs_v3: string | null;
-  base_price: number;
-  currency: string;
-  citations_included: number | null;
-  turnaround_days: number | null;
-  seller_rating: number | null;
-  total_reviews: number;
-  da_range: string | null;
-  provides_report: boolean;
-  quality_score: number | null;
-  orders_placed: number;
-  last_order_date: string | null;
+interface CallPlatform {
+  platform_id: number;
+  platform_name: string;
+  platform_url: string | null;
+  api_endpoint: string | null;
+  api_key_encrypted: string | null;
   is_active: boolean;
-  internal_notes: string | null;
-  icon_name: string | null;
-  icon_color: string | null;
+  user_id: string;
   created_at: string;
   updated_at: string;
 }
 
-export default function CgigjarTable() {
-  const [data, setData] = useState<CitationGig[]>([]);
+export default function CallPlatjarTable() {
+  const [data, setData] = useState<CallPlatform[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [sortField, setSortField] = useState<keyof CitationGig>('created_at');
+  const [sortField, setSortField] = useState<keyof CallPlatform>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<CitationGig | null>(null);
+  const [editingRecord, setEditingRecord] = useState<CallPlatform | null>(null);
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   
-  // Expand popup states
-  const [expandPopup, setExpandPopup] = useState<{ id: number; field: string; value: string } | null>(null);
-  const [expandPopupValue, setExpandPopupValue] = useState<string>('');
-  
   // Form data for creating/editing
   const [formData, setFormData] = useState({
-    cgig_title: '',
-    cgig_description: '',
-    seller_name: '',
-    seller_profile_url: '',
-    cgig_url: '',
-    marketplace: 'fiverr',
-    marketplace_category: '',
-    inputs_v1: '',
-    inputs_v2: '',
-    inputs_v3: '',
-    base_price: 0,
-    currency: 'USD',
-    citations_included: 0,
-    turnaround_days: 0,
-    seller_rating: 0,
-    total_reviews: 0,
-    da_range: '',
-    provides_report: true,
-    quality_score: 0,
-    orders_placed: 0,
-    last_order_date: '',
-    is_active: true,
-    internal_notes: '',
-    icon_name: '',
-    icon_color: ''
+    platform_name: '',
+    platform_url: '',
+    api_endpoint: '',
+    api_key_encrypted: '',
+    is_active: true
   });
   
   const supabase = createClientComponentClient();
   
   // Column definitions
   const columns: Array<{ 
-    key: keyof CitationGig; 
+    key: keyof CallPlatform; 
     type: string; 
     width: string; 
     label: string;
   }> = [
-    { key: 'cgig_id', type: 'integer', width: '80px', label: 'cgig_id' },
-    { key: 'user_id', type: 'text', width: '100px', label: 'user_id' },
-    { key: 'cgig_title', type: 'text', width: '250px', label: 'cgig_title' },
-    { key: 'cgig_description', type: 'text', width: '300px', label: 'cgig_description' },
-    { key: 'seller_name', type: 'text', width: '150px', label: 'seller_name' },
-    { key: 'seller_profile_url', type: 'text', width: '200px', label: 'seller_profile_url' },
-    { key: 'cgig_url', type: 'text', width: '200px', label: 'cgig_url' },
-    { key: 'marketplace', type: 'text', width: '120px', label: 'marketplace' },
-    { key: 'marketplace_category', type: 'text', width: '150px', label: 'marketplace_category' },
-    { key: 'inputs_v1', type: 'text', width: '120px', label: 'inputs_v1' },
-    { key: 'inputs_v2', type: 'text', width: '120px', label: 'inputs_v2' },
-    { key: 'inputs_v3', type: 'text', width: '120px', label: 'inputs_v3' },
-    { key: 'base_price', type: 'number', width: '100px', label: 'base_price' },
-    { key: 'currency', type: 'text', width: '80px', label: 'currency' },
-    { key: 'citations_included', type: 'integer', width: '120px', label: 'citations_included' },
-    { key: 'turnaround_days', type: 'integer', width: '100px', label: 'turnaround_days' },
-    { key: 'seller_rating', type: 'number', width: '100px', label: 'seller_rating' },
-    { key: 'total_reviews', type: 'integer', width: '100px', label: 'total_reviews' },
-    { key: 'da_range', type: 'text', width: '100px', label: 'da_range' },
-    { key: 'provides_report', type: 'boolean', width: '120px', label: 'provides_report' },
-    { key: 'quality_score', type: 'integer', width: '100px', label: 'quality_score' },
-    { key: 'orders_placed', type: 'integer', width: '100px', label: 'orders_placed' },
-    { key: 'last_order_date', type: 'timestamp', width: '150px', label: 'last_order_date' },
+    { key: 'platform_id', type: 'integer', width: '100px', label: 'platform_id' },
+    { key: 'platform_name', type: 'text', width: '200px', label: 'platform_name' },
+    { key: 'platform_url', type: 'text', width: '250px', label: 'platform_url' },
+    { key: 'api_endpoint', type: 'text', width: '250px', label: 'api_endpoint' },
+    { key: 'api_key_encrypted', type: 'text', width: '200px', label: 'api_key_encrypted' },
     { key: 'is_active', type: 'boolean', width: '100px', label: 'is_active' },
-    { key: 'internal_notes', type: 'text', width: '250px', label: 'internal_notes' },
-    { key: 'icon_name', type: 'text', width: '120px', label: 'icon_name' },
-    { key: 'icon_color', type: 'text', width: '120px', label: 'icon_color' },
+    { key: 'user_id', type: 'text', width: '120px', label: 'user_id' },
     { key: 'created_at', type: 'timestamp', width: '180px', label: 'created_at' },
     { key: 'updated_at', type: 'timestamp', width: '180px', label: 'updated_at' }
   ];
@@ -169,7 +105,7 @@ export default function CgigjarTable() {
       }
       
       const { data: tableData, error: fetchError } = await supabase
-        .from('citation_gigs')
+        .from('call_platforms')
         .select('*')
         .eq('user_id', userData.id)
         .order('created_at', { ascending: false });
@@ -177,8 +113,8 @@ export default function CgigjarTable() {
       if (fetchError) throw fetchError;
       setData(tableData || []);
     } catch (err) {
-      console.error('Error fetching citation gigs:', err);
-      setError('Failed to fetch citation gigs');
+      console.error('Error fetching call platforms:', err);
+      setError('Failed to fetch call platforms');
     } finally {
       setLoading(false);
     }
@@ -217,7 +153,7 @@ export default function CgigjarTable() {
     : filteredAndSortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   // Handle sort
-  const handleSort = (field: keyof CitationGig) => {
+  const handleSort = (field: keyof CallPlatform) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -231,7 +167,7 @@ export default function CgigjarTable() {
     if (selectedRows.size === paginatedData.length) {
       setSelectedRows(new Set());
     } else {
-      setSelectedRows(new Set(paginatedData.map(item => item.cgig_id)));
+      setSelectedRows(new Set(paginatedData.map(item => item.platform_id)));
     }
   };
 
@@ -281,16 +217,16 @@ export default function CgigjarTable() {
       if (userError || !userData) throw new Error('User not found');
       
       const { error } = await supabase
-        .from('citation_gigs')
+        .from('call_platforms')
         .update({ [field]: processedValue })
-        .eq('cgig_id', id)
+        .eq('platform_id', id)
         .eq('user_id', userData.id);
 
       if (error) throw error;
 
       // Update local data
       setData(data.map(item => 
-        item.cgig_id === id ? { ...item, [field]: processedValue } : item
+        item.platform_id === id ? { ...item, [field]: processedValue } : item
       ));
 
       setEditingCell(null);
@@ -301,52 +237,7 @@ export default function CgigjarTable() {
     }
   };
 
-  // Handle expand popup
-  const handleExpandClick = (id: number, field: string, value: string) => {
-    setExpandPopup({ id, field, value });
-    setExpandPopupValue(value || '');
-  };
-
-  const handleExpandSave = async () => {
-    if (!expandPopup) return;
-
-    try {
-      const { id, field } = expandPopup;
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) throw new Error('User not authenticated');
-
-      // Get internal user ID
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-
-      if (userError || !userData) throw new Error('User not found');
-      
-      const { error } = await supabase
-        .from('citation_gigs')
-        .update({ [field]: expandPopupValue })
-        .eq('cgig_id', id)
-        .eq('user_id', userData.id);
-
-      if (error) throw error;
-
-      // Update local data
-      setData(data.map(item => 
-        item.cgig_id === id ? { ...item, [field]: expandPopupValue } : item
-      ));
-
-      setExpandPopup(null);
-      setExpandPopupValue('');
-    } catch (err) {
-      console.error('Error updating field:', err);
-      alert('Failed to update field');
-    }
-  };
-
-  const handleBooleanToggle = async (id: number, field: keyof CitationGig, currentValue: boolean) => {
+  const handleBooleanToggle = async (id: number, field: keyof CallPlatform, currentValue: boolean) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.id) throw new Error('User not authenticated');
@@ -361,16 +252,16 @@ export default function CgigjarTable() {
       if (userError || !userData) throw new Error('User not found');
       
       const { error } = await supabase
-        .from('citation_gigs')
+        .from('call_platforms')
         .update({ [field]: !currentValue })
-        .eq('cgig_id', id)
+        .eq('platform_id', id)
         .eq('user_id', userData.id);
 
       if (error) throw error;
 
       // Update local data
       setData(data.map(item => 
-        item.cgig_id === id ? { ...item, [field]: !currentValue } : item
+        item.platform_id === id ? { ...item, [field]: !currentValue } : item
       ));
     } catch (err) {
       console.error('Error toggling boolean:', err);
@@ -384,7 +275,7 @@ export default function CgigjarTable() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.id) throw new Error('User not authenticated');
 
-      // Get internal user ID from users table
+      // Get internal user ID
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
@@ -395,21 +286,15 @@ export default function CgigjarTable() {
       
       const newRow = {
         user_id: userData.id,
-        cgig_title: 'New Citation Gig',
-        cgig_description: '',
-        seller_name: 'New Seller',
-        cgig_url: 'https://example.com',
-        marketplace: 'fiverr',
-        base_price: 0,
-        currency: 'USD',
-        provides_report: true,
-        total_reviews: 0,
-        orders_placed: 0,
+        platform_name: 'New Platform',
+        platform_url: 'https://example.com',
+        api_endpoint: '',
+        api_key_encrypted: '',
         is_active: true
       };
 
       const { data: createdData, error } = await supabase
-        .from('citation_gigs')
+        .from('call_platforms')
         .insert([newRow])
         .select()
         .single();
@@ -418,9 +303,9 @@ export default function CgigjarTable() {
 
       setData([createdData, ...data]);
       
-      // Start editing the title of the new row
+      // Start editing the platform_name of the new row
       setTimeout(() => {
-        handleCellClick(createdData.cgig_id, 'cgig_title', createdData.cgig_title);
+        handleCellClick(createdData.platform_id, 'platform_name', createdData.platform_name);
       }, 100);
     } catch (err) {
       console.error('Error creating row:', err);
@@ -431,28 +316,11 @@ export default function CgigjarTable() {
   // Create new with popup
   const handleCreatePopup = () => {
     setFormData({
-      cgig_title: '',
-      cgig_description: '',
-      seller_name: '',
-      seller_profile_url: '',
-      cgig_url: '',
-      marketplace: 'fiverr',
-      marketplace_category: '',
-      base_price: 0,
-      currency: 'USD',
-      citations_included: 0,
-      turnaround_days: 0,
-      seller_rating: 0,
-      total_reviews: 0,
-      da_range: '',
-      provides_report: true,
-      quality_score: 0,
-      orders_placed: 0,
-      last_order_date: '',
-      is_active: true,
-      internal_notes: '',
-      icon_name: '',
-      icon_color: ''
+      platform_name: '',
+      platform_url: '',
+      api_endpoint: '',
+      api_key_encrypted: '',
+      is_active: true
     });
     setIsCreateModalOpen(true);
   };
@@ -472,7 +340,7 @@ export default function CgigjarTable() {
       if (userError || !userData) throw new Error('User not found');
       
       const { data: createdData, error } = await supabase
-        .from('citation_gigs')
+        .from('call_platforms')
         .insert([{ ...formData, user_id: userData.id }])
         .select()
         .single();
@@ -482,8 +350,8 @@ export default function CgigjarTable() {
       setData([createdData, ...data]);
       setIsCreateModalOpen(false);
     } catch (err) {
-      console.error('Error creating citation gig:', err);
-      alert('Failed to create citation gig');
+      console.error('Error creating call platform:', err);
+      alert('Failed to create call platform');
     }
   };
 
@@ -507,14 +375,14 @@ export default function CgigjarTable() {
       if (userError || !userData) throw new Error('User not found');
       
       const { error } = await supabase
-        .from('citation_gigs')
+        .from('call_platforms')
         .delete()
-        .in('cgig_id', Array.from(selectedRows))
+        .in('platform_id', Array.from(selectedRows))
         .eq('user_id', userData.id);
 
       if (error) throw error;
 
-      setData(data.filter(item => !selectedRows.has(item.cgig_id)));
+      setData(data.filter(item => !selectedRows.has(item.platform_id)));
       setSelectedRows(new Set());
     } catch (err) {
       console.error('Error deleting rows:', err);
@@ -634,7 +502,7 @@ export default function CgigjarTable() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading citation gigs...</div>
+        <div className="text-gray-500">Loading call platforms...</div>
       </div>
     );
   }
@@ -654,7 +522,7 @@ export default function CgigjarTable() {
       
       {/* Nubra Tableface Kite */}
       <div className="mb-2">
-        <NubraTablefaceKite tableType="cgigjar-citation-gigs" />
+        <NubraTablefaceKite tableType="callplatjar-call-platforms" />
       </div>
 
       {/* Top Controls */}
@@ -700,7 +568,7 @@ export default function CgigjarTable() {
                       type="checkbox"
                       checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
                       onChange={() => {}}
-                      className="w-5 h-5 rounded border-gray-300 focus:outline-none"
+                      className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                       style={{ width: '20px', height: '20px' }}
                     />
                   </div>
@@ -709,11 +577,7 @@ export default function CgigjarTable() {
                 {columns.map((column) => (
                   <th
                     key={column.key}
-                    className={`px-3 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 ${
-                      column.key === 'inputs_v1' ? 'border-l-2 border-l-black' : ''
-                    } ${
-                      column.key === 'inputs_v3' ? 'border-r-2 border-r-black' : ''
-                    }`}
+                    className="px-3 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
                     style={{ width: column.width, minWidth: column.width }}
                     onClick={() => handleSort(column.key)}
                   >
@@ -729,18 +593,18 @@ export default function CgigjarTable() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedData.map((row) => (
-                <tr key={row.cgig_id} className="hover:bg-gray-50">
+                <tr key={row.platform_id} className="hover:bg-gray-50">
                   {/* Checkbox */}
                   <td 
                     className="w-12 px-2 py-2 cursor-pointer"
-                    onClick={() => handleRowSelect(row.cgig_id)}
+                    onClick={() => handleRowSelect(row.platform_id)}
                   >
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
-                        checked={selectedRows.has(row.cgig_id)}
+                        checked={selectedRows.has(row.platform_id)}
                         onChange={() => {}}
-                        className="w-5 h-5 rounded border-gray-300 focus:outline-none"
+                        className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                         style={{ width: '20px', height: '20px' }}
                       />
                     </div>
@@ -748,23 +612,16 @@ export default function CgigjarTable() {
                   {/* Data cells */}
                   {columns.map((column) => {
                     const value = row[column.key];
-                    const isEditing = editingCell?.id === row.cgig_id && editingCell?.field === column.key;
+                    const isEditing = editingCell?.id === row.platform_id && editingCell?.field === column.key;
 
                     if (column.type === 'boolean') {
                       return (
-                        <td 
-                          key={column.key} 
-                          className={`px-3 py-2 text-sm text-gray-900 ${
-                            column.key === 'inputs_v1' ? 'border-l-2 border-l-black' : ''
-                          } ${
-                            column.key === 'inputs_v3' ? 'border-r-2 border-r-black' : ''
-                          }`}
-                        >
+                        <td key={column.key} className="px-3 py-2 text-sm text-gray-900">
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input
                               type="checkbox"
                               checked={!!value}
-                              onChange={() => handleBooleanToggle(row.cgig_id, column.key, !!value)}
+                              onChange={() => handleBooleanToggle(row.platform_id, column.key, !!value)}
                               className="sr-only peer"
                             />
                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -773,41 +630,11 @@ export default function CgigjarTable() {
                       );
                     }
 
-                    // Special handling for inputs_v* columns
-                    if (column.key.startsWith('inputs_v')) {
-                      return (
-                        <td
-                          key={column.key}
-                          className={`px-3 py-2 text-sm text-gray-900 ${
-                            column.key === 'inputs_v1' ? 'border-l-2 border-l-black' : ''
-                          } ${
-                            column.key === 'inputs_v3' ? 'border-r-2 border-r-black' : ''
-                          }`}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <div className="truncate flex-1">
-                              {value ? value.toString().substring(0, 10) + (value.toString().length > 10 ? '...' : '') : '-'}
-                            </div>
-                            <button
-                              onClick={() => handleExpandClick(row.cgig_id, column.key, value?.toString() || '')}
-                              className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-xs rounded transition-colors"
-                            >
-                              expand
-                            </button>
-                          </div>
-                        </td>
-                      );
-                    }
-
                     return (
                       <td
                         key={column.key}
-                        className={`px-3 py-2 text-sm text-gray-900 cursor-pointer ${
-                          column.key === 'inputs_v1' ? 'border-l-2 border-l-black' : ''
-                        } ${
-                          column.key === 'inputs_v3' ? 'border-r-2 border-r-black' : ''
-                        }`}
-                        onClick={() => !isEditing && handleCellClick(row.cgig_id, column.key, value)}
+                        className="px-3 py-2 text-sm text-gray-900 cursor-pointer"
+                        onClick={() => !isEditing && handleCellClick(row.platform_id, column.key, value)}
                       >
                         {isEditing ? (
                           <input
@@ -850,104 +677,71 @@ export default function CgigjarTable() {
         <PaginationControls />
       </div>
 
-      {/* Expand Popup Modal */}
-      {expandPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div 
-            className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col"
-            style={{ width: '800px', height: '100vh' }}
-          >
-            {/* Header with Save button */}
-            <div className="px-6 py-4 border-b bg-gray-50 flex items-center justify-between">
-              <h2 className="text-xl font-bold">
-                {expandPopup.field.replace('_', ' ').toUpperCase()}
-              </h2>
-              <div className="flex space-x-3">
-                <button
-                  onClick={handleExpandSave}
-                  className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-800 transition-colors font-medium"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => {
-                    setExpandPopup(null);
-                    setExpandPopupValue('');
-                  }}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-            
-            {/* Content area */}
-            <div className="flex-1 p-6">
-              <textarea
-                value={expandPopupValue}
-                onChange={(e) => setExpandPopupValue(e.target.value)}
-                className="w-full h-full resize-none border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder={`Enter ${expandPopup.field.replace('_', ' ')} content...`}
-                style={{ minHeight: 'calc(100vh - 140px)' }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Create/Edit Modal */}
       {(isCreateModalOpen || isEditModalOpen) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">
-              {isCreateModalOpen ? 'Create Citation Gig' : 'Edit Citation Gig'}
+              {isCreateModalOpen ? 'Create Call Platform' : 'Edit Call Platform'}
             </h2>
             
-            <div className="grid grid-cols-2 gap-4">
-              {Object.entries(formData).map(([key, value]) => {
-                const column = columns.find(col => col.key === key);
-                if (!column) return null;
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Platform Name</label>
+                <input
+                  type="text"
+                  value={formData.platform_name}
+                  onChange={(e) => setFormData({ ...formData, platform_name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Ringba"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Platform URL</label>
+                <input
+                  type="text"
+                  value={formData.platform_url}
+                  onChange={(e) => setFormData({ ...formData, platform_url: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="https://ringba.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">API Endpoint</label>
+                <input
+                  type="text"
+                  value={formData.api_endpoint}
+                  onChange={(e) => setFormData({ ...formData, api_endpoint: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="https://api.ringba.com/v1"
+                />
+              </div>
 
-                if (column.type === 'boolean') {
-                  return (
-                    <div key={key} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id={key}
-                        checked={value as boolean}
-                        onChange={(e) => setFormData({ ...formData, [key]: e.target.checked })}
-                        className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                      />
-                      <label htmlFor={key} className="text-sm font-medium text-gray-700">
-                        {column.label}
-                      </label>
-                    </div>
-                  );
-                }
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">API Key (Encrypted)</label>
+                <input
+                  type="password"
+                  value={formData.api_key_encrypted}
+                  onChange={(e) => setFormData({ ...formData, api_key_encrypted: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Enter API key"
+                />
+              </div>
 
-                return (
-                  <div key={key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {column.label}
-                    </label>
-                    {key.includes('description') || key.includes('notes') ? (
-                      <textarea
-                        value={value as string}
-                        onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        rows={3}
-                      />
-                    ) : (
-                      <input
-                        type={column.type === 'integer' || column.type === 'number' ? 'number' : 'text'}
-                        value={value as string | number}
-                        onChange={(e) => setFormData({ ...formData, [key]: column.type === 'integer' || column.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      />
-                    )}
-                  </div>
-                );
-              })}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  checked={formData.is_active}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+                  Active
+                </label>
+              </div>
             </div>
 
             <div className="mt-6 flex justify-end space-x-3">
