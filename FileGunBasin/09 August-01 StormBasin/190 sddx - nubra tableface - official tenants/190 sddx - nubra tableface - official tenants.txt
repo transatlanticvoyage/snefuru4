@@ -5,7 +5,7 @@
 		NUBRA TABLEFACES - MAIN TENANTS
 		==========================================================
 		for our page at 
-variable per page:	--	/tshelljar
+        /cgigjar
 		
 		———————————————————————
 		please create a robust ui table grid system, and build something similar to what is on our current page at /xpagesmanager1
@@ -14,7 +14,7 @@ variable per page:	--	/tshelljar
 		
 		
 		please make sure that every column in this ui table contains every db column from db table:
-variable per page:	--	tableshells
+        yegdbc
 		
 		———————————————————————
 		please make sure there is a checkbox in the far left column of this ui table
