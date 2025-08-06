@@ -39,6 +39,7 @@ interface SitesprenSite {
   driggs_site_type_purpose: string | null;
   driggs_email_1: string | null;
   driggs_address_full: string | null;
+  driggs_address_species_id: number | null;
   driggs_phone_1: string | null;
   driggs_phone1_platform_id: number | null;
   driggs_cgig_id: number | null;
@@ -50,6 +51,7 @@ interface SitesprenSite {
   icon_name: string | null;
   icon_color: string | null;
   is_bulldozer: boolean | null;
+  is_competitor: boolean | null;
 }
 
 interface CallPlatform {
@@ -62,6 +64,17 @@ interface CallPlatform {
   user_id: string;
   created_at: string;
   updated_at: string;
+}
+
+interface AddressSpecies {
+  aspecies_id: number;
+  aspecies_name: string | null;
+  aspecies_code: string | null;
+  address_format: string | null;
+  country_code: string | null;
+  is_active: boolean | null;
+  created_at: string;
+  updated_at: string | null;
 }
 
 interface CitationGig {
@@ -120,6 +133,18 @@ export default function DriggsmanTable() {
   const [citationGigs, setCitationGigs] = useState<CitationGig[]>([]);
   const [cgigDropdownOpen, setCgigDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
   
+  // Address species dropdown states
+  const [addressSpecies, setAddressSpecies] = useState<AddressSpecies[]>([]);
+  const [addressSpeciesDropdownOpen, setAddressSpeciesDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+  
+  // Selected sites for table filtering
+  // TODO: Implement URL state persistence using one of these approaches:
+  // 1. Simple: ?selected=site1,site2,site3 (readable but can get long)
+  // 2. Encoded: ?penja=9284jsiweu294824 (short but requires mapping)
+  // 3. Base64: ?state=eyJ0YWciOiJ0YWduYW1lIn0= (middle ground)
+  // 4. Hybrid: Use simple for <5 sites, encoded for larger selections
+  const [selectedSiteIds, setSelectedSiteIds] = useState<Set<string>>(new Set());
+  
   // Inputs expand editor states
   const [inputsExpandPopup, setInputsExpandPopup] = useState<{ 
     cgigId: number; 
@@ -151,6 +176,35 @@ export default function DriggsmanTable() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Site selection functions
+  const toggleSiteSelection = (siteId: string) => {
+    console.log('Toggle site selection:', siteId);
+    setSelectedSiteIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(siteId)) {
+        newSet.delete(siteId);
+        console.log('Removed site from selection:', siteId);
+      } else {
+        newSet.add(siteId);
+        console.log('Added site to selection:', siteId);
+      }
+      console.log('New selection set size:', newSet.size);
+      return newSet;
+    });
+  };
+
+  const selectAllTaggedSites = () => {
+    console.log('Select all tagged sites - count:', taggedSites.length);
+    const allSiteIds = taggedSites.map(site => site.id);
+    console.log('Site IDs to select:', allSiteIds);
+    setSelectedSiteIds(new Set(allSiteIds));
+  };
+
+  const deselectAllTaggedSites = () => {
+    console.log('Deselect all tagged sites');
+    setSelectedSiteIds(new Set());
+  };
+
   // Phone number formatting functions
   const normalizePhoneNumber = (phone: string): string => {
     // Remove all non-digit characters
@@ -172,9 +226,11 @@ export default function DriggsmanTable() {
     label: string;
     group?: string;
   }> = [
+    { key: 'driggs_revenue_goal', type: 'number', label: 'driggs_revenue_goal', group: 'business' },
     { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
     { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
     { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
+    { key: 'driggs_address_species_id', type: 'address_species_dropdown', label: 'driggs_address_species_id', group: 'contact' },
     { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
     { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
     { key: 'driggs_city', type: 'text', label: 'driggs_city', group: 'business' },
@@ -182,7 +238,6 @@ export default function DriggsmanTable() {
     { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
     { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
     { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
-    { key: 'driggs_revenue_goal', type: 'number', label: 'driggs_revenue_goal', group: 'business' },
     { key: 'id', type: 'text', label: 'id', group: 'system' },
     { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
     { key: 'updated_at', type: 'timestamp', label: 'updated_at', group: 'system' },
@@ -203,7 +258,8 @@ export default function DriggsmanTable() {
     { key: 'is_starred1', type: 'text', label: 'is_starred1', group: 'meta' },
     { key: 'icon_name', type: 'text', label: 'icon_name', group: 'display' },
     { key: 'icon_color', type: 'text', label: 'icon_color', group: 'display' },
-    { key: 'is_bulldozer', type: 'boolean', label: 'is_bulldozer', group: 'meta' }
+    { key: 'is_bulldozer', type: 'boolean', label: 'is_bulldozer', group: 'meta' },
+    { key: 'is_competitor', type: 'boolean', label: 'is_competitor', group: 'meta' }
   ];
   
   // Initialize manual sites from URL parameter
@@ -221,11 +277,21 @@ export default function DriggsmanTable() {
     fetchSites();
     fetchCallPlatforms();
     fetchCitationGigs();
+    fetchAddressSpecies();
     fetchSitesprenTags();
   }, []);
 
   // Re-filter sites when manual sites change or filtering states change
   useEffect(() => {
+    console.log('Filtering effect triggered:', {
+      allSitesLength: allSites.length,
+      useDaylightFilter,
+      useRainFilter, 
+      taggedSitesLength: taggedSites.length,
+      selectedSiteIdsSize: selectedSiteIds.size,
+      selectedSiteIds: Array.from(selectedSiteIds)
+    });
+    
     if (allSites.length > 0) {
       if (useDaylightFilter && manualSites.length > 0) {
         // Use daylight chamber filtering (manual sites)
@@ -235,25 +301,30 @@ export default function DriggsmanTable() {
             site.true_root_domain?.toLowerCase().includes(manualSite.toLowerCase())
           )
         );
+        console.log('Daylight filtering - setting sites:', filteredSites.length);
         setSites(filteredSites);
       } else if (useRainFilter && taggedSites.length > 0) {
-        // Use rain chamber filtering (tagged sites)
-        setSites(taggedSites);
+        // Use rain chamber filtering (tagged sites) - only show selected sites
+        const filteredTaggedSites = taggedSites.filter(site => selectedSiteIds.has(site.id));
+        console.log('Rain filtering - setting sites:', filteredTaggedSites.length, 'from tagged sites:', taggedSites.length, 'selected:', selectedSiteIds.size);
+        setSites(filteredTaggedSites);
       } else {
         // No filtering - show all sites
+        console.log('No filtering - setting all sites:', allSites.length);
         setSites(allSites);
       }
     }
-  }, [manualSites, allSites, useDaylightFilter, useRainFilter, taggedSites]);
+  }, [manualSites, allSites, useDaylightFilter, useRainFilter, taggedSites, selectedSiteIds]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (platformDropdownOpen || cgigDropdownOpen || tagsDropdownOpen) {
+      if (platformDropdownOpen || cgigDropdownOpen || addressSpeciesDropdownOpen || tagsDropdownOpen) {
         const target = event.target as HTMLElement;
         if (!target.closest('.relative')) {
           setPlatformDropdownOpen(null);
           setCgigDropdownOpen(null);
+          setAddressSpeciesDropdownOpen(null);
           setTagsDropdownOpen(false);
         }
       }
@@ -263,7 +334,7 @@ export default function DriggsmanTable() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [platformDropdownOpen, cgigDropdownOpen, tagsDropdownOpen]);
+  }, [platformDropdownOpen, cgigDropdownOpen, addressSpeciesDropdownOpen, tagsDropdownOpen]);
   
   const fetchSites = async () => {
     try {
@@ -404,6 +475,41 @@ export default function DriggsmanTable() {
       setCitationGigs(gigsData || []);
     } catch (err) {
       console.error('Error in fetchCitationGigs:', err);
+    }
+  };
+
+  // Fetch address species
+  const fetchAddressSpecies = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('User not found:', userError);
+        return;
+      }
+
+      const { data: speciesData, error } = await supabase
+        .from('address_species')
+        .select('*')
+        .eq('is_active', true)
+        .order('aspecies_name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching address species:', error);
+        return;
+      }
+
+      setAddressSpecies(speciesData || []);
+    } catch (err) {
+      console.error('Error in fetchAddressSpecies:', err);
     }
   };
 
@@ -881,6 +987,77 @@ export default function DriggsmanTable() {
     return `${truncatedTitle} -- ${gig.seller_name} -- $${gig.base_price} -- ${gig.citations_included || 0} citations`;
   };
 
+  const getAddressSpeciesName = (speciesId: number | null): string => {
+    if (!speciesId) return 'None';
+    const species = addressSpecies.find(s => s.aspecies_id === speciesId);
+    return species ? species.aspecies_name || `Species ${speciesId}` : `Species ${speciesId}`;
+  };
+
+  const getAddressSpeciesDetails = (speciesId: number | null): string => {
+    if (!speciesId) return 'None';
+    const species = addressSpecies.find(s => s.aspecies_id === speciesId);
+    if (!species) return `Species ${speciesId}`;
+    
+    const name = species.aspecies_name || 'Unnamed';
+    const code = species.aspecies_code || 'No code';
+    const country = species.country_code || 'Unknown';
+    
+    return `${name} (${code}) - ${country}`;
+  };
+
+  const handleAddressSpeciesDropdownClick = (field: string, siteId: string) => {
+    if (addressSpeciesDropdownOpen?.field === field && addressSpeciesDropdownOpen?.siteId === siteId) {
+      setAddressSpeciesDropdownOpen(null);
+    } else {
+      setAddressSpeciesDropdownOpen({ field, siteId });
+      // Close other dropdowns if open
+      setPlatformDropdownOpen(null);
+      setCgigDropdownOpen(null);
+    }
+  };
+
+  const handleAddressSpeciesSelect = async (speciesId: number | null, field: string, siteId: string) => {
+    try {
+      console.log('Updating address species:', { speciesId, field, siteId });
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) throw new Error('User not found');
+
+      const { data, error } = await supabase
+        .from('sitespren')
+        .update({ driggs_address_species_id: speciesId })
+        .eq('id', siteId)
+        .eq('fk_users_id', userData.id)
+        .select('id, driggs_address_species_id');
+
+      if (error) {
+        console.error('Supabase update error:', error);
+        throw error;
+      }
+
+      console.log('Update successful:', data);
+
+      // Update local data
+      setSites(sites.map(site => 
+        site.id === siteId ? { ...site, driggs_address_species_id: speciesId } : site
+      ));
+
+      setAddressSpeciesDropdownOpen(null);
+    } catch (err: any) {
+      console.error('Error updating address species:', err);
+      alert(`Failed to update address species: ${err.message}`);
+    }
+  };
+
   const handleCgigDropdownClick = (field: string, siteId: string) => {
     if (cgigDropdownOpen?.field === field && cgigDropdownOpen?.siteId === siteId) {
       setCgigDropdownOpen(null);
@@ -1283,8 +1460,22 @@ export default function DriggsmanTable() {
       
       {/* Nubra Tableface Kite with Control Buttons */}
       <div className="mb-2 flex items-center justify-between">
-        <div>
+        <div className="flex items-center space-x-4">
           <NubraTablefaceKite tableType="driggsman-site-matrix" />
+          <div className="flex items-center bg-gray-100 border border-gray-300 rounded px-3 py-2">
+            <span className="text-sm font-medium text-gray-800">
+              jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m
+            </span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText('jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m');
+              }}
+              className="ml-3 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+              title="Copy to clipboard"
+            >
+              Copy
+            </button>
+          </div>
         </div>
         <div className="flex items-center space-x-2">
           <button
@@ -1537,22 +1728,48 @@ export default function DriggsmanTable() {
           {/* Tagged Sites Horizontal Button Bar */}
           {activeRainChamber && taggedSites.length > 0 && (
             <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">
-                Tagged Sites ({taggedSites.length}):
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {taggedSites.map((site) => (
+              <div className="flex items-center gap-4 mb-2">
+                <div className="font-bold text-sm text-gray-800">
+                  gutter_box
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  Tagged Sites ({taggedSites.length}):
+                </div>
+                
+                {/* Select All / Deselect All buttons */}
+                <div className="flex items-center space-x-2">
                   <button
-                    key={site.id}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 transition-colors"
-                    onClick={() => {
-                      // TODO: Add functionality to focus on this site in the table
-                      console.log('Clicked site:', site.sitespren_base);
-                    }}
+                    onClick={selectAllTaggedSites}
+                    className="px-3 py-1 text-sm rounded transition-colors bg-green-200 hover:bg-green-300"
                   >
-                    {site.sitespren_base || site.true_root_domain || 'Unknown Site'}
+                    Select All
                   </button>
-                ))}
+                  <button
+                    onClick={deselectAllTaggedSites}
+                    className="px-3 py-1 text-sm rounded transition-colors bg-red-200 hover:bg-red-300"
+                  >
+                    Deselect All
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-2">
+                {taggedSites.map((site) => {
+                  const isSelected = selectedSiteIds.has(site.id);
+                  return (
+                    <button
+                      key={site.id}
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                        isSelected 
+                          ? 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200' 
+                          : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
+                      }`}
+                      onClick={() => toggleSiteSelection(site.id)}
+                    >
+                      {site.sitespren_base || site.true_root_domain || 'Unknown Site'}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -1623,7 +1840,7 @@ export default function DriggsmanTable() {
                   className={`hover:bg-gray-50 ${
                     field.key === 'driggs_phone_1' ? 'border-b-4 border-b-black' : ''
                   } ${
-                    field.key === 'driggs_address_full' ? 'border-b-4 border-b-black' : ''
+                    field.key === 'driggs_address_species_id' ? 'border-b-4 border-b-black' : ''
                   } ${
                     field.key === 'driggs_cgig_id' ? 'border-b-4 border-b-black' : ''
                   } ${
@@ -1673,7 +1890,7 @@ export default function DriggsmanTable() {
                               onChange={() => handleBooleanToggle(field.key, site.id, !!value)}
                               className="sr-only peer"
                             />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                           </label>
                         </td>
                       );
@@ -1787,6 +2004,120 @@ export default function DriggsmanTable() {
                                   <div className="text-center py-4 text-gray-500">
                                     <div>No call platforms found</div>
                                     <div className="text-xs mt-1">Add platforms in /callplatjar</div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      );
+                    }
+
+                    if (field.type === 'address_species_dropdown') {
+                      const isAddressSpeciesDropdownOpen = addressSpeciesDropdownOpen?.field === field.key && addressSpeciesDropdownOpen?.siteId === site.id;
+                      return (
+                        <td
+                          key={`${field.key}-${site.id}`}
+                          className={`px-3 py-2 text-sm text-gray-900 relative w-96 ${
+                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                          }`}
+                        >
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={() => handleAddressSpeciesDropdownClick(field.key, site.id)}
+                              className={`px-2 py-1 text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                                !value || getAddressSpeciesName(value as number) === 'None' 
+                                  ? 'bg-gray-50 hover:bg-gray-100 text-gray-900' 
+                                  : ''
+                              }`}
+                              style={{
+                                width: '400px',
+                                ...(value && getAddressSpeciesName(value as number) !== 'None'
+                                  ? { 
+                                      backgroundColor: '#dbeafe',
+                                      color: '#1d1d1d',
+                                      fontWeight: 'bold'
+                                    }
+                                  : {})
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="truncate">
+                                  {value && getAddressSpeciesName(value as number) !== 'None' 
+                                    ? getAddressSpeciesDetails(value as number)
+                                    : getAddressSpeciesName(value as number)
+                                  }
+                                </span>
+                                <span className="ml-1">▼</span>
+                              </div>
+                            </button>
+                          </div>
+
+                          {/* Address Species Dropdown Menu */}
+                          {isAddressSpeciesDropdownOpen && (
+                            <div className="absolute top-full left-0 mt-1 w-96 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                              <div className="p-3">
+                                <div className="text-sm font-medium text-gray-700 mb-2">Select Address Species</div>
+                                
+                                {/* None Option */}
+                                <button
+                                  onClick={() => handleAddressSpeciesSelect(null, field.key, site.id)}
+                                  className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded mb-1"
+                                >
+                                  <div className="font-medium text-gray-600">None</div>
+                                  <div className="text-xs text-gray-500">No address species assigned</div>
+                                </button>
+
+                                {/* Address Species Table */}
+                                {addressSpecies.length > 0 ? (
+                                  <div className="border border-gray-200 rounded">
+                                    <div className="max-h-64 overflow-y-auto">
+                                      <table className="w-full text-xs">
+                                        <thead className="bg-gray-50 sticky top-0">
+                                          <tr>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Name</th>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Code</th>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Country</th>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Format</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {addressSpecies.map((species) => (
+                                            <tr
+                                              key={species.aspecies_id}
+                                              onClick={() => handleAddressSpeciesSelect(species.aspecies_id, field.key, site.id)}
+                                              className="hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                            >
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-32" title={species.aspecies_name || ''}>
+                                                  {species.aspecies_name || 'Unnamed'}
+                                                </div>
+                                              </td>
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-16" title={species.aspecies_code || ''}>
+                                                  {species.aspecies_code || '-'}
+                                                </div>
+                                              </td>
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-16" title={species.country_code || ''}>
+                                                  {species.country_code || '-'}
+                                                </div>
+                                              </td>
+                                              <td className="px-2 py-2">
+                                                <div className="truncate max-w-24" title={species.address_format || ''}>
+                                                  {species.address_format || '-'}
+                                                </div>
+                                              </td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="text-center py-4 text-gray-500">
+                                    <div>No address species found</div>
+                                    <div className="text-xs mt-1">Add species in /aspejar</div>
                                   </div>
                                 )}
                               </div>
@@ -2072,24 +2403,48 @@ export default function DriggsmanTable() {
                         ) : (
                           <>
                             {isEditing ? (
-                              <input
-                                type="text"
-                                value={editingValue}
-                                onChange={(e) => setEditingValue(e.target.value)}
-                                onBlur={handleCellSave}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') handleCellSave();
-                                  if (e.key === 'Escape') {
-                                    setEditingCell(null);
-                                    setEditingValue('');
-                                  }
-                                }}
-                                className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                autoFocus
-                              />
+                              field.key === 'driggs_revenue_goal' ? (
+                                <div className="relative">
+                                  <span className="absolute left-2 top-1 text-gray-600 font-bold mr-1" style={{marginRight: '3px', fontFamily: 'Arial, sans-serif', fontSize: '18px'}}>$</span>
+                                  <input
+                                    type="text"
+                                    value={editingValue}
+                                    onChange={(e) => setEditingValue(e.target.value)}
+                                    onBlur={handleCellSave}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') handleCellSave();
+                                      if (e.key === 'Escape') {
+                                        setEditingCell(null);
+                                        setEditingValue('');
+                                      }
+                                    }}
+                                    className="w-full pl-6 pr-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                                    style={{fontFamily: 'Arial, sans-serif', fontSize: '18px'}}
+                                    autoFocus
+                                  />
+                                </div>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={editingValue}
+                                  onChange={(e) => setEditingValue(e.target.value)}
+                                  onBlur={handleCellSave}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleCellSave();
+                                    if (e.key === 'Escape') {
+                                      setEditingCell(null);
+                                      setEditingValue('');
+                                    }
+                                  }}
+                                  className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                  autoFocus
+                                />
+                              )
                             ) : (
                               <div className="truncate">
-                                {field.type === 'timestamp' && value
+                                {field.key === 'driggs_revenue_goal' && value
+                                  ? <span className="font-bold" style={{fontFamily: 'Arial, sans-serif', fontSize: '18px'}}><span style={{marginRight: '3px'}}>$</span>{value.toString()}</span>
+                                  : field.type === 'timestamp' && value
                                   ? new Date(value).toLocaleString()
                                   : value?.toString() || '-'}
                               </div>

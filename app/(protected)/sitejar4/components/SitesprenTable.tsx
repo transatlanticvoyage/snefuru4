@@ -26,6 +26,7 @@ interface SitesprenRecord {
   is_wp_site: boolean | null;
   is_starred1: string | null;
   is_bulldozer: boolean | null;
+  is_competitor: boolean | null;
   // New joined columns from sitespren_large_view_1
   registrar_username: string | null;
   registrar_company_id: string | null;
@@ -102,7 +103,8 @@ const allColumns = [
   'wp_plugin_installed1', // 20
   'wp_plugin_connected2', // 21
   'is_wp_site',        // 22
-  'is_bulldozer'       // 23
+  'is_bulldozer',      // 23
+  'is_competitor'      // 24
 ];
 
 export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, onTagsUpdate }: SitesprenTableProps) {
@@ -1050,6 +1052,46 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       
     } catch (error) {
       console.error('Error in bulldozer toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // Competitor toggle handler
+  const handleCompetitorToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_competitor`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      // Update database
+      const { error } = await supabase
+        .from('sitespren')
+        .update({ is_competitor: newValue })
+        .eq('id', siteId);
+
+      if (error) {
+        console.error('Error updating competitor:', error);
+        return;
+      }
+
+      // Update local data without page refresh
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_competitor: newValue }
+          : site
+      );
+      
+      // Call parent component to update the data
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in competitor toggle handler:', error);
     } finally {
       setUpdatingStars(prev => {
         const newSet = new Set(prev);
@@ -2269,7 +2311,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         'tool_buttons'
                       ) : (
                         <>
-                          {col === 'is_starred1' ? '•str1' : col === 'is_bulldozer' ? 'is_bulldozer' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
+                          {col === 'is_starred1' ? '•str1' : col === 'is_bulldozer' ? 'is_bulldozer' : col === 'is_competitor' ? 'is_competitor' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
                         </>
                       )}
                       {hasRightSeparator && (
@@ -2405,6 +2447,13 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                               title="Open GC Jar"
                             >
                               GC
+                            </Link>
+                            <Link
+                              href={`/driggsman?sitesentered=${encodeURIComponent(item.sitespren_base || '')}`}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-purple-500 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                              title="Open Driggsman"
+                            >
+                              DG
                             </Link>
                           </div>
                         ) : col === 'id' ? (
@@ -2661,6 +2710,28 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                                 <span
                                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                     item.is_bulldozer ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_competitor' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_competitor`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleCompetitorToggle(item.id, !item.is_competitor)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_competitor ? 'bg-red-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_competitor ? 'translate-x-6' : 'translate-x-1'
                                   }`}
                                 />
                               </button>
