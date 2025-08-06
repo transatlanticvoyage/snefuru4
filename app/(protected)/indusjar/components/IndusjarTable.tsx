@@ -9,34 +9,23 @@ const NubraTablefaceKite = dynamic(
   { ssr: false }
 );
 
-interface City {
-  city_id: number;
-  city_name: string | null;
-  state_code: string | null;
-  state_full: string | null;
-  country: string | null;
-  rank_in_pop: number | null;
-  gmaps_link: string | null;
-  is_suburb: boolean | null;
-  city_and_state_code: string | null;
-  city_population: number | null;
-  latitude: number | null;
-  longitude: number | null;
-  rel_metro_id: number | null;
-  population_last_updated: string | null;
+interface Industry {
+  industry_id: number;
+  industry_name: string | null;
+  industry_description: string | null;
   created_at: string;
   updated_at: string | null;
 }
 
-export default function CityjarTable() {
-  const [data, setData] = useState<City[]>([]);
+export default function IndusjarTable() {
+  const [data, setData] = useState<Industry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [sortField, setSortField] = useState<keyof City>('created_at');
+  const [sortField, setSortField] = useState<keyof Industry>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Modal states
@@ -48,54 +37,32 @@ export default function CityjarTable() {
   
   // Form data for creating
   const [formData, setFormData] = useState({
-    city_name: '',
-    state_code: '',
-    state_full: '',
-    country: '',
-    rank_in_pop: 0,
-    gmaps_link: '',
-    is_suburb: false,
-    city_and_state_code: '',
-    city_population: 0,
-    latitude: 0,
-    longitude: 0,
-    rel_metro_id: 0,
-    population_last_updated: ''
+    industry_name: '',
+    industry_description: ''
   });
 
   const supabase = createClientComponentClient();
 
   // Define columns
   const columns = [
-    { key: 'city_id' as keyof City, label: 'city_id', type: 'number', readOnly: true },
-    { key: 'city_name' as keyof City, label: 'city_name', type: 'text' },
-    { key: 'state_code' as keyof City, label: 'state_code', type: 'text' },
-    { key: 'state_full' as keyof City, label: 'state_full', type: 'text' },
-    { key: 'country' as keyof City, label: 'country', type: 'text' },
-    { key: 'rank_in_pop' as keyof City, label: 'rank_in_pop', type: 'number' },
-    { key: 'gmaps_link' as keyof City, label: 'gmaps_link', type: 'text', width: '100px' },
-    { key: 'is_suburb' as keyof City, label: 'is_suburb', type: 'boolean' },
-    { key: 'city_and_state_code' as keyof City, label: 'city_and_state_code', type: 'text' },
-    { key: 'city_population' as keyof City, label: 'city_population', type: 'number' },
-    { key: 'latitude' as keyof City, label: 'latitude', type: 'number' },
-    { key: 'longitude' as keyof City, label: 'longitude', type: 'number' },
-    { key: 'rel_metro_id' as keyof City, label: 'rel_metro_id', type: 'number' },
-    { key: 'population_last_updated' as keyof City, label: 'population_last_updated', type: 'datetime' },
-    { key: 'created_at' as keyof City, label: 'created_at', type: 'datetime', readOnly: true },
-    { key: 'updated_at' as keyof City, label: 'updated_at', type: 'datetime', readOnly: true }
+    { key: 'industry_id' as keyof Industry, label: 'industry_id', type: 'number', readOnly: true },
+    { key: 'industry_name' as keyof Industry, label: 'industry_name', type: 'text' },
+    { key: 'industry_description' as keyof Industry, label: 'industry_description', type: 'text' },
+    { key: 'created_at' as keyof Industry, label: 'created_at', type: 'datetime', readOnly: true },
+    { key: 'updated_at' as keyof Industry, label: 'updated_at', type: 'datetime', readOnly: true }
   ];
 
   // Fetch data from Supabase
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data: citiesData, error } = await supabase
-        .from('cities')
+      const { data: industriesData, error } = await supabase
+        .from('industries')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setData(citiesData || []);
+      setData(industriesData || []);
     } catch (err) {
       console.error('Error fetching data:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -140,7 +107,7 @@ export default function CityjarTable() {
   const paginatedData = itemsPerPage === -1 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Handle sorting
-  const handleSort = (field: keyof City) => {
+  const handleSort = (field: keyof Industry) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -175,15 +142,15 @@ export default function CityjarTable() {
       }
 
       const { error } = await supabase
-        .from('cities')
+        .from('industries')
         .update({ [editingCell.field]: processedValue })
-        .eq('city_id', editingCell.id);
+        .eq('industry_id', editingCell.id);
 
       if (error) throw error;
 
       // Update local data
       setData(data.map(item => 
-        item.city_id === editingCell.id 
+        item.industry_id === editingCell.id 
           ? { ...item, [editingCell.field]: processedValue }
           : item
       ));
@@ -202,20 +169,20 @@ export default function CityjarTable() {
   };
 
   // Handle boolean toggle
-  const handleBooleanToggle = async (id: number, field: keyof City, currentValue: boolean | null) => {
+  const handleBooleanToggle = async (id: number, field: keyof Industry, currentValue: boolean | null) => {
     const newValue = currentValue === null ? true : !currentValue;
     
     try {
       const { error } = await supabase
-        .from('cities')
+        .from('industries')
         .update({ [field]: newValue })
-        .eq('city_id', id);
+        .eq('industry_id', id);
 
       if (error) throw error;
 
       // Update local data
       setData(data.map(item => 
-        item.city_id === id ? { ...item, [field]: newValue } : item
+        item.industry_id === id ? { ...item, [field]: newValue } : item
       ));
     } catch (err) {
       console.error('Error toggling boolean:', err);
@@ -227,23 +194,12 @@ export default function CityjarTable() {
   const createNewRecordInline = async () => {
     try {
       const newRecord = {
-        city_name: 'New City',
-        state_code: 'ST',
-        state_full: 'State Name',
-        country: 'Country',
-        rank_in_pop: null,
-        gmaps_link: '',
-        is_suburb: false,
-        city_and_state_code: 'New City, ST',
-        city_population: null,
-        latitude: null,
-        longitude: null,
-        rel_metro_id: null,
-        population_last_updated: null
+        industry_name: 'New Industry',
+        industry_description: 'Industry description here'
       };
 
       const { data: insertedData, error } = await supabase
-        .from('cities')
+        .from('industries')
         .insert([newRecord])
         .select()
         .single();
@@ -254,8 +210,8 @@ export default function CityjarTable() {
       setData([insertedData, ...data]);
       
       // Set first editable cell to editing mode
-      setEditingCell({ id: insertedData.city_id, field: 'city_name' });
-      setEditingValue('New City');
+      setEditingCell({ id: insertedData.industry_id, field: 'industry_name' });
+      setEditingValue('New Industry');
     } catch (err) {
       console.error('Error creating record:', err);
       alert('Failed to create record');
@@ -266,23 +222,12 @@ export default function CityjarTable() {
   const handleCreateSubmit = async () => {
     try {
       const insertData = {
-        city_name: formData.city_name?.trim() || null,
-        state_code: formData.state_code?.trim() || null,
-        state_full: formData.state_full?.trim() || null,
-        country: formData.country?.trim() || null,
-        rank_in_pop: formData.rank_in_pop || null,
-        gmaps_link: formData.gmaps_link?.trim() || null,
-        is_suburb: formData.is_suburb,
-        city_and_state_code: formData.city_and_state_code?.trim() || null,
-        city_population: formData.city_population || null,
-        latitude: formData.latitude || null,
-        longitude: formData.longitude || null,
-        rel_metro_id: formData.rel_metro_id || null,
-        population_last_updated: formData.population_last_updated?.trim() || null
+        industry_name: formData.industry_name?.trim() || null,
+        industry_description: formData.industry_description?.trim() || null
       };
       
       const { data: insertedData, error } = await supabase
-        .from('cities')
+        .from('industries')
         .insert([insertData])
         .select()
         .single();
@@ -301,43 +246,21 @@ export default function CityjarTable() {
   // Reset form
   const resetForm = () => {
     setFormData({
-      city_name: '',
-      state_code: '',
-      state_full: '',
-      country: '',
-      rank_in_pop: 0,
-      gmaps_link: '',
-      is_suburb: false,
-      city_and_state_code: '',
-      city_population: 0,
-      latitude: 0,
-      longitude: 0,
-      rel_metro_id: 0,
-      population_last_updated: ''
+      industry_name: '',
+      industry_description: ''
     });
   };
 
-  // Format population display
-  const formatPopulation = (population: number | null) => {
-    if (!population) return '';
-    if (population >= 1000000) {
-      return `${(population / 1000000).toFixed(1)}M`;
-    } else if (population >= 1000) {
-      return `${(population / 1000).toFixed(0)}K`;
-    }
-    return population.toString();
-  };
-
   // Render cell content
-  const renderCell = (item: City, column: typeof columns[0]) => {
+  const renderCell = (item: Industry, column: typeof columns[0]) => {
     const value = item[column.key];
-    const isEditing = editingCell?.id === item.city_id && editingCell?.field === column.key;
+    const isEditing = editingCell?.id === item.industry_id && editingCell?.field === column.key;
     const isReadOnly = column.readOnly;
 
     if (column.type === 'boolean' && !isReadOnly) {
       return (
         <button
-          onClick={() => handleBooleanToggle(item.city_id, column.key, value as boolean | null)}
+          onClick={() => handleBooleanToggle(item.industry_id, column.key, value as boolean | null)}
           className={`w-12 h-6 rounded-full transition-colors ${
             value === true ? 'bg-green-500' : 
             value === false ? 'bg-gray-300' : 'bg-yellow-300'
@@ -354,17 +277,34 @@ export default function CityjarTable() {
     if (isEditing) {
       return (
         <div className="flex items-center space-x-2">
-          <input
-            type={column.type === 'number' ? 'number' : 'text'}
-            value={editingValue}
-            onChange={(e) => setEditingValue(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') handleCellSave();
-              if (e.key === 'Escape') handleCellCancel();
-            }}
-            className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none"
-            autoFocus
-          />
+          {column.key === 'industry_description' ? (
+            <textarea
+              value={editingValue}
+              onChange={(e) => setEditingValue(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleCellSave();
+                }
+                if (e.key === 'Escape') handleCellCancel();
+              }}
+              className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none resize-none"
+              autoFocus
+              rows={3}
+            />
+          ) : (
+            <input
+              type={column.type === 'number' ? 'number' : 'text'}
+              value={editingValue}
+              onChange={(e) => setEditingValue(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') handleCellSave();
+                if (e.key === 'Escape') handleCellCancel();
+              }}
+              className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none"
+              autoFocus
+            />
+          )}
           <button onClick={handleCellSave} className="text-green-600 hover:text-green-800">
             ✓
           </button>
@@ -375,64 +315,15 @@ export default function CityjarTable() {
       );
     }
 
-    // Special handling for gmaps_link column
-    if (column.key === 'gmaps_link') {
-      return (
-        <div className="flex items-center space-x-1" style={{ width: '100px', maxWidth: '100px', minWidth: '100px' }}>
-          {/* Copy button */}
-          <button
-            onClick={async (e) => {
-              e.stopPropagation();
-              if (value) {
-                try {
-                  await navigator.clipboard.writeText(value.toString());
-                  // You could add a toast notification here
-                } catch (err) {
-                  console.error('Failed to copy to clipboard:', err);
-                }
-              }
-            }}
-            className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold flex items-center justify-center"
-            title="Copy to clipboard"
-          >
-            📋
-          </button>
-          
-          {/* Open button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (value) {
-                window.open(value.toString(), '_blank');
-              }
-            }}
-            className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold flex items-center justify-center"
-            title="Open in new tab"
-          >
-            OP
-          </button>
-          
-          {/* Editable text area */}
-          <div
-            onClick={() => handleCellClick(item.city_id, column.key, value)}
-            className={`cursor-pointer hover:bg-gray-100 px-1 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'} truncate overflow-hidden whitespace-nowrap`}
-            style={{ width: '46px', maxWidth: '46px', minWidth: '46px' }}
-            title={value?.toString() || ''}
-          >
-            {value?.toString() || ''}
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div
-        onClick={() => handleCellClick(item.city_id, column.key, value)}
-        className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'}`}
+        onClick={() => handleCellClick(item.industry_id, column.key, value)}
+        className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'} ${
+          column.key === 'industry_description' ? 'min-h-[60px] whitespace-pre-wrap' : ''
+        }`}
       >
         {column.type === 'datetime' && value ? 
           new Date(value).toLocaleString() : 
-          column.key === 'city_population' ? formatPopulation(value as number) :
           value?.toString() || ''
         }
       </div>
@@ -532,7 +423,7 @@ export default function CityjarTable() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading cities...</div>
+        <div className="text-gray-500">Loading industries...</div>
       </div>
     );
   }
@@ -551,7 +442,7 @@ export default function CityjarTable() {
       <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-6">
-            <NubraTablefaceKite tableType="cities-grid" />
+            <NubraTablefaceKite tableType="industries-grid" />
             <div className="text-sm text-gray-600">
               {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
@@ -599,7 +490,7 @@ export default function CityjarTable() {
       {/* Table */}
       <div className="bg-white overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200" style={{ tableLayout: 'fixed' }}>
+          <table className="w-full border-collapse border border-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '50px' }}>
@@ -609,7 +500,7 @@ export default function CityjarTable() {
                       if (selectedRows.size === paginatedData.length && paginatedData.length > 0) {
                         setSelectedRows(new Set());
                       } else {
-                        setSelectedRows(new Set(paginatedData.map(item => item.city_id)));
+                        setSelectedRows(new Set(paginatedData.map(item => item.industry_id)));
                       }
                     }}
                   >
@@ -625,11 +516,6 @@ export default function CityjarTable() {
                   <th
                     key={column.key}
                     className="text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1"
-                    style={(column as any).width ? { 
-                      width: (column as any).width, 
-                      maxWidth: (column as any).width, 
-                      minWidth: (column as any).width 
-                    } : {}}
                     onClick={() => handleSort(column.key)}
                   >
                     <div className="flex items-center space-x-1">
@@ -646,16 +532,16 @@ export default function CityjarTable() {
             </thead>
             <tbody className="bg-white">
               {paginatedData.map((item) => (
-                <tr key={item.city_id} className="hover:bg-gray-50">
+                <tr key={item.industry_id} className="hover:bg-gray-50">
                   <td className="px-2 py-1 border border-gray-200">
                     <div 
                       className="w-full h-full flex items-center justify-center cursor-pointer"
                       onClick={() => {
                         const newSelected = new Set(selectedRows);
-                        if (newSelected.has(item.city_id)) {
-                          newSelected.delete(item.city_id);
+                        if (newSelected.has(item.industry_id)) {
+                          newSelected.delete(item.industry_id);
                         } else {
-                          newSelected.add(item.city_id);
+                          newSelected.add(item.industry_id);
                         }
                         setSelectedRows(newSelected);
                       }}
@@ -663,21 +549,13 @@ export default function CityjarTable() {
                       <input
                         type="checkbox"
                         style={{ width: '20px', height: '20px' }}
-                        checked={selectedRows.has(item.city_id)}
+                        checked={selectedRows.has(item.industry_id)}
                         onChange={() => {}} // Handled by div onClick
                       />
                     </div>
                   </td>
                   {columns.map((column) => (
-                    <td 
-                      key={column.key} 
-                      className="border border-gray-200"
-                      style={(column as any).width ? { 
-                        width: (column as any).width, 
-                        maxWidth: (column as any).width, 
-                        minWidth: (column as any).width 
-                      } : {}}
-                    >
+                    <td key={column.key} className="border border-gray-200">
                       {renderCell(item, column)}
                     </td>
                   ))}
@@ -705,153 +583,29 @@ export default function CityjarTable() {
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Create New City</h2>
+            <h2 className="text-xl font-bold mb-4">Create New Industry</h2>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Industry Name</label>
                 <input
                   type="text"
-                  value={formData.city_name}
-                  onChange={(e) => setFormData({ ...formData, city_name: e.target.value })}
+                  value={formData.industry_name}
+                  onChange={(e) => setFormData({ ...formData, industry_name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="Enter city name"
+                  placeholder="Enter industry name"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State Code</label>
-                <input
-                  type="text"
-                  value={formData.state_code}
-                  onChange={(e) => setFormData({ ...formData, state_code: e.target.value })}
+                <label className="block text-sm font-medium text-gray-700 mb-1">Industry Description</label>
+                <textarea
+                  value={formData.industry_description}
+                  onChange={(e) => setFormData({ ...formData, industry_description: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="CA, TX, NY, etc."
+                  rows={4}
+                  placeholder="Enter industry description"
                 />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State Full Name</label>
-                <input
-                  type="text"
-                  value={formData.state_full}
-                  onChange={(e) => setFormData({ ...formData, state_full: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="California, Texas, New York, etc."
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                <input
-                  type="text"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="United States, Canada, etc."
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Population Rank</label>
-                <input
-                  type="number"
-                  value={formData.rank_in_pop}
-                  onChange={(e) => setFormData({ ...formData, rank_in_pop: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="1, 2, 3, etc."
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City Population</label>
-                <input
-                  type="number"
-                  value={formData.city_population}
-                  onChange={(e) => setFormData({ ...formData, city_population: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="Population count"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
-                <input
-                  type="number"
-                  step="0.00000001"
-                  value={formData.latitude}
-                  onChange={(e) => setFormData({ ...formData, latitude: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="40.7128"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
-                <input
-                  type="number"
-                  step="0.00000001"
-                  value={formData.longitude}
-                  onChange={(e) => setFormData({ ...formData, longitude: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="-74.0060"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Metro Area ID</label>
-                <input
-                  type="number"
-                  value={formData.rel_metro_id}
-                  onChange={(e) => setFormData({ ...formData, rel_metro_id: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="Metro area reference ID"
-                />
-              </div>
-              
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Google Maps Link</label>
-                <input
-                  type="text"
-                  value={formData.gmaps_link}
-                  onChange={(e) => setFormData({ ...formData, gmaps_link: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="https://maps.google.com/..."
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City and State Code</label>
-                <input
-                  type="text"
-                  value={formData.city_and_state_code}
-                  onChange={(e) => setFormData({ ...formData, city_and_state_code: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="San Francisco, CA"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Population Last Updated</label>
-                <input
-                  type="datetime-local"
-                  value={formData.population_last_updated}
-                  onChange={(e) => setFormData({ ...formData, population_last_updated: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="col-span-2 flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="is_suburb"
-                  checked={formData.is_suburb}
-                  onChange={(e) => setFormData({ ...formData, is_suburb: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                />
-                <label htmlFor="is_suburb" className="text-sm font-medium text-gray-700">
-                  Is Suburb
-                </label>
               </div>
             </div>
 
@@ -869,7 +623,7 @@ export default function CityjarTable() {
                 onClick={handleCreateSubmit}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
-                Create City
+                Create Industry
               </button>
             </div>
           </div>

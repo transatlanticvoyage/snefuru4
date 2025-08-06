@@ -46,9 +46,33 @@ export default function DrenjariButtonBarDriggsmanLinks() {
           </Link>
           <Link
             href="/metrojar"
-            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
           >
             <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/metrojar</span>
+          </Link>
+          <Link
+            href="/cnjar1"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+          >
+            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/cnjar1</span>
+          </Link>
+          <Link
+            href="/cnjar2"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+          >
+            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/cnjar2</span>
+          </Link>
+          <Link
+            href="/skojar1"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+          >
+            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/skojar1</span>
+          </Link>
+          <Link
+            href="/skojar2"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+          >
+            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/skojar2</span>
           </Link>
         </div>
       </div>
