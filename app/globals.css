@@ -24,6 +24,11 @@ body.filegun-hide-main-header .snefuru-content-wrapper > header:first-child {
   display: none !important;
 }
 
+/* Hide main navigation header when on cnjar1 page with hide setting */
+body.cnjar1-hide-main-header .snefuru-content-wrapper > header:first-child {
+  display: none !important;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
