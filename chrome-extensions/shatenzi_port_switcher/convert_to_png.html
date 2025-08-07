@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Convert Icons to PNG</title>
+  <style>
+    body { 
+      font-family: -apple-system, sans-serif; 
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .icon-container {
+      margin: 20px 0;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    canvas {
+      border: 1px solid #ddd;
+      margin: 10px;
+      cursor: pointer;
+    }
+    button {
+      background: #0066ff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0052cc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Icon PNG Converter for Shatenzi Port Switcher</h1>
+  
+  <div class="icon-container">
+    <h3>16x16 Icon</h3>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <br>
+    <button onclick="downloadPNG('canvas16', 'icon16.png')">Download icon16.png</button>
+  </div>
+  
+  <div class="icon-container">
+    <h3>48x48 Icon</h3>
+    <canvas id="canvas48" width="48" height="48"></canvas>
+    <br>
+    <button onclick="downloadPNG('canvas48', 'icon48.png')">Download icon48.png</button>
+  </div>
+  
+  <div class="icon-container">
+    <h3>128x128 Icon</h3>
+    <canvas id="canvas128" width="128" height="128"></canvas>
+    <br>
+    <button onclick="downloadPNG('canvas128', 'icon128.png')">Download icon128.png</button>
+  </div>
+
+  <script>
+    function drawIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, size, size);
+      
+      // Draw rounded rectangle background
+      const radius = size * 0.125; // Proportional corner radius
+      ctx.fillStyle = '#0066ff';
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(size - radius, 0);
+      ctx.quadraticCurveTo(size, 0, size, radius);
+      ctx.lineTo(size, size - radius);
+      ctx.quadraticCurveTo(size, size, size - radius, size);
+      ctx.lineTo(radius, size);
+      ctx.quadraticCurveTo(0, size, 0, size - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Draw text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `700 ${Math.floor(size * 0.55)}px -apple-system, system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('PO', size / 2, size / 2 + size * 0.05);
+      
+      // Set display size for canvas
+      canvas.style.width = (size > 48 ? size : size * 4) + 'px';
+      canvas.style.height = (size > 48 ? size : size * 4) + 'px';
+      canvas.style.imageRendering = 'crisp-edges';
+    }
+    
+    function downloadPNG(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+    
+    // Draw all icons on load
+    window.onload = function() {
+      drawIcon('canvas16', 16);
+      drawIcon('canvas48', 48);
+      drawIcon('canvas128', 128);
+    };
+  </script>
+  
+  <hr style="margin: 40px 0;">
+  
+  <h2>Instructions:</h2>
+  <ol>
+    <li>Click each "Download" button to save the PNG files</li>
+    <li>Save them to the <code>icons/</code> folder</li>
+    <li>Update <code>manifest.json</code> to use <code>.png</code> instead of <code>.svg</code></li>
+    <li>Reload the extension in Chrome</li>
+  </ol>
+  
+  <h2>Alternative: Update manifest.json to use PNG</h2>
+  <pre style="background: #f0f0f0; padding: 15px; border-radius: 4px;">
+"action": {
+  "default_popup": "popup.html",
+  "default_icon": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+},
+"icons": {
+  "16": "icons/icon16.png",
+  "48": "icons/icon48.png",
+  "128": "icons/icon128.png"
+}</pre>
+</body>
+</html>

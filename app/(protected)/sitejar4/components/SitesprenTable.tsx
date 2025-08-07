@@ -27,6 +27,16 @@ interface SitesprenRecord {
   is_starred1: string | null;
   is_bulldozer: boolean | null;
   is_competitor: boolean | null;
+  is_external: boolean | null;
+  is_internal: boolean | null;
+  is_ppx: boolean | null;
+  is_ms: boolean | null;
+  is_wayback_rebuild: boolean | null;
+  is_naked_wp_build: boolean | null;
+  is_rnr: boolean | null;
+  is_aff: boolean | null;
+  is_other1: boolean | null;
+  is_other2: boolean | null;
   // New joined columns from sitespren_large_view_1
   registrar_username: string | null;
   registrar_company_id: string | null;
@@ -43,6 +53,8 @@ interface SitesprenTableProps {
   searchTerm?: string;
   onSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   totalUnfilteredCount?: number;
+  isExternalFilter?: string;
+  onIsExternalFilterChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onTagsUpdate?: (tagsData: {
     tags: any[];
     selectedTags: Set<string>;
@@ -104,10 +116,20 @@ const allColumns = [
   'wp_plugin_connected2', // 21
   'is_wp_site',        // 22
   'is_bulldozer',      // 23
-  'is_competitor'      // 24
+  'is_competitor',     // 24
+  'is_external',       // 25
+  'is_internal',       // 26
+  'is_ppx',            // 27
+  'is_ms',             // 28
+  'is_wayback_rebuild', // 29
+  'is_naked_wp_build', // 30
+  'is_rnr',            // 31
+  'is_aff',            // 32
+  'is_other1',         // 33
+  'is_other2'          // 34
 ];
 
-export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, onTagsUpdate }: SitesprenTableProps) {
+export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate }: SitesprenTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -1101,6 +1123,482 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
     }
   };
 
+  // External toggle handler
+  const handleExternalToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_external`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      console.log('Attempting to update is_external:', { siteId, newValue, userInternalId });
+
+      // Use API endpoint instead of direct Supabase call
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_external: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      console.log('API response for is_external:', result);
+      console.log('Response status:', response.status);
+      console.log('Response success:', result.success);
+
+      if (!result.success) {
+        console.error('Error updating external via API:', result.error);
+        alert(`Failed to update external status: ${result.error}`);
+        return;
+      }
+
+      // Update local data without page refresh
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_external: newValue }
+          : site
+      );
+      
+      console.log('Updated local data for site', siteId, 'new is_external value:', newValue);
+      console.log('Updated site data:', updatedData.find(site => site.id === siteId));
+      
+      // Call parent component to update the data
+      if (onDataUpdate) {
+        console.log('Calling onDataUpdate with updated data');
+        onDataUpdate(updatedData);
+      } else {
+        console.log('WARNING: onDataUpdate callback is not available');
+      }
+      
+    } catch (error) {
+      console.error('Error in external toggle handler:', error);
+      alert(`Network error updating external status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // Internal toggle handler
+  const handleInternalToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_internal`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      console.log('Attempting to update is_internal:', { siteId, newValue, userInternalId });
+
+      // Use API endpoint instead of direct Supabase call
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_internal: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      console.log('API response for is_internal:', result);
+
+      if (!result.success) {
+        console.error('Error updating internal via API:', result.error);
+        alert(`Failed to update internal status: ${result.error}`);
+        return;
+      }
+
+      // Update local data without page refresh
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_internal: newValue }
+          : site
+      );
+      
+      // Call parent component to update the data
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in internal toggle handler:', error);
+      alert(`Network error updating internal status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // PPX toggle handler
+  const handlePpxToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_ppx`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_ppx: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error('Error updating ppx via API:', result.error);
+        return;
+      }
+
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_ppx: newValue }
+          : site
+      );
+      
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in ppx toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // MS toggle handler
+  const handleMsToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_ms`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_ms: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error('Error updating ms via API:', result.error);
+        return;
+      }
+
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_ms: newValue }
+          : site
+      );
+      
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in ms toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // Wayback Rebuild toggle handler
+  const handleWaybackRebuildToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_wayback_rebuild`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_wayback_rebuild: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error('Error updating wayback_rebuild via API:', result.error);
+        return;
+      }
+
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_wayback_rebuild: newValue }
+          : site
+      );
+      
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in wayback_rebuild toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // Naked WP Build toggle handler
+  const handleNakedWpBuildToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_naked_wp_build`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_naked_wp_build: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error('Error updating naked_wp_build via API:', result.error);
+        return;
+      }
+
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_naked_wp_build: newValue }
+          : site
+      );
+      
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in naked_wp_build toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // RNR toggle handler
+  const handleRnrToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_rnr`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_rnr: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error('Error updating rnr via API:', result.error);
+        return;
+      }
+
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_rnr: newValue }
+          : site
+      );
+      
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in rnr toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // AFF toggle handler
+  const handleAffToggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_aff`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_aff: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error('Error updating aff via API:', result.error);
+        return;
+      }
+
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_aff: newValue }
+          : site
+      );
+      
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in aff toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // Other1 toggle handler
+  const handleOther1Toggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_other1`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_other1: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error('Error updating other1 via API:', result.error);
+        return;
+      }
+
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_other1: newValue }
+          : site
+      );
+      
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in other1 toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
+  // Other2 toggle handler
+  const handleOther2Toggle = async (siteId: string, newValue: boolean) => {
+    const updateKey = `${siteId}_is_other2`;
+    setUpdatingStars(prev => new Set([...prev, updateKey]));
+
+    try {
+      const response = await fetch('/api/update_sitespren', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_id: siteId,
+          user_internal_id: userInternalId,
+          updates: { is_other2: newValue }
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.error('Error updating other2 via API:', result.error);
+        return;
+      }
+
+      const updatedData = data.map(site => 
+        site.id === siteId 
+          ? { ...site, is_other2: newValue }
+          : site
+      );
+      
+      if (onDataUpdate) {
+        onDataUpdate(updatedData);
+      }
+      
+    } catch (error) {
+      console.error('Error in other2 toggle handler:', error);
+    } finally {
+      setUpdatingStars(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(updateKey);
+        return newSet;
+      });
+    }
+  };
+
   // Single site action handler for the gadgets section
   const handleSingleSiteAction = async (action: string, method?: string) => {
     const selectedSiteId = Array.from(selectedSites)[0];
@@ -1688,7 +2186,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         }
       });
     }
-  }, [tags, selectedTags, tagsFeedback, newTagName, newTagOrder, editingTagId, editingTagName, editingTagOrder, isCreatingTag, isUpdatingTag, isDeletingTag, isAddingSitesToTag, onTagsUpdate]);
+  }, [tags, selectedTags, tagsFeedback, newTagName, newTagOrder, editingTagId, editingTagName, editingTagOrder, isCreatingTag, isUpdatingTag, isDeletingTag, isAddingSitesToTag]);
 
   // Copy button handler with overlay animation
   const handleCopyClick = async (textToCopy: string, event: React.MouseEvent) => {
@@ -1898,7 +2396,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       
       {/* Search and Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="md:col-span-2">
             <label htmlFor="site-search-table" className="block text-sm font-medium text-gray-700 mb-2">
               Search Sites
@@ -1921,6 +2419,27 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                 Showing {data.length} of {totalUnfilteredCount} sites
               </p>
             )}
+          </div>
+          <div>
+            <label htmlFor="is-external-filter" className="block text-sm font-bold text-gray-700 mb-2">
+              external sites
+            </label>
+            <select
+              id="is-external-filter"
+              className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 ${
+                isExternalFilter === 'show' ? 'bg-red-900 text-white' : ''
+              }`}
+              value={isExternalFilter || 'hide'}
+              onChange={(e) => {
+                if (onIsExternalFilterChange) {
+                  onIsExternalFilterChange(e);
+                }
+                setCurrentPage(1);
+              }}
+            >
+              <option value="hide">Hide</option>
+              <option value="show">Show</option>
+            </select>
           </div>
           <div>
             <label htmlFor="tag-filter" className="block text-sm font-medium text-gray-700 mb-2">
@@ -2311,7 +2830,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                         'tool_buttons'
                       ) : (
                         <>
-                          {col === 'is_starred1' ? '•str1' : col === 'is_bulldozer' ? 'is_bulldozer' : col === 'is_competitor' ? 'is_competitor' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
+                          {col === 'is_starred1' ? '•str1' : col === 'is_bulldozer' ? 'is_bulldozer' : col === 'is_competitor' ? 'is_competitor' : col === 'is_external' ? 'is_external' : col === 'is_internal' ? 'is_internal' : col === 'is_ppx' ? 'is_ppx' : col === 'is_ms' ? 'is_ms' : col === 'is_wayback_rebuild' ? 'wayback_rebuild' : col === 'is_naked_wp_build' ? 'naked_wp_build' : col === 'is_rnr' ? 'is_rnr' : col === 'is_aff' ? 'is_aff' : col === 'is_other1' ? 'is_other1' : col === 'is_other2' ? 'is_other2' : col} {['id', 'created_at', 'sitespren_base', 'true_root_domain', 'updated_at', 'is_starred1'].includes(col) && sortField === col && (sortOrder === 'asc' ? '↑' : '↓')}
                         </>
                       )}
                       {hasRightSeparator && (
@@ -2732,6 +3251,226 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                                 <span
                                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                     item.is_competitor ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_external' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_external`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleExternalToggle(item.id, !item.is_external)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_external ? 'bg-green-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_external ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_internal' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_internal`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleInternalToggle(item.id, !item.is_internal)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_internal ? 'bg-purple-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_internal ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_ppx' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_ppx`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handlePpxToggle(item.id, !item.is_ppx)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_ppx ? 'bg-orange-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_ppx ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_ms' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_ms`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleMsToggle(item.id, !item.is_ms)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_ms ? 'bg-yellow-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_ms ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_wayback_rebuild' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_wayback_rebuild`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleWaybackRebuildToggle(item.id, !item.is_wayback_rebuild)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_wayback_rebuild ? 'bg-indigo-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_wayback_rebuild ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_naked_wp_build' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_naked_wp_build`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleNakedWpBuildToggle(item.id, !item.is_naked_wp_build)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_naked_wp_build ? 'bg-pink-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_naked_wp_build ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_rnr' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_rnr`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleRnrToggle(item.id, !item.is_rnr)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_rnr ? 'bg-teal-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_rnr ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_aff' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_aff`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleAffToggle(item.id, !item.is_aff)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_aff ? 'bg-cyan-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_aff ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_other1' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_other1`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleOther1Toggle(item.id, !item.is_other1)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_other1 ? 'bg-lime-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_other1 ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            )}
+                          </div>
+                        ) : col === 'is_other2' ? (
+                          <div className="flex justify-center items-center">
+                            {updatingStars.has(`${item.id}_is_other2`) ? (
+                              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <button
+                                onClick={() => handleOther2Toggle(item.id, !item.is_other2)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  item.is_other2 ? 'bg-rose-600' : 'bg-gray-200'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    item.is_other2 ? 'translate-x-6' : 'translate-x-1'
                                   }`}
                                 />
                               </button>

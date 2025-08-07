@@ -1,0 +1,36 @@
+
+
+
+is_ppx
+is_ms
+is_wayback_rebuild
+is_naked_wp_build
+is_rnr
+is_aff
+is_other1
+is_other2
+
+
+please create the sql
+
+
+==========================================================
+
+please create sql that i can run in supabase to do the following
+in existing db table sitespren
+we must create new db fields
+
+boolean, default false
+
+is_ppx
+is_ms
+is_wayback_rebuild
+is_naked_wp_build
+is_rnr
+is_aff
+is_other1
+is_other2
+
+then we must update the following places
+
+

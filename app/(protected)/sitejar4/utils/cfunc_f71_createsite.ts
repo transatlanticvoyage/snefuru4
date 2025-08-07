@@ -17,7 +17,8 @@ interface CreateSitesResult {
 
 export async function cfunc_f71_createsite(
   userInternalId: string, 
-  sitesList: string
+  sitesList: string,
+  additionalFields?: Record<string, any>
 ): Promise<CreateSitesResult> {
   try {
     const response = await fetch('/api/f71_createsite', {
@@ -27,7 +28,8 @@ export async function cfunc_f71_createsite(
       },
       body: JSON.stringify({
         user_internal_id: userInternalId,
-        sites_list: sitesList
+        sites_list: sitesList,
+        additional_fields: additionalFields || {}
       }),
     });
 

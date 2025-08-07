@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Shatenzi Port Switcher",
+  "version": "1.0.0",
+  "description": "Quickly switch between localhost ports 3000, 3001, and 3002",
+  "permissions": [
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "http://192.168.*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.svg",
+      "48": "icons/icon48.svg",
+      "128": "icons/icon128.svg"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.svg",
+    "48": "icons/icon48.svg",
+    "128": "icons/icon128.svg"
+  }
+}

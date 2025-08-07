@@ -43,6 +43,7 @@ interface SitesprenSite {
   driggs_phone_1: string | null;
   driggs_phone1_platform_id: number | null;
   driggs_cgig_id: number | null;
+  driggs_citations_done: boolean | null;
   driggs_special_note_for_ai_tool: string | null;
   driggs_revenue_goal: number | null;
   ns_full: string | null;
@@ -52,6 +53,16 @@ interface SitesprenSite {
   icon_color: string | null;
   is_bulldozer: boolean | null;
   is_competitor: boolean | null;
+  is_external: boolean | null;
+  is_internal: boolean | null;
+  is_ppx: boolean | null;
+  is_ms: boolean | null;
+  is_wayback_rebuild: boolean | null;
+  is_naked_wp_build: boolean | null;
+  is_rnr: boolean | null;
+  is_aff: boolean | null;
+  is_other1: boolean | null;
+  is_other2: boolean | null;
 }
 
 interface CallPlatform {
@@ -88,6 +99,9 @@ interface CitationGig {
   citations_included: number;
   is_active: boolean;
   user_id: string;
+  inputs_v1: string | null;
+  inputs_v2: string | null;
+  inputs_v3: string | null;
 }
 
 interface SitesprenTag {
@@ -148,8 +162,7 @@ export default function DriggsmanTable() {
   // Inputs expand editor states
   const [inputsExpandPopup, setInputsExpandPopup] = useState<{ 
     cgigId: number; 
-    field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3'; 
-    value: string 
+    initialTab: 'inputs_v1' | 'inputs_v2' | 'inputs_v3';
   } | null>(null);
   
   // Verification column toggle
@@ -232,6 +245,7 @@ export default function DriggsmanTable() {
     { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
     { key: 'driggs_address_species_id', type: 'address_species_dropdown', label: 'driggs_address_species_id', group: 'contact' },
     { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
+    { key: 'driggs_citations_done', type: 'boolean', label: 'driggs_citations_done', group: 'contact' },
     { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
     { key: 'driggs_city', type: 'text', label: 'driggs_city', group: 'business' },
     { key: 'driggs_brand_name', type: 'text', label: 'driggs_brand_name', group: 'business' },
@@ -259,7 +273,17 @@ export default function DriggsmanTable() {
     { key: 'icon_name', type: 'text', label: 'icon_name', group: 'display' },
     { key: 'icon_color', type: 'text', label: 'icon_color', group: 'display' },
     { key: 'is_bulldozer', type: 'boolean', label: 'is_bulldozer', group: 'meta' },
-    { key: 'is_competitor', type: 'boolean', label: 'is_competitor', group: 'meta' }
+    { key: 'is_competitor', type: 'boolean', label: 'is_competitor', group: 'meta' },
+    { key: 'is_external', type: 'boolean', label: 'is_external', group: 'meta' },
+    { key: 'is_internal', type: 'boolean', label: 'is_internal', group: 'meta' },
+    { key: 'is_ppx', type: 'boolean', label: 'is_ppx', group: 'meta' },
+    { key: 'is_ms', type: 'boolean', label: 'is_ms', group: 'meta' },
+    { key: 'is_wayback_rebuild', type: 'boolean', label: 'is_wayback_rebuild', group: 'meta' },
+    { key: 'is_naked_wp_build', type: 'boolean', label: 'is_naked_wp_build', group: 'meta' },
+    { key: 'is_rnr', type: 'boolean', label: 'is_rnr', group: 'meta' },
+    { key: 'is_aff', type: 'boolean', label: 'is_aff', group: 'meta' },
+    { key: 'is_other1', type: 'boolean', label: 'is_other1', group: 'meta' },
+    { key: 'is_other2', type: 'boolean', label: 'is_other2', group: 'meta' }
   ];
   
   // Initialize manual sites from URL parameter
@@ -462,7 +486,7 @@ export default function DriggsmanTable() {
 
       const { data: gigsData, error: gigsError } = await supabase
         .from('citation_gigs')
-        .select('cgig_id, cgig_title, seller_name, marketplace, base_price, currency, cgig_url, is_active, user_id, citations_included')
+        .select('cgig_id, cgig_title, seller_name, marketplace, base_price, currency, cgig_url, is_active, user_id, citations_included, inputs_v1, inputs_v2, inputs_v3')
         .eq('user_id', userData.id)
         .eq('is_active', true)
         .order('cgig_title');
@@ -1070,35 +1094,59 @@ export default function DriggsmanTable() {
 
   // Handle inputs expand editor
   const handleInputsExpandClick = (cgigId: number, field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3') => {
-    const gig = citationGigs.find(g => g.cgig_id === cgigId);
-    const currentValue = gig?.[field] || '';
-    setInputsExpandPopup({ cgigId, field, value: currentValue });
+    console.log(`Opening inputs editor for cgig ${cgigId}, initial tab: ${field}`);
+    setInputsExpandPopup({ cgigId, initialTab: field });
   };
 
-  const handleInputsExpandSave = async (newValue: string) => {
+  const handleInputsExpandSave = async (field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3', newValue: string) => {
     if (!inputsExpandPopup) return;
 
-    const { cgigId, field } = inputsExpandPopup;
+    const { cgigId } = inputsExpandPopup;
     
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.id) throw new Error('User not authenticated');
-
-    // Get internal user ID
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', user.id)
-      .single();
-
-    if (userError || !userData) throw new Error('User not found');
+    console.log(`Saving ${field} for cgig ${cgigId}:`, newValue);
     
-    const { error } = await supabase
-      .from('citation_gigs')
-      .update({ [field]: newValue })
-      .eq('cgig_id', cgigId)
-      .eq('user_id', userData.id);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) throw new Error('User not authenticated');
 
-    if (error) throw error;
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) throw new Error('User not found');
+      
+      // Verify the citation gig exists and belongs to the user before updating
+      const { data: gigCheck, error: checkError } = await supabase
+        .from('citation_gigs')
+        .select('cgig_id, cgig_title')
+        .eq('cgig_id', cgigId)
+        .eq('user_id', userData.id)
+        .single();
+      
+      if (checkError || !gigCheck) {
+        throw new Error(`Citation gig ${cgigId} not found or access denied`);
+      }
+      
+      const { error } = await supabase
+        .from('citation_gigs')
+        .update({ [field]: newValue })
+        .eq('cgig_id', cgigId)
+        .eq('user_id', userData.id);
+
+      if (error) {
+        console.error('Database update error:', error);
+        throw error;
+      }
+      
+      console.log(`Successfully saved ${field} for ${gigCheck.cgig_title} (${cgigId})`);
+    } catch (error) {
+      console.error('Error saving inputs field:', error);
+      alert(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      return;
+    }
 
     // Update local citation gigs data
     setCitationGigs(citationGigs.map(gig => 
@@ -2233,6 +2281,13 @@ export default function DriggsmanTable() {
                                     <button
                                       key={num}
                                       onClick={() => {
+                                        console.log(`Button ${buttonText} clicked for site ${site.sitespren_base}:`, { 
+                                          cgigId, 
+                                          inputField, 
+                                          fieldKey: field.key,
+                                          siteData: site[field.key as keyof typeof site]
+                                        });
+                                        
                                         if (cgigId) {
                                           handleInputsExpandClick(cgigId, inputField);
                                         } else {
@@ -2551,8 +2606,8 @@ export default function DriggsmanTable() {
       {/* Inputs Expand Editor */}
       <InputsExpandEditor
         isOpen={!!inputsExpandPopup}
-        fieldName={inputsExpandPopup?.field || 'inputs_v1'}
-        initialValue={inputsExpandPopup?.value || ''}
+        cgigId={inputsExpandPopup?.cgigId || 0}
+        initialTab={inputsExpandPopup?.initialTab || 'inputs_v1'}
         onSave={handleInputsExpandSave}
         onClose={handleInputsExpandClose}
       />

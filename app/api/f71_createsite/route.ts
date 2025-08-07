@@ -34,9 +34,9 @@ export async function POST(request: NextRequest) {
     console.log('API route called');
     
     // Get the request body
-    const { user_internal_id, sites_list } = await request.json();
+    const { user_internal_id, sites_list, additional_fields } = await request.json();
     
-    console.log('Received request:', { user_internal_id, sites_list });
+    console.log('Received request:', { user_internal_id, sites_list, additional_fields });
     
     // Initialize Supabase client with service role key to bypass RLS
     const supabase = createClient(
@@ -92,7 +92,8 @@ export async function POST(request: NextRequest) {
     // Prepare records for insertion
     const sitesToInsert = urlsToProcess.map(url => ({
       sitespren_base: url,
-      fk_users_id: user_internal_id
+      fk_users_id: user_internal_id,
+      ...additional_fields // Spread the additional fields
     }));
 
     console.log(`Attempting to insert ${sitesToInsert.length} sites:`, sitesToInsert);

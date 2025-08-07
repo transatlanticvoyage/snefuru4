@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
 
     console.log('Fetching sitespren data for user:', userInternalId);
 
-    // Fetch sitespren data from the large view that includes registrar joins
+    // Fetch sitespren data from the base table to ensure we get is_external/is_internal columns
     const { data: sitespren, error } = await supabase
-      .from('sitespren_large_view_1')
+      .from('sitespren')
       .select('*')
       .eq('fk_users_id', userInternalId)
       .order('created_at', { ascending: false });
@@ -38,6 +38,19 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('Found sitespren records:', sitespren?.length || 0);
+    
+    // Debug: Check if is_external and is_internal columns are present
+    if (sitespren && sitespren.length > 0) {
+      const firstRecord = sitespren[0];
+      const hasExternal = 'is_external' in firstRecord;
+      const hasInternal = 'is_internal' in firstRecord;
+      console.log('First record keys:', Object.keys(firstRecord));
+      console.log('Has is_external column:', hasExternal);
+      console.log('Has is_internal column:', hasInternal);
+      if (hasExternal) {
+        console.log('Sample is_external values:', sitespren.slice(0, 3).map(r => ({ id: r.id, is_external: r.is_external })));
+      }
+    }
 
     return NextResponse.json({
       success: true,

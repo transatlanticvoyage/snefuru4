@@ -15,6 +15,7 @@ interface Cncglub {
   cncg_id: number;
   rel_city_id: number;
   rel_industry_id: number;
+  is_sko: boolean;
   created_at: string;
   updated_at: string | null;
   // Joined city data
@@ -98,6 +99,7 @@ export default function Cnjar1Table() {
     { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
     { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
     { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+    { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
     { key: 'created_at' as keyof Cncglub, label: 'created_at', type: 'datetime', readOnly: true },
     { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true, separator: 'black-3px' }
   ];
@@ -316,10 +318,40 @@ export default function Cnjar1Table() {
   // Handle cell editing
   const handleCellClick = (id: number, field: string, value: any) => {
     const column = columns.find(col => col.key === field);
-    if (column?.readOnly || column?.type === 'boolean') return;
+    if (column?.readOnly) return;
+    
+    // Handle boolean columns specially
+    if (column?.type === 'boolean') {
+      handleBooleanToggle(id, field, value);
+      return;
+    }
     
     setEditingCell({ id, field });
     setEditingValue(value?.toString() || '');
+  };
+
+  // Handle boolean toggle
+  const handleBooleanToggle = async (id: number, field: string, currentValue: boolean) => {
+    try {
+      const newValue = !currentValue;
+      
+      const { error } = await supabase
+        .from('cncglub')
+        .update({ [field]: newValue })
+        .eq('cncg_id', id);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(data.map(item => 
+        item.cncg_id === id 
+          ? { ...item, [field]: newValue }
+          : item
+      ));
+    } catch (err) {
+      console.error('Error updating boolean field:', err);
+      alert('Failed to update field');
+    }
   };
 
   const handleCellSave = async () => {
@@ -669,7 +701,7 @@ export default function Cnjar1Table() {
     return (
       <div
         onClick={() => !isReadOnly && !column.isJoined && handleCellClick(item.cncg_id, column.key, value)}
-        className={`px-2 py-1 ${!isReadOnly && !column.isJoined ? 'cursor-pointer hover:bg-gray-100 cursor-text' : 'cursor-default'}`}
+        className={`px-2 py-1 ${!isReadOnly && !column.isJoined ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} ${column.type === 'boolean' ? 'cursor-pointer' : 'cursor-text'}`}
       >
         {column.type === 'boolean' ? 
           (value ? '✓' : '✗') :

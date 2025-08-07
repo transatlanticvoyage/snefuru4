@@ -68,7 +68,7 @@ export default function CgigjarTable() {
   const [editingValue, setEditingValue] = useState<string>('');
   
   // Expand popup states
-  const [expandPopup, setExpandPopup] = useState<{ id: number; field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3'; value: string } | null>(null);
+  const [expandPopup, setExpandPopup] = useState<{ cgigId: number; initialTab: 'inputs_v1' | 'inputs_v2' | 'inputs_v3' } | null>(null);
   
   // Form data for creating/editing
   const [formData, setFormData] = useState({
@@ -302,14 +302,15 @@ export default function CgigjarTable() {
   };
 
   // Handle expand popup
-  const handleExpandClick = (id: number, field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3', value: string) => {
-    setExpandPopup({ id, field, value: value || '' });
+  const handleExpandClick = (cgigId: number, field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3') => {
+    console.log(`Opening inputs editor for cgig ${cgigId}, initial tab: ${field}`);
+    setExpandPopup({ cgigId, initialTab: field });
   };
 
-  const handleExpandSave = async (newValue: string) => {
+  const handleExpandSave = async (field: 'inputs_v1' | 'inputs_v2' | 'inputs_v3', newValue: string) => {
     if (!expandPopup) return;
 
-    const { id, field } = expandPopup;
+    const { cgigId } = expandPopup;
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user?.id) throw new Error('User not authenticated');
@@ -326,14 +327,14 @@ export default function CgigjarTable() {
     const { error } = await supabase
       .from('citation_gigs')
       .update({ [field]: newValue })
-      .eq('cgig_id', id)
+      .eq('cgig_id', cgigId)
       .eq('user_id', userData.id);
 
     if (error) throw error;
 
     // Update local data
     setData(data.map(item => 
-      item.cgig_id === id ? { ...item, [field]: newValue } : item
+      item.cgig_id === cgigId ? { ...item, [field]: newValue } : item
     ));
   };
 
@@ -784,7 +785,7 @@ export default function CgigjarTable() {
                               {value ? value.toString().substring(0, 10) + (value.toString().length > 10 ? '...' : '') : '-'}
                             </div>
                             <button
-                              onClick={() => handleExpandClick(row.cgig_id, column.key, value?.toString() || '')}
+                              onClick={() => handleExpandClick(row.cgig_id, column.key as 'inputs_v1' | 'inputs_v2' | 'inputs_v3')}
                               className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-xs rounded transition-colors"
                             >
                               expand
@@ -848,8 +849,8 @@ export default function CgigjarTable() {
       {/* Expand Popup Modal */}
       <InputsExpandEditor
         isOpen={!!expandPopup}
-        fieldName={expandPopup?.field || 'inputs_v1'}
-        initialValue={expandPopup?.value || ''}
+        cgigId={expandPopup?.cgigId || 0}
+        initialTab={expandPopup?.initialTab || 'inputs_v1'}
         onSave={handleExpandSave}
         onClose={handleExpandClose}
       />

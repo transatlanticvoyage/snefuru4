@@ -17,6 +17,7 @@ export default function Sitejar4Page() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteNotification, setDeleteNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [isExternalFilter, setIsExternalFilter] = useState<string>('hide');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [kz101Checked, setKz101Checked] = useState(false);
   const [kz103Checked, setKz103Checked] = useState(false);
@@ -28,6 +29,62 @@ export default function Sitejar4Page() {
   const [sitesList, setSitesList] = useState('');
   const [isSubmittingF71, setIsSubmittingF71] = useState(false);
   const [f71Notification, setF71Notification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+  
+  // Tags management tab state
+  const [tagsActiveTab, setTagsActiveTab] = useState<'fromUTG' | 'fromPaste'>('fromUTG');
+  const [pastedSitesContent, setPastedSitesContent] = useState('');
+  const [isProcessingPastedSites, setIsProcessingPastedSites] = useState(false);
+  const [pastedSitesReport, setPastedSitesReport] = useState<{
+    totalSubmitted: number;
+    successfullyAdded: number;
+    alreadyExisted: number;
+    notInAccount: number;
+    details?: string[];
+  } | null>(null);
+  
+  // F71 additional fields state for the table grid
+  const [f71Fields, setF71Fields] = useState({
+    true_root_domain: '',
+    full_subdomain: '',
+    webproperty_type: '',
+    wpuser1: '',
+    wppass1: '',
+    wp_plugin_installed1: false,
+    wp_plugin_connected2: false,
+    fk_domreg_hostaccount: '',
+    is_wp_site: false,
+    wp_rest_app_pass: '',
+    driggs_industry: '',
+    driggs_city: '',
+    driggs_brand_name: '',
+    driggs_site_type_purpose: '',
+    driggs_email_1: '',
+    driggs_address_full: '',
+    driggs_address_species_id: null as number | null,
+    driggs_phone_1: '',
+    driggs_phone1_platform_id: null as number | null,
+    driggs_cgig_id: null as number | null,
+    driggs_special_note_for_ai_tool: '',
+    driggs_revenue_goal: null as number | null,
+    ns_full: '',
+    ip_address: '',
+    is_starred1: '',
+    icon_name: '',
+    icon_color: '',
+    is_bulldozer: false,
+    is_competitor: false,
+    is_external: false,
+    is_internal: false,
+    is_ppx: false,
+    is_ms: false,
+    is_wayback_rebuild: false,
+    is_naked_wp_build: false,
+    is_rnr: false,
+    is_aff: false,
+    is_other1: false,
+    is_other2: false
+  });
+  const [selectedF71Fields, setSelectedF71Fields] = useState<Set<string>>(new Set());
   const [tagsData, setTagsData] = useState<any>(null);
   const { user } = useAuth();
   const supabase = createClientComponentClient();
@@ -72,11 +129,17 @@ export default function Sitejar4Page() {
     }
   }, []);
 
-  // Initialize search term from URL parameter
+  // Initialize search term and is_external filter from URL parameters
   useEffect(() => {
     const searchsite = searchParams?.get('searchsite');
+    const isExternal = searchParams?.get('is_external');
+    
     if (searchsite) {
       setSearchTerm(searchsite);
+    }
+    
+    if (isExternal === 'show' || isExternal === 'hide') {
+      setIsExternalFilter(isExternal);
     }
   }, [searchParams]);
 
@@ -118,14 +181,23 @@ export default function Sitejar4Page() {
     };
   }, [currentUrl]);
 
-  // Update URL when search term changes
-  const updateSearchInURL = (newSearchTerm: string) => {
+  // Update URL when search term or is_external filter changes
+  const updateSearchInURL = (newSearchTerm: string, newIsExternal?: string) => {
     const url = new URL(window.location.href);
+    
     if (newSearchTerm.trim()) {
       url.searchParams.set('searchsite', newSearchTerm.trim());
     } else {
       url.searchParams.delete('searchsite');
     }
+    
+    const externalFilter = newIsExternal !== undefined ? newIsExternal : isExternalFilter;
+    if (externalFilter === 'show') {
+      url.searchParams.set('is_external', 'show');
+    } else {
+      url.searchParams.delete('is_external'); // Default is 'hide', no need to set in URL
+    }
+    
     router.replace(url.pathname + url.search, { scroll: false });
   };
 
@@ -136,18 +208,36 @@ export default function Sitejar4Page() {
     updateSearchInURL(newValue);
   };
 
-  // Filter sitespren data based on search term
+  // Handle is_external filter change
+  const handleIsExternalFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newValue = e.target.value;
+    setIsExternalFilter(newValue);
+    updateSearchInURL(searchTerm, newValue);
+  };
+
+  // Filter sitespren data based on search term and is_external filter
   const filteredSitesprenData = sitesprenData.filter(site => {
-    if (!searchTerm.trim()) return true;
+    // Apply search term filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = (
+        site.sitespren_base?.toLowerCase().includes(searchLower) ||
+        site.true_root_domain?.toLowerCase().includes(searchLower) ||
+        site.full_subdomain?.toLowerCase().includes(searchLower) ||
+        site.webproperty_type?.toLowerCase().includes(searchLower) ||
+        site.id?.toLowerCase().includes(searchLower)
+      );
+      if (!matchesSearch) return false;
+    }
     
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      site.sitespren_base?.toLowerCase().includes(searchLower) ||
-      site.true_root_domain?.toLowerCase().includes(searchLower) ||
-      site.full_subdomain?.toLowerCase().includes(searchLower) ||
-      site.webproperty_type?.toLowerCase().includes(searchLower) ||
-      site.id?.toLowerCase().includes(searchLower)
-    );
+    // Apply is_external filter
+    if (isExternalFilter === 'show') {
+      // Show all sites regardless of is_external value
+      return true;
+    } else {
+      // 'hide' - do not display sites where is_external = true
+      return site.is_external !== true;
+    }
   });
 
   useEffect(() => {
@@ -252,7 +342,16 @@ export default function Sitejar4Page() {
     setF71Notification(null);
 
     try {
-      const result = await cfunc_f71_createsite(userInternalId, sitesList);
+      // Build additional fields object with only selected fields
+      const additionalFields: any = {};
+      selectedF71Fields.forEach(fieldName => {
+        if (f71Fields[fieldName as keyof typeof f71Fields] !== '' && 
+            f71Fields[fieldName as keyof typeof f71Fields] !== null) {
+          additionalFields[fieldName] = f71Fields[fieldName as keyof typeof f71Fields];
+        }
+      });
+      
+      const result = await cfunc_f71_createsite(userInternalId, sitesList, additionalFields);
       
       if (result.success) {
         console.log('Sites created successfully, calling refetchSitesprenData()');
@@ -261,6 +360,41 @@ export default function Sitejar4Page() {
           message: `Successfully created ${result.data?.sitesCreated} site(s)!`
         });
         setSitesList(''); // Clear the textarea
+        // Clear additional fields
+        setF71Fields({
+          true_root_domain: '',
+          full_subdomain: '',
+          webproperty_type: '',
+          wpuser1: '',
+          wppass1: '',
+          wp_plugin_installed1: false,
+          wp_plugin_connected2: false,
+          fk_domreg_hostaccount: '',
+          is_wp_site: false,
+          wp_rest_app_pass: '',
+          driggs_industry: '',
+          driggs_city: '',
+          driggs_brand_name: '',
+          driggs_site_type_purpose: '',
+          driggs_email_1: '',
+          driggs_address_full: '',
+          driggs_address_species_id: null,
+          driggs_phone_1: '',
+          driggs_phone1_platform_id: null,
+          driggs_cgig_id: null,
+          driggs_special_note_for_ai_tool: '',
+          driggs_revenue_goal: null,
+          ns_full: '',
+          ip_address: '',
+          is_starred1: '',
+          icon_name: '',
+          icon_color: '',
+          is_bulldozer: false,
+          is_competitor: false,
+          is_external: false,
+          is_internal: false
+        });
+        setSelectedF71Fields(new Set()); // Clear selections
         await refetchSitesprenData(); // Refresh the table
       } else {
         setF71Notification({
@@ -278,6 +412,66 @@ export default function Sitejar4Page() {
       setIsSubmittingF71(false);
       // Clear notification after 5 seconds
       setTimeout(() => setF71Notification(null), 5000);
+    }
+  };
+
+  // Handle adding pasted sites to selected tag
+  const handleAddPastedSitesToTag = async () => {
+    if (!pastedSitesContent.trim()) {
+      return;
+    }
+    
+    if (!tagsData?.selectedTags || tagsData.selectedTags.size === 0) {
+      return;
+    }
+    
+    if (!userInternalId) {
+      return;
+    }
+
+    setIsProcessingPastedSites(true);
+    setPastedSitesReport(null);
+
+    try {
+      // Parse pasted content - split by lines and clean up
+      const pastedSites = pastedSitesContent
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+
+      const tagId = Array.from(tagsData.selectedTags)[0]; // Use first selected tag
+      
+      // Call API to process pasted sites
+      const response = await fetch('/api/add_pasted_sites_to_tag', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pasted_sites: pastedSites,
+          tag_id: tagId,
+          user_internal_id: userInternalId
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setPastedSitesReport({
+          totalSubmitted: result.totalSubmitted,
+          successfullyAdded: result.successfullyAdded,
+          alreadyExisted: result.alreadyExisted,
+          notInAccount: result.notInAccount,
+          details: result.details
+        });
+        
+        // Clear the textarea after successful processing
+        setPastedSitesContent('');
+      }
+    } catch (error) {
+      console.error('Error processing pasted sites:', error);
+    } finally {
+      setIsProcessingPastedSites(false);
     }
   };
 
@@ -804,6 +998,119 @@ http://www.drogs.com`}
                           {isSubmittingF71 ? 'Creating Sites...' : 'f71_createsite'}
                         </button>
                       </div>
+
+                      {/* F71 Additional Fields Table Grid */}
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-3">Additional Site Fields (Optional)</h3>
+                        <div className="overflow-x-auto border border-gray-300 rounded-lg">
+                          <table className="divide-y divide-gray-200" style={{ width: 'auto' }}>
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '50px' }}>
+                                  Select
+                                </th>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '300px' }}>
+                                  Field Name
+                                </th>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Value
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                              {Object.entries(f71Fields).map(([fieldName, fieldValue]) => {
+                                const isBoolean = typeof fieldValue === 'boolean';
+                                const isNumber = fieldName.includes('_id') || fieldName.includes('revenue_goal');
+                                const isSelected = selectedF71Fields.has(fieldName);
+                                
+                                return (
+                                  <tr key={fieldName} className={isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}>
+                                    <td className="px-3 py-2" style={{ width: '50px' }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={(e) => {
+                                          const newSelected = new Set(selectedF71Fields);
+                                          if (e.target.checked) {
+                                            newSelected.add(fieldName);
+                                          } else {
+                                            newSelected.delete(fieldName);
+                                          }
+                                          setSelectedF71Fields(newSelected);
+                                        }}
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2 text-sm text-gray-900 font-medium" style={{ width: '300px' }}>
+                                      {fieldName}
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      {isBoolean ? (
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                          <input
+                                            type="checkbox"
+                                            checked={fieldValue}
+                                            onChange={(e) => {
+                                              setF71Fields(prev => ({
+                                                ...prev,
+                                                [fieldName]: e.target.checked
+                                              }));
+                                              // Auto-select field when value changes
+                                              if (!isSelected) {
+                                                setSelectedF71Fields(prev => new Set([...prev, fieldName]));
+                                              }
+                                            }}
+                                            className="sr-only peer"
+                                          />
+                                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                        </label>
+                                      ) : isNumber ? (
+                                        <input
+                                          type="number"
+                                          value={fieldValue || ''}
+                                          onChange={(e) => {
+                                            const value = e.target.value ? parseInt(e.target.value) : null;
+                                            setF71Fields(prev => ({
+                                              ...prev,
+                                              [fieldName]: value
+                                            }));
+                                            // Auto-select field when value changes
+                                            if (!isSelected && e.target.value) {
+                                              setSelectedF71Fields(prev => new Set([...prev, fieldName]));
+                                            }
+                                          }}
+                                          className="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                          placeholder="Enter number..."
+                                        />
+                                      ) : (
+                                        <input
+                                          type="text"
+                                          value={fieldValue || ''}
+                                          onChange={(e) => {
+                                            setF71Fields(prev => ({
+                                              ...prev,
+                                              [fieldName]: e.target.value
+                                            }));
+                                            // Auto-select field when value changes
+                                            if (!isSelected && e.target.value) {
+                                              setSelectedF71Fields(prev => new Set([...prev, fieldName]));
+                                            }
+                                          }}
+                                          className="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                          placeholder={`Enter ${fieldName}...`}
+                                        />
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                        <p className="mt-2 text-sm text-gray-600">
+                          Selected fields will be applied to all sites being created. Check the box next to each field you want to include.
+                        </p>
+                      </div>
                     </div>
 
                     {/* Other Functions */}
@@ -913,21 +1220,99 @@ http://www.drogs.com`}
                       </div>
                     )}
 
-                    {/* Add Sites to Tag Button */}
+                    {/* Add Sites to Tag Section with Tabs */}
                     <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <button
-                        onClick={() => tagsData?.functions?.handleAddSitesToTag()}
-                        disabled={!tagsData?.functions?.handleAddSitesToTag || tagsData?.loadingStates?.isAddingSitesToTag}
-                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-bold rounded-md transition-colors text-lg"
-                      >
-                        {tagsData?.loadingStates?.isAddingSitesToTag ? 'Adding Sites...' : 'Add Selected Sites to Selected Tag'}
-                      </button>
-                      <div className="mt-2 text-sm text-blue-600">
-                        <p>• First select sites from the main table using checkboxes</p>
-                        <p>• Then select one tag from the table below using its checkbox</p>
-                        <p>• Finally click the button above to add selected sites to the selected tag</p>
-                        <p>• Currently selected: {selectedSiteIds.length} site(s), {tagsData?.selectedTags?.size || 0} tag(s)</p>
+                      {/* Tab Navigation */}
+                      <div className="mb-4 border-b border-blue-200">
+                        <div className="flex">
+                          <button
+                            onClick={() => setTagsActiveTab('fromUTG')}
+                            className={`px-4 py-2 font-medium transition-colors ${
+                              tagsActiveTab === 'fromUTG'
+                                ? 'border-b-2 border-blue-600 text-blue-600'
+                                : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                          >
+                            From UTG
+                          </button>
+                          <button
+                            onClick={() => setTagsActiveTab('fromPaste')}
+                            className={`px-4 py-2 font-medium transition-colors ${
+                              tagsActiveTab === 'fromPaste'
+                                ? 'border-b-2 border-blue-600 text-blue-600'
+                                : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                          >
+                            From Paste
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Tab Content */}
+                      {tagsActiveTab === 'fromUTG' && (
+                        <div>
+                          <button
+                            onClick={() => tagsData?.functions?.handleAddSitesToTag()}
+                            disabled={!tagsData?.functions?.handleAddSitesToTag || tagsData?.loadingStates?.isAddingSitesToTag}
+                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-bold rounded-md transition-colors text-lg"
+                          >
+                            {tagsData?.loadingStates?.isAddingSitesToTag ? 'Adding Sites...' : 'Add Selected Sites to Selected Tag'}
+                          </button>
+                          <div className="mt-2 text-sm text-blue-600">
+                            <p>• First select sites from the main table using checkboxes</p>
+                            <p>• Then select one tag from the table below using its checkbox</p>
+                            <p>• Finally click the button above to add selected sites to the selected tag</p>
+                            <p>• Currently selected: {selectedSiteIds.length} site(s), {tagsData?.selectedTags?.size || 0} tag(s)</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {tagsActiveTab === 'fromPaste' && (
+                        <div>
+                          <textarea
+                            value={pastedSitesContent}
+                            onChange={(e) => setPastedSitesContent(e.target.value)}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            style={{ width: '600px', height: '200px' }}
+                            placeholder="Paste site URLs here (one per line)..."
+                            disabled={isProcessingPastedSites}
+                          />
+                          <button
+                            onClick={handleAddPastedSitesToTag}
+                            disabled={!pastedSitesContent.trim() || !tagsData?.selectedTags || tagsData.selectedTags.size === 0 || isProcessingPastedSites}
+                            className="mt-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-bold rounded-md transition-colors text-lg"
+                          >
+                            {isProcessingPastedSites ? 'Processing...' : 'Add Pasted Sites to Selected Tag'}
+                          </button>
+                          <div className="mt-2 text-sm text-blue-600">
+                            <p>• Currently selected: {tagsData?.selectedTags?.size || 0} tag(s)</p>
+                            <p>• Lines to process: {pastedSitesContent.split('\n').filter(line => line.trim()).length}</p>
+                          </div>
+                          
+                          {/* Report Section */}
+                          {pastedSitesReport && (
+                            <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                              <h5 className="text-md font-semibold mb-2">Processing Report</h5>
+                              <div className="space-y-1 text-sm">
+                                <p>• Total sites submitted: <strong>{pastedSitesReport.totalSubmitted}</strong></p>
+                                <p>• Successfully added to tag: <strong className="text-green-600">{pastedSitesReport.successfullyAdded}</strong></p>
+                                <p>• Already existed in tag: <strong className="text-yellow-600">{pastedSitesReport.alreadyExisted}</strong></p>
+                                <p>• Not found in your account: <strong className="text-red-600">{pastedSitesReport.notInAccount}</strong></p>
+                                {pastedSitesReport.details && pastedSitesReport.details.length > 0 && (
+                                  <div className="mt-2 pt-2 border-t border-gray-300">
+                                    <p className="font-medium">Details:</p>
+                                    <ul className="mt-1 ml-4 text-xs">
+                                      {pastedSitesReport.details.map((detail, index) => (
+                                        <li key={index} className="text-gray-600">• {detail}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Create New Tag Form */}
@@ -1097,6 +1482,9 @@ http://www.drogs.com`}
                         </table>
                       </div>
                     </div>
+                    
+                    {/* Bottom spacing to allow scrolling past the table */}
+                    <div style={{ height: '60px' }}></div>
                   </div>
                 )}
                 {activePopupTab === 'ptab4' && (
@@ -1140,6 +1528,8 @@ http://www.drogs.com`}
         onSearchChange={handleSearchChange}
         totalUnfilteredCount={sitesprenData.length}
         onTagsUpdate={handleTagsUpdate}
+        isExternalFilter={isExternalFilter}
+        onIsExternalFilterChange={handleIsExternalFilterChange}
       />
     </div>
   );

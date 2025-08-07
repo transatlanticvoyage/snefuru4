@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Icons</title>
+</head>
+<body>
+  <h1>Icon Generator for Shatenzi Port Switcher</h1>
+  <p>Right-click each canvas and save as PNG to the icons folder</p>
+  
+  <div>
+    <h3>16x16 icon (icon16.png)</h3>
+    <canvas id="icon16" width="16" height="16"></canvas>
+  </div>
+  
+  <div>
+    <h3>48x48 icon (icon48.png)</h3>
+    <canvas id="icon48" width="48" height="48"></canvas>
+  </div>
+  
+  <div>
+    <h3>128x128 icon (icon128.png)</h3>
+    <canvas id="icon128" width="128" height="128"></canvas>
+  </div>
+
+  <script>
+    function drawIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Fill background with bright blue
+      ctx.fillStyle = '#0066ff';
+      ctx.fillRect(0, 0, size, size);
+      
+      // Add slight rounded corners effect for larger icons
+      if (size > 16) {
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.roundRect(0, 0, size, size, size * 0.1);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      
+      // Set text properties
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `bold ${size * 0.5}px -apple-system, system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Draw "PO" text
+      ctx.fillText('PO', size / 2, size / 2);
+      
+      // Add canvas to page with border for visibility
+      canvas.style.border = '1px solid #ccc';
+      canvas.style.margin = '10px';
+      canvas.style.imageRendering = 'pixelated';
+      canvas.style.width = size * 2 + 'px';
+      canvas.style.height = size * 2 + 'px';
+    }
+    
+    // Generate all icons
+    drawIcon('icon16', 16);
+    drawIcon('icon48', 48);
+    drawIcon('icon128', 128);
+    
+    // Function to download canvas as PNG
+    function downloadCanvas(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+    
+    // Auto-download all icons (commented out - user should save manually)
+    // setTimeout(() => {
+    //   downloadCanvas('icon16', 'icon16.png');
+    //   downloadCanvas('icon48', 'icon48.png');
+    //   downloadCanvas('icon128', 'icon128.png');
+    // }, 1000);
+  </script>
+  
+  <hr>
+  <h3>Instructions:</h3>
+  <ol>
+    <li>Open this file in a browser</li>
+    <li>Right-click each icon and select "Save Image As..."</li>
+    <li>Save to the icons/ folder with the names: icon16.png, icon48.png, icon128.png</li>
+  </ol>
+</body>
+</html>
