@@ -9,8 +9,8 @@ please create a new page at
 
 		NUBRA TABLEFACES - MAIN TENANTS
 		==========================================================
-		for our page at
-        /cnjar1
+		please create a new page at
+        /scafjar
 		
 		———————————————————————
 		please create a robust ui table grid system, and build something similar to what is on our current page at /xpagesmanager1
@@ -18,7 +18,7 @@ please create a new page at
 		———————————————————————
     		
         please make sure that this ui table lists every db column from this db table:
-		cncglub
+		d
 
 
 		———————————————————————

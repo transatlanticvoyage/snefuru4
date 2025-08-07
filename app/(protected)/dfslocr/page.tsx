@@ -3,9 +3,15 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import KeywordsHubTable from './components/KeywordsHubTable';
+import dynamic from 'next/dynamic';
+import DfsLocationsTable from './components/DfsLocationsTable';
 
-export default function KwjarPage() {
+const DrenjariButtonBarDriggsmanLinks = dynamic(
+  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+  { ssr: false }
+);
+
+export default function DfslocrPage() {
   const { user } = useAuth();
   const router = useRouter();
 
@@ -26,22 +32,27 @@ export default function KwjarPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Drenjari Button Bar */}
+      <div className="px-6 pb-0">
+        <DrenjariButtonBarDriggsmanLinks />
+      </div>
+      
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">🔍 Keywords Hub</h1>
+            <h1 className="text-2xl font-bold text-gray-800">🌍 DataForSEO Locations</h1>
           </div>
           <div className="text-right">
-            <div className="text-sm text-gray-500">DataForSEO Integration</div>
-            <div className="text-xs text-gray-400">Project: Keywords Research</div>
+            <div className="text-sm text-gray-500">Location Database</div>
+            <div className="text-xs text-gray-400">Project: DFS Location Manager</div>
           </div>
         </div>
       </div>
 
-      {/* Main Content - Full Width KeywordsHubTable */}
+      {/* Main Content - Full Width DfsLocationsTable */}
       <div className="flex-1 overflow-hidden">
-        <KeywordsHubTable />
+        <DfsLocationsTable />
       </div>
     </div>
   );
