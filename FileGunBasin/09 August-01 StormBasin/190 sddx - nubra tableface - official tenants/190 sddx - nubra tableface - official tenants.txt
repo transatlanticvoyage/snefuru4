@@ -10,7 +10,7 @@ please create a new page at
 		NUBRA TABLEFACES - MAIN TENANTS
 		==========================================================
 		please create a new page at
-        /scafjar
+        /scafjars
 		
 		———————————————————————
 		please create a robust ui table grid system, and build something similar to what is on our current page at /xpagesmanager1
