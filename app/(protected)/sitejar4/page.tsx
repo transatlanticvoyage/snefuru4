@@ -92,6 +92,12 @@ export default function Sitejar4Page() {
     is_other2: false,
     is_flylocal: false
   });
+  
+  // Chamber visibility states
+  const [chambersVisible, setChambersVisible] = useState({
+    yupik: true,
+    chepno: true
+  });
   const [selectedF71Fields, setSelectedF71Fields] = useState<Set<string>>(new Set());
   const [tagsData, setTagsData] = useState<any>(null);
   const { user } = useAuth();
@@ -580,6 +586,14 @@ export default function Sitejar4Page() {
     setTagsData(newTagsData);
   };
 
+  // Toggle chamber visibility
+  const toggleChamber = (chamber: keyof typeof chambersVisible) => {
+    setChambersVisible(prev => ({
+      ...prev,
+      [chamber]: !prev[chamber]
+    }));
+  };
+
   const f18_deletesites = async () => {
     if (selectedSiteIds.length === 0) {
       setDeleteNotification({
@@ -682,6 +696,29 @@ export default function Sitejar4Page() {
       {/* Drenjari Navigation Links */}
       <div className="mb-4">
         <DrenjariButtonBarDriggsmanLinks />
+      </div>
+
+      {/* Chamber Controlyar Buttons */}
+      <div className="mb-4 flex items-center">
+        <span className="font-bold text-black mr-6" style={{ fontSize: '16px' }}>chamber controlyar buttons</span>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => toggleChamber('yupik')}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              chambersVisible.yupik ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+            }`}
+          >
+            yupik
+          </button>
+          <button
+            onClick={() => toggleChamber('chepno')}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              chambersVisible.chepno ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+            }`}
+          >
+            chepno
+          </button>
+        </div>
       </div>
 
       {/* Functions popup button */}
@@ -1553,6 +1590,7 @@ http://www.drogs.com`}
         onTagsUpdate={handleTagsUpdate}
         isExternalFilter={isExternalFilter}
         onIsExternalFilterChange={handleIsExternalFilterChange}
+        chambersVisible={chambersVisible}
       />
     </div>
   );

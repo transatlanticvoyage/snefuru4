@@ -86,6 +86,10 @@ interface SitesprenTableProps {
       isAddingSitesToTag: boolean;
     };
   }) => void;
+  chambersVisible?: {
+    yupik: boolean;
+    chepno: boolean;
+  };
 }
 
 type SortField = keyof SitesprenRecord;
@@ -130,7 +134,7 @@ const allColumns = [
   'is_flylocal'        // 35
 ];
 
-export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate }: SitesprenTableProps) {
+export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate, chambersVisible }: SitesprenTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -2441,8 +2445,13 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
       </div>
       
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      {chambersVisible?.yupik !== false && (
+        <div className="bg-white p-4 rounded-lg shadow">
+          {/* Yupik Chamber Label */}
+          <div className="mb-4">
+            <h3 className="font-bold text-black" style={{ fontSize: '16px' }}>yupik chamber</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="md:col-span-2">
             <label htmlFor="site-search-table" className="block text-sm font-medium text-gray-700 mb-2">
               Search Sites
@@ -2670,10 +2679,12 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           </nav>
         </div>
       </div>
+      )}
 
       {/* Site Gadgets Section */}
-      <div className="bg-white p-4 rounded-lg shadow border">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
+      {chambersVisible?.chepno !== false && (
+        <div className="bg-white p-4 rounded-lg shadow border">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
         
         {/* Sync Actions Buttons */}
         <div className="mb-4">
@@ -2820,6 +2831,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
       </div>
       </div> {/* End of flex container for Essex and Chepno */}
+      )}
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
