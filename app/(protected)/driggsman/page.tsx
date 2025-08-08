@@ -4,6 +4,17 @@ import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import DriggsmanTable from './components/DriggsmanTable';
+import dynamic from 'next/dynamic';
+
+const SitedoriButtonBar = dynamic(
+  () => import('@/app/components/SitedoriButtonBar'),
+  { ssr: false }
+);
+
+const DrenjariButtonBarDriggsmanLinks = dynamic(
+  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+  { ssr: false }
+);
 
 export default function DriggsmanPage() {
   const { user } = useAuth();
@@ -39,6 +50,19 @@ export default function DriggsmanPage() {
             <div className="text-sm text-gray-500">Site Field Management</div>
             <div className="text-xs text-gray-400">Cross-reference all site fields</div>
           </div>
+        </div>
+      </div>
+
+      {/* Navigation Components */}
+      <div className="px-6 py-2">
+        {/* Sitedori Navigation Links */}
+        <div className="mb-4">
+          <SitedoriButtonBar />
+        </div>
+
+        {/* Drenjari Navigation Links */}
+        <div className="mb-4">
+          <DrenjariButtonBarDriggsmanLinks />
         </div>
       </div>
 

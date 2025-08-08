@@ -14,6 +14,11 @@ const DrenjariButtonBarDriggsmanLinks = dynamic(
   { ssr: false }
 );
 
+const SitedoriButtonBar = dynamic(
+  () => import('@/app/components/SitedoriButtonBar'),
+  { ssr: false }
+);
+
 export default function Sitejar4Page() {
   const [sitesprenData, setSitesprenData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -692,6 +697,11 @@ export default function Sitejar4Page() {
 
   return (
     <div className="pr-4">
+
+      {/* Sitedori Navigation Links */}
+      <div className="mb-4">
+        <SitedoriButtonBar />
+      </div>
 
       {/* Drenjari Navigation Links */}
       <div className="mb-4">
@@ -1590,7 +1600,7 @@ http://www.drogs.com`}
         onTagsUpdate={handleTagsUpdate}
         isExternalFilter={isExternalFilter}
         onIsExternalFilterChange={handleIsExternalFilterChange}
-        chambersVisible={chambersVisible}
+        // chambersVisible={chambersVisible}
       />
     </div>
   );
