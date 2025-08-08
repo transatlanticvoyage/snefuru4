@@ -1,0 +1,3 @@
+Aug 08 2025 14:22:27
+{"type":8192,"message":"Creation of dynamic property Pusher\\Log\\Logger::$file is deprecated","file":"\/Users\/kylecampbell\/Documents\/repos\/localrepo-snefuru4\/wordpress-sites\/mold-removal-stars\/wp-content\/plugins\/wppusher\/Pusher\/Log\/Logger.php","line":18}
+

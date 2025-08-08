@@ -1,0 +1,31 @@
+/**
+ * Admin Styles.
+ *
+ * @package aubreypwd\WPNoteup
+ * @since  1.1
+ */
+
+/* Resize the Media Button */
+.cmb2-id-wp-noteup {
+	padding: 10px 0 0 0 !important;
+}
+
+.cmb2-id-wp-noteup .button.insert-media,
+.cmb2-id-wp-noteup .button.insert-media:active,
+.cmb2-id-wp-noteup .button.insert-media:focus {
+	color: transparent;
+	overflow: hidden;
+	position: absolute;
+	right: 0;
+	top: 5px;
+	width: 32px;
+}
+
+/* Make sure only the add media buttons shows. */
+#wp-wp_noteup-media-buttons > * {
+	display: none;
+}
+
+#wp-wp_noteup-media-buttons > .add_media {
+	display: block;
+}

@@ -4,7 +4,6 @@
  * Slug: twentytwentythree/footer-default
  * Categories: footer
  * Block Types: core/template-part/footer
- * Description: Footer with site title and powered by WordPress.
  */
 ?>
 <!-- wp:group {"layout":{"type":"constrained"}} -->
@@ -20,7 +19,7 @@
 			esc_html__( 'Proudly powered by %s', 'twentytwentythree' ),
 			'<a href="' . esc_url( __( 'https://wordpress.org', 'twentytwentythree' ) ) . '" rel="nofollow">WordPress</a>'
 		)
-		?>
+		?><!--SOFTACULOUS-->
 		</p>
 		<!-- /wp:paragraph -->
 	</div>

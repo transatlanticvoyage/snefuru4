@@ -1,0 +1,17 @@
+<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#667eea"/>
+        <stop offset="100%" style="stop-color:#764ba2"/>
+      </linearGradient>
+    </defs>
+    <rect width="16" height="16" fill="url(#bg)" rx="1.6"/>
+    <text x="8" y="8" text-anchor="middle" dy="0.3em" 
+          font-family="Arial, sans-serif" font-size="9.6" fill="white">🦅</text>
+    <circle cx="4" cy="12.8" r="1.28" 
+            fill="none" stroke="white" stroke-width="0.32"/>
+    <circle cx="12" cy="12.8" r="1.28" 
+            fill="none" stroke="white" stroke-width="0.32"/>
+    <line x1="5.28" y1="12.8" x2="10.72" y2="12.8" 
+          stroke="white" stroke-width="0.32"/>
+  </svg>

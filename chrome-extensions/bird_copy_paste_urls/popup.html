@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="main-layout">
+      <!-- Column 1: Original content -->
+      <div class="column column-1">
+        <h1>Bird URL Manager</h1>
+        
+        <button id="copyBtn" class="btn btn-copy">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span>Copy All Tab URLs</span>
+        </button>
+        
+        <button id="pasteBtn" class="btn btn-paste">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+          </svg>
+          <span>Paste URLs to Open</span>
+        </button>
+
+        <div class="section-header">From URL Of The Current Tab Only</div>
+
+        <button id="rootlifyBtn" class="btn btn-rootlify">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 7h6l3 5-3 5H9l3-5-3-5z"></path>
+            <circle cx="9" cy="12" r="3"></circle>
+          </svg>
+          <span>Rootlify - Remove URL Params (Current Tab)</span>
+        </button>
+
+        <button id="copyDomainBtn" class="btn btn-domain">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6"></path>
+          </svg>
+          <span>Copy domain (no protocol - no www - no slash on end)</span>
+        </button>
+
+        <button id="copyDomainNoSubBtn" class="btn btn-domain">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m6-6H1"></path>
+          </svg>
+          <span>Copy domain + preceding part of url (no subdomains)</span>
+        </button>
+
+        <button id="copyDomainWithSubBtn" class="btn btn-domain">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m6-6H1m12-6l-3-3 3-3"></path>
+          </svg>
+          <span>Copy domain + preceding part of url (include subdomains)</span>
+        </button>
+        
+        <div id="status" class="status"></div>
+      </div>
+
+      <!-- Column 2: Future content -->
+      <div class="column column-2">
+        <div class="column-header">Column 2</div>
+        
+        <button id="driggsmanRootBtn" class="btn btn-driggsman">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15,3 21,3 21,9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>/driggsman - open root domain only</span>
+        </button>
+
+        <button id="driggsmanSubBtn" class="btn btn-driggsman">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15,3 21,3 21,9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+            <circle cx="10" cy="10" r="2"></circle>
+          </svg>
+          <span>/driggsman - open w all subdomains</span>
+        </button>
+      </div>
+
+      <!-- Column 3: Future content -->
+      <div class="column column-3"></div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

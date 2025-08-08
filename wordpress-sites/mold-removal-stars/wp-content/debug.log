@@ -1,0 +1,2044 @@
+[22-May-2025 20:42:49 UTC] Starting function_inject_content_2 for page_id: 603
+[22-May-2025 20:42:49 UTC] Decoded content: #prextemplate: homepage1
+#img_hero1
+#y_hero1_heading
+Shreveport’s Mold Problem? We’re the Solution.
+#y_hero1_main
+From hidden leaks to full-blown infestations, Shreveport Mold Removal tackles
+[22-May-2025 20:42:49 UTC] Processing line 1: #prextemplate: homepage1
+[22-May-2025 20:42:49 UTC] Ignoring non-y code: #prextemplate: homepage1
+[22-May-2025 20:42:49 UTC] Processing line 2: #img_hero1
+[22-May-2025 20:42:49 UTC] Ignoring non-y code: #img_hero1
+[22-May-2025 20:42:49 UTC] Processing line 3: #y_hero1_heading
+[22-May-2025 20:42:49 UTC] Found y_ code: y_hero1_heading
+[22-May-2025 20:42:49 UTC] Processing line 4: Shreveport’s Mold Problem? We’re the Solution.
+[22-May-2025 20:42:49 UTC] Added content for y_hero1_heading: Shreveport’s Mold Problem? We’re the Solution....
+[22-May-2025 20:42:49 UTC] Processing line 5: #y_hero1_main
+[22-May-2025 20:42:49 UTC] Found y_ code: y_hero1_main
+[22-May-2025 20:42:49 UTC] Processing line 6: From hidden leaks to full-blown infestations, Shreveport Mold Removal tackles mold at the source with precision, speed, and care.
+[22-May-2025 20:42:49 UTC] Added content for y_hero1_main: From hidden leaks to full-blown infestations, Shre...
+[22-May-2025 20:42:49 UTC] Processing line 7: #y_services1_heading
+[22-May-2025 20:42:49 UTC] Found y_ code: y_services1_heading
+[22-May-2025 20:42:49 UTC] Processing line 8: What We Do
+[22-May-2025 20:42:49 UTC] Added content for y_services1_heading: What We Do...
+[22-May-2025 20:42:49 UTC] Processing line 9: #y_services1_main
+[22-May-2025 20:42:49 UTC] Found y_ code: y_services1_main
+[22-May-2025 20:42:49 UTC] Processing line 10: Dependable mold detection and removal services tailored to the unique climate and construction challenges of Shreveport homes and businesses.
+[22-May-2025 20:42:49 UTC] Added content for y_services1_main: Dependable mold detection and removal services tai...
+[22-May-2025 20:42:49 UTC] Processing line 11: #img_serv1
+[22-May-2025 20:42:49 UTC] Ignoring non-y code: #img_serv1
+[22-May-2025 20:42:49 UTC] Processing line 12: #y_serv1
+[22-May-2025 20:42:49 UTC] Found y_ code: y_serv1
+[22-May-2025 20:42:49 UTC] Processing line 13: Moisture Source Detection
+[22-May-2025 20:42:49 UTC] Added content for y_serv1: Moisture Source Detection...
+[22-May-2025 20:42:49 UTC] Processing line 14: #y_serv1_main
+[22-May-2025 20:42:49 UTC] Found y_ code: y_serv1_main
+[22-May-2025 20:42:49 UTC] Processing line 15: We identify leaks and moisture issues contributing to mold growth before treatment begins.
+[22-May-2025 20:42:49 UTC] Added content for y_serv1_main: We identify leaks and moisture issues contributing...
+[22-May-2025 20:42:49 UTC] Processing line 16: #img_serv2
+[22-May-2025 20:42:49 UTC] Ignoring non-y code: #img_serv2
+[22-May-2025 20:42:49 UTC] Processing line 17: #y_serv2
+[22-May-2025 20:42:49 UTC] Found y_ code: y_serv2
+[22-May-2025 20:42:49 UTC] Processing line 18: Safe Mold Removal
+[22-May-2025 20:42:49 UTC] Added content for y_serv2: Safe Mold Removal...
+[22-May-2025 20:42:49 UTC] Processing line 19: #y_serv2_main
+[22-May-2025 20:42:49 UTC] Found y_ code: y_serv2_main
+[22-May-2025 20:42:49 UTC] Processing line 20: Our removal methods isolate and eliminate mold colonies while protecting your air quality.
+[22-May-2025 20:42:49 UTC] Added content for y_serv2_main: Our removal methods isolate and eliminate mold col...
+[22-May-2025 20:42:49 UTC] Processing line 21: #img_serv3
+[22-May-2025 20:42:49 UTC] Ignoring non-y code: #img_serv3
+[22-May-2025 20:42:49 UTC] Processing line 22: #y_serv3
+[22-May-2025 20:42:49 UTC] Found y_ code: y_serv3
+[22-May-2025 20:42:49 UTC] Processing line 23: Remediation & Sealing
+[22-May-2025 20:42:49 UTC] Added content for y_serv3: Remediation & Sealing...
+[22-May-2025 20:42:49 UTC] Processing line 24: #y_serv3_main
+[22-May-2025 20:42:49 UTC] Found y_ code: y_serv3_main
+[22-May-2025 20:42:49 UTC] Processing line 25: We treat contaminated areas and seal them to prevent future outbreaks and spreading.
+[22-May-2025 20:42:49 UTC] Added content for y_serv3_main: We treat contaminated areas and seal them to preve...
+[22-May-2025 20:42:49 UTC] Processing line 26: #img_serv4
+[22-May-2025 20:42:49 UTC] Ignoring non-y code: #img_serv4
+[22-May-2025 20:42:49 UTC] Processing line 27: #y_serv4
+[22-May-2025 20:42:49 UTC] Found y_ code: y_serv4
+[22-May-2025 20:42:49 UTC] Processing line 28: Post-Remediation Testing
+[22-May-2025 20:42:49 UTC] Added content for y_serv4: Post-Remediation Testing...
+[22-May-2025 20:42:49 UTC] Processing line 29: #y_serv4_main
+[22-May-2025 20:42:49 UTC] Found y_ code: y_serv4_main
+[22-May-2025 20:42:49 UTC] Processing line 30: Air and surface testing confirms that mold levels are safe and the job is fully complete.
+[22-May-2025 20:42:49 UTC] Added content for y_serv4_main: Air and surface testing confirms that mold levels ...
+[22-May-2025 20:42:49 UTC] Found 12 codes to process
+[22-May-2025 20:42:49 UTC] Codes: y_hero1_heading, y_hero1_main, y_services1_heading, y_services1_main, y_serv1, y_serv1_main, y_serv2, y_serv2_main, y_serv3, y_serv3_main, y_serv4, y_serv4_main
+[22-May-2025 20:42:49 UTC] Saved mapping to zeeprex_map
+[22-May-2025 20:42:49 UTC] Raw Elementor data: [{"id":"39b3102e","elType":"container","settings":{"flex_gap":{"size":"","unit":"px","column":"","row":"","isLinked":true},"min_height":{"unit":"vh","size":88,"sizes":[]},"background_background":"clas...
+[22-May-2025 20:42:49 UTC] Processing widget type: heading
+[22-May-2025 20:42:49 UTC] Widget settings: {"title":"y_hero1_heading","header_size":"h1","align":"center","__globals__":{"typography_typography":"globals\/typography?id=b2deeae"},"_padding":{"unit":"%","top":"","right":"","bottom":"","left":"","isLinked":true},"_padding_tablet":{"unit":"%","top":"","right":"","bottom":"","left":"","isLinked":true},"_padding_mobile":{"unit":"%","top":"","right":"","bottom":"","left":"","isLinked":true},"title_color":"#FFFFFF"}
+[22-May-2025 20:42:49 UTC] Found match in heading title: y_hero1_heading
+[22-May-2025 20:42:49 UTC] Processing widget type: heading
+[22-May-2025 20:42:49 UTC] Widget settings: {"title":"y_hero1_main","align":"center","header_size":"p","__globals__":{"typography_typography":"globals\/typography?id=c05b693","title_color":""},"typography_typography":"custom","typography_font_family":"Poppins","typography_font_size":{"unit":"px","size":22,"sizes":[]},"typography_font_size_tablet":{"unit":"px","size":14,"sizes":[]},"typography_font_weight":"300","typography_text_transform":"none","typography_font_style":"normal","typography_text_decoration":"none","typography_line_height":{"unit":"em","size":1.5,"sizes":[]},"typography_letter_spacing":{"unit":"px","size":0,"sizes":[]},"title_color":"#FFFFFF"}
+[22-May-2025 20:42:49 UTC] Found match in heading title: y_hero1_main
+[22-May-2025 20:42:49 UTC] Processing widget type: button
+[22-May-2025 20:42:49 UTC] Widget settings: {"text":"Contact us","align":"center","button_text_color":"#FFFFFF","border_border":"solid","border_width":{"unit":"px","top":"1","right":"1","bottom":"1","left":"1","isLinked":"1"},"border_color":"#2C6FC0","border_radius":{"unit":"px","top":"100","right":"100","bottom":"100","left":"100","isLinked":"1"},"text_padding":{"unit":"px","top":"16","right":"55","bottom":"16","left":"55","isLinked":""},"_margin":{"unit":"px","top":"20","right":"0","bottom":"0","left":"0","isLinked":""},"__globals__":{"button_text_color":"globals\/colors?id=d6cea4e","border_color":"globals\/colors?id=accent","button_background_hover_color":"globals\/colors?id=86b4fcd","hover_color":"globals\/colors?id=accent"},"link":{"url":"https:\/\/library.elementor.com\/local-services-wireframe-1\/contact\/","is_external":"","nofollow":"","custom_attributes":""},"__dynamic__":{"link":"[elementor-tag id=\"720b4e5\" name=\"internal-url\" settings=\"%7B%22type%22%3A%22post%22%2C%22post_id%22%3A%2241%22%7D\"]"}}
+[22-May-2025 20:42:49 UTC] Processing widget type: heading
+[22-May-2025 20:42:49 UTC] Widget settings: {"title":"y_services1_heading","align":"center","__globals__":{"typography_typography":"globals\/typography?id=primary"}}
+[22-May-2025 20:42:49 UTC] Found match in heading title: y_services1_heading
+[22-May-2025 20:42:49 UTC] Processing widget type: heading
+[22-May-2025 20:42:49 UTC] Widget settings: {"title":"y_services1_main","align":"center","header_size":"h5","__globals__":{"typography_typography":"globals\/typography?id=c05b693","title_color":"globals\/colors?id=text"}}
+[22-May-2025 20:42:49 UTC] Found match in heading title: y_services1_main
+[22-May-2025 20:42:49 UTC] Processing widget type: image-box
+[22-May-2025 20:42:49 UTC] Widget settings: {"image":{"id":"88","url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"},"title_text":"y_serv1","description_text":"y_serv1_main","title_size":"h4","image_size":{"unit":"%","size":"100","sizes":[]},"hover_animation":"grow","text_align":"left","title_bottom_space":{"unit":"px","size":"15","sizes":[]},"__globals__":{"title_typography_typography":"globals\/typography?id=392b9e0"},"_element_custom_width":{"unit":"%","size":25,"sizes":[]},"_element_width_tablet":"initial","_element_width_mobile":"inherit","_element_custom_width_tablet":{"unit":"%","size":45,"sizes":[]},"_element_custom_width_mobile":{"unit":"%","size":"","sizes":[]},"_element_width":"initial"}
+[22-May-2025 20:42:49 UTC] Found match in image-box title_text: y_serv1
+[22-May-2025 20:42:49 UTC] Found match in image-box description_text: y_serv1_main
+[22-May-2025 20:42:49 UTC] Processing widget type: image-box
+[22-May-2025 20:42:49 UTC] Widget settings: {"image":{"id":"88","url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"},"title_text":"y_serv2","description_text":"y_serv2_main","title_size":"h4","image_size":{"unit":"%","size":"100","sizes":[]},"hover_animation":"grow","text_align":"left","title_bottom_space":{"unit":"px","size":"15","sizes":[]},"__globals__":{"title_typography_typography":"globals\/typography?id=392b9e0"},"_element_width_tablet":"initial","_element_width_mobile":"inherit","_element_custom_width":{"unit":"%","size":25,"sizes":[]},"_element_custom_width_tablet":{"unit":"%","size":45,"sizes":[]},"_element_custom_width_mobile":{"unit":"%","size":"","sizes":[]},"_element_width":"initial"}
+[22-May-2025 20:42:49 UTC] Found match in image-box title_text: y_serv2
+[22-May-2025 20:42:49 UTC] Found match in image-box description_text: y_serv2_main
+[22-May-2025 20:42:49 UTC] Processing widget type: image-box
+[22-May-2025 20:42:49 UTC] Widget settings: {"image":{"id":"88","url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"},"title_text":"y_serv3","description_text":"y_serv3_main","title_size":"h4","image_size":{"unit":"%","size":"100","sizes":[]},"hover_animation":"grow","text_align":"left","title_bottom_space":{"unit":"px","size":"15","sizes":[]},"__globals__":{"title_typography_typography":"globals\/typography?id=392b9e0"},"_element_width_tablet":"initial","_element_width_mobile":"inherit","_element_custom_width":{"unit":"%","size":25,"sizes":[]},"_element_custom_width_tablet":{"unit":"%","size":45,"sizes":[]},"_element_custom_width_mobile":{"unit":"%","size":"","sizes":[]},"_element_width":"initial"}
+[22-May-2025 20:42:49 UTC] Found match in image-box title_text: y_serv3
+[22-May-2025 20:42:49 UTC] Found match in image-box description_text: y_serv3_main
+[22-May-2025 20:42:49 UTC] Processing widget type: image-box
+[22-May-2025 20:42:49 UTC] Widget settings: {"image":{"id":"88","url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"},"title_text":"y_serv4","description_text":"y_serv4_main","title_size":"h4","image_size":{"unit":"%","size":"100","sizes":[]},"hover_animation":"grow","text_align":"left","title_bottom_space":{"unit":"px","size":"15","sizes":[]},"__globals__":{"title_typography_typography":"globals\/typography?id=392b9e0"},"_element_width_tablet":"initial","_element_width_mobile":"inherit","_element_custom_width":{"unit":"%","size":25,"sizes":[]},"_element_custom_width_tablet":{"unit":"%","size":45,"sizes":[]},"_element_custom_width_mobile":{"unit":"%","size":"","sizes":[]},"_element_width":"initial"}
+[22-May-2025 20:42:49 UTC] Found match in image-box title_text: y_serv4
+[22-May-2025 20:42:49 UTC] Found match in image-box description_text: y_serv4_main
+[22-May-2025 20:42:49 UTC] Processing widget type: text-editor
+[22-May-2025 20:42:49 UTC] Widget settings: {"editor":"<p>y_alca_1<\/p>","align":"left","_element_custom_width":{"unit":"px","size":"","sizes":[]},"_border_border":"solid","_border_width":{"unit":"px","top":"6","right":"6","bottom":"6","left":"6","isLinked":true},"_border_radius":{"unit":"px","top":"6","right":"6","bottom":"6","left":"6","isLinked":true},"_box_shadow_box_shadow_type":"yes","custom_css":"{max-width:400px !important;}","_padding":{"unit":"px","top":"34","right":"34","bottom":"34","left":"34","isLinked":true}}
+[22-May-2025 20:42:49 UTC] Processing widget type: heading
+[22-May-2025 20:42:49 UTC] Widget settings: {"title":"y_gizmo1_heading","align":"center","__globals__":{"typography_typography":"globals\/typography?id=primary"}}
+[22-May-2025 20:42:49 UTC] Processing widget type: text-editor
+[22-May-2025 20:42:49 UTC] Widget settings: {"editor":"<p>y_gizmo1_main<\/p>"}
+[22-May-2025 20:42:49 UTC] Processing widget type: image-carousel
+[22-May-2025 20:42:49 UTC] Widget settings: {"carousel":[{"id":114,"url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder_2_Slider_1-13122021.jpg"}],"thumbnail_size":"full","slides_to_show":"1","navigation":"dots","__globals__":{"dots_color":"globals\/colors?id=accent"},"carousel_name":"Image Carousel"}
+[22-May-2025 20:42:49 UTC] Processing widget type: heading
+[22-May-2025 20:42:49 UTC] Widget settings: {"title":"y_gizmo2_heading"}
+[22-May-2025 20:42:49 UTC] Processing widget type: text-editor
+[22-May-2025 20:42:49 UTC] Widget settings: {"editor":"<p>y_gizmo2_main<\/p>","_padding_tablet":{"unit":"%","top":"0","right":"35","bottom":"0","left":"0","isLinked":false},"_padding_mobile":{"unit":"px","top":"0","right":"0","bottom":"0","left":"0","isLinked":""},"_padding":{"unit":"%","top":"0","right":"25","bottom":"0","left":"0","isLinked":false}}
+[22-May-2025 20:42:49 UTC] Updated Elementor data: [{"id":"39b3102e","elType":"container","settings":{"flex_gap":{"size":"","unit":"px","column":"","row":"","isLinked":true},"min_height":{"unit":"vh","size":88,"sizes":[]},"background_background":"clas...
+[22-May-2025 20:42:50 UTC] Saved using Elementor document save
+[22-May-2025 20:43:07 UTC] Starting function_inject_content_2 for page_id: 603
+[22-May-2025 20:43:07 UTC] Decoded content: #y_alca_1
+<h2>Local Experts for Mold Problems in Shreveport, LA</h2>
+<h3>Responsive Service Rooted in Local Knowledge</h3>
+Mold isn’t just unsightly — it’s a health risk and a structural conc
+[22-May-2025 20:43:07 UTC] Processing line 1: #y_alca_1
+[22-May-2025 20:43:07 UTC] Found y_ code: y_alca_1
+[22-May-2025 20:43:07 UTC] Processing line 2: <h2>Local Experts for Mold Problems in Shreveport, LA</h2>
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: <h2>Local Experts for Mold Problems in Shreveport,...
+[22-May-2025 20:43:07 UTC] Processing line 3: <h3>Responsive Service Rooted in Local Knowledge</h3>
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: <h3>Responsive Service Rooted in Local Knowledge</...
+[22-May-2025 20:43:07 UTC] Processing line 4: Mold isn’t just unsightly — it’s a health risk and a structural concern. At Shreveport Mold Removal, we understand the regional challenges that contribute to mold growth in Northwest Louisiana. Our technicians are trained to deal with everything from routine attic mold to hidden wall cavity outbreaks.
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: Mold isn’t just unsightly — it’s a health ri...
+[22-May-2025 20:43:07 UTC] Processing line 5: <h3>No Guesswork — Just Straight Answers</h3>
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: <h3>No Guesswork — Just Straight Answers</h3>...
+[22-May-2025 20:43:07 UTC] Processing line 6: We don’t upsell or scare you with vague claims. We offer direct, on-site evaluations with honest assessments, so you know exactly what you’re dealing with — and what it will take to fix it.
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: We don’t upsell or scare you with vague claims. ...
+[22-May-2025 20:43:07 UTC] Processing line 7: <h3>Every Job Backed by Real Accountability</h3>
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: <h3>Every Job Backed by Real Accountability</h3>...
+[22-May-2025 20:43:07 UTC] Processing line 8: From the moment you contact us to the final post-treatment check, our team delivers clear communication and detailed work logs. If an issue isn’t solved, we make it right.
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: From the moment you contact us to the final post-t...
+[22-May-2025 20:43:07 UTC] Processing line 9: <h3>Protecting Shreveport’s Homes & Health</h3>
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: <h3>Protecting Shreveport’s Homes & Health</h3>...
+[22-May-2025 20:43:07 UTC] Processing line 10: With our region’s high humidity and aging infrastructure, mold is a common threat. Whether you’re a homeowner, landlord, or small business owner, we help you stay ahead of mold and restore your space with confidence.
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: With our region’s high humidity and aging infras...
+[22-May-2025 20:43:07 UTC] Processing line 11: <h3>Book Local. Work With Real People.</h3>
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: <h3>Book Local. Work With Real People.</h3>...
+[22-May-2025 20:43:07 UTC] Processing line 12: We’re not a franchise or national call center — just a committed local team doing dependable work for our neighbors across Shreveport.
+[22-May-2025 20:43:07 UTC] Added content for y_alca_1: We’re not a franchise or national call center �...
+[22-May-2025 20:43:07 UTC] Processing line 13: #y_gizmo1_heading
+[22-May-2025 20:43:07 UTC] Found y_ code: y_gizmo1_heading
+[22-May-2025 20:43:07 UTC] Processing line 14: Serving All of Shreveport — and Then Some
+[22-May-2025 20:43:07 UTC] Added content for y_gizmo1_heading: Serving All of Shreveport — and Then Some...
+[22-May-2025 20:43:07 UTC] Processing line 15: #y_gizmo1_main
+[22-May-2025 20:43:07 UTC] Found y_ code: y_gizmo1_main
+[22-May-2025 20:43:07 UTC] Processing line 16: From Highland to Southern Hills and every neighborhood in between, Shreveport Mold Removal brings expert mold services right to your doorstep.
+[22-May-2025 20:43:07 UTC] Added content for y_gizmo1_main: From Highland to Southern Hills and every neighbor...
+[22-May-2025 20:43:07 UTC] Processing line 17: #img_gizmo2
+[22-May-2025 20:43:07 UTC] Ignoring non-y code: #img_gizmo2
+[22-May-2025 20:43:07 UTC] Processing line 18: #y_gizmo2_heading
+[22-May-2025 20:43:07 UTC] Found y_ code: y_gizmo2_heading
+[22-May-2025 20:43:07 UTC] Processing line 19: Let’s Clear the Air — Call Today
+[22-May-2025 20:43:07 UTC] Added content for y_gizmo2_heading: Let’s Clear the Air — Call Today...
+[22-May-2025 20:43:07 UTC] Processing line 20: #y_gizmo2_main
+[22-May-2025 20:43:07 UTC] Found y_ code: y_gizmo2_main
+[22-May-2025 20:43:07 UTC] Processing line 21: Contact Shreveport Mold Removal to schedule your inspection or get fast answers about mold issues — we’re ready to help.
+[22-May-2025 20:43:07 UTC] Added content for y_gizmo2_main: Contact Shreveport Mold Removal to schedule your i...
+[22-May-2025 20:43:07 UTC] Found 5 codes to process
+[22-May-2025 20:43:07 UTC] Codes: y_alca_1, y_gizmo1_heading, y_gizmo1_main, y_gizmo2_heading, y_gizmo2_main
+[22-May-2025 20:43:07 UTC] Saved mapping to zeeprex_map
+[22-May-2025 20:43:07 UTC] Raw Elementor data: [{"id":"39b3102e","elType":"container","settings":{"flex_gap":{"size":"","unit":"px","column":"","row":"","isLinked":true},"min_height":{"unit":"vh","size":88,"sizes":[]},"background_background":"clas...
+[22-May-2025 20:43:07 UTC] Processing widget type: heading
+[22-May-2025 20:43:07 UTC] Widget settings: {"title":"Shreveport\u2019s Mold Problem? We\u2019re the Solution.","header_size":"h1","align":"center","__globals__":{"typography_typography":"globals\/typography?id=b2deeae"},"_padding":{"unit":"%","top":"","right":"","bottom":"","left":"","isLinked":true},"_padding_tablet":{"unit":"%","top":"","right":"","bottom":"","left":"","isLinked":true},"_padding_mobile":{"unit":"%","top":"","right":"","bottom":"","left":"","isLinked":true},"title_color":"#FFFFFF"}
+[22-May-2025 20:43:07 UTC] Processing widget type: heading
+[22-May-2025 20:43:07 UTC] Widget settings: {"title":"From hidden leaks to full-blown infestations, Shreveport Mold Removal tackles mold at the source with precision, speed, and care.","align":"center","header_size":"p","__globals__":{"typography_typography":"globals\/typography?id=c05b693","title_color":""},"typography_typography":"custom","typography_font_family":"Poppins","typography_font_size":{"unit":"px","size":22,"sizes":[]},"typography_font_size_tablet":{"unit":"px","size":14,"sizes":[]},"typography_font_weight":"300","typography_text_transform":"none","typography_font_style":"normal","typography_text_decoration":"none","typography_line_height":{"unit":"em","size":1.5,"sizes":[]},"typography_letter_spacing":{"unit":"px","size":0,"sizes":[]},"title_color":"#FFFFFF"}
+[22-May-2025 20:43:07 UTC] Processing widget type: button
+[22-May-2025 20:43:07 UTC] Widget settings: {"text":"Contact us","align":"center","button_text_color":"#FFFFFF","border_border":"solid","border_width":{"unit":"px","top":"1","right":"1","bottom":"1","left":"1","isLinked":"1"},"border_color":"#2C6FC0","border_radius":{"unit":"px","top":"100","right":"100","bottom":"100","left":"100","isLinked":"1"},"text_padding":{"unit":"px","top":"16","right":"55","bottom":"16","left":"55","isLinked":""},"_margin":{"unit":"px","top":"20","right":"0","bottom":"0","left":"0","isLinked":""},"__globals__":{"button_text_color":"globals\/colors?id=d6cea4e","border_color":"globals\/colors?id=accent","button_background_hover_color":"globals\/colors?id=86b4fcd","hover_color":"globals\/colors?id=accent"},"link":{"url":"https:\/\/library.elementor.com\/local-services-wireframe-1\/contact\/","is_external":"","nofollow":"","custom_attributes":""},"__dynamic__":{"link":"[elementor-tag id=\"720b4e5\" name=\"internal-url\" settings=\"%7B%22type%22%3A%22post%22%2C%22post_id%22%3A%2241%22%7D\"]"}}
+[22-May-2025 20:43:07 UTC] Processing widget type: heading
+[22-May-2025 20:43:07 UTC] Widget settings: {"title":"What We Do","align":"center","__globals__":{"typography_typography":"globals\/typography?id=primary"}}
+[22-May-2025 20:43:07 UTC] Processing widget type: heading
+[22-May-2025 20:43:07 UTC] Widget settings: {"title":"Dependable mold detection and removal services tailored to the unique climate and construction challenges of Shreveport homes and businesses.","align":"center","header_size":"h5","__globals__":{"typography_typography":"globals\/typography?id=c05b693","title_color":"globals\/colors?id=text"}}
+[22-May-2025 20:43:07 UTC] Processing widget type: image-box
+[22-May-2025 20:43:07 UTC] Widget settings: {"image":{"id":"88","url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"},"title_text":"Moisture Source Detection","description_text":"We identify leaks and moisture issues contributing to mold growth before treatment begins.","title_size":"h4","image_size":{"unit":"%","size":"100","sizes":[]},"hover_animation":"grow","text_align":"left","title_bottom_space":{"unit":"px","size":"15","sizes":[]},"__globals__":{"title_typography_typography":"globals\/typography?id=392b9e0"},"_element_custom_width":{"unit":"%","size":25,"sizes":[]},"_element_width_tablet":"initial","_element_width_mobile":"inherit","_element_custom_width_tablet":{"unit":"%","size":45,"sizes":[]},"_element_custom_width_mobile":{"unit":"%","size":"","sizes":[]},"_element_width":"initial"}
+[22-May-2025 20:43:07 UTC] Processing widget type: image-box
+[22-May-2025 20:43:07 UTC] Widget settings: {"image":{"id":"88","url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"},"title_text":"Safe Mold Removal","description_text":"Our removal methods isolate and eliminate mold colonies while protecting your air quality.","title_size":"h4","image_size":{"unit":"%","size":"100","sizes":[]},"hover_animation":"grow","text_align":"left","title_bottom_space":{"unit":"px","size":"15","sizes":[]},"__globals__":{"title_typography_typography":"globals\/typography?id=392b9e0"},"_element_width_tablet":"initial","_element_width_mobile":"inherit","_element_custom_width":{"unit":"%","size":25,"sizes":[]},"_element_custom_width_tablet":{"unit":"%","size":45,"sizes":[]},"_element_custom_width_mobile":{"unit":"%","size":"","sizes":[]},"_element_width":"initial"}
+[22-May-2025 20:43:07 UTC] Processing widget type: image-box
+[22-May-2025 20:43:07 UTC] Widget settings: {"image":{"id":"88","url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"},"title_text":"Remediation & Sealing","description_text":"We treat contaminated areas and seal them to prevent future outbreaks and spreading.","title_size":"h4","image_size":{"unit":"%","size":"100","sizes":[]},"hover_animation":"grow","text_align":"left","title_bottom_space":{"unit":"px","size":"15","sizes":[]},"__globals__":{"title_typography_typography":"globals\/typography?id=392b9e0"},"_element_width_tablet":"initial","_element_width_mobile":"inherit","_element_custom_width":{"unit":"%","size":25,"sizes":[]},"_element_custom_width_tablet":{"unit":"%","size":45,"sizes":[]},"_element_custom_width_mobile":{"unit":"%","size":"","sizes":[]},"_element_width":"initial"}
+[22-May-2025 20:43:07 UTC] Processing widget type: image-box
+[22-May-2025 20:43:07 UTC] Widget settings: {"image":{"id":"88","url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"},"title_text":"Post-Remediation Testing","description_text":"Air and surface testing confirms that mold levels are safe and the job is fully complete.","title_size":"h4","image_size":{"unit":"%","size":"100","sizes":[]},"hover_animation":"grow","text_align":"left","title_bottom_space":{"unit":"px","size":"15","sizes":[]},"__globals__":{"title_typography_typography":"globals\/typography?id=392b9e0"},"_element_width_tablet":"initial","_element_width_mobile":"inherit","_element_custom_width":{"unit":"%","size":25,"sizes":[]},"_element_custom_width_tablet":{"unit":"%","size":45,"sizes":[]},"_element_custom_width_mobile":{"unit":"%","size":"","sizes":[]},"_element_width":"initial"}
+[22-May-2025 20:43:07 UTC] Processing widget type: text-editor
+[22-May-2025 20:43:07 UTC] Widget settings: {"editor":"<p>y_alca_1<\/p>","align":"left","_element_custom_width":{"unit":"px","size":"","sizes":[]},"_border_border":"solid","_border_width":{"unit":"px","top":"6","right":"6","bottom":"6","left":"6","isLinked":true},"_border_radius":{"unit":"px","top":"6","right":"6","bottom":"6","left":"6","isLinked":true},"_box_shadow_box_shadow_type":"yes","custom_css":"{max-width:400px !important;}","_padding":{"unit":"px","top":"34","right":"34","bottom":"34","left":"34","isLinked":true}}
+[22-May-2025 20:43:07 UTC] Found match in text-editor editor: y_alca_1
+[22-May-2025 20:43:07 UTC] Processing widget type: heading
+[22-May-2025 20:43:07 UTC] Widget settings: {"title":"y_gizmo1_heading","align":"center","__globals__":{"typography_typography":"globals\/typography?id=primary"}}
+[22-May-2025 20:43:07 UTC] Found match in heading title: y_gizmo1_heading
+[22-May-2025 20:43:07 UTC] Processing widget type: text-editor
+[22-May-2025 20:43:07 UTC] Widget settings: {"editor":"<p>y_gizmo1_main<\/p>"}
+[22-May-2025 20:43:07 UTC] Found match in text-editor editor: y_gizmo1_main
+[22-May-2025 20:43:07 UTC] Processing widget type: image-carousel
+[22-May-2025 20:43:07 UTC] Widget settings: {"carousel":[{"id":114,"url":"https:\/\/rnrtemplate2.valueoffershq.com\/wp-content\/uploads\/2025\/03\/Image_Placeholder_2_Slider_1-13122021.jpg"}],"thumbnail_size":"full","slides_to_show":"1","navigation":"dots","__globals__":{"dots_color":"globals\/colors?id=accent"},"carousel_name":"Image Carousel"}
+[22-May-2025 20:43:07 UTC] Processing widget type: heading
+[22-May-2025 20:43:07 UTC] Widget settings: {"title":"y_gizmo2_heading"}
+[22-May-2025 20:43:07 UTC] Found match in heading title: y_gizmo2_heading
+[22-May-2025 20:43:07 UTC] Processing widget type: text-editor
+[22-May-2025 20:43:07 UTC] Widget settings: {"editor":"<p>y_gizmo2_main<\/p>","_padding_tablet":{"unit":"%","top":"0","right":"35","bottom":"0","left":"0","isLinked":false},"_padding_mobile":{"unit":"px","top":"0","right":"0","bottom":"0","left":"0","isLinked":""},"_padding":{"unit":"%","top":"0","right":"25","bottom":"0","left":"0","isLinked":false}}
+[22-May-2025 20:43:07 UTC] Found match in text-editor editor: y_gizmo2_main
+[22-May-2025 20:43:07 UTC] Updated Elementor data: [{"id":"39b3102e","elType":"container","settings":{"flex_gap":{"size":"","unit":"px","column":"","row":"","isLinked":true},"min_height":{"unit":"vh","size":88,"sizes":[]},"background_background":"clas...
+[22-May-2025 20:43:08 UTC] Saved using Elementor document save
+[22-May-2025 21:17:11 UTC] Elementor data structure:
+[22-May-2025 21:17:11 UTC] Array
+(
+    [0] => Array
+        (
+            [id] => 39b3102e
+            [elType] => container
+            [settings] => Array
+                (
+                    [flex_gap] => Array
+                        (
+                            [size] => 
+                            [unit] => px
+                            [column] => 
+                            [row] => 
+                            [isLinked] => 1
+                        )
+
+                    [min_height] => Array
+                        (
+                            [unit] => vh
+                            [size] => 88
+                            [sizes] => Array
+                                (
+                                )
+
+                        )
+
+                    [background_background] => classic
+                    [flex_align_items] => center
+                    [content_position] => middle
+                    [padding] => Array
+                        (
+                            [unit] => %
+                            [top] => 0
+                            [right] => 8
+                            [bottom] => 0
+                            [left] => 8
+                            [isLinked] => 
+                        )
+
+                    [padding_tablet] => Array
+                        (
+                            [unit] => %
+                            [top] => 0
+                            [right] => 5
+                            [bottom] => 0
+                            [left] => 5
+                            [isLinked] => 
+                        )
+
+                    [_title] => Hero
+                    [__globals__] => Array
+                        (
+                            [background_color] => globals/colors?id=secondary
+                            [background_overlay_color] => globals/colors?id=primary
+                        )
+
+                    [background_image] => Array
+                        (
+                            [id] => 
+                            [url] => 
+                            [alt] => mold removal murfreesboro
+                            [source] => library
+                            [size] => 
+                        )
+
+                    [background_position] => center right
+                    [background_repeat] => no-repeat
+                    [background_size] => cover
+                    [min_height_mobile] => Array
+                        (
+                            [unit] => vh
+                            [size] => 
+                            [sizes] => Array
+                                (
+                                )
+
+                        )
+
+                    [background_position_mobile] => center center
+                    [flex_direction] => column
+                    [flex_justify_content] => center
+                    [link] => Array
+                        (
+                            [url] => #
+                            [is_external] => 
+                            [nofollow] => 
+                            [custom_attributes] => 
+                        )
+
+                    [boxed_width] => Array
+                        (
+                            [unit] => px
+                            [size] => 920
+                            [sizes] => Array
+                                (
+                                )
+
+                        )
+
+                    [background_overlay_background] => classic
+                    [background_overlay_opacity] => Array
+                        (
+                            [unit] => px
+                            [size] => 0.8
+                            [sizes] => Array
+                                (
+                                )
+
+                        )
+
+                )
+
+            [elements] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 7135770b
+                            [elType] => widget
+                            [settings] => Array
+                                (
+                                    [title] => y_hero1_heading
+                                    [header_size] => h1
+                                    [align] => center
+                                    [__globals__] => Array
+                                        (
+                                            [typography_typography] => globals/typography?id=b2deeae
+                                        )
+
+                                    [_padding] => Array
+                                        (
+                                            [unit] => %
+                                            [top] => 
+                                            [right] => 
+                                            [bottom] => 
+                                            [left] => 
+                                            [isLinked] => 1
+                                        )
+
+                                    [_padding_tablet] => Array
+                                        (
+                                            [unit] => %
+                                            [top] => 
+                                            [right] => 
+                                            [bottom] => 
+                                            [left] => 
+                                            [isLinked] => 1
+                                        )
+
+                                    [_padding_mobile] => Array
+                                        (
+                                            [unit] => %
+                                            [top] => 
+                                            [right] => 
+                                            [bottom] => 
+                                            [left] => 
+                                            [isLinked] => 1
+                                        )
+
+                                    [title_color] => #FFFFFF
+                                )
+
+                            [elements] => Array
+                                (
+                                )
+
+                            [widgetType] => heading
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 39e00e39
+                            [elType] => widget
+                            [settings] => Array
+                                (
+                                    [title] => y_hero1_main
+                                    [align] => center
+                                    [header_size] => p
+                                    [__globals__] => Array
+                                        (
+                                            [typography_typography] => globals/typography?id=c05b693
+                                            [title_color] => 
+                                        )
+
+                                    [typography_typography] => custom
+                                    [typography_font_family] => Poppins
+                                    [typography_font_size] => Array
+                                        (
+                                            [unit] => px
+                                            [size] => 22
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                        )
+
+                                    [typography_font_size_tablet] => Array
+                                        (
+                                            [unit] => px
+                                            [size] => 14
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                        )
+
+                                    [typography_font_weight] => 300
+                                    [typography_text_transform] => none
+                                    [typography_font_style] => normal
+                                    [typography_text_decoration] => none
+                                    [typography_line_height] => Array
+                                        (
+                                            [unit] => em
+                                            [size] => 1.5
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                        )
+
+                                    [typography_letter_spacing] => Array
+                                        (
+                                            [unit] => px
+                                            [size] => 0
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                        )
+
+                                    [title_color] => #FFFFFF
+                                )
+
+                            [elements] => Array
+                                (
+                                )
+
+                            [widgetType] => heading
+                        )
+
+                    [2] => Array
+                        (
+                            [id] => 1d79a52f
+                            [elType] => widget
+                            [settings] => Array
+                                (
+                                    [text] => Contact us
+                                    [align] => center
+                                    [button_text_color] => #FFFFFF
+                                    [border_border] => solid
+                                    [border_width] => Array
+                                        (
+                                            [unit] => px
+                                            [top] => 1
+                                            [right] => 1
+                                            [bottom] => 1
+                                            [left] => 1
+                                            [isLinked] => 1
+                                        )
+
+                                    [border_color] => #2C6FC0
+                                    [border_radius] => Array
+                                        (
+                                            [unit] => px
+                                            [top] => 100
+                                            [right] => 100
+                                            [bottom] => 100
+                                            [left] => 100
+                                            [isLinked] => 1
+                                        )
+
+                                    [text_padding] => Array
+                                        (
+                                            [unit] => px
+                                            [top] => 16
+                                            [right] => 55
+                                            [bottom] => 16
+                                            [left] => 55
+                                            [isLinked] => 
+                                        )
+
+                                    [_margin] => Array
+                                        (
+                                            [unit] => px
+                                            [top] => 20
+                                            [right] => 0
+                                            [bottom] => 0
+                                            [left] => 0
+                                            [isLinked] => 
+                                        )
+
+                                    [__globals__] => Array
+                                        (
+                                            [button_text_color] => globals/colors?id=d6cea4e
+                                            [border_color] => globals/colors?id=accent
+                                            [button_background_hover_color] => globals/colors?id=86b4fcd
+                                            [hover_color] => globals/colors?id=accent
+                                        )
+
+                                    [link] => Array
+                                        (
+                                            [url] => https://library.elementor.com/local-services-wireframe-1/contact/
+                                            [is_external] => 
+                                            [nofollow] => 
+                                            [custom_attributes] => 
+                                        )
+
+                                    [__dynamic__] => Array
+                                        (
+                                            [link] => [elementor-tag id="720b4e5" name="internal-url" settings="%7B%22type%22%3A%22post%22%2C%22post_id%22%3A%2241%22%7D"]
+                                        )
+
+                                )
+
+                            [elements] => Array
+                                (
+                                )
+
+                            [widgetType] => button
+                        )
+
+                )
+
+            [isInner] => 
+        )
+
+    [1] => Array
+        (
+            [id] => 2b2beba8
+            [elType] => container
+            [settings] => Array
+                (
+                    [layout] => full_width
+                    [flex_gap] => Array
+                        (
+                            [size] => 90
+                            [unit] => px
+                            [column] => 90
+                            [row] => 90
+                            [isLinked] => 1
+                        )
+
+                    [padding] => Array
+                        (
+                            [unit] => %
+                            [top] => 0
+                            [right] => 8
+                            [bottom] => 0
+                            [left] => 8
+                            [isLinked] => 
+                        )
+
+                    [margin] => Array
+                        (
+                            [unit] => %
+                            [top] => 12
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [padding_tablet] => Array
+                        (
+                            [unit] => %
+                            [top] => 0
+                            [right] => 5
+                            [bottom] => 0
+                            [left] => 5
+                            [isLinked] => 
+                        )
+
+                    [margin_tablet] => Array
+                        (
+                            [unit] => %
+                            [top] => 25
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [margin_mobile] => Array
+                        (
+                            [unit] => %
+                            [top] => 35
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [_title] => Services
+                    [flex_direction] => column
+                    [flex_align_items] => stretch
+                    [flex_gap_tablet] => Array
+                        (
+                            [unit] => px
+                            [size] => 60
+                            [sizes] => Array
+                                (
+                                )
+
+                            [column] => 60
+                            [row] => 60
+                            [isLinked] => 1
+                        )
+
+                )
+
+            [elements] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 25b3a2c5
+                            [elType] => container
+                            [settings] => Array
+                                (
+                                    [content_width] => full
+                                    [flex_direction] => column
+                                    [flex_gap] => Array
+                                        (
+                                            [unit] => px
+                                            [size] => 0
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                            [column] => 0
+                                            [row] => 0
+                                            [isLinked] => 1
+                                        )
+
+                                )
+
+                            [elements] => Array
+                                (
+                                    [0] => Array
+                                        (
+                                            [id] => 67fdea72
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [title] => y_services1_heading
+                                                    [align] => center
+                                                    [__globals__] => Array
+                                                        (
+                                                            [typography_typography] => globals/typography?id=primary
+                                                        )
+
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => heading
+                                        )
+
+                                    [1] => Array
+                                        (
+                                            [id] => 7fc1e434
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [title] => y_services1_main
+                                                    [align] => center
+                                                    [header_size] => h5
+                                                    [__globals__] => Array
+                                                        (
+                                                            [typography_typography] => globals/typography?id=c05b693
+                                                            [title_color] => globals/colors?id=text
+                                                        )
+
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => heading
+                                        )
+
+                                )
+
+                            [isInner] => 1
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 48485263
+                            [elType] => container
+                            [settings] => Array
+                                (
+                                    [layout] => full_width
+                                    [flex_gap] => Array
+                                        (
+                                            [size] => 1.5
+                                            [unit] => %
+                                            [column] => 1.5
+                                            [row] => 1.5
+                                            [isLinked] => 1
+                                        )
+
+                                    [structure] => 40
+                                    [margin] => Array
+                                        (
+                                            [unit] => %
+                                            [top] => 
+                                            [right] => 
+                                            [bottom] => 
+                                            [left] => 
+                                            [isLinked] => 1
+                                        )
+
+                                    [margin_mobile] => Array
+                                        (
+                                            [unit] => %
+                                            [top] => 
+                                            [right] => 
+                                            [bottom] => 
+                                            [left] => 
+                                            [isLinked] => 1
+                                        )
+
+                                    [flex_direction] => row
+                                    [content_width] => full
+                                    [width_tablet] => Array
+                                        (
+                                            [unit] => %
+                                            [size] => 
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                        )
+
+                                    [flex_justify_content] => space-between
+                                    [flex_gap_tablet] => Array
+                                        (
+                                            [unit] => px
+                                            [size] => 60
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                            [column] => 60
+                                            [row] => 60
+                                            [isLinked] => 1
+                                        )
+
+                                    [flex_gap_mobile] => Array
+                                        (
+                                            [unit] => %
+                                            [size] => 
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                            [column] => 
+                                            [row] => 
+                                            [isLinked] => 1
+                                        )
+
+                                    [flex_wrap_tablet] => wrap
+                                    [link] => Array
+                                        (
+                                            [url] => #
+                                            [is_external] => 
+                                            [nofollow] => 
+                                            [custom_attributes] => 
+                                        )
+
+                                    [flex_justify_content_mobile] => center
+                                )
+
+                            [elements] => Array
+                                (
+                                    [0] => Array
+                                        (
+                                            [id] => 50cfbb1b
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [image] => Array
+                                                        (
+                                                            [id] => 88
+                                                            [url] => https://rnrtemplate2.valueoffershq.com/wp-content/uploads/2025/03/Image_Placeholder-13122021.jpg
+                                                        )
+
+                                                    [title_text] => y_serv1
+                                                    [description_text] => y_serv1_main
+                                                    [title_size] => h4
+                                                    [image_size] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 100
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [hover_animation] => grow
+                                                    [text_align] => left
+                                                    [title_bottom_space] => Array
+                                                        (
+                                                            [unit] => px
+                                                            [size] => 15
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [__globals__] => Array
+                                                        (
+                                                            [title_typography_typography] => globals/typography?id=392b9e0
+                                                        )
+
+                                                    [_element_custom_width] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 25
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_width_tablet] => initial
+                                                    [_element_width_mobile] => inherit
+                                                    [_element_custom_width_tablet] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 45
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_custom_width_mobile] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_width] => initial
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => image-box
+                                        )
+
+                                    [1] => Array
+                                        (
+                                            [id] => 64803ab5
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [image] => Array
+                                                        (
+                                                            [id] => 88
+                                                            [url] => https://rnrtemplate2.valueoffershq.com/wp-content/uploads/2025/03/Image_Placeholder-13122021.jpg
+                                                        )
+
+                                                    [title_text] => y_serv2
+                                                    [description_text] => y_serv2_main
+                                                    [title_size] => h4
+                                                    [image_size] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 100
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [hover_animation] => grow
+                                                    [text_align] => left
+                                                    [title_bottom_space] => Array
+                                                        (
+                                                            [unit] => px
+                                                            [size] => 15
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [__globals__] => Array
+                                                        (
+                                                            [title_typography_typography] => globals/typography?id=392b9e0
+                                                        )
+
+                                                    [_element_width_tablet] => initial
+                                                    [_element_width_mobile] => inherit
+                                                    [_element_custom_width] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 25
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_custom_width_tablet] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 45
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_custom_width_mobile] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_width] => initial
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => image-box
+                                        )
+
+                                    [2] => Array
+                                        (
+                                            [id] => 3538b6ef
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [image] => Array
+                                                        (
+                                                            [id] => 88
+                                                            [url] => https://rnrtemplate2.valueoffershq.com/wp-content/uploads/2025/03/Image_Placeholder-13122021.jpg
+                                                        )
+
+                                                    [title_text] => y_serv3
+                                                    [description_text] => y_serv3_main
+                                                    [title_size] => h4
+                                                    [image_size] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 100
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [hover_animation] => grow
+                                                    [text_align] => left
+                                                    [title_bottom_space] => Array
+                                                        (
+                                                            [unit] => px
+                                                            [size] => 15
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [__globals__] => Array
+                                                        (
+                                                            [title_typography_typography] => globals/typography?id=392b9e0
+                                                        )
+
+                                                    [_element_width_tablet] => initial
+                                                    [_element_width_mobile] => inherit
+                                                    [_element_custom_width] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 25
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_custom_width_tablet] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 45
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_custom_width_mobile] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_width] => initial
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => image-box
+                                        )
+
+                                    [3] => Array
+                                        (
+                                            [id] => 7d66454f
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [image] => Array
+                                                        (
+                                                            [id] => 88
+                                                            [url] => https://rnrtemplate2.valueoffershq.com/wp-content/uploads/2025/03/Image_Placeholder-13122021.jpg
+                                                        )
+
+                                                    [title_text] => y_serv4
+                                                    [description_text] => y_serv4_main
+                                                    [title_size] => h4
+                                                    [image_size] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 100
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [hover_animation] => grow
+                                                    [text_align] => left
+                                                    [title_bottom_space] => Array
+                                                        (
+                                                            [unit] => px
+                                                            [size] => 15
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [__globals__] => Array
+                                                        (
+                                                            [title_typography_typography] => globals/typography?id=392b9e0
+                                                        )
+
+                                                    [_element_width_tablet] => initial
+                                                    [_element_width_mobile] => inherit
+                                                    [_element_custom_width] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 25
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_custom_width_tablet] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 45
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_custom_width_mobile] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [size] => 
+                                                            [sizes] => Array
+                                                                (
+                                                                )
+
+                                                        )
+
+                                                    [_element_width] => initial
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => image-box
+                                        )
+
+                                )
+
+                            [isInner] => 1
+                        )
+
+                )
+
+            [isInner] => 
+        )
+
+    [2] => Array
+        (
+            [id] => ef4344b
+            [elType] => container
+            [settings] => Array
+                (
+                )
+
+            [elements] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 051212a
+                            [elType] => widget
+                            [settings] => Array
+                                (
+                                    [editor] => <p>y_alca_1</p>
+                                    [align] => left
+                                    [_element_custom_width] => Array
+                                        (
+                                            [unit] => px
+                                            [size] => 
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                        )
+
+                                    [_border_border] => solid
+                                    [_border_width] => Array
+                                        (
+                                            [unit] => px
+                                            [top] => 6
+                                            [right] => 6
+                                            [bottom] => 6
+                                            [left] => 6
+                                            [isLinked] => 1
+                                        )
+
+                                    [_border_radius] => Array
+                                        (
+                                            [unit] => px
+                                            [top] => 6
+                                            [right] => 6
+                                            [bottom] => 6
+                                            [left] => 6
+                                            [isLinked] => 1
+                                        )
+
+                                    [_box_shadow_box_shadow_type] => yes
+                                    [custom_css] => {max-width:400px !important;}
+                                    [_padding] => Array
+                                        (
+                                            [unit] => px
+                                            [top] => 34
+                                            [right] => 34
+                                            [bottom] => 34
+                                            [left] => 34
+                                            [isLinked] => 1
+                                        )
+
+                                )
+
+                            [elements] => Array
+                                (
+                                )
+
+                            [widgetType] => text-editor
+                        )
+
+                )
+
+            [isInner] => 
+        )
+
+    [3] => Array
+        (
+            [id] => 705c0113
+            [elType] => container
+            [settings] => Array
+                (
+                    [layout] => full_width
+                    [flex_gap] => Array
+                        (
+                            [size] => 80
+                            [unit] => px
+                            [column] => 80
+                            [row] => 80
+                            [isLinked] => 1
+                        )
+
+                    [padding] => Array
+                        (
+                            [unit] => %
+                            [top] => 8
+                            [right] => 8
+                            [bottom] => 8
+                            [left] => 8
+                            [isLinked] => 
+                        )
+
+                    [margin] => Array
+                        (
+                            [unit] => %
+                            [top] => 12
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [content_position] => middle
+                    [background_background] => classic
+                    [__globals__] => Array
+                        (
+                            [background_color] => globals/colors?id=secondary
+                        )
+
+                    [padding_tablet] => Array
+                        (
+                            [unit] => %
+                            [top] => 12
+                            [right] => 5
+                            [bottom] => 12
+                            [left] => 5
+                            [isLinked] => 
+                        )
+
+                    [margin_tablet] => Array
+                        (
+                            [unit] => %
+                            [top] => 25
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [margin_mobile] => Array
+                        (
+                            [unit] => %
+                            [top] => 35
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [padding_mobile] => Array
+                        (
+                            [unit] => %
+                            [top] => 25
+                            [right] => 5
+                            [bottom] => 25
+                            [left] => 5
+                            [isLinked] => 
+                        )
+
+                    [_title] => Benefits
+                    [flex_direction] => column
+                    [flex_align_items] => stretch
+                    [flex_gap_mobile] => Array
+                        (
+                            [unit] => px
+                            [size] => 60
+                            [sizes] => Array
+                                (
+                                )
+
+                            [column] => 60
+                            [row] => 60
+                            [isLinked] => 1
+                        )
+
+                )
+
+            [elements] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 672aecdf
+                            [elType] => widget
+                            [settings] => Array
+                                (
+                                    [title] => y_gizmo1_heading
+                                    [align] => center
+                                    [__globals__] => Array
+                                        (
+                                            [typography_typography] => globals/typography?id=primary
+                                        )
+
+                                )
+
+                            [elements] => Array
+                                (
+                                )
+
+                            [widgetType] => heading
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 114370a
+                            [elType] => container
+                            [settings] => Array
+                                (
+                                    [content_width] => full
+                                )
+
+                            [elements] => Array
+                                (
+                                    [0] => Array
+                                        (
+                                            [id] => f7ddf3e
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [editor] => <p>y_gizmo1_main</p>
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => text-editor
+                                        )
+
+                                )
+
+                            [isInner] => 1
+                        )
+
+                    [2] => Array
+                        (
+                            [id] => 08df688
+                            [elType] => container
+                            [settings] => Array
+                                (
+                                    [content_width] => full
+                                )
+
+                            [elements] => Array
+                                (
+                                )
+
+                            [isInner] => 1
+                        )
+
+                )
+
+            [isInner] => 
+        )
+
+    [4] => Array
+        (
+            [id] => 6b1e54e5
+            [elType] => container
+            [settings] => Array
+                (
+                    [layout] => full_width
+                    [flex_gap] => Array
+                        (
+                            [size] => 0
+                            [unit] => px
+                            [column] => 0
+                            [row] => 0
+                            [isLinked] => 1
+                        )
+
+                    [content_position] => middle
+                    [structure] => 20
+                    [margin] => Array
+                        (
+                            [unit] => %
+                            [top] => 12
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [padding] => Array
+                        (
+                            [unit] => %
+                            [top] => 0
+                            [right] => 8
+                            [bottom] => 0
+                            [left] => 8
+                            [isLinked] => 
+                        )
+
+                    [padding_tablet] => Array
+                        (
+                            [unit] => %
+                            [top] => 0
+                            [right] => 5
+                            [bottom] => 0
+                            [left] => 5
+                            [isLinked] => 
+                        )
+
+                    [margin_tablet] => Array
+                        (
+                            [unit] => %
+                            [top] => 25
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [reverse_order_tablet] => reverse-tablet
+                    [reverse_order_mobile] => reverse-mobile
+                    [margin_mobile] => Array
+                        (
+                            [unit] => %
+                            [top] => 35
+                            [right] => 0
+                            [bottom] => 0
+                            [left] => 0
+                            [isLinked] => 
+                        )
+
+                    [_title] => Examples
+                    [flex_direction] => row
+                    [flex_align_items] => center
+                    [flex_direction_tablet] => column-reverse
+                )
+
+            [elements] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 12759082
+                            [elType] => container
+                            [settings] => Array
+                                (
+                                    [_column_size] => 50
+                                    [width_tablet] => Array
+                                        (
+                                            [size] => 100
+                                            [unit] => %
+                                        )
+
+                                    [margin_tablet] => Array
+                                        (
+                                            [unit] => %
+                                            [top] => 10
+                                            [right] => 0
+                                            [bottom] => 0
+                                            [left] => 0
+                                            [isLinked] => 
+                                        )
+
+                                    [content_width] => full
+                                    [width] => Array
+                                        (
+                                            [unit] => %
+                                            [size] => 50
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                        )
+
+                                    [flex_direction] => column
+                                )
+
+                            [elements] => Array
+                                (
+                                    [0] => Array
+                                        (
+                                            [id] => 4d9e55fd
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [carousel] => Array
+                                                        (
+                                                            [0] => Array
+                                                                (
+                                                                    [id] => 114
+                                                                    [url] => https://rnrtemplate2.valueoffershq.com/wp-content/uploads/2025/03/Image_Placeholder_2_Slider_1-13122021.jpg
+                                                                )
+
+                                                        )
+
+                                                    [thumbnail_size] => full
+                                                    [slides_to_show] => 1
+                                                    [navigation] => dots
+                                                    [__globals__] => Array
+                                                        (
+                                                            [dots_color] => globals/colors?id=accent
+                                                        )
+
+                                                    [carousel_name] => Image Carousel
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => image-carousel
+                                        )
+
+                                )
+
+                            [isInner] => 1
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 4606971
+                            [elType] => container
+                            [settings] => Array
+                                (
+                                    [_column_size] => 50
+                                    [padding] => Array
+                                        (
+                                            [unit] => %
+                                            [top] => 0
+                                            [right] => 8
+                                            [bottom] => 0
+                                            [left] => 8
+                                            [isLinked] => 
+                                        )
+
+                                    [width_tablet] => Array
+                                        (
+                                            [size] => 100
+                                            [unit] => %
+                                        )
+
+                                    [padding_tablet] => Array
+                                        (
+                                            [unit] => %
+                                            [top] => 0
+                                            [right] => 20
+                                            [bottom] => 0
+                                            [left] => 0
+                                            [isLinked] => 
+                                        )
+
+                                    [content_width] => full
+                                    [width] => Array
+                                        (
+                                            [unit] => %
+                                            [size] => 50
+                                            [sizes] => Array
+                                                (
+                                                )
+
+                                        )
+
+                                    [flex_direction] => column
+                                )
+
+                            [elements] => Array
+                                (
+                                    [0] => Array
+                                        (
+                                            [id] => 7a0fc07e
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [title] => y_gizmo2_heading
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => heading
+                                        )
+
+                                    [1] => Array
+                                        (
+                                            [id] => 30cff0fe
+                                            [elType] => widget
+                                            [settings] => Array
+                                                (
+                                                    [editor] => <p>y_gizmo2_main</p>
+                                                    [_padding_tablet] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [top] => 0
+                                                            [right] => 35
+                                                            [bottom] => 0
+                                                            [left] => 0
+                                                            [isLinked] => 
+                                                        )
+
+                                                    [_padding_mobile] => Array
+                                                        (
+                                                            [unit] => px
+                                                            [top] => 0
+                                                            [right] => 0
+                                                            [bottom] => 0
+                                                            [left] => 0
+                                                            [isLinked] => 
+                                                        )
+
+                                                    [_padding] => Array
+                                                        (
+                                                            [unit] => %
+                                                            [top] => 0
+                                                            [right] => 25
+                                                            [bottom] => 0
+                                                            [left] => 0
+                                                            [isLinked] => 
+                                                        )
+
+                                                )
+
+                                            [elements] => Array
+                                                (
+                                                )
+
+                                            [widgetType] => text-editor
+                                        )
+
+                                )
+
+                            [isInner] => 1
+                        )
+
+                )
+
+            [isInner] => 
+        )
+
+    [5] => Array
+        (
+            [id] => 7c5e724
+            [elType] => container
+            [settings] => Array
+                (
+                    [flex_direction] => column
+                )
+
+            [elements] => Array
+                (
+                )
+
+            [isInner] => 
+        )
+
+)
+
+[22-May-2025 21:17:11 UTC] Processing line: y_hero1_heading
+[22-May-2025 21:17:11 UTC] Found match in widget: heading setting: title
+[22-May-2025 21:17:11 UTC] Processing line: y_hero1_main
+[22-May-2025 21:17:11 UTC] Found match in widget: heading setting: title
+[22-May-2025 21:17:11 UTC] Processing line: y_services1_heading
+[22-May-2025 21:17:11 UTC] Found match in widget: heading setting: title
+[22-May-2025 21:17:11 UTC] Processing line: y_services1_main
+[22-May-2025 21:17:11 UTC] Found match in widget: heading setting: title
+[22-May-2025 21:17:11 UTC] Processing line: y_serv1
+[22-May-2025 21:17:11 UTC] Found match in widget: image-box setting: title_text
+[22-May-2025 21:17:11 UTC] Processing line: y_serv1_main
+[22-May-2025 21:17:11 UTC] Found match in widget: image-box setting: description_text
+[22-May-2025 21:17:11 UTC] Processing line: y_serv2
+[22-May-2025 21:17:11 UTC] Found match in widget: image-box setting: title_text
+[22-May-2025 21:17:11 UTC] Processing line: y_serv2_main
+[22-May-2025 21:17:11 UTC] Found match in widget: image-box setting: description_text
+[22-May-2025 21:17:11 UTC] Processing line: y_serv3
+[22-May-2025 21:17:11 UTC] Found match in widget: image-box setting: title_text
+[22-May-2025 21:17:11 UTC] Processing line: y_serv3_main
+[22-May-2025 21:17:11 UTC] Found match in widget: image-box setting: description_text
+[22-May-2025 21:17:11 UTC] Processing line: y_serv4
+[22-May-2025 21:17:11 UTC] Found match in widget: image-box setting: title_text
+[22-May-2025 21:17:11 UTC] Processing line: y_serv4_main
+[22-May-2025 21:17:11 UTC] Found match in widget: image-box setting: description_text
+[22-May-2025 21:17:11 UTC] Processing line: y_alca_1
+[22-May-2025 21:17:11 UTC] Found match in widget: text-editor setting: editor
+[22-May-2025 21:17:11 UTC] Processing line: y_gizmo1_heading
+[22-May-2025 21:17:11 UTC] Found match in widget: heading setting: title
+[22-May-2025 21:17:11 UTC] Processing line: y_gizmo1_main
+[22-May-2025 21:17:11 UTC] Found match in widget: text-editor setting: editor
+[22-May-2025 21:17:11 UTC] Processing line: y_gizmo2_heading
+[22-May-2025 21:17:11 UTC] Found match in widget: heading setting: title
+[22-May-2025 21:17:11 UTC] Processing line: y_gizmo2_main
+[22-May-2025 21:17:11 UTC] Found match in widget: text-editor setting: editor
+[22-May-2025 21:17:11 UTC] Saved mapping: Array
+(
+    [y_hero1_heading] => Array
+        (
+            [widget_type] => heading
+            [setting_key] => title
+        )
+
+    [y_hero1_main] => Array
+        (
+            [widget_type] => heading
+            [setting_key] => title
+        )
+
+    [y_services1_heading] => Array
+        (
+            [widget_type] => heading
+            [setting_key] => title
+        )
+
+    [y_services1_main] => Array
+        (
+            [widget_type] => heading
+            [setting_key] => title
+        )
+
+    [y_serv1] => Array
+        (
+            [widget_type] => image-box
+            [setting_key] => title_text
+        )
+
+    [y_serv1_main] => Array
+        (
+            [widget_type] => image-box
+            [setting_key] => description_text
+        )
+
+    [y_serv2] => Array
+        (
+            [widget_type] => image-box
+            [setting_key] => title_text
+        )
+
+    [y_serv2_main] => Array
+        (
+            [widget_type] => image-box
+            [setting_key] => description_text
+        )
+
+    [y_serv3] => Array
+        (
+            [widget_type] => image-box
+            [setting_key] => title_text
+        )
+
+    [y_serv3_main] => Array
+        (
+            [widget_type] => image-box
+            [setting_key] => description_text
+        )
+
+    [y_serv4] => Array
+        (
+            [widget_type] => image-box
+            [setting_key] => title_text
+        )
+
+    [y_serv4_main] => Array
+        (
+            [widget_type] => image-box
+            [setting_key] => description_text
+        )
+
+    [y_alca_1] => Array
+        (
+            [widget_type] => text-editor
+            [setting_key] => editor
+        )
+
+    [y_gizmo1_heading] => Array
+        (
+            [widget_type] => heading
+            [setting_key] => title
+        )
+
+    [y_gizmo1_main] => Array
+        (
+            [widget_type] => text-editor
+            [setting_key] => editor
+        )
+
+    [y_gizmo2_heading] => Array
+        (
+            [widget_type] => heading
+            [setting_key] => title
+        )
+
+    [y_gizmo2_main] => Array
+        (
+            [widget_type] => text-editor
+            [setting_key] => editor
+        )
+
+)
+
+[22-May-2025 21:19:52 UTC] Elementor data structure:
+[22-May-2025 21:19:52 UTC] Failed to decode Elementor data: Syntax error
+[23-May-2025 11:22:14 UTC] Automatic updates starting...
+[23-May-2025 11:22:15 UTC]   Automatic plugin updates starting...
+[23-May-2025 11:22:15 UTC]   Automatic plugin updates complete.
+[23-May-2025 11:22:16 UTC]   Automatic theme updates starting...
+[23-May-2025 11:22:16 UTC]   Automatic theme updates complete.
+[23-May-2025 11:22:16 UTC] Automatic updates complete.
+[23-May-2025 19:55:24 UTC] Automatic updates starting...
+[23-May-2025 19:55:25 UTC]   Automatic plugin updates starting...
+[23-May-2025 19:55:25 UTC]   Automatic plugin updates complete.
+[23-May-2025 19:55:25 UTC]   Automatic theme updates starting...
+[23-May-2025 19:55:25 UTC]   Automatic theme updates complete.
+[23-May-2025 19:55:25 UTC] Automatic updates complete.
+[24-May-2025 05:24:56 UTC] Automatic updates starting...
+[24-May-2025 05:24:56 UTC]   Automatic plugin updates starting...
+[24-May-2025 05:24:56 UTC]   Automatic plugin updates complete.
+[24-May-2025 05:24:56 UTC]   Automatic theme updates starting...
+[24-May-2025 05:24:56 UTC]     Upgrading theme 'extendable'...
+[24-May-2025 05:24:57 UTC]     Theme 'extendable' has been upgraded.
+[24-May-2025 05:24:57 UTC]   Automatic theme updates complete.
+[24-May-2025 05:24:57 UTC] Automatic updates complete.
+[24-May-2025 15:58:52 UTC] Automatic updates starting...
+[24-May-2025 15:58:52 UTC]   Automatic plugin updates starting...
+[24-May-2025 15:58:52 UTC]   Automatic plugin updates complete.
+[24-May-2025 15:58:52 UTC]   Automatic theme updates starting...
+[24-May-2025 15:58:52 UTC]     Upgrading theme 'extendable'...
+[24-May-2025 15:58:53 UTC]     Theme 'extendable' has been upgraded.
+[24-May-2025 15:58:53 UTC]   Automatic theme updates complete.
+[24-May-2025 15:58:53 UTC] Automatic updates complete.
+[25-May-2025 05:57:13 UTC] Automatic updates starting...
+[25-May-2025 05:57:14 UTC]   Automatic plugin updates starting...
+[25-May-2025 05:57:14 UTC]   Automatic plugin updates complete.
+[25-May-2025 05:57:14 UTC]   Automatic theme updates starting...
+[25-May-2025 05:57:14 UTC]     Upgrading theme 'extendable'...
+[25-May-2025 05:57:15 UTC]     Theme 'extendable' has been upgraded.
+[25-May-2025 05:57:15 UTC]   Automatic theme updates complete.
+[25-May-2025 05:57:15 UTC] Automatic updates complete.
+[26-May-2025 11:14:05 UTC] Automatic updates starting...
+[26-May-2025 11:14:06 UTC]   Automatic plugin updates starting...
+[26-May-2025 11:14:06 UTC]   Automatic plugin updates complete.
+[26-May-2025 11:14:06 UTC]   Automatic theme updates starting...
+[26-May-2025 11:14:06 UTC]   Automatic theme updates complete.
+[26-May-2025 11:14:06 UTC] Automatic updates complete.
+[26-May-2025 16:00:30 UTC] PHP Warning:  unlink(/tmp/extendable.2.0.23-97p0DT.tmp): No such file or directory in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-admin/includes/file.php on line 1182
+[26-May-2025 16:00:34 UTC] PHP Warning:  unlink(/tmp/extendable.2.0.23-lahgod.tmp): No such file or directory in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-admin/includes/file.php on line 1182
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Finder::getIterator() should either be compatible with IteratorAggregate::getIterator(): Traversable, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Finder.php on line 566
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Finder::count() should either be compatible with Countable::count(): int, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Finder.php on line 637
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\FilterIterator::rewind() should either be compatible with FilterIterator::rewind(): void, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/FilterIterator.php on line 32
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\FileTypeFilterIterator::accept() should either be compatible with FilterIterator::accept(): bool, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/FileTypeFilterIterator.php on line 42
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator::getChildren() should either be compatible with RecursiveDirectoryIterator::getChildren(): RecursiveDirectoryIterator, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/RecursiveDirectoryIterator.php on line 89
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator::rewind() should either be compatible with FilesystemIterator::rewind(): void, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/RecursiveDirectoryIterator.php on line 117
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator::current() should either be compatible with FilesystemIterator::current(): SplFileInfo|FilesystemIterator|string, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/RecursiveDirectoryIterator.php on line 65
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator::accept() should either be compatible with FilterIterator::accept(): bool, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/ExcludeDirectoryFilterIterator.php on line 55
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator::hasChildren() should either be compatible with RecursiveIterator::hasChildren(): bool, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/ExcludeDirectoryFilterIterator.php on line 71
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator::getChildren() should either be compatible with RecursiveIterator::getChildren(): ?RecursiveIterator, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/ExcludeDirectoryFilterIterator.php on line 76
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\FilterIterator::rewind() should either be compatible with Iterator::rewind(): void, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/FilterIterator.php on line 32
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\DateRangeFilterIterator::accept() should either be compatible with FilterIterator::accept(): bool, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/DateRangeFilterIterator.php on line 41
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\PathFilterIterator::accept() should either be compatible with FilterIterator::accept(): bool, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/PathFilterIterator.php on line 27
+[26-May-2025 16:00:35 UTC] PHP Deprecated:  Return type of Symfony\Component\Finder\Iterator\SortableIterator::getIterator() should either be compatible with IteratorAggregate::getIterator(): Traversable, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice in /usr/local/cpanel/3rdparty/wp-toolkit/plib/vendor/wp-cli/vendor/symfony/finder/Iterator/SortableIterator.php on line 73
+[02-Jun-2025 05:04:14 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:14 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:14 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:14 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:14 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:14 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:14 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:14 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:20 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[02-Jun-2025 05:04:25 UTC] PHP Warning:  Trying to access array offset on value of type bool in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/elementor/includes/managers/image.php on line 113
+[04-Jun-2025 02:49:55 UTC] Snefuru: API key not configured
+[04-Jun-2025 02:50:01 UTC] PHP Fatal error:  Uncaught Error: Call to private method Snefuru_Data_Collector::get_site_info() from scope Snefuru_Admin in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php:110
+Stack trace:
+#0 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(324): Snefuru_Admin->admin_page()
+#1 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#2 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#3 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-admin/admin.php(259): do_action()
+#4 {main}
+  thrown in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 110
+[04-Jun-2025 02:50:25 UTC] PHP Fatal error:  Uncaught Error: Call to private method Snefuru_Data_Collector::get_site_info() from scope Snefuru_Admin in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php:110
+Stack trace:
+#0 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(324): Snefuru_Admin->admin_page()
+#1 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#2 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#3 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-admin/admin.php(259): do_action()
+#4 {main}
+  thrown in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 110
+[04-Jun-2025 02:54:37 UTC] PHP Fatal error:  Uncaught Error: Call to private method Snefuru_Data_Collector::get_site_info() from scope Snefuru_Admin in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php:110
+Stack trace:
+#0 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(324): Snefuru_Admin->admin_page()
+#1 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#2 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#3 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-admin/admin.php(259): do_action()
+#4 {main}
+  thrown in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 110
+[04-Jun-2025 03:51:22 UTC] Snefuru: API key not configured
+[04-Jun-2025 04:49:58 UTC] Snefuru: API key not configured
+[04-Jun-2025 13:47:22 UTC] Snefuru: API key not configured
+[04-Jun-2025 13:47:31 UTC] PHP Fatal error:  Uncaught Error: Call to private method Snefuru_Data_Collector::get_site_info() from scope Snefuru_Admin in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php:116
+Stack trace:
+#0 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(324): Snefuru_Admin->admin_page()
+#1 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#2 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#3 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-admin/admin.php(259): do_action()
+#4 {main}
+  thrown in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 116
+[04-Jun-2025 13:49:53 UTC] Snefuru: API key not configured
+[04-Jun-2025 13:50:49 UTC] PHP Fatal error:  Uncaught Error: Call to private method Snefuru_Data_Collector::get_site_info() from scope Snefuru_Admin in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php:125
+Stack trace:
+#0 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(324): Snefuru_Admin->admin_page()
+#1 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#2 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#3 /home/wphostin/rnrtemplate2.valueoffershq.com/wp-admin/admin.php(259): do_action()
+#4 {main}
+  thrown in /home/wphostin/rnrtemplate2.valueoffershq.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 125
+[04-Jun-2025 15:56:55 UTC] Snefuru: API key not configured
+[04-Jun-2025 17:53:12 UTC] Snefuru: API key not configured
+[04-Jun-2025 18:51:18 UTC] Snefuru: API key not configured
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: get_site_posts method called
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: Permission check passed
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: Query params - post_types: ["post","page"], post_status: ["publish","private","draft","pending"], limit: 1000
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: Querying for type: post with args: {"post_type":"post","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: Found 0 posts of type: post
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: Querying for type: page with args: {"post_type":"page","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: Found 44 posts of type: page
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: Total posts found: 44
+[04-Jun-2025 19:29:16 UTC] Snefuru Plugin: Returning response with 44 posts
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: get_site_posts method called
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: Permission check passed
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: Query params - post_types: ["post","page"], post_status: ["publish","private","draft","pending"], limit: 1000
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: Querying for type: post with args: {"post_type":"post","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: Found 0 posts of type: post
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: Querying for type: page with args: {"post_type":"page","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: Found 44 posts of type: page
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: Total posts found: 44
+[04-Jun-2025 19:29:21 UTC] Snefuru Plugin: Returning response with 44 posts
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: get_site_posts method called
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: Permission check passed
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: Query params - post_types: ["post","page"], post_status: ["publish","private","draft","pending"], limit: 1000
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: Querying for type: post with args: {"post_type":"post","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: Found 0 posts of type: post
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: Querying for type: page with args: {"post_type":"page","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: Found 44 posts of type: page
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: Total posts found: 44
+[04-Jun-2025 19:30:13 UTC] Snefuru Plugin: Returning response with 44 posts
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: get_site_posts method called
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: Permission check passed
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: Query params - post_types: ["post","page"], post_status: ["publish","private","draft","pending"], limit: 1000
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: Querying for type: post with args: {"post_type":"post","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: Found 0 posts of type: post
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: Querying for type: page with args: {"post_type":"page","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: Found 44 posts of type: page
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: Total posts found: 44
+[04-Jun-2025 19:42:12 UTC] Snefuru Plugin: Returning response with 44 posts
+[04-Jun-2025 19:50:46 UTC] Snefuru API Error: HTTP 405 - 
+[04-Jun-2025 23:08:04 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 00:06:49 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 01:50:49 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 09:27:41 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 11:30:42 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 14:08:36 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 15:56:43 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 19:55:29 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 20:51:08 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 21:51:38 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 22:50:06 UTC] Snefuru API Error: HTTP 405 - 
+[05-Jun-2025 23:50:36 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 05:55:14 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 06:49:54 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 08:02:24 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 09:18:55 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 10:19:47 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 11:21:04 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 12:22:01 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 13:06:27 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 14:24:29 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 16:05:26 UTC] Snefuru API Error: HTTP 405 - 
+[06-Jun-2025 19:55:27 UTC] Snefuru API Error: HTTP 405 - 
+[07-Jun-2025 02:26:26 UTC] Snefuru API Error: HTTP 405 - 
+[07-Jun-2025 02:59:16 UTC] Snefuru API Error: HTTP 405 - 
+[07-Jun-2025 11:17:29 UTC] Snefuru API Error: HTTP 405 - 
+[07-Jun-2025 14:28:27 UTC] Snefuru API Error: HTTP 405 - 
+[07-Jun-2025 15:36:52 UTC] Snefuru API Error: HTTP 405 - 
+[07-Jun-2025 19:55:19 UTC] Snefuru API Error: HTTP 405 - 
+[08-Jun-2025 11:19:02 UTC] Snefuru API Error: HTTP 405 - 
+[08-Jun-2025 19:55:08 UTC] Snefuru API Error: HTTP 405 - 
+[09-Jun-2025 09:34:06 UTC] Snefuru API Error: HTTP 405 - 
+[09-Jun-2025 11:14:05 UTC] Snefuru API Error: HTTP 405 - 
+[09-Jun-2025 15:55:36 UTC] Snefuru API Error: HTTP 405 - 
+[09-Jun-2025 19:55:28 UTC] Snefuru API Error: HTTP 405 - 
+[10-Jun-2025 12:31:32 UTC] Snefuru API Error: HTTP 405 - 
+[10-Jun-2025 12:50:07 UTC] Snefuru API Error: HTTP 405 - 
+[10-Jun-2025 19:55:19 UTC] Snefuru API Error: HTTP 405 - 
+[11-Jun-2025 02:07:51 UTC] Snefuru API Error: HTTP 405 - 
+[11-Jun-2025 07:21:55 UTC] Snefuru API Error: HTTP 405 - 
+[11-Jun-2025 11:13:43 UTC] Snefuru API Error: HTTP 405 - 
+[11-Jun-2025 15:01:40 UTC] Snefuru API Error: HTTP 405 - 
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: get_site_posts method called
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: Permission check passed
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: Query params - post_types: ["post","page"], post_status: ["publish","private","draft","pending"], limit: 1000
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: Querying for type: post with args: {"post_type":"post","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: Found 0 posts of type: post
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: Querying for type: page with args: {"post_type":"page","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: Found 43 posts of type: page
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: Total posts found: 43
+[11-Jun-2025 15:41:09 UTC] Snefuru Plugin: Returning response with 43 posts
+[11-Jun-2025 19:55:35 UTC] Snefuru API Error: HTTP 405 - 
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: get_site_posts method called
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: Permission check passed
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: Query params - post_types: ["post","page"], post_status: ["publish","private","draft","pending"], limit: 1000
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: Querying for type: post with args: {"post_type":"post","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: Found 0 posts of type: post
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: Querying for type: page with args: {"post_type":"page","post_status":["publish","private","draft","pending"],"posts_per_page":1000,"offset":0,"orderby":"modified","order":"DESC"}
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: Found 17 posts of type: page
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: Total posts found: 17
+[11-Jun-2025 20:43:43 UTC] Snefuru Plugin: Returning response with 17 posts
+[11-Jun-2025 20:50:01 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 08:55:47 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 11:14:17 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 13:27:34 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 13:50:15 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 15:00:34 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 17:56:46 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 19:55:12 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 21:09:37 UTC] Snefuru API Error: HTTP 405 - 
+[12-Jun-2025 22:50:30 UTC] Snefuru API Error: HTTP 405 - 
+[13-Jun-2025 00:46:23 UTC] Snefuru API Error: HTTP 405 - 
+[13-Jun-2025 02:43:52 UTC] Snefuru API Error: HTTP 405 - 

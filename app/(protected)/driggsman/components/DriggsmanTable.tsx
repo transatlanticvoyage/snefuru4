@@ -283,17 +283,33 @@ export default function DriggsmanTable() {
     { key: 'is_rnr', type: 'boolean', label: 'is_rnr', group: 'meta' },
     { key: 'is_aff', type: 'boolean', label: 'is_aff', group: 'meta' },
     { key: 'is_other1', type: 'boolean', label: 'is_other1', group: 'meta' },
-    { key: 'is_other2', type: 'boolean', label: 'is_other2', group: 'meta' }
+    { key: 'is_other2', type: 'boolean', label: 'is_other2', group: 'meta' },
+    { key: 'is_flylocal', type: 'boolean', label: 'is_flylocal', group: 'meta' }
   ];
   
-  // Initialize manual sites from URL parameter
+  // Initialize manual sites and active filter chamber from URL parameters
   useEffect(() => {
     const sitesEnteredParam = searchParams?.get('sitesentered');
+    const activeFilterChamber = searchParams?.get('activefilterchamber');
+    
+    // Handle sites parameter (existing code)
     if (sitesEnteredParam) {
       const sitesFromUrl = sitesEnteredParam.split(',').map(s => s.trim()).filter(s => s);
       setManualSites(sitesFromUrl);
       setManualSiteInput(sitesFromUrl.join(', '));
     }
+    
+    // Handle new activefilterchamber parameter
+    if (activeFilterChamber === 'daylight') {
+      setUseDaylightFilter(true);
+      setUseRainFilter(false);
+      setActiveRainChamber(false);
+    } else if (activeFilterChamber === 'rain') {
+      setUseRainFilter(true);
+      setUseDaylightFilter(false);
+      setActiveRainChamber(true);
+    }
+    // If absent or invalid, neither is selected (existing default behavior)
   }, [searchParams]);
 
   // Fetch sites data and re-filter when manual sites change
@@ -839,6 +855,34 @@ export default function DriggsmanTable() {
       .filter(s => s.length > 0);
   };
 
+  // Helper function to update URL parameters with proper ordering
+  const updateURL = (chamber: 'daylight' | 'rain' | null = null, sites: string[] = []) => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      
+      // Clear existing parameters
+      url.searchParams.delete('activefilterchamber');
+      url.searchParams.delete('sitesentered');
+      
+      // Add parameters in the desired order: activefilterchamber first, then sitesentered
+      if (chamber) {
+        url.searchParams.set('activefilterchamber', chamber);
+      }
+      
+      if (sites.length > 0) {
+        url.searchParams.set('sitesentered', sites.join(','));
+      }
+      
+      router.replace(url.pathname + url.search, { scroll: false });
+    }
+  };
+
+  // Helper function to update only activefilterchamber while preserving sitesentered order
+  const updateActiveChamberURL = (chamber: 'daylight' | 'rain' | null) => {
+    const currentSites = manualSites.length > 0 ? manualSites : [];
+    updateURL(chamber, currentSites);
+  };
+
   // Checkbox filter handlers
   const handleDaylightFilterChange = (checked: boolean) => {
     setUseDaylightFilter(checked);
@@ -849,9 +893,12 @@ export default function DriggsmanTable() {
       if (storedManualSites.length > 0) {
         setManualSites(storedManualSites);
       }
+      // Update URL
+      updateActiveChamberURL('daylight');
     } else {
       // No filtering - show all sites
       setManualSites([]);
+      updateActiveChamberURL(null);
     }
   };
 
@@ -865,10 +912,13 @@ export default function DriggsmanTable() {
       if (selectedTagId) {
         setActiveRainChamber(true);
       }
+      // Update URL
+      updateActiveChamberURL('rain');
     } else {
       // No filtering - show all sites
       setActiveRainChamber(false);
       setManualSites([]);
+      updateActiveChamberURL(null);
     }
   };
 
@@ -877,16 +927,9 @@ export default function DriggsmanTable() {
     setManualSites(sites);
     setStoredManualSites(sites); // Store permanently for toggle between chambers
     
-    // Update URL parameter only in browser environment
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      if (sites.length > 0) {
-        url.searchParams.set('sitesentered', sites.join(','));
-      } else {
-        url.searchParams.delete('sitesentered');
-      }
-      router.replace(url.pathname + url.search, { scroll: false });
-    }
+    // Update URL with proper parameter ordering
+    const currentChamber = useDaylightFilter ? 'daylight' : useRainFilter ? 'rain' : null;
+    updateURL(currentChamber, sites);
   };
 
   const handleManualSiteKeyPress = (e: React.KeyboardEvent) => {
@@ -900,16 +943,9 @@ export default function DriggsmanTable() {
     setManualSites(updatedSites);
     setManualSiteInput(updatedSites.join(', '));
     
-    // Update URL parameter only in browser environment
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      if (updatedSites.length > 0) {
-        url.searchParams.set('sitesentered', updatedSites.join(','));
-      } else {
-        url.searchParams.delete('sitesentered');
-      }
-      router.replace(url.pathname + url.search, { scroll: false });
-    }
+    // Update URL with proper parameter ordering
+    const currentChamber = useDaylightFilter ? 'daylight' : useRainFilter ? 'rain' : null;
+    updateURL(currentChamber, updatedSites);
   };
 
   const clearAllManualSites = () => {
@@ -917,12 +953,9 @@ export default function DriggsmanTable() {
     setStoredManualSites([]);
     setManualSiteInput('');
     
-    // Remove URL parameter only in browser environment
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('sitesentered');
-      router.replace(url.pathname + url.search, { scroll: false });
-    }
+    // Update URL with proper parameter ordering (remove sitesentered, keep chamber if active)
+    const currentChamber = useDaylightFilter ? 'daylight' : useRainFilter ? 'rain' : null;
+    updateURL(currentChamber, []);
   };
 
   // Platform dropdown functions

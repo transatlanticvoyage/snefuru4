@@ -1,0 +1,289 @@
+document.addEventListener('DOMContentLoaded', function() {
+  const copyBtn = document.getElementById('copyBtn');
+  const pasteBtn = document.getElementById('pasteBtn');
+  const rootlifyBtn = document.getElementById('rootlifyBtn');
+  const driggsmanRootBtn = document.getElementById('driggsmanRootBtn');
+  const driggsmanSubBtn = document.getElementById('driggsmanSubBtn');
+  const statusDiv = document.getElementById('status');
+
+  // Copy all tab URLs to clipboard
+  copyBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      copyBtn.classList.add('loading');
+      
+      // Get all tabs in current window
+      const tabs = await chrome.tabs.query({ currentWindow: true });
+      
+      // Extract URLs - include ALL URLs (chrome://, local, etc.)
+      const urls = tabs.map(tab => tab.url).filter(url => {
+        // Include all URLs, only filter out undefined/null
+        return url && url.trim().length > 0;
+      });
+      
+      if (urls.length === 0) {
+        showStatus('No valid URLs to copy', 'error');
+        copyBtn.classList.remove('loading');
+        return;
+      }
+      
+      // Join URLs with newlines
+      const urlText = urls.join('\n');
+      
+      // Copy to clipboard
+      await navigator.clipboard.writeText(urlText);
+      
+      // Show success message
+      showStatus(`Copied ${urls.length} URL${urls.length !== 1 ? 's' : ''} to clipboard!`, 'success');
+      
+    } catch (error) {
+      console.error('Error copying URLs:', error);
+      showStatus('Failed to copy URLs', 'error');
+    } finally {
+      copyBtn.classList.remove('loading');
+    }
+  });
+
+  // Paste URLs from clipboard and open in new tabs
+  pasteBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      pasteBtn.classList.add('loading');
+      
+      // Read from clipboard
+      const clipboardText = await navigator.clipboard.readText();
+      
+      if (!clipboardText.trim()) {
+        showStatus('Clipboard is empty', 'error');
+        pasteBtn.classList.remove('loading');
+        return;
+      }
+      
+      // Parse URLs from clipboard (split by newlines, spaces, or commas)
+      const urls = clipboardText
+        .split(/[\n,\s]+/)
+        .map(url => url.trim())
+        .filter(url => {
+          // Basic URL validation
+          if (!url) return false;
+          
+          // Add protocol if missing
+          if (!url.match(/^https?:\/\//i)) {
+            url = 'https://' + url;
+          }
+          
+          try {
+            new URL(url);
+            return true;
+          } catch {
+            return false;
+          }
+        })
+        .map(url => {
+          // Ensure URLs have protocol
+          if (!url.match(/^https?:\/\//i)) {
+            return 'https://' + url;
+          }
+          return url;
+        });
+      
+      if (urls.length === 0) {
+        showStatus('No valid URLs found in clipboard', 'error');
+        pasteBtn.classList.remove('loading');
+        return;
+      }
+      
+      // Limit to 20 tabs to prevent browser overload
+      const maxTabs = 20;
+      const urlsToOpen = urls.slice(0, maxTabs);
+      const skipped = urls.length - urlsToOpen.length;
+      
+      // Open each URL in a new tab
+      for (const url of urlsToOpen) {
+        chrome.tabs.create({ url: url, active: false });
+      }
+      
+      // Show success message
+      let message = `Opened ${urlsToOpen.length} tab${urlsToOpen.length !== 1 ? 's' : ''}`;
+      if (skipped > 0) {
+        message += ` (${skipped} skipped - max ${maxTabs})`;
+      }
+      showStatus(message, 'success');
+      
+      // Close popup after a short delay
+      setTimeout(() => {
+        window.close();
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error pasting URLs:', error);
+      
+      // Check if it's a permissions issue
+      if (error.message && error.message.includes('clipboard')) {
+        showStatus('Please allow clipboard access', 'error');
+      } else {
+        showStatus('Failed to paste URLs', 'error');
+      }
+    } finally {
+      pasteBtn.classList.remove('loading');
+    }
+  });
+
+  // Rootlify - Remove URL parameters from current tab
+  rootlifyBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      rootlifyBtn.classList.add('loading');
+      
+      // Get current active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!activeTab || !activeTab.url) {
+        showStatus('Cannot access current tab URL', 'error');
+        rootlifyBtn.classList.remove('loading');
+        return;
+      }
+      
+      const currentUrl = activeTab.url;
+      
+      // Check if URL has parameters (contains ?)
+      if (!currentUrl.includes('?')) {
+        showStatus('No URL params to remove', 'info');
+        rootlifyBtn.classList.remove('loading');
+        return;
+      }
+      
+      // Remove everything from ? onwards
+      const rootUrl = currentUrl.split('?')[0];
+      
+      // Navigate to the root URL (this will refresh the page)
+      await chrome.tabs.update(activeTab.id, { url: rootUrl });
+      
+      // Show success message
+      showStatus('URL parameters removed and page refreshed!', 'success');
+      
+      // Close popup after a short delay
+      setTimeout(() => {
+        window.close();
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error rootlifying URL:', error);
+      showStatus('Failed to remove URL parameters', 'error');
+    } finally {
+      rootlifyBtn.classList.remove('loading');
+    }
+  });
+
+  // Driggsman - Open root domain only
+  driggsmanRootBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      driggsmanRootBtn.classList.add('loading');
+      
+      // Get current active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!activeTab || !activeTab.url) {
+        showStatus('Cannot access current tab URL', 'error');
+        driggsmanRootBtn.classList.remove('loading');
+        return;
+      }
+      
+      try {
+        const url = new URL(activeTab.url);
+        
+        // Extract root domain (remove subdomains)
+        const hostname = url.hostname;
+        const parts = hostname.split('.');
+        let rootDomain;
+        
+        if (parts.length >= 2) {
+          // Take last 2 parts for root domain (e.g., moldremovalstars.com)
+          rootDomain = parts.slice(-2).join('.');
+        } else {
+          rootDomain = hostname;
+        }
+        
+        // Create driggsman URL
+        const driggsmanUrl = `http://localhost:3000/driggsman?activefilterchamber=daylight&sitesentered=${encodeURIComponent(rootDomain)}`;
+        
+        // Open in new tab
+        await chrome.tabs.create({ url: driggsmanUrl, active: true });
+        
+        showStatus(`Opened driggsman with root domain: ${rootDomain}`, 'success');
+        
+        // Close popup after a short delay
+        setTimeout(() => {
+          window.close();
+        }, 1500);
+        
+      } catch (urlError) {
+        showStatus('Invalid URL in current tab', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error opening driggsman root:', error);
+      showStatus('Failed to open driggsman', 'error');
+    } finally {
+      driggsmanRootBtn.classList.remove('loading');
+    }
+  });
+
+  // Driggsman - Open with all subdomains
+  driggsmanSubBtn.addEventListener('click', async function() {
+    try {
+      // Add loading state
+      driggsmanSubBtn.classList.add('loading');
+      
+      // Get current active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!activeTab || !activeTab.url) {
+        showStatus('Cannot access current tab URL', 'error');
+        driggsmanSubBtn.classList.remove('loading');
+        return;
+      }
+      
+      try {
+        const url = new URL(activeTab.url);
+        
+        // Use full hostname including subdomains
+        const fullDomain = url.hostname;
+        
+        // Create driggsman URL
+        const driggsmanUrl = `http://localhost:3000/driggsman?activefilterchamber=daylight&sitesentered=${encodeURIComponent(fullDomain)}`;
+        
+        // Open in new tab
+        await chrome.tabs.create({ url: driggsmanUrl, active: true });
+        
+        showStatus(`Opened driggsman with full domain: ${fullDomain}`, 'success');
+        
+        // Close popup after a short delay
+        setTimeout(() => {
+          window.close();
+        }, 1500);
+        
+      } catch (urlError) {
+        showStatus('Invalid URL in current tab', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error opening driggsman with subdomains:', error);
+      showStatus('Failed to open driggsman', 'error');
+    } finally {
+      driggsmanSubBtn.classList.remove('loading');
+    }
+  });
+
+  // Helper function to show status messages
+  function showStatus(message, type = 'info') {
+    statusDiv.textContent = message;
+    statusDiv.className = `status ${type} show`;
+    
+    // Hide message after 3 seconds
+    setTimeout(() => {
+      statusDiv.classList.remove('show');
+    }, 3000);
+  }
+});

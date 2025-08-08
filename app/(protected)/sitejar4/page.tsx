@@ -5,7 +5,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import SitesprenTable from './components/SitesprenTable';
+import ExportSitesComponent from './components/ExportSitesComponent';
 import { cfunc_f71_createsite } from './utils/cfunc_f71_createsite';
+import dynamic from 'next/dynamic';
+
+const DrenjariButtonBarDriggsmanLinks = dynamic(
+  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+  { ssr: false }
+);
 
 export default function Sitejar4Page() {
   const [sitesprenData, setSitesprenData] = useState<any[]>([]);
@@ -82,7 +89,8 @@ export default function Sitejar4Page() {
     is_rnr: false,
     is_aff: false,
     is_other1: false,
-    is_other2: false
+    is_other2: false,
+    is_flylocal: false
   });
   const [selectedF71Fields, setSelectedF71Fields] = useState<Set<string>>(new Set());
   const [tagsData, setTagsData] = useState<any>(null);
@@ -392,7 +400,16 @@ export default function Sitejar4Page() {
           is_bulldozer: false,
           is_competitor: false,
           is_external: false,
-          is_internal: false
+          is_internal: false,
+          is_ppx: false,
+          is_ms: false,
+          is_wayback_rebuild: false,
+          is_naked_wp_build: false,
+          is_rnr: false,
+          is_aff: false,
+          is_other1: false,
+          is_other2: false,
+          is_flylocal: false
         });
         setSelectedF71Fields(new Set()); // Clear selections
         await refetchSitesprenData(); // Refresh the table
@@ -661,6 +678,11 @@ export default function Sitejar4Page() {
 
   return (
     <div className="pr-4">
+
+      {/* Drenjari Navigation Links */}
+      <div className="mb-4">
+        <DrenjariButtonBarDriggsmanLinks />
+      </div>
 
       {/* Functions popup button */}
       <div className="mb-4">
@@ -1488,10 +1510,11 @@ http://www.drogs.com`}
                   </div>
                 )}
                 {activePopupTab === 'ptab4' && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Content for ptab4</h3>
-                    <p className="text-gray-600">This is the content area for ptab4.</p>
-                  </div>
+                  <ExportSitesComponent
+                    selectedSiteIds={selectedSiteIds}
+                    totalSitesCount={sitesprenData.length}
+                    userId={user.id}
+                  />
                 )}
                 {activePopupTab === 'ptab5' && (
                   <div>
