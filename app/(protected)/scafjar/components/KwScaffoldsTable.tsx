@@ -4,58 +4,52 @@ import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
 import dynamic from 'next/dynamic';
-import ImportLocationsButton from './ImportLocationsButton';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
   { ssr: false }
 );
 
-interface DfsLocationRecord {
-  location_id: number;
-  location_code: number | null;
-  location_name: string | null;
-  location_code_parent: number | null;
-  country_iso_code: string | null;
-  location_type: string | null;
-  available_sources: string | null;
-  is_available_google_ads: boolean | null;
-  is_available_bing_ads: boolean | null;
-  is_available_google_trends: boolean | null;
-  is_available_google_search: boolean | null;
+interface KwScaffoldRecord {
+  scaffold_global_id: number;
+  scaffold_datum: string | null;
+  rel_industry_id: number | null;
+  scaffold_packet_id: number | null;
   created_at: string;
   updated_at: string;
   created_by: string | null;
   last_updated_by: string | null;
 }
 
+interface Industry {
+  industry_id: number;
+  industry_name: string;
+  industry_description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 const columns = [
-  { key: 'location_code', label: 'location_code', type: 'number' },
-  { key: 'location_name', label: 'location_name', type: 'text' },
-  { key: 'location_code_parent', label: 'location_code_parent', type: 'number' },
-  { key: 'country_iso_code', label: 'country_iso_code', type: 'text' },
-  { key: 'location_type', label: 'location_type', type: 'text' },
-  { key: 'available_sources', label: 'available_sources', type: 'text' },
-  { key: 'is_available_google_ads', label: 'is_available_google_ads', type: 'boolean' },
-  { key: 'is_available_bing_ads', label: 'is_available_bing_ads', type: 'boolean' },
-  { key: 'is_available_google_trends', label: 'is_available_google_trends', type: 'boolean' },
-  { key: 'is_available_google_search', label: 'is_available_google_search', type: 'boolean' },
-  { key: 'created_at', label: 'created_at', type: 'datetime' },
-  { key: 'updated_at', label: 'updated_at', type: 'datetime' },
-  { key: 'created_by', label: 'created_by', type: 'text' },
-  { key: 'last_updated_by', label: 'last_updated_by', type: 'text' }
+  { key: 'scaffold_global_id', label: 'scaffold_global_id', type: 'number', readonly: true },
+  { key: 'scaffold_datum', label: 'scaffold_datum', type: 'text' },
+  { key: 'rel_industry_id', label: 'rel_industry_id', type: 'industry_dropdown' },
+  { key: 'scaffold_packet_id', label: 'scaffold_packet_id', type: 'number', readonly: true },
+  { key: 'created_at', label: 'created_at', type: 'datetime', readonly: true },
+  { key: 'updated_at', label: 'updated_at', type: 'datetime', readonly: true },
+  { key: 'created_by', label: 'created_by', type: 'text', readonly: true },
+  { key: 'last_updated_by', label: 'last_updated_by', type: 'text', readonly: true }
 ];
 
-export default function DfsLocationsTable() {
+export default function KwScaffoldsTable() {
   const { user } = useAuth();
-  const [data, setData] = useState<DfsLocationRecord[]>([]);
+  const [data, setData] = useState<KwScaffoldRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [sortField, setSortField] = useState<keyof DfsLocationRecord>('created_at');
+  const [sortField, setSortField] = useState<keyof KwScaffoldRecord>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Modal states
@@ -65,18 +59,14 @@ export default function DfsLocationsTable() {
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   
+  // Industry dropdown states
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [industryDropdownOpen, setIndustryDropdownOpen] = useState<{ field: string; recordId: number } | null>(null);
+  
   // Form data for creating
   const [formData, setFormData] = useState({
-    location_code: 0,
-    location_name: '',
-    location_code_parent: 0,
-    country_iso_code: '',
-    location_type: '',
-    available_sources: '',
-    is_available_google_ads: false,
-    is_available_bing_ads: false,
-    is_available_google_trends: false,
-    is_available_google_search: false
+    scaffold_datum: '',
+    rel_industry_id: 0
   });
 
   const supabase = createClientComponentClient();
@@ -105,24 +95,58 @@ export default function DfsLocationsTable() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data: locations, error } = await supabase
-        .from('dfs_locations')
+      const { data: scaffolds, error } = await supabase
+        .from('kw_scaffolds')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      setData(locations || []);
+      setData(scaffolds || []);
     } catch (err) {
-      console.error('Error fetching locations:', err);
+      console.error('Error fetching scaffolds:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch industries data
+  const fetchIndustries = async () => {
+    try {
+      const { data: industriesData, error } = await supabase
+        .from('industries')
+        .select('*')
+        .order('industry_name', { ascending: true });
+
+      if (error) throw error;
+      
+      setIndustries(industriesData || []);
+    } catch (err) {
+      console.error('Error fetching industries:', err);
+    }
+  };
+
+  // Click outside handler for dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (industryDropdownOpen) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.relative')) {
+          setIndustryDropdownOpen(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [industryDropdownOpen]);
+
   useEffect(() => {
     fetchData();
+    fetchIndustries();
   }, []);
 
   // Filter and sort data
@@ -157,7 +181,7 @@ export default function DfsLocationsTable() {
   const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Handle sort
-  const handleSort = (field: keyof DfsLocationRecord) => {
+  const handleSort = (field: keyof KwScaffoldRecord) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -182,7 +206,7 @@ export default function DfsLocationsTable() {
     if (selectedRows.size === paginatedData.length) {
       setSelectedRows(new Set());
     } else {
-      setSelectedRows(new Set(paginatedData.map(item => item.location_id)));
+      setSelectedRows(new Set(paginatedData.map(item => item.scaffold_global_id)));
     }
   };
 
@@ -204,20 +228,22 @@ export default function DfsLocationsTable() {
         value = editingValue === '' ? null : Number(editingValue);
       }
 
+      const updateData: any = { 
+        [editingCell.field]: value,
+        last_updated_by: userInternalId
+      };
+
       const { error } = await supabase
-        .from('dfs_locations')
-        .update({ 
-          [editingCell.field]: value,
-          last_updated_by: userInternalId
-        })
-        .eq('location_id', editingCell.id);
+        .from('kw_scaffolds')
+        .update(updateData)
+        .eq('scaffold_global_id', editingCell.id);
 
       if (error) throw error;
 
       // Update local data
       setData(prevData => 
         prevData.map(item => 
-          item.location_id === editingCell.id 
+          item.scaffold_global_id === editingCell.id 
             ? { ...item, [editingCell.field]: value, updated_at: new Date().toISOString() }
             : item
         )
@@ -236,59 +262,20 @@ export default function DfsLocationsTable() {
     setEditingValue('');
   };
 
-  // Handle boolean toggle
-  const handleBooleanToggle = async (id: number, field: keyof DfsLocationRecord, currentValue: boolean | null) => {
-    if (!userInternalId) return;
-    
-    const newValue = currentValue === null ? true : !currentValue;
-    
-    try {
-      const { error } = await supabase
-        .from('dfs_locations')
-        .update({ 
-          [field]: newValue,
-          last_updated_by: userInternalId
-        })
-        .eq('location_id', id);
-
-      if (error) throw error;
-
-      // Update local data
-      setData(prevData => 
-        prevData.map(item => 
-          item.location_id === id 
-            ? { ...item, [field]: newValue, updated_at: new Date().toISOString() }
-            : item
-        )
-      );
-    } catch (error) {
-      console.error('Error updating boolean field:', error);
-      alert('Failed to update field');
-    }
-  };
-
   // Create new inline record
   const createNewInline = async () => {
     if (!userInternalId) return;
 
     try {
       const newRecord = {
-        location_code: null,
-        location_name: 'New Location',
-        location_code_parent: null,
-        country_iso_code: null,
-        location_type: null,
-        available_sources: null,
-        is_available_google_ads: false,
-        is_available_bing_ads: false,
-        is_available_google_trends: false,
-        is_available_google_search: false,
+        scaffold_datum: 'New Scaffold Template',
+        rel_industry_id: null,
         created_by: userInternalId,
         last_updated_by: userInternalId
       };
 
       const { data: inserted, error } = await supabase
-        .from('dfs_locations')
+        .from('kw_scaffolds')
         .insert([newRecord])
         .select()
         .single();
@@ -298,9 +285,9 @@ export default function DfsLocationsTable() {
       // Add to local data at the beginning
       setData(prevData => [inserted, ...prevData]);
       
-      // Start editing the location_name field immediately
+      // Start editing the scaffold_datum field immediately
       setTimeout(() => {
-        startEditing(inserted.location_id, 'location_name', 'New Location');
+        startEditing(inserted.scaffold_global_id, 'scaffold_datum', 'New Scaffold Template');
       }, 100);
 
     } catch (error) {
@@ -315,15 +302,14 @@ export default function DfsLocationsTable() {
 
     try {
       const insertData = {
-        ...formData,
-        location_code: formData.location_code || null,
-        location_code_parent: formData.location_code_parent || null,
+        scaffold_datum: formData.scaffold_datum || null,
+        rel_industry_id: formData.rel_industry_id || null,
         created_by: userInternalId,
         last_updated_by: userInternalId
       };
       
       const { error } = await supabase
-        .from('dfs_locations')
+        .from('kw_scaffolds')
         .insert([insertData]);
         
       if (error) throw error;
@@ -340,43 +326,62 @@ export default function DfsLocationsTable() {
   // Reset form
   const resetForm = () => {
     setFormData({
-      location_code: 0,
-      location_name: '',
-      location_code_parent: 0,
-      country_iso_code: '',
-      location_type: '',
-      available_sources: '',
-      is_available_google_ads: false,
-      is_available_bing_ads: false,
-      is_available_google_trends: false,
-      is_available_google_search: false
+      scaffold_datum: '',
+      rel_industry_id: 0
     });
   };
 
-  // Render cell content
-  const renderCell = (item: DfsLocationRecord, column: typeof columns[0]) => {
-    const value = item[column.key as keyof DfsLocationRecord];
-    const isEditing = editingCell?.id === item.location_id && editingCell?.field === column.key;
-    const isReadOnly = column.key === 'location_id' || column.key === 'created_at' || column.key === 'updated_at';
-
-    if (column.type === 'boolean' && !isReadOnly) {
-      return (
-        <div className="w-full h-full flex items-center justify-center cursor-pointer"
-             onClick={() => handleBooleanToggle(item.location_id, column.key as keyof DfsLocationRecord, value as boolean | null)}>
-          <button
-            className={`w-12 h-6 rounded-full transition-colors ${
-              value === true ? 'bg-green-500' : 
-              value === false ? 'bg-gray-300' : 'bg-yellow-300'
-            }`}
-          >
-            <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-              value === true ? 'translate-x-6' : 
-              value === false ? 'translate-x-1' : 'translate-x-3'
-            }`} />
-          </button>
-        </div>
-      );
+  // Industry dropdown handlers
+  const handleIndustryDropdownClick = (field: string, recordId: number) => {
+    if (industryDropdownOpen?.field === field && industryDropdownOpen?.recordId === recordId) {
+      setIndustryDropdownOpen(null);
+    } else {
+      setIndustryDropdownOpen({ field, recordId });
     }
+  };
+
+  const handleIndustrySelect = async (industryId: number | null, field: string, recordId: number) => {
+    try {
+      console.log('Updating industry:', { industryId, field, recordId });
+      
+      if (!userInternalId) {
+        console.error('User internal ID not available');
+        return;
+      }
+
+      const updateData: any = { 
+        [field]: industryId,
+        last_updated_by: userInternalId
+      };
+
+      const { error } = await supabase
+        .from('kw_scaffolds')
+        .update(updateData)
+        .eq('scaffold_global_id', recordId);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(prevData => 
+        prevData.map(item => 
+          item.scaffold_global_id === recordId 
+            ? { ...item, [field]: industryId, updated_at: new Date().toISOString() }
+            : item
+        )
+      );
+
+      setIndustryDropdownOpen(null);
+    } catch (err: any) {
+      console.error('Error updating industry:', err);
+      alert(`Failed to update industry: ${err.message}`);
+    }
+  };
+
+  // Render cell content
+  const renderCell = (item: KwScaffoldRecord, column: typeof columns[0]) => {
+    const value = item[column.key as keyof KwScaffoldRecord];
+    const isEditing = editingCell?.id === item.scaffold_global_id && editingCell?.field === column.key;
+    const isReadOnly = column.readonly;
 
     if (isEditing && !isReadOnly) {
       return (
@@ -414,9 +419,93 @@ export default function DfsLocationsTable() {
       return (
         <div
           className={cellClass}
-          onClick={() => !isReadOnly && startEditing(item.location_id, column.key, value)}
+          onClick={() => !isReadOnly && startEditing(item.scaffold_global_id, column.key, value)}
         >
           {new Date(value as string).toLocaleString()}
+        </div>
+      );
+    }
+
+    if (column.type === 'industry_dropdown') {
+      const isIndustryDropdownOpen = industryDropdownOpen?.field === column.key && industryDropdownOpen?.recordId === item.scaffold_global_id;
+      const selectedIndustry = value ? industries.find(ind => ind.industry_id === value) : null;
+      
+      return (
+        <div className="relative">
+          <div
+            className="px-2 py-1 cursor-pointer hover:bg-blue-50 text-xs border border-gray-300 rounded bg-white min-h-[28px] flex items-center"
+            onClick={() => handleIndustryDropdownClick(column.key, item.scaffold_global_id)}
+          >
+            <span className={`flex-1 ${!selectedIndustry ? 'text-gray-400' : 'text-gray-900'}`}>
+              {selectedIndustry ? selectedIndustry.industry_name : 'Select Industry'}
+            </span>
+            <span className="ml-2 text-gray-400">▼</span>
+          </div>
+
+          {/* Industry Dropdown Menu */}
+          {isIndustryDropdownOpen && (
+            <div className="absolute top-full left-0 mt-1 w-96 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+              <div className="p-3">
+                <div className="text-sm font-medium text-gray-700 mb-2">Select Industry</div>
+                
+                {/* None Option */}
+                <button
+                  onClick={() => handleIndustrySelect(null, column.key, item.scaffold_global_id)}
+                  className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded mb-1"
+                >
+                  <div className="font-medium text-gray-600">None</div>
+                  <div className="text-xs text-gray-500">No industry assigned</div>
+                </button>
+
+                {/* Industries Table */}
+                {industries.length > 0 ? (
+                  <div className="border border-gray-200 rounded">
+                    <div className="max-h-64 overflow-y-auto">
+                      <table className="w-full text-xs">
+                        <thead className="bg-gray-50 sticky top-0">
+                          <tr>
+                            <th className="px-2 py-1 text-left font-medium text-gray-700">ID</th>
+                            <th className="px-2 py-1 text-left font-medium text-gray-700">Name</th>
+                            <th className="px-2 py-1 text-left font-medium text-gray-700">Description</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {industries.map((industry) => (
+                            <tr
+                              key={industry.industry_id}
+                              onClick={() => handleIndustrySelect(industry.industry_id, column.key, item.scaffold_global_id)}
+                              className="hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                            >
+                              <td className="px-2 py-2">
+                                <div className="font-medium text-gray-900">
+                                  {industry.industry_id}
+                                </div>
+                              </td>
+                              <td className="px-2 py-2">
+                                <div className="truncate max-w-32" title={industry.industry_name}>
+                                  {industry.industry_name}
+                                </div>
+                              </td>
+                              <td className="px-2 py-2">
+                                <div className="truncate max-w-48" title={industry.industry_description || ''}>
+                                  {industry.industry_description || 'No description'}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    <div>No industries found</div>
+                    <div className="text-xs mt-1">Add industries to the database</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       );
     }
@@ -425,7 +514,7 @@ export default function DfsLocationsTable() {
       return (
         <div
           className={cellClass}
-          onClick={() => !isReadOnly && startEditing(item.location_id, column.key, value)}
+          onClick={() => !isReadOnly && startEditing(item.scaffold_global_id, column.key, value)}
         >
           {typeof value === 'number' ? value.toLocaleString() : value}
         </div>
@@ -435,7 +524,7 @@ export default function DfsLocationsTable() {
     return (
       <div
         className={cellClass}
-        onClick={() => !isReadOnly && startEditing(item.location_id, column.key, value)}
+        onClick={() => !isReadOnly && startEditing(item.scaffold_global_id, column.key, value)}
       >
         {value?.toString() || ''}
       </div>
@@ -457,7 +546,7 @@ export default function DfsLocationsTable() {
                 setItemsPerPage(size);
                 setCurrentPage(1);
               }}
-              className={`px-2 py-2.5 text-sm border cursor-pointer ${ 
+              className={`px-2 py-2.5 text-sm border cursor-pointer ${
                 index === 0 ? 'rounded-l' : ''
               } ${
                 index === 5 ? '' : '-mr-px'
@@ -520,7 +609,7 @@ export default function DfsLocationsTable() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading locations...</div>
+        <div className="text-gray-500">Loading scaffolds...</div>
       </div>
     );
   }
@@ -535,11 +624,6 @@ export default function DfsLocationsTable() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Import Button */}
-      <div className="flex-none px-6 pt-4">
-        <ImportLocationsButton />
-      </div>
-      
       {/* Controls */}
       <div className="flex-none bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
@@ -590,7 +674,7 @@ export default function DfsLocationsTable() {
       {/* Table */}
       <div className="flex-1 bg-white overflow-hidden">
         <div className="h-full overflow-auto">
-          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '2000px' }}>
+          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '1500px' }}>
             <thead className="bg-gray-50 sticky top-0">
               <tr>
                 <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '20px' }}>
@@ -617,7 +701,7 @@ export default function DfsLocationsTable() {
                   <th
                     key={column.key}
                     className="px-2 py-3 text-left border border-gray-200 cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort(column.key as keyof DfsLocationRecord)}
+                    onClick={() => handleSort(column.key as keyof KwScaffoldRecord)}
                   >
                     <div className="flex items-center space-x-1">
                       <span className="font-bold text-xs lowercase">{column.label}</span>
@@ -633,22 +717,22 @@ export default function DfsLocationsTable() {
             </thead>
             <tbody className="bg-white">
               {paginatedData.map((item) => (
-                <tr key={item.location_id} className="hover:bg-gray-50">
+                <tr key={item.scaffold_global_id} className="hover:bg-gray-50">
                   <td className="px-2 py-2 border border-gray-200">
                     <div 
                       className="w-full h-full flex items-center justify-center cursor-pointer"
                       style={{ width: '20px', height: '20px' }}
-                      onClick={() => handleRowSelect(item.location_id)}
+                      onClick={() => handleRowSelect(item.scaffold_global_id)}
                     >
                       <div
                         className={`w-full h-full border-2 flex items-center justify-center ${
-                          selectedRows.has(item.location_id) 
+                          selectedRows.has(item.scaffold_global_id) 
                             ? 'bg-blue-500 border-blue-500' 
                             : 'border-gray-300 bg-white'
                         }`}
                         style={{ width: '20px', height: '20px' }}
                       >
-                        {selectedRows.has(item.location_id) && (
+                        {selectedRows.has(item.scaffold_global_id) && (
                           <span className="text-white text-xs">✓</span>
                         )}
                       </div>
@@ -700,128 +784,50 @@ export default function DfsLocationsTable() {
       {/* Create Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Create New Location Record</h3>
+          <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4">Create New Keyword Scaffold</h3>
             <form onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location Code</label>
-                  <input
-                    type="number"
-                    value={formData.location_code}
-                    onChange={(e) => setFormData({...formData, location_code: parseInt(e.target.value) || 0})}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    placeholder="2840"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location Name</label>
-                  <input
-                    type="text"
-                    value={formData.location_name}
-                    onChange={(e) => setFormData({...formData, location_name: e.target.value})}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    placeholder="United States"
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Scaffold Template</label>
+                  <textarea
+                    value={formData.scaffold_datum}
+                    onChange={(e) => setFormData({...formData, scaffold_datum: e.target.value})}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 h-20"
+                    placeholder="Enter scaffold template like: best (service) in (city)"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Use placeholders like (city), (state), (service) that will be replaced with actual values
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location Code Parent</label>
-                  <input
-                    type="number"
-                    value={formData.location_code_parent}
-                    onChange={(e) => setFormData({...formData, location_code_parent: parseInt(e.target.value) || 0})}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                  <select
+                    value={formData.rel_industry_id || ''}
+                    onChange={(e) => setFormData({...formData, rel_industry_id: parseInt(e.target.value) || 0})}
                     className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Country ISO Code</label>
-                  <input
-                    type="text"
-                    value={formData.country_iso_code}
-                    onChange={(e) => setFormData({...formData, country_iso_code: e.target.value})}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    placeholder="US"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location Type</label>
-                  <input
-                    type="text"
-                    value={formData.location_type}
-                    onChange={(e) => setFormData({...formData, location_type: e.target.value})}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    placeholder="Country"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Available Sources</label>
-                  <input
-                    type="text"
-                    value={formData.available_sources}
-                    onChange={(e) => setFormData({...formData, available_sources: e.target.value})}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    placeholder="google_ads,bing_ads"
-                  />
-                </div>
-                
-                {/* Boolean Fields */}
-                <div className="md:col-span-2">
-                  <h4 className="font-medium text-gray-700 mb-2">Availability Settings</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.is_available_google_ads}
-                          onChange={(e) => setFormData({...formData, is_available_google_ads: e.target.checked})}
-                          className="mr-2"
-                        />
-                        Available for Google Ads
-                      </label>
-                    </div>
-                    <div>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.is_available_bing_ads}
-                          onChange={(e) => setFormData({...formData, is_available_bing_ads: e.target.checked})}
-                          className="mr-2"
-                        />
-                        Available for Bing Ads
-                      </label>
-                    </div>
-                    <div>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.is_available_google_trends}
-                          onChange={(e) => setFormData({...formData, is_available_google_trends: e.target.checked})}
-                          className="mr-2"
-                        />
-                        Available for Google Trends
-                      </label>
-                    </div>
-                    <div>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.is_available_google_search}
-                          onChange={(e) => setFormData({...formData, is_available_google_search: e.target.checked})}
-                          className="mr-2"
-                        />
-                        Available for Google Search
-                      </label>
-                    </div>
-                  </div>
+                  >
+                    <option value="">Select an industry</option>
+                    {industries.map((industry) => (
+                      <option key={industry.industry_id} value={industry.industry_id}>
+                        {industry.industry_name} (ID: {industry.industry_id})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Reference to the industries table (packet IDs are scoped per industry)
+                  </p>
                 </div>
               </div>
               
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
+                  onClick={() => {
+                    setIsCreateModalOpen(false);
+                    resetForm();
+                  }}
                   className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
                 >
                   Cancel
@@ -830,7 +836,7 @@ export default function DfsLocationsTable() {
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
-                  Create Location
+                  Create Scaffold
                 </button>
               </div>
             </form>
