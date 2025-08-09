@@ -1475,7 +1475,7 @@ http://www.drogs.com`}
                                     {tag.tag_id?.substring(0, 8)}...
                                   </td>
                                   <td className="px-4 py-3 text-sm text-gray-900">
-                                    {tagsData?.editingTagId === tag.tag_id ? (
+                                    {tagsData?.formData?.editingTagId === tag.tag_id ? (
                                       <input
                                         type="text"
                                         value={tagsData?.formData?.editingTagName || ''}
@@ -1487,7 +1487,7 @@ http://www.drogs.com`}
                                     )}
                                   </td>
                                   <td className="px-4 py-3 text-sm text-gray-900">
-                                    {tagsData?.editingTagId === tag.tag_id ? (
+                                    {tagsData?.formData?.editingTagId === tag.tag_id ? (
                                       <input
                                         type="number"
                                         value={tagsData?.formData?.editingTagOrder || 0}
@@ -1509,7 +1509,7 @@ http://www.drogs.com`}
                                   </td>
                                   <td className="px-4 py-3 text-sm">
                                     <div className="flex space-x-2">
-                                      {tagsData?.editingTagId === tag.tag_id ? (
+                                      {tagsData?.formData?.editingTagId === tag.tag_id ? (
                                         <>
                                           <button
                                             onClick={() => tagsData?.functions?.handleUpdateTag()}

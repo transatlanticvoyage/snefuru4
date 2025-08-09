@@ -2306,70 +2306,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
   };
 
   return (
-    <div>
-      <style jsx>{`
-        .group {
-          position: relative;
-        }
-        
-        .info-icon {
-          font-size: 12px;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 50%;
-          width: 16px;
-          height: 16px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          cursor: help;
-        }
-        
-        .tooltip-content {
-          position: absolute;
-          bottom: 100%;
-          left: 0;
-          margin-bottom: 8px;
-          background: #1a1a1a;
-          color: white;
-          padding: 12px;
-          border-radius: 6px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-          width: 320px;
-          z-index: 50;
-          opacity: 0;
-          visibility: hidden;
-          transition: opacity 0.2s, visibility 0.2s;
-          pointer-events: none;
-        }
-        
-        .group:hover .tooltip-content {
-          opacity: 1;
-          visibility: visible;
-        }
-        
-        .tooltip-content::after {
-          content: '';
-          position: absolute;
-          top: 100%;
-          left: 20px;
-          border: 6px solid transparent;
-          border-top-color: #1a1a1a;
-        }
-        
-        .tooltip-content p {
-          margin: 4px 0;
-        }
-        
-        .tooltip-content strong {
-          color: #60a5fa;
-        }
-        
-        .tooltip-content ol,
-        .tooltip-content ul {
-          margin: 4px 0;
-        }
-      `}</style>
-      <div className="space-y-4">
+    <div className="space-y-4">
       {/* Column Template and View Control System */}
       <div className="flex items-start space-x-4">
         {/* SQL View Info */}
@@ -2671,10 +2608,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
         </div>
       </div>
-      )}
 
       {/* Site Gadgets Section */}
-      {chambersVisible?.chepno !== false && (
         <div className="bg-white p-4 rounded-lg shadow border">
           <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
         
@@ -2821,9 +2756,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
             )}
           </div>
         </div>
-      </div>
       </div> {/* End of flex container for Essex and Chepno */}
-      )}
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -3739,7 +3672,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
           </button>
         </div>
       </div>
-    </div>
 
     {/* Host Account Selection Popup */}
     {registrarPopupOpen && (
