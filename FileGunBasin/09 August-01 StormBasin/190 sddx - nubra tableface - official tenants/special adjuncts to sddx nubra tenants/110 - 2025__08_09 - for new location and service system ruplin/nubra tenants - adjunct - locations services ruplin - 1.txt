@@ -1,0 +1,24 @@
+on our wp plugin page at
+  page=rup_locations_mar
+
+  please add a new ui column to the right of our existing ui column by name of
+  rel_image1_id
+
+  the new column should have the name of:
+  pick image1
+
+  please write it in bolder, all lowercase, exactly as above, with the space included
+
+  in the actual <td> section of the table, under this new ui column, please create some type of widget that the
+  user can click on. please create a button that says:
+  choose image
+
+  if an image is already assigned, then show the image (but constrain it to a max of 30 px height and 200 px
+  width), and also show a button to the left of the image that says "assign new image"
+
+  when user clicks on this button, they will be able to change the assigned image
+
+  ———————————————————————
+  special note about what this feature does:
+  this updates the db field
+  rel_image1_id to hold the id number of a specific image that has already been uploaded to the media library
