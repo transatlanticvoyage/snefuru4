@@ -72,4 +72,7 @@ next-env.d.ts
 *.db-shm
 
 # Application Support Directory Database
-Feldervich/feldervich.sqlite3*.wpress
+# WordPress backup files
+*.wpress
+wordpress-sites/*/wp-content/ai1wm-backups/
+wordpress-sites/*/wp-content/backups/

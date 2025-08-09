@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import SaberTable from './components/SaberTable';
+import SaberTableFixed from './components/SaberTableFixed';
 
 export default function SabjarPage() {
   const { user } = useAuth();
@@ -46,7 +46,7 @@ export default function SabjarPage() {
 
       {/* Main Content */}
       <div className="p-6">
-        <SaberTable />
+        <SaberTableFixed />
       </div>
     </div>
   );
