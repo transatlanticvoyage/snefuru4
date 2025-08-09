@@ -23,8 +23,7 @@ export const columnGroups: ColumnGroup[] = [
       { key: 'updated_at', label: 'Updated', description: 'Last update date' },
       { key: 'true_root_domain', label: 'Root Domain', description: 'True root domain' },
       { key: 'full_subdomain', label: 'Full Subdomain', description: 'Complete subdomain' },
-      { key: 'webproperty_type', label: 'Web Property Type', description: 'Type of web property' },
-      { key: 'ruplin_apikey', label: 'Ruplin API Key', description: 'Ruplin API key' }
+      { key: 'webproperty_type', label: 'Web Property Type', description: 'Type of web property' }
     ]
   },
   {

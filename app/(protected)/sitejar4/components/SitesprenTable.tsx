@@ -18,7 +18,6 @@ interface SitesprenRecord {
   updated_at: string | null;
   wpuser1: string | null;
   wppass1: string | null;
-  ruplin_apikey: string | null;
   wp_rest_app_pass: string | null;
   wp_plugin_installed1: boolean | null;
   wp_plugin_connected2: boolean | null;
@@ -110,7 +109,6 @@ const allColumns = [
   'updated_at',        // 15
   'wpuser1',           // 16
   'wppass1',           // 17
-  'ruplin_apikey',     // 18
   'wp_rest_app_pass',  // 19
   'wp_plugin_installed1', // 20
   'wp_plugin_connected2', // 21
@@ -1799,7 +1797,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         webproperty_type: editFormData.webproperty_type,
         wpuser1: editFormData.wpuser1,
         wppass1: editFormData.wppass1,
-        ruplin_apikey: editFormData.ruplin_apikey,
         wp_rest_app_pass: editFormData.wp_rest_app_pass,
         wp_plugin_installed1: editFormData.wp_plugin_installed1,
         wp_plugin_connected2: editFormData.wp_plugin_connected2,
@@ -3003,7 +3000,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                           )
                         ) : col === 'wppass1' ? (
                           renderCopyableContent(item.wppass1 ? '***' : null, col)
-                        ) : col === 'ruplin_apikey' || col === 'wp_rest_app_pass' ? (
+                        ) : col === 'wp_rest_app_pass' ? (
                           renderCopyableContent(item[col as keyof SitesprenRecord] ? truncateText(item[col as keyof SitesprenRecord] as string, 15) : null, col)
                         ) : col === 'wp_plugin_installed1' || col === 'wp_plugin_connected2' || col === 'is_wp_site' ? (
                           renderCopyableContent(formatBoolean(item[col as keyof SitesprenRecord] as boolean | null), col)
@@ -3970,19 +3967,6 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                 <div className="bg-yellow-50 p-4 rounded-lg">
                   <h4 className="text-lg font-medium text-gray-900 mb-4">API & Access</h4>
                   
-                  {/* Ruplin API Key */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Ruplin API Key
-                    </label>
-                    <input
-                      type="text"
-                      value={editFormData.ruplin_apikey || ''}
-                      onChange={(e) => setEditFormData({...editFormData, ruplin_apikey: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="API key..."
-                    />
-                  </div>
 
                   {/* WP REST App Pass */}
                   <div className="mb-4">
