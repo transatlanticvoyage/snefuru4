@@ -6275,3 +6275,187 @@ I have successfully removed the `zurko_driggs` table and all related code from t
 
 **The zurko_driggs table has been completely eliminated from the zurkovich plugin while maintaining full functionality!**
 
+---
+
+_**User**_
+
+pleaes update the page at rup_sitespren_mar so that the ui column named "values" is totally functional (text editor boxes should update active db values, toggle switches should update active db values, etc.) . currently it seems that these elements are not working to update the db. the toggle switches simply do not work at all. they dont even change visually when clicked. 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to examine the rup_sitespren_mar page to understand why the UI elements aren't working properly. Let me first check if this page exists and examine its current implementation.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Find and examine rup_sitespren_mar page implementation
+- [ ] 🌡️ Identify issues with toggle switches and text editors
+- [ ] 🌡️ Fix toggle switch functionality and visual feedback
+- [ ] 🌡️ Fix text editor database update functionality
+- [ ] 🌡️ Test all UI elements work properly
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me search more broadly for sitespren references:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+3310:        $table_name = $wpdb->prefix . 'zen_sitespren';
+3313:        // Ensure zen_sitespren table has a record for current site
+3314:        $this->ensure_sitespren_record();
+3414:                    {key: 'sitespren_base', label: 'sitespren_base', type: 'text'},
+4099:        $table_name = $wpdb->prefix . 'zen_sitespren';
+4113:                $this->ensure_sitespren_record();
+4150:        // Validate field name - all editable fields from zen_sitespren table
+4152:            'created_at', 'sitespren_base', 'true_root_domain', 'full_subdomain', 'webproperty_type',
+4188:        $table_name = $wpdb->prefix . 'zen_sitespren';
+4788:     * Ensure zen_sitespren table has a record for the current site
+4790:    private function ensure_sitespren_record() {
+4792:        $table_name = $wpdb->prefix . 'zen_sitespren';
+4806:                    'sitespren_base' => parse_url($current_site_url, PHP_URL_HOST),
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the references to zen_sitespren table. It looks like the rup_driggs_mar page is actually working with the zen_sitespren table (which we corrected earlier). Let me examine that page since it appears to be the page you're referring to:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+3300→    }
+  3301→    
+  3302→    /**
+  3303→     * rup_driggs_mar page - Driggs Management (Vertical Field Editor)
+  3304→     */
+  3305→    public function rup_driggs_mar_page() {
+  3306→        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+  3307→        $this->suppress_all_admin_notices();
+  3308→        
+  3309→        global $wpdb;
+  3310→        $table_name = $wpdb->prefix . 'zen_sitespren';
+  3311→        $current_site_url = get_site_url();
+  3312→        
+  3313→        // Ensure zen_sitespren table has a record for current site
+  3314→        $this->ensure_sitespren_record();
+  3315→        
+  3316→        // Handle AJAX requests
+  3317→        if (isset($_POST['action'])) {
+  3318→            $this->handle_driggs_ajax();
+  3319→            return;
+  3320→        }
+  3321→        
+  3322→        ?>
+  3323→        <div class="wrap" style="margin: 0; padding: 0;">
+  3324→            <!-- Allow space for WordPress notices -->
+  3325→            <div style="height: 20px;"></div>
+  3326→            
+  3327→            <div style="padding: 20px;">
+  3328→                <h1 style="margin-bottom: 20px;">🎯 Driggs Site Manager</h1>
+  3329→                
+  3330→                <!-- Control Bar -->
+  3331→                <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+  3332→                    <div style="display: flex; justify-content: space-between; align-items: center;">
+  3333→                        <div>
+  3334→                            <strong>Current Site:</strong> <?php echo esc_html($current_site_url); ?>
+  3335→                        </div>
+  3336→                        <div>
+  3337→                            <button id="save-all-btn" class="button button-primary">Save All Changes</button>
+  3338→                            <button id="reset-btn" class="button button-secondary">Reset to Defaults</button>
+  3339→                        </div>
+  3340→                    </div>
+  3341→                </div>
+  3342→                
+  3343→                <!-- Vertical Field Table -->
+  3344→                <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+  3345→                    <div style="overflow-x: auto;">
+  3346→                        <table id="driggs-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+  3347→                            <thead style="background: #f8f9fa;">
+  3348→                                <tr>
+  3349→                                    <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px;">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me continue reading the JavaScript part of the page to see how the UI elements are implemented:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+3480→                    // Value column
+  3481→                    let valueTd = $('<td style="padding: 8px; border: 1px solid #ddd;"></td>');
+  3482→                    let value = currentData[field.key] || '';
+  3483→                    
+  3484→                    if (field.type === 'boolean') {
+  3485→                        // Toggle switch for boolean fields
+  3486→                        let toggleSwitch = createToggleSwitch(field.key, value == 1);
+  3487→                        valueTd.append(toggleSwitch);
+  3488→                    } else {
+  3489→                        // Text field for other types
+  3490→                        valueTd.text(value);
+  3491→                        valueTd.attr('data-field', field.key);
+  3492→                        valueTd.attr('data-type', field.type);
+  3493→                        valueTd.css('cursor', 'text');
+  3494→                        valueTd.click(function() {
+  3495→                            startInlineEdit($(this), value, field.key, field.type);
+  3496→                        });
+  3497→                    }
+  3498→                    
+  3499→                    tr.append(valueTd);
+  3500→                    tbody.append(tr);
+  3501→                });
+  3502→            }
+  3503→            
+  3504→            function createToggleSwitch(fieldKey, isChecked) {
+  3505→                let toggleContainer = $('<div style="display: flex; align-items: center;"></div>');
+  3506→                let toggleSwitch = $('<label style="position: relative; display: inline-block; width: 50px; height: 24px;"><input type="checkbox" style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span></label>');
+  3507→                let checkbox = toggleSwitch.find('input');
+  3508→                let slider = toggleSwitch.find('span');
+  3509→                
+  3510→                checkbox.prop('checked', isChecked);
+  3511→                if (isChecked) {
+  3512→                    slider.css('background-color', '#2196F3');
+  3513→                    slider.append('<span style="position: absolute; content: ""; height: 18px; width: 18px; left: 26px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>');
+  3514→                } else {
+  3515→                    slider.append('<span style="position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>');
+  3516→                }
+  3517→                
+  3518→                checkbox.change(function() {
+  3519→                    updateField(fieldKey, this.checked ? 1 : 0);
+  3520→                    currentData[fieldKey] = this.checked ? 1 : 0;
+  3521→                    hasChanges = true;
+  3522→                });
+  3523→                
+  3524→                toggleContainer.append(toggleSwitch);
+  3525→                return toggleContainer;
+  3526→            }
+  3527→            
+  3528→            function startInlineEdit(cell, currentValue, fieldKey, fieldType) {
+  3529→                if (cell.find('input, textarea').length > 0) return; // Already editing
+```
+
