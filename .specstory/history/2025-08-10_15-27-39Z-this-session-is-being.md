@@ -4374,3 +4374,32 @@ The new textbox contains all three existing instances combined in this format:
 
 The feature is now ready and will show users a combined view of all the database mapping information, current page/post data, and Elementor JSON structure in one convenient copyable textbox!
 
+---
+
+_**User**_
+
+if one does not already exist, please create a wrapper div around the area that contains:
+
+copy all instances
+(text box)
+copy (copy button)
+
+then give the area a black 1 px solid border
+
+then, inside this new bordered area, insert a text label in bold 16 px:
+replete_instance
+then have a <hr> on the line below it
+then have the text label that says:
+copy all instances
+
+———————————————————————
+secondly, we must do this next task
+
+create a wrapper div around every other instance which is below the "replete instance" that says "copy all instancfes". 
+
+an instance is defined as a text box plus a copy button together forming a unit. 
+
+in future prompts, we will add text labels to these instances 
+
+this entire prompt has been in reference to the denyeep column div 1 area under the elementor elicitor tab 
+
