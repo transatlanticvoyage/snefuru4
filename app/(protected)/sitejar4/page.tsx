@@ -30,6 +30,7 @@ export default function Sitejar4Page() {
   const [deleteNotification, setDeleteNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isExternalFilter, setIsExternalFilter] = useState<string>('hide');
+  const [sitesEnteredFilter, setSitesEnteredFilter] = useState<string[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [kz101Checked, setKz101Checked] = useState(false);
   const [kz103Checked, setKz103Checked] = useState(false);
@@ -148,10 +149,11 @@ export default function Sitejar4Page() {
     }
   }, []);
 
-  // Initialize search term and is_external filter from URL parameters
+  // Initialize search term, is_external filter, and sitesentered filter from URL parameters
   useEffect(() => {
     const searchsite = searchParams?.get('searchsite');
     const isExternal = searchParams?.get('is_external');
+    const sitesEntered = searchParams?.get('sitesentered');
     
     if (searchsite) {
       setSearchTerm(searchsite);
@@ -159,6 +161,14 @@ export default function Sitejar4Page() {
     
     if (isExternal === 'show' || isExternal === 'hide') {
       setIsExternalFilter(isExternal);
+    }
+    
+    if (sitesEntered) {
+      // Parse comma-separated sites (URL encoded)
+      const sites = sitesEntered.split(',').map(site => decodeURIComponent(site.trim())).filter(site => site.length > 0);
+      setSitesEnteredFilter(sites);
+    } else {
+      setSitesEnteredFilter([]);
     }
   }, [searchParams]);
 
@@ -217,6 +227,12 @@ export default function Sitejar4Page() {
       url.searchParams.delete('is_external'); // Default is 'hide', no need to set in URL
     }
     
+    // Preserve sitesentered parameter if it exists
+    const currentSitesEntered = searchParams?.get('sitesentered');
+    if (currentSitesEntered) {
+      url.searchParams.set('sitesentered', currentSitesEntered);
+    }
+    
     router.replace(url.pathname + url.search, { scroll: false });
   };
 
@@ -234,8 +250,16 @@ export default function Sitejar4Page() {
     updateSearchInURL(searchTerm, newValue);
   };
 
-  // Filter sitespren data based on search term and is_external filter
+  // Filter sitespren data based on search term, is_external filter, and sitesentered filter
   const filteredSitesprenData = sitesprenData.filter(site => {
+    // Apply sitesentered filter first (most restrictive)
+    if (sitesEnteredFilter.length > 0) {
+      const matchesSitesEntered = sitesEnteredFilter.some(enteredSite => 
+        site.sitespren_base?.toLowerCase() === enteredSite.toLowerCase()
+      );
+      if (!matchesSitesEntered) return false;
+    }
+    
     // Apply search term filter
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
@@ -781,6 +805,7 @@ export default function Sitejar4Page() {
               <p><strong>Total Sites:</strong> {sitesprenData.length}</p>
               <p><strong>Filtered Sites:</strong> {filteredSitesprenData.length}</p>
               <p><strong>Search Term:</strong> {searchTerm || '(none)'}</p>
+              <p><strong>Sites Entered Filter:</strong> {sitesEnteredFilter.length > 0 ? sitesEnteredFilter.join(', ') : '(none)'}</p>
               <div>
                 <strong>Data:</strong>
                 <pre className="mt-1 text-xs bg-yellow-50 p-2 rounded border overflow-x-auto">

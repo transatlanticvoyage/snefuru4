@@ -2954,6 +2954,13 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
                             >
                               DG
                             </Link>
+                            <Link
+                              href={`/sitejar4?sitesentered=${encodeURIComponent(item.sitespren_base || '')}`}
+                              className="inline-flex items-center justify-center w-8 h-8 border border-transparent text-xs font-medium rounded text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              title="View only this site"
+                            >
+                              IN
+                            </Link>
                           </div>
                         ) : col === 'id' ? (
                           renderCopyableContent(`${item.id.substring(0, 3)}..`, col, '-', item.id)
