@@ -73,6 +73,38 @@ export default function YoshidexSessionsTable() {
   
   const supabase = createClientComponentClient();
 
+  // Import SpecStory files
+  const importSpecStoryFiles = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/yoshidex/import-specstory-files', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`Import completed!\nProcessed: ${result.results.processed}\nFailed: ${result.results.failed}\n\nImported sessions:\n${result.results.imported.slice(0, 10).join('\n')}`);
+        // Refresh the data
+        fetchData();
+      } else {
+        throw new Error(result.error || 'Import failed');
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      alert(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Create new yoshidex session
   const createNewSession = async () => {
     try {
@@ -312,8 +344,15 @@ export default function YoshidexSessionsTable() {
       {/* Nubra Tableface Kite */}
       <NubraTablefaceKite className="mb-4" />
 
-      {/* Create New Button */}
-      <div className="mb-4">
+      {/* Action Buttons */}
+      <div className="mb-4 flex gap-3">
+        <button
+          onClick={importSpecStoryFiles}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-colors"
+          disabled={loading}
+        >
+          {loading ? 'Importing...' : 'Import SpecStory Files'}
+        </button>
         <button
           onClick={createNewSession}
           className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md transition-colors"

@@ -421,6 +421,29 @@ export class YoshidexDatabaseService {
     }
   }
 
+  async getSessionByClaudeId(claudeSessionId: string): Promise<YoshidexSession | null> {
+    try {
+      const { data, error } = await this.supabase
+        .from('yoshidex_sessions')
+        .select('*')
+        .eq('claude_session_id', claudeSessionId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No rows found
+          return null;
+        }
+        throw error;
+      }
+      
+      return data;
+    } catch (error) {
+      console.error(`Failed to get session by Claude ID ${claudeSessionId}:`, error);
+      return null;
+    }
+  }
+
   // Analytics and Reporting
   async getSessionStats(userId?: string): Promise<any> {
     try {

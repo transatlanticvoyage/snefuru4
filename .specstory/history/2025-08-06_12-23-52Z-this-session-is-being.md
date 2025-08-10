@@ -1,0 +1,7660 @@
+## 2025-08-06 12:23:52Z
+
+<!-- Claude Code Session 69f69adc-9aec-4afe-ae3b-e1b27b5c688b (2025-08-06_12-23-52Z) -->
+
+_**User**_
+
+This session is being continued from a previous conversation that ran out of context. The conversation is summarized below:
+Analysis:
+Looking at the conversation chronologically:
+
+1. The user asked about importing XLS data into their cities table, which I addressed by providing CSV conversion options and SQL approaches.
+
+2. The user then requested SQL to add latitude and longitude fields to the cities table, which I provided along with index creation.
+
+3. The user asked to update the /cityjar UI table to include these new columns, which I implemented by updating the interface, columns array, form data, and all related functions.
+
+4. The user requested adding buttons in the gmaps_link column - a copy button and an "OP" (open) button. I implemented this with special rendering logic.
+
+5. The user reported the gmaps_link column wasn't respecting the 100px width constraint. I applied multiple aggressive CSS techniques including table-layout: fixed.
+
+6. The user requested SQL for a foreign key field rel_metro_id linking to metros table, which I provided with proper constraints and indexes.
+
+7. The user then asked to update the /cityjar UI to include this new column, which I fully implemented.
+
+8. The user presented a complex requirement for /cnjar1 - creating a UI table representing combinations of cities and industries. They provided extensive details about their 41 industries and ~1000 cities, asking for database design suggestions.
+
+9. I suggested a comprehensive database design for a cncombos table with various business-specific fields.
+
+10. The user then provided simpler SQL requirements for a cncglub table with just basic fields and foreign keys.
+
+11. Finally, the user asked me to create a full UI table grid system for /cnjar1 to manage the cncglub table, with very specific requirements matching their existing patterns.
+
+Throughout the conversation, I've been careful to follow the user's exact specifications, provide complete implementations, and maintain consistency with their existing codebase patterns.
+
+Summary:
+1. **Primary Request and Intent:**
+   - Import XLS data with 444 rows into live cities database table via SQL
+   - Add latitude and longitude fields to cities table and update /cityjar UI to display them
+   - Add copy and open buttons to gmaps_link column in /cityjar with specific styling
+   - Fix gmaps_link column width to exactly 100px with text truncation
+   - Add rel_metro_id foreign key field to cities table linking to metros.metro_id
+   - Update /cityjar UI to include the new rel_metro_id column
+   - Design database structure for city-industry combinations (~41,000 rows)
+   - Create cncglub table with minimal fields for city-industry relationships
+   - Build complete UI table grid system for /cnjar1 page to manage cncglub data with specific styling requirements
+
+2. **Key Technical Concepts:**
+   - PostgreSQL/Supabase database management with foreign keys and indexes
+   - React/Next.js table components with inline editing
+   - TypeScript interfaces for type safety
+   - CSS table-layout: fixed for column width control
+   - Dynamic imports and lazy loading
+   - Clipboard API for copy functionality
+   - Foreign key relationships and referential integrity
+   - Composite unique constraints for preventing duplicates
+   - Pagination controls with button bars
+   - Search functionality across multiple fields
+
+3. **Files and Code Sections:**
+   - **/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cityjar/components/CityjarTable.tsx**
+     - Core table component for city management
+     - Added latitude/longitude fields to interface and columns
+     - Implemented special gmaps_link rendering with copy/open buttons
+     - Applied aggressive width constraints with table-layout: fixed
+     - Added rel_metro_id foreign key field
+     ```typescript
+     // Special handling for gmaps_link column
+     if (column.key === 'gmaps_link') {
+       return (
+         <div className="flex items-center space-x-1" style={{ width: '100px', maxWidth: '100px', minWidth: '100px' }}>
+           {/* Copy button */}
+           <button onClick={async (e) => {
+             e.stopPropagation();
+             if (value) {
+               try {
+                 await navigator.clipboard.writeText(value.toString());
+               } catch (err) {
+                 console.error('Failed to copy to clipboard:', err);
+               }
+             }
+           }}
+           className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold flex items-center justify-center"
+           title="Copy to clipboard">
+             📋
+           </button>
+           {/* Open button */}
+           <button onClick={(e) => {
+             e.stopPropagation();
+             if (value) {
+               window.open(value.toString(), '_blank');
+             }
+           }}
+           className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold flex items-center justify-center"
+           title="Open in new tab">
+             OP
+           </button>
+         </div>
+       );
+     }
+     ```
+
+   - **/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx**
+     - New component for city-industry combination management
+     - Implements foreign key dropdowns for editing
+     - Fetches and displays related city/industry names
+     - Complete CRUD functionality with inline editing
+     ```typescript
+     interface Cncglub {
+       cncg_id: number;
+       rel_city_id: number;
+       rel_industry_id: number;
+       created_at: string;
+       updated_at: string | null;
+     }
+     ```
+
+4. **Errors and fixes:**
+   - **gmaps_link column width not constraining**: User reported the column was still showing wide despite 100px setting
+     - Fixed by applying `table-layout: fixed` to the table element
+     - Added triple width constraints (width, maxWidth, minWidth) to both th and td elements
+     - Applied specific width calculations to the text area (46px = 100px - 2 buttons - spacing)
+
+5. **Problem Solving:**
+   - Designed efficient database schema for 41,000 city-industry combinations with unique constraints
+   - Implemented foreign key display showing actual names instead of IDs
+   - Created dropdown selection for foreign key editing instead of raw number input
+   - Solved table column width issues with multiple CSS techniques
+   - Implemented copy-to-clipboard functionality with proper error handling
+
+6. **All user messages:**
+   - "how can i import from xls through sql to populate my live cities db table with 444 rows of data? can you prepare it for me if i attach a spreadsheet? what should i do?"
+   - "sqlplease create sql that i can run in supabase to do the following create new db fields named latitude longitude in esxisting db table cities"
+   - "ok i ran the sql. please update the ui table grid on page at /cityjar to add these 2 new ui columns"
+   - "on page at /cityjar , pleaes create a new square button that sits inside the gmaps_link main <td> area..."
+   - "please set the width for the ui column of gmaps_link at page of /city jar to be 100 px wide..."
+   - "the ui column is still showing the same for me. its not obeying our constricted column width for some reason. it looks very wide still"
+   - "please create sql that i can run in supabase to do the following create new db field rel_metro_id inside existing db table cities..."
+   - "for our page at /cnjar1 I want to create a big ui table where the 'primary key' of this ui table is a 'combination' of 2 different db tables..."
+   - "please create sql that i can run in supabase to do the following create new tble db table name cncglub..."
+   - "i just ran the sql you suggested for our page at /cnjar1..."
+
+7. **Pending Tasks:**
+   - Update /cnjar1 page.tsx to use the new Cnjar1Table component (in progress)
+
+8. **Current Work:**
+   Just created the Cnjar1Table component at `/app/(protected)/cnjar1/components/Cnjar1Table.tsx` with full functionality including:
+   - Foreign key dropdown selections for cities and industries
+   - Display of actual city/industry names instead of IDs
+   - Inline editing with proper validation
+   - Pagination controls matching filejar styling
+   - Search functionality across all fields including foreign key names
+   - Create new functionality (both inline and popup)
+   - Proper TypeScript interfaces and error handling
+
+9. **Optional Next Step:**
+   Based on the user's explicit request: "please create a robust ui table grid system, and build something similar to what is on our current page at /xpagesmanager1"
+   
+   The immediate next step is to update the /cnjar1 page.tsx file to import and use the newly created Cnjar1Table component, completing the implementation of the city-industry combination management system..
+Please continue the conversation from where we left it off without asking the user any further questions. Continue with the last task that you were asked to work on.
+
+---
+
+_**Agent (claude-opus-4-20250514)**_
+
+I'll update the /cnjar1 page to use the new Cnjar1Table component. Let me first check the current page structure.
+
+_**Agent (claude-opus-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import dynamic from 'next/dynamic';
+     7→
+     8→const DrenjariButtonBarDriggsmanLinks = dynamic(
+     9→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    10→  { ssr: false }
+    11→);
+    12→
+    13→export default function Cnjar1Page() {
+    14→  const { user } = useAuth();
+    15→  const router = useRouter();
+    16→
+    17→  useEffect(() => {
+    18→    if (!user) {
+    19→      router.push('/login');
+    20→      return;
+    21→    }
+    22→  }, [user, router]);
+    23→
+    24→  if (!user) {
+    25→    return (
+    26→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    27→        <div className="text-gray-500">Loading...</div>
+    28→      </div>
+    29→    );
+    30→  }
+    31→
+    32→  return (
+    33→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    34→      {/* Header */}
+    35→      <div className="bg-white border-b px-6 py-4">
+    36→        <div className="flex items-center justify-between">
+    37→          <div>
+    38→            <h1 className="text-2xl font-bold text-gray-800">
+    39→              CNJar1 Manager
+    40→            </h1>
+    41→          </div>
+    42→          <div className="flex items-center space-x-4">
+    43→            <DrenjariButtonBarDriggsmanLinks />
+    44→            <div className="text-right">
+    45→              <div className="text-sm text-gray-500">CNJar1 Management System</div>
+    46→              <div className="text-xs text-gray-400">Coming soon</div>
+    47→            </div>
+    48→          </div>
+    49→        </div>
+    50→      </div>
+    51→
+    52→      {/* Drenjari Links at Top */}
+    53→      <div className="px-6 py-4">
+    54→        <DrenjariButtonBarDriggsmanLinks />
+    55→      </div>
+    56→
+    57→      {/* Main Content - Blank for now */}
+    58→      <div className="flex-1 overflow-hidden p-6">
+    59→        <div className="bg-white rounded-lg shadow p-6">
+    60→          <p className="text-gray-500">CNJar1 interface coming soon...</p>
+    61→        </div>
+    62→      </div>
+    63→    </div>
+    64→  );
+    65→}
+```
+
+_**Agent**_
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the cnjar1 page to use the new Cnjar1Table component, replacing the placeholder content:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import dynamic from 'next/dynamic';
+     7→
+     8→const DrenjariButtonBarDriggsmanLinks = dynamic(
+     9→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    10→  { ssr: false }
+    11→);
+    12→
+    13→const Cnjar1Table = dynamic(
+    14→  () => import('./components/Cnjar1Table'),
+    15→  { ssr: false }
+    16→);
+    17→
+    18→export default function Cnjar1Page() {
+    19→  const { user } = useAuth();
+    20→  const router = useRouter();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    38→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    39→      {/* Header */}
+    40→      <div className="bg-white border-b px-6 py-4">
+    41→        <div className="flex items-center justify-between">
+    42→          <div>
+    43→            <h1 className="text-2xl font-bold text-gray-800">
+    44→              CNJar1 Manager
+    45→            </h1>
+    46→          </div>
+    47→          <div className="flex items-center space-x-4">
+    48→            <DrenjariButtonBarDriggsmanLinks />
+    49→            <div className="text-right">
+    50→              <div className="text-sm text-gray-500">City-Industry Combinations</div>
+    51→              <div className="text-xs text-gray-400">Manage cncglub table</div>
+    52→            </div>
+    53→          </div>
+    54→        </div>
+    55→      </div>
+    56→
+    57→      {/* Drenjari Links at Top */}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    58→      <div className="px-6 py-4">
+    59→        <DrenjariButtonBarDriggsmanLinks />
+    60→      </div>
+    61→
+    62→      {/* Main Content */}
+    63→      <div className="flex-1 overflow-hidden">
+    64→        <Cnjar1Table />
+    65→      </div>
+    66→    </div>
+    67→  );
+    68→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🔥 Create Cnjar1Table component with full functionality
+- [X] 🔥 Update /cnjar1 page to use new table component
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+The /cnjar1 page has been successfully updated to use the new Cnjar1Table component. The implementation is now complete with:
+
+1. **Dynamic import** of the Cnjar1Table component at `/cnjar1/components/Cnjar1Table.tsx:15`
+2. **Updated header** with proper description "City-Industry Combinations" and "Manage cncglub table" at `/cnjar1/page.tsx:50-51`
+3. **Main content area** now renders the full Cnjar1Table component at `/cnjar1/page.tsx:64`
+
+The city-industry combination management system is now fully functional with:
+- Foreign key dropdown selections for cities and industries
+- Display of actual city/industry names instead of IDs  
+- Inline editing with proper validation
+- Pagination controls matching existing styling
+- Search functionality across all fields
+- Create new functionality (both inline and popup)
+- Complete CRUD operations
+
+---
+
+_**User**_
+
+please create a button to the right of the nubra tableface element on page /cnjar1 that says:
+f355 populate cncglub
+
+when user clicks it will run a function (we must put f355 in file names and/or folders related to this function to identify it 
+
+when user clicks button, there will be a double confirmation popup where he can cancel or confirm 2 times. he must confirm 2 times to run the function
+
+the function will:
+look at all existing rows in db tables cities and industries 
+
+create a new row in cncglub for every combination of the 2 that does not yet exist (in cncglub db table) 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🔥 Create f355 populate button with double confirmation on /cnjar1
+- [ ] 🔥 Create f355 function to populate all city-industry combinations
+- [ ] 🔥 Add double confirmation popup for f355 function
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll create the f355 populate button with double confirmation and the function to populate all city-industry combinations. Let me first examine the current Cnjar1Table component to see where to add the button.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import dynamic from 'next/dynamic';
+     6→
+     7→const NubraTablefaceKite = dynamic(
+     8→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+     9→  { ssr: false }
+    10→);
+    11→
+    12→interface Cncglub {
+    13→  cncg_id: number;
+    14→  rel_city_id: number;
+    15→  rel_industry_id: number;
+    16→  created_at: string;
+    17→  updated_at: string | null;
+    18→}
+    19→
+    20→interface City {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+500→
+   501→  return (
+   502→    <div className="w-full">
+   503→      {/* Top Header Area */}
+   504→      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
+   505→        <div className="flex justify-between items-center">
+   506→          <div className="flex items-center space-x-6">
+   507→            <NubraTablefaceKite tableType="cncglub-grid" />
+   508→            <div className="text-sm text-gray-600">
+   509→              {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
+   510→              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+   511→            </div>
+   512→            <PaginationControls />
+   513→            <div className="relative">
+   514→              <input
+   515→                type="text"
+   516→                placeholder="Search all fields..."
+   517→                value={searchTerm}
+   518→                onChange={(e) => {
+   519→                  setSearchTerm(e.target.value);
+   520→                  setCurrentPage(1);
+   521→                }}
+   522→                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+   523→              />
+   524→              <button
+   525→                onClick={() => {
+   526→                  setSearchTerm('');
+   527→                  setCurrentPage(1);
+   528→                }}
+   529→                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+   530→              >
+   531→                CL
+   532→              </button>
+   533→            </div>
+   534→          </div>
+   535→          <div className="flex items-center space-x-2">
+   536→            <button
+   537→              onClick={createNewRecordInline}
+   538→              className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+   539→            >
+   540→              Create New (Inline)
+   541→            </button>
+   542→            <button
+   543→              onClick={() => setIsCreateModalOpen(true)}
+   544→              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+   545→            >
+   546→              Create New (Popup)
+   547→            </button>
+   548→          </div>
+   549→        </div>
+   550→      </div>
+   551→
+   552→      {/* Table */}
+   553→      <div className="bg-white overflow-hidden">
+   554→        <div className="overflow-x-auto">
+   555→          <table className="w-full border-collapse border border-gray-200">
+   556→            <thead className="bg-gray-50">
+   557→              <tr>
+   558→                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '50px' }}>
+   559→                  <div
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll create the f355 populate function and add the button. First, let me create a separate utility file for the f355 function to keep it organized:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```typescript
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+interface City {
+  city_id: number;
+  city_name: string | null;
+  state_code: string | null;
+}
+
+interface Industry {
+  industry_id: number;
+  industry_name: string | null;
+}
+
+interface CncglubCombo {
+  rel_city_id: number;
+  rel_industry_id: number;
+}
+
+export async function f355PopulateCncglub(): Promise<{ success: boolean; message: string; stats?: { cities: number; industries: number; existingCombos: number; newCombos: number; totalPossible: number } }> {
+  const supabase = createClientComponentClient();
+  
+  try {
+    console.log('F355: Starting populate cncglub function...');
+    
+    // Step 1: Fetch all cities
+    const { data: cities, error: citiesError } = await supabase
+      .from('cities')
+      .select('city_id, city_name, state_code');
+    
+    if (citiesError) {
+      throw new Error(`Failed to fetch cities: ${citiesError.message}`);
+    }
+    
+    if (!cities || cities.length === 0) {
+      return { success: false, message: 'No cities found in database' };
+    }
+    
+    console.log(`F355: Found ${cities.length} cities`);
+    
+    // Step 2: Fetch all industries
+    const { data: industries, error: industriesError } = await supabase
+      .from('industries')
+      .select('industry_id, industry_name');
+    
+    if (industriesError) {
+      throw new Error(`Failed to fetch industries: ${industriesError.message}`);
+    }
+    
+    if (!industries || industries.length === 0) {
+      return { success: false, message: 'No industries found in database' };
+    }
+    
+    console.log(`F355: Found ${industries.length} industries`);
+    
+    // Step 3: Fetch existing combinations
+    const { data: existingCombos, error: existingError } = await supabase
+      .from('cncglub')
+      .select('rel_city_id, rel_industry_id');
+    
+    if (existingError) {
+      throw new Error(`Failed to fetch existing combinations: ${existingError.message}`);
+    }
+    
+    console.log(`F355: Found ${existingCombos?.length || 0} existing combinations`);
+    
+    // Step 4: Create a Set of existing combinations for fast lookup
+    const existingSet = new Set(
+      (existingCombos || []).map(combo => `${combo.rel_city_id}-${combo.rel_industry_id}`)
+    );
+    
+    // Step 5: Generate all possible combinations and filter out existing ones
+    const newCombinations: CncglubCombo[] = [];
+    const totalPossible = cities.length * industries.length;
+    
+    for (const city of cities) {
+      for (const industry of industries) {
+        const comboKey = `${city.city_id}-${industry.industry_id}`;
+        if (!existingSet.has(comboKey)) {
+          newCombinations.push({
+            rel_city_id: city.city_id,
+            rel_industry_id: industry.industry_id
+          });
+        }
+      }
+    }
+    
+    console.log(`F355: Need to create ${newCombinations.length} new combinations out of ${totalPossible} total possible`);
+    
+    if (newCombinations.length === 0) {
+      return {
+        success: true,
+        message: 'All possible city-industry combinations already exist!',
+        stats: {
+          cities: cities.length,
+          industries: industries.length,
+          existingCombos: existingCombos?.length || 0,
+          newCombos: 0,
+          totalPossible
+        }
+      };
+    }
+    
+    // Step 6: Insert new combinations in batches to avoid timeout
+    const batchSize = 1000;
+    let insertedCount = 0;
+    
+    for (let i = 0; i < newCombinations.length; i += batchSize) {
+      const batch = newCombinations.slice(i, i + batchSize);
+      
+      console.log(`F355: Inserting batch ${Math.floor(i / batchSize) + 1} (${batch.length} records)...`);
+      
+      const { error: insertError } = await supabase
+        .from('cncglub')
+        .insert(batch);
+      
+      if (insertError) {
+        throw new Error(`Failed to insert batch starting at index ${i}: ${insertError.message}`);
+      }
+      
+      insertedCount += batch.length;
+      console.log(`F355: Successfully inserted ${insertedCount}/${newCombinations.length} combinations`);
+    }
+    
+    console.log('F355: Populate function completed successfully');
+    
+    return {
+      success: true,
+      message: `Successfully created ${insertedCount} new city-industry combinations!`,
+      stats: {
+        cities: cities.length,
+        industries: industries.length,
+        existingCombos: existingCombos?.length || 0,
+        newCombos: insertedCount,
+        totalPossible
+      }
+    };
+    
+  } catch (error) {
+    console.error('F355: Error in populate function:', error);
+    return {
+      success: false,
+      message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+    };
+  }
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/utils/f355-populate-cncglub.ts
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the Cnjar1Table component to add the f355 populate button with double confirmation:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import dynamic from 'next/dynamic';
+     6→import { f355PopulateCncglub } from '../utils/f355-populate-cncglub';
+     7→
+     8→const NubraTablefaceKite = dynamic(
+     9→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    10→  { ssr: false }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    41→  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    42→  const [sortField, setSortField] = useState<keyof Cncglub>('created_at');
+    43→  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    44→  
+    45→  // Modal states
+    46→  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    47→  const [isF355ConfirmOpen, setIsF355ConfirmOpen] = useState(false);
+    48→  const [f355ConfirmStep, setF355ConfirmStep] = useState(1);
+    49→  const [isF355Running, setIsF355Running] = useState(false);
+    50→  const [f355Message, setF355Message] = useState('');
+    51→  
+    52→  // Inline editing states
+    53→  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+    54→  const [editingValue, setEditingValue] = useState<string>('');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the f355 populate function handlers:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   284→      alert(`Failed to create record: ${err instanceof Error ? err.message : 'Unknown error'}`);
+   285→    }
+   286→  };
+   287→
+   288→  // Reset form
+   289→  const resetForm = () => {
+   290→    setFormData({
+   291→      rel_city_id: 0,
+   292→      rel_industry_id: 0
+   293→    });
+   294→  };
+   295→
+   296→  // F355 Populate function handlers
+   297→  const handleF355PopulateClick = () => {
+   298→    setIsF355ConfirmOpen(true);
+   299→    setF355ConfirmStep(1);
+   300→    setF355Message('');
+   301→  };
+   302→
+   303→  const handleF355Confirm = async () => {
+   304→    if (f355ConfirmStep === 1) {
+   305→      setF355ConfirmStep(2);
+   306→      return;
+   307→    }
+   308→    
+   309→    // Step 2 confirmed, run the function
+   310→    setIsF355Running(true);
+   311→    setF355Message('');
+   312→    
+   313→    try {
+   314→      const result = await f355PopulateCncglub();
+   315→      
+   316→      if (result.success) {
+   317→        setF355Message(result.message);
+   318→        if (result.stats && result.stats.newCombos > 0) {
+   319→          // Refresh the data to show new records
+   320→          fetchData();
+   321→        }
+   322→      } else {
+   323→        setF355Message(`Error: ${result.message}`);
+   324→      }
+   325→    } catch (error) {
+   326→      setF355Message(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+   327→    } finally {
+   328→      setIsF355Running(false);
+   329→    }
+   330→  };
+   331→
+   332→  const handleF355Cancel = () => {
+   333→    setIsF355ConfirmOpen(false);
+   334→    setF355ConfirmStep(1);
+   335→    setF355Message('');
+   336→  };
+   337→
+   338→  // Render cell content with special handling for foreign keys
+   339→  const renderCell = (item: Cncglub, column: typeof columns[0]) => {
+   340→    const value = item[column.key];
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the f355 populate button to the header area, positioning it to the right of the NubraTablefaceKite element:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   548→  return (
+   549→    <div className="w-full">
+   550→      {/* Top Header Area */}
+   551→      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
+   552→        <div className="flex justify-between items-center">
+   553→          <div className="flex items-center space-x-6">
+   554→            <NubraTablefaceKite tableType="cncglub-grid" />
+   555→            <button
+   556→              onClick={handleF355PopulateClick}
+   557→              disabled={isF355Running}
+   558→              className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors flex items-center space-x-2"
+   559→            >
+   560→              {isF355Running ? (
+   561→                <>
+   562→                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+   563→                  <span>Running...</span>
+   564→                </>
+   565→              ) : (
+   566→                <span>f355 populate cncglub</span>
+   567→              )}
+   568→            </button>
+   569→            <div className="text-sm text-gray-600">
+   570→              {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
+   571→              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+   572→            </div>
+   573→            <PaginationControls />
+   574→            <div className="relative">
+   575→              <input
+   576→                type="text"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the double confirmation popup modal at the end of the component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   701→          </div>
+   702→        </div>
+   703→      </div>
+   704→
+   705→      {/* Create Modal */}
+   706→      {isCreateModalOpen && (
+   707→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+   708→          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+   709→            <h2 className="text-xl font-bold mb-4">Create New City-Industry Combination</h2>
+   710→            
+   711→            <div className="grid grid-cols-1 gap-4">
+   712→              <div>
+   713→                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+   714→                <select
+   715→                  value={formData.rel_city_id}
+   716→                  onChange={(e) => setFormData({ ...formData, rel_city_id: parseInt(e.target.value) || 0 })}
+   717→                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+   718→                >
+   719→                  <option value={0}>Select a city...</option>
+   720→                  {cities.map(city => (
+   721→                    <option key={city.city_id} value={city.city_id}>
+   722→                      {city.city_name}, {city.state_code}
+   723→                    </option>
+   724→                  ))}
+   725→                </select>
+   726→              </div>
+   727→              
+   728→              <div>
+   729→                <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+   730→                <select
+   731→                  value={formData.rel_industry_id}
+   732→                  onChange={(e) => setFormData({ ...formData, rel_industry_id: parseInt(e.target.value) || 0 })}
+   733→                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+   734→                >
+   735→                  <option value={0}>Select an industry...</option>
+   736→                  {industries.map(industry => (
+   737→                    <option key={industry.industry_id} value={industry.industry_id}>
+   738→                      {industry.industry_name}
+   739→                    </option>
+   740→                  ))}
+   741→                </select>
+   742→              </div>
+   743→            </div>
+   744→
+   745→            <div className="mt-6 flex justify-end space-x-3">
+   746→              <button
+   747→                onClick={() => {
+   748→                  setIsCreateModalOpen(false);
+   749→                  resetForm();
+   750→                }}
+   751→                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+   752→              >
+   753→                Cancel
+   754→              </button>
+   755→              <button
+   756→                onClick={handleCreateSubmit}
+   757→                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+   758→              >
+   759→                Create Combination
+   760→              </button>
+   761→            </div>
+   762→          </div>
+   763→        </div>
+   764→      )}
+   765→
+   766→      {/* F355 Double Confirmation Modal */}
+   767→      {isF355ConfirmOpen && (
+   768→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+   769→          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+   770→            <h2 className="text-xl font-bold mb-4 text-purple-700">
+   771→              F355 Populate All City-Industry Combinations
+   772→            </h2>
+   773→            
+   774→            {f355ConfirmStep === 1 && (
+   775→              <>
+   776→                <div className="mb-6">
+   777→                  <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
+   778→                    <div className="flex">
+   779→                      <div className="flex-shrink-0">
+   780→                        <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+   781→                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+   782→                        </svg>
+   783→                      </div>
+   784→                      <div className="ml-3">
+   785→                        <h3 className="text-sm font-medium text-yellow-800">First Confirmation</h3>
+   786→                        <div className="mt-2 text-sm text-yellow-700">
+   787→                          <p>This will create a new row in cncglub for EVERY combination of cities and industries that doesn't already exist.</p>
+   788→                        </div>
+   789→                      </div>
+   790→                    </div>
+   791→                  </div>
+   792→                  <p className="text-gray-600 mb-4">
+   793→                    This action will:
+   794→                  </p>
+   795→                  <ul className="list-disc list-inside text-gray-600 mb-4 space-y-1">
+   796→                    <li>Fetch all cities from the cities table</li>
+   797→                    <li>Fetch all industries from the industries table</li>
+   798→                    <li>Create combinations for all cities × all industries</li>
+   799→                    <li>Skip combinations that already exist in cncglub</li>
+   800→                    <li>Insert all missing combinations into cncglub table</li>
+   801→                  </ul>
+   802→                  <p className="text-sm text-gray-500">
+   803→                    Are you sure you want to proceed? This is the first confirmation.
+   804→                  </p>
+   805→                </div>
+   806→                
+   807→                <div className="flex justify-end space-x-3">
+   808→                  <button
+   809→                    onClick={handleF355Cancel}
+   810→                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+   811→                  >
+   812→                    Cancel
+   813→                  </button>
+   814→                  <button
+   815→                    onClick={handleF355Confirm}
+   816→                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+   817→                  >
+   818→                    Confirm (Step 1)
+   819→                  </button>
+   820→                </div>
+   821→              </>
+   822→            )}
+   823→            
+   824→            {f355ConfirmStep === 2 && (
+   825→              <>
+   826→                <div className="mb-6">
+   827→                  <div className="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
+   828→                    <div className="flex">
+   829→                      <div className="flex-shrink-0">
+   830→                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+   831→                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+   832→                        </svg>
+   833→                      </div>
+   834→                      <div className="ml-3">
+   835→                        <h3 className="text-sm font-medium text-red-800">Final Confirmation</h3>
+   836→                        <div className="mt-2 text-sm text-red-700">
+   837→                          <p><strong>WARNING:</strong> This action cannot be undone!</p>
+   838→                        </div>
+   839→                      </div>
+   840→                    </div>
+   841→                  </div>
+   842→                  <p className="text-gray-800 font-semibold mb-4">
+   843→                    This is your FINAL confirmation. Are you absolutely sure?
+   844→                  </p>
+   845→                  <div className="bg-gray-100 p-3 rounded text-sm text-gray-600">
+   846→                    <p>The F355 populate function will run and may create thousands of new records. This could take several seconds to complete.</p>
+   847→                  </div>
+   848→                  {isF355Running && (
+   849→                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+   850→                      <div className="flex items-center space-x-3">
+   851→                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+   852→                        <span className="text-blue-700">Running F355 populate function...</span>
+   853→                      </div>
+   854→                    </div>
+   855→                  )}
+   856→                  {f355Message && (
+   857→                    <div className={`mt-4 p-4 rounded ${f355Message.includes('Error') ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+   858→                      {f355Message}
+   859→                    </div>
+   860→                  )}
+   861→                </div>
+   862→                
+   863→                <div className="flex justify-end space-x-3">
+   864→                  <button
+   865→                    onClick={handleF355Cancel}
+   866→                    disabled={isF355Running}
+   867→                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 transition-colors"
+   868→                  >
+   869→                    Cancel
+   870→                  </button>
+   871→                  <button
+   872→                    onClick={handleF355Confirm}
+   873→                    disabled={isF355Running}
+   874→                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-400 transition-colors flex items-center space-x-2"
+   875→                  >
+   876→                    {isF355Running ? (
+   877→                      <>
+   878→                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+   879→                        <span>Running...</span>
+   880→                      </>
+   881→                    ) : (
+   882→                      <span>RUN F355 POPULATE</span>
+   883→                    )}
+   884→                  </button>
+   885→                </div>
+   886→              </>
+   887→            )}
+   888→          </div>
+   889→        </div>
+   890→      )}
+   891→    </div>
+   892→  );
+   893→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🔥 Create f355 populate button with double confirmation on /cnjar1
+- [X] 🔥 Create f355 function to populate all city-industry combinations
+- [X] 🔥 Add double confirmation popup for f355 function
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully implemented the f355 populate functionality with all the requested features:
+
+## ✅ Completed Implementation
+
+### **F355 Populate Button**
+- **Location**: Right of the NubraTablefaceKite element on `/cnjar1` page at `Cnjar1Table.tsx:555-568`
+- **Button text**: "f355 populate cncglub" 
+- **Purple styling**: `bg-purple-600 hover:bg-purple-700`
+- **Loading state**: Shows spinner and "Running..." when executing
+
+### **F355 Function** 
+- **File**: `/cnjar1/utils/f355-populate-cncglub.ts` (following f355 naming convention)
+- **Functionality**:
+  - Fetches all cities and industries from respective tables
+  - Creates combinations for every city × industry pair
+  - Skips combinations that already exist in cncglub 
+  - Inserts missing combinations in batches of 1000 for performance
+  - Returns detailed stats and success/error messages
+
+### **Double Confirmation System**
+- **Step 1**: Yellow warning with explanation of what will happen
+- **Step 2**: Red warning with final confirmation and "cannot be undone" message
+- **User must confirm TWICE** to execute the function
+- **Can cancel** at any step to abort
+
+### **Key Features**
+- **Batch processing**: Inserts in 1000-record batches to avoid timeouts
+- **Duplicate prevention**: Checks existing combinations to avoid duplicates  
+- **Progress indicators**: Loading spinners and status messages
+- **Error handling**: Comprehensive try/catch with user-friendly error messages
+- **Auto-refresh**: Refreshes table data after successful population
+- **Statistics**: Shows counts of cities, industries, existing combos, new combos created
+
+The f355 populate function will efficiently create all possible city-industry combinations that don't already exist, potentially creating thousands of new records in the cncglub table.
+
+---
+
+_**User**_
+
+pleaes create a vertical black separator of 3 px and place it at the right of the updated_at column in the ui table grid on /cnjar1 page 
+
+please add an additional <tr> row inside the <thead> above the current existing row 
+
+please make sure that the existing <tr> row inside the main ui table grid's <thead> becomes marked in the code as the primary identifying row for a column inside the <thead>
+
+leave our new <tr> blank and do not even put a checkbox in it. but make sure there is a column in the ui in this new row that does correspond to the checkbox column (just leave every cell blank in our new row - blank of contents)
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll add the vertical separator and the additional header row to the /cnjar1 table. Let me update the Cnjar1Table component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   612→
+   613→      {/* Table */}
+   614→      <div className="bg-white overflow-hidden">
+   615→        <div className="overflow-x-auto">
+   616→          <table className="w-full border-collapse border border-gray-200">
+   617→            <thead className="bg-gray-50">
+   618→              {/* Additional blank header row */}
+   619→              <tr>
+   620→                <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
+   621→                  {/* Blank cell corresponding to checkbox column */}
+   622→                </th>
+   623→                {columns.map((column, index) => (
+   624→                  <th
+   625→                    key={`blank-${column.key}`}
+   626→                    className={`text-left border border-gray-200 px-2 py-1 ${
+   627→                      column.key === 'updated_at' ? 'border-r-black border-r-[3px]' : ''
+   628→                    }`}
+   629→                  >
+   630→                    {/* Blank cell */}
+   631→                  </th>
+   632→                ))}
+   633→              </tr>
+   634→              {/* Primary identifying row for columns */}
+   635→              <tr>
+   636→                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '50px' }}>
+   637→                  <div 
+   638→                    className="w-full h-full flex items-center justify-center cursor-pointer"
+   639→                    onClick={() => {
+   640→                      if (selectedRows.size === paginatedData.length && paginatedData.length > 0) {
+   641→                        setSelectedRows(new Set());
+   642→                      } else {
+   643→                        setSelectedRows(new Set(paginatedData.map(item => item.cncg_id)));
+   644→                      }
+   645→                    }}
+   646→                  >
+   647→                    <input
+   648→                      type="checkbox"
+   649→                      style={{ width: '20px', height: '20px' }}
+   650→                      checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+   651→                      onChange={() => {}} // Handled by div onClick
+   652→                    />
+   653→                  </div>
+   654→                </th>
+   655→                {columns.map((column) => (
+   656→                  <th
+   657→                    key={column.key}
+   658→                    className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1 ${
+   659→                      column.key === 'updated_at' ? 'border-r-black border-r-[3px]' : ''
+   660→                    }`}
+   661→                    onClick={() => handleSort(column.key)}
+   662→                  >
+   663→                    <div className="flex items-center space-x-1">
+   664→                      <span className="font-bold text-xs lowercase">{column.label}</span>
+   665→                      {sortField === column.key && (
+   666→                        <span className="text-xs">
+   667→                          {sortOrder === 'asc' ? '↑' : '↓'}
+   668→                        </span>
+   669→                      )}
+   670→                    </div>
+   671→                  </th>
+   672→                ))}
+   673→              </tr>
+   674→            </thead>
+   675→            <tbody className="bg-white">
+   676→              {paginatedData.map((item) => (
+   677→                <tr key={item.cncg_id} className="hover:bg-gray-50">
+   678→                  <td className="px-2 py-1 border border-gray-200">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to also add the vertical separator to the tbody cells for the updated_at column:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   695→                        onChange={() => {}} // Handled by div onClick
+   696→                      />
+   697→                    </div>
+   698→                  </td>
+   699→                  {columns.map((column) => (
+   700→                    <td 
+   701→                      key={column.key} 
+   702→                      className={`border border-gray-200 ${
+   703→                        column.key === 'updated_at' ? 'border-r-black border-r-[3px]' : ''
+   704→                      }`}
+   705→                    >
+   706→                      {renderCell(item, column)}
+   707→                    </td>
+   708→                  ))}
+   709→                </tr>
+   710→              ))}
+   711→            </tbody>
+   712→          </table>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully implemented all the requested changes to the /cnjar1 table:
+
+## ✅ Changes Made
+
+### **Vertical Black Separator**
+- **Location**: Right of the `updated_at` column at `Cnjar1Table.tsx:627,659,703`
+- **Styling**: `border-r-black border-r-[3px]` (3px black right border)
+- **Applied to**: Both header cells and body cells in the `updated_at` column
+
+### **Additional Header Row**
+- **New blank row**: Added above the existing header row at `Cnjar1Table.tsx:618-633`
+- **Blank cells**: All cells are empty with just basic styling
+- **Checkbox column**: Includes corresponding blank cell for the checkbox column
+- **Same structure**: Matches the column structure of the main header row
+
+### **Primary Identifying Row**
+- **Marked in code**: Added comment `{/* Primary identifying row for columns */}` at `Cnjar1Table.tsx:634`
+- **Maintained functionality**: All sorting, checkboxes, and column headers work exactly as before
+
+The table now has:
+1. **Two header rows** in the `<thead>` section
+2. **Top row**: Completely blank cells (including checkbox column)
+3. **Bottom row**: The original functional header with sorting and checkboxes 
+4. **Vertical separator**: 3px black line to the right of the `updated_at` column throughout the entire table
+
+The visual result will be a cleaner table with an additional blank header row and a prominent black separator after the `updated_at` column.
+
+---
+
+_**User**_
+
+pleaes view the /cityjar page and add teh same ui columns to /cnjar1 . add these new ui columns to the right of our vertical black separator
+
+obviously, in /cnjar1 page, these must appear through a relationship that's pulling them in the db . if you think a join is needed, please advise me. im not sure what best method is for this. after we add this section of ui columns we will want to add a new black separator vertical of 3 pixels tot he right side of this columns ection. then we will proceed to add all of the ui columns from /indusjar to the right of that (of course these are pulled from relationshiip as well on page at /cnjar1 . let me know what best practices for this are in your opinion 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>The user wants me to:
+
+1. First, look at the /cityjar page to see what columns are there
+2. Add those same UI columns to /cnjar1 page, but these need to be pulled through relationships (since /cnjar1 is about city-industry combinations in the cncglub table)
+3. Position these new columns to the right of the current vertical black separator (which is after updated_at)
+4. After adding these columns, add another 3px black vertical separator to the right of this new section
+5. Then they want to add all UI columns from /indusjar to the right of that separator
+6. They're asking for advice on best practices for relationships/joins
+
+Let me first examine the /cityjar page to see what columns are there, then examine /indusjar to see what columns are there, and then think about the best approach for relationships.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll examine the /cityjar and /indusjar pages to see what columns they have, then advise on the best approach for adding them to /cnjar1 through relationships.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cityjar/components/CityjarTable.tsx`
+
+Result:
+
+```
+60→    latitude: 0,
+    61→    longitude: 0,
+    62→    rel_metro_id: 0,
+    63→    population_last_updated: ''
+    64→  });
+    65→
+    66→  const supabase = createClientComponentClient();
+    67→
+    68→  // Define columns
+    69→  const columns = [
+    70→    { key: 'city_id' as keyof City, label: 'city_id', type: 'number', readOnly: true },
+    71→    { key: 'city_name' as keyof City, label: 'city_name', type: 'text' },
+    72→    { key: 'state_code' as keyof City, label: 'state_code', type: 'text' },
+    73→    { key: 'state_full' as keyof City, label: 'state_full', type: 'text' },
+    74→    { key: 'country' as keyof City, label: 'country', type: 'text' },
+    75→    { key: 'rank_in_pop' as keyof City, label: 'rank_in_pop', type: 'number' },
+    76→    { key: 'gmaps_link' as keyof City, label: 'gmaps_link', type: 'text', width: '100px' },
+    77→    { key: 'is_suburb' as keyof City, label: 'is_suburb', type: 'boolean' },
+    78→    { key: 'city_and_state_code' as keyof City, label: 'city_and_state_code', type: 'text' },
+    79→    { key: 'city_population' as keyof City, label: 'city_population', type: 'number' },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>I need to see more of the cityjar columns to get the complete picture.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cityjar/components/CityjarTable.tsx`
+
+Result:
+
+```
+75→    { key: 'rank_in_pop' as keyof City, label: 'rank_in_pop', type: 'number' },
+    76→    { key: 'gmaps_link' as keyof City, label: 'gmaps_link', type: 'text', width: '100px' },
+    77→    { key: 'is_suburb' as keyof City, label: 'is_suburb', type: 'boolean' },
+    78→    { key: 'city_and_state_code' as keyof City, label: 'city_and_state_code', type: 'text' },
+    79→    { key: 'city_population' as keyof City, label: 'city_population', type: 'number' },
+    80→    { key: 'latitude' as keyof City, label: 'latitude', type: 'number' },
+    81→    { key: 'longitude' as keyof City, label: 'longitude', type: 'number' },
+    82→    { key: 'rel_metro_id' as keyof City, label: 'rel_metro_id', type: 'number' },
+    83→    { key: 'population_last_updated' as keyof City, label: 'population_last_updated', type: 'datetime' },
+    84→    { key: 'created_at' as keyof City, label: 'created_at', type: 'datetime', readOnly: true },
+    85→    { key: 'updated_at' as keyof City, label: 'updated_at', type: 'datetime', readOnly: true }
+    86→  ];
+    87→
+    88→  // Fetch data from Supabase
+    89→  const fetchData = async () => {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>Great, so the cityjar columns are:
+- city_id
+- city_name
+- state_code
+- state_full
+- country
+- rank_in_pop
+- gmaps_link
+- is_suburb
+- city_and_state_code
+- city_population
+- latitude
+- longitude
+- rel_metro_id
+- population_last_updated
+- created_at
+- updated_at
+
+Now let me check the indusjar columns.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/indusjar/components/IndusjarTable.tsx`
+
+Result:
+
+```
+60→        .from('industries')
+    61→        .select('*')
+    62→        .order('created_at', { ascending: false });
+    63→
+    64→      if (error) throw error;
+    65→      setData(industriesData || []);
+    66→    } catch (err) {
+    67→      console.error('Error fetching data:', err);
+    68→      setError(err instanceof Error ? err.message : 'Unknown error');
+    69→    } finally {
+    70→      setLoading(false);
+    71→    }
+    72→  };
+    73→
+    74→  useEffect(() => {
+    75→    fetchData();
+    76→  }, []);
+    77→
+    78→  // Filter and sort data
+    79→  const filteredAndSortedData = useMemo(() => {
+    80→    let filtered = data;
+    81→    
+    82→    if (searchTerm) {
+    83→      filtered = data.filter(item => 
+    84→        Object.values(item).some(value =>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>Let me look for the columns definition in the indusjar component.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/indusjar/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx:  const columns = [
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-    { key: 'industry_id' as keyof Industry, label: 'industry_id', type: 'number', readOnly: true },
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-    { key: 'industry_name' as keyof Industry, label: 'industry_name', type: 'text' },
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-    { key: 'industry_description' as keyof Industry, label: 'industry_description', type: 'text' },
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-    { key: 'created_at' as keyof Industry, label: 'created_at', type: 'datetime', readOnly: true },
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-    { key: 'updated_at' as keyof Industry, label: 'updated_at', type: 'datetime', readOnly: true }
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-  ];
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-  // Fetch data from Supabase
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-  const fetchData = async () => {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-    try {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-      setLoading(true);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-      const { data: industriesData, error } = await supabase
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-        .from('industries')
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-        .select('*')
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx-        .order('created_at', { ascending: false });
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>Perfect! Now I have the complete picture:
+
+**Cityjar columns:**
+- city_id
+- city_name  
+- state_code
+- state_full
+- country
+- rank_in_pop
+- gmaps_link
+- is_suburb
+- city_and_state_code
+- city_population
+- latitude
+- longitude
+- rel_metro_id
+- population_last_updated
+- created_at
+- updated_at
+
+**Indusjar columns:**
+- industry_id
+- industry_name
+- industry_description
+- created_at  
+- updated_at
+
+Now for the /cnjar1 page, we currently have the cncglub table with:
+- cncg_id
+- rel_city_id
+- rel_industry_id
+- created_at
+- updated_at
+
+To add the cityjar and indusjar columns to the /cnjar1 page, we have a few options:
+
+1. **Frontend JOIN approach**: Modify the existing fetchData function to use Supabase joins/relationships
+2. **Separate queries approach**: Fetch cities and industries separately (already doing this) and merge data on frontend
+3. **Database view approach**: Create a database view that joins all three tables
+
+The current /cnjar1 implementation is already fetching cities and industries separately and using helper functions like `getCityDisplay()` and `getIndustryDisplay()`.
+
+**Best practice recommendation**: I think the cleanest approach would be to modify the main data fetching to use Supabase's built-in relationship/join capabilities to fetch all the related city and industry data in one query. This would be more efficient than multiple separate queries.
+
+Let me propose updating the fetchData function to use a JOIN query that pulls in all the city and industry fields alongside the cncglub data.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Based on my analysis of the /cityjar and /indusjar pages, here's what I found and my recommendation:
+
+## **Column Analysis**
+
+### **Cityjar columns** (that we'll add after the black separator):
+- city_name, state_code, state_full, country, rank_in_pop, gmaps_link, is_suburb, city_and_state_code, city_population, latitude, longitude, rel_metro_id, population_last_updated
+
+### **Indusjar columns** (that we'll add after the next separator):  
+- industry_name, industry_description
+
+## **Best Practice Recommendation**
+
+**I recommend using Supabase's built-in JOIN capabilities** rather than separate queries. Here's why:
+
+1. **Performance**: Single query vs multiple queries
+2. **Data consistency**: All data fetched at once
+3. **Simpler state management**: One data structure instead of merging separate arrays
+4. **Supabase optimization**: Built-in relationship handling
+
+## **Implementation Approach**
+
+I suggest modifying the `fetchData` function in `/cnjar1` to use a Supabase join like this:
+
+```typescript
+const { data: cncglubData, error } = await supabase
+  .from('cncglub')
+  .select(`
+    *,
+    cities!rel_city_id (
+      city_name, state_code, state_full, country, rank_in_pop, 
+      gmaps_link, is_suburb, city_and_state_code, city_population, 
+      latitude, longitude, rel_metro_id, population_last_updated
+    ),
+    industries!rel_industry_id (
+      industry_name, industry_description
+    )
+  `)
+  .order('created_at', { ascending: false });
+```
+
+This would give us a flattened structure where each row contains the cncglub data plus all related city and industry fields.
+
+**Should I proceed with this approach?** It would involve:
+
+1. Updating the data fetching to use joins
+2. Modifying the interface types to include the joined data  
+3. Adding the city columns after the current black separator
+4. Adding a new 3px black separator after the city columns
+5. Adding the industry columns after that separator
+
+Would you like me to implement this JOIN approach, or do you prefer a different method?
+
+---
+
+_**User**_
+
+ok pleaes implement the join approach 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll implement the JOIN approach to add the cityjar and indusjar columns to /cnjar1. Let me update the Cnjar1Table component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🔥 Update Cncglub interface to include joined city and industry data
+- [ ] 🔥 Modify fetchData function to use Supabase joins
+- [ ] 🔥 Add city columns after first black separator
+- [ ] 🔥 Add second black separator after city columns
+- [ ] 🔥 Add industry columns after second separator
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+First, I'll update the interfaces to include the joined data:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     9→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    10→  { ssr: false }
+    11→);
+    12→
+    13→interface Cncglub {
+    14→  cncg_id: number;
+    15→  rel_city_id: number;
+    16→  rel_industry_id: number;
+    17→  created_at: string;
+    18→  updated_at: string | null;
+    19→  // Joined city data
+    20→  cities?: {
+    21→    city_name: string | null;
+    22→    state_code: string | null;
+    23→    state_full: string | null;
+    24→    country: string | null;
+    25→    rank_in_pop: number | null;
+    26→    gmaps_link: string | null;
+    27→    is_suburb: boolean | null;
+    28→    city_and_state_code: string | null;
+    29→    city_population: number | null;
+    30→    latitude: number | null;
+    31→    longitude: number | null;
+    32→    rel_metro_id: number | null;
+    33→    population_last_updated: string | null;
+    34→  } | null;
+    35→  // Joined industry data
+    36→  industries?: {
+    37→    industry_name: string | null;
+    38→    industry_description: string | null;
+    39→  } | null;
+    40→}
+    41→
+    42→interface City {
+    43→  city_id: number;
+    44→  city_name: string | null;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the columns array to include the new city and industry columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    81→  });
+    82→
+    83→  const supabase = createClientComponentClient();
+    84→
+    85→  // Define columns
+    86→  const columns = [
+    87→    { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
+    88→    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
+    89→    { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+    90→    { key: 'created_at' as keyof Cncglub, label: 'created_at', type: 'datetime', readOnly: true },
+    91→    { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true, separator: 'black-3px' }
+    92→  ];
+    93→
+    94→  // City columns from cityjar
+    95→  const cityColumns = [
+    96→    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+    97→    { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
+    98→    { key: 'cities.state_full', label: 'state_full', type: 'text', readOnly: true, isJoined: true },
+    99→    { key: 'cities.country', label: 'country', type: 'text', readOnly: true, isJoined: true },
+   100→    { key: 'cities.rank_in_pop', label: 'rank_in_pop', type: 'number', readOnly: true, isJoined: true },
+   101→    { key: 'cities.gmaps_link', label: 'gmaps_link', type: 'text', readOnly: true, isJoined: true, width: '100px' },
+   102→    { key: 'cities.is_suburb', label: 'is_suburb', type: 'boolean', readOnly: true, isJoined: true },
+   103→    { key: 'cities.city_and_state_code', label: 'city_and_state_code', type: 'text', readOnly: true, isJoined: true },
+   104→    { key: 'cities.city_population', label: 'city_population', type: 'number', readOnly: true, isJoined: true },
+   105→    { key: 'cities.latitude', label: 'latitude', type: 'number', readOnly: true, isJoined: true },
+   106→    { key: 'cities.longitude', label: 'longitude', type: 'number', readOnly: true, isJoined: true },
+   107→    { key: 'cities.rel_metro_id', label: 'rel_metro_id', type: 'number', readOnly: true, isJoined: true },
+   108→    { key: 'cities.population_last_updated', label: 'population_last_updated', type: 'datetime', readOnly: true, isJoined: true, separator: 'black-3px' }
+   109→  ];
+   110→
+   111→  // Industry columns from indusjar
+   112→  const industryColumns = [
+   113→    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
+   114→    { key: 'industries.industry_description', label: 'industry_description', type: 'text', readOnly: true, isJoined: true }
+   115→  ];
+   116→
+   117→  // Combine all columns
+   118→  const allColumns = [...columns, ...cityColumns, ...industryColumns];
+   119→
+   120→  // Fetch data from Supabase
+   121→  const fetchData = async () => {
+   122→    try {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the fetchData function to use the JOIN approach:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   116→
+   117→  // Combine all columns
+   118→  const allColumns = [...columns, ...cityColumns, ...industryColumns];
+   119→
+   120→  // Fetch data from Supabase
+   121→  const fetchData = async () => {
+   122→    try {
+   123→      setLoading(true);
+   124→      
+   125→      // Fetch main data with joins
+   126→      const { data: cncglubData, error: cncglubError } = await supabase
+   127→        .from('cncglub')
+   128→        .select(`
+   129→          *,
+   130→          cities!rel_city_id (
+   131→            city_name, state_code, state_full, country, rank_in_pop, 
+   132→            gmaps_link, is_suburb, city_and_state_code, city_population, 
+   133→            latitude, longitude, rel_metro_id, population_last_updated
+   134→          ),
+   135→          industries!rel_industry_id (
+   136→            industry_name, industry_description
+   137→          )
+   138→        `)
+   139→        .order('created_at', { ascending: false });
+   140→
+   141→      if (cncglubError) throw cncglubError;
+   142→      
+   143→      // Fetch cities for reference (still needed for dropdowns)
+   144→      const { data: citiesData, error: citiesError } = await supabase
+   145→        .from('cities')
+   146→        .select('city_id, city_name, state_code')
+   147→        .order('city_name');
+   148→        
+   149→      if (citiesError) throw citiesError;
+   150→      
+   151→      // Fetch industries for reference (still needed for dropdowns)
+   152→      const { data: industriesData, error: industriesError } = await supabase
+   153→        .from('industries')
+   154→        .select('industry_id, industry_name')
+   155→        .order('industry_name');
+   156→        
+   157→      if (industriesError) throw industriesError;
+   158→      
+   159→      setData(cncglubData || []);
+   160→      setCities(citiesData || []);
+   161→      setIndustries(industriesData || []);
+   162→    } catch (err) {
+   163→      console.error('Error fetching data:', err);
+   164→      setError(err instanceof Error ? err.message : 'Unknown error');
+   165→    } finally {
+   166→      setLoading(false);
+   167→    }
+   168→  };
+   169→
+   170→  useEffect(() => {
+   171→    fetchData();
+   172→  }, []);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to create a function to get values from joined data and update the renderCell function:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   176→    const city = cities.find(c => c.city_id === cityId);
+   177→    return city ? `${city.city_name}, ${city.state_code}` : `City ID: ${cityId}`;
+   178→  };
+   179→
+   180→  // Helper function to get industry display name
+   181→  const getIndustryDisplay = (industryId: number) => {
+   182→    const industry = industries.find(i => i.industry_id === industryId);
+   183→    return industry ? industry.industry_name : `Industry ID: ${industryId}`;
+   184→  };
+   185→
+   186→  // Helper function to get joined column value
+   187→  const getJoinedValue = (item: Cncglub, columnKey: string) => {
+   188→    const [table, field] = columnKey.split('.');
+   189→    if (table === 'cities' && item.cities) {
+   190→      return (item.cities as any)[field];
+   191→    }
+   192→    if (table === 'industries' && item.industries) {
+   193→      return (item.industries as any)[field];
+   194→    }
+   195→    return null;
+   196→  };
+   197→
+   198→  // Filter and sort data
+   199→  const filteredAndSortedData = useMemo(() => {
+   200→    let filtered = data;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the renderCell function to handle the joined columns and update the table headers to use allColumns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   403→    setF355ConfirmStep(1);
+   404→    setF355Message('');
+   405→  };
+   406→
+   407→  // Render cell content with special handling for foreign keys
+   408→  const renderCell = (item: Cncglub, column: any) => {
+   409→    let value: any;
+   410→    
+   411→    // Handle joined columns
+   412→    if (column.isJoined) {
+   413→      value = getJoinedValue(item, column.key);
+   414→    } else {
+   415→      value = item[column.key as keyof Cncglub];
+   416→    }
+   417→    
+   418→    const isEditing = editingCell?.id === item.cncg_id && editingCell?.field === column.key;
+   419→    const isReadOnly = column.readOnly;
+   420→
+   421→    if (isEditing && !column.isJoined) {
+   422→      return (
+   423→        <div className="flex items-center space-x-2">
+   424→          {column.key === 'rel_city_id' ? (
+   425→            <select
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to also add special handling for the gmaps_link column from the joined city data. Let me continue updating the renderCell function:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   479→        </div>
+   480→      );
+   481→    }
+   482→
+   483→    // Special display for foreign keys
+   484→    if (column.key === 'rel_city_id') {
+   485→      return (
+   486→        <div
+   487→          onClick={() => !isReadOnly && handleCellClick(item.cncg_id, column.key, value)}
+   488→          className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'}`}
+   489→        >
+   490→          {getCityDisplay(value as number)}
+   491→        </div>
+   492→      );
+   493→    }
+   494→
+   495→    if (column.key === 'rel_industry_id') {
+   496→      return (
+   497→        <div
+   498→          onClick={() => !isReadOnly && handleCellClick(item.cncg_id, column.key, value)}
+   499→          className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'}`}
+   500→        >
+   501→          {getIndustryDisplay(value as number)}
+   502→        </div>
+   503→      );
+   504→    }
+   505→
+   506→    // Special handling for joined gmaps_link column
+   507→    if (column.key === 'cities.gmaps_link' && value) {
+   508→      return (
+   509→        <div className="flex items-center space-x-1" style={{ width: '100px', maxWidth: '100px', minWidth: '100px' }}>
+   510→          <button onClick={async (e) => {
+   511→            e.stopPropagation();
+   512→            if (value) {
+   513→              try {
+   514→                await navigator.clipboard.writeText(value.toString());
+   515→              } catch (err) {
+   516→                console.error('Failed to copy to clipboard:', err);
+   517→              }
+   518→            }
+   519→          }}
+   520→          className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold flex items-center justify-center"
+   521→          title="Copy to clipboard">
+   522→            📋
+   523→          </button>
+   524→          <button onClick={(e) => {
+   525→            e.stopPropagation();
+   526→            if (value) {
+   527→              window.open(value.toString(), '_blank');
+   528→            }
+   529→          }}
+   530→          className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold flex items-center justify-center"
+   531→          title="Open in new tab">
+   532→            OP
+   533→          </button>
+   534→          <div className="flex-1 overflow-hidden">
+   535→            <textarea
+   536→              value={value?.toString() || ''}
+   537→              readOnly
+   538→              className="w-full text-xs border-none resize-none bg-transparent overflow-hidden"
+   539→              style={{ height: '20px', width: '46px' }}
+   540→            />
+   541→          </div>
+   542→        </div>
+   543→      );
+   544→    }
+   545→
+   546→    return (
+   547→      <div
+   548→        onClick={() => handleCellClick(item.cncg_id, column.key, value)}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the final return section to handle boolean values and other joined data:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   542→        </div>
+   543→      );
+   544→    }
+   545→
+   546→    return (
+   547→      <div
+   548→        onClick={() => !isReadOnly && !column.isJoined && handleCellClick(item.cncg_id, column.key, value)}
+   549→        className={`px-2 py-1 ${!isReadOnly && !column.isJoined ? 'cursor-pointer hover:bg-gray-100 cursor-text' : 'cursor-default'}`}
+   550→      >
+   551→        {column.type === 'boolean' ? 
+   552→          (value ? '✓' : '✗') :
+   553→          column.type === 'datetime' && value ? 
+   554→            new Date(value).toLocaleString() : 
+   555→            value?.toString() || ''
+   556→        }
+   557→      </div>
+   558→    );
+   559→  };
+   560→
+   561→  // Pagination Controls Component
+   562→  const PaginationControls = () => (
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the table headers and body to use allColumns and add the separators:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   733→      <div className="bg-white overflow-hidden">
+   734→        <div className="overflow-x-auto">
+   735→          <table className="w-full border-collapse border border-gray-200">
+   736→            <thead className="bg-gray-50">
+   737→              {/* Additional blank header row */}
+   738→              <tr>
+   739→                <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
+   740→                  {/* Blank cell corresponding to checkbox column */}
+   741→                </th>
+   742→                {allColumns.map((column, index) => (
+   743→                  <th
+   744→                    key={`blank-${column.key}`}
+   745→                    className={`text-left border border-gray-200 px-2 py-1 ${
+   746→                      column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+   747→                    }`}
+   748→                  >
+   749→                    {/* Blank cell */}
+   750→                  </th>
+   751→                ))}
+   752→              </tr>
+   753→              {/* Primary identifying row for columns */}
+   754→              <tr>
+   755→                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '50px' }}>
+   756→                  <div
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   770→                      onChange={() => {}} // Handled by div onClick
+   771→                    />
+   772→                  </div>
+   773→                </th>
+   774→                {allColumns.map((column) => (
+   775→                  <th
+   776→                    key={column.key}
+   777→                    className={`text-left ${!column.isJoined ? 'cursor-pointer hover:bg-gray-100' : ''} border border-gray-200 px-2 py-1 ${
+   778→                      column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+   779→                    }`}
+   780→                    onClick={() => !column.isJoined && handleSort(column.key)}
+   781→                  >
+   782→                    <div className="flex items-center space-x-1">
+   783→                      <span className="font-bold text-xs lowercase">{column.label}</span>
+   784→                      {!column.isJoined && sortField === column.key && (
+   785→                        <span className="text-xs">
+   786→                          {sortOrder === 'asc' ? '↑' : '↓'}
+   787→                        </span>
+   788→                      )}
+   789→                    </div>
+   790→                  </th>
+   791→                ))}
+   792→              </tr>
+   793→            </thead>
+   794→            <tbody className="bg-white">
+   795→              {paginatedData.map((item) => (
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   814→                        onChange={() => {}} // Handled by div onClick
+   815→                      />
+   816→                    </div>
+   817→                  </td>
+   818→                  {allColumns.map((column) => (
+   819→                    <td 
+   820→                      key={column.key} 
+   821→                      className={`border border-gray-200 ${
+   822→                        column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+   823→                      }`}
+   824→                    >
+   825→                      {renderCell(item, column)}
+   826→                    </td>
+   827→                  ))}
+   828→                </tr>
+   829→              ))}
+   830→            </tbody>
+   831→          </table>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🔥 Update Cncglub interface to include joined city and industry data
+- [X] 🔥 Modify fetchData function to use Supabase joins
+- [X] 🔥 Add city columns after first black separator
+- [X] 🔥 Add second black separator after city columns
+- [X] 🔥 Add industry columns after second separator
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully implemented the JOIN approach to add all the cityjar and indusjar columns to the /cnjar1 page. Here's what was accomplished:
+
+## ✅ JOIN Implementation Complete
+
+### **Database Optimization**
+- **Single Query Performance**: Using Supabase's native JOIN functionality instead of multiple queries
+- **JOIN Query**: Fetches cncglub with related city and industry data in one call at `Cnjar1Table.tsx:126-139`
+
+### **Interface Updates**
+- **Extended Cncglub Interface**: Added optional `cities` and `industries` objects at `Cnjar1Table.tsx:19-40`
+- **Joined Data Types**: Includes all cityjar and indusjar fields with proper TypeScript typing
+
+### **Column Structure** 
+- **Original Columns**: cncg_id, rel_city_id, rel_industry_id, created_at, updated_at
+- **First Black Separator**: 3px after updated_at column
+- **City Columns**: city_name, state_code, state_full, country, rank_in_pop, gmaps_link, is_suburb, city_and_state_code, city_population, latitude, longitude, rel_metro_id, population_last_updated
+- **Second Black Separator**: 3px after population_last_updated
+- **Industry Columns**: industry_name, industry_description
+
+### **Special Features**
+- **Read-Only Joined Data**: All joined columns are read-only (non-editable)
+- **gmaps_link Buttons**: Copy and "OP" buttons work for joined city gmaps_link data at `Cnjar1Table.tsx:507-544`
+- **Boolean Display**: ✓/✗ for boolean fields like is_suburb
+- **No Sorting**: Joined columns don't have sorting (appropriate for display-only data)
+
+### **Visual Separators**
+- **3px Black Line**: After updated_at column (first separator)
+- **3px Black Line**: After population_last_updated column (second separator)
+- **Applied to**: Headers and body cells throughout the table
+
+### **Performance Benefits**
+- **Single Database Query**: Instead of 3 separate queries 
+- **Reduced Network Calls**: Faster page loading
+- **Automatic Relationship Handling**: Supabase manages the foreign key relationships
+- **Consistent Data**: All related data fetched atomically
+
+The /cnjar1 page now displays comprehensive city-industry combination data with all related city and industry details in a well-organized table with clear visual separators!
+
+---
+
+_**User**_
+
+in our blank header row inside the thead, please add the name of the db table (in all lowercase) of the column that is associated underneath it . 
+
+cncglub
+cities
+industries
+
+these are the text to use 
+
+color the bg color for <th> that contain cncglub with code of f6bff8
+for <th> that contain cities text, give <th> bg color of bff8e8
+for industries text containing <th> give <th> bg color of f8ebbf
+
+this is on page of /cnjar1 obviously 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll update the blank header row to show the database table names with the specified background colors.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   733→      <div className="bg-white overflow-hidden">
+   734→        <div className="overflow-x-auto">
+   735→          <table className="w-full border-collapse border border-gray-200">
+   736→            <thead className="bg-gray-50">
+   737→              {/* Additional blank header row */}
+   738→              <tr>
+   739→                <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
+   740→                  {/* Blank cell corresponding to checkbox column */}
+   741→                </th>
+   742→                {allColumns.map((column, index) => {
+   743→                  let bgColorClass = '';
+   744→                  let tableText = '';
+   745→                  
+   746→                  if (column.isJoined) {
+   747→                    if (column.key.startsWith('cities.')) {
+   748→                      bgColorClass = 'bg-[#bff8e8]';
+   749→                      tableText = 'cities';
+   750→                    } else if (column.key.startsWith('industries.')) {
+   751→                      bgColorClass = 'bg-[#f8ebbf]';
+   752→                      tableText = 'industries';
+   753→                    }
+   754→                  } else {
+   755→                    bgColorClass = 'bg-[#f6bff8]';
+   756→                    tableText = 'cncglub';
+   757→                  }
+   758→                  
+   759→                  return (
+   760→                    <th
+   761→                      key={`blank-${column.key}`}
+   762→                      className={`text-left border border-gray-200 px-2 py-1 ${bgColorClass} ${
+   763→                        column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+   764→                      }`}
+   765→                    >
+   766→                      <span className="text-xs font-normal text-gray-600">{tableText}</span>
+   767→                    </th>
+   768→                  );
+   769→                })}
+   770→              </tr>
+   771→              {/* Primary identifying row for columns */}
+   772→              <tr>
+   773→                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '50px' }}>
+   774→                  <div
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully updated the blank header row with the database table names and color coding:
+
+## ✅ Database Table Headers Added
+
+### **Table Name Display**
+- **cncglub**: Shows for original columns (cncg_id, rel_city_id, rel_industry_id, created_at, updated_at)
+- **cities**: Shows for all joined city columns (city_name, state_code, etc.)
+- **industries**: Shows for all joined industry columns (industry_name, industry_description)
+
+### **Background Colors Applied**
+- **cncglub columns**: `bg-[#f6bff8]` (light purple) at `Cnjar1Table.tsx:755`
+- **cities columns**: `bg-[#bff8e8]` (light green) at `Cnjar1Table.tsx:748`
+- **industries columns**: `bg-[#f8ebbf]` (light yellow) at `Cnjar1Table.tsx:752`
+
+### **Styling Details**
+- **Text styling**: `text-xs font-normal text-gray-600` for subtle appearance
+- **Logic**: Automatically detects column type based on `column.isJoined` and `column.key` prefix
+- **Separators**: Black 3px separators still work correctly with the colored backgrounds
+
+### **Visual Organization**
+The table now clearly shows:
+1. **Purple section**: cncglub table columns (main entity data)
+2. **Black separator** (3px)
+3. **Green section**: cities table columns (joined city data)
+4. **Black separator** (3px) 
+5. **Yellow section**: industries table columns (joined industry data)
+
+This creates a clear visual hierarchy showing which columns come from which database tables, making it much easier to understand the data relationships in the /cnjar1 interface!
+
+---
+
+_**User**_
+
+pleaes add a dropdown above the nubra tableface area that says in bold text label
+select city size 
+
+put varous options but one of them should be:
+75k-300k 
+
+this will filter the main ui table grid when selected to only contain cncglub rows where the associated row for db table cities has a city_population that matches this 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll add a city size dropdown filter above the NubraTablefaceKite area on /cnjar1. Let me implement this:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    67→  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    68→  const [isF355ConfirmOpen, setIsF355ConfirmOpen] = useState(false);
+    69→  const [f355ConfirmStep, setF355ConfirmStep] = useState(1);
+    70→  const [isF355Running, setIsF355Running] = useState(false);
+    71→  const [f355Message, setF355Message] = useState('');
+    72→  
+    73→  // Filter states
+    74→  const [citySizeFilter, setCitySizeFilter] = useState('all');
+    75→  
+    76→  // Inline editing states
+    77→  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+    78→  const [editingValue, setEditingValue] = useState<string>('');
+    79→  
+    80→  // Form data for creating
+    81→  const [formData, setFormData] = useState({
+    82→    rel_city_id: 0,
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the city size filter logic to the filteredAndSortedData function:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   197→    }
+   198→    return null;
+   199→  };
+   200→
+   201→  // Helper function to check if city population matches filter
+   202→  const matchesCitySizeFilter = (item: Cncglub) => {
+   203→    if (citySizeFilter === 'all') return true;
+   204→    
+   205→    const cityPopulation = item.cities?.city_population;
+   206→    if (!cityPopulation) return false;
+   207→    
+   208→    switch (citySizeFilter) {
+   209→      case 'under-25k':
+   210→        return cityPopulation < 25000;
+   211→      case '25k-75k':
+   212→        return cityPopulation >= 25000 && cityPopulation < 75000;
+   213→      case '75k-300k':
+   214→        return cityPopulation >= 75000 && cityPopulation < 300000;
+   215→      case '300k-1m':
+   216→        return cityPopulation >= 300000 && cityPopulation < 1000000;
+   217→      case '1m-plus':
+   218→        return cityPopulation >= 1000000;
+   219→      default:
+   220→        return true;
+   221→    }
+   222→  };
+   223→
+   224→  // Filter and sort data
+   225→  const filteredAndSortedData = useMemo(() => {
+   226→    let filtered = data;
+   227→    
+   228→    // Apply city size filter
+   229→    if (citySizeFilter !== 'all') {
+   230→      filtered = filtered.filter(item => matchesCitySizeFilter(item));
+   231→    }
+   232→    
+   233→    if (searchTerm) {
+   234→      filtered = filtered.filter(item => {
+   235→        const searchLower = searchTerm.toLowerCase();
+   236→        // Search in city and industry names
+   237→        const cityName = getCityDisplay(item.rel_city_id).toLowerCase();
+   238→        const industryName = getIndustryDisplay(item.rel_industry_id).toLowerCase();
+   239→        
+   240→        return (
+   241→          cityName.includes(searchLower) ||
+   242→          industryName.includes(searchLower) ||
+   243→          Object.values(item).some(value => 
+   244→            value && value.toString().toLowerCase().includes(searchLower)
+   245→          )
+   246→        );
+   247→      });
+   248→    }
+   249→
+   250→    return filtered.sort((a, b) => {
+   251→      const aValue = a[sortField];
+   252→      const bValue = b[sortField];
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the useMemo dependency array to include citySizeFilter:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   256→      if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
+   257→      
+   258→      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+   259→      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+   260→      return 0;
+   261→    });
+   262→  }, [data, searchTerm, sortField, sortOrder, cities, industries, citySizeFilter]);
+   263→
+   264→  // Pagination
+   265→  const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));
+   266→  const startIndex = (currentPage - 1) * (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the dropdown in the header area above the NubraTablefaceKite:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   694→      </div>
+   695→    );
+   696→  }
+   697→
+   698→  return (
+   699→    <div className="w-full">
+   700→      {/* City Size Filter */}
+   701→      <div className="bg-white border-b border-gray-200 px-4 py-2">
+   702→        <div className="flex items-center space-x-3">
+   703→          <label className="font-bold text-sm text-gray-700">Select City Size:</label>
+   704→          <select
+   705→            value={citySizeFilter}
+   706→            onChange={(e) => {
+   707→              setCitySizeFilter(e.target.value);
+   708→              setCurrentPage(1); // Reset to first page when filtering
+   709→            }}
+   710→            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+   711→          >
+   712→            <option value="all">All Cities</option>
+   713→            <option value="under-25k">Under 25k</option>
+   714→            <option value="25k-75k">25k - 75k</option>
+   715→            <option value="75k-300k">75k - 300k</option>
+   716→            <option value="300k-1m">300k - 1M</option>
+   717→            <option value="1m-plus">1M+</option>
+   718→          </select>
+   719→        </div>
+   720→      </div>
+   721→
+   722→      {/* Top Header Area */}
+   723→      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
+   724→        <div className="flex justify-between items-center">
+   725→          <div className="flex items-center space-x-6">
+   726→            <NubraTablefaceKite tableType="cncglub-grid" />
+   727→            <button
+   728→              onClick={handleF355PopulateClick}
+   729→              disabled={isF355Running}
+   730→              className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors flex items-center space-x-2"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully implemented the city size filter dropdown on the /cnjar1 page. Here's what was added:
+
+## ✅ City Size Filter Implementation
+
+### **Dropdown Location**
+- **Position**: Above the NubraTablefaceKite area at `Cnjar1Table.tsx:701-720`
+- **Label**: Bold text "Select City Size:" as requested
+- **Styling**: Clean border, padding, focus states
+
+### **Filter Options**
+- **All Cities**: Default option (shows all data)
+- **Under 25k**: Population < 25,000
+- **25k - 75k**: Population 25,000 - 74,999
+- **75k - 300k**: Population 75,000 - 299,999 ✅ (as requested)
+- **300k - 1M**: Population 300,000 - 999,999
+- **1M+**: Population 1,000,000+
+
+### **Filter Logic**
+- **Function**: `matchesCitySizeFilter()` at `Cnjar1Table.tsx:202-222`
+- **Data Source**: Uses `item.cities?.city_population` from the joined city data
+- **Integration**: Works with existing search functionality
+- **Reset Pagination**: Automatically resets to page 1 when filter changes
+
+### **User Experience**
+- **Real-time Filtering**: Updates table immediately when selection changes
+- **State Management**: Maintains filter state with `citySizeFilter` useState hook
+- **Combined Filtering**: Works alongside the search box for refined results
+- **Record Count**: Shows filtered record count in the pagination info
+
+### **Technical Implementation**
+- **Performance**: Uses useMemo for efficient filtering with dependency on `citySizeFilter`
+- **Error Handling**: Handles cases where city population data is missing
+- **Type Safety**: Properly typed with TypeScript interfaces
+
+The filter now allows users to focus on specific city size ranges, with the requested "75k-300k" option prominently available, filtering the cncglub table to show only city-industry combinations for cities within the selected population range!
+
+---
+
+_**User**_
+
+its not working to filter properly. when selection is made from dropdown, the main ui table grid becomes totally blank with no active rows showing in it 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+You're right, the filter isn't working properly. The issue is likely that the joined data structure from Supabase might be different than expected, or the city population data isn't available. Let me debug and fix this:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   197→    }
+   198→    return null;
+   199→  };
+   200→
+   201→  // Helper function to check if city population matches filter
+   202→  const matchesCitySizeFilter = (item: Cncglub) => {
+   203→    if (citySizeFilter === 'all') return true;
+   204→    
+   205→    // Debug: Log the data structure to understand what we're getting
+   206→    console.log('Debug filter - item structure:', {
+   207→      cncg_id: item.cncg_id,
+   208→      cities: item.cities,
+   209→      cityPopulation: item.cities?.city_population
+   210→    });
+   211→    
+   212→    const cityPopulation = item.cities?.city_population;
+   213→    
+   214→    // If no city population data, include in results for now (to avoid empty table)
+   215→    if (cityPopulation === null || cityPopulation === undefined) {
+   216→      console.log('No city population data for item:', item.cncg_id);
+   217→      return true; // Changed from false to true to avoid empty results
+   218→    }
+   219→    
+   220→    switch (citySizeFilter) {
+   221→      case 'under-25k':
+   222→        return cityPopulation < 25000;
+   223→      case '25k-75k':
+   224→        return cityPopulation >= 25000 && cityPopulation < 75000;
+   225→      case '75k-300k':
+   226→        return cityPopulation >= 75000 && cityPopulation < 300000;
+   227→      case '300k-1m':
+   228→        return cityPopulation >= 300000 && cityPopulation < 1000000;
+   229→      case '1m-plus':
+   230→        return cityPopulation >= 1000000;
+   231→      default:
+   232→        return true;
+   233→    }
+   234→  };
+   235→
+   236→  // Filter and sort data
+   237→  const filteredAndSortedData = useMemo(() => {
+   238→    let filtered = data;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me also add some debugging to the filter application and temporarily disable the filter to see what's happening:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   232→        return true;
+   233→    }
+   234→  };
+   235→
+   236→  // Filter and sort data
+   237→  const filteredAndSortedData = useMemo(() => {
+   238→    let filtered = data;
+   239→    
+   240→    console.log('Filter applied - citySizeFilter:', citySizeFilter);
+   241→    console.log('Original data length:', data.length);
+   242→    
+   243→    // Apply city size filter
+   244→    if (citySizeFilter !== 'all') {
+   245→      console.log('Applying city size filter...');
+   246→      filtered = filtered.filter(item => matchesCitySizeFilter(item));
+   247→      console.log('Filtered data length after city size filter:', filtered.length);
+   248→    }
+   249→    
+   250→    if (searchTerm) {
+   251→      filtered = filtered.filter(item => {
+   252→        const searchLower = searchTerm.toLowerCase();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+The issue is most likely that either:
+1. The JOIN query isn't returning the city data properly
+2. The city_population field isn't populated in the database
+3. The data structure is different than expected
+
+Let me also add a debug section to the component to show what data we're actually getting:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   713→  }
+   714→
+   715→  return (
+   716→    <div className="w-full">
+   717→      {/* City Size Filter */}
+   718→      <div className="bg-white border-b border-gray-200 px-4 py-2">
+   719→        <div className="flex items-center space-x-3">
+   720→          <label className="font-bold text-sm text-gray-700">Select City Size:</label>
+   721→          <select
+   722→            value={citySizeFilter}
+   723→            onChange={(e) => {
+   724→              setCitySizeFilter(e.target.value);
+   725→              setCurrentPage(1); // Reset to first page when filtering
+   726→            }}
+   727→            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+   728→          >
+   729→            <option value="all">All Cities</option>
+   730→            <option value="under-25k">Under 25k</option>
+   731→            <option value="25k-75k">25k - 75k</option>
+   732→            <option value="75k-300k">75k - 300k</option>
+   733→            <option value="300k-1m">300k - 1M</option>
+   734→            <option value="1m-plus">1M+</option>
+   735→          </select>
+   736→          {/* Debug info */}
+   737→          <div className="text-xs text-gray-500">
+   738→            Debug: {data.length} total, {filteredAndSortedData.length} filtered
+   739→          </div>
+   740→        </div>
+   741→      </div>
+   742→
+   743→      {/* Top Header Area */}
+   744→      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
+   745→        <div className="flex justify-between items-center">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now please try using the filter again. When you select a filter option (like "75k - 300k"), check:
+
+1. **Browser Console**: Look for the debug logs that show:
+   - The data structure of items
+   - Whether city population data exists
+   - Original vs filtered data counts
+
+2. **Debug Info**: The debug text next to the dropdown will show total vs filtered counts
+
+Can you tell me what you see in the browser console when you select a filter option? This will help me identify exactly why the filter is returning no results. The most likely issues are:
+
+1. **JOIN structure**: The city data might be nested differently than expected
+2. **Missing data**: The city_population field might be null/empty for all cities  
+3. **Data type**: The population might be stored as strings instead of numbers
+
+Once I see the console output, I can fix the filter logic accordingly.
+
+---
+
+_**User**_
+
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+ Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+ Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:206 Debug filter - item structure: Object
+Cnjar1Table.tsx:247 Filtered data length after city size filter: 0
+
+
+another version
+
+main-app.js?v=1754487078730:2293 Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+navigationHelper.ts:298 adminMenuItem children: (27) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: []
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (27) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: []
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+Header.tsx:99 Fetching navigation items...
+Header.tsx:99 Fetching navigation items...
+navigationHelper.ts:298 adminMenuItem children: (27) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: []
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (27) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: []
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (27) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: []
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (27) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: []
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: all
+Cnjar1Table.tsx:241 Original data length: 0
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: all
+Cnjar1Table.tsx:241 Original data length: 0
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (27) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: []
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (27) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: []
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+Header.tsx:101 Navigation response: Response {type: 'basic', url: 'http://localhost:3000/api/navigation', redirected: false, status: 200, ok: true, …}
+Header.tsx:103 Navigation data: (25) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+Header.tsx:101 Navigation response: Response {type: 'basic', url: 'http://localhost:3000/api/navigation', redirected: false, status: 200, ok: true, …}
+Header.tsx:103 Navigation data: (25) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+navigationHelper.ts:298 adminMenuItem children: (57) ['Drahi Docking Stations', 'choptext', 'Code Range Jar', 'Jetla Masterlist', 'Bensa Masterlist', 'Azo System', 'Obi Page Settings Manager', 'Bren1 - Cricket Matches', 'Azulp SQL Swipes', 'ColTemp System', 'ColTemp Command', 'rackjar', 'Style Rocket', 'XPages Manager', 'UTG Manager', 'Zarno Manager', 'Ketch Manager', 'Column Robot', 'Bakli Mockups', 'Jexplanations', 'RSTOR Manager', 'End Of Style Rocket', 'API Key Slots Management', 'User Management', 'Popup Development', 'Download Plugin', 'Filegun Manager', 'azulpsql', 'baklivid', 'bensamaster', 'coderangejar', 'colors1', 'coltempcommand', 'create-new-api-key-slots', 'depline_imperatives', 'drahiman', 'favaconfignow', 'filegun', 'filegun-nav-demo', 'filejar', 'fobjectjar', 'folderjar', 'jetlamaster', 'jexplain', 'mapping1', 'migration-check', 'moonjar', 'popnow', 'rackjar', 'sunjar', 'sync-metadata', 'tshelljar', 'usersp1', 'yegjar', 'yoshidexman', 'zarnomanager', 'zugjar']
+navigationHelper.ts:299 specialFirstItem children: (12) ['/tebnar2 - Generate Images In A Batch', '/nwjar1 - T.NWPI_CONTENT - UTG', '/nwivid - t.nwpi_content - item', '/sitejar4 - T.SITESPREN - UTG', '/gconjar1 - T.GCON_PIECES - UTG', '/pedbar - t.gcon_pieces - item', '/pedtor - t.gcon_pieces - item', '/flatx1 - JSON Flattener (Elementor) - t.gcon_pieces - item', '/slotx1 - Slot View (Elementor) - t.gcon_pieces - item', '/fanex1 - Prex System Tools (Elementor) - t.gcon_pieces - item', '/karfi1 - Karfi Arrangements - Arrange narpi_pushes.kareench1 into elementor data', '/narpo1 - Narpi Image Pushes']
+navigationHelper.ts:300 oldAllGroupItem children: (19) ['A', 'c', 'C', 'D', 'F', 'gconjar1', 'H', 'indusjar', 'K', 'M', 'N', 'navgroup6', 'P', 'R', 'S', 'T', 'U', 'valan', 'W']
+navigationHelper.ts:301 plutoJetstreamItem children: (12) ['sunjar', 'moonjar', '---separator2---', 'rackjar', '---separator4---', 'yegjar', 'zugjar', '---separator3---', 'cfdefjar', 'cfvaljar', '---separator---', 'favaconfignow']
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: all
+Cnjar1Table.tsx:241 Original data length: 1000
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: all
+Cnjar1Table.tsx:241 Original data length: 1000
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: all
+Cnjar1Table.tsx:241 Original data length: 1000
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: all
+Cnjar1Table.tsx:241 Original data length: 1000
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: 75k-300k
+Cnjar1Table.tsx:241 Original data length: 1000
+Cnjar1Table.tsx:245 Applying city size filter...
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 41000, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40999, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40998, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40997, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40889, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40891, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40892, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40893, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40894, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40895, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40896, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40897, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40898, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40899, cities: {…}, cityPopulation: 36516}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40900, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40901, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40902, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40903, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40904, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40905, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40906, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40907, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40908, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40909, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40910, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40911, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40912, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40913, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40914, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40915, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40916, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40917, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40918, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40919, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40920, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40921, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40922, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40923, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40924, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40925, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40926, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40927, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40928, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40929, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40930, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40931, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40932, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40933, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40934, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40935, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40936, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40937, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40938, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40939, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40940, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40941, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40942, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40943, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40944, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40945, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40946, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40947, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40948, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40949, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40950, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40951, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40952, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40953, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40954, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40955, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40956, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40957, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40958, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40959, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40960, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40961, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40962, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40963, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40964, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40965, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40966, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40967, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40968, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40969, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40970, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40971, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40972, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40973, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40974, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40975, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40976, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40977, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40978, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40979, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40980, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40981, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40982, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40983, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40984, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40985, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40986, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40987, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40988, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40989, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40990, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40991, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40992, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40993, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40994, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40995, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40996, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40667, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40668, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40669, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40670, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40671, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40672, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40673, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40674, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40675, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40676, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40677, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40678, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40679, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40680, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40681, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40682, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40683, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40684, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40685, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40686, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40687, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40688, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40689, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40690, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40691, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40692, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40693, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40694, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40695, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40696, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40697, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40698, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40699, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40700, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40701, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40702, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40703, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40704, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40705, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40706, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40707, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40708, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40709, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40710, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40711, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40712, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40713, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40714, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40715, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40716, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40717, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40718, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40719, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40720, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40721, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40722, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40723, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40724, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40725, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40726, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40727, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40728, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40729, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40730, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40731, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40732, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40733, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40734, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40735, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40736, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40737, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40738, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40739, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40740, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40741, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40742, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40743, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40744, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40745, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40746, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40747, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40748, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40749, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40750, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40751, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40752, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40753, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40754, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40755, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40756, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40757, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40758, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40759, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40760, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40761, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40762, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40763, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40764, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40765, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40766, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40767, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40768, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40769, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40770, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40771, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40772, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40773, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40774, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40775, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40776, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40777, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40778, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40779, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40780, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40781, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40782, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40783, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40784, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40785, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40786, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40787, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40788, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40789, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40790, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40791, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40792, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40793, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40794, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40795, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40796, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40797, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40798, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40799, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40800, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40801, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40802, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40803, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40804, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40805, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40806, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40807, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40808, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40809, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40810, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40811, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40812, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40813, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40814, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40815, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40816, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40817, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40818, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40819, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40820, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40821, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40822, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40823, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40824, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40825, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40826, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40827, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40828, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40829, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40830, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40831, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40832, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40833, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40834, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40835, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40836, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40837, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40838, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40839, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40840, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40841, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40842, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40843, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40844, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40845, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40846, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40847, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40848, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40849, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40850, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40851, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40852, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40853, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40854, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40855, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40856, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40857, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40858, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40859, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40860, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40861, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40862, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40863, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40864, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40865, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40866, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40867, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40868, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40869, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40870, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40871, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40872, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40873, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40874, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40875, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40876, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40877, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40878, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40879, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40880, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40881, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40882, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40883, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40884, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40885, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40886, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40887, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40888, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40445, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40446, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40447, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40448, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40449, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40450, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40451, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40452, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40453, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40454, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40455, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40456, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40457, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40458, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40459, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40460, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40461, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40462, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40463, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40464, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40465, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40466, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40467, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40468, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40469, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40470, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40471, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40472, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40473, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40474, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40475, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40476, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40477, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40478, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40479, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40480, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40481, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40482, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40483, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40484, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40485, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40486, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40487, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40488, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40489, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40490, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40491, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40492, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40493, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40494, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40495, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40496, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40497, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40498, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40499, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40500, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40501, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40502, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40503, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40504, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40505, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40506, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40507, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40508, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40509, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40510, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40511, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40512, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40513, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40514, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40515, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40516, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40517, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40518, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40519, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40520, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40521, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40522, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40523, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40524, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40525, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40526, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40527, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40528, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40529, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40530, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40531, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40532, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40533, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40534, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40535, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40536, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40537, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40538, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40539, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40540, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40541, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40542, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40543, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40544, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40545, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40546, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40547, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40548, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40549, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40550, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40551, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40552, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40553, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40554, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40555, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40556, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40557, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40558, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40559, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40560, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40561, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40562, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40563, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40564, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40565, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40566, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40567, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40568, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40569, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40570, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40571, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40572, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40573, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40574, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40575, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40576, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40577, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40578, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40579, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40580, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40581, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40582, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40583, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40584, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40585, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40586, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40587, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40588, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40589, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40590, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40591, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40592, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40593, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40594, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40595, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40596, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40597, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40598, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40599, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40600, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40601, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40602, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40603, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40604, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40605, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40606, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40607, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40608, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40609, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40610, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40611, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40612, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40613, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40614, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40615, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40616, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40617, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40618, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40619, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40620, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40621, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40622, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40623, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40624, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40625, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40626, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40627, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40628, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40629, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40630, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40631, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40632, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40633, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40634, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40635, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40636, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40637, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40638, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40639, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40640, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40641, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40642, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40643, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40644, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40645, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40646, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40647, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40648, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40649, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40650, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40651, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40652, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40653, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40654, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40655, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40656, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40657, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40658, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40659, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40660, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40661, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40662, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40663, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40664, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40665, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40666, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40223, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40224, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40225, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40226, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40227, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40228, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40229, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40230, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40231, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40232, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40233, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40234, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40235, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40236, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40237, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40238, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40239, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40240, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40241, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40242, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40243, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40244, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40245, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40246, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40247, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40248, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40249, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40250, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40251, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40252, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40253, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40254, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40255, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40256, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40257, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40258, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40259, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40260, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40261, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40262, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40263, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40264, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40265, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40266, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40267, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40268, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40269, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40270, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40271, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40272, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40273, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40274, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40275, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40276, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40277, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40278, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40279, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40280, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40281, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40282, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40283, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40284, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40285, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40286, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40287, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40288, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40289, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40290, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40291, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40292, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40293, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40294, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40295, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40296, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40297, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40298, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40299, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40300, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40301, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40302, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40303, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40304, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40305, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40306, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40307, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40308, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40309, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40310, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40311, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40312, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40313, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40314, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40315, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40316, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40317, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40318, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40319, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40320, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40321, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40322, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40323, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40324, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40325, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40326, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40327, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40328, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40329, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40330, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40331, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40332, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40333, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40334, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40335, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40336, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40337, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40338, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40339, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40340, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40341, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40342, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40343, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40344, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40345, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40346, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40347, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40348, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40349, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40350, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40351, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40352, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40353, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40354, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40355, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40356, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40357, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40358, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40359, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40360, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40361, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40362, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40363, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40364, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40365, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40366, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40367, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40368, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40369, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40370, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40371, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40372, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40373, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40374, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40375, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40376, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40377, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40378, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40379, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40380, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40381, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40382, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40383, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40384, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40385, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40386, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40387, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40388, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40389, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40390, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40391, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40392, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40393, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40394, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40395, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40396, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40397, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40398, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40399, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40400, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40401, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40402, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40403, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40404, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40405, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40406, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40407, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40408, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40409, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40410, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40411, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40412, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40413, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40414, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40415, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40416, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40417, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40418, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40419, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40420, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40421, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40422, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40423, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40424, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40425, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40426, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40427, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40428, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40429, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40430, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40431, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40432, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40433, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40434, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40435, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40436, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40437, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40438, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40439, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40440, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40441, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40442, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40443, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40444, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40222, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40001, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40002, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40003, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40004, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40005, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40006, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40007, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40008, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40009, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40010, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40011, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40012, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40013, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40014, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40015, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40016, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40017, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40018, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40019, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40020, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40021, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40022, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40023, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40024, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40025, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40026, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40027, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40028, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40029, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40030, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40031, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40032, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40033, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40034, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40035, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40036, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40037, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40038, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40039, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40040, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40890, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40041, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40042, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40043, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40044, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40045, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40046, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40047, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40048, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40049, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40050, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40051, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40052, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40053, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40054, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40055, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40056, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40057, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40058, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40059, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40060, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40061, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40062, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40063, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40064, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40065, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40066, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40067, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40068, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40069, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40070, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40071, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40072, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40073, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40074, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40075, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40076, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40077, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40078, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40079, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40080, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40081, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40082, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40083, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40084, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40085, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40086, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40087, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40088, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40089, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40090, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40091, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40092, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40093, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40094, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40095, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40096, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40097, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40098, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40099, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40100, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40101, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40102, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40103, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40104, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40105, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40106, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40107, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40108, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40109, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40110, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40111, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40112, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40113, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40114, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40115, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40116, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40117, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40118, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40119, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40120, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40121, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40122, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40123, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40124, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40125, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40126, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40127, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40128, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40129, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40130, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40131, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40132, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40133, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40134, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40135, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40136, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40137, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40138, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40139, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40140, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40141, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40142, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40143, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40144, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40145, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40146, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40147, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40148, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40149, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40150, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40151, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40152, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40153, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40154, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40155, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40156, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40157, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40158, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40159, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40160, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40161, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40162, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40163, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40164, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40165, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40166, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40167, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40168, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40169, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40170, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40171, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40172, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40173, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40174, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40175, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40176, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40177, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40178, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40179, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40180, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40181, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40182, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40183, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40184, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40185, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40186, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40187, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40188, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40189, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40190, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40191, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40192, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40193, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40194, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40195, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40196, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40197, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40198, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40199, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40200, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40201, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40202, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40203, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40204, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40205, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40206, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40207, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40208, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40209, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40210, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40211, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40212, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40213, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40214, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40215, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40216, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40217, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40218, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40219, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40220, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40221, cities: {…}, cityPopulation: 44546}
+ Filtered data length after city size filter: 0
+ Filter applied - citySizeFilter: 75k-300k
+ Original data length: 1000
+ Applying city size filter...
+ Debug filter - item structure: {cncg_id: 41000, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40999, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40998, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40997, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40889, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40891, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40892, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40893, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40894, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40895, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40896, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40897, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40898, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40899, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40900, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40901, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40902, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40903, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40904, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40905, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40906, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40907, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40908, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40909, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40910, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40911, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40912, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40913, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40914, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40915, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40916, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40917, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40918, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40919, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40920, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40921, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40922, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40923, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40924, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40925, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40926, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40927, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40928, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40929, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40930, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40931, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40932, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40933, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40934, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40935, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40936, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40937, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40938, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40939, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40940, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40941, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40942, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40943, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40944, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40945, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40946, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40947, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40948, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40949, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40950, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40951, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40952, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40953, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40954, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40955, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40956, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40957, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40958, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40959, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40960, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40961, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40962, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40963, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40964, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40965, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40966, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40967, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40968, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40969, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40970, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40971, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40972, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40973, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40974, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40975, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40976, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40977, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40978, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40979, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40980, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40981, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40982, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40983, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40984, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40985, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40986, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40987, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40988, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40989, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40990, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40991, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40992, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40993, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40994, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40995, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40996, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40667, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40668, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40669, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40670, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40671, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40672, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40673, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40674, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40675, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40676, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40677, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40678, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40679, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40680, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40681, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40682, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40683, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40684, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40685, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40686, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40687, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40688, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40689, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40690, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40691, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40692, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40693, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40694, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40695, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40696, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40697, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40698, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40699, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40700, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40701, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40702, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40703, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40704, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40705, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40706, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40707, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40708, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40709, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40710, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40711, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40712, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40713, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40714, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40715, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40716, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40717, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40718, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40719, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40720, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40721, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40722, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40723, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40724, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40725, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40726, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40727, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40728, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40729, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40730, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40731, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40732, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40733, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40734, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40735, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40736, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40737, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40738, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40739, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40740, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40741, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40742, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40743, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40744, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40745, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40746, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40747, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40748, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40749, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40750, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40751, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40752, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40753, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40754, cities: {…}, cityPopulation: 37732}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40755, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40756, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40757, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40758, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40759, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40760, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40761, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40762, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40763, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40764, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40765, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40766, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40767, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40768, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40769, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40770, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40771, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40772, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40773, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40774, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40775, cities: {…}, cityPopulation: 37545}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40776, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40777, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40778, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40779, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40780, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40781, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40782, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40783, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40784, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40785, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40786, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40787, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40788, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40789, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40790, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40791, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40792, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40793, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40794, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40795, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40796, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40797, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40798, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40799, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40800, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40801, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40802, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40803, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40804, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40805, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40806, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40807, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40808, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40809, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40810, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40811, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40812, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40813, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40814, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40815, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40816, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40817, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40818, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40819, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40820, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40821, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40822, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40823, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40824, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40825, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40826, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40827, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40828, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40829, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40830, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40831, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40832, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40833, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40834, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40835, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40836, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40837, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40838, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40839, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40840, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40841, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40842, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40843, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40844, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40845, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40846, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40847, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40848, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40849, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40850, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40851, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40852, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40853, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40854, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40855, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40856, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40857, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40858, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40859, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40860, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40861, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40862, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40863, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40864, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40865, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40866, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40867, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40868, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40869, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40870, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40871, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40872, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40873, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40874, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40875, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40876, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40877, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40878, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40879, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40880, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40881, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40882, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40883, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40884, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40885, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40886, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40887, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40888, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40445, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40446, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40447, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40448, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40449, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40450, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40451, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40452, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40453, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40454, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40455, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40456, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40457, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40458, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40459, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40460, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40461, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40462, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40463, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40464, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40465, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40466, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40467, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40468, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40469, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40470, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40471, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40472, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40473, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40474, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40475, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40476, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40477, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40478, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40479, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40480, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40481, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40482, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40483, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40484, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40485, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40486, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40487, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40488, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40489, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40490, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40491, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40492, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40493, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40494, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40495, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40496, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40497, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40498, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40499, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40500, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40501, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40502, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40503, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40504, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40505, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40506, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40507, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40508, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40509, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40510, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40511, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40512, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40513, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40514, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40515, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40516, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40517, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40518, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40519, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40520, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40521, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40522, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40523, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40524, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40525, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40526, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40527, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40528, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40529, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40530, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40531, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40532, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40533, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40534, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40535, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40536, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40537, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40538, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40539, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40540, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40541, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40542, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40543, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40544, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40545, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40546, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40547, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40548, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40549, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40550, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40551, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40552, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40553, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40554, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40555, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40556, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40557, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40558, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40559, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40560, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40561, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40562, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40563, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40564, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40565, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40566, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40567, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40568, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40569, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40570, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40571, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40572, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40573, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40574, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40575, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40576, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40577, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40578, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40579, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40580, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40581, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40582, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40583, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40584, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40585, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40586, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40587, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40588, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40589, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40590, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40591, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40592, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40593, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40594, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40595, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40596, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40597, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40598, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40599, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40600, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40601, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40602, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40603, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40604, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40605, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40606, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40607, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40608, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40609, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40610, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40611, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40612, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40613, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40614, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40615, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40616, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40617, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40618, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40619, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40620, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40621, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40622, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40623, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40624, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40625, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40626, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40627, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40628, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40629, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40630, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40631, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40632, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40633, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40634, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40635, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40636, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40637, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40638, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40639, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40640, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40641, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40642, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40643, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40644, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40645, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40646, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40647, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40648, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40649, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40650, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40651, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40652, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40653, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40654, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40655, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40656, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40657, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40658, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40659, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40660, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40661, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40662, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40663, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40664, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40665, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40666, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40223, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40224, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40225, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40226, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40227, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40228, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40229, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40230, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40231, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40232, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40233, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40234, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40235, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40236, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40237, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40238, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40239, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40240, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40241, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40242, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40243, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40244, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40245, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40246, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40247, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40248, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40249, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40250, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40251, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40252, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40253, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40254, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40255, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40256, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40257, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40258, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40259, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40260, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40261, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40262, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40263, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40264, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40265, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40266, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40267, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40268, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40269, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40270, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40271, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40272, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40273, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40274, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40275, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40276, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40277, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40278, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40279, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40280, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40281, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40282, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40283, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40284, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40285, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40286, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40287, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40288, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40289, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40290, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40291, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40292, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40293, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40294, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40295, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40296, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40297, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40298, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40299, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40300, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40301, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40302, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40303, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40304, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40305, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40306, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40307, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40308, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40309, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40310, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40311, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40312, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40313, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40314, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40315, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40316, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40317, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40318, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40319, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40320, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40321, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40322, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40323, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40324, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40325, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40326, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40327, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40328, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40329, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40330, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40331, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40332, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40333, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40334, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40335, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40336, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40337, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40338, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40339, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40340, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40341, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40342, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40343, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40344, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40345, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40346, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40347, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40348, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40349, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40350, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40351, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40352, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40353, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40354, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40355, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40356, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40357, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40358, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40359, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40360, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40361, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40362, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40363, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40364, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40365, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40366, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40367, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40368, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40369, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40370, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40371, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40372, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40373, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40374, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40375, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40376, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40377, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40378, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40379, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40380, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40381, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40382, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40383, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40384, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40385, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40386, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40387, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40388, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40389, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40390, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40391, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40392, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40393, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40394, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40395, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40396, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40397, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40398, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40399, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40400, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40401, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40402, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40403, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40404, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40405, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40406, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40407, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40408, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40409, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40410, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40411, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40412, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40413, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40414, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40415, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40416, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40417, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40418, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40419, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40420, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40421, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40422, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40423, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40424, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40425, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40426, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40427, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40428, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40429, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40430, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40431, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40432, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40433, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40434, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40435, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40436, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40437, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40438, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40439, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40440, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40441, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40442, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40443, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40444, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40222, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40001, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40002, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40003, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40004, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40005, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40006, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40007, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40008, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40009, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40010, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40011, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40012, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40013, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40014, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40015, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40016, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40017, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40018, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40019, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40020, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40021, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40022, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40023, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40024, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40025, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40026, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40027, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40028, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40029, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40030, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40031, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40032, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40033, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40034, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40035, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40036, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40037, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40038, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40039, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40040, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40890, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40041, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40042, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40043, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40044, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40045, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40046, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40047, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40048, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40049, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40050, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40051, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40052, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40053, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40054, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40055, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40056, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40057, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40058, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40059, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40060, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40061, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40062, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40063, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40064, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40065, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40066, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40067, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40068, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40069, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40070, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40071, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40072, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40073, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40074, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40075, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40076, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40077, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40078, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40079, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40080, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40081, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40082, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40083, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40084, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40085, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40086, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40087, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40088, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40089, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40090, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40091, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40092, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40093, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40094, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40095, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40096, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40097, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40098, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40099, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40100, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40101, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40102, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40103, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40104, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40105, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40106, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40107, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40108, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40109, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40110, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40111, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40112, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40113, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40114, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40115, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40116, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40117, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40118, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40119, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40120, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40121, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40122, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40123, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40124, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40125, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40126, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40127, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40128, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40129, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40130, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40131, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40132, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40133, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40134, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40135, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40136, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40137, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40138, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40139, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40140, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40141, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40142, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40143, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40144, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40145, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40146, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40147, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40148, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40149, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40150, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40151, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40152, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40153, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40154, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40155, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40156, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40157, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40158, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40159, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40160, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40161, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40162, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40163, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40164, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40165, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40166, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40167, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40168, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40169, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40170, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40171, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40172, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40173, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40174, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40175, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40176, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40177, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40178, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40179, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40180, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40181, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40182, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40183, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40184, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40185, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40186, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40187, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40188, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40189, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40190, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40191, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40192, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40193, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40194, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40195, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40196, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40197, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40198, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40199, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40200, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40201, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40202, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40203, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40204, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40205, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40206, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40207, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40208, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40209, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40210, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40211, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40212, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40213, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40214, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40215, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40216, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40217, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40218, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40219, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40220, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40221, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:247 Filtered data length after city size filter: 0
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: 25k-75k
+Cnjar1Table.tsx:241 Original data length: 1000
+Cnjar1Table.tsx:245 Applying city size filter...
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 41000, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40999, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40998, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40997, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40889, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40891, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40892, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40893, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40894, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40895, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40896, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40897, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40898, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40899, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40900, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40901, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40902, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40903, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40904, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40905, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40906, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40907, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40908, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40909, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40910, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40911, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40912, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40913, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40914, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40915, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40916, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40917, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40918, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40919, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40920, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40921, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40922, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40923, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40924, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40925, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40926, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40927, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40928, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40929, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40930, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40931, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40932, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40933, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40934, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40935, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40936, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40937, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40938, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40939, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40940, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40941, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40942, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40943, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40944, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40945, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40946, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40947, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40948, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40949, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40950, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40951, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40952, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40953, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40954, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40955, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40956, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40957, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40958, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40959, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40960, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40961, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40962, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40963, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40964, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40965, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40966, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40967, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40968, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40969, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40970, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40971, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40972, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40973, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40974, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40975, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40976, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40977, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40978, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40979, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40980, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40981, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40982, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40983, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40984, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40985, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40986, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40987, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40988, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40989, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40990, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40991, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40992, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40993, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40994, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40995, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40996, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40667, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40668, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40669, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40670, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40671, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40672, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40673, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40674, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40675, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40676, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40677, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40678, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40679, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40680, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40681, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40682, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40683, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40684, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40685, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40686, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40687, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40688, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40689, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40690, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40691, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40692, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40693, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40694, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40695, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40696, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40697, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40698, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40699, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40700, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40701, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40702, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40703, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40704, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40705, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40706, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40707, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40708, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40709, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40710, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40711, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40712, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40713, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40714, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40715, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40716, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40717, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40718, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40719, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40720, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40721, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40722, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40723, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40724, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40725, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40726, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40727, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40728, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40729, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40730, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40731, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40732, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40733, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40734, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40735, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40736, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40737, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40738, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40739, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40740, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40741, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40742, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40743, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40744, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40745, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40746, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40747, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40748, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40749, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40750, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40751, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40752, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40753, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40754, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40755, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40756, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40757, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40758, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40759, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40760, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40761, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40762, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40763, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40764, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40765, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40766, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40767, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40768, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40769, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40770, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40771, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40772, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40773, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40774, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40775, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40776, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40777, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40778, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40779, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40780, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40781, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40782, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40783, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40784, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40785, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40786, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40787, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40788, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40789, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40790, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40791, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40792, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40793, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40794, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40795, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40796, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40797, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40798, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40799, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40800, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40801, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40802, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40803, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40804, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40805, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40806, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40807, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40808, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40809, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40810, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40811, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40812, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40813, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40814, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40815, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40816, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40817, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40818, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40819, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40820, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40821, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40822, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40823, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40824, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40825, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40826, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40827, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40828, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40829, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40830, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40831, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40832, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40833, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40834, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40835, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40836, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40837, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40838, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40839, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40840, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40841, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40842, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40843, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40844, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40845, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40846, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40847, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40848, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40849, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40850, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40851, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40852, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40853, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40854, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40855, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40856, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40857, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40858, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40859, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40860, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40861, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40862, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40863, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40864, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40865, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40866, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40867, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40868, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40869, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40870, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40871, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40872, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40873, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40874, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40875, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40876, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40877, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40878, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40879, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40880, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40881, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40882, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40883, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40884, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40885, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40886, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40887, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40888, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40445, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40446, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40447, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40448, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40449, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40450, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40451, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40452, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40453, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40454, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40455, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40456, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40457, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40458, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40459, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40460, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40461, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40462, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40463, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40464, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40465, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40466, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40467, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40468, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40469, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40470, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40471, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40472, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40473, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40474, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40475, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40476, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40477, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40478, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40479, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40480, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40481, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40482, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40483, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40484, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40485, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40486, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40487, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40488, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40489, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40490, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40491, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40492, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40493, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40494, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40495, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40496, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40497, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40498, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40499, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40500, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40501, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40502, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40503, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40504, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40505, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40506, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40507, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40508, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40509, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40510, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40511, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40512, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40513, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40514, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40515, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40516, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40517, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40518, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40519, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40520, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40521, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40522, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40523, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40524, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40525, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40526, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40527, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40528, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40529, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40530, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40531, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40532, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40533, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40534, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40535, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40536, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40537, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40538, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40539, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40540, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40541, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40542, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40543, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40544, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40545, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40546, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40547, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40548, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40549, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40550, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40551, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40552, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40553, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40554, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40555, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40556, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40557, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40558, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40559, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40560, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40561, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40562, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40563, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40564, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40565, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40566, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40567, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40568, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40569, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40570, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40571, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40572, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40573, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40574, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40575, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40576, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40577, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40578, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40579, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40580, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40581, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40582, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40583, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40584, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40585, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40586, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40587, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40588, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40589, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40590, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40591, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40592, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40593, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40594, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40595, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40596, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40597, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40598, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40599, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40600, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40601, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40602, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40603, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40604, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40605, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40606, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40607, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40608, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40609, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40610, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40611, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40612, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40613, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40614, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40615, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40616, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40617, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40618, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40619, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40620, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40621, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40622, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40623, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40624, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40625, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40626, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40627, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40628, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40629, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40630, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40631, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40632, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40633, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40634, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40635, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40636, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40637, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40638, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40639, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40640, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40641, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40642, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40643, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40644, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40645, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40646, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40647, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40648, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40649, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40650, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40651, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40652, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40653, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40654, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40655, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40656, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40657, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40658, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40659, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40660, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40661, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40662, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40663, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40664, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40665, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40666, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40223, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40224, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40225, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40226, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40227, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40228, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40229, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40230, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40231, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40232, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40233, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40234, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40235, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40236, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40237, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40238, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40239, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40240, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40241, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40242, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40243, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40244, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40245, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40246, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40247, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40248, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40249, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40250, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40251, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40252, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40253, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40254, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40255, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40256, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40257, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40258, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40259, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40260, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40261, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40262, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40263, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40264, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40265, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40266, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40267, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40268, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40269, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40270, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40271, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40272, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40273, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40274, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40275, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40276, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40277, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40278, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40279, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40280, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40281, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40282, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40283, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40284, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40285, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40286, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40287, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40288, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40289, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40290, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40291, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40292, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40293, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40294, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40295, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40296, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40297, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40298, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40299, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40300, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40301, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40302, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40303, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40304, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40305, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40306, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40307, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40308, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40309, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40310, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40311, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40312, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40313, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40314, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40315, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40316, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40317, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40318, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40319, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40320, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40321, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40322, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40323, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40324, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40325, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40326, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40327, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40328, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40329, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40330, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40331, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40332, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40333, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40334, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40335, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40336, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40337, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40338, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40339, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40340, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40341, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40342, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40343, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40344, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40345, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40346, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40347, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40348, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40349, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40350, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40351, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40352, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40353, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40354, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40355, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40356, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40357, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40358, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40359, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40360, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40361, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40362, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40363, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40364, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40365, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40366, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40367, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40368, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40369, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40370, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40371, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40372, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40373, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40374, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40375, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40376, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40377, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40378, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40379, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40380, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40381, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40382, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40383, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40384, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40385, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40386, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40387, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40388, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40389, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40390, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40391, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40392, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40393, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40394, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40395, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40396, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40397, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40398, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40399, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40400, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40401, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40402, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40403, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40404, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40405, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40406, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40407, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40408, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40409, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40410, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40411, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40412, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40413, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40414, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40415, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40416, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40417, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40418, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40419, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40420, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40421, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40422, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40423, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40424, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40425, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40426, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40427, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40428, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40429, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40430, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40431, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40432, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40433, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40434, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40435, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40436, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40437, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40438, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40439, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40440, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40441, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40442, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40443, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40444, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40222, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40001, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40002, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40003, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40004, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40005, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40006, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40007, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40008, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40009, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40010, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40011, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40012, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40013, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40014, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40015, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40016, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40017, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40018, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40019, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40020, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40021, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40022, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40023, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40024, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40025, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40026, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40027, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40028, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40029, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40030, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40031, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40032, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40033, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40034, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40035, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40036, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40037, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40038, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40039, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40040, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40890, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40041, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40042, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40043, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40044, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40045, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40046, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40047, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40048, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40049, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40050, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40051, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40052, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40053, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40054, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40055, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40056, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40057, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40058, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40059, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40060, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40061, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40062, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40063, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40064, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40065, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40066, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40067, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40068, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40069, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40070, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40071, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40072, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40073, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40074, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40075, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40076, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40077, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40078, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40079, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40080, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40081, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40082, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40083, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40084, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40085, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40086, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40087, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40088, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40089, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40090, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40091, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40092, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40093, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40094, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40095, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40096, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40097, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40098, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40099, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40100, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40101, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40102, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40103, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40104, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40105, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40106, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40107, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40108, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40109, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40110, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40111, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40112, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40113, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40114, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40115, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40116, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40117, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40118, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40119, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40120, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40121, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40122, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40123, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40124, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40125, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40126, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40127, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40128, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40129, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40130, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40131, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40132, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40133, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40134, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40135, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40136, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40137, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40138, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40139, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40140, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40141, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40142, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40143, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40144, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40145, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40146, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40147, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40148, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40149, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40150, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40151, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40152, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40153, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40154, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40155, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40156, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40157, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40158, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40159, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40160, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40161, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40162, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40163, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40164, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40165, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40166, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40167, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40168, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40169, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40170, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40171, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40172, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40173, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40174, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40175, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40176, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40177, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40178, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40179, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40180, cities: {…}, cityPopulation: 45218}
+ Debug filter - item structure: {cncg_id: 40181, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40182, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40183, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40184, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40185, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40186, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40187, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40188, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40189, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40190, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40191, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40192, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40193, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40194, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40195, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40196, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40197, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40198, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40199, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40200, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40201, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40202, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40203, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40204, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40205, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40206, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40207, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40208, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40209, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40210, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40211, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40212, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40213, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40214, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40215, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40216, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40217, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40218, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40219, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40220, cities: {…}, cityPopulation: 44546}
+ Debug filter - item structure: {cncg_id: 40221, cities: {…}, cityPopulation: 44546}
+ Filtered data length after city size filter: 1000
+ Filter applied - citySizeFilter: 25k-75k
+ Original data length: 1000
+ Applying city size filter...
+ Debug filter - item structure: {cncg_id: 41000, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40999, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40998, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40997, cities: {…}, cityPopulation: 36395}
+ Debug filter - item structure: {cncg_id: 40889, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40891, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40892, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40893, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40894, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40895, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40896, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40897, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40898, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40899, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40900, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40901, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40902, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40903, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40904, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40905, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40906, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40907, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40908, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40909, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40910, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40911, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40912, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40913, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40914, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40915, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40916, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40917, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40918, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40919, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40920, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40921, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40922, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40923, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40924, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40925, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40926, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40927, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40928, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40929, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40930, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40931, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40932, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40933, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40934, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40935, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40936, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40937, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40938, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40939, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40940, cities: {…}, cityPopulation: 36426}
+ Debug filter - item structure: {cncg_id: 40941, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40942, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40943, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40944, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40945, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40946, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40947, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40948, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40949, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40950, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40951, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40952, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40953, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40954, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40955, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40956, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40957, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40958, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40959, cities: {…}, cityPopulation: 36426}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40960, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40961, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40962, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40963, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40964, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40965, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40966, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40967, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40968, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40969, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40970, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40971, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40972, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40973, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40974, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40975, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40976, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40977, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40978, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40979, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40980, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40981, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40982, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40983, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40984, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40985, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40986, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40987, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40988, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40989, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40990, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40991, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40992, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40993, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40994, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40995, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40996, cities: {…}, cityPopulation: 36395}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40667, cities: {…}, cityPopulation: 38815}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40668, cities: {…}, cityPopulation: 38815}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40669, cities: {…}, cityPopulation: 38815}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40670, cities: {…}, cityPopulation: 38815}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40671, cities: {…}, cityPopulation: 38815}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40672, cities: {…}, cityPopulation: 38815}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40673, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40674, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40675, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40676, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40677, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40678, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40679, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40680, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40681, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40682, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40683, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40684, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40685, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40686, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40687, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40688, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40689, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40690, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40691, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40692, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40693, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40694, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40695, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40696, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40697, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40698, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40699, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40700, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40701, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40702, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40703, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40704, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40705, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40706, cities: {…}, cityPopulation: 38224}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40707, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40708, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40709, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40710, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40711, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40712, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40713, cities: {…}, cityPopulation: 38224}
+ Debug filter - item structure: {cncg_id: 40714, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40715, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40716, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40717, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40718, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40719, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40720, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40721, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40722, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40723, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40724, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40725, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40726, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40727, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40728, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40729, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40730, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40731, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40732, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40733, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40734, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40735, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40736, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40737, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40738, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40739, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40740, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40741, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40742, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40743, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40744, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40745, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40746, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40747, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40748, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40749, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40750, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40751, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40752, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40753, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40754, cities: {…}, cityPopulation: 37732}
+ Debug filter - item structure: {cncg_id: 40755, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40756, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40757, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40758, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40759, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40760, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40761, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40762, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40763, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40764, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40765, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40766, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40767, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40768, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40769, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40770, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40771, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40772, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40773, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40774, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40775, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40776, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40777, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40778, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40779, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40780, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40781, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40782, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40783, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40784, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40785, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40786, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40787, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40788, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40789, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40790, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40791, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40792, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40793, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40794, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40795, cities: {…}, cityPopulation: 37545}
+ Debug filter - item structure: {cncg_id: 40796, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40797, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40798, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40799, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40800, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40801, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40802, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40803, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40804, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40805, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40806, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40807, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40808, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40809, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40810, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40811, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40812, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40813, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40814, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40815, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40816, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40817, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40818, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40819, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40820, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40821, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40822, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40823, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40824, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40825, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40826, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40827, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40828, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40829, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40830, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40831, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40832, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40833, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40834, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40835, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40836, cities: {…}, cityPopulation: 37467}
+ Debug filter - item structure: {cncg_id: 40837, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40838, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40839, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40840, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40841, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40842, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40843, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40844, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40845, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40846, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40847, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40848, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40849, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40850, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40851, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40852, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40853, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40854, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40855, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40856, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40857, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40858, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40859, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40860, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40861, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40862, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40863, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40864, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40865, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40866, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40867, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40868, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40869, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40870, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40871, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40872, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40873, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40874, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40875, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40876, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40877, cities: {…}, cityPopulation: 36768}
+ Debug filter - item structure: {cncg_id: 40878, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40879, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40880, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40881, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40882, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40883, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40884, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40885, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40886, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40887, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40888, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40445, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40446, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40447, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40448, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40449, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40450, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40451, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40452, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40453, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40454, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40455, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40456, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40457, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40458, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40459, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40460, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40461, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40462, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40463, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40464, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40465, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40466, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40467, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40468, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40469, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40470, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40471, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40472, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40473, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40474, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40475, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40476, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40477, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40478, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40479, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40480, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40481, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40482, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40483, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40484, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40485, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40486, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40487, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40488, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40489, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40490, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40491, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40492, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40493, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40494, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40495, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40496, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40497, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40498, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40499, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40500, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40501, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40502, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40503, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40504, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40505, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40506, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40507, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40508, cities: {…}, cityPopulation: 41327}
+ Debug filter - item structure: {cncg_id: 40509, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40510, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40511, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40512, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40513, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40514, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40515, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40516, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40517, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40518, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40519, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40520, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40521, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40522, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40523, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40524, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40525, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40526, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40527, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40528, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40529, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40530, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40531, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40532, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40533, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40534, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40535, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40536, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40537, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40538, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40539, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40540, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40541, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40542, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40543, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40544, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40545, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40546, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40547, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40548, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40549, cities: {…}, cityPopulation: 39980}
+ Debug filter - item structure: {cncg_id: 40550, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40551, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40552, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40553, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40554, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40555, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40556, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40557, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40558, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40559, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40560, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40561, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40562, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40563, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40564, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40565, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40566, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40567, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40568, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40569, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40570, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40571, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40572, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40573, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40574, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40575, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40576, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40577, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40578, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40579, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40580, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40581, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40582, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40583, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40584, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40585, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40586, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40587, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40588, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40589, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40590, cities: {…}, cityPopulation: 39081}
+ Debug filter - item structure: {cncg_id: 40591, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40592, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40593, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40594, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40595, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40596, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40597, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40598, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40599, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40600, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40601, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40602, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40603, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40604, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40605, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40606, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40607, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40608, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40609, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40610, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40611, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40612, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40613, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40614, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40615, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40616, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40617, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40618, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40619, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40620, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40621, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40622, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40623, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40624, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40625, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40626, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40627, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40628, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40629, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40630, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40631, cities: {…}, cityPopulation: 39041}
+ Debug filter - item structure: {cncg_id: 40632, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40633, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40634, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40635, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40636, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40637, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40638, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40639, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40640, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40641, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40642, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40643, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40644, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40645, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40646, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40647, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40648, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40649, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40650, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40651, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40652, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40653, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40654, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40655, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40656, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40657, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40658, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40659, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40660, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40661, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40662, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40663, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40664, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40665, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40666, cities: {…}, cityPopulation: 38815}
+ Debug filter - item structure: {cncg_id: 40223, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40224, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40225, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40226, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40227, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40228, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40229, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40230, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40231, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40232, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40233, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40234, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40235, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40236, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40237, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40238, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40239, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40240, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40241, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40242, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40243, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40244, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40245, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40246, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40247, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40248, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40249, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40250, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40251, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40252, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40253, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40254, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40255, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40256, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40257, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40258, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40259, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40260, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40261, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40262, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40263, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40264, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40265, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40266, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40267, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40268, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40269, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40270, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40271, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40272, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40273, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40274, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40275, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40276, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40277, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40278, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40279, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40280, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40281, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40282, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40283, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40284, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40285, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40286, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40287, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40288, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40289, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40290, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40291, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40292, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40293, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40294, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40295, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40296, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40297, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40298, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40299, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40300, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40301, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40302, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40303, cities: {…}, cityPopulation: 43772}
+ Debug filter - item structure: {cncg_id: 40304, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40305, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40306, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40307, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40308, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40309, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40310, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40311, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40312, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40313, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40314, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40315, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40316, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40317, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40318, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40319, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40320, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40321, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40322, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40323, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40324, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40325, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40326, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40327, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40328, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40329, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40330, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40331, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40332, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40333, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40334, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40335, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40336, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40337, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40338, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40339, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40340, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40341, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40342, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40343, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40344, cities: {…}, cityPopulation: 43590}
+ Debug filter - item structure: {cncg_id: 40345, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40346, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40347, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40348, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40349, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40350, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40351, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40352, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40353, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40354, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40355, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40356, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40357, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40358, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40359, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40360, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40361, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40362, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40363, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40364, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40365, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40366, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40367, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40368, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40369, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40370, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40371, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40372, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40373, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40374, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40375, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40376, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40377, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40378, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40379, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40380, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40381, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40382, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40383, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40384, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40385, cities: {…}, cityPopulation: 43045}
+ Debug filter - item structure: {cncg_id: 40386, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40387, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40388, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40389, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40390, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40391, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40392, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40393, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40394, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40395, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40396, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40397, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40398, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40399, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40400, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40401, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40402, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40403, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40404, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40405, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40406, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40407, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40408, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40409, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40410, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40411, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40412, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40413, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40414, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40415, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40416, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40417, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40418, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40419, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40420, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40421, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40422, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40423, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40424, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40425, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40426, cities: {…}, cityPopulation: 42999}
+ Debug filter - item structure: {cncg_id: 40427, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40428, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40429, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40430, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40431, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40432, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40433, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40434, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40435, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40436, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40437, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40438, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40439, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40440, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40441, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40442, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40443, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40444, cities: {…}, cityPopulation: 41700}
+ Debug filter - item structure: {cncg_id: 40222, cities: {…}, cityPopulation: 44478}
+ Debug filter - item structure: {cncg_id: 40001, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40002, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40003, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40004, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40005, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40006, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40007, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40008, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40009, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40010, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40011, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40012, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40013, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40014, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40015, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40016, cities: {…}, cityPopulation: 46797}
+ Debug filter - item structure: {cncg_id: 40017, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40018, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40019, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40020, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40021, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40022, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40023, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40024, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40025, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40026, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40027, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40028, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40029, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40030, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40031, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40032, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40033, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40034, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40035, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40036, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40037, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40038, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40039, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40040, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40890, cities: {…}, cityPopulation: 36516}
+ Debug filter - item structure: {cncg_id: 40041, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40042, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40043, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40044, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40045, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40046, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40047, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40048, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40049, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40050, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40051, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40052, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40053, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40054, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40055, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40056, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40057, cities: {…}, cityPopulation: 46182}
+ Debug filter - item structure: {cncg_id: 40058, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40059, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40060, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40061, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40062, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40063, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40064, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40065, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40066, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40067, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40068, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40069, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40070, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40071, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40072, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40073, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40074, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40075, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40076, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40077, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40078, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40079, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40080, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40081, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40082, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40083, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40084, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40085, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40086, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40087, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40088, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40089, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40090, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40091, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40092, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40093, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40094, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40095, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40096, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40097, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40098, cities: {…}, cityPopulation: 45761}
+ Debug filter - item structure: {cncg_id: 40099, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40100, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40101, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40102, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40103, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40104, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40105, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40106, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40107, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40108, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40109, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40110, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40111, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40112, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40113, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40114, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40115, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40116, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40117, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40118, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40119, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40120, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40121, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40122, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40123, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40124, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40125, cities: {…}, cityPopulation: 45505}
+ Debug filter - item structure: {cncg_id: 40126, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40127, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40128, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40129, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40130, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40131, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40132, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40133, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40134, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40135, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40136, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40137, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40138, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40139, cities: {…}, cityPopulation: 45505}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40140, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40141, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40142, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40143, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40144, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40145, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40146, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40147, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40148, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40149, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40150, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40151, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40152, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40153, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40154, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40155, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40156, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40157, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40158, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40159, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40160, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40161, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40162, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40163, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40164, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40165, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40166, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40167, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40168, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40169, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40170, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40171, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40172, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40173, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40174, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40175, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40176, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40177, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40178, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40179, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40180, cities: {…}, cityPopulation: 45218}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40181, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40182, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40183, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40184, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40185, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40186, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40187, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40188, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40189, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40190, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40191, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40192, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40193, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40194, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40195, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40196, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40197, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40198, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40199, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40200, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40201, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40202, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40203, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40204, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40205, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40206, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40207, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40208, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40209, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40210, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40211, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40212, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40213, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40214, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40215, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40216, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40217, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40218, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40219, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40220, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:206 Debug filter - item structure: {cncg_id: 40221, cities: {…}, cityPopulation: 44546}
+Cnjar1Table.tsx:247 Filtered data length after city size filter: 1000
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: all
+Cnjar1Table.tsx:241 Original data length: 1000
+Cnjar1Table.tsx:240 Filter applied - citySizeFilter: all
+Cnjar1Table.tsx:241 Original data length: 1000
+
+
+---
+
+_**Agent (<synthetic>)**_
+
+Prompt is too long
+

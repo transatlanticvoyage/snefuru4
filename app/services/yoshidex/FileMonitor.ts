@@ -338,7 +338,10 @@ export class FileMonitor extends EventEmitter {
 
 // Default file monitor instance
 export const defaultFileMonitor = new FileMonitor({
-  watchDirectory: path.join(process.cwd(), 'uploads', 'claude-exports'),
-  filePatterns: ['claude-conversation-*.json', 'claude-session-*.md', '*.json', '*.md'],
-  autoImport: false // Set to true when you have a default user setup
+  watchDirectory: path.join(process.cwd(), '.specstory', 'history'),
+  filePatterns: ['*.md', '*.json'],
+  autoImport: true,
+  defaultUserId: null, // Will be set when we have a user context
+  processedDirectory: path.join(process.cwd(), '.specstory', 'processed'),
+  errorDirectory: path.join(process.cwd(), '.specstory', 'errors')
 });

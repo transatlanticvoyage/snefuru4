@@ -1,0 +1,2725 @@
+## 2025-08-06 18:00:18Z
+
+<!-- Claude Code Session 44a86523-b609-4b8a-bb62-e073b6043e4a (2025-08-06_18-00-18Z) -->
+
+_**User**_
+
+This session is being continued from a previous conversation that ran out of context. The conversation is summarized below:
+Analysis:
+Looking through the conversation chronologically:
+
+1. The user started by asking to research the /cnjar1 page and investigate why the "select city size" dropdown filter wasn't working for filtering table records. They mentioned this table has joins between multiple DB tables.
+
+2. I investigated and found the issue was that Supabase has a default limit of 1000 rows, and the filter logic wasn't working correctly because the population data in the database (36k-47k) didn't match the filter ranges (which included "under-25k" but no cities were actually under 25k).
+
+3. The user then pointed out a fundamental flaw - we're not selecting cities directly, but filtering cncglub rows where the related city falls into population criteria. They also noted there should be ~41,000 rows (1000 cities × 41 industries) but only 1000 were showing.
+
+4. I fixed both issues by adding `.limit(50000)` to the query and adjusting the filter ranges. I also clarified the filter labels to make it clear we're filtering cncglub records by their related city population.
+
+5. The user then requested creating an f360 delete button with triple confirmation, including a requirement that users type "i confirm totally" with the text being non-copyable.
+
+6. I implemented the f360 delete functionality with all requested features including the triple confirmation system and non-copyable text using CSS and span elements.
+
+7. The user asked me to look at the hide page header button on /filegun and create the same functionality on /cnjar1.
+
+8. I implemented the hide header functionality, but initially it wasn't working because I hadn't added the CSS rule to actually hide the header.
+
+9. The user pointed out it wasn't working and asked me to analyze how it works on /filegun and copy it exactly. They wanted to hide the main header (with nav menu) that appears on every page.
+
+10. I found the issue - needed to add a CSS rule in globals.css that targets the header element when the body has the special class. Added the rule and the functionality now works.
+
+11. Finally, the user asked to create a new page at /kwjar with basic setup and to add it to the Drenjari navigation component.
+
+12. I started creating the /kwjar page but was interrupted by the summary request before completing the task of adding it to the DrenjariButtonBarDriggsmanLinks component.
+
+Summary:
+1. Primary Request and Intent:
+   - Investigate and fix the "select city size" dropdown filter on /cnjar1 page that wasn't working to filter records in a table with multiple DB table joins
+   - Fix the issue where only 1000 records were showing instead of expected ~41,000 records (1000 cities × 41 industries)
+   - Create an f360 delete all button with triple confirmation popup where users must type "i confirm totally" with non-copyable text
+   - Implement hide page header functionality on /cnjar1 identical to /filegun page functionality
+   - Create a new page at /kwjar with basic structure and add it to Drenjari navigation
+
+2. Key Technical Concepts:
+   - Supabase database queries with joins and default limits
+   - React hooks (useState, useEffect, useMemo)
+   - Dynamic imports with Next.js
+   - localStorage for persistence
+   - CSS selectors and body class manipulation
+   - Non-copyable text implementation using CSS properties and span elements
+   - Triple confirmation modal pattern
+   - Population-based filtering on joined table data
+
+3. Files and Code Sections:
+   - `/app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+      - Main table component with filtering logic
+      - Fixed Supabase query limit from default 1000 to 50000
+      - Fixed filter logic to properly handle city population ranges
+      - Added f360 delete button and modal implementation
+      ```typescript
+      .limit(50000); // Set explicit limit to handle up to 50k records
+      ```
+      ```typescript
+      // Helper function to check if cncglub record's related city population matches filter
+      const matchesCitySizeFilter = (item: Cncglub) => {
+        const cityPopulation = item.cities?.city_population;
+        if (citySizeFilter === 'all') return true;
+        // Apply specific city size filters based on city_population from cities table
+        switch (citySizeFilter) {
+          case 'under-25k': return cityPopulation < 25000;
+          case '25k-50k': return cityPopulation >= 25000 && cityPopulation < 50000;
+          // ...
+        }
+      };
+      ```
+
+   - `/app/(protected)/cnjar1/utils/f360-delete-all-cncglub.ts`
+      - Created new utility function for deleting all cncglub records
+      ```typescript
+      export async function f360DeleteAllCncglub(): Promise<{ success: boolean; message: string; deletedCount?: number }> {
+        const supabase = createClientComponentClient();
+        // Delete all records
+        const { error: deleteError } = await supabase
+          .from('cncglub')
+          .delete()
+          .neq('cncg_id', 0); // This ensures we delete all records
+      }
+      ```
+
+   - `/app/(protected)/cnjar1/page.tsx`
+      - Added header visibility state and localStorage persistence
+      - Added useEffect to manage body class for hiding header
+      ```typescript
+      const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(() => {
+        if (typeof window !== 'undefined') {
+          const saved = localStorage.getItem('cnjar1-header-visible');
+          return saved === null ? true : saved === 'true';
+        }
+        return true;
+      });
+      ```
+
+   - `/app/globals.css`
+      - Added CSS rule to hide header when body has special class
+      ```css
+      /* Hide main navigation header when on cnjar1 page with hide setting */
+      body.cnjar1-hide-main-header .snefuru-content-wrapper > header:first-child {
+        display: none !important;
+      }
+      ```
+
+   - `/app/(protected)/kwjar/page.tsx`
+      - Created new page with basic structure
+      ```typescript
+      export default function KwjarPage() {
+        // Basic page setup with header, drenjari links, and blank main content area
+      }
+      ```
+
+4. Errors and fixes:
+   - **City size filter not working**:
+      - Found that all city populations were above 25k, so "under-25k" filter correctly returned 0 results
+      - Fixed by adjusting filter ranges to match actual data (25k-50k, 50k-100k, etc.)
+      - User feedback: "it only shows records in the ui table when set to all cities or 25-75k"
+   
+   - **Only 1000 records showing instead of 41,000**:
+      - Discovered Supabase has default limit of 1000 rows
+      - Fixed by adding explicit `.limit(50000)` to query
+   
+   - **Hide header functionality not working**:
+      - Initially only added JavaScript logic but no CSS
+      - User feedback: "the functionality is not working to hide the page header on /cnjar1"
+      - Fixed by adding CSS rule in globals.css targeting the header element
+
+5. Problem Solving:
+   - Solved the filtering issue by understanding the data structure (cncglub records filtered by related city population)
+   - Solved the 1000 record limit by adding explicit limit to Supabase query
+   - Implemented non-copyable text using multiple techniques (CSS userSelect, individual spans, event prevention)
+   - Successfully replicated filegun's header hiding mechanism for cnjar1
+
+6. All user messages:
+   - "pleaes research our page at /cnjar1 and investigate twhy the dorpdown filter for 'select city size' is not working to filter the records in the table. this table has a join between multiple db tables and we still cant get this filte feature to work"
+   - "it still doesnt work. please remove the show excluded records with no population dropdown and any of its compoenents. we need to focus on the other filter and make it work. it currently still is not working. it must be due to the join and some flaw in the logic. remember that the primary listing item of this ui table comes from db table cncglub but we are filtering by the db column city_population which is contained in db table cities and determined through relationship of rel_city_id field in cncglub. pleaes confirm that the code is correct in this manner"
+   - "i think there is a funcdamental flaw in the logic of the 'select a city size' dropdown on our page at /cnjar1. we are not supposed to be selecting 'cities' directly. we are supposed to be selecting cncglub rows where the related city falls into the population criteria. also im wondering: why does /cncjar1 have text that says this: 1-10 of 1000 records. there is supposed to be over 40,000 rows in my ui table after i ran f355 function butt, this should be the case because i have around 41 rows in my db table industries and i have around 1000 rows in my db table cities. the function is supposed to populate the cncglub db table with a row for each of these combinations. pleaes check to see if its doing this or if it was coded wrong"
+   - "please create a button that shows to the right of (after) the f355 button in our ui on /cnjar1. make the button say text of f360 delete all cncglub records. this must have a triple confirm popup with warnings that this will delete all. user must type i confirm totally in order to confirm the 3rd prompt. do not have the text be copy-able on the screen - display it in a pseudo-image or special hidden format of some type"
+   - "please view the hide page header button on our page at /filegun. then please create the same button on /cnjar1. please create the same functionality. place the button somewhere just barely after the header ends on the page (obviously)"
+   - "the functionaltiy is not working to hide the page header on /cnjar1. please analyze how the button functions on /filegun and mimick it or copy it exactly. the button should hide the main header piece that shows the nav menu etc on every page that we have in the app. were trying to hide it only on the /cnjar1 page when this button is clicked"
+   - "pleaes create a new page at /kwjar. please add this page's link to the drenjari element central component. please leave the main ui blank on the page except for a drenjari eleemnt dynamically called (such as we are currently doing on other pages). and of course have the header and sidebar etc but just leave the main ui blank on /kwjar until further instructions"
+
+7. Pending Tasks:
+   - Add /kwjar page link to the DrenjariButtonBarDriggsmanLinks component (not yet completed)
+
+8. Current Work:
+   Created the /kwjar page at `/app/(protected)/kwjar/page.tsx` with basic structure including header, DrenjariButtonBarDriggsmanLinks component, and blank main content area. Was about to add the kwjar link to the DrenjariButtonBarDriggsmanLinks component when the summary was requested.
+
+9. Optional Next Step:
+   Add the /kwjar page link to the DrenjariButtonBarDriggsmanLinks component to complete the user's request: "please add this page's link to the drenjari element central component".
+Please continue the conversation from where we left it off without asking the user any further questions. Continue with the last task that you were asked to work on.
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll continue by adding the /kwjar page link to the DrenjariButtonBarDriggsmanLinks component.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep**
+
+Result:
+
+```
+Found 12 files
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/DrenjariButtonBarDriggsmanLinks.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/skojar2/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/skojar1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar2/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cityjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/aspejar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cgigjar/components/CgigjarTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/callplatjar/components/CallPlatjarTable.tsx
+```
+
+_**Agent**_
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/components/DrenjariButtonBarDriggsmanLinks.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import Link from 'next/link';
+     4→
+     5→export default function DrenjariButtonBarDriggsmanLinks() {
+     6→  return (
+     7→    <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-3 py-1 mb-4">
+     8→      <div className="flex items-center">
+     9→        <span className="text-sm font-bold text-black mr-4">drenjari</span>
+    10→        <div className="flex items-center">
+    11→          <Link
+    12→            href="/driggsman"
+    13→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-l transition-colors -mr-px"
+    14→          >
+    15→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/driggsman</span>
+    16→          </Link>
+    17→          <Link
+    18→            href="/cgigjar"
+    19→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    20→          >
+    21→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/cgigjar</span>
+    22→          </Link>
+    23→          <Link
+    24→            href="/callplatjar"
+    25→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    26→          >
+    27→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/callplatjar</span>
+    28→          </Link>
+    29→          <Link
+    30→            href="/aspejar"
+    31→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    32→          >
+    33→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/aspejar</span>
+    34→          </Link>
+    35→          <Link
+    36→            href="/cityjar"
+    37→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    38→          >
+    39→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/cityjar</span>
+    40→          </Link>
+    41→          <Link
+    42→            href="/indusjar"
+    43→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    44→          >
+    45→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/indusjar</span>
+    46→          </Link>
+    47→          <Link
+    48→            href="/metrojar"
+    49→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    50→          >
+    51→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/metrojar</span>
+    52→          </Link>
+    53→          <Link
+    54→            href="/cnjar1"
+    55→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    56→          >
+    57→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/cnjar1</span>
+    58→          </Link>
+    59→          <Link
+    60→            href="/cnjar2"
+    61→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    62→          >
+    63→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/cnjar2</span>
+    64→          </Link>
+    65→          <Link
+    66→            href="/skojar1"
+    67→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    68→          >
+    69→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/skojar1</span>
+    70→          </Link>
+    71→          <Link
+    72→            href="/skojar2"
+    73→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+    74→          >
+    75→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/skojar2</span>
+    76→          </Link>
+    77→        </div>
+    78→      </div>
+    79→    </div>
+    80→  );
+    81→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Create new page at /kwjar
+- [⚡] 🌡️ Add kwjar link to DrenjariButtonBarDriggsmanLinks component
+- [X] 🌡️ Set up basic page structure with header, sidebar, and drenjari element
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/DrenjariButtonBarDriggsmanLinks.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    67→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    68→          >
+    69→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/skojar1</span>
+    70→          </Link>
+    71→          <Link
+    72→            href="/skojar2"
+    73→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    74→          >
+    75→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/skojar2</span>
+    76→          </Link>
+    77→          <Link
+    78→            href="/kwjar"
+    79→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+    80→          >
+    81→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/kwjar</span>
+    82→          </Link>
+    83→        </div>
+    84→      </div>
+    85→    </div>
+    86→  );
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Create new page at /kwjar
+- [X] 🌡️ Add kwjar link to DrenjariButtonBarDriggsmanLinks component
+- [X] 🌡️ Set up basic page structure with header, sidebar, and drenjari element
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+The /kwjar page has been successfully created with basic structure and added to the DrenjariButtonBarDriggsmanLinks component. The page includes:
+
+1. **Created /kwjar page** at `/app/(protected)/kwjar/page.tsx` with:
+   - Header with "Kwjar" title
+   - DrenjariButtonBarDriggsmanLinks component in header and main area
+   - Blank main content area ready for future configuration
+   - Authentication protection and loading states
+
+2. **Added /kwjar link** to `DrenjariButtonBarDriggsmanLinks.tsx`:
+   - Added as the last button in the navigation bar
+   - Styled consistently with other buttons
+   - Applied `rounded-r` class to make it the rightmost button
+
+The kwjar page is now accessible through the drenjari navigation and ready for further development.
+
+---
+
+_**User**_
+
+please propose sql for a keywords db table named zemkws (with zem for identifiability) 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+```sql
+CREATE TABLE zemkws (
+  zk_id SERIAL PRIMARY KEY,
+  keyword VARCHAR(255) NOT NULL,
+  keyword_category VARCHAR(100),
+  search_volume INTEGER DEFAULT 0,
+  competition_level VARCHAR(20) CHECK (competition_level IN ('low', 'medium', 'high')),
+  cost_per_click DECIMAL(10,2),
+  trend_direction VARCHAR(20) CHECK (trend_direction IN ('rising', 'stable', 'declining')),
+  related_industry VARCHAR(100),
+  target_audience VARCHAR(100),
+  intent_type VARCHAR(50) CHECK (intent_type IN ('informational', 'commercial', 'transactional', 'navigational')),
+  is_branded BOOLEAN DEFAULT false,
+  is_long_tail BOOLEAN DEFAULT false,
+  difficulty_score INTEGER CHECK (difficulty_score BETWEEN 0 AND 100),
+  priority_level INTEGER CHECK (priority_level BETWEEN 1 AND 5) DEFAULT 3,
+  status VARCHAR(20) CHECK (status IN ('active', 'paused', 'archived')) DEFAULT 'active',
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_by UUID REFERENCES users(id),
+  last_updated_by UUID REFERENCES users(id)
+);
+
+-- Indexes for performance
+CREATE INDEX idx_zemkws_keyword ON zemkws(keyword);
+CREATE INDEX idx_zemkws_category ON zemkws(keyword_category);
+CREATE INDEX idx_zemkws_industry ON zemkws(related_industry);
+CREATE INDEX idx_zemkws_status ON zemkws(status);
+CREATE INDEX idx_zemkws_priority ON zemkws(priority_level);
+
+-- Updated timestamp trigger
+CREATE OR REPLACE FUNCTION update_zemkws_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_zemkws_updated_at
+    BEFORE UPDATE ON zemkws
+    FOR EACH ROW
+    EXECUTE FUNCTION update_zemkws_updated_at();
+```
+
+---
+
+_**User**_
+
+please change db table name to kws 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+```sql
+CREATE TABLE kws (
+  kw_id SERIAL PRIMARY KEY,
+  keyword VARCHAR(255) NOT NULL,
+  keyword_category VARCHAR(100),
+  search_volume INTEGER DEFAULT 0,
+  competition_level VARCHAR(20) CHECK (competition_level IN ('low', 'medium', 'high')),
+  cost_per_click DECIMAL(10,2),
+  trend_direction VARCHAR(20) CHECK (trend_direction IN ('rising', 'stable', 'declining')),
+  related_industry VARCHAR(100),
+  target_audience VARCHAR(100),
+  intent_type VARCHAR(50) CHECK (intent_type IN ('informational', 'commercial', 'transactional', 'navigational')),
+  is_branded BOOLEAN DEFAULT false,
+  is_long_tail BOOLEAN DEFAULT false,
+  difficulty_score INTEGER CHECK (difficulty_score BETWEEN 0 AND 100),
+  priority_level INTEGER CHECK (priority_level BETWEEN 1 AND 5) DEFAULT 3,
+  status VARCHAR(20) CHECK (status IN ('active', 'paused', 'archived')) DEFAULT 'active',
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_by UUID REFERENCES users(id),
+  last_updated_by UUID REFERENCES users(id)
+);
+
+-- Indexes for performance
+CREATE INDEX idx_kws_keyword ON kws(keyword);
+CREATE INDEX idx_kws_category ON kws(keyword_category);
+CREATE INDEX idx_kws_industry ON kws(related_industry);
+CREATE INDEX idx_kws_status ON kws(status);
+CREATE INDEX idx_kws_priority ON kws(priority_level);
+
+-- Updated timestamp trigger
+CREATE OR REPLACE FUNCTION update_kws_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_kws_updated_at
+    BEFORE UPDATE ON kws
+    FOR EACH ROW
+    EXECUTE FUNCTION update_kws_updated_at();
+```
+
+---
+
+_**User**_
+
+change keyword to keyword_datum
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+```sql
+CREATE TABLE kws (
+  kw_id SERIAL PRIMARY KEY,
+  keyword_datum VARCHAR(255) NOT NULL,
+  keyword_category VARCHAR(100),
+  search_volume INTEGER DEFAULT 0,
+  competition_level VARCHAR(20) CHECK (competition_level IN ('low', 'medium', 'high')),
+  cost_per_click DECIMAL(10,2),
+  trend_direction VARCHAR(20) CHECK (trend_direction IN ('rising', 'stable', 'declining')),
+  related_industry VARCHAR(100),
+  target_audience VARCHAR(100),
+  intent_type VARCHAR(50) CHECK (intent_type IN ('informational', 'commercial', 'transactional', 'navigational')),
+  is_branded BOOLEAN DEFAULT false,
+  is_long_tail BOOLEAN DEFAULT false,
+  difficulty_score INTEGER CHECK (difficulty_score BETWEEN 0 AND 100),
+  priority_level INTEGER CHECK (priority_level BETWEEN 1 AND 5) DEFAULT 3,
+  status VARCHAR(20) CHECK (status IN ('active', 'paused', 'archived')) DEFAULT 'active',
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_by UUID REFERENCES users(id),
+  last_updated_by UUID REFERENCES users(id)
+);
+
+-- Indexes for performance
+CREATE INDEX idx_kws_keyword_datum ON kws(keyword_datum);
+CREATE INDEX idx_kws_category ON kws(keyword_category);
+CREATE INDEX idx_kws_industry ON kws(related_industry);
+CREATE INDEX idx_kws_status ON kws(status);
+CREATE INDEX idx_kws_priority ON kws(priority_level);
+
+-- Updated timestamp trigger
+CREATE OR REPLACE FUNCTION update_kws_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_kws_updated_at
+    BEFORE UPDATE ON kws
+    FOR EACH ROW
+    EXECUTE FUNCTION update_kws_updated_at();
+```
+
+---
+
+_**User**_
+
+im trying to follow these directions to install the dataforseo mcp server. should i place it in a subfolder in snefuru? or where do you receommend?
+
+———————————————————————
+1 Local integration with Claude AI
+The local MCP setup is straightforward, as we will see in the example of integration with Claude AI, a powerful AI model from Anthropic. We designed and tested the current MCP server version using that AI model and interface, but the core integration principles can also work with other AI models.
+
+Before getting started, ensure you have Node.js installed and an account at Claude AI. Then, proceed with the following steps:
+
+1. Open the MacOS Terminal or Windows Command prompt.
+
+2. Clone the GitHub repository using git clone https://github.com/dataforseo/mcp-server-typescript.
+
+3. Change the project’s directory using cd mcp-server-typescript.
+
+4. Install dependencies with npm install command and set the following environment variables:
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I recommend creating it as a **separate folder alongside your main Snefuru project**, not inside it. Here's the recommended structure:
+
+```
+Documents/repos/
+├── localrepo-snefuru4/          # Your main project
+└── mcp-server-typescript/       # DataForSEO MCP server
+```
+
+This keeps the MCP server separate from your main application code, which is cleaner for several reasons:
+
+1. **Separation of concerns** - The MCP server is a standalone service
+2. **Independent updates** - You can update either project without affecting the other
+3. **Cleaner git history** - Separate repositories for separate concerns
+4. **Easier maintenance** - No confusion between your app code and the MCP server
+
+So from your current directory (`/Users/kylecampbell/Documents/repos/localrepo-snefuru4`), you should:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Navigate to parent repos directory
+
+`cd .. && pwd`
+
+Error:
+
+```
+<tool_use_error>cd to '/Users/kylecampbell/Documents/repos' was blocked. For security, Claude Code may only change directories to child directories of the allowed working directories for this session: '/Users/kylecampbell/Documents/repos/localrepo-snefuru4'.</tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Since I can't navigate outside your current project directory, you'll need to manually navigate to `/Users/kylecampbell/Documents/repos/` and run:
+
+```bash
+git clone https://github.com/dataforseo/mcp-server-typescript
+cd mcp-server-typescript
+npm install
+```
+
+This will create the MCP server alongside your Snefuru project, keeping them properly separated.
+
+---
+
+_**User**_
+
+ok please give me the exact commands i need for terminal to do myself
+
+and please name the folder
+mcp-server-dfs
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here are the exact Terminal commands:
+
+```bash
+cd /Users/kylecampbell/Documents/repos
+git clone https://github.com/dataforseo/mcp-server-typescript mcp-server-dfs
+cd mcp-server-dfs
+npm install
+```
+
+This will:
+1. Navigate to your repos directory
+2. Clone the DataForSEO MCP server into a folder named `mcp-server-dfs`
+3. Enter that folder
+4. Install all dependencies
+
+After running these commands, you'll have the structure:
+```
+Documents/repos/
+├── localrepo-snefuru4/     # Your main project
+└── mcp-server-dfs/         # DataForSEO MCP server
+```
+
+---
+
+_**User**_
+
+User provided an image (image/png).
+
+are you capable of marking the lines or listing them to me, (line number), that contain the name of a location (such as a city) in them? 
+
+Keyword
+mold removal spray
+spray for mold removal
+mold removal sprays
+spray on mold removal
+mold removal services near me
+bleach mold removal
+bleach for mold removal
+bleach and mold removal
+mold removal service near me
+mold removal services near me
+bleach mold removal
+bleach for mold removal
+bleach and mold removal
+mold removal service near me
+bathroom mold removal
+mold removal in wood
+mold removal for shower
+mold removal bathtub
+mold removal in bathroom
+mold removal wood
+mold removal from shower
+mold removal in shower
+mold removal from bathroom
+mold removal in showers
+wood mold removal
+mold removal for wood
+shower mold removal
+mold removal shower
+baking soda for mold removal
+dehumidifiers for mold removal
+mold removal in car
+how much can mold removal cost
+automotive mold removal
+mold removal for car
+how much does it cost for mold removal
+auto mold removal
+mold removal for cars
+mold removal car
+vehicle mold removal
+mold removal from car
+mold removal how much does it cost
+mold removal with baking soda
+automobile mold removal
+mold removal dehumidifier
+black mold mold removal
+dehumidifier for mold removal
+mold removal in cars
+dehumidifier mold removal
+dehumidifier and mold removal
+mold removal cars
+baking soda mold removal
+how much does mold removal cost
+car mold removal
+baking soda for mold removal
+dehumidifiers for mold removal
+mold removal with baking soda
+mold removal dehumidifier
+dehumidifier for mold removal
+dehumidifier mold removal
+dehumidifier and mold removal
+baking soda mold removal
+black mold removal costs
+cost for black mold removal
+how to mold removal
+cost of black mold removal
+mold removal bleach solution
+white vinegar mold removal
+black mold removal price
+black mold removal prices
+expert mold removal
+black mold removal estimate
+mold removal expert
+mold removal white vinegar
+mold removal experts
+black mold removal cost
+how to mold removal
+mold removal bleach solution
+white vinegar mold removal
+expert mold removal
+mold removal expert
+mold removal white vinegar
+mold removal experts
+mold removal basement
+contractor mold removal
+contractors for mold removal
+mold removal from basement
+professional mold removal service
+mold removal contractors
+basement mold removal
+mold removal in basements
+mold removal wall
+mold removal on walls
+mold removal in walls
+wall mold removal
+basement and mold removal
+mold removal contractor
+mold removal inside walls
+professional mold removal services
+mold removal from walls
+mold removal in basement
+mold removal for walls
+contractor mold removal
+contractors for mold removal
+professional mold removal service
+mold removal contractors
+mold removal contractor
+professional mold removal services
+carpet mold removal
+mold removal clothes
+mold removal washing machine
+mold removal in carpet
+mold removal with bleach
+mold removal from drywall
+crawlspace mold removal
+mold removal in attic
+mold removal for carpet
+mold removal carpet
+mold removal from crawl space
+black mold removal spray
+mold removal from carpet
+mold removal in clothes
+mold removal attic
+mold removal from clothes
+mold removal drywall
+mold removal on drywall
+attic mold removal
+mold removal for drywall
+rug mold removal
+clothes mold removal
+washer mold removal
+mold removal from sheetrock
+mold removal products home depot
+sheetrock mold removal
+washing machine mold removal
+mold removal cost calculator
+mold removal bleach
+mold removal on carpet
+mold removal at home depot
+home depot mold removal products
+mold removal clothing
+mold removal from carpets
+mold removal on sheetrock
+mold removal in drywall
+mold removal from attic
+crawl space mold removal
+mold removal on clothes
+mold removal clothes
+mold removal with bleach
+crawlspace mold removal
+mold removal in attic
+mold removal from crawl space
+mold removal in clothes
+mold removal attic
+mold removal from clothes
+attic mold removal
+clothes mold removal
+mold removal cost calculator
+mold removal bleach
+mold removal clothing
+mold removal from attic
+crawl space mold removal
+mold removal on clothes
+bathroom ceiling mold removal
+mold removal in bathroom ceiling
+how much is mold removal
+mold removal water damage
+mold removal new york city
+mold removal nyc
+water damage and mold removal
+bathroom mold removal ceiling
+mold removal from bathroom ceiling
+do it yourself mold removal
+new york city mold removal
+hydrogen peroxide on mold removal
+mold removal with hydrogen peroxide
+water damage mold removal
+hydrogen peroxide mold removal
+hydrogen peroxide and mold removal
+mold removal new york
+mold removal hydrogen peroxide
+mold removal bathroom ceiling
+hydrogen peroxide for mold removal
+hepa vacuum for mold removal
+mold removal diy
+how much for mold removal
+mold removal do it yourself
+hepa vacuum mold removal
+diy mold removal
+mold removal on bathroom ceiling
+mold removal water damage
+mold removal new york city
+mold removal nyc
+water damage and mold removal
+new york city mold removal
+hydrogen peroxide on mold removal
+mold removal with hydrogen peroxide
+water damage mold removal
+hydrogen peroxide mold removal
+hydrogen peroxide and mold removal
+mold removal new york
+mold removal hydrogen peroxide
+hydrogen peroxide for mold removal
+hepa vacuum for mold removal
+hepa vacuum mold removal
+mold removal in home
+mold removal in homes
+home mold removal
+mold removal on leather
+attic mold removal cost
+ac mold removal
+cost of attic mold removal
+air conditioning mold removal
+mold removal air conditioner
+cost of mold removal in attic
+mold removal in attic cost
+mold removal ac unit
+mold removal on wood
+mold removal on fabric
+car mold removal service near me
+mold removal from wood
+mold removal from leather
+mold removal certification
+mold removal attic cost
+mold removal from fabric
+aircon mold removal
+certified mold removal
+mold removal from home
+mold removal charleston
+mold removal ann arbor mi
+mold removal charleston sc
+car mold removal services near me
+air conditioner mold removal
+mold removal leather
+charleston mold removal
+certification for mold removal
+mold removal cost attic
+attic mold removal costs
+mold removal ann arbor
+mold removal in home
+mold removal in homes
+home mold removal
+ac mold removal
+air conditioning mold removal
+mold removal air conditioner
+mold removal ac unit
+mold removal certification
+aircon mold removal
+certified mold removal
+mold removal from home
+mold removal charleston
+mold removal charleston sc
+air conditioner mold removal
+charleston mold removal
+certification for mold removal
+mold removal in basement cost
+cost of mold removal in basement
+mold removal costs for basement
+cost for mold removal in basement
+mold removal dallas
+black mold removal service
+what is mold removal
+mold removal cost per square foot
+black mold removal company
+cost of mold removal per square foot
+black shower mold removal
+mold removal basement cost
+mold removal sheetrock
+mold removal price per square foot
+servpro mold removal reviews
+basement mold removal cost
+black mold removal in shower
+drywall mold removal
+black mold removal companies
+black mold removal services
+black mold removal service
+what is mold removal
+mold removal cost per square foot
+black mold removal company
+cost of mold removal per square foot
+mold removal price per square foot
+servpro mold removal reviews
+black mold removal companies
+black mold removal services
+mold removal borax
+best mold removal company near me
+does insurance cover mold removal
+mold removal seattle
+mold removal chicago illinois
+concrete mold removal
+steam mold removal
+average mold removal cost
+average cost of mold removal
+mold removal remediation
+new jersey mold removal
+mold removal nj
+cement mold removal
+mold removal seattle wa
+mold removal with borax
+mold removal chicago
+mold removal in new jersey
+mold removal from concrete
+mold removal in ceiling
+mold removal chicago il
+borax for mold removal
+mold removal in atlanta ga
+mold removal spray for bathroom
+average price for mold removal
+mold removal service atlanta
+chicago mold removal
+mold removal atlanta ga
+mold removal from ceiling
+mold removal and remediation
+seattle mold removal
+mold removal on concrete
+mold removal company atlanta
+will insurance cover mold removal
+servpro mold removal cost
+mold removal in nj
+mold removal average cost
+does insurance pay for mold removal
+mold removal ceiling
+mold removal companies atlanta
+best mold removal companies near me
+mold removal on ceiling
+bathroom mold removal service
+ceiling mold removal
+mold removal new jersey
+mold removal in chicago
+mold removal borax
+does insurance cover mold removal
+average mold removal cost
+average cost of mold removal
+mold removal remediation
+new jersey mold removal
+mold removal nj
+mold removal with borax
+mold removal in new jersey
+borax for mold removal
+mold removal in atlanta ga
+average price for mold removal
+mold removal service atlanta
+mold removal atlanta ga
+mold removal and remediation
+mold removal company atlanta
+will insurance cover mold removal
+mold removal in nj
+mold removal average cost
+does insurance pay for mold removal
+mold removal companies atlanta
+bathroom mold removal service
+mold removal new jersey
+mold removal in house
+mold removal solutions
+mold removal portland
+mold removal portland oregon
+mold removal greensboro nc
+solutions for mold removal
+mold removal at home
+house mold removal
+household mold removal
+shower grout mold removal
+mold removal charlotte
+mold removal greensboro
+hvac mold removal cost
+caulk mold removal
+mold removal in shower grout
+mold removal denver colorado
+mold removal shower grout
+mold removal denver
+mold removal denver co
+free mold removal
+caulking mold removal
+portland mold removal
+mold removal process
+fort myers mold removal
+servpro mold removal
+mold removal portland or
+mold removal house
+mold removal charlotte nc
+mold removal denver county
+mold removal fort myers fl
+mold removal solution
+solution for mold removal
+mold removal fort myers
+mold removal san francisco
+mold removal home
+mold removal from shower grout
+mold removal solutions
+mold removal portland
+mold removal portland oregon
+mold removal greensboro nc
+solutions for mold removal
+mold removal charlotte
+mold removal greensboro
+portland mold removal
+mold removal process
+servpro mold removal
+mold removal portland or
+mold removal charlotte nc
+mold removal solution
+solution for mold removal
+mold removal washington dc
+baltimore mold removal
+mold removal san jose
+mold removal car interior
+vinegar and baking soda for mold removal
+louisville mold removal
+cleveland mold removal
+mold removal estimates
+dishwasher mold removal
+st louis mold removal
+mold removal louisville
+mold removal pittsburgh
+mold removal baltimore md
+mold removal dc
+mold removal in car interior
+baking soda and vinegar mold removal
+mold removal from car interior
+how long does mold removal take
+columbus mold removal
+mold removal columbus ohio
+mold removal long island
+does home insurance cover mold removal
+orlando mold removal
+mold removal in brooklyn
+attic mold removal near me
+auto interior mold removal
+mold removal santa rosa
+mold removal orlando fl
+long island mold removal
+mold removal residential
+will homeowners insurance cover mold removal
+mold removal oakland ca
+mold removal san jose ca
+mold removal louisville ky
+raleigh mold removal
+mold removal santa rosa ca
+mold removal in pittsburgh
+rochester mold removal
+mold removal oakland
+mold removal baltimore
+rochester ny mold removal
+mold removal in st louis
+will home insurance cover mold removal
+mold removal alexandria va
+car upholstery mold removal
+mold removal for car interior
+mold removal in dc
+mold removal rochester ny
+dc mold removal
+mold removal vinegar baking soda
+vinegar baking soda mold removal
+mold removal cleveland ohio
+mold removal in rochester ny
+car interior mold removal
+mold removal gainesville fl
+vinegar and baking soda mold removal
+mold removal brooklyn
+mold removal cleveland
+mold removal raleigh nc
+gainesville mold removal
+mold removal rochester
+mold removal columbus oh
+mold removal in orlando
+pittsburgh mold removal
+roof mold removal
+mold removal brooklyn ny
+mold removal st louis
+mold removal estimate
+does homeowners insurance cover mold removal
+mold removal orlando florida
+how much does black mold removal cost
+mold removal raleigh
+mold removal alexandria
+columbus ohio mold removal
+residential mold removal
+mold removal washington dc
+mold removal san jose
+vinegar and baking soda for mold removal
+mold removal estimates
+mold removal dc
+baking soda and vinegar mold removal
+how long does mold removal take
+does home insurance cover mold removal
+mold removal in brooklyn
+mold removal santa rosa
+mold removal residential
+will homeowners insurance cover mold removal
+mold removal oakland ca
+mold removal san jose ca
+mold removal santa rosa ca
+mold removal oakland
+will home insurance cover mold removal
+mold removal alexandria va
+mold removal in dc
+dc mold removal
+mold removal vinegar baking soda
+vinegar baking soda mold removal
+mold removal gainesville fl
+vinegar and baking soda mold removal
+mold removal brooklyn
+gainesville mold removal
+roof mold removal
+mold removal brooklyn ny
+mold removal estimate
+does homeowners insurance cover mold removal
+mold removal alexandria
+residential mold removal
+mold removal washington dc
+mold removal san jose
+vinegar and baking soda for mold removal
+mold removal estimates
+mold removal dc
+baking soda and vinegar mold removal
+how long does mold removal take
+does home insurance cover mold removal
+mold removal in brooklyn
+mold removal santa rosa
+mold removal residential
+will homeowners insurance cover mold removal
+mold removal oakland ca
+mold removal san jose ca
+mold removal santa rosa ca
+mold removal oakland
+will home insurance cover mold removal
+mold removal alexandria va
+mold removal in dc
+dc mold removal
+mold removal vinegar baking soda
+vinegar baking soda mold removal
+mold removal gainesville fl
+vinegar and baking soda mold removal
+mold removal brooklyn
+gainesville mold removal
+roof mold removal
+mold removal brooklyn ny
+mold removal estimate
+does homeowners insurance cover mold removal
+mold removal alexandria
+residential mold removal
+air cleaner mold removal
+boston mold removal
+car mold removal services
+mold removal milwaukee wi
+air duct mold removal
+rapid mold removal llc
+mold removal hvac
+shower caulk mold removal
+mold removal new orleans
+mask for mold removal
+air purifier mold removal
+mold removal tallahassee
+natural mold removal
+air purifiers for mold removal
+mold removal mask
+mold removal in ductwork
+new orleans mold removal
+car mold removal service
+mold removal tucson
+mold removal boston
+mold removal in new orleans
+is mold removal covered by insurance
+mold removal milwaukee
+mold removal boston ma
+commercial mold removal
+fort worth mold removal
+rapid mold removal
+mold removal fort worth
+mold removal in shower caulking
+air purifiers mold removal
+mold removal kc
+mold removal training
+crawl space mold removal near me
+mold removal fort lauderdale florida
+mold removal austin texas
+mold removal sacramento
+milwaukee mold removal
+kansas city mold removal
+sacramento mold removal
+mold removal natural
+mold removal in air ducts
+mold removal tucson az
+mold removal course
+mold removal tallahassee fl
+tucson mold removal
+mold removal from ducts
+duct mold removal
+ductwork mold removal
+mold removal from air ducts
+mold removal kansas city
+fort lauderdale mold removal
+mold removal kansas city mo
+tallahassee mold removal
+mold removal new orleans la
+pink mold removal
+masks for mold removal
+shower caulking mold removal
+mold removal air ducts
+air purifier for mold removal
+car mold removal services
+natural mold removal
+car mold removal service
+is mold removal covered by insurance
+commercial mold removal
+mold removal training
+mold removal fort lauderdale florida
+mold removal sacramento
+sacramento mold removal
+mold removal natural
+mold removal course
+fort lauderdale mold removal
+car mold removal services
+natural mold removal
+car mold removal service
+is mold removal covered by insurance
+commercial mold removal
+mold removal training
+mold removal fort lauderdale florida
+mold removal sacramento
+sacramento mold removal
+mold removal natural
+mold removal course
+fort lauderdale mold removal
+mold removal cost bathroom
+mold removal knoxville
+cost of mold removal in bathroom
+fungicide for mold removal
+mold removal tulsa ok
+auto detailing mold removal
+nyc mold removal
+mold removal okc
+front load washer mold removal
+front loading washer mold removal
+mold removal florida
+mattress mold removal
+car mold removal near me
+duct cleaning mold removal
+basement mold removal near me
+mold removal omaha ne
+mold removal ny
+fogging for mold removal
+mold removal greenville sc
+duct cleaning and mold removal
+black mold removal professionals
+omaha mold removal
+mold removal mattress
+mold removal and repair
+mold removal oklahoma city
+front loader washer mold removal
+bathroom mold removal cost
+philadelphia mold removal
+mold removal knoxville tn
+professional black mold removal
+mold removal repair
+mold removal nashville tn
+sarasota mold removal
+florida mold removal
+mold removal fl
+fogging mold removal
+mold removal tulsa
+fog mold removal
+wood furniture mold removal
+mold removal from wood furniture
+bathtub mold removal
+mold removal sarasota
+mold removal bathroom
+black mold removal product
+mold removal san antonio
+mold removal bath
+mold removal on wood furniture
+black mold removal products
+fogger for mold removal
+mold removal philadelphia
+air duct cleaning mold removal
+new york mold removal
+mold removal in philadelphia
+mold removal wood furniture
+knoxville mold removal
+air duct cleaning and mold removal
+mold removal in florida
+tulsa mold removal
+foggers for mold removal
+car detailing mold removal
+mold removal omaha
+mold removal equipment
+mold removal ct
+mold removal sarasota fl
+bath tub mold removal
+mold removal san antonio texas
+black mold removal on wood
+mold removal sarasota florida
+mold removal fogger
+nyc mold removal
+mold removal okc
+mold removal florida
+mattress mold removal
+mold removal ny
+black mold removal professionals
+mold removal mattress
+mold removal and repair
+mold removal oklahoma city
+professional black mold removal
+mold removal repair
+florida mold removal
+mold removal fl
+new york mold removal
+mold removal in florida
+nyc mold removal
+mold removal okc
+mold removal florida
+mattress mold removal
+mold removal ny
+black mold removal professionals
+mold removal mattress
+mold removal and repair
+mold removal oklahoma city
+professional black mold removal
+mold removal repair
+florida mold removal
+mold removal fl
+new york mold removal
+mold removal in florida
+mold removal spray for walls
+mold removal home remedy
+mold removal siding
+vinegar for mold removal on wood
+car detailing mold removal cost
+epa recommendations for mold removal
+mold removal plano tx
+mold removal long beach ca
+mold removal madison wi
+laundry detergent for mold removal
+mold removal buffalo ny
+white mold removal
+chemicals for mold removal
+mold removal laundry detergent
+home mold removal remedies
+chemical mold removal
+mold removal crawl space cost
+home remedy for mold removal
+artillery mold removal
+car a c mold removal
+mold removal plano
+mold removal laws
+albuquerque mold removal
+mold removal protective gear
+car air conditioner mold removal
+home remedies for mold removal
+crawl space mold removal cost
+mold removal richmond va
+mold removal home remedies
+mold removal memphis tn
+clorox mold removal
+mold removal albuquerque nm
+mold removal wilmington nc
+mold removal richmond
+protective clothing for mold removal
+mold removal albany ny
+memphis mold removal
+siding mold removal
+mold removal chemical
+mold removal grand rapids
+mold removal columbia sc
+epa guidelines for mold removal
+mold removal albuquerque
+mold removal on siding
+mold removal in crawl space cost
+madison mold removal
+mold removal baton rouge
+mold removal toms river nj
+mold removal in richmond va
+richmond va mold removal
+vinegar mold removal wood
+car air conditioning mold removal
+epa mold removal guidelines
+cost of mold removal in crawl space
+mold removal cost crawl space
+clorox and mold removal
+mold removal from siding
+mold removal chemicals
+home remedy mold removal
+mold removal baking soda
+clorox for mold removal
+mold removal madison
+mold removal savannah ga
+mold removal grand rapids mi
+grand rapids mold removal
+albany mold removal
+minnesota mold removal
+mold removal memphis
+richmond mold removal
+mold removal savannah
+car ac mold removal
+affordable mold removal near me
+protective gear for mold removal
+buffalo mold removal
+mold removal home remedy
+epa recommendations for mold removal
+mold removal plano tx
+home mold removal remedies
+mold removal crawl space cost
+home remedy for mold removal
+artillery mold removal
+car a c mold removal
+mold removal plano
+mold removal laws
+mold removal protective gear
+car air conditioner mold removal
+home remedies for mold removal
+crawl space mold removal cost
+mold removal richmond va
+mold removal home remedies
+mold removal wilmington nc
+mold removal richmond
+protective clothing for mold removal
+mold removal columbia sc
+epa guidelines for mold removal
+mold removal in crawl space cost
+mold removal in richmond va
+richmond va mold removal
+car air conditioning mold removal
+epa mold removal guidelines
+cost of mold removal in crawl space
+mold removal cost crawl space
+home remedy mold removal
+mold removal baking soda
+richmond mold removal
+car ac mold removal
+protective gear for mold removal
+mold removal home remedy
+epa recommendations for mold removal
+mold removal plano tx
+home mold removal remedies
+mold removal crawl space cost
+home remedy for mold removal
+artillery mold removal
+car a c mold removal
+mold removal plano
+mold removal laws
+mold removal protective gear
+car air conditioner mold removal
+home remedies for mold removal
+crawl space mold removal cost
+mold removal richmond va
+mold removal home remedies
+mold removal wilmington nc
+mold removal richmond
+protective clothing for mold removal
+mold removal columbia sc
+epa guidelines for mold removal
+mold removal in crawl space cost
+mold removal in richmond va
+richmond va mold removal
+car air conditioning mold removal
+epa mold removal guidelines
+cost of mold removal in crawl space
+mold removal cost crawl space
+home remedy mold removal
+mold removal baking soda
+richmond mold removal
+car ac mold removal
+protective gear for mold removal
+mold removal in las vegas
+top mold removal companies
+air scrubber for mold removal
+mold removal on furniture
+lexington mold removal
+mold removal in springfield mo
+mold removal methods
+asheville mold removal
+is mold removal covered by homeowners insurance
+mold removal service cost
+mold removal boise idaho
+window sill mold removal
+is mold removal covered by home insurance
+furniture mold removal
+mold removal birmingham al
+mold removal lexington ky
+mold removal vinyl siding
+mold removal ri
+mold removal windows
+mold removal springfield mo
+mold removal spray drywall
+mold removal dayton ohio
+window mold removal
+drywall mold removal spray
+mold removal lexington
+mold removal in ri
+mold removal dayton oh
+mold removal asheville nc
+cost of mold removal in house
+ozone for mold removal
+mold removal birmingham
+mold removal rhode island
+mold removal boise id
+mold removal techniques
+mold removal steps
+mold removal services cost
+cost of mold removal from home
+mold removal dayton
+air duct cleaning mold removal cost
+mold removal fremont ca
+licensed mold removal
+mold removal furniture
+homeowners insurance mold removal
+mold removal from furniture
+mold removal boise
+mold removal homeowners insurance
+vinyl siding mold removal
+shower curtain mold removal
+mold removal window sills
+mold removal license
+mold removal on vinyl siding
+mold removal asheville
+ozone mold removal
+cost of mold removal in home
+top mold removal companies
+mold removal methods
+is mold removal covered by homeowners insurance
+mold removal service cost
+is mold removal covered by home insurance
+mold removal techniques
+mold removal steps
+mold removal services cost
+mold removal fremont ca
+homeowners insurance mold removal
+mold removal homeowners insurance
+shower curtain mold removal
+top mold removal companies
+mold removal methods
+is mold removal covered by homeowners insurance
+mold removal service cost
+is mold removal covered by home insurance
+mold removal techniques
+mold removal steps
+mold removal services cost
+mold removal fremont ca
+homeowners insurance mold removal
+mold removal homeowners insurance
+shower curtain mold removal
+mold removal spray for cars
+uv light mold removal
+mold removal garland
+mold removal in bathroom walls
+mold removal in west palm beach
+mold removal charlottesville va
+best for mold removal
+mold removal durham nc
+mold removal delaware
+mold removal spokane
+mold removal west palm beach
+mold removal durham
+mold removal lincoln ne
+mold removal murfreesboro
+mold removal lakeland fl
+mold removal cleaning
+dry fog mold removal cost
+mold removal spokane wa
+detroit mold removal
+professional mold removal cost
+mold removal professional cost
+ultraviolet light mold removal
+upholstery mold removal
+mold removal augusta ga
+mold removal kit
+mold removal spray for car
+maine mold removal
+mold removal respirator
+mold removal from bathroom walls
+mold removal cleaning products
+cost of professional mold removal
+mold removal on painted walls
+durham mold removal
+staten island mold removal
+bathroom walls mold removal
+mold removal staten island
+mold removal charlottesville
+chimney mold removal cost
+car mold removal spray
+mold removal westchester ny
+mold removal murfreesboro tn
+mold removal detroit
+mold removal westchester county ny
+mold removal chattanooga tn
+uv light for mold removal
+mold removal maine
+mold removal lafayette la
+mold removal from painted walls
+mold removal lakeland
+mold removal detroit mi
+respirator for mold removal
+mold removal in maine
+mold removal west palm beach fl
+mold removal bathroom walls
+bathroom wall mold removal
+respirators for mold removal
+mold removal upholstery
+mold removal staten island ny
+mold removal cary nc
+mold removal westchester
+mold removal in delaware
+mold removal chattanooga
+westchester mold removal
+charlottesville mold removal
+mold removal garland
+mold removal durham nc
+mold removal durham
+mold removal murfreesboro
+dry fog mold removal cost
+professional mold removal cost
+mold removal professional cost
+maine mold removal
+mold removal cleaning products
+cost of professional mold removal
+durham mold removal
+mold removal murfreesboro tn
+mold removal maine
+mold removal lafayette la
+mold removal in maine
+mold removal cary nc
+mold removal garland
+mold removal durham nc
+mold removal durham
+mold removal murfreesboro
+dry fog mold removal cost
+professional mold removal cost
+mold removal professional cost
+maine mold removal
+mold removal cleaning products
+cost of professional mold removal
+durham mold removal
+mold removal murfreesboro tn
+mold removal maine
+mold removal lafayette la
+mold removal in maine
+mold removal cary nc
+how much is mold removal in house
+commercial mold removal products
+mold removal syracuse ny
+dry ice blasting for mold removal
+book mold removal
+outdoor cushion mold removal
+mold removal roanoke va
+bathtub black mold removal
+mold removal melbourne fl
+mold removal york
+mold removal machines
+mold removal fort wayne
+mold removal fairfax
+texas mold removal
+mold removal roof
+control mold removal
+mold removal jacksonville florida
+syracuse mold removal
+how expensive is mold removal
+mold removal hardwood floors
+mold removal syracuse
+mold removal paint
+mold removal on basement walls
+mold removal reno nv
+mold removal wichita ks
+mold removal car carpet
+wood floor mold removal
+green mold removal
+mold removal green
+mold removal little rock
+black mold removal on drywall
+mold removal inspection
+mold removal dry ice blasting
+mold removal gloves
+borax and mold removal
+mold removal fairfax va
+mold removal reno
+black mold removal diy
+mold removal indiana
+mold removal virginia beach
+how much is mold removal cost
+professional mold removal near me
+rainbow mold removal
+mold removal santa barbara
+mold removal basement walls
+mold removal products for car
+mold removal santa cruz
+mold removal machine
+black mold removal do it yourself
+mold removal corpus christi
+fort wayne mold removal
+mold removal lancaster
+basement wall mold removal
+mold removal amazon
+mold removal fort wayne indiana
+mold removal mobile al
+mold removal from basement walls
+diy black mold removal
+mold removal lancaster pa
+mold removal on wood floors
+myrtle beach mold removal
+mold removal roanoke
+mold removal santa cruz ca
+virginia beach mold removal
+reno mold removal
+car carpet mold removal
+mold removal huntsville al
+car mold removal products
+mold removal books
+mold removal york pa
+bathroom black mold removal
+what to use for mold removal
+mold removal wood floors
+mold removal from roof
+salt lake city mold removal
+car detailing mold removal near me
+hardwood floor mold removal
+gloves for mold removal
+mold removal inspector
+dry ice blasting mold removal
+mold removal little rock ar
+mold removal from leather jacket
+mold removal texas
+mold removal virginia beach va
+mold removal in jacksonville
+mold removal myrtle beach sc
+mold removal products for cars
+brooklyn mold removal
+mold removal corpus christi tx
+air filter mold removal
+mold removal protocol
+mold removal on roof
+mold removal myrtle beach
+how much mold removal cost
+borax mold removal
+dry ice blasting for mold removal
+book mold removal
+mold removal fairfax
+texas mold removal
+control mold removal
+mold removal car carpet
+mold removal little rock
+mold removal inspection
+mold removal dry ice blasting
+mold removal gloves
+mold removal fairfax va
+professional mold removal near me
+mold removal corpus christi
+mold removal mobile al
+myrtle beach mold removal
+car carpet mold removal
+mold removal books
+gloves for mold removal
+mold removal inspector
+dry ice blasting mold removal
+mold removal little rock ar
+mold removal from leather jacket
+mold removal texas
+mold removal myrtle beach sc
+mold removal corpus christi tx
+mold removal protocol
+mold removal myrtle beach
+dry ice blasting for mold removal
+book mold removal
+mold removal fairfax
+texas mold removal
+control mold removal
+mold removal car carpet
+mold removal little rock
+mold removal inspection
+mold removal dry ice blasting
+mold removal gloves
+mold removal fairfax va
+professional mold removal near me
+mold removal corpus christi
+mold removal mobile al
+myrtle beach mold removal
+car carpet mold removal
+mold removal books
+gloves for mold removal
+mold removal inspector
+dry ice blasting mold removal
+mold removal little rock ar
+mold removal from leather jacket
+mold removal texas
+mold removal myrtle beach sc
+mold removal corpus christi tx
+mold removal protocol
+mold removal myrtle beach
+is mold removal expensive
+mold removal massachusetts
+ppe for mold removal
+mold removal katy tx
+mold removal franklin tn
+mold removal products for bathroom
+mold removal bellevue
+mold removal bellevue wa
+mold removal el paso texas
+mold removal tool
+mold removal tea tree oil
+shockwave mold removal
+mold removal in massachusetts
+mold removal cape cod
+mold removal anchorage
+mold removal nh
+mold removal control
+mold removal beaverton
+mold removal tools
+rv mold removal
+mold removal express
+ct mold removal
+el paso mold removal
+car seat mold removal
+air mold removal
+mold removal fresno
+mold removal annapolis
+mold removal from house
+mold removal beaverton oregon
+best product for mold removal
+free mold removal for seniors
+mold removal el paso tx
+best products for mold removal
+mold removal peoria
+jacksonville fl mold removal
+anchorage mold removal
+mold removal frederick md
+cape cod mold removal
+professional mold removal company
+peoria mold removal
+clr mold removal
+mold removal el paso
+mold removal peoria il
+angie's list mold removal
+connecticut mold removal
+mold removal ppe
+mold removal anchorage ak
+personal protective equipment for mold removal
+air handler mold removal
+mold removal in ct
+epa registered mold removal product
+mold removal port st lucie
+plant mold removal
+mold removal cape cod ma
+mold removal certification online
+bathroom mold removal products
+mold removal bellevue
+mold removal bellevue wa
+mold removal el paso texas
+mold removal control
+mold removal express
+el paso mold removal
+mold removal el paso tx
+mold removal frederick md
+professional mold removal company
+mold removal el paso
+angie's list mold removal
+mold removal bellevue
+mold removal bellevue wa
+mold removal el paso texas
+mold removal control
+mold removal express
+el paso mold removal
+mold removal el paso tx
+mold removal frederick md
+professional mold removal company
+mold removal el paso
+angie's list mold removal
+mold removal with peroxide
+mold removal tyler tx
+mold removal in ac ducts
+mold removal missoula
+sofa mold removal
+mold removal fredericksburg va
+winston salem mold removal
+roof mold removal spray
+mold removal salem oregon
+mold removal with dry ice
+rapid mold removal reviews
+mold removal akron ohio
+mold removal rock hill sc
+mold removal carpet cleaning
+mold removal des moines
+concrobium mold removal
+environmental protection agency mold removal
+mold removal peroxide
+mold removal missoula mt
+hepa filter mold removal
+mold removal on roof shingles
+couch mold removal
+dry fog mold removal
+mold removal erie pa
+dry-fog mold removal
+mold removal winston salem nc
+roof shingle mold removal
+mold removal uv light
+mold removal jobs
+denver mold removal
+rockville mold removal
+carpet cleaning mold removal
+mold removal epa
+mold removal springfield il
+mold removal from roof shingles
+asbestos and mold removal
+mold removal jackson ms
+carpet cleaner mold removal
+mold removal jackson
+mold removal eugene
+mold removal michigan
+mold removal vermont
+mold removal topeka
+mold removal portland maine
+mold removal concord ca
+springfield il mold removal
+mold removal rockville md
+mold removal lansing
+refrigerator mold removal
+epa mold removal
+mold removal carpet cleaner
+mold removal rockville
+boat seat mold removal
+basement mold removal companies
+mold removal des moines ia
+black mold removal companies near me
+mold removal akron
+black mold removal company near me
+mold removal toledo
+mold removal roof shingles
+dry ice for mold removal
+best air purifier for mold removal
+mold removal pensacola
+mold removal pensacola fl
+tent mold removal
+attic mold removal services
+mold removal toledo ohio
+mold removal lansing mi
+mold removal athens ga
+best air purifiers for mold removal
+mold removal borax vinegar
+mold removal vancouver wa
+asbestos mold removal
+steam cleaner for mold removal
+carpet cleaning for mold removal
+dry ice mold removal
+mold removal toledo oh
+roof shingles mold removal
+vacuum for mold removal
+mold removal in my area
+michigan mold removal
+ac duct mold removal
+professional mold removal products
+mold removal with borax and vinegar
+pensacola mold removal
+athens ga mold removal
+mold removal topeka ks
+mold removal in air conditioning ducts
+mold removal with dry ice
+rapid mold removal reviews
+mold removal rock hill sc
+environmental protection agency mold removal
+hepa filter mold removal
+mold removal jobs
+mold removal epa
+asbestos and mold removal
+mold removal michigan
+mold removal portland maine
+mold removal concord ca
+refrigerator mold removal
+epa mold removal
+basement mold removal companies
+dry ice for mold removal
+attic mold removal services
+mold removal borax vinegar
+asbestos mold removal
+steam cleaner for mold removal
+dry ice mold removal
+vacuum for mold removal
+michigan mold removal
+mold removal with borax and vinegar
+mold removal with dry ice
+rapid mold removal reviews
+mold removal rock hill sc
+environmental protection agency mold removal
+hepa filter mold removal
+mold removal jobs
+mold removal epa
+asbestos and mold removal
+mold removal michigan
+mold removal portland maine
+mold removal concord ca
+refrigerator mold removal
+epa mold removal
+basement mold removal companies
+dry ice for mold removal
+attic mold removal services
+mold removal borax vinegar
+asbestos mold removal
+steam cleaner for mold removal
+dry ice mold removal
+vacuum for mold removal
+michigan mold removal
+mold removal with borax and vinegar
+sink mold removal
+body mold removal
+cdc mold removal
+rochester mn mold removal
+mobile car detailing mold removal
+bathroom tiles mold removal
+house mold removal cost
+black mold removal on concrete
+mold removal grants
+mold removal companies in my area
+mold removal lynchburg va
+mold removal stockton ca
+mold removal bakersfield ca
+mold removal cost home
+chlorine dioxide mold removal
+colorado mold removal
+chlorine dioxide for mold removal
+tilex mold removal
+grants for mold removal
+best masks for mold removal
+mold removal beaumont
+mold removal covered by insurance
+mold removal scottsdale
+service pro mold removal
+mold removal in house cost
+black mold removal home remedies
+mold removal harrisburg pa
+mold removal boynton beach fl
+black mold removal service near me
+mold removal macon ga
+mold removal summerville sc
+mold removal in crawlspace
+mold removal honolulu
+mold removal spartanburg sc
+what does mold removal cost
+roof mold removal cost
+mold removal des moines iowa
+mold removal in boynton beach
+home remedies for black mold removal
+mold removal rockford il
+mold removal jacksonville fl
+black mold removal home remedy
+mold removal bowling green ky
+boat mold removal
+house with mold removal cost
+mold removal beaumont tx
+mold removal oahu
+best mask for mold removal
+mold removal cost house
+mold removal san luis obispo
+air duct mold removal cost
+bathroom tile mold removal
+black mold removal services near me
+mold removal spray for wood
+air duct mold removal near me
+anaheim mold removal
+mold removal scottsdale az
+mold removal jacksonville
+mold removal denton tx
+mold removal bergen county nj
+mold removal bergen county
+cost of mold removal in air ducts
+mold removal rochester mn
+vhs mold removal
+mold removal lawrenceville ga
+mold removal boynton beach
+mold removal in crawl space
+mold removal denton
+mold removal rockford
+mold removal franchise
+mold removal in home cost
+mold removal anaheim
+mold removal columbia mo
+mold removal brick
+stockton mold removal
+des moines mold removal
+mold removal columbia md
+cdc mold removal
+rochester mn mold removal
+mold removal grants
+mold removal stockton ca
+colorado mold removal
+grants for mold removal
+mold removal covered by insurance
+mold removal summerville sc
+mold removal in crawlspace
+mold removal spartanburg sc
+mold removal bowling green ky
+mold removal san luis obispo
+mold removal spray for wood
+anaheim mold removal
+mold removal denton tx
+mold removal rochester mn
+mold removal lawrenceville ga
+mold removal in crawl space
+mold removal denton
+mold removal franchise
+mold removal anaheim
+stockton mold removal
+cdc mold removal
+rochester mn mold removal
+mold removal grants
+mold removal stockton ca
+colorado mold removal
+grants for mold removal
+mold removal covered by insurance
+mold removal summerville sc
+mold removal in crawlspace
+mold removal spartanburg sc
+mold removal bowling green ky
+mold removal san luis obispo
+mold removal spray for wood
+anaheim mold removal
+mold removal denton tx
+mold removal rochester mn
+mold removal lawrenceville ga
+mold removal in crawl space
+mold removal denton
+mold removal franchise
+mold removal anaheim
+stockton mold removal
+mold removal experts near me
+window air conditioner mold removal
+mold removal yelp
+shower ceiling mold removal
+window ac mold removal
+mold removal bloomington il
+trisodium phosphate mold removal
+window air conditioner mold removal
+window ac mold removal
+shower mold removal services
+california mold removal
+tea tree oil mold removal
+tea tree oil and mold removal
+mold removal georgia
+certified mold removal inc
+mold removal treatment
+mold removal aurora
+big apple mold removal
+financial assistance with mold removal
+mold removal with tea tree oil
+mold removal san mateo
+mold removal aurora co
+surface mold removal
+homeowners insurance cover mold removal
+prime mold removal
+home mold removal services
+tea tree oil for mold removal
+mold removal cookeville tn
+home insurance cover mold removal
+mold removal and remediation services
+cutting board mold removal
+mold removal scams
+mold removal colorado
+mold removal california
+black mold removal bleach
+mold removal deerfield beach
+ac unit mold removal
+mold removal shoes
+window air conditioner mold removal
+window ac mold removal
+shower mold removal services
+california mold removal
+tea tree oil mold removal
+tea tree oil and mold removal
+mold removal georgia
+certified mold removal inc
+mold removal treatment
+mold removal aurora
+big apple mold removal
+financial assistance with mold removal
+mold removal with tea tree oil
+mold removal san mateo
+mold removal aurora co
+surface mold removal
+homeowners insurance cover mold removal
+prime mold removal
+home mold removal services
+tea tree oil for mold removal
+mold removal cookeville tn
+home insurance cover mold removal
+mold removal and remediation services
+cutting board mold removal
+mold removal scams
+mold removal colorado
+mold removal california
+black mold removal bleach
+mold removal deerfield beach
+ac unit mold removal
+mold removal shoes
+mold removal jersey city
+hero mold removal
+mold removal tips
+subfloor mold removal
+dry ice mold removal cost
+northwest mold removal
+mold removal safety
+mold removal lubbock tx
+soda blasting for mold removal
+how to start a mold removal business
+lubbock mold removal
+mold removal overland park
+toronto mold removal
+does homeowners cover mold removal
+soda blasting mold removal
+nw mold removal
+mold removal newnan ga
+mold removal toronto
+mold removal business
+freezer mold removal
+mold removal palm springs
+safe mold removal
+mold removal overland park ks
+mold removal south carolina
+mold removal sc
+mold removal under sink
+mold removal certification california
+mold removal lubbock
+mold removal reviews
+mold removal team
+mold removal medford oregon
+oxiclean for mold removal
+mold removal in toronto
+mold removal florence sc
+mold removal jersey city
+hero mold removal
+mold removal tips
+subfloor mold removal
+dry ice mold removal cost
+northwest mold removal
+mold removal safety
+mold removal lubbock tx
+soda blasting for mold removal
+how to start a mold removal business
+lubbock mold removal
+mold removal overland park
+toronto mold removal
+does homeowners cover mold removal
+soda blasting mold removal
+nw mold removal
+mold removal newnan ga
+mold removal toronto
+mold removal business
+freezer mold removal
+mold removal palm springs
+safe mold removal
+mold removal overland park ks
+mold removal south carolina
+mold removal sc
+mold removal under sink
+mold removal certification california
+mold removal lubbock
+mold removal reviews
+mold removal team
+mold removal medford oregon
+oxiclean for mold removal
+mold removal in toronto
+mold removal florence sc
+mold removal apex nc
+government grants for mold removal
+whole house mold removal cost
+mold removal grand junction co
+midwest mold removal
+recipe for mold removal
+mold removal agents
+cladosporium mold removal
+estimated cost of mold removal
+mold removal before and after
+mold removal hartford ct
+dry cleaning mold removal
+mold removal hamilton ontario
+brown mold removal
+dry cleaner mold removal
+mold removal virginia
+mold removal va
+mold removal recipe
+mold removal in south florida
+mold removal everett
+virginia mold removal
+mold removal arizona
+guardian mold removal
+mold removal marketing
+arizona mold removal
+dry cleaners mold removal
+mold removal hamilton
+what is the difference between mold removal and mold remediation
+home mold removal near me
+minneapolis mold removal
+bathroom mold removal near me
+n95 mask for mold removal
+mold removal company cost
+mold removal everett wa
+mold removal chesterfield va
+mold removal az
+mold removal apex nc
+government grants for mold removal
+whole house mold removal cost
+mold removal grand junction co
+midwest mold removal
+recipe for mold removal
+mold removal agents
+cladosporium mold removal
+estimated cost of mold removal
+mold removal before and after
+mold removal hartford ct
+dry cleaning mold removal
+mold removal hamilton ontario
+brown mold removal
+dry cleaner mold removal
+mold removal virginia
+mold removal va
+mold removal recipe
+mold removal in south florida
+mold removal everett
+virginia mold removal
+mold removal arizona
+guardian mold removal
+mold removal marketing
+arizona mold removal
+dry cleaners mold removal
+mold removal hamilton
+what is the difference between mold removal and mold remediation
+home mold removal near me
+minneapolis mold removal
+bathroom mold removal near me
+n95 mask for mold removal
+mold removal company cost
+mold removal everett wa
+mold removal chesterfield va
+mold removal az
+after mold removal
+mold removal automobile upholstery
+mold removal ocean city md
+mold removal manassas va
+bleach to water ratio for mold removal
+mold removal company long island
+mold removal on plaster walls
+mold removal plaster walls
+hawaii mold removal
+mold removal pa
+mold removal valdosta ga
+dr mold removal
+aspergillus mold removal
+mold removal bleach water ratio
+mold removal companies long island
+mold removal procedures
+mold removal procedure
+long island mold removal company
+pure air mold removal macomb
+drymore mold removal
+superior mold removal
+mold removal companies in md
+mold removal hawaii
+toxic black mold removal
+mold removal alabama
+bleach water ratio for mold removal
+after mold removal
+mold removal automobile upholstery
+mold removal ocean city md
+mold removal manassas va
+bleach to water ratio for mold removal
+mold removal company long island
+mold removal on plaster walls
+mold removal plaster walls
+hawaii mold removal
+mold removal pa
+mold removal valdosta ga
+dr mold removal
+aspergillus mold removal
+mold removal bleach water ratio
+mold removal companies long island
+mold removal procedures
+mold removal procedure
+long island mold removal company
+pure air mold removal macomb
+drymore mold removal
+superior mold removal
+mold removal companies in md
+mold removal hawaii
+toxic black mold removal
+mold removal alabama
+bleach water ratio for mold removal
+mold removal company houston
+greene planet mold removal
+mold removal arkansas
+mold removal and prevention
+mold removal companies in chicago
+mold removal companies chicago
+average cost of mold removal in basement
+average cost of mold removal in home
+chaetomium mold removal
+eco friendly mold removal
+mold removal new haven ct
+mold removal racine wi
+mold removal how to
+mold removal las cruces nm
+insulation mold removal
+mold removal new haven
+mold removal prevention
+mold removal ithaca ny
+slime mold removal
+who do you call for mold removal
+mold removal certification ny
+mold removal pittsburgh pa
+emergency water and mold removal
+mold removal company chicago
+professional mold removal spray
+mold removal company houston
+greene planet mold removal
+mold removal arkansas
+mold removal and prevention
+mold removal companies in chicago
+mold removal companies chicago
+average cost of mold removal in basement
+average cost of mold removal in home
+chaetomium mold removal
+eco friendly mold removal
+mold removal new haven ct
+mold removal racine wi
+mold removal how to
+mold removal las cruces nm
+insulation mold removal
+mold removal new haven
+mold removal prevention
+mold removal ithaca ny
+slime mold removal
+who do you call for mold removal
+mold removal certification ny
+mold removal pittsburgh pa
+emergency water and mold removal
+mold removal company chicago
+professional mold removal spray
+for mold removal
+san jose mold removal
+oxnard mold removal
+mold removal calgary
+zep mold removal
+is bleach good for mold removal
+mold removal bleach mixture
+mold removal paducah ky
+mold removal brush
+mold removal suffolk county ny
+black mold removal specialists
+window mold removal products
+black mold removal cost per square foot
+ice maker mold removal
+mold removal kentucky
+mold removal technician salary
+vhs tape mold removal
+suffolk county mold removal
+financial assistance for mold removal
+mold removal dover de
+black mold removal specialist
+bathroom remodel mold removal
+wallpaper mold removal
+average cost of mold removal in attic
+citric acid mold removal
+mold removal companies raleigh nc
+sodium hypochlorite mold removal
+best home remedy for mold removal
+milton mold removal
+mold removal evanston
+how does mold removal work
+mold removal companies in baton rouge
+mold removal lake charles la
+red mold removal
+hepa air purifier mold removal
+mold removal companies nyc
+black mold removal baltimore
+mold remediation vs mold removal
+government assistance for mold removal
+wellington mold removal
+this old house mold removal
+diy mold removal drywall
+valor mold removal reviews
+hero mold removal reviews
+furnace mold removal
+mold removal st louis mo
+raleigh mold removal company
+mold removal wellington
+black mold removal baltimore md
+sodium hypochlorite for mold removal
+mold removal pueblo co
+for mold removal
+san jose mold removal
+oxnard mold removal
+mold removal calgary
+zep mold removal
+is bleach good for mold removal
+mold removal bleach mixture
+mold removal paducah ky
+mold removal brush
+mold removal suffolk county ny
+black mold removal specialists
+window mold removal products
+black mold removal cost per square foot
+ice maker mold removal
+mold removal kentucky
+mold removal technician salary
+vhs tape mold removal
+suffolk county mold removal
+financial assistance for mold removal
+mold removal dover de
+black mold removal specialist
+bathroom remodel mold removal
+wallpaper mold removal
+average cost of mold removal in attic
+citric acid mold removal
+mold removal companies raleigh nc
+sodium hypochlorite mold removal
+best home remedy for mold removal
+milton mold removal
+mold removal evanston
+how does mold removal work
+mold removal companies in baton rouge
+mold removal lake charles la
+red mold removal
+hepa air purifier mold removal
+mold removal companies nyc
+black mold removal baltimore
+mold remediation vs mold removal
+government assistance for mold removal
+wellington mold removal
+this old house mold removal
+diy mold removal drywall
+valor mold removal reviews
+hero mold removal reviews
+furnace mold removal
+mold removal st louis mo
+raleigh mold removal company
+mold removal wellington
+black mold removal baltimore md
+sodium hypochlorite for mold removal
+mold removal pueblo co
+mold removal cleaners
+mold removal effingham il
+wall mold removal solution
+mold removal product reviews
+sodium carbonate mold removal
+mold removal remedies
+mold removal idaho
+what is good for mold removal
+black mold removal buffalo ny
+mold removal under kitchen sink
+mold removal vs mold remediation
+mold removal troy ny
+attic mold removal companies
+mold removal commercial
+house mold removal companies near me
+mold removal products review
+mold removal bunnings
+diy white mold removal
+mold removal bleach or vinegar
+mold removal dublin
+mold removal products reviews
+car mold removal services cost
+mold removal with vinegar and baking soda
+mold removal spray in india
+mold removal upholstered furniture
+mold removal vineland nj
+dry ice mold removal equipment rental
+rapid mold removal llc reviews
+rm mold removal
+mold removal versus mold remediation
+mold removal and prevention products
+mold removal system
+washing machine gasket mold removal
+pillow mold removal
+mold removal jamestown ny
+top mold removal products
+mold removal control central research
+mold removal gear
+how much does servpro mold removal cost
+mold removal mask home depot
+mold removal london
+log home mold removal
+london mold removal
+mold removal plattsburgh ny
+mold removal guidelines
+clorox bleach for mold removal
+natural black mold removal
+carpet mold removal baking soda
+nw mold removal reviews
+window ac unit mold removal
+black mold removal with vinegar and baking soda
+mold removal carbondale il
+mold removal guide
+mold removal loveland co
+iicrc mold removal guidelines
+english ivy mold removal
+mold removal cleaners
+mold removal effingham il
+wall mold removal solution
+mold removal product reviews
+sodium carbonate mold removal
+mold removal remedies
+mold removal idaho
+what is good for mold removal
+black mold removal buffalo ny
+mold removal under kitchen sink
+mold removal vs mold remediation
+mold removal troy ny
+attic mold removal companies
+mold removal commercial
+house mold removal companies near me
+mold removal products review
+mold removal bunnings
+diy white mold removal
+mold removal bleach or vinegar
+mold removal dublin
+mold removal products reviews
+car mold removal services cost
+mold removal with vinegar and baking soda
+mold removal spray in india
+mold removal upholstered furniture
+mold removal vineland nj
+dry ice mold removal equipment rental
+rapid mold removal llc reviews
+rm mold removal
+mold removal versus mold remediation
+mold removal and prevention products
+mold removal system
+washing machine gasket mold removal
+pillow mold removal
+mold removal jamestown ny
+top mold removal products
+mold removal control central research
+mold removal gear
+how much does servpro mold removal cost
+mold removal mask home depot
+mold removal london
+log home mold removal
+london mold removal
+mold removal plattsburgh ny
+mold removal guidelines
+clorox bleach for mold removal
+natural black mold removal
+carpet mold removal baking soda
+nw mold removal reviews
+window ac unit mold removal
+black mold removal with vinegar and baking soda
+mold removal carbondale il
+mold removal guide
+mold removal loveland co
+iicrc mold removal guidelines
+english ivy mold removal
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Yes, I can identify the lines containing location names. Here are the lines with city/location references:
+
+**Line 160:** mold removal new york city  
+**Line 161:** mold removal nyc  
+**Line 165:** new york city mold removal  
+**Line 171:** mold removal new york  
+**Line 211:** mold removal charleston  
+**Line 212:** mold removal ann arbor mi  
+**Line 213:** mold removal charleston sc  
+**Line 216:** charleston mold removal  
+**Line 220:** mold removal ann arbor  
+**Line 227:** mold removal dallas  
+**Line 250:** mold removal seattle  
+**Line 251:** mold removal chicago illinois  
+**Line 256:** new jersey mold removal  
+**Line 257:** mold removal nj  
+**Line 259:** mold removal seattle wa  
+**Line 261:** mold removal chicago  
+**Line 262:** mold removal in new jersey  
+**Line 265:** mold removal chicago il  
+**Line 267:** mold removal in atlanta ga  
+**Line 270:** mold removal service atlanta  
+**Line 271:** chicago mold removal  
+**Line 272:** mold removal atlanta ga  
+**Line 275:** seattle mold removal  
+**Line 277:** mold removal company atlanta  
+**Line 280:** mold removal in nj  
+**Line 284:** mold removal companies atlanta  
+**Line 287:** mold removal new jersey  
+**Line 288:** mold removal in chicago  
+**Line 296:** mold removal in new jersey  
+**Line 299:** mold removal service atlanta  
+**Line 300:** mold removal atlanta ga  
+**Line 302:** mold removal company atlanta  
+**Line 305:** mold removal companies atlanta  
+**Line 307:** mold removal new jersey  
+**Line 313:** mold removal portland  
+**Line 314:** mold removal portland oregon  
+**Line 315:** mold removal greensboro nc  
+**Line 320:** mold removal charlotte  
+**Line 321:** mold removal greensboro  
+**Line 326:** mold removal denver colorado  
+**Line 328:** mold removal denver  
+**Line 329:** mold removal denver co  
+**Line 332:** portland mold removal  
+**Line 335:** fort myers mold removal  
+**Line 337:** mold removal portland or  
+**Line 339:** mold removal charlotte nc  
+**Line 340:** mold removal denver county  
+**Line 341:** mold removal fort myers fl  
+**Line 344:** mold removal fort myers  
+**Line 345:** mold removal san francisco  
+
+And many more through line 1088, including cities like Washington DC, Baltimore, San Jose, Louisville, Cleveland, Columbus, Orlando, Brooklyn, Santa Rosa, Oakland, Gainesville, Boston, Milwaukee, New Orleans, Tucson, Sacramento, Kansas City, Fort Lauderdale, Tallahassee, Knoxville, Philadelphia, Nashville, Sarasota, San Antonio, Buffalo, Madison, Albuquerque, Richmond, Memphis, Grand Rapids, Albany, Savannah, Rochester, Raleigh, Detroit, etc.
+
+The list contains approximately 200+ location-specific entries spanning major U.S. cities and some international locations like Toronto and Calgary.
+

@@ -130,43 +130,72 @@ export class ClaudeCodeParser {
     }
   }
 
-  // Parse Markdown format conversation export
+  // Parse Markdown format conversation export (SpecStory format)
   private static parseMarkdownConversation(markdownContent: string): ClaudeCodeConversation {
     const lines = markdownContent.split('\n');
-    const conversation: ClaudeCodeConversation = {
+    let conversation: ClaudeCodeConversation = {
       id: this.generateId(),
-      title: 'Parsed Markdown Conversation',
+      title: 'Parsed SpecStory Session',
       model: 'claude-3-5-sonnet',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       messages: []
     };
 
+    // Extract metadata from SpecStory format
+    for (let i = 0; i < Math.min(20, lines.length); i++) {
+      const line = lines[i];
+      
+      // Extract title from timestamp header
+      if (line.startsWith('## ') && line.includes('Z')) {
+        conversation.title = `SpecStory Session ${line.replace('## ', '').trim()}`;
+        conversation.created_at = line.replace('## ', '').trim();
+        continue;
+      }
+      
+      // Extract Claude session ID from HTML comment
+      const sessionMatch = line.match(/<!-- Claude Code Session ([a-f0-9\-]+)/);
+      if (sessionMatch) {
+        conversation.id = sessionMatch[1];
+        // Store the original session ID for later use
+        if (!conversation.metadata) {
+          conversation.metadata = {};
+        }
+        conversation.metadata.originalSessionId = sessionMatch[1];
+      }
+    }
+
     let currentMessage: Partial<ClaudeCodeMessage> | null = null;
     let messageSequence = 0;
     let inCodeBlock = false;
+    let messageContent: string[] = [];
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
-      // Parse metadata from front matter or headers
-      if (line.startsWith('# ') && i < 10) {
-        conversation.title = line.replace('# ', '').trim();
+      // Skip metadata lines
+      if (line.startsWith('## ') || line.startsWith('<!-- ') || line.trim() === '') {
+        if (currentMessage && line.trim() === '') {
+          messageContent.push(''); // Preserve empty lines within messages
+        }
         continue;
       }
       
-      // Detect message boundaries
-      if (line.startsWith('## ') || line.startsWith('**Human:**') || line.startsWith('**Assistant:**')) {
+      // Detect SpecStory message boundaries: _**User**_ or _**Agent**_
+      if (line.match(/^_\*\*(User|Agent|Assistant)\*\*_/)) {
         // Save previous message if exists
-        if (currentMessage && currentMessage.content) {
-          conversation.messages.push({
-            ...currentMessage,
-            content: currentMessage.content.trim()
-          } as ClaudeCodeMessage);
+        if (currentMessage && messageContent.length > 0) {
+          currentMessage.content = messageContent.join('\n').trim();
+          if (currentMessage.content) {
+            conversation.messages.push({
+              ...currentMessage,
+              content: currentMessage.content
+            } as ClaudeCodeMessage);
+          }
         }
         
         // Start new message
-        const role = this.extractRoleFromHeader(line);
+        const role = this.extractRoleFromSpecStoryHeader(line);
         currentMessage = {
           id: this.generateId(),
           role,
@@ -174,6 +203,7 @@ export class ClaudeCodeParser {
           timestamp: new Date().toISOString(),
           sequence: messageSequence++
         };
+        messageContent = [];
         continue;
       }
       
@@ -184,16 +214,19 @@ export class ClaudeCodeParser {
       
       // Add content to current message
       if (currentMessage) {
-        currentMessage.content += line + '\n';
+        messageContent.push(line);
       }
     }
     
     // Add final message
-    if (currentMessage && currentMessage.content) {
-      conversation.messages.push({
-        ...currentMessage,
-        content: currentMessage.content.trim()
-      } as ClaudeCodeMessage);
+    if (currentMessage && messageContent.length > 0) {
+      currentMessage.content = messageContent.join('\n').trim();
+      if (currentMessage.content) {
+        conversation.messages.push({
+          ...currentMessage,
+          content: currentMessage.content
+        } as ClaudeCodeMessage);
+      }
     }
     
     return conversation;
@@ -290,15 +323,15 @@ export class ClaudeCodeParser {
   // Convert Claude Code conversation to Yoshidex session format
   private static convertToYoshidexSession(conversation: ClaudeCodeConversation): YoshidexSession {
     const session: YoshidexSession = {
-      yoshidex_session_id: conversation.id,
+      yoshidex_session_id: `yoshidx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       user_id: '', // Will need to be set by the calling code
       claude_session_id: conversation.id,
-      session_title: conversation.title || 'Imported Claude Code Session',
-      session_description: `Imported from Claude Code - ${conversation.messages.length} messages`,
+      session_title: conversation.title || 'Imported SpecStory Session',
+      session_description: `Imported from SpecStory - ${conversation.messages?.length || 0} messages`,
       model_used: conversation.model || 'claude-3-5-sonnet',
       session_status: 'completed',
-      total_messages: conversation.messages.length,
-      total_tokens_used: this.calculateTotalTokens(conversation.messages),
+      total_messages: conversation.messages?.length || 0,
+      total_tokens_used: this.calculateTotalTokens(conversation.messages || []),
       session_started_at: conversation.created_at,
       session_ended_at: conversation.updated_at,
       created_at: new Date().toISOString(),
@@ -309,7 +342,7 @@ export class ClaudeCodeParser {
       git_repository_url: conversation.metadata?.git_info?.repository_url,
       git_branch: conversation.metadata?.git_info?.branch,
       git_commit_hash: conversation.metadata?.git_info?.commit_hash,
-      tags: ['imported', 'claude-code'],
+      tags: ['imported', 'specstory'],
       is_archived: false
     };
 
@@ -321,15 +354,16 @@ export class ClaudeCodeParser {
     conversation: ClaudeCodeConversation, 
     sessionId: string
   ): YoshidexMessage[] {
-    return conversation.messages.map(message => ({
-      yoshidex_message_id: message.id,
+    const messages = conversation.messages || [];
+    return messages.map((message, index) => ({
+      yoshidex_message_id: `msg_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
       yoshidex_session_id: sessionId,
-      claude_message_id: message.id,
-      message_sequence: message.sequence,
+      claude_message_id: message.id || `msg_${index}`,
+      message_sequence: message.sequence || index,
       role: message.role,
       content: message.content,
       content_type: 'text',
-      message_timestamp: message.timestamp,
+      message_timestamp: message.timestamp || new Date().toISOString(),
       response_time_ms: message.metadata?.response_time_ms,
       input_tokens: message.metadata?.input_tokens,
       output_tokens: message.metadata?.output_tokens,
@@ -354,6 +388,16 @@ export class ClaudeCodeParser {
     if (lowerHeader.includes('human') || lowerHeader.includes('user')) {
       return 'user';
     } else if (lowerHeader.includes('assistant') || lowerHeader.includes('claude')) {
+      return 'assistant';
+    } else {
+      return 'system';
+    }
+  }
+
+  private static extractRoleFromSpecStoryHeader(header: string): 'user' | 'assistant' | 'system' {
+    if (header.includes('**User**')) {
+      return 'user';
+    } else if (header.includes('**Agent**') || header.includes('**Assistant**')) {
       return 'assistant';
     } else {
       return 'system';
