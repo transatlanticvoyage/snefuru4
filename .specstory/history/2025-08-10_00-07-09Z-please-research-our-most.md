@@ -5679,3 +5679,238 @@ I've added the beautiful button with copy functionality to the Locations tab in 
 
 The button combination looks beautiful and professional, with the main blue button flowing seamlessly into the compact green copy button, exactly as requested.
 
+---
+
+_**User**_
+
+pleae update the page at page=rup_locations_mar so that there are no warning messages cluttering the screen. completely disable such messages from the broader wp system of plugins, etc. from ever displaying any message here . you failed in the past to fix this 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll find the page at `page=rup_locations_mar` and completely disable all warning messages, error notices, and admin notices on that page.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [ ] 🌡️ Find rup_locations_mar page handler in snefuruplin plugin
+- [ ] 🌡️ Add complete admin notices suppression for that page
+- [ ] 🌡️ Disable WordPress plugin warnings and errors
+- [ ] 🌡️ Test clean page display with no messages
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Find rup_locations_mar page handler in snefuruplin plugin
+- [ ] 🌡️ Add complete admin notices suppression for that page
+- [ ] 🌡️ Disable WordPress plugin warnings and errors
+- [ ] 🌡️ Test clean page display with no messages
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep**
+
+Result:
+
+```
+Found 9 files
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-10_00-07-09Z-please-research-our-most.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_23-49-28Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_21-51-13Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_20-48-23Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_15-46-20Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/09 August-01 StormBasin/190 sddx - nubra tableface - official tenants/special adjuncts to sddx nubra tenants/120 special copy button prompt/120 special copy button prompt - 1.txt
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/09 August-01 StormBasin/190 sddx - nubra tableface - official tenants/special adjuncts to sddx nubra tenants/110 - 2025__08_09 - for new location and service system ruplin/nubra tenants - adjunct - locations services ruplin - 1.txt
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+// New Ruplin pages
+        add_submenu_page(
+            'snefuru',
+            'rup_locations_mar',
+            'rup_locations_mar',
+            'manage_options',
+            'rup_locations_mar',
+            array($this, 'rup_locations_mar_page')
+        );
+        
+        add_submenu_page(
+            'snefuru',
+            'rup_services_mar',
+            'rup_services_mar',
+            'manage_options',
+            'rup_services_mar',
+            array($this, 'rup_services_mar_page')
+        );
+--
+    }
+    
+    /**
+     * rup_locations_mar page - Locations Management
+     */
+    public function rup_locations_mar_page() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_locations';
+        
+        // Handle AJAX requests
+        if (isset($_POST['action'])) {
+            $this->handle_locations_ajax();
+            return;
+        }
+        
+        // Enqueue WordPress media scripts
+--
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 5px; margin: 30px 0;">
+                        <h4 style="margin-top: 0; color: #856404;">💡 Pro Tip: Finding IDs</h4>
+                        <p style="margin-bottom: 0; color: #856404; line-height: 1.6;">
+                            To find Service IDs and Location IDs, visit your <strong>rup_services_mar</strong> and <strong>rup_locations_mar</strong> admin pages. 
+                            The ID numbers are shown in the first column of each table. You can also use the <strong>SH</strong> copy buttons to quickly copy shortcodes with the correct IDs.
+                        </p>
+                    </div>
+                    
+                    <h3 style="color: #0073aa; margin-top: 30px;">Available Service Fields</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                        <div>
+                            <ul style="line-height: 1.6;">
+                                <li>Service Name</li>
+                                <li>Service Placard</li>
+--
+                        <h4 style="color: #0073aa;">Quick Links to Data Management:</h4>
+                        <ul style="line-height: 1.6;">
+                            <li><a href="<?php echo admin_url('admin.php?page=rup_services_mar'); ?>" class="button button-secondary">Manage Services & Images →</a></li>
+                            <li style="margin-top: 10px;"><a href="<?php echo admin_url('admin.php?page=rup_locations_mar'); ?>" class="button button-secondary">Manage Locations & Images →</a></li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me find the actual `rup_locations_mar_page` function to add warning suppression:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+public function rup_locations_mar_page() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'zen_locations';
+        
+        // Handle AJAX requests
+        if (isset($_POST['action'])) {
+            $this->handle_locations_ajax();
+            return;
+        }
+        
+        // Enqueue WordPress media scripts
+        wp_enqueue_media();
+        
+        // Suppress all admin notices except those directly related to this page
+        add_action('admin_print_scripts', function() {
+            remove_all_actions('admin_notices');
+            remove_all_actions('all_admin_notices');
+        });
+        
+        ?>
+        <div class="wrap" style="margin: 0; padding: 0;">
+            <!-- Allow space for WordPress notices -->
+            <div style="height: 20px;"></div>
+            
+            <div style="padding: 20px;">
+                <h1 style="margin-bottom: 20px;">📍 Zen Locations Manager</h1>
+            
+            <!-- Control Bar -->
+            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="create-inline-btn" class="button button-primary">Create New (Inline)</button>
+                        <button id="create-popup-btn" class="button button-secondary">Create New (Popup)</button>
+                    </div>
+                </div>
+                
+                <!-- Nubra Tableface Kite -->
+                <div id="nubra-tableface-kite" style="margin-bottom: 15px;"></div>
+                
+                <!-- Pagination and Search Controls -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <!-- Items per page -->
+                        <div style="display: flex; gap: 0; border: 1px solid #ccc;">
+                            <button class="per-page-btn" data-value="10" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px;">10</button>
+                            <button class="per-page-btn" data-value="20" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">20</button>
+                            <button class="per-page-btn" data-value="50" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">50</button>
+                            <button class="per-page-btn active" data-value="100" style="border: none; padding: 10px 15px; background: #0073aa; color: white; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">100</button>
+                            <button class="per-page-btn" data-value="200" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">200</button>
+                            <button class="per-page-btn" data-value="500" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">500</button>
+                            <button class="per-page-btn" data-value="all" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">All</button>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the notice suppression is already there but it's not working properly. Let me add more aggressive notice suppression:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find rup_locations_mar page handler in snefuruplin plugin
+- [⚡] 🌡️ Add complete admin notices suppression for that page
+- [ ] 🌡️ Disable WordPress plugin warnings and errors
+- [ ] 🌡️ Test clean page display with no messages
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1530→        </div>
+  1531→        <?php
+  1532→    }
+  1533→    
+  1534→    /**
+  1535→     * rup_locations_mar page - Locations Management
+  1536→     */
+  1537→    public function rup_locations_mar_page() {
+  1538→        global $wpdb;
+  1539→        $table_name = $wpdb->prefix . 'zen_locations';
+  1540→        
+  1541→        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+  1542→        $this->suppress_all_admin_notices();
+  1543→        
+  1544→        // Handle AJAX requests
+  1545→        if (isset($_POST['action'])) {
+  1546→            $this->handle_locations_ajax();
+  1547→            return;
+  1548→        }
+  1549→        
+  1550→        // Enqueue WordPress media scripts
+  1551→        wp_enqueue_media();
+  1552→        
+  1553→        ?>
+  1554→        <div class="wrap" style="margin: 0; padding: 0;">
+  1555→            <!-- Allow space for WordPress notices -->
+```
+
