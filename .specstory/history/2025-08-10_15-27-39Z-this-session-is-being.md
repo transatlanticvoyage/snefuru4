@@ -3177,3 +3177,1200 @@ The system integrates seamlessly with your existing WordPress structure and main
 
 **Ready for testing via WP Pusher!** 🚀
 
+---
+
+_**User**_
+
+on the elementor elicitor tab, under the denyeep column div 1 label text, (and under the <hr>), please create a new instance of a text box plus a copy button above it. 
+
+this instance will be above the current 3 instances we have of (copy button + text box). 
+
+please also put a text label in bold 16 px on the page between the <hr> and the copy button that says:
+
+copy all instances 
+
+in the actual text box, create a piece of text that is a arrangement of the contents of the other existing boxes in the same denyeep area put together 
+
+so an example value will be like this for example:
+
+———————————————————————
+
+
+
+
+wp_posts.ID / wp_posts.post_title / wp_posts.post_status / admin_url('post.php?post=$ID&action=edit')
+
+Database field mappings:
+- Post ID: wp_posts.ID (bigint unsigned, primary key)
+- Post Title: wp_posts.post_title (text field)
+- Post Status: wp_posts.post_status (varchar, values: publish/draft/pending/private/trash/auto-draft/inherit)
+- Edit Link: Dynamically generated using WordPress admin_url() function with wp_posts.ID
+
+
+
+wp_posts.post_id = 666 / Home vev2 / publish / https://8mako.ksit.me/wp-admin/post.php?post=666&action=edit
+BELOW
+
+
+
+[
+    {
+        "id": "39b3102e",
+        "elType": "container",
+        "settings": {
+            "flex_gap": {
+                "size": "",
+                "unit": "px",
+                "column": "",
+                "row": "",
+                "isLinked": true
+            },
+            "min_height": {
+                "unit": "vh",
+                "size": 88,
+                "sizes": []
+            },
+            "background_background": "classic",
+            "flex_align_items": "center",
+            "content_position": "middle",
+            "padding": {
+                "unit": "%",
+                "top": "0",
+                "right": "8",
+                "bottom": "0",
+                "left": "8",
+                "isLinked": ""
+            },
+            "padding_tablet": {
+                "unit": "%",
+                "top": "0",
+                "right": "5",
+                "bottom": "0",
+                "left": "5",
+                "isLinked": ""
+            },
+            "_title": "Hero",
+            "__globals__": {
+                "background_color": "globals\/colors?id=secondary",
+                "background_overlay_color": "globals\/colors?id=primary"
+            },
+            "background_image": {
+                "id": "",
+                "url": "",
+                "alt": "mold removal murfreesboro",
+                "source": "library",
+                "size": ""
+            },
+            "background_position": "center right",
+            "background_repeat": "no-repeat",
+            "background_size": "cover",
+            "min_height_mobile": {
+                "unit": "vh",
+                "size": "",
+                "sizes": []
+            },
+            "background_position_mobile": "center center",
+            "flex_direction": "column",
+            "flex_justify_content": "center",
+            "link": {
+                "url": "#",
+                "is_external": "",
+                "nofollow": "",
+                "custom_attributes": ""
+            },
+            "boxed_width": {
+                "unit": "px",
+                "size": 920,
+                "sizes": []
+            },
+            "background_overlay_background": "classic",
+            "background_overlay_opacity": {
+                "unit": "px",
+                "size": 0.8,
+                "sizes": []
+            }
+        },
+        "elements": [
+            {
+                "id": "7135770b",
+                "elType": "widget",
+                "settings": {
+                    "title": "y_hero1_heading",
+                    "header_size": "h1",
+                    "align": "center",
+                    "__globals__": {
+                        "typography_typography": "globals\/typography?id=b2deeae"
+                    },
+                    "_padding": {
+                        "unit": "%",
+                        "top": "",
+                        "right": "",
+                        "bottom": "",
+                        "left": "",
+                        "isLinked": true
+                    },
+                    "_padding_tablet": {
+                        "unit": "%",
+                        "top": "",
+                        "right": "",
+                        "bottom": "",
+                        "left": "",
+                        "isLinked": true
+                    },
+                    "_padding_mobile": {
+                        "unit": "%",
+                        "top": "",
+                        "right": "",
+                        "bottom": "",
+                        "left": "",
+                        "isLinked": true
+                    },
+                    "title_color": "#FFFFFF"
+                },
+                "elements": [],
+                "widgetType": "heading"
+            },
+            {
+                "id": "39e00e39",
+                "elType": "widget",
+                "settings": {
+                    "title": "y_hero1_main",
+                    "align": "center",
+                    "header_size": "p",
+                    "__globals__": {
+                        "typography_typography": "globals\/typography?id=c05b693",
+                        "title_color": ""
+                    },
+                    "typography_typography": "custom",
+                    "typography_font_family": "Poppins",
+                    "typography_font_size": {
+                        "unit": "px",
+                        "size": 22,
+                        "sizes": []
+                    },
+                    "typography_font_size_tablet": {
+                        "unit": "px",
+                        "size": 14,
+                        "sizes": []
+                    },
+                    "typography_font_weight": "300",
+                    "typography_text_transform": "none",
+                    "typography_font_style": "normal",
+                    "typography_text_decoration": "none",
+                    "typography_line_height": {
+                        "unit": "em",
+                        "size": 1.5,
+                        "sizes": []
+                    },
+                    "typography_letter_spacing": {
+                        "unit": "px",
+                        "size": 0,
+                        "sizes": []
+                    },
+                    "title_color": "#FFFFFF"
+                },
+                "elements": [],
+                "widgetType": "heading"
+            },
+            {
+                "id": "1d79a52f",
+                "elType": "widget",
+                "settings": {
+                    "text": "Contact us",
+                    "align": "center",
+                    "button_text_color": "#FFFFFF",
+                    "border_border": "solid",
+                    "border_width": {
+                        "unit": "px",
+                        "top": "1",
+                        "right": "1",
+                        "bottom": "1",
+                        "left": "1",
+                        "isLinked": "1"
+                    },
+                    "border_color": "#2C6FC0",
+                    "border_radius": {
+                        "unit": "px",
+                        "top": "100",
+                        "right": "100",
+                        "bottom": "100",
+                        "left": "100",
+                        "isLinked": "1"
+                    },
+                    "text_padding": {
+                        "unit": "px",
+                        "top": "16",
+                        "right": "55",
+                        "bottom": "16",
+                        "left": "55",
+                        "isLinked": ""
+                    },
+                    "_margin": {
+                        "unit": "px",
+                        "top": "20",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0",
+                        "isLinked": ""
+                    },
+                    "__globals__": {
+                        "button_text_color": "globals\/colors?id=d6cea4e",
+                        "border_color": "globals\/colors?id=accent",
+                        "button_background_hover_color": "globals\/colors?id=86b4fcd",
+                        "hover_color": "globals\/colors?id=accent"
+                    },
+                    "link": {
+                        "url": "https:\/\/library.elementor.com\/local-services-wireframe-1\/contact\/",
+                        "is_external": "",
+                        "nofollow": "",
+                        "custom_attributes": ""
+                    },
+                    "__dynamic__": {
+                        "link": "[elementor-tag id=\"720b4e5\" name=\"internal-url\" settings=\"%7B%22type%22%3A%22post%22%2C%22post_id%22%3A%2241%22%7D\"]"
+                    }
+                },
+                "elements": [],
+                "widgetType": "button"
+            }
+        ],
+        "isInner": false
+    },
+    {
+        "id": "2b2beba8",
+        "elType": "container",
+        "settings": {
+            "layout": "full_width",
+            "flex_gap": {
+                "size": 90,
+                "unit": "px",
+                "column": "90",
+                "row": "90",
+                "isLinked": true
+            },
+            "padding": {
+                "unit": "%",
+                "top": "0",
+                "right": "8",
+                "bottom": "0",
+                "left": "8",
+                "isLinked": ""
+            },
+            "margin": {
+                "unit": "%",
+                "top": "12",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "padding_tablet": {
+                "unit": "%",
+                "top": "0",
+                "right": "5",
+                "bottom": "0",
+                "left": "5",
+                "isLinked": ""
+            },
+            "margin_tablet": {
+                "unit": "%",
+                "top": "25",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "margin_mobile": {
+                "unit": "%",
+                "top": "35",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "_title": "Services",
+            "flex_direction": "column",
+            "flex_align_items": "stretch",
+            "flex_gap_tablet": {
+                "unit": "px",
+                "size": 60,
+                "sizes": [],
+                "column": "60",
+                "row": "60",
+                "isLinked": true
+            }
+        },
+        "elements": [
+            {
+                "id": "25b3a2c5",
+                "elType": "container",
+                "settings": {
+                    "content_width": "full",
+                    "flex_direction": "column",
+                    "flex_gap": {
+                        "unit": "px",
+                        "size": 0,
+                        "sizes": [],
+                        "column": "0",
+                        "row": "0",
+                        "isLinked": true
+                    }
+                },
+                "elements": [
+                    {
+                        "id": "67fdea72",
+                        "elType": "widget",
+                        "settings": {
+                            "title": "y_services1_heading",
+                            "align": "center",
+                            "__globals__": {
+                                "typography_typography": "globals\/typography?id=primary"
+                            }
+                        },
+                        "elements": [],
+                        "widgetType": "heading"
+                    },
+                    {
+                        "id": "7fc1e434",
+                        "elType": "widget",
+                        "settings": {
+                            "title": "y_services1_main",
+                            "align": "center",
+                            "header_size": "h5",
+                            "__globals__": {
+                                "typography_typography": "globals\/typography?id=c05b693",
+                                "title_color": "globals\/colors?id=text"
+                            }
+                        },
+                        "elements": [],
+                        "widgetType": "heading"
+                    }
+                ],
+                "isInner": true
+            },
+            {
+                "id": "48485263",
+                "elType": "container",
+                "settings": {
+                    "layout": "full_width",
+                    "flex_gap": {
+                        "size": 1.5,
+                        "unit": "%",
+                        "column": "1.5",
+                        "row": "1.5",
+                        "isLinked": true
+                    },
+                    "structure": "40",
+                    "margin": {
+                        "unit": "%",
+                        "top": "",
+                        "right": "",
+                        "bottom": "",
+                        "left": "",
+                        "isLinked": true
+                    },
+                    "margin_mobile": {
+                        "unit": "%",
+                        "top": "",
+                        "right": "",
+                        "bottom": "",
+                        "left": "",
+                        "isLinked": true
+                    },
+                    "flex_direction": "row",
+                    "content_width": "full",
+                    "width_tablet": {
+                        "unit": "%",
+                        "size": "",
+                        "sizes": []
+                    },
+                    "flex_justify_content": "space-between",
+                    "flex_gap_tablet": {
+                        "unit": "px",
+                        "size": 60,
+                        "sizes": [],
+                        "column": "60",
+                        "row": "60",
+                        "isLinked": true
+                    },
+                    "flex_gap_mobile": {
+                        "unit": "%",
+                        "size": "",
+                        "sizes": [],
+                        "column": "",
+                        "row": "",
+                        "isLinked": true
+                    },
+                    "flex_wrap_tablet": "wrap",
+                    "link": {
+                        "url": "#",
+                        "is_external": "",
+                        "nofollow": "",
+                        "custom_attributes": ""
+                    },
+                    "flex_justify_content_mobile": "center"
+                },
+                "elements": [
+                    {
+                        "id": "50cfbb1b",
+                        "elType": "widget",
+                        "settings": {
+                            "image": {
+                                "id": "88",
+                                "url": "https:\/\/8mako.ksit.me\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"
+                            },
+                            "title_text": "y_serv1",
+                            "description_text": "y_serv1_main",
+                            "title_size": "h4",
+                            "image_size": {
+                                "unit": "%",
+                                "size": "100",
+                                "sizes": []
+                            },
+                            "hover_animation": "grow",
+                            "text_align": "left",
+                            "title_bottom_space": {
+                                "unit": "px",
+                                "size": "15",
+                                "sizes": []
+                            },
+                            "__globals__": {
+                                "title_typography_typography": "globals\/typography?id=392b9e0"
+                            },
+                            "_element_custom_width": {
+                                "unit": "%",
+                                "size": 25,
+                                "sizes": []
+                            },
+                            "_element_width_tablet": "initial",
+                            "_element_width_mobile": "inherit",
+                            "_element_custom_width_tablet": {
+                                "unit": "%",
+                                "size": 45,
+                                "sizes": []
+                            },
+                            "_element_custom_width_mobile": {
+                                "unit": "%",
+                                "size": "",
+                                "sizes": []
+                            },
+                            "_element_width": "initial"
+                        },
+                        "elements": [],
+                        "widgetType": "image-box"
+                    },
+                    {
+                        "id": "64803ab5",
+                        "elType": "widget",
+                        "settings": {
+                            "image": {
+                                "id": "88",
+                                "url": "https:\/\/8mako.ksit.me\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"
+                            },
+                            "title_text": "y_serv2",
+                            "description_text": "y_serv2_main",
+                            "title_size": "h4",
+                            "image_size": {
+                                "unit": "%",
+                                "size": "100",
+                                "sizes": []
+                            },
+                            "hover_animation": "grow",
+                            "text_align": "left",
+                            "title_bottom_space": {
+                                "unit": "px",
+                                "size": "15",
+                                "sizes": []
+                            },
+                            "__globals__": {
+                                "title_typography_typography": "globals\/typography?id=392b9e0"
+                            },
+                            "_element_width_tablet": "initial",
+                            "_element_width_mobile": "inherit",
+                            "_element_custom_width": {
+                                "unit": "%",
+                                "size": 25,
+                                "sizes": []
+                            },
+                            "_element_custom_width_tablet": {
+                                "unit": "%",
+                                "size": 45,
+                                "sizes": []
+                            },
+                            "_element_custom_width_mobile": {
+                                "unit": "%",
+                                "size": "",
+                                "sizes": []
+                            },
+                            "_element_width": "initial"
+                        },
+                        "elements": [],
+                        "widgetType": "image-box"
+                    },
+                    {
+                        "id": "3538b6ef",
+                        "elType": "widget",
+                        "settings": {
+                            "image": {
+                                "id": "88",
+                                "url": "https:\/\/8mako.ksit.me\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"
+                            },
+                            "title_text": "y_serv3",
+                            "description_text": "y_serv3_main",
+                            "title_size": "h4",
+                            "image_size": {
+                                "unit": "%",
+                                "size": "100",
+                                "sizes": []
+                            },
+                            "hover_animation": "grow",
+                            "text_align": "left",
+                            "title_bottom_space": {
+                                "unit": "px",
+                                "size": "15",
+                                "sizes": []
+                            },
+                            "__globals__": {
+                                "title_typography_typography": "globals\/typography?id=392b9e0"
+                            },
+                            "_element_width_tablet": "initial",
+                            "_element_width_mobile": "inherit",
+                            "_element_custom_width": {
+                                "unit": "%",
+                                "size": 25,
+                                "sizes": []
+                            },
+                            "_element_custom_width_tablet": {
+                                "unit": "%",
+                                "size": 45,
+                                "sizes": []
+                            },
+                            "_element_custom_width_mobile": {
+                                "unit": "%",
+                                "size": "",
+                                "sizes": []
+                            },
+                            "_element_width": "initial"
+                        },
+                        "elements": [],
+                        "widgetType": "image-box"
+                    },
+                    {
+                        "id": "7d66454f",
+                        "elType": "widget",
+                        "settings": {
+                            "image": {
+                                "id": "88",
+                                "url": "https:\/\/8mako.ksit.me\/wp-content\/uploads\/2025\/03\/Image_Placeholder-13122021.jpg"
+                            },
+                            "title_text": "y_serv4",
+                            "description_text": "y_serv4_main",
+                            "title_size": "h4",
+                            "image_size": {
+                                "unit": "%",
+                                "size": "100",
+                                "sizes": []
+                            },
+                            "hover_animation": "grow",
+                            "text_align": "left",
+                            "title_bottom_space": {
+                                "unit": "px",
+                                "size": "15",
+                                "sizes": []
+                            },
+                            "__globals__": {
+                                "title_typography_typography": "globals\/typography?id=392b9e0"
+                            },
+                            "_element_width_tablet": "initial",
+                            "_element_width_mobile": "inherit",
+                            "_element_custom_width": {
+                                "unit": "%",
+                                "size": 25,
+                                "sizes": []
+                            },
+                            "_element_custom_width_tablet": {
+                                "unit": "%",
+                                "size": 45,
+                                "sizes": []
+                            },
+                            "_element_custom_width_mobile": {
+                                "unit": "%",
+                                "size": "",
+                                "sizes": []
+                            },
+                            "_element_width": "initial"
+                        },
+                        "elements": [],
+                        "widgetType": "image-box"
+                    }
+                ],
+                "isInner": true
+            }
+        ],
+        "isInner": false
+    },
+    {
+        "id": "ef4344b",
+        "elType": "container",
+        "settings": [],
+        "elements": [
+            {
+                "id": "051212a",
+                "elType": "widget",
+                "settings": {
+                    "editor": "<p>y_alca_1<\/p>",
+                    "align": "left",
+                    "_element_custom_width": {
+                        "unit": "px",
+                        "size": "",
+                        "sizes": []
+                    },
+                    "_border_border": "solid",
+                    "_border_width": {
+                        "unit": "px",
+                        "top": "6",
+                        "right": "6",
+                        "bottom": "6",
+                        "left": "6",
+                        "isLinked": true
+                    },
+                    "_border_radius": {
+                        "unit": "px",
+                        "top": "6",
+                        "right": "6",
+                        "bottom": "6",
+                        "left": "6",
+                        "isLinked": true
+                    },
+                    "_box_shadow_box_shadow_type": "yes",
+                    "custom_css": "{max-width:400px !important;}",
+                    "_padding": {
+                        "unit": "px",
+                        "top": "34",
+                        "right": "34",
+                        "bottom": "34",
+                        "left": "34",
+                        "isLinked": true
+                    }
+                },
+                "elements": [],
+                "widgetType": "text-editor"
+            }
+        ],
+        "isInner": false
+    },
+    {
+        "id": "705c0113",
+        "elType": "container",
+        "settings": {
+            "layout": "full_width",
+            "flex_gap": {
+                "size": 80,
+                "unit": "px",
+                "column": "80",
+                "row": "80",
+                "isLinked": true
+            },
+            "padding": {
+                "unit": "%",
+                "top": "8",
+                "right": "8",
+                "bottom": "8",
+                "left": "8",
+                "isLinked": ""
+            },
+            "margin": {
+                "unit": "%",
+                "top": "12",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "content_position": "middle",
+            "background_background": "classic",
+            "__globals__": {
+                "background_color": "globals\/colors?id=secondary"
+            },
+            "padding_tablet": {
+                "unit": "%",
+                "top": "12",
+                "right": "5",
+                "bottom": "12",
+                "left": "5",
+                "isLinked": ""
+            },
+            "margin_tablet": {
+                "unit": "%",
+                "top": "25",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "margin_mobile": {
+                "unit": "%",
+                "top": "35",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "padding_mobile": {
+                "unit": "%",
+                "top": "25",
+                "right": "5",
+                "bottom": "25",
+                "left": "5",
+                "isLinked": ""
+            },
+            "_title": "Benefits",
+            "flex_direction": "column",
+            "flex_align_items": "stretch",
+            "flex_gap_mobile": {
+                "unit": "px",
+                "size": 60,
+                "sizes": [],
+                "column": "60",
+                "row": "60",
+                "isLinked": true
+            }
+        },
+        "elements": [
+            {
+                "id": "672aecdf",
+                "elType": "widget",
+                "settings": {
+                    "title": "y_gizmo1_heading",
+                    "align": "center",
+                    "__globals__": {
+                        "typography_typography": "globals\/typography?id=primary"
+                    }
+                },
+                "elements": [],
+                "widgetType": "heading"
+            },
+            {
+                "id": "114370a",
+                "elType": "container",
+                "settings": {
+                    "content_width": "full"
+                },
+                "elements": [
+                    {
+                        "id": "f7ddf3e",
+                        "elType": "widget",
+                        "settings": {
+                            "editor": "<p>y_gizmo1_main<\/p>"
+                        },
+                        "elements": [],
+                        "widgetType": "text-editor"
+                    }
+                ],
+                "isInner": true
+            },
+            {
+                "id": "08df688",
+                "elType": "container",
+                "settings": {
+                    "content_width": "full"
+                },
+                "elements": [],
+                "isInner": true
+            }
+        ],
+        "isInner": false
+    },
+    {
+        "id": "6b1e54e5",
+        "elType": "container",
+        "settings": {
+            "layout": "full_width",
+            "flex_gap": {
+                "size": 0,
+                "unit": "px",
+                "column": "0",
+                "row": "0",
+                "isLinked": true
+            },
+            "content_position": "middle",
+            "structure": "20",
+            "margin": {
+                "unit": "%",
+                "top": "12",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "padding": {
+                "unit": "%",
+                "top": "0",
+                "right": "8",
+                "bottom": "0",
+                "left": "8",
+                "isLinked": ""
+            },
+            "padding_tablet": {
+                "unit": "%",
+                "top": "0",
+                "right": "5",
+                "bottom": "0",
+                "left": "5",
+                "isLinked": ""
+            },
+            "margin_tablet": {
+                "unit": "%",
+                "top": "25",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "reverse_order_tablet": "reverse-tablet",
+            "reverse_order_mobile": "reverse-mobile",
+            "margin_mobile": {
+                "unit": "%",
+                "top": "35",
+                "right": "0",
+                "bottom": "0",
+                "left": "0",
+                "isLinked": ""
+            },
+            "_title": "Examples",
+            "flex_direction": "row",
+            "flex_align_items": "center",
+            "flex_direction_tablet": "column-reverse"
+        },
+        "elements": [
+            {
+                "id": "12759082",
+                "elType": "container",
+                "settings": {
+                    "_column_size": "50",
+                    "width_tablet": {
+                        "size": "100",
+                        "unit": "%"
+                    },
+                    "margin_tablet": {
+                        "unit": "%",
+                        "top": "10",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0",
+                        "isLinked": ""
+                    },
+                    "content_width": "full",
+                    "width": {
+                        "unit": "%",
+                        "size": 50,
+                        "sizes": []
+                    },
+                    "flex_direction": "column"
+                },
+                "elements": [
+                    {
+                        "id": "4d9e55fd",
+                        "elType": "widget",
+                        "settings": {
+                            "carousel": [
+                                {
+                                    "id": 114,
+                                    "url": "https:\/\/8mako.ksit.me\/wp-content\/uploads\/2025\/03\/Image_Placeholder_2_Slider_1-13122021.jpg"
+                                }
+                            ],
+                            "thumbnail_size": "full",
+                            "slides_to_show": "1",
+                            "navigation": "dots",
+                            "__globals__": {
+                                "dots_color": "globals\/colors?id=accent"
+                            },
+                            "carousel_name": "Image Carousel"
+                        },
+                        "elements": [],
+                        "widgetType": "image-carousel"
+                    }
+                ],
+                "isInner": true
+            },
+            {
+                "id": "4606971",
+                "elType": "container",
+                "settings": {
+                    "_column_size": "50",
+                    "padding": {
+                        "unit": "%",
+                        "top": "0",
+                        "right": "8",
+                        "bottom": "0",
+                        "left": "8",
+                        "isLinked": ""
+                    },
+                    "width_tablet": {
+                        "size": "100",
+                        "unit": "%"
+                    },
+                    "padding_tablet": {
+                        "unit": "%",
+                        "top": "0",
+                        "right": "20",
+                        "bottom": "0",
+                        "left": "0",
+                        "isLinked": ""
+                    },
+                    "content_width": "full",
+                    "width": {
+                        "unit": "%",
+                        "size": 50,
+                        "sizes": []
+                    },
+                    "flex_direction": "column"
+                },
+                "elements": [
+                    {
+                        "id": "7a0fc07e",
+                        "elType": "widget",
+                        "settings": {
+                            "title": "y_gizmo2_heading"
+                        },
+                        "elements": [],
+                        "widgetType": "heading"
+                    },
+                    {
+                        "id": "30cff0fe",
+                        "elType": "widget",
+                        "settings": {
+                            "editor": "<p>y_gizmo2_main<\/p>",
+                            "_padding_tablet": {
+                                "unit": "%",
+                                "top": "0",
+                                "right": "35",
+                                "bottom": "0",
+                                "left": "0",
+                                "isLinked": false
+                            },
+                            "_padding_mobile": {
+                                "unit": "px",
+                                "top": "0",
+                                "right": "0",
+                                "bottom": "0",
+                                "left": "0",
+                                "isLinked": ""
+                            },
+                            "_padding": {
+                                "unit": "%",
+                                "top": "0",
+                                "right": "25",
+                                "bottom": "0",
+                                "left": "0",
+                                "isLinked": false
+                            }
+                        },
+                        "elements": [],
+                        "widgetType": "text-editor"
+                    }
+                ],
+                "isInner": true
+            }
+        ],
+        "isInner": false
+    },
+    {
+        "id": "7c5e724",
+        "elType": "container",
+        "settings": {
+            "flex_direction": "column"
+        },
+        "elements": [],
+        "isInner": false
+    }
+]
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll add the new "copy all instances" textbox with a copy button above the existing instances in the Elementor Elicitor tab under denyeep column div 1.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+125→                        // Generate header303 content
+   126→                        $post_id = $post->ID;
+   127→                        $post_title = get_the_title($post_id);
+   128→                        $post_status = get_post_status($post_id);
+   129→                        $edit_link = admin_url('post.php?post=' . $post_id . '&action=edit');
+   130→                        
+   131→                        // Format the header303 content with two lines
+   132→                        $header303_line1 = sprintf(
+   133→                            'wp_posts.post_id = %d / %s / %s / %s',
+   134→                            $post_id,
+   135→                            $post_title,
+   136→                            $post_status,
+   137→                            $edit_link
+   138→                        );
+   139→                        $header303_content = $header303_line1 . "\nBELOW";
+   140→                        
+   141→                        // Get Elementor data for this post
+   142→                        $elementor_data = get_post_meta($post->ID, '_elementor_data', true);
+   143→                        $formatted_data = '';
+   144→                        
+   145→                        if (!empty($elementor_data)) {
+   146→                            // Decode and pretty print the JSON for better readability
+   147→                            $decoded = json_decode($elementor_data, true);
+   148→                            if ($decoded !== null) {
+   149→                                $formatted_data = json_encode($decoded, JSON_PRETTY_PRINT);
+   150→                            } else {
+   151→                                $formatted_data = $elementor_data;
+   152→                            }
+   153→                        }
+   154→                        
+   155→                        // Static mapping text for header303_db_mapping
+   156→                        $db_mapping_text = "wp_posts.ID / wp_posts.post_title / wp_posts.post_status / admin_url('post.php?post=\$ID&action=edit')\n\nDatabase field mappings:\n- Post ID: wp_posts.ID (bigint unsigned, primary key)\n- Post Title: wp_posts.post_title (text field)\n- Post Status: wp_posts.post_status (varchar, values: publish/draft/pending/private/trash/auto-draft/inherit)\n- Edit Link: Dynamically generated using WordPress admin_url() function with wp_posts.ID";
+   157→                        ?>
+   158→                        
+   159→                        <!-- Column Container Wrapper -->
+   160→                        <div class="snefuru-denyeep-columns-wrapper" style="display: flex; gap: 15px; margin-top: 10px;">
+   161→                            
+   162→                            <!-- Denyeep Column Div 1 -->
+   163→                            <div class="snefuru-denyeep-column" style="border: 1px solid black; padding: 10px; flex: 1; min-width: 420px;">
+   164→                                <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">denyeep column div 1</span>
+   165→                                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+   166→                                
+   167→                                <!-- Header303 DB Mapping Container -->
+   168→                                <div class="snefuru-header303-db-mapping-container">
+   169→                                    <div class="snefuru-header303-db-mapping-header">
+   170→                                        <span class="snefuru-header303-db-mapping-label">header303_db_mapping</span>
+   171→                                        <button type="button" class="snefuru-copy-btn" data-target="header303-db-mapping-textbox">
+   172→                                            Copy
+   173→                                        </button>
+   174→                                    </div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me find where the existing instances are so I can add the new "copy all instances" section before them:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+165→                                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+   166→                                
+   167→                                <!-- Header303 DB Mapping Container -->
+   168→                                <div class="snefuru-header303-db-mapping-container">
+   169→                                    <div class="snefuru-header303-db-mapping-header">
+   170→                                        <span class="snefuru-header303-db-mapping-label">header303_db_mapping</span>
+   171→                                        <button type="button" class="snefuru-copy-btn" data-target="header303-db-mapping-textbox">
+   172→                                            Copy
+   173→                                        </button>
+   174→                                    </div>
+   175→                                    <textarea 
+   176→                                        id="header303-db-mapping-textbox" 
+   177→                                        class="snefuru-header303-db-mapping-textbox" 
+   178→                                        readonly
+   179→                                    ><?php echo esc_textarea($db_mapping_text); ?></textarea>
+   180→                                </div>
+   181→                                
+   182→                                <!-- Header303 Container -->
+   183→                                <div class="snefuru-header303-container">
+   184→                                    <div class="snefuru-header303-header">
+   185→                                        <span class="snefuru-header303-label">header303</span>
+   186→                                        <button type="button" class="snefuru-copy-btn" data-target="header303-textbox">
+   187→                                            Copy
+   188→                                        </button>
+   189→                                    </div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see the structure. I need to add the new "copy all instances" section right after the HR element and before the first existing container. Let me add it:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   161→                            
+   162→                            <!-- Denyeep Column Div 1 -->
+   163→                            <div class="snefuru-denyeep-column" style="border: 1px solid black; padding: 10px; flex: 1; min-width: 420px;">
+   164→                                <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">denyeep column div 1</span>
+   165→                                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+   166→                                
+   167→                                <!-- Copy All Instances Container -->
+   168→                                <div class="snefuru-copy-all-instances-container" style="margin-bottom: 20px;">
+   169→                                    <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">copy all instances</span>
+   170→                                    <div style="position: relative; display: inline-block;">
+   171→                                        <button type="button" class="snefuru-copy-btn" data-target="copy-all-instances-textbox" style="margin-bottom: 5px;">
+   172→                                            Copy
+   173→                                        </button>
+   174→                                        <textarea 
+   175→                                            id="copy-all-instances-textbox" 
+   176→                                            class="snefuru-header303-db-mapping-textbox" 
+   177→                                            readonly
+   178→                                            style="height: 200px;"
+   179→                                        ><?php 
+   180→                                        // Combine all three instances into one text
+   181→                                        $all_instances_text = $db_mapping_text . "\n\n———————————————————————\n\n" . $header303_content . "\n\n———————————————————————\n\n" . $formatted_data;
+   182→                                        echo esc_textarea($all_instances_text); 
+   183→                                        ?></textarea>
+   184→                                    </div>
+   185→                                </div>
+   186→                                
+   187→                                <!-- Header303 DB Mapping Container -->
+   188→                                <div class="snefuru-header303-db-mapping-container">
+   189→                                    <div class="snefuru-header303-db-mapping-header">
+   190→                                        <span class="snefuru-header303-db-mapping-label">header303_db_mapping</span>
+   191→                                        <button type="button" class="snefuru-copy-btn" data-target="header303-db-mapping-textbox">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully added the new "copy all instances" section to the Elementor Elicitor tab under denyeep column div 1. Here's what I implemented:
+
+## ✅ **New "Copy All Instances" Feature Added**
+
+### **📋 What Was Added:**
+- **Bold label** - "copy all instances" in 16px font weight bold
+- **Copy button** - Using the existing snefuru-copy-btn styling and functionality  
+- **Large textarea** - 200px height to accommodate the combined content
+- **Combined content** - All three existing textbox contents merged with separators
+
+### **📝 Content Structure:**
+The new textbox contains all three existing instances combined in this format:
+
+```
+[DB Mapping Content]
+
+———————————————————————
+
+[Header303 Content with post data]
+
+———————————————————————
+
+[Elementor JSON data]
+```
+
+### **🎨 Styling & Integration:**
+- **Consistent styling** - Uses existing textarea and copy button classes
+- **Proper positioning** - Added above the 3 existing instances as requested
+- **Same functionality** - Copy button works with the existing JavaScript handlers
+- **Responsive design** - Follows the same layout patterns as other elements
+
+### **🔧 Technical Implementation:**
+- **PHP variables** - Reuses existing `$db_mapping_text`, `$header303_content`, and `$formatted_data`
+- **Proper escaping** - Uses `esc_textarea()` for security
+- **Consistent ID** - `copy-all-instances-textbox` for the copy functionality
+- **Existing JS integration** - Works with the current `data-target` copy system
+
+The feature is now ready and will show users a combined view of all the database mapping information, current page/post data, and Elementor JSON structure in one convenient copyable textbox!
+
