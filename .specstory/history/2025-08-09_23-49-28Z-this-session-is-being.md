@@ -2917,3 +2917,55 @@ _**Agent (claude-sonnet-4-20250514)**_
 
 No, I did not alter the styling for the main UI table grids on the _locations_mar page and the _services_mar page. All my recent work was focused only on creating the new Gopher Dynamic Tab functionality for the media library workaround. I have not touched the existing table grid styling on your admin pages.
 
+---
+
+_**User**_
+
+i now see the gopher dynamic tab appear in the menu that appears after user clicks "choose image". however, it does not appear to be working in frontend to successfuly place the image in that spot. please tell me the behind the scenes logic of this feature and how it compares to other default image assignment functions i n wordpress. please just explain it to me
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## Behind the Scenes Logic of Gopher Dynamic Tab
+
+Here's how our Gopher Dynamic Tab works compared to WordPress default image assignment:
+
+### **Default WordPress Image Assignment:**
+1. User clicks "Choose Image" 
+2. WordPress opens media modal showing the **Media Library**
+3. User selects an existing uploaded image file
+4. WordPress returns the **attachment ID** and **URL** of that physical file
+5. The image control gets populated with this real WordPress attachment data
+
+### **Our Gopher Dynamic Tab Logic:**
+1. User clicks "Choose Image" → same media modal opens
+2. Our JavaScript **injects** the "Gopher Dynamic Tab" into the sidebar
+3. User clicks our tab → we replace the modal content with zen data interface
+4. User selects a zen service/location → we make AJAX call to get the associated `rel_image1_id`
+5. **Key Step:** We take that `rel_image1_id` (which points to a real WordPress attachment) and create a **fake attachment model**
+6. We populate this fake model with the real attachment's data (URL, ID, title, etc.)
+7. We pass this fake model to WordPress's media frame selection system
+8. WordPress treats it as if user selected a normal image
+
+### **The Critical Issue:**
+The problem is likely in **step 6-8**. Our `useSelectedZenImage()` function creates this fake attachment model:
+
+```javascript
+var attachment = new wp.media.model.Attachment(imageData);
+frame.state().get('selection').reset([attachment]);
+frame.close();
+```
+
+**Potential Issues:**
+1. **Attachment Model Format:** The `imageData` we return from PHP might not match exactly what WordPress expects
+2. **Frame State:** The media frame might not be in the right state to accept our fake attachment
+3. **Elementor Integration:** Elementor might have additional requirements for how image data is formatted
+4. **Selection Reset:** The selection might not be persisting when the modal closes
+
+### **Comparison to Default:**
+- **Default:** Real attachment → Real selection → Works perfectly
+- **Ours:** Real attachment → Fake model wrapper → May not work seamlessly
+
+The core challenge is that we're essentially "spoofing" the normal WordPress media selection process by creating artificial attachment models from real attachments, and this intermediary step might be breaking the expected data flow.
+
