@@ -2425,3 +2425,26 @@ _**Agent (claude-sonnet-4-20250514)**_
 - [X] 🌡️ Test lightning popup functionality
 
 
+_**Agent (claude-sonnet-4-20250514)**_
+
+## Fixed the Global Function Issue!
+
+The problem was that the functions were defined inside the jQuery scope, making them inaccessible globally. Here's what I fixed:
+
+### Key Changes:
+
+1. **Moved Functions Outside jQuery Scope**: The `snefuruOpenLightningPopup()` and `snefuruCloseLightningPopup()` functions are now defined at the global level snefuruplin/hurricane/assets/hurricane.js:7-24
+
+2. **Used `jQuery` Instead of `$`**: Since we're outside the jQuery wrapper, I used the full `jQuery` name to avoid conflicts snefuruplin/hurricane/assets/hurricane.js:9
+
+3. **Explicit Window Assignment**: Functions are explicitly assigned to the window object snefuruplin/hurricane/assets/hurricane.js:27-28
+
+### How It Works Now:
+- **Inline onclick**: `onclick="window.snefuruOpenLightningPopup()"` will now work
+- **jQuery Events**: The jQuery event handlers also call the same global functions
+- **Multiple Fallbacks**: Both methods should work independently
+
+The lightning popup should now open when you click the button. The console will show "Opening lightning popup..." followed by "Lightning popup opened successfully" when it works properly.
+
+Try clicking the "⚡ Lightning Popup" button again - it should now display the full-screen modal with the "Lightning Popup" title!
+
