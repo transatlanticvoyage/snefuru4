@@ -1,0 +1,12 @@
+{
+  "created": "2024-08-10T00:00:00.000Z",
+  "auto_convert": true,
+  "keep_original": true,
+  "description": "Marker file for automatic Excel to CSV conversion via IceSickleDuplicator system",
+  "target_files": ["210 sddx - pantheon table tenants - 1.xlsx"],
+  "conversion_options": {
+    "preserve_formatting": false,
+    "include_empty_rows": true,
+    "sheet_selection": "first"
+  }
+}
