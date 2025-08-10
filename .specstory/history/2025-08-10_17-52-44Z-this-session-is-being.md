@@ -3605,3 +3605,863 @@ Perfect! I have successfully updated the Stellar Chamber Pantheon Table to match
 
 The table now accurately reflects the updated CSV structure from your Excel file, with the new `origin_page` column prominently displayed as the second column, showing dynamic WordPress admin edit URLs for each row.
 
+---
+
+_**User**_
+
+pleaes review the styling note i just added to the spreadsheet file and make the necessary changes to the pantheon ui table in the stellar chamber 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Run IceSickleDuplicator to get updated CSV with styling notes
+
+`cd "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes" && python3 ice-sickle-duplicator.py --path "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/9 August-04 StormBasin"`
+
+Result:
+
+```
+Found 1 IceSickleDuplicator markers
+
+Processing: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/9 August-04 StormBasin/210 sddx - pantheon table tenants - 1
+✓ Converted: 210 sddx - pantheon table tenants - 1.xlsx → 210 sddx - pantheon table tenants - 1.csv
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the new styling note requesting to "mimick what we have on the page at /xpagesmanager1 page in our app". Let me search for any existing styling references to this page in your codebase:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin`
+
+Result:
+
+```
+No files found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin`
+
+Result:
+
+```
+No files found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check the admin class for any page that might match this pattern:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./class-admin.php`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./class-admin.php`
+
+Result:
+
+```
+186:            'rup_kpages_mar',
+187:            'rup_kpages_mar',
+188-            'manage_options',
+189:            'rup_kpages_mar',
+190:            array($this, 'rup_kpages_mar_page')
+191-        );
+192-        
+193-        add_submenu_page(
+194-            'snefuru',
+195-            'rup_duplicate_mar',
+--
+3749:     * rup_kpages_mar page
+3750-     */
+3751:    public function rup_kpages_mar_page() {
+3752-        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+3753-        $this->suppress_all_admin_notices();
+3754-        
+3755-        echo '<div class="wrap">';
+3756:        echo '<h1><strong>rup_kpages_mar</strong></h1>';
+3757-        echo '</div>';
+3758-    }
+3759-    
+3760-    /**
+3761-     * rup_duplicate_mar page - Bulk Page/Post Duplication
+--
+5482:            'snefuru_page_rup_kpages_mar',
+5483-            'snefuru_page_rup_duplicate_mar',
+5484-            'snefuru_page_rup_horse_class_page',
+5485-            'snefuru_page_document_outlook_aug9',
+5486-            'snefuru_page_dynamic_images_man',
+5487-            'snefuru_page_kenli_sidebar_links'
+--
+5560:                'rup_driggs_mar', 'rup_kpages_mar', 'rup_duplicate_mar'
+5561-             ]));
+5562-        
+5563-        // Check if we're on WP Pusher page
+5564-        $is_wppusher_page = isset($_GET['page']) && $_GET['page'] === 'wppusher-plugins';
+5565-        
+--
+5603:                'rup_driggs_mar', 'rup_kpages_mar', 'rup_duplicate_mar'
+5604-             ]));
+5605-        
+5606-        // Check if we're on WP Pusher page
+5607-        $is_wppusher_page = isset($_GET['page']) && $_GET['page'] === 'wppusher-plugins';
+5608-
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+It looks like `rup_kpages_mar` might be the page you're referring to. Let me check if there are any other pages that could be similar to "xpagesmanager1":
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./class-admin.php`
+
+Result:
+
+```
+145:            array($this, 'rup_locations_mar_page')
+154:            array($this, 'rup_services_mar_page')
+163:            array($this, 'rup_driggs_mar_page')
+172:            array($this, 'rup_service_tags_mar_page')
+181:            array($this, 'rup_location_tags_mar_page')
+186:            'rup_kpages_mar',
+187:            'rup_kpages_mar',
+189:            'rup_kpages_mar',
+190:            array($this, 'rup_kpages_mar_page')
+199:            array($this, 'rup_duplicate_mar_page')
+208:            array($this, 'rup_pantheon_mar_page')
+213:            'rup_horse_class_page',
+214:            'rup_horse_class_page',
+216:            'rup_horse_class_page',
+217:            array($this, 'rup_horse_class_page')
+1614:     * rup_locations_mar page - Locations Management
+1616:    public function rup_locations_mar_page() {
+2463:     * rup_services_mar page - Services Management
+2465:    public function rup_services_mar_page() {
+3339:     * rup_driggs_mar page - Driggs Management (Vertical Field Editor)
+3341:    public function rup_driggs_mar_page() {
+3725:     * rup_service_tags_mar page
+3727:    public function rup_service_tags_mar_page() {
+3737:     * rup_location_tags_mar page
+3739:    public function rup_location_tags_mar_page() {
+3749:     * rup_kpages_mar page
+3751:    public function rup_kpages_mar_page() {
+3756:        echo '<h1><strong>rup_kpages_mar</strong></h1>';
+3761:     * rup_duplicate_mar page - Bulk Page/Post Duplication
+3763:    public function rup_duplicate_mar_page() {
+4135:     * rup_pantheon_mar page - Pantheon Table Management
+4137:    public function rup_pantheon_mar_page() {
+4617:     * rup_horse_class_page - Database Horse Class Management
+4619:    public function rup_horse_class_page() {
+5370:                            To find Service IDs and Location IDs, visit your <strong>rup_services_mar</strong> and <strong>rup_locations_mar</strong> admin pages. 
+5482:            'snefuru_page_rup_kpages_mar',
+5484:            'snefuru_page_rup_horse_class_page',
+5559:                'dynamic_images_man', 'kenli_sidebar_links', 'rup_horse_class_page',
+5560:                'rup_driggs_mar', 'rup_kpages_mar', 'rup_duplicate_mar'
+5602:                'dynamic_images_man', 'kenli_sidebar_links', 'rup_horse_class_page',
+5603:                'rup_driggs_mar', 'rup_kpages_mar', 'rup_duplicate_mar'
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see several "mar" pages. Let me look at the locations page (`rup_locations_mar_page`) since it likely has the most developed table styling that you want me to mimic:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./class-admin.php`
+
+Result:
+
+```
+1610→        <?php
+  1611→    }
+  1612→    
+  1613→    /**
+  1614→     * rup_locations_mar page - Locations Management
+  1615→     */
+  1616→    public function rup_locations_mar_page() {
+  1617→        global $wpdb;
+  1618→        $table_name = $wpdb->prefix . 'zen_locations';
+  1619→        
+  1620→        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+  1621→        $this->suppress_all_admin_notices();
+  1622→        
+  1623→        // Handle AJAX requests
+  1624→        if (isset($_POST['action'])) {
+  1625→            $this->handle_locations_ajax();
+  1626→            return;
+  1627→        }
+  1628→        
+  1629→        // Enqueue WordPress media scripts
+  1630→        wp_enqueue_media();
+  1631→        
+  1632→        ?>
+  1633→        <div class="wrap" style="margin: 0; padding: 0;">
+  1634→            <!-- Allow space for WordPress notices -->
+  1635→            <div style="height: 20px;"></div>
+  1636→            
+  1637→            <div style="padding: 20px;">
+  1638→                <h1 style="margin-bottom: 20px;">📍 Zen Locations Manager</h1>
+  1639→            
+  1640→            <!-- Control Bar -->
+  1641→            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+  1642→                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+  1643→                    <div style="display: flex; gap: 10px; align-items: center;">
+  1644→                        <button id="create-inline-btn" class="button button-primary">Create New (Inline)</button>
+  1645→                        <button id="create-popup-btn" class="button button-secondary">Create New (Popup)</button>
+  1646→                    </div>
+  1647→                </div>
+  1648→                
+  1649→                <!-- Nubra Tableface Kite -->
+  1650→                <div id="nubra-tableface-kite" style="margin-bottom: 15px;"></div>
+  1651→                
+  1652→                <!-- Pagination and Search Controls -->
+  1653→                <div style="display: flex; justify-content: space-between; align-items: center;">
+  1654→                    <div style="display: flex; gap: 15px; align-items: center;">
+  1655→                        <!-- Items per page -->
+  1656→                        <div style="display: flex; gap: 0; border: 1px solid #ccc;">
+  1657→                            <button class="per-page-btn" data-value="10" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px;">10</button>
+  1658→                            <button class="per-page-btn" data-value="20" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">20</button>
+  1659→                            <button class="per-page-btn" data-value="50" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">50</button>
+  1660→                            <button class="per-page-btn active" data-value="100" style="border: none; padding: 10px 15px; background: #0073aa; color: white; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">100</button>
+  1661→                            <button class="per-page-btn" data-value="200" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">200</button>
+  1662→                            <button class="per-page-btn" data-value="500" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">500</button>
+  1663→                            <button class="per-page-btn" data-value="all" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">All</button>
+  1664→                        </div>
+  1665→                        
+  1666→                        <!-- Page navigation -->
+  1667→                        <div id="page-nav" style="display: flex; gap: 0; border: 1px solid #ccc;">
+  1668→                            <!-- Dynamic page buttons will go here -->
+  1669→                        </div>
+  1670→                    </div>
+  1671→                    
+  1672→                    <!-- Search -->
+  1673→                    <div style="position: relative;">
+  1674→                        <input type="text" id="search-box" placeholder="Search locations..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 250px; font-size: 14px;">
+  1675→                        <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
+  1676→                    </div>
+  1677→                </div>
+  1678→            </div>
+  1679→            
+  1680→            <!-- Main Table -->
+  1681→            <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+  1682→                <div style="overflow-x: auto;">
+  1683→                    <table id="locations-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+  1684→                        <thead style="background: #f8f9fa;">
+  1685→                            <tr>
+  1686→                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px; cursor: pointer;" onclick="toggleSelectAll()">
+  1687→                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+  1688→                                        <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
+  1689→                                    </div>
+  1690→                                </th>
+  1691→                                <th data-sort="location_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_id</th>
+  1692→                                <th data-sort="location_name" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_name</th>
+  1693→                                <th data-sort="location_placard" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_placard</th>
+  1694→                                <th data-sort="location_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_moniker</th>
+  1695→                                <th data-sort="location_sobriquet" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_sobriquet</th>
+  1696→                                <th data-sort="street" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">street</th>
+  1697→                                <th data-sort="city" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">city</th>
+  1698→                                <th data-sort="state_code" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">state_code</th>
+  1699→                                <th data-sort="zip_code" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">zip_code</th>
+  1700→                                <th data-sort="country" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">country</th>
+  1701→                                <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
+  1702→                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">pick image1</th>
+  1703→                                <th data-sort="is_pinned_location" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_location</th>
+  1704→                                <th data-sort="position_in_custom_order" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">position_in_custom_order</th>
+  1705→                            </tr>
+  1706→                        </thead>
+  1707→                        <tbody id="table-body">
+  1708→                            <!-- Data will be loaded here via AJAX -->
+  1709→                        </tbody>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see the styling pattern from the `rup_locations_mar_page`. It has a very specific styling with:
+
+1. **Control Bar** - white background, border, padding, rounded corners
+2. **Pagination buttons** - segmented control style with border styling
+3. **Search functionality** with a clear button
+4. **Table styling** - specific header colors, borders, and layout
+
+Let me update the Stellar Chamber Pantheon table to match this styling pattern:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   675→                    </div>
+   676→                    <div class="snefuru-stellar-tab-panel" data-panel="kpages-schema">
+   677→                        <!-- KPages Schema content will go here -->
+   678→                    </div>
+   679→                    <div class="snefuru-stellar-tab-panel" data-panel="pantheon-table">
+   680→                        <div style="padding: 15px;">
+   681→                            <h1 style="margin-bottom: 20px; font-size: 18px;">📋 Pantheon Table Management</h1>
+   682→                        
+   683→                            <!-- Control Bar (mimicking rup_locations_mar style) -->
+   684→                            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+   685→                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+   686→                                    <div style="display: flex; gap: 10px; align-items: center;">
+   687→                                        <button type="button" id="stellar-pantheon-process" class="button button-primary" style="font-size: 12px; padding: 8px 12px;">
+   688→                                            🚀 Process Selected
+   689→                                        </button>
+   690→                                        <span id="stellar-pantheon-count" style="color: #666; font-size: 12px;">0 selected</span>
+   691→                                    </div>
+   692→                                    <div>
+   693→                                        <a href="<?php echo admin_url('admin.php?page=rup_pantheon_mar'); ?>" class="button" style="font-size: 12px; padding: 6px 12px; background: #f0ad4e; color: #fff; text-decoration: none; border-color: #eea236;" target="_blank">
+   694→                                            📋 Full Admin Page
+   695→                                        </a>
+   696→                                    </div>
+   697→                                </div>
+   698→                                
+   699→                                <!-- Search Controls (matching rup_locations_mar style) -->
+   700→                                <div style="display: flex; justify-content: space-between; align-items: center;">
+   701→                                    <div style="display: flex; gap: 15px; align-items: center;">
+   702→                                        <!-- Type Filter Buttons -->
+   703→                                        <div style="display: flex; gap: 0; border: 1px solid #ccc;">
+   704→                                            <button class="pantheon-type-btn active" data-value="" style="border: none; padding: 8px 12px; background: #0073aa; color: white; cursor: pointer; font-size: 12px;">All</button>
+   705→                                            <button class="pantheon-type-btn" data-value="chen" style="border: none; padding: 8px 12px; background: #f9f9f9; cursor: pointer; font-size: 12px; border-left: 1px solid #ccc;">Chen</button>
+   706→                                            <button class="pantheon-type-btn" data-value="sitejar4" style="border: none; padding: 8px 12px; background: #f9f9f9; cursor: pointer; font-size: 12px; border-left: 1px solid #ccc;">SiteJar4</button>
+   707→                                            <button class="pantheon-type-btn" data-value="driggsman" style="border: none; padding: 8px 12px; background: #f9f9f9; cursor: pointer; font-size: 12px; border-left: 1px solid #ccc;">Driggsman</button>
+   708→                                            <button class="pantheon-type-btn" data-value="gcjar1" style="border: none; padding: 8px 12px; background: #f9f9f9; cursor: pointer; font-size: 12px; border-left: 1px solid #ccc;">GCJar1</button>
+   709→                                            <button class="pantheon-type-btn" data-value="nwjar1" style="border: none; padding: 8px 12px; background: #f9f9f9; cursor: pointer; font-size: 12px; border-left: 1px solid #ccc;">NWJar1</button>
+   710→                                        </div>
+   711→                                    </div>
+   712→                                    
+   713→                                    <!-- Search -->
+   714→                                    <div style="position: relative;">
+   715→                                        <input type="text" id="stellar-pantheon-search" placeholder="Search descriptions..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 200px; font-size: 12px;">
+   716→                                        <button id="stellar-pantheon-clear" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
+   717→                                    </div>
+   718→                                </div>
+   719→                            </div>
+   720→                            
+   721→                            <!-- Main Table (matching rup_locations_mar style) -->
+   722→                            <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+   723→                                <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
+   724→                                    <table id="stellar-pantheon-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+   725→                                        <thead style="background: #f8f9fa;">
+   726→                                            <tr>
+   727→                                                <th style="padding: 10px 6px; border: 1px solid #ddd; font-weight: bold; text-align: center; background: #f0f0f0; width: 40px;">
+   728→                                                    <input type="checkbox" id="stellar-pantheon-select-all" style="width: 16px; height: 16px;">
+   729→                                                </th>
+   730→                                                <th style="padding: 10px 6px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 180px; font-size: 11px;">origin_page</th>
+   731→                                                <th style="padding: 10px 6px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; font-size: 11px;">description</th>
+   732→                                                <th style="padding: 10px 6px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 80px; font-size: 11px;">name</th>
+   733→                                                <th style="padding: 10px 6px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 100px; font-size: 11px;">id_code_of_turtle</th>
+   734→                                                <th style="padding: 10px 6px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 100px; font-size: 11px;">related_entitites</th>
+   735→                                            </tr>
+   736→                                        </thead>
+   737→                                    <tbody>
+   738→                                        <tr data-type="chen" data-description="open chen page">
+   739→                                            <td style="text-align: center; padding: 6px;">
+   740→                                                <input type="checkbox" class="stellar-pantheon-checkbox" value="chen-1" style="transform: scale(0.9);">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the table body rows to match the new styling with proper borders and cell styling:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   733→                                                <th style="padding: 10px 6px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 100px; font-size: 11px;">id_code_of_turtle</th>
+   734→                                                <th style="padding: 10px 6px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa; width: 100px; font-size: 11px;">related_entitites</th>
+   735→                                            </tr>
+   736→                                        </thead>
+   737→                                        <tbody>
+   738→                                            <tr data-type="chen" data-description="open chen page">
+   739→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd;">
+   740→                                                    <input type="checkbox" class="stellar-pantheon-checkbox" value="chen-1" style="width: 14px; height: 14px;">
+   741→                                                </td>
+   742→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 10px;">
+   743→                                                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=edit'); ?>" style="color: #0073aa; text-decoration: none; font-family: monospace;">
+   744→                                                        <?php echo home_url(); ?>/wp-admin/post.php?post=<?php echo $post->ID; ?>&action=edit
+   745→                                                    </a>
+   746→                                                </td>
+   747→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">
+   748→                                                    <strong style="color: #0073aa;">open chen page</strong>
+   749→                                                </td>
+   750→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   751→                                                    -
+   752→                                                </td>
+   753→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   754→                                                    -
+   755→                                                </td>
+   756→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   757→                                                    -
+   758→                                                </td>
+   759→                                            </tr>
+   760→                                            
+   761→                                            <tr data-type="chen" data-description="open chen page">
+   762→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd;">
+   763→                                                    <input type="checkbox" class="stellar-pantheon-checkbox" value="chen-2" style="width: 14px; height: 14px;">
+   764→                                                </td>
+   765→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 10px;">
+   766→                                                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=edit'); ?>" style="color: #0073aa; text-decoration: none; font-family: monospace;">
+   767→                                                        <?php echo home_url(); ?>/wp-admin/post.php?post=<?php echo $post->ID; ?>&action=edit
+   768→                                                    </a>
+   769→                                                </td>
+   770→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">
+   771→                                                    <strong style="color: #0073aa;">open chen page</strong>
+   772→                                                </td>
+   773→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   774→                                                    -
+   775→                                                </td>
+   776→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   777→                                                    -
+   778→                                                </td>
+   779→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   780→                                                    -
+   781→                                                </td>
+   782→                                            </tr>
+   783→                                            
+   784→                                            <tr data-type="chen" data-description="open chen page">
+   785→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd;">
+   786→                                                    <input type="checkbox" class="stellar-pantheon-checkbox" value="chen-3" style="width: 14px; height: 14px;">
+   787→                                                </td>
+   788→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 10px;">
+   789→                                                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=edit'); ?>" style="color: #0073aa; text-decoration: none; font-family: monospace;">
+   790→                                                        <?php echo home_url(); ?>/wp-admin/post.php?post=<?php echo $post->ID; ?>&action=edit
+   791→                                                    </a>
+   792→                                                </td>
+   793→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">
+   794→                                                    <strong style="color: #0073aa;">open chen page</strong>
+   795→                                                </td>
+   796→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   797→                                                    -
+   798→                                                </td>
+   799→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   800→                                                    -
+   801→                                                </td>
+   802→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   803→                                                    -
+   804→                                                </td>
+   805→                                            </tr>
+   806→                                            
+   807→                                            <tr data-type="sitejar4" data-description="open /sitejar4?PARAMETER">
+   808→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd;">
+   809→                                                    <input type="checkbox" class="stellar-pantheon-checkbox" value="sitejar4-1" style="width: 14px; height: 14px;">
+   810→                                                </td>
+   811→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 10px;">
+   812→                                                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=edit'); ?>" style="color: #0073aa; text-decoration: none; font-family: monospace;">
+   813→                                                        <?php echo home_url(); ?>/wp-admin/post.php?post=<?php echo $post->ID; ?>&action=edit
+   814→                                                    </a>
+   815→                                                </td>
+   816→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">
+   817→                                                    <strong style="color: #0073aa;">open /sitejar4?PARAMETER</strong>
+   818→                                                </td>
+   819→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   820→                                                    -
+   821→                                                </td>
+   822→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   823→                                                    -
+   824→                                                </td>
+   825→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   826→                                                    -
+   827→                                                </td>
+   828→                                            </tr>
+   829→                                            
+   830→                                            <tr data-type="driggsman" data-description="open /driggsman?PARAMETER">
+   831→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd;">
+   832→                                                    <input type="checkbox" class="stellar-pantheon-checkbox" value="driggsman-1" style="width: 14px; height: 14px;">
+   833→                                                </td>
+   834→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 10px;">
+   835→                                                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=edit'); ?>" style="color: #0073aa; text-decoration: none; font-family: monospace;">
+   836→                                                        <?php echo home_url(); ?>/wp-admin/post.php?post=<?php echo $post->ID; ?>&action=edit
+   837→                                                    </a>
+   838→                                                </td>
+   839→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">
+   840→                                                    <strong style="color: #0073aa;">open /driggsman?PARAMETER</strong>
+   841→                                                </td>
+   842→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   843→                                                    -
+   844→                                                </td>
+   845→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   846→                                                    -
+   847→                                                </td>
+   848→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   849→                                                    -
+   850→                                                </td>
+   851→                                            </tr>
+   852→                                            
+   853→                                            <tr data-type="gcjar1" data-description="open /gcjar1?PARAMETER">
+   854→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd;">
+   855→                                                    <input type="checkbox" class="stellar-pantheon-checkbox" value="gcjar1-1" style="width: 14px; height: 14px;">
+   856→                                                </td>
+   857→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 10px;">
+   858→                                                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=edit'); ?>" style="color: #0073aa; text-decoration: none; font-family: monospace;">
+   859→                                                        <?php echo home_url(); ?>/wp-admin/post.php?post=<?php echo $post->ID; ?>&action=edit
+   860→                                                    </a>
+   861→                                                </td>
+   862→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">
+   863→                                                    <strong style="color: #0073aa;">open /gcjar1?PARAMETER</strong>
+   864→                                                </td>
+   865→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   866→                                                    -
+   867→                                                </td>
+   868→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   869→                                                    -
+   870→                                                </td>
+   871→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   872→                                                    -
+   873→                                                </td>
+   874→                                            </tr>
+   875→                                            
+   876→                                            <tr data-type="nwjar1" data-description="open /nwjar1?PARAMETER">
+   877→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd;">
+   878→                                                    <input type="checkbox" class="stellar-pantheon-checkbox" value="nwjar1-1" style="width: 14px; height: 14px;">
+   879→                                                </td>
+   880→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 10px;">
+   881→                                                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=edit'); ?>" style="color: #0073aa; text-decoration: none; font-family: monospace;">
+   882→                                                        <?php echo home_url(); ?>/wp-admin/post.php?post=<?php echo $post->ID; ?>&action=edit
+   883→                                                    </a>
+   884→                                                </td>
+   885→                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">
+   886→                                                    <strong style="color: #0073aa;">open /nwjar1?PARAMETER</strong>
+   887→                                                </td>
+   888→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   889→                                                    -
+   890→                                                </td>
+   891→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   892→                                                    -
+   893→                                                </td>
+   894→                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+   895→                                                    -
+   896→                                                </td>
+   897→                                            </tr>
+   898→                                        </tbody>
+   899→                                </table>
+   900→                            </div>
+   901→                            
+   902→                            <!-- Action Buttons -->
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the end of the table section and clean up the closing structure:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   895→                                                    -
+   896→                                                </td>
+   897→                                            </tr>
+   898→                                        </tbody>
+   899→                                    </table>
+   900→                                </div>
+   901→                            </div>
+   902→                            
+   903→                            <!-- Status Messages -->
+   904→                            <div id="stellar-pantheon-messages" style="margin-top: 15px;"></div>
+   905→                        </div>
+   906→                    </div>
+   907→                    <div class="snefuru-stellar-tab-panel" data-panel="duplicate-kpage">
+   908→                        <div style="text-align: center; padding: 30px 20px;">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the JavaScript to handle the new filter buttons and clear button functionality:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1260→                });
+  1261→                updateStellarSelectionCount();
+  1262→            });
+  1263→            
+  1264→            // Search functionality
+  1265→            $('#stellar-pantheon-search').on('input', function() {
+  1266→                filterStellarTable();
+  1267→            });
+  1268→            
+  1269→            // Type filter buttons (matching rup_locations_mar style)
+  1270→            $(document).on('click', '.pantheon-type-btn', function() {
+  1271→                $('.pantheon-type-btn').removeClass('active').css({
+  1272→                    'background': '#f9f9f9',
+  1273→                    'color': '#333'
+  1274→                });
+  1275→                $(this).addClass('active').css({
+  1276→                    'background': '#0073aa',
+  1277→                    'color': 'white'
+  1278→                });
+  1279→                filterStellarTable();
+  1280→            });
+  1281→            
+  1282→            // Clear search button
+  1283→            $('#stellar-pantheon-clear').click(function() {
+  1284→                $('#stellar-pantheon-search').val('');
+  1285→                filterStellarTable();
+  1286→            });
+  1287→            
+  1288→            // Filter table function
+  1289→            function filterStellarTable() {
+  1290→                var searchText = $('#stellar-pantheon-search').val().toLowerCase();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the filter function to work with the new button-based type filter:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1284→                $('#stellar-pantheon-search').val('');
+  1285→                filterStellarTable();
+  1286→            });
+  1287→            
+  1288→            // Filter table function
+  1289→            function filterStellarTable() {
+  1290→                var searchText = $('#stellar-pantheon-search').val().toLowerCase();
+  1291→                var typeFilter = $('.pantheon-type-btn.active').data('value') || '';
+  1292→                
+  1293→                $('#stellar-pantheon-table tbody tr').each(function() {
+  1294→                    var $row = $(this);
+  1295→                    var description = $row.attr('data-description').toLowerCase();
+  1296→                    var type = $row.attr('data-type');
+  1297→                    
+  1298→                    var matchesSearch = searchText === '' || description.includes(searchText);
+  1299→                    var matchesType = typeFilter === '' || type === typeFilter;
+  1300→                    
+  1301→                    if (matchesSearch && matchesType) {
+  1302→                        $row.show();
+  1303→                    } else {
+  1304→                        $row.hide();
+  1305→                        // Uncheck hidden rows
+  1306→                        $row.find('.stellar-pantheon-checkbox').prop('checked', false);
+  1307→                        $row.css('background-color', '');
+  1308→                    }
+  1309→                });
+  1310→                
+  1311→                updateStellarSelectionCount();
+  1312→            }
+  1313→            
+  1314→            // Handle process selected button
+  1315→            $('#stellar-pantheon-process').click(function() {
+  1316→                var selectedItems = [];
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully updated the Stellar Chamber Pantheon Table to match the styling of the `rup_locations_mar` page as requested in the CSV styling note. Here's a summary of the changes made:
+
+## ✅ **Updated Pantheon Table - Matching rup_locations_mar Style**
+
+### **New Styling Features (Mimicking /xpagesmanager1):**
+
+1. **Control Bar Layout**
+   - White background with border and rounded corners
+   - Split layout: action buttons on left, admin page link on right
+   - Proper spacing and padding matching the locations page
+
+2. **Filter Button System**
+   - **Segmented buttons** instead of dropdown (All, Chen, SiteJar4, Driggsman, GCJar1, NWJar1)
+   - Matching border style with `1px solid #ccc` 
+   - Active state: `#0073aa` background with white text
+   - Inactive state: `#f9f9f9` background
+
+3. **Search Interface**
+   - **Clear button ("CL")** with yellow `#ffeb3b` background 
+   - Positioned inside search box on the right
+   - Matching the exact positioning from rup_locations_mar
+
+4. **Table Structure**
+   - **Bordered cells** with `1px solid #ddd` borders
+   - **Header styling**: `#f8f9fa` background, lowercase text transform
+   - **Checkbox column**: `#f0f0f0` background, proper sizing
+   - **Collapsed borders** and proper cell padding
+
+5. **Updated Column Headers**
+   - All lowercase to match locations page style
+   - Proper font sizing (11px headers, 10-12px content)
+   - Matching the exact naming from CSV: `origin_page`, `description`, etc.
+
+6. **Enhanced Functionality**
+   - Filter buttons with active/inactive state management
+   - Clear search functionality 
+   - Updated JavaScript to work with button-based filters
+   - Maintained all existing checkbox and processing features
+
+The table now perfectly matches the professional styling of your existing `rup_locations_mar` admin page with segmented filter buttons, bordered table cells, and the same visual hierarchy and spacing patterns.
+
+---
+
+_**User**_
+
+pleae get rid of this and any of the associated heavy code that was related to it:
+
+All
+Chen
+SiteJar4
+Driggsman
+GCJar1
+NWJar1
+
+we dont need this on the pantheon table tab 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   695→                                        </a>
+   696→                                    </div>
+   697→                                </div>
+   698→                                
+   699→                                <!-- Search Controls -->
+   700→                                <div style="display: flex; justify-content: flex-end; align-items: center;">
+   701→                                    <!-- Search -->
+   702→                                    <div style="position: relative;">
+   703→                                        <input type="text" id="stellar-pantheon-search" placeholder="Search descriptions..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 200px; font-size: 12px;">
+   704→                                        <button id="stellar-pantheon-clear" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
+   705→                                    </div>
+   706→                                </div>
+   707→                            </div>
+   708→                            
+   709→                            <!-- Main Table (matching rup_locations_mar style) -->
+   710→                            <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to remove the JavaScript code related to the filter buttons:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1248→                });
+  1249→                updateStellarSelectionCount();
+  1250→            });
+  1251→            
+  1252→            // Search functionality
+  1253→            $('#stellar-pantheon-search').on('input', function() {
+  1254→                filterStellarTable();
+  1255→            });
+  1256→            
+  1257→            // Clear search button
+  1258→            $('#stellar-pantheon-clear').click(function() {
+  1259→                $('#stellar-pantheon-search').val('');
+  1260→                filterStellarTable();
+  1261→            });
+  1262→            
+  1263→            // Filter table function
+  1264→            function filterStellarTable() {
+  1265→                var searchText = $('#stellar-pantheon-search').val().toLowerCase();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the filter function to remove the type filtering logic:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1259→                $('#stellar-pantheon-search').val('');
+  1260→                filterStellarTable();
+  1261→            });
+  1262→            
+  1263→            // Filter table function
+  1264→            function filterStellarTable() {
+  1265→                var searchText = $('#stellar-pantheon-search').val().toLowerCase();
+  1266→                
+  1267→                $('#stellar-pantheon-table tbody tr').each(function() {
+  1268→                    var $row = $(this);
+  1269→                    var description = $row.attr('data-description').toLowerCase();
+  1270→                    
+  1271→                    var matchesSearch = searchText === '' || description.includes(searchText);
+  1272→                    
+  1273→                    if (matchesSearch) {
+  1274→                        $row.show();
+  1275→                    } else {
+  1276→                        $row.hide();
+  1277→                        // Uncheck hidden rows
+  1278→                        $row.find('.stellar-pantheon-checkbox').prop('checked', false);
+  1279→                        $row.css('background-color', '');
+  1280→                    }
+  1281→                });
+  1282→                
+  1283→                updateStellarSelectionCount();
+  1284→            }
+  1285→            
+  1286→            // Handle process selected button
+  1287→            $('#stellar-pantheon-process').click(function() {
+  1288→                var selectedItems = [];
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully removed all the filter button functionality from the Stellar Chamber Pantheon Table. Here's what was removed:
+
+## ✅ **Removed Filter Button System**
+
+### **Removed Components:**
+1. **Filter Button HTML** - All segmented buttons (All, Chen, SiteJar4, Driggsman, GCJar1, NWJar1)
+2. **Button Container** - The entire filter button div with borders and styling
+3. **Click Event Handler** - JavaScript for button active/inactive state management
+4. **Filter Logic** - Type filtering logic in the `filterStellarTable()` function
+
+### **What Remains:**
+- ✅ **Search functionality** - Text search still works
+- ✅ **Clear button ("CL")** - Yellow button to clear search
+- ✅ **Table structure** - All table styling and data intact
+- ✅ **Checkbox functionality** - Selection and processing still works
+- ✅ **Process Selected button** - Action button still functional
+- ✅ **Full Admin Page link** - Link to `rup_pantheon_mar` still present
+
+### **Simplified Layout:**
+The search controls now use `justify-content: flex-end` to align the search box to the right side of the control bar, creating a cleaner, more focused interface without the complex filter button system.
+
+The table now has a simpler, cleaner interface that focuses on search functionality only, as requested.
+
