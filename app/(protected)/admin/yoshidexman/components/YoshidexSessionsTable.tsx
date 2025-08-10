@@ -73,6 +73,10 @@ export default function YoshidexSessionsTable() {
   
   const supabase = createClientComponentClient();
 
+  // Debug modal state
+  const [debugModalOpen, setDebugModalOpen] = useState(false);
+  const [debugResult, setDebugResult] = useState<any>(null);
+
   // Debug single SpecStory file
   const debugSingleFile = async () => {
     try {
@@ -102,17 +106,79 @@ export default function YoshidexSessionsTable() {
 
       const result = await response.json();
       
-      if (result.success) {
-        alert(`Debug Success!\n\nFile: ${testFile}\nSession ID: ${result.session.yoshidex_session_id}\nTitle: ${result.session.session_title}\nMessages: ${result.session.total_messages}\n\nContent Preview:\n${result.fileInfo.contentPreview}`);
-      } else {
-        console.error('Debug failed:', result);
-        alert(`Debug Failed!\n\nFile: ${testFile}\nError: ${result.error}\nDetails: ${result.details || 'N/A'}\n\nContent Preview:\n${result.fileContent?.substring(0, 500) || 'N/A'}`);
-      }
+      // Store result for modal display
+      setDebugResult({
+        filename: testFile,
+        ...result
+      });
+      setDebugModalOpen(true);
+      
     } catch (error) {
       console.error('Debug error:', error);
-      alert(`Debug failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setDebugResult({
+        error: `Debug failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        success: false
+      });
+      setDebugModalOpen(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Copy debug result to clipboard
+  const copyDebugResult = async () => {
+    if (!debugResult) return;
+    
+    let debugText = '';
+    
+    if (debugResult.success) {
+      debugText = `DEBUG SUCCESS ✅
+=================
+File: ${debugResult.filename}
+Session ID: ${debugResult.session?.yoshidex_session_id || 'N/A'}
+Claude Session ID: ${debugResult.session?.claude_session_id || 'N/A'}
+Title: ${debugResult.session?.session_title || 'N/A'}
+Messages: ${debugResult.session?.total_messages || 0}
+Model: ${debugResult.session?.model_used || 'N/A'}
+Status: ${debugResult.session?.session_status || 'N/A'}
+File Size: ${debugResult.fileInfo?.size || 'N/A'} bytes
+
+CONTENT PREVIEW:
+================
+${debugResult.fileInfo?.contentPreview || 'N/A'}
+
+FULL RESULT:
+===========
+${JSON.stringify(debugResult, null, 2)}`;
+    } else {
+      debugText = `DEBUG FAILED ❌
+===============
+File: ${debugResult.filename || 'Unknown'}
+Error: ${debugResult.error || 'Unknown error'}
+Details: ${debugResult.details || 'N/A'}
+
+CONTENT PREVIEW:
+================
+${debugResult.fileContent?.substring(0, 500) || 'N/A'}
+
+FULL ERROR RESULT:
+==================
+${JSON.stringify(debugResult, null, 2)}`;
+    }
+
+    try {
+      await navigator.clipboard.writeText(debugText);
+      alert('Debug result copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = debugText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Debug result copied to clipboard (fallback method)!');
     }
   };
 
@@ -631,6 +697,155 @@ export default function YoshidexSessionsTable() {
           </button>
         </div>
       </div>
+
+      {/* Debug Modal */}
+      {debugModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4 text-white">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold">🔍 SpecStory File Debug Results</h2>
+                <button
+                  onClick={() => setDebugModalOpen(false)}
+                  className="text-white hover:text-gray-200 text-2xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {debugResult?.success ? (
+                // Success Display
+                <div className="space-y-6">
+                  <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <span className="text-green-400 text-2xl">✅</span>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-lg font-medium text-green-800">Debug Success!</h3>
+                        <p className="text-green-700">File was parsed successfully</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-2">📁 File Information</h4>
+                      <div className="space-y-1 text-sm">
+                        <div><span className="font-medium">Filename:</span> {debugResult.filename}</div>
+                        <div><span className="font-medium">Size:</span> {debugResult.fileInfo?.size} bytes</div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-2">🆔 Session Information</h4>
+                      <div className="space-y-1 text-sm">
+                        <div><span className="font-medium">Session ID:</span> {debugResult.session?.yoshidex_session_id}</div>
+                        <div><span className="font-medium">Claude ID:</span> {debugResult.session?.claude_session_id}</div>
+                        <div><span className="font-medium">Messages:</span> {debugResult.session?.total_messages}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">📝 Session Details</h4>
+                    <div className="space-y-2 text-sm">
+                      <div><span className="font-medium">Title:</span> {debugResult.session?.session_title}</div>
+                      <div><span className="font-medium">Model:</span> {debugResult.session?.model_used}</div>
+                      <div><span className="font-medium">Status:</span> {debugResult.session?.session_status}</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-yellow-800 mb-2">👀 Content Preview</h4>
+                    <pre className="text-xs text-gray-700 bg-white p-3 rounded border overflow-x-auto whitespace-pre-wrap">
+                      {debugResult.fileInfo?.contentPreview}
+                    </pre>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">📊 Full Debug Data</h4>
+                    <pre className="text-xs text-gray-600 bg-white p-3 rounded border overflow-x-auto max-h-40 overflow-y-auto">
+                      {JSON.stringify(debugResult, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              ) : (
+                // Error Display
+                <div className="space-y-6">
+                  <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <span className="text-red-400 text-2xl">❌</span>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-lg font-medium text-red-800">Debug Failed</h3>
+                        <p className="text-red-700">There was an error parsing the file</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">📁 File Information</h4>
+                    <div className="space-y-1 text-sm">
+                      <div><span className="font-medium">Filename:</span> {debugResult.filename || 'Unknown'}</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-red-800 mb-2">⚠️ Error Details</h4>
+                    <div className="space-y-2 text-sm">
+                      <div><span className="font-medium">Error:</span> {debugResult.error}</div>
+                      <div><span className="font-medium">Details:</span> {debugResult.details || 'N/A'}</div>
+                    </div>
+                  </div>
+
+                  {debugResult.fileContent && (
+                    <div className="bg-yellow-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-yellow-800 mb-2">👀 Content Preview</h4>
+                      <pre className="text-xs text-gray-700 bg-white p-3 rounded border overflow-x-auto whitespace-pre-wrap">
+                        {debugResult.fileContent.substring(0, 500)}
+                      </pre>
+                    </div>
+                  )}
+
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">📊 Full Debug Data</h4>
+                    <pre className="text-xs text-gray-600 bg-white p-3 rounded border overflow-x-auto max-h-40 overflow-y-auto">
+                      {JSON.stringify(debugResult, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-gray-100 px-6 py-4 flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                Click "Copy All" to copy the complete debug information
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={copyDebugResult}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors"
+                >
+                  📋 Copy All
+                </button>
+                <button
+                  onClick={() => setDebugModalOpen(false)}
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded-md transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

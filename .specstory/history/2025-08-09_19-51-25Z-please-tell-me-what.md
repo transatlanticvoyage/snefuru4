@@ -6985,3 +6985,554 @@ _**Agent (claude-sonnet-4-20250514)**_
 
 <think><details>Now let me also add some logging to the parseMarkdownConversation function to see what's happening during the markdown parsing process, since that's what SpecStory files are.</details></think>
 
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/services/yoshidex/parsers/ClaudeCodeParser.ts has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   148→      throw error;
+   149→    }
+   150→  }
+   151→
+   152→  // Parse Markdown format conversation export (SpecStory format)
+   153→  private static parseMarkdownConversation(markdownContent: string): ClaudeCodeConversation {
+   154→    console.log(`[parseMarkdownConversation] Starting markdown parsing`);
+   155→    const lines = markdownContent.split('\n');
+   156→    console.log(`[parseMarkdownConversation] Total lines: ${lines.length}`);
+   157→    
+   158→    let conversation: ClaudeCodeConversation = {
+   159→      id: this.generateId(),
+   160→      title: 'Parsed SpecStory Session',
+   161→      model: 'claude-3-5-sonnet',
+   162→      created_at: new Date().toISOString(),
+   163→      updated_at: new Date().toISOString(),
+   164→      messages: []
+   165→    };
+   166→
+   167→    // Extract metadata from SpecStory format
+   168→    console.log(`[parseMarkdownConversation] Extracting metadata from first 20 lines`);
+   169→    for (let i = 0; i < Math.min(20, lines.length); i++) {
+   170→      const line = lines[i];
+   171→      
+   172→      // Extract title from timestamp header
+   173→      if (line.startsWith('## ') && line.includes('Z')) {
+   174→        conversation.title = `SpecStory Session ${line.replace('## ', '').trim()}`;
+   175→        conversation.created_at = line.replace('## ', '').trim();
+   176→        console.log(`[parseMarkdownConversation] Found timestamp header: ${conversation.title}`);
+   177→        continue;
+   178→      }
+   179→      
+   180→      // Extract Claude session ID from HTML comment
+   181→      const sessionMatch = line.match(/<!-- Claude Code Session ([a-f0-9\-]+)/);
+   182→      if (sessionMatch) {
+   183→        conversation.id = sessionMatch[1];
+   184→        // Store the original session ID for later use
+   185→        if (!conversation.metadata) {
+   186→          conversation.metadata = {};
+   187→        }
+   188→        conversation.metadata.originalSessionId = sessionMatch[1];
+   189→        console.log(`[parseMarkdownConversation] Found session ID: ${sessionMatch[1]}`);
+   190→      }
+   191→    }
+   192→
+   193→    let currentMessage: Partial<ClaudeCodeMessage> | null = null;
+   194→    let messageSequence = 0;
+   195→    let inCodeBlock = false;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>Now let me add logging to the message parsing section as well, since that's probably where the issue is - we're likely not finding any messages.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/services/yoshidex/parsers/ClaudeCodeParser.ts has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   189→        console.log(`[parseMarkdownConversation] Found session ID: ${sessionMatch[1]}`);
+   190→      }
+   191→    }
+   192→
+   193→    let currentMessage: Partial<ClaudeCodeMessage> | null = null;
+   194→    let messageSequence = 0;
+   195→    let inCodeBlock = false;
+   196→    let messageContent: string[] = [];
+   197→    let messagesFound = 0;
+   198→    
+   199→    console.log(`[parseMarkdownConversation] Starting message parsing`);
+   200→    
+   201→    for (let i = 0; i < lines.length; i++) {
+   202→      const line = lines[i];
+   203→      
+   204→      // Skip metadata lines
+   205→      if (line.startsWith('## ') || line.startsWith('<!-- ') || line.trim() === '') {
+   206→        if (currentMessage && line.trim() === '') {
+   207→          messageContent.push(''); // Preserve empty lines within messages
+   208→        }
+   209→        continue;
+   210→      }
+   211→      
+   212→      // Detect SpecStory message boundaries: _**User**_ or _**Agent**_
+   213→      if (line.match(/^_\*\*(User|Agent|Assistant)\*\*_/)) {
+   214→        console.log(`[parseMarkdownConversation] Found message boundary at line ${i}: ${line}`);
+   215→        
+   216→        // Save previous message if exists
+   217→        if (currentMessage && messageContent.length > 0) {
+   218→          currentMessage.content = messageContent.join('\n').trim();
+   219→          if (currentMessage.content) {
+   220→            conversation.messages.push({
+   221→              ...currentMessage,
+   222→              content: currentMessage.content
+   223→            } as ClaudeCodeMessage);
+   224→            messagesFound++;
+   225→            console.log(`[parseMarkdownConversation] Saved message ${messagesFound}, content length: ${currentMessage.content.length}`);
+   226→          }
+   227→        }
+   228→        
+   229→        // Start new message
+   230→        const role = this.extractRoleFromSpecStoryHeader(line);
+   231→        console.log(`[parseMarkdownConversation] Starting new message with role: ${role}`);
+   232→        currentMessage = {
+   233→          id: this.generateId(),
+   234→          role,
+   235→          content: '',
+   236→          timestamp: new Date().toISOString(),
+   237→          sequence: messageSequence++
+   238→        };
+   239→        messageContent = [];
+   240→        continue;
+   241→      }
+   242→      
+   243→      // Track code blocks for better parsing
+   244→      if (line.startsWith('\```')) {
+   245→        inCodeBlock = !inCodeBlock;
+   246→      }
+   247→      
+   248→      // Add content to current message
+   249→      if (currentMessage) {
+   250→        messageContent.push(line);
+   251→      }
+   252→    }
+   253→    
+   254→    // Add final message
+   255→    if (currentMessage && messageContent.length > 0) {
+   256→      currentMessage.content = messageContent.join('\n').trim();
+   257→      if (currentMessage.content) {
+   258→        conversation.messages.push({
+   259→          ...currentMessage,
+   260→          content: currentMessage.content
+   261→        } as ClaudeCodeMessage);
+   262→        messagesFound++;
+   263→        console.log(`[parseMarkdownConversation] Saved final message ${messagesFound}, content length: ${currentMessage.content.length}`);
+   264→      }
+   265→    }
+   266→    
+   267→    console.log(`[parseMarkdownConversation] Parsing complete. Total messages found: ${messagesFound}`);
+   268→    
+   269→    return conversation;
+   270→  }
+   271→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>Perfect! Now I have extensive debugging in place. Let me also make sure we can check the server logs. The key things we'll be able to see now:
+
+1. What files are being processed
+2. Whether they're being detected as markdown or JSON
+3. What metadata is being extracted (timestamps, session IDs)
+4. How many message boundaries are being found
+5. What content is being saved
+
+The user should now click the **"Debug Single File"** button first to see what's happening with just one file, then we can understand the issue and fix it.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've added extensive debugging. Now you have two options:
+
+## **🔍 Debug Single File (Recommended)**
+
+**Click the purple "Debug Single File" button first.** This will:
+- Process just one SpecStory file with detailed logging
+- Show you exactly what's being parsed
+- Display the first 500 characters of the file content
+- Tell you if messages are being found correctly
+
+## **📊 What the Debug Will Show**
+
+The debug will help us identify if the issue is:
+1. **File reading** - Can we read the SpecStory files?
+2. **Format detection** - Are we detecting them as markdown?
+3. **Metadata extraction** - Are we finding session IDs and timestamps?
+4. **Message parsing** - Are we finding `_**User**_` and `_**Agent**_` boundaries?
+5. **Content extraction** - Are we capturing message content?
+
+## **🎯 Next Steps**
+
+1. **First**: Click **"Debug Single File"** 
+2. **Check the results**: The popup will show you exactly what happened
+3. **Check browser console**: Open DevTools → Console to see detailed server logs
+4. **Report back**: Tell me what the debug popup shows and any console errors
+
+This will give us pinpoint accuracy on what's going wrong. The extensive logging I added will show us every step of the parsing process, so we can identify and fix the exact issue.
+
+**Try the debug button now and let me know what it shows!**
+
+---
+
+_**User**_
+
+i have ran the import and it still doesnt work. when i click debug file it opens a popup where i cant select the text. please make the popup that appears much bigger, styled beautifully, and with an easy 1 click copy button to copy the netire message that is in this popup on /yoshidexman 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/yoshidexman/components/YoshidexSessionsTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    72→  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+    73→  
+    74→  const supabase = createClientComponentClient();
+    75→
+    76→  // Debug modal state
+    77→  const [debugModalOpen, setDebugModalOpen] = useState(false);
+    78→  const [debugResult, setDebugResult] = useState<any>(null);
+    79→
+    80→  // Debug single SpecStory file
+    81→  const debugSingleFile = async () => {
+    82→    try {
+    83→      setLoading(true);
+    84→      
+    85→      // First get the list of files
+    86→      const listResponse = await fetch('/api/yoshidex/debug-single-file');
+    87→      if (!listResponse.ok) {
+    88→        throw new Error(`Failed to get file list: ${listResponse.status}`);
+    89→      }
+    90→      
+    91→      const fileList = await listResponse.json();
+    92→      if (!fileList.success || !fileList.files || fileList.files.length === 0) {
+    93→        throw new Error('No files found to debug');
+    94→      }
+    95→      
+    96→      // Use the first file for testing
+    97→      const testFile = fileList.files[0].filename;
+    98→      
+    99→      const response = await fetch('/api/yoshidex/debug-single-file', {
+   100→        method: 'POST',
+   101→        headers: {
+   102→          'Content-Type': 'application/json'
+   103→        },
+   104→        body: JSON.stringify({ filename: testFile })
+   105→      });
+   106→
+   107→      const result = await response.json();
+   108→      
+   109→      // Store result for modal display
+   110→      setDebugResult({
+   111→        filename: testFile,
+   112→        ...result
+   113→      });
+   114→      setDebugModalOpen(true);
+   115→      
+   116→    } catch (error) {
+   117→      console.error('Debug error:', error);
+   118→      setDebugResult({
+   119→        error: `Debug failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+   120→        success: false
+   121→      });
+   122→      setDebugModalOpen(true);
+   123→    } finally {
+   124→      setLoading(false);
+   125→    }
+   126→  };
+   127→
+   128→  // Copy debug result to clipboard
+   129→  const copyDebugResult = async () => {
+   130→    if (!debugResult) return;
+   131→    
+   132→    let debugText = '';
+   133→    
+   134→    if (debugResult.success) {
+   135→      debugText = `DEBUG SUCCESS ✅
+   136→=================
+   137→File: ${debugResult.filename}
+   138→Session ID: ${debugResult.session?.yoshidex_session_id || 'N/A'}
+   139→Claude Session ID: ${debugResult.session?.claude_session_id || 'N/A'}
+   140→Title: ${debugResult.session?.session_title || 'N/A'}
+   141→Messages: ${debugResult.session?.total_messages || 0}
+   142→Model: ${debugResult.session?.model_used || 'N/A'}
+   143→Status: ${debugResult.session?.session_status || 'N/A'}
+   144→File Size: ${debugResult.fileInfo?.size || 'N/A'} bytes
+   145→
+   146→CONTENT PREVIEW:
+   147→================
+   148→${debugResult.fileInfo?.contentPreview || 'N/A'}
+   149→
+   150→FULL RESULT:
+   151→===========
+   152→${JSON.stringify(debugResult, null, 2)}`;
+   153→    } else {
+   154→      debugText = `DEBUG FAILED ❌
+   155→===============
+   156→File: ${debugResult.filename || 'Unknown'}
+   157→Error: ${debugResult.error || 'Unknown error'}
+   158→Details: ${debugResult.details || 'N/A'}
+   159→
+   160→CONTENT PREVIEW:
+   161→================
+   162→${debugResult.fileContent?.substring(0, 500) || 'N/A'}
+   163→
+   164→FULL ERROR RESULT:
+   165→==================
+   166→${JSON.stringify(debugResult, null, 2)}`;
+   167→    }
+   168→
+   169→    try {
+   170→      await navigator.clipboard.writeText(debugText);
+   171→      alert('Debug result copied to clipboard!');
+   172→    } catch (err) {
+   173→      console.error('Failed to copy to clipboard:', err);
+   174→      // Fallback for older browsers
+   175→      const textArea = document.createElement('textarea');
+   176→      textArea.value = debugText;
+   177→      document.body.appendChild(textArea);
+   178→      textArea.select();
+   179→      document.execCommand('copy');
+   180→      document.body.removeChild(textArea);
+   181→      alert('Debug result copied to clipboard (fallback method)!');
+   182→    }
+   183→  };
+   184→
+   185→  // Import SpecStory files
+   186→  const importSpecStoryFiles = async () => {
+   187→    try {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the beautiful modal at the end of the component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/yoshidexman/components/YoshidexSessionsTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   693→            disabled={currentPage === totalPages}
+   694→            className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   695→          >
+   696→            Last
+   697→          </button>
+   698→        </div>
+   699→      </div>
+   700→
+   701→      {/* Debug Modal */}
+   702→      {debugModalOpen && (
+   703→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+   704→          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+   705→            {/* Modal Header */}
+   706→            <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4 text-white">
+   707→              <div className="flex items-center justify-between">
+   708→                <h2 className="text-xl font-bold">🔍 SpecStory File Debug Results</h2>
+   709→                <button
+   710→                  onClick={() => setDebugModalOpen(false)}
+   711→                  className="text-white hover:text-gray-200 text-2xl font-bold"
+   712→                >
+   713→                  ×
+   714→                </button>
+   715→              </div>
+   716→            </div>
+   717→
+   718→            {/* Modal Content */}
+   719→            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+   720→              {debugResult?.success ? (
+   721→                // Success Display
+   722→                <div className="space-y-6">
+   723→                  <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded">
+   724→                    <div className="flex">
+   725→                      <div className="flex-shrink-0">
+   726→                        <span className="text-green-400 text-2xl">✅</span>
+   727→                      </div>
+   728→                      <div className="ml-3">
+   729→                        <h3 className="text-lg font-medium text-green-800">Debug Success!</h3>
+   730→                        <p className="text-green-700">File was parsed successfully</p>
+   731→                      </div>
+   732→                    </div>
+   733→                  </div>
+   734→
+   735→                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   736→                    <div className="bg-gray-50 p-4 rounded-lg">
+   737→                      <h4 className="font-semibold text-gray-800 mb-2">📁 File Information</h4>
+   738→                      <div className="space-y-1 text-sm">
+   739→                        <div><span className="font-medium">Filename:</span> {debugResult.filename}</div>
+   740→                        <div><span className="font-medium">Size:</span> {debugResult.fileInfo?.size} bytes</div>
+   741→                      </div>
+   742→                    </div>
+   743→
+   744→                    <div className="bg-gray-50 p-4 rounded-lg">
+   745→                      <h4 className="font-semibold text-gray-800 mb-2">🆔 Session Information</h4>
+   746→                      <div className="space-y-1 text-sm">
+   747→                        <div><span className="font-medium">Session ID:</span> {debugResult.session?.yoshidex_session_id}</div>
+   748→                        <div><span className="font-medium">Claude ID:</span> {debugResult.session?.claude_session_id}</div>
+   749→                        <div><span className="font-medium">Messages:</span> {debugResult.session?.total_messages}</div>
+   750→                      </div>
+   751→                    </div>
+   752→                  </div>
+   753→
+   754→                  <div className="bg-blue-50 p-4 rounded-lg">
+   755→                    <h4 className="font-semibold text-blue-800 mb-2">📝 Session Details</h4>
+   756→                    <div className="space-y-2 text-sm">
+   757→                      <div><span className="font-medium">Title:</span> {debugResult.session?.session_title}</div>
+   758→                      <div><span className="font-medium">Model:</span> {debugResult.session?.model_used}</div>
+   759→                      <div><span className="font-medium">Status:</span> {debugResult.session?.session_status}</div>
+   760→                    </div>
+   761→                  </div>
+   762→
+   763→                  <div className="bg-yellow-50 p-4 rounded-lg">
+   764→                    <h4 className="font-semibold text-yellow-800 mb-2">👀 Content Preview</h4>
+   765→                    <pre className="text-xs text-gray-700 bg-white p-3 rounded border overflow-x-auto whitespace-pre-wrap">
+   766→                      {debugResult.fileInfo?.contentPreview}
+   767→                    </pre>
+   768→                  </div>
+   769→
+   770→                  <div className="bg-gray-50 p-4 rounded-lg">
+   771→                    <h4 className="font-semibold text-gray-800 mb-2">📊 Full Debug Data</h4>
+   772→                    <pre className="text-xs text-gray-600 bg-white p-3 rounded border overflow-x-auto max-h-40 overflow-y-auto">
+   773→                      {JSON.stringify(debugResult, null, 2)}
+   774→                    </pre>
+   775→                  </div>
+   776→                </div>
+   777→              ) : (
+   778→                // Error Display
+   779→                <div className="space-y-6">
+   780→                  <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded">
+   781→                    <div className="flex">
+   782→                      <div className="flex-shrink-0">
+   783→                        <span className="text-red-400 text-2xl">❌</span>
+   784→                      </div>
+   785→                      <div className="ml-3">
+   786→                        <h3 className="text-lg font-medium text-red-800">Debug Failed</h3>
+   787→                        <p className="text-red-700">There was an error parsing the file</p>
+   788→                      </div>
+   789→                    </div>
+   790→                  </div>
+   791→
+   792→                  <div className="bg-gray-50 p-4 rounded-lg">
+   793→                    <h4 className="font-semibold text-gray-800 mb-2">📁 File Information</h4>
+   794→                    <div className="space-y-1 text-sm">
+   795→                      <div><span className="font-medium">Filename:</span> {debugResult.filename || 'Unknown'}</div>
+   796→                    </div>
+   797→                  </div>
+   798→
+   799→                  <div className="bg-red-50 p-4 rounded-lg">
+   800→                    <h4 className="font-semibold text-red-800 mb-2">⚠️ Error Details</h4>
+   801→                    <div className="space-y-2 text-sm">
+   802→                      <div><span className="font-medium">Error:</span> {debugResult.error}</div>
+   803→                      <div><span className="font-medium">Details:</span> {debugResult.details || 'N/A'}</div>
+   804→                    </div>
+   805→                  </div>
+   806→
+   807→                  {debugResult.fileContent && (
+   808→                    <div className="bg-yellow-50 p-4 rounded-lg">
+   809→                      <h4 className="font-semibold text-yellow-800 mb-2">👀 Content Preview</h4>
+   810→                      <pre className="text-xs text-gray-700 bg-white p-3 rounded border overflow-x-auto whitespace-pre-wrap">
+   811→                        {debugResult.fileContent.substring(0, 500)}
+   812→                      </pre>
+   813→                    </div>
+   814→                  )}
+   815→
+   816→                  <div className="bg-gray-50 p-4 rounded-lg">
+   817→                    <h4 className="font-semibold text-gray-800 mb-2">📊 Full Debug Data</h4>
+   818→                    <pre className="text-xs text-gray-600 bg-white p-3 rounded border overflow-x-auto max-h-40 overflow-y-auto">
+   819→                      {JSON.stringify(debugResult, null, 2)}
+   820→                    </pre>
+   821→                  </div>
+   822→                </div>
+   823→              )}
+   824→            </div>
+   825→
+   826→            {/* Modal Footer */}
+   827→            <div className="bg-gray-100 px-6 py-4 flex justify-between items-center">
+   828→              <div className="text-sm text-gray-600">
+   829→                Click "Copy All" to copy the complete debug information
+   830→              </div>
+   831→              <div className="flex gap-3">
+   832→                <button
+   833→                  onClick={copyDebugResult}
+   834→                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors"
+   835→                >
+   836→                  📋 Copy All
+   837→                </button>
+   838→                <button
+   839→                  onClick={() => setDebugModalOpen(false)}
+   840→                  className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded-md transition-colors"
+   841→                >
+   842→                  Close
+   843→                </button>
+   844→              </div>
+   845→            </div>
+   846→          </div>
+   847→        </div>
+   848→      )}
+   849→    </div>
+   850→  );
+   851→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've created a beautiful, large debug modal with:
+
+## **🎨 New Debug Modal Features**
+
+### **✨ Beautiful Design**
+- **Large modal** taking up most of the screen (max 4xl width, 90% height)
+- **Gradient header** (purple to blue)
+- **Color-coded sections** with emojis for easy scanning
+- **Responsive layout** with organized information cards
+
+### **📋 One-Click Copy**
+- **"📋 Copy All" button** that copies everything to clipboard
+- **Formatted output** with headers and structure for easy reading
+- **Fallback support** for older browsers
+
+### **🔍 Organized Information Display**
+
+**For Success:**
+- ✅ Success indicator with green styling
+- 📁 File information (name, size)
+- 🆔 Session details (IDs, message count)
+- 📝 Session metadata (title, model, status)
+- 👀 Content preview (first 500 chars)
+- 📊 Full debug data (JSON)
+
+**For Errors:**
+- ❌ Error indicator with red styling
+- ⚠️ Error details clearly displayed
+- 👀 Content preview to see what was in the file
+- 📊 Complete error information
+
+## **🚀 Try It Now!**
+
+1. **Go to** `/admin/yoshidexman`
+2. **Click** the purple **"Debug Single File"** button
+3. **View** the beautiful modal with all debug information
+4. **Click** **"📋 Copy All"** to copy everything to clipboard
+5. **Share** the copied text with me
+
+The modal is now much larger, beautifully styled, and all the text is selectable. The one-click copy button will give us all the debug information we need to identify the exact parsing issue!
+
+**Click "Debug Single File" now and copy the results to share with me!**
+
