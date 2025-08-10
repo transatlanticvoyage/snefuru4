@@ -7536,3 +7536,65 @@ The modal is now much larger, beautifully styled, and all the text is selectable
 
 **Click "Debug Single File" now and copy the results to share with me!**
 
+---
+
+_**User**_
+
+here is debug result copied
+
+DEBUG SUCCESS ✅
+=================
+File: 2025-08-10_00-07-09Z-please-research-our-most.md
+Session ID: yoshidx_1754786127958_1c49m9ihx
+Claude Session ID: 8699d725-e19b-44db-9d40-50acc61fdd31
+Title: SpecStory Session 2025-08-10 00:07:09Z
+Messages: 2
+Model: claude-3-5-sonnet
+Status: completed
+File Size: 67041 bytes
+
+CONTENT PREVIEW:
+================
+## 2025-08-10 00:07:09Z
+
+<!-- Claude Code Session 8699d725-e19b-44db-9d40-50acc61fdd31 (2025-08-10_00-07-09Z) -->
+
+_**User**_
+
+please research our most recent edits to the snefuruplin wp plugin system. onlyaplease just answer and do not change any of our code right now. tell me what you can see
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll research the recent edits to the snefuruplin WordPress plugin system. Let me search for relevant files and changes.
+
+_**Agent (claude-sonnet-4-20250514)
+
+FULL RESULT:
+===========
+{
+  "filename": "2025-08-10_00-07-09Z-please-research-our-most.md",
+  "success": true,
+  "message": "File parsed successfully",
+  "session": {
+    "yoshidex_session_id": "yoshidx_1754786127958_1c49m9ihx",
+    "claude_session_id": "8699d725-e19b-44db-9d40-50acc61fdd31",
+    "session_title": "SpecStory Session 2025-08-10 00:07:09Z",
+    "session_description": "Imported from SpecStory - 2 messages",
+    "total_messages": 2,
+    "model_used": "claude-3-5-sonnet",
+    "session_status": "completed",
+    "created_at": "2025-08-10T00:35:27.958Z",
+    "tags": [
+      "imported",
+      "specstory"
+    ]
+  },
+  "fileInfo": {
+    "filename": "2025-08-10_00-07-09Z-please-research-our-most.md",
+    "size": 67041,
+    "contentPreview": "## 2025-08-10 00:07:09Z\n\n<!-- Claude Code Session 8699d725-e19b-44db-9d40-50acc61fdd31 (2025-08-10_00-07-09Z) -->\n\n_**User**_\n\nplease research our most recent edits to the snefuruplin wp plugin system. onlyaplease just answer and do not change any of our code right now. tell me what you can see\n\n---\n\n_**Agent (claude-sonnet-4-20250514)**_\n\nI'll research the recent edits to the snefuruplin WordPress plugin system. Let me search for relevant files and changes.\n\n_**Agent (claude-sonnet-4-20250514)"
+  }
+}
+

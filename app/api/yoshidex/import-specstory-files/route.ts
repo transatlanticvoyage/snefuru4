@@ -47,33 +47,68 @@ export async function POST(request: NextRequest) {
         console.log(`Processing file: ${filename}`);
         
         // Parse the conversation file
+        console.log(`[${filename}] Step 1: Starting parsing...`);
         const session = await ClaudeCodeParser.parseConversationFile(filePath);
         
         if (!session) {
-          console.error(`Failed to parse ${filename}: No session data extracted`);
+          console.error(`[${filename}] FAILED - Step 1: No session data extracted`);
           results.failed++;
           results.errors.push(`Failed to parse ${filename}: No session data extracted`);
           continue;
         }
         
-        console.log(`Parsed session ${session.claude_session_id} with ${session.total_messages} messages`);
+        console.log(`[${filename}] Step 1: SUCCESS - Parsed session ${session.claude_session_id} with ${session.total_messages} messages`);
         
         // Set the user ID
         session.user_id = user.id;
+        console.log(`[${filename}] Step 2: Set user_id = ${user.id}`);
         
         // Check if this session already exists
-        const existingSession = await yoshidexDatabaseService.getSessionByClaudeId(session.claude_session_id);
+        console.log(`[${filename}] Step 3: Checking if session already exists...`);
+        let existingSession;
+        try {
+          existingSession = await yoshidexDatabaseService.getSessionByClaudeId(session.claude_session_id);
+          console.log(`[${filename}] Step 3: Database check result - ${existingSession ? 'EXISTS' : 'NOT_FOUND'}`);
+        } catch (dbError) {
+          console.error(`[${filename}] FAILED - Step 3: Database check error:`, dbError);
+          results.failed++;
+          results.errors.push(`Database check failed for ${filename}: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`);
+          continue;
+        }
+        
         if (existingSession) {
-          console.log(`Session ${session.claude_session_id} already exists, skipping...`);
+          console.log(`[${filename}] SKIPPED - Session ${session.claude_session_id} already exists`);
           continue;
         }
         
         // Save session to database
-        const savedSession = await yoshidexDatabaseService.createSession(session);
+        console.log(`[${filename}] Step 4: Creating session in database...`);
+        console.log(`[${filename}] Session data:`, {
+          yoshidex_session_id: session.yoshidex_session_id,
+          claude_session_id: session.claude_session_id,
+          user_id: session.user_id,
+          session_title: session.session_title,
+          total_messages: session.total_messages
+        });
+        
+        let savedSession;
+        try {
+          savedSession = await yoshidexDatabaseService.createSession(session);
+          console.log(`[${filename}] Step 4: Create session result - ${savedSession ? 'SUCCESS' : 'NULL_RESULT'}`);
+          if (savedSession) {
+            console.log(`[${filename}] Saved session ID: ${savedSession.yoshidex_session_id}`);
+          }
+        } catch (dbError) {
+          console.error(`[${filename}] FAILED - Step 4: Create session error:`, dbError);
+          results.failed++;
+          results.errors.push(`Failed to create session for ${filename}: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`);
+          continue;
+        }
         
         if (!savedSession) {
+          console.error(`[${filename}] FAILED - Step 4: createSession returned null`);
           results.failed++;
-          results.errors.push(`Failed to save session for ${filename}`);
+          results.errors.push(`Failed to save session for ${filename}: createSession returned null`);
           continue;
         }
         
