@@ -41,24 +41,10 @@ function zurkovich_create_tables() {
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
 
-    // Table name for driggs
-    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
-    
-    // SQL for driggs table
-    $sql_driggs = "CREATE TABLE $table_name_driggs (
-        driggs_id bigint(20) NOT NULL AUTO_INCREMENT,
-        driggs_domain varchar(255) NOT NULL,
-        driggs_industry text NOT NULL,
-        driggs_city varchar(255) NOT NULL,
-        driggs_brand_name_1 varchar(255) NOT NULL,
-        driggs_site_type_or_purpose text NOT NULL,
-        driggs_email_1 varchar(255) NOT NULL,
-        driggs_address_1 text NOT NULL,
-        driggs_phone1 varchar(50) NOT NULL,
-        PRIMARY KEY  (driggs_id)
-    ) $charset_collate;";
+    // Clean up any unwanted tables that should not exist
+    zurkovich_cleanup_unwanted_tables();
 
-    // Table name for pageideas
+    // Table name for pageideas (keeping this table as it may be used elsewhere)
     $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
     
     // SQL for pageideas table
@@ -71,8 +57,21 @@ function zurkovich_create_tables() {
     ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql_driggs);
     dbDelta($sql_pageideas);
+}
+
+// Clean up unwanted tables function
+function zurkovich_cleanup_unwanted_tables() {
+    global $wpdb;
+    
+    // Remove zurko_driggs table if it exists (this table should not exist)
+    $zurko_driggs_table = $wpdb->prefix . 'zurko_driggs';
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$zurko_driggs_table'") == $zurko_driggs_table;
+    
+    if ($table_exists) {
+        $wpdb->query("DROP TABLE IF EXISTS $zurko_driggs_table");
+        error_log('Zurkovich: Removed unwanted zurko_driggs table during activation');
+    }
 }
 
 // Register activation hook

@@ -3,71 +3,85 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Handle form submission
-if (isset($_POST['submit_driggs'])) {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'zurko_driggs';
+// Handle configuration form submission
+if (isset($_POST['save_site_config'])) {
+    // Save site configuration as WordPress options instead of database table
+    update_option('zurkovich_site_domain', sanitize_text_field($_POST['site_domain']));
+    update_option('zurkovich_site_industry', sanitize_text_field($_POST['site_industry']));
+    update_option('zurkovich_site_city', sanitize_text_field($_POST['site_city']));
+    update_option('zurkovich_brand_name', sanitize_text_field($_POST['brand_name']));
+    update_option('zurkovich_site_purpose', sanitize_textarea_field($_POST['site_purpose']));
+    update_option('zurkovich_contact_email', sanitize_email($_POST['contact_email']));
+    update_option('zurkovich_business_address', sanitize_text_field($_POST['business_address']));
+    update_option('zurkovich_phone_number', sanitize_text_field($_POST['phone_number']));
     
-    $data = array(
-        'driggs_domain' => sanitize_text_field($_POST['driggs_domain']),
-        'driggs_industry' => sanitize_text_field($_POST['driggs_industry']),
-        'driggs_city' => sanitize_text_field($_POST['driggs_city']),
-        'driggs_brand_name_1' => sanitize_text_field($_POST['driggs_brand_name_1']),
-        'driggs_site_type_or_purpose' => sanitize_textarea_field($_POST['driggs_site_type_or_purpose']),
-        'driggs_email_1' => sanitize_email($_POST['driggs_email_1']),
-        'driggs_address_1' => sanitize_text_field($_POST['driggs_address_1']),
-        'driggs_phone1' => sanitize_text_field($_POST['driggs_phone1'])
-    );
-
-    $wpdb->insert($table_name, $data);
+    echo '<div class="notice notice-success is-dismissible"><p>Site configuration saved successfully!</p></div>';
 }
+
+// Get current values
+$site_domain = get_option('zurkovich_site_domain', get_site_url());
+$site_industry = get_option('zurkovich_site_industry', '');
+$site_city = get_option('zurkovich_site_city', '');
+$brand_name = get_option('zurkovich_brand_name', get_bloginfo('name'));
+$site_purpose = get_option('zurkovich_site_purpose', '');
+$contact_email = get_option('zurkovich_contact_email', get_option('admin_email'));
+$business_address = get_option('zurkovich_business_address', '');
+$phone_number = get_option('zurkovich_phone_number', '');
 ?>
 <div class="wrap">
-    <h1>Screen 2 - Driggs</h1>
+    <h1>Screen 2 - Site Configuration</h1>
+    <p>Configure your site information for use with Zurkovich AI tools.</p>
     <hr>
     
     <form method="post" action="">
         <table class="form-table">
             <tr>
-                <th scope="row"><label for="driggs_id">driggs_id</label></th>
-                <td><input type="text" name="driggs_id" id="driggs_id" class="regular-text" readonly></td>
+                <th scope="row"><label for="site_domain">Site Domain</label></th>
+                <td><input type="url" name="site_domain" id="site_domain" class="regular-text" value="<?php echo esc_attr($site_domain); ?>" placeholder="https://example.com"></td>
             </tr>
             <tr>
-                <th scope="row"><label for="driggs_domain">driggs_domain</label></th>
-                <td><input type="text" name="driggs_domain" id="driggs_domain" class="regular-text"></td>
+                <th scope="row"><label for="site_industry">Industry</label></th>
+                <td><input type="text" name="site_industry" id="site_industry" class="regular-text" value="<?php echo esc_attr($site_industry); ?>" placeholder="e.g., Plumbing, Real Estate, Consulting"></td>
             </tr>
             <tr>
-                <th scope="row"><label for="driggs_industry">driggs_industry</label></th>
-                <td><input type="text" name="driggs_industry" id="driggs_industry" class="regular-text"></td>
+                <th scope="row"><label for="site_city">City/Location</label></th>
+                <td><input type="text" name="site_city" id="site_city" class="regular-text" value="<?php echo esc_attr($site_city); ?>" placeholder="e.g., New York, NY"></td>
             </tr>
             <tr>
-                <th scope="row"><label for="driggs_city">driggs_city</label></th>
-                <td><input type="text" name="driggs_city" id="driggs_city" class="regular-text"></td>
+                <th scope="row"><label for="brand_name">Brand Name</label></th>
+                <td><input type="text" name="brand_name" id="brand_name" class="regular-text" value="<?php echo esc_attr($brand_name); ?>" placeholder="Your business name"></td>
             </tr>
             <tr>
-                <th scope="row"><label for="driggs_brand_name_1">driggs_brand_name_1</label></th>
-                <td><input type="text" name="driggs_brand_name_1" id="driggs_brand_name_1" class="regular-text"></td>
+                <th scope="row"><label for="site_purpose">Site Purpose/Description</label></th>
+                <td><textarea name="site_purpose" id="site_purpose" class="large-text" rows="5" placeholder="Describe what your website is about and its main purpose"><?php echo esc_textarea($site_purpose); ?></textarea></td>
             </tr>
             <tr>
-                <th scope="row"><label for="driggs_site_type_or_purpose">driggs_site_type_or_purpose</label></th>
-                <td><textarea name="driggs_site_type_or_purpose" id="driggs_site_type_or_purpose" class="large-text" rows="5"></textarea></td>
+                <th scope="row"><label for="contact_email">Contact Email</label></th>
+                <td><input type="email" name="contact_email" id="contact_email" class="regular-text" value="<?php echo esc_attr($contact_email); ?>" placeholder="info@example.com"></td>
             </tr>
             <tr>
-                <th scope="row"><label for="driggs_email_1">driggs_email_1</label></th>
-                <td><input type="email" name="driggs_email_1" id="driggs_email_1" class="regular-text"></td>
+                <th scope="row"><label for="business_address">Business Address</label></th>
+                <td><input type="text" name="business_address" id="business_address" class="regular-text" value="<?php echo esc_attr($business_address); ?>" placeholder="123 Main St, City, State 12345"></td>
             </tr>
             <tr>
-                <th scope="row"><label for="driggs_address_1">driggs_address_1</label></th>
-                <td><input type="text" name="driggs_address_1" id="driggs_address_1" class="regular-text"></td>
-            </tr>
-            <tr>
-                <th scope="row"><label for="driggs_phone1">driggs_phone1</label></th>
-                <td><input type="text" name="driggs_phone1" id="driggs_phone1" class="regular-text"></td>
+                <th scope="row"><label for="phone_number">Phone Number</label></th>
+                <td><input type="tel" name="phone_number" id="phone_number" class="regular-text" value="<?php echo esc_attr($phone_number); ?>" placeholder="(555) 123-4567"></td>
             </tr>
         </table>
         
         <p class="submit">
-            <input type="submit" name="submit_driggs" class="button button-primary" value="Save">
+            <input type="submit" name="save_site_config" class="button button-primary" value="Save Configuration">
         </p>
     </form>
+    
+    <div class="card" style="margin-top: 20px;">
+        <h3>How to Use This Information</h3>
+        <p>The information saved here can be used by other Zurkovich AI tools and screens. This configuration replaces the previous database-driven approach with a more flexible WordPress options system.</p>
+        <ul>
+            <li><strong>Site Domain:</strong> Used for API calls and content generation</li>
+            <li><strong>Industry & Location:</strong> Helps AI tools generate relevant content</li>
+            <li><strong>Brand Information:</strong> Used in content personalization</li>
+            <li><strong>Contact Details:</strong> Available for content injection and templates</li>
+        </ul>
+    </div>
 </div> 

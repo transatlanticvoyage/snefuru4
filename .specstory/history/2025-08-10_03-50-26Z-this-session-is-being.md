@@ -3097,3 +3097,3181 @@ The rup_driggs_mar page still displays all 47 fields in your **exact specified o
 
 The rup_driggs_mar page now correctly pulls from and updates the single record in the zen_sitespren table, exactly as you specified. No zen_driggs table will ever be created in WordPress installations using the snefuruplin plugin.
 
+---
+
+_**User**_
+
+i have deactivated and reactiated the snefuruplin wp plugin on my 8mako site, but in phpmyadmin, i still see the db table for _zen_driggs there. do i need to delete it manually for this stie? and will this undesired table appear in any future sites i install the wp plugin on? i dont want there to be any mention fo _zen_driggs anywhere in our app since it is not something that should exist (this db table was never consciously intended) 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+You're absolutely right - we need to make sure that zen_driggs table is completely eliminated and will never appear again. Let me check if there are any remaining references and add cleanup code.
+Tool use: **Grep** path `./snefuruplin`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php:4147:        // Validate field name - all editable fields from zen_driggs table
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I found one remaining reference in a comment. Let me also add code to automatically drop the zen_driggs table if it exists, and fix that comment:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  4143→        
+  4144→        $field = sanitize_text_field($_POST['field']);
+  4145→        $value = $_POST['value'];
+  4146→        
+  4147→        // Validate field name - all editable fields from zen_sitespren table
+  4148→        $allowed_fields = [
+  4149→            'created_at', 'sitespren_base', 'true_root_domain', 'full_subdomain', 'webproperty_type',
+  4150→            'fk_users_id', 'updated_at', 'wpuser1', 'wppass1', 'wp_plugin_installed1', 'wp_plugin_connected2',
+  4151→            'fk_domreg_hostaccount', 'is_wp_site', 'wp_rest_app_pass', 'driggs_industry', 'driggs_city',
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add code to the plugin activation to automatically clean up any existing zen_driggs tables:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    92→        add_action('wp', array($this, 'schedule_events'));
+    93→        add_action('snefuru_sync_data', array($this, 'sync_data_to_cloud'));
+    94→    }
+    95→    
+    96→    public function activate() {
+    97→        // Clean up any mistakenly created zen_driggs table
+    98→        $this->cleanup_unwanted_tables();
+    99→        
+   100→        // Create database tables if needed
+   101→        $this->create_tables();
+   102→        
+   103→        // Load the database class before trying to use it
+   104→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-ruplin-wppma-database.php';
+   105→        
+   106→        // Create zen tables
+   107→        Ruplin_WP_Database_Horse_Class::create_tables();
+   108→        
+   109→        // Schedule recurring events
+   110→        if (!wp_next_scheduled('snefuru_sync_data')) {
+   111→            wp_schedule_event(time(), 'hourly', 'snefuru_sync_data');
+   112→        }
+   113→        
+   114→        // Set default upload settings
+   115→        if (get_option('snefuru_upload_enabled') === false) {
+   116→            update_option('snefuru_upload_enabled', 1);
+   117→        }
+   118→        if (get_option('snefuru_upload_max_size') === false) {
+   119→            update_option('snefuru_upload_max_size', '10MB');
+   120→        }
+   121→    }
+   122→    
+   123→    public function deactivate() {
+   124→        // Clear scheduled events
+   125→        wp_clear_scheduled_hook('snefuru_sync_data');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the cleanup function before the closing brace of the class:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/snefuruplin.php`
+
+Result:
+
+```
+
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/snefuruplin.php`
+
+Result:
+
+```
+240→                $styling_table,
+   241→                array(
+   242→                    'styling_content' => "/* Bespoke CSS Editor - Add your custom styles here */\n\nbody {\n    /* Your custom styles */\n}",
+   243→                    'styling_end_url' => $default_url
+   244→                )
+   245→            );
+   246→        }
+   247→    }
+   248→}
+   249→
+   250→// Initialize the plugin
+   251→new SnefuruPlugin();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me add the cleanup function before the closing brace of the class:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   242→                    'styling_content' => "/* Bespoke CSS Editor - Add your custom styles here */\n\nbody {\n    /* Your custom styles */\n}",
+   243→                    'styling_end_url' => $default_url
+   244→                )
+   245→            );
+   246→        }
+   247→    }
+   248→    
+   249→    /**
+   250→     * Clean up any unwanted tables that should not exist
+   251→     */
+   252→    private function cleanup_unwanted_tables() {
+   253→        global $wpdb;
+   254→        
+   255→        // Remove zen_driggs table if it exists (this table should never have existed)
+   256→        $zen_driggs_table = $wpdb->prefix . 'zen_driggs';
+   257→        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$zen_driggs_table'") == $zen_driggs_table;
+   258→        
+   259→        if ($table_exists) {
+   260→            $wpdb->query("DROP TABLE IF EXISTS $zen_driggs_table");
+   261→            error_log('Snefuru: Removed unwanted zen_driggs table during activation');
+   262→        }
+   263→    }
+   264→}
+   265→
+   266→// Initialize the plugin
+   267→new SnefuruPlugin();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now let me also double-check that there are no other references to zen_driggs anywhere in the codebase:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Find any remaining references to zen_driggs in PHP files
+
+`find /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin -type f -name "*.php" -exec grep -l "zen_driggs" {} \;`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Good, the only remaining reference is in our cleanup function. Let me also check for any other file types:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Find any references to zen_driggs in all files
+
+`find /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin -type f -exec grep -l "zen_driggs" {} \;`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now let me create a simple script you can run to manually clean up the existing table on your 8mako site. Let me add a one-time cleanup hook to the admin class:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    39→        // Driggs management AJAX actions
+    40→        add_action('wp_ajax_rup_driggs_get_data', array($this, 'rup_driggs_get_data'));
+    41→        add_action('wp_ajax_rup_driggs_update_field', array($this, 'rup_driggs_update_field'));
+    42→        
+    43→        // Add Elementor data viewer
+    44→        add_action('add_meta_boxes', array($this, 'add_elementor_data_metabox'));
+    45→        
+    46→        // One-time cleanup on admin_init
+    47→        add_action('admin_init', array($this, 'one_time_cleanup_zen_driggs'), 1);
+    48→    }
+    49→    
+    50→    /**
+    51→     * Add admin menu pages
+    52→     */
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the cleanup function at the end of the admin class:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  4810→                    'driggs_email_1' => get_option('admin_email'),
+  4811→                    'is_wp_site' => 1
+  4812→                )
+  4813→            );
+  4814→        }
+  4815→    }
+  4816→    
+  4817→    /**
+  4818→     * One-time cleanup of zen_driggs table - runs once then sets flag to never run again
+  4819→     */
+  4820→    public function one_time_cleanup_zen_driggs() {
+  4821→        // Check if cleanup has already been done
+  4822→        if (get_option('snefuru_zen_driggs_cleaned_up', false)) {
+  4823→            return;
+  4824→        }
+  4825→        
+  4826→        global $wpdb;
+  4827→        $zen_driggs_table = $wpdb->prefix . 'zen_driggs';
+  4828→        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$zen_driggs_table'") == $zen_driggs_table;
+  4829→        
+  4830→        if ($table_exists) {
+  4831→            $wpdb->query("DROP TABLE IF EXISTS $zen_driggs_table");
+  4832→            error_log('Snefuru: One-time cleanup - Removed unwanted zen_driggs table');
+  4833→        }
+  4834→        
+  4835→        // Set flag so this only runs once
+  4836→        update_option('snefuru_zen_driggs_cleaned_up', true);
+  4837→    }
+  4838→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## ✅ **Complete zen_driggs Elimination Solution**
+
+### **🛡️ Immediate Cleanup for Your 8mako Site:**
+The next time you visit the WordPress admin area on your 8mako site (any admin page), the plugin will **automatically detect and delete** the zen_driggs table. This happens via the `one_time_cleanup_zen_driggs()` function that runs on `admin_init`.
+
+### **🚫 Prevention for All Future Sites:**
+1. **No zen_driggs table will ever be created again** - all creation code has been removed
+2. **New plugin activations** automatically check for and remove any zen_driggs table
+3. **Only zen_sitespren table will exist** in all WordPress installations
+
+### **🔧 What I've Implemented:**
+
+1. **Removed all zen_driggs references** except in cleanup functions
+2. **Added automatic cleanup** that runs during plugin activation
+3. **Added one-time cleanup** that runs on admin_init (for existing sites like 8mako)
+4. **Fixed the last comment reference** to mention zen_sitespren instead
+
+### **📋 For Your 8mako Site:**
+**You don't need to manually delete the table.** Just:
+1. Visit any WordPress admin page (like the dashboard)
+2. The table will be automatically detected and deleted
+3. Check your WordPress error log - you'll see: "Snefuru: One-time cleanup - Removed unwanted zen_driggs table"
+
+### **🎯 Result:**
+- ✅ **zen_driggs table eliminated** from 8mako and all future sites
+- ✅ **rup_driggs_mar page works with zen_sitespren** table only  
+- ✅ **Only one record per site** in zen_sitespren
+- ✅ **No unwanted tables will ever be created again**
+
+The zen_driggs table was never intended to exist and has been completely eliminated from the codebase. It will be automatically cleaned up from your 8mako site and prevented from appearing on any future WordPress installations.
+
+---
+
+_**User**_
+
+please research our plugin called zurkovich 
+
+please find out what components use the db table
+
+_zurko_driggs in the wp db table 
+
+you will have to first search the app for a folder with zurkovich in it which contains the wp plugin files
+
+our next task is to modify the zurkovich plugin (which is a different wp plugin entirely than the snefuruplin wp plugin) to remove the db table _zurko_driggs and any code that references it cleanly 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll research the zurkovich plugin to understand what components use the `_zurko_driggs` database table. Let me start by searching for the zurkovich folder.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Find zurkovich plugin folder and files
+- [ ] 🌡️ Identify all components that use _zurko_driggs table
+- [ ] 🌡️ Map out table references and dependencies
+- [ ] 🌡️ Plan clean removal of _zurko_driggs table
+- [ ] 🌡️ Execute removal of table and references
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Task** Find zurkovich plugin folder
+
+---
+
+_**User (sidechain)**_
+
+I need you to search the entire repository for a folder or directory containing "zurkovich" in its name. This should be a WordPress plugin folder. Please search thoroughly through the entire directory structure starting from /Users/kylecampbell/Documents/repos/localrepo-snefuru4/ and find any folder with "zurkovich" in the name. Once found, also look for any files that might reference "zurko_driggs" database table.
+
+---
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+I'll help you search for the "zurkovich" folder and any references to "zurko_driggs" database table. Let me start by searching the entire repository structure.
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/assets/js/zurkovich-ai-tool.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/zurkovich.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/zurkovich.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/assets/js/zurkovich-ai-tool.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/assets/js/zurkovich-ai-tool.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich2025__06_05 - 1.zip
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich2025__06_05 - 1.zip
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich2025__06_05 - 1.zip
+```
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Great! I found several zurkovich folders and files. Now let me search for any references to "zurko_driggs" database table throughout the repository.
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Tool use: **Grep** path `./`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:    $table_name = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/zurkovich.php:    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php:    $table_name = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/zurkovich.php:    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php:    $table_name = $wpdb->prefix . 'zurko_driggs';
+```
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Now let me get a better view of the directory structure to see the complete zurkovich folders:
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Tool use: **LS**
+
+Result:
+
+```
+- /Users/kylecampbell/Documents/repos/localrepo-snefuru4/
+  - app/
+    - (auth)/
+      - forgot-password/
+        - page.tsx
+      - layout.tsx
+      - login/
+        - page.tsx
+      - reset-password/
+        - page.tsx
+      - signup/
+        - page.tsx
+    - (prot3)/
+      - layout.tsx
+      - lib/
+        - apollo-client.ts
+        - graphql-queries.ts
+      - sabjar/
+        - components/
+          - AdvancedDataGrid.tsx
+          - SaberTable.tsx
+          - SaberTableFixed.tsx
+        - page.tsx
+    - (protected)/
+      - admin-tools/
+        - f23-storage-cleanup/
+          - components/
+            - F23StorageCleanupForm.tsx
+          - constants/
+            - f23-constants.ts
+          - page.tsx
+          - types/
+            - f23-types.ts
+      - admin/
+        - azulpsql/
+          - page.tsx
+        - baklijar/
+          - page.tsx
+        - baklivid/
+          - page.tsx
+        - bensamaster/
+          - page.tsx
+        - coderangejar/
+          - page.tsx
+        - colors1/
+          - page.tsx
+        - coltempcommand/
+          - page.tsx
+        - columnrobot/
+          - page.tsx
+        - create-new-api-key-slots/
+          - page.tsx
+        - depline_imperatives/
+          - page.tsx
+        - drahiman/
+          - page.tsx
+        - favaconfignow/
+          - page.tsx
+        - filegun-nav-demo/
+          - page.tsx
+        - filegun/
+          - components/
+            - FilegunColumnView.tsx
+            - FilegunExplorer.tsx
+            - FilegunStatusBar.tsx
+            - FilegunToolbar.tsx
+            - MeadControl.tsx
+            - SentinelControl.tsx
+            - SentinelStatus.tsx
+          - hooks/
+            - useFilegunDirectory.ts
+            - useFilegunOperations.ts
+            - useSentinel.ts
+          - page.tsx
+          - types/
+            - filegun.types.ts
+        - filejar/
+          - components/
+            - FilejarTable.tsx
+          - page.tsx
+        - fobjectjar/
+          - components/
+            - FobjectjarTable.tsx
+          - page.tsx
+        - folderjar/
+          - components/
+            - FolderjarTable.tsx
+          - page.tsx
+        - jetlamaster/
+          - page.tsx
+        - jexplain/
+          - components/
+            - JexplanationsTable.tsx
+          - page.tsx
+        - ketch_manager/
+          - components/
+            - KetchSettingsTable.tsx
+          - page.tsx
+        - layout.tsx
+        - mapping1/
+          - page.tsx
+        - moonjar/
+          - page.tsx
+        - obi/
+          - page.tsx
+        - popnow/
+          - components/
+            - KPopup1.tsx
+            - KPopup1Config.ts
+            - KPopup1Provider.tsx
+            - hooks/
+              - useKPopup1.ts
+          - page.tsx
+        - rackjar/
+          - components/
+            - RackuiColumnsTable.tsx
+          - migration-check/
+            - page.tsx
+          - page.tsx
+        - rstormanager/
+          - page.tsx
+        - sunjar/
+          - page.tsx
+        - sync-metadata/
+          - page.tsx
+        - tshelljar/
+          - page.tsx
+        - usersp1/
+          - page.tsx
+        - utg_manager/
+          - components/
+            - UiTableGridsTable.tsx
+          - page.tsx
+        - xpagesmanager1/
+          - page.tsx
+        - yegjar/
+          - page.tsx
+        - yoshidexman/
+          - components/
+            - YoshidexSessionsTable.tsx
+          - page.tsx
+        - zarnomanager/
+          - components/
+            - ZarnosTable.tsx
+          - page.tsx
+        - zugjar/
+          - page.tsx
+      - artifjar/
+        - page.tsx
+      - aspejar/
+        - components/
+          - AspejarTable.tsx
+        - page.tsx
+      - bin153/
+        - sitejar3/
+          - page.tsx
+      - bin31/
+        - panjar4/
+          - api/
+          - components/
+            - panjar4.tsx
+          - page.tsx
+          - types.ts
+          - utils/
+            - cfunc_fetch_image_4.ts
+      - bin32/
+        - tebnar1/
+          - components/
+            - tebnar1.tsx
+          - page.tsx
+          - utils/
+            - cfunc_create_plans_from_xls_1.ts
+            - cfunc_create_plans_make_images_1.ts
+      - bin33/
+        - rungi1/
+          - page.tsx
+      - bin34/
+        - statusjar1/
+          - components/
+            - StatusJar1.tsx
+          - page.tsx
+        - tebnar2/
+          - components/
+            - Tebnar2Actions.tsx
+            - Tebnar2Columns.tsx
+            - Tebnar2ExcelPasteGrid.tsx
+            - Tebnar2Filters.tsx
+            - Tebnar2ImagePreview.tsx
+            - Tebnar2Main.tsx
+            - Tebnar2Table.tsx
+          - constants/
+            - tebnar2-constants.ts
+          - page.tsx
+          - types/
+            - tebnar2-types.ts
+          - utils/
+            - tbn2-data-functions.ts
+            - tbn2-table-functions.ts
+            - tbn2-utils.ts
+            - tbn2_func_create_plans_from_xls_2.ts
+            - tbn2_func_create_plans_make_images_2.ts
+      - bin35/
+        - statusbox1/
+          - page.tsx
+          - test-logging.tsx
+      - bin36/
+        - domjar1/
+          - page.tsx
+          - utils/
+            - cfunc_44_add_domains.ts
+      - bin36b/
+        - domjar2/
+          - page.tsx
+          - utils/
+            - cfunc_45_addtositespren.ts
+      - bin37/
+        - pubnar1/
+          - page.tsx
+      - bin38/
+        - rangivid/
+          - page.tsx
+      - bin4/
+        - api/
+          - sfunc_fetch_image_4/
+            - route.ts
+        - panjar3/
+          - page.tsx
+        - utils/
+          - cfunc_fetch_image_4.ts
+      - bin41/
+        - domnivid/
+          - page.tsx
+      - bin42/
+        - narpo1/
+          - page.tsx
+      - bin43/
+        - narpivid/
+          - page.tsx
+      - bin51/
+        - uidev1/
+          - components/
+            - uidev1.tsx
+          - page.tsx
+          - utils/
+            - cfunc_create_plans_from_xls_1.ts
+            - cfunc_create_plans_make_images_1.ts
+      - bin65/
+      - callplatjar/
+        - components/
+          - CallPlatjarTable.tsx
+        - page.tsx
+      - cfdefjar/
+        - page.tsx
+      - cfvaljar/
+        - page.tsx
+      - cgigjar/
+        - components/
+          - CgigjarTable.tsx
+        - page.tsx
+      - chanbri_filter_controls/
+        - page.tsx
+      - choptext/
+        - components/
+          - SharmiChopTextLayout.tsx
+        - layout.tsx
+        - page.tsx
+      - cityjar/
+        - components/
+          - CityjarTable.tsx
+        - page.tsx
+      - clevnar1/
+        - page.tsx
+      - clevnar2/
+        - page.tsx
+      - clevnar3/
+        - page.tsx
+      - cnjar1/
+        - components/
+          - Cnjar1Table.tsx
+        - page.tsx
+        - utils/
+          - f355-populate-cncglub.ts
+          - f360-delete-all-cncglub.ts
+      - cnjar2/
+        - page.tsx
+      - czonejar1/
+        - page.tsx
+      - dfslocr/
+        - components/
+          - DfsLocationsTable.tsx
+          - ImportLocationsButton.tsx
+        - page.tsx
+      - downloadplugin/
+        - page.tsx
+      - driggsman/
+        - components/
+          - DriggsmanTable.tsx
+        - page.tsx
+      - edable/
+        - [id]/
+          - page.tsx
+        - components/
+          - DorliEditor.tsx
+          - EdableTableEditor.tsx
+        - hooks/
+          - useDorliBlocks.ts
+          - useEdableContent.ts
+      - fanex1/
+        - page.tsx
+      - favprar1/
+        - page.tsx
+      - fbin2/
+        - api/
+          - sfunc_fetch_image_2/
+            - route.ts
+        - fapikeys1/
+          - page.tsx
+        - panjar1/
+          - page.tsx
+        - panjar2/
+          - components/
+            - panjar2.tsx
+          - page.tsx
+          - types.ts
+        - utils/
+          - cfunc_fetch_image_2.ts
+      - fbin3/
+        - gapikeys1/
+        - ranlar1/
+          - components/
+      - flatx1/
+        - page.tsx
+      - gconjar1/
+        - components/
+          - GconPiecesTable.tsx
+        - page.tsx
+        - utils/
+          - cfunc_215_createpiece.ts
+      - haccjar/
+        - components/
+          - HostAccountsUITable.tsx
+        - page.tsx
+      - haccjar2/
+        - components/
+          - HostAccountsUITableV2.tsx
+        - page.tsx
+      - hcomjar/
+        - components/
+          - HostCompanyUITable.tsx
+        - page.tsx
+      - home/
+        - page.tsx
+      - indusjar/
+        - components/
+          - IndusjarTable.tsx
+        - page.tsx
+      - karfi1/
+        - page.tsx
+      - kwjar/
+        - components/
+          - KeywordsHubTable.tsx
+        - page.tsx
+      - kxtemplates/
+        - page.tsx
+      - layout.tsx
+      - mesagen/
+        - [id]/
+          - page.tsx
+        - components/
+          - MesagenTableEditor.tsx
+          - marzdi_sticky_menu.tsx
+      - metrojar/
+        - page.tsx
+      - myhub/
+        - page.tsx
+      - nwivid/
+        - components/
+          - NwpiContentView.tsx
+        - page.tsx
+      - nwjar1/
+        - components/
+          - NwpiContentTable.tsx
+          - NwpiPusherButton.tsx
+        - page.tsx
+      - panjar1/
+        - components/
+          - panjar1.tsx
+        - page.tsx
+        - types.ts
+      - panjar3/
+        - components/
+          - panjar3.tsx
+        - page.tsx
+      - papikeys/
+      - papikeys2/
+      - papikeys3/
+      - pedbar/
+        - components/
+          - GconPieceEditor.tsx
+        - page.tsx
+      - pedtor1/
+        - components/
+          - ElementorEditor.tsx
+        - page.tsx
+      - profile/
+        - page.tsx
+      - ruplin-api-keys-p1/
+        - page.tsx
+      - scafjar/
+        - components/
+          - KwScaffoldsTable.tsx
+        - page.tsx
+      - sitejar4/
+        - components/
+          - ExportSitesComponent.tsx
+          - F71CreateSiteForm.tsx
+          - SitesprenTable.tsx
+          - SitesprenTable.tsx.backup
+        - page.tsx
+        - utils/
+          - cfunc_f71_createsite.ts
+          - urlCleaner.ts
+      - siteupd1/
+        - components/
+          - SpreadsheetGrid.tsx
+        - page.tsx
+      - sitnivid/
+        - components/
+          - SitesprenEditor.tsx
+        - page.tsx
+        - utils/
+      - skojar1/
+        - page.tsx
+      - skojar2/
+        - page.tsx
+      - slotx1/
+        - page.tsx
+      - statusbox1/
+      - stuff1/
+      - torlid1/
+        - page.tsx
+      - tornado/
+        - components/
+          - WaterTable.tsx
+          - marzdi_sticky_menu.tsx
+        - page.tsx
+        - styles/
+      - torya/
+        - components/
+          - WaterTable.tsx
+          - marzdi_sticky_menu.tsx
+        - page.tsx
+      - utilpr1/
+        - components/
+          - UtilityPromptsTable.tsx
+        - page.tsx
+      - valan/
+        - components/
+          - AvalancheSidebar1.tsx
+          - TipTapEditor.tsx
+        - hooks/
+          - useAvalancheContent.ts
+        - page.tsx
+      - zenriver/
+        - page.tsx
+    - (protected2)/
+      - admin/
+        - favaconfigman/
+          - page.tsx
+      - bren1/
+        - page.tsx
+      - fava/
+        - README.md
+        - components/
+          - ColVisMatDiagram/
+          - ColumnTemplateControls/
+            - favaCTCButtonsClassic.tsx
+            - favaCTCButtonsEnhanced.tsx
+            - favaCTCEvents.ts
+            - favaCTCMaster.tsx
+            - favaCTCShendoActive.tsx
+            - favaCTCShendoClassic.tsx
+            - favaCTCShendoEnhanced.tsx
+            - favaCTCShendoPreview.tsx
+            - favaCTCTypes.ts
+            - index.ts
+          - JetstreamUtensilTable.tsx
+          - PlutoControlTable.tsx
+          - Shendo/
+          - TableHeaderRows/
+          - favaBiriDevInfoBox.tsx
+          - favaColVisMatMainBar.tsx
+          - favaColVisMatPreviewBar.tsx
+          - favaColVisMatTooltip.tsx
+          - favaColVisMatrixMaster.tsx
+          - favaColumnTemplateControls.tsx
+          - favaColumnVisibilityMatrix.tsx
+          - favaFilterControls.tsx
+          - favaHeader.tsx
+          - favaHeaderRows.ts
+          - favaMinimalTable.tsx
+          - favaMultiDeckButton.tsx
+          - favaNavToggle.tsx
+          - favaPageMaster.tsx
+          - favaPageMasterWithPagination.tsx
+          - favaPaginationControls.tsx
+          - favaSearchBox.tsx
+          - favaShendoBar.tsx
+          - favaSidebar.tsx
+          - favaTaniPopup/
+            - README.md
+            - favaTaniConditionalComponents.tsx
+            - favaTaniConditionalProvider.tsx
+            - favaTaniModal.tsx
+            - types.ts
+          - favaTrelnoColumnsDefBox.tsx
+          - favaZarnoMaster.tsx
+          - icons/
+            - expandedIconData.ts.disabled
+            - expandedIconRegistry.ts.disabled
+            - iconPreview.tsx
+            - iconRegistry.ts
+            - iconSelector.tsx.disabled
+            - iconUtils.ts.disabled
+            - types/
+              - iconTypes.ts
+          - jetstream/
+            - docs/
+              - 412 jetstream xls mockup 9.xlsx
+              - 412_jetstream_xls_mockup_9.csv
+              - 412_jetstream_xls_mockup_9.csv.backup
+              - 412_mockup_for_zug_yeg_8.csv
+              - 412_mockup_for_zug_yeg_8.csv.backup
+              - 415 jetstream adjunct file - 1.xlsx
+              - 415 jetstream adjunct file - 2.xlsx
+              - README.md
+              - convertExcelToCSV.js
+              - updateCSV.js
+              - ~$412 jetstream xls mockup 9.xlsx
+              - ~$415 jetstream adjunct file - 2.xlsx
+            - moonrowmodules/
+            - sunrowslots/
+              - SunRowsDefaultConfig.ts
+              - SunRowsHeader.tsx
+              - sunRowsTypes.ts
+              - sunrowpageconfigs/
+              - useSunRows.ts
+          - pagination/
+            - favaMinimalTablePaginated.tsx
+            - favaPaginationControlsOriginal.tsx
+            - favaPaginationControlsWorking.tsx
+            - favaPaginationProvider.tsx
+            - favaPaginationTypes.ts
+            - favaPaginationUtils.ts
+            - useFavaPagination.tsx
+          - plutoDebugMonitor.tsx
+          - plutoShowHideInstrument.tsx
+          - plutoTestPage.tsx
+          - plutoToggleSwitch.tsx
+          - pureFavaPageMaster.tsx
+        - config/
+          - favaTaniFeatureFlags.ts
+          - tableConfig.advanced.example.ts
+          - tableConfig.sample.ts
+          - tableConfig.ts
+          - torna2TableConfig.ts
+          - torna3TableConfig.ts
+        - data/
+          - artichokeData.ts
+        - hooks/
+          - useFavaTaniSafeListeners.ts
+          - usePlutoSettings.ts
+        - styles/
+          - fava-beralis-table-grid.css
+          - fava-navigation.css
+          - fava-pluto-controlix.css
+          - fava-table-template.css
+        - utils/
+          - fava-table-helpers.ts
+      - layout.tsx
+      - pluto-test/
+        - page.tsx
+      - torna2/
+        - page.tsx
+      - torna3/
+        - components/
+          - Torna3ZarnoAccordion.tsx
+        - page.tsx
+        - styles/
+          - beralis-table-overrides.css
+          - zarno-accordion.css
+        - taniContent/
+          - config.ts
+          - index.ts
+          - ptab1Content.tsx
+          - ptab2Content.tsx
+          - ptab3Content.tsx
+          - ptab4Content.tsx
+          - ptab5Content.tsx
+          - ptab6Content.tsx
+          - ptab7Content.tsx
+    - (protected3)/
+      - bensa/
+        - components/
+          - BensaFieldTable.tsx
+          - BensaFieldTableStyles.ts
+          - BensaFieldTableTypes.ts
+        - config/
+          - bensaUsersConfig.ts
+          - bensaUtgsConfig.ts
+          - bensaXpagesConfig.ts
+          - bensaZarnosConfig.ts
+        - hooks/
+          - useBensaFieldMetadata.ts
+        - page.tsx
+      - layout.tsx
+    - (zurkovich)/
+    - admin/
+      - rapidlyxman/
+        - page.tsx
+    - api/
+      - add_pasted_sites_to_tag/
+        - route.ts
+      - add_sites_to_tag/
+        - route.ts
+      - admin-options/
+        - [option_name]/
+          - route.ts
+      - admin/
+        - f91-create-api-key-slot/
+          - route.ts
+      - api-keys/
+      - background-jobs/
+        - add-job/
+          - route.ts
+        - add-settings-column/
+          - route.ts
+        - clear-pending/
+          - route.ts
+        - create-queue-table/
+          - route.ts
+        - end-process/
+          - route.ts
+        - load-settings/
+          - route.ts
+        - process/
+          - route.ts
+        - save-settings/
+          - route.ts
+        - status/
+          - route.ts
+      - bakli-css/
+        - [bakli_id]/
+          - route.ts
+      - barkro/
+        - download-plugin/
+          - route.ts
+        - push-update/
+          - route.ts
+      - bin152/
+        - sfunc_63_push_images/
+      - bin36/
+        - domjar1/
+          - sfunc_44_add_domains/
+            - route.ts
+      - bin36b/
+        - domjar2/
+          - sfunc_45_addtositespren/
+            - route.ts
+      - bin45/
+        - sfunc_63_push_images/
+          - route.ts
+        - weplich1/
+          - sfunc_71_add_sites/
+            - route.ts
+      - create-user-record/
+      - database/
+        - add-image-columns/
+        - add-settings-column/
+          - route.ts
+        - add-submission-order-column/
+      - debug-colors/
+      - debug-env/
+      - dfs-locations/
+        - check-schema/
+          - route.ts
+        - clear/
+          - route.ts
+        - import/
+          - route.ts
+        - status/
+          - route.ts
+        - test-connection/
+          - route.ts
+        - test-insert/
+          - route.ts
+      - dublish-create-elementor-page/
+        - route.ts
+      - error-logs/
+        - add-log/
+          - route.ts
+        - clear-logs/
+          - route.ts
+        - get-logs/
+          - route.ts
+        - setup-table/
+          - route.ts
+      - export-sites/
+        - columns/
+          - route.ts
+        - route.ts
+      - f18_createhostcompany/
+        - route.ts
+      - f18_deletesites/
+        - route.ts
+      - f19_updatesites/
+        - route.ts
+      - f211-update-end-site-pelementor/
+        - route.ts
+      - f22-gcon-piece-processor/
+        - route.ts
+      - f22-nwpi-to-gcon-pusher/
+        - route.ts
+        - route.ts.bak
+      - f23-storage-cleanup/
+        - route.ts
+      - f71_createsite/
+        - route.ts
+      - filegun/
+        - check-db/
+          - route.ts
+        - check-test-file/
+          - route.ts
+        - create/
+          - route.ts
+        - debug-path/
+          - route.ts
+        - delete/
+          - route.ts
+        - download/
+          - route.ts
+        - list/
+          - route.ts
+        - pin/
+          - route.ts
+        - rename/
+          - route.ts
+        - sentinel/
+          - operations/
+            - route.ts
+          - route.ts
+          - stats/
+            - route.ts
+        - test-db/
+          - route.ts
+        - test-path/
+          - route.ts
+        - test-scanner/
+          - route.ts
+        - test-simple/
+          - route.ts
+      - filejar/
+        - files/
+          - route.ts
+      - folderjar/
+        - folders/
+          - route.ts
+      - func_215_createpiece/
+        - route.ts
+      - generate-colors-css/
+      - generate-image/
+        - route.ts
+      - generate-plugin-zip-with-key/
+        - route.ts
+      - generate-plugin-zip/
+        - route.ts
+      - get_domain_registrar_info/
+        - route.ts
+      - get_hostaccount_data/
+        - route.ts
+      - get_hostaccount_data_v2/
+        - route.ts
+      - get_hostcompany_data/
+        - route.ts
+      - get_sites_by_tag/
+        - route.ts
+      - get_sitespren_data/
+        - route.ts
+      - get_sitespren_record/
+        - route.ts
+      - get_user_internal_id/
+        - route.ts
+      - graphql/
+        - route.ts
+      - joni-mud-depline-population-process/
+        - route.ts
+      - navigation/
+        - route.ts
+      - nwp-sync/
+        - posts/
+          - create/
+        - sites/
+          - register/
+          - status/
+      - plugin/
+        - check-version/
+          - route.ts
+        - update/
+          - route.ts
+      - poke-api-key/
+        - route.ts
+      - populate-nemtor-units/
+        - route.ts
+      - scrape_links_from_homepage/
+        - route.ts
+      - setup-database/
+        - route.ts
+      - sfunc_create_plans_from_xls_1/
+        - route.ts
+      - sfunc_create_plans_make_images_1/
+        - route.ts
+        - sfunc_create_image_with_openai.ts
+      - sfunc_fetch_image_2/
+        - route.ts
+      - sfunc_fetch_image_4/
+        - route.ts
+      - sfunc_fetch_single_image/
+        - route.ts
+      - sites/
+        - refresh-ip/
+          - route.ts
+        - refresh-ns/
+          - route.ts
+      - sitespren_tags/
+        - route.ts
+      - snefuruplin/
+        - download/
+          - route.ts
+      - snoverride-update-elementor-page/
+        - route.ts
+      - submit-to-ai/
+        - route.ts
+      - sync-xpage-metadata/
+        - route.ts
+      - sync/
+        - test-plugin/
+          - route.ts
+        - wordpress-site/
+          - route.ts
+      - tbn2_sfunc_create_plans_from_xls_2/
+        - route.ts
+      - tbn2_sfunc_create_plans_make_images_2/
+        - route.ts
+      - tbn2_sfunc_fetch_single_image/
+        - route.ts
+        - tbn2_sfunc_create_image_with_openai.ts
+      - test-supabase/
+        - route.ts
+      - update-database/
+      - update-page-title/
+        - route.ts
+      - update_domain_registrar/
+        - route.ts
+      - update_sitespren/
+        - route.ts
+      - valan-save/
+        - route.ts
+      - wordpress/
+        - install-activate-plugin/
+          - route.ts
+      - wpsv2/
+        - sync-site/
+          - route.ts
+        - test-connection/
+          - route.ts
+      - yoshidex/
+        - debug-single-file/
+          - route.ts
+        - file-monitor/
+          - route.ts
+        - import-session/
+          - route.ts
+        - import-specstory-files/
+          - route.ts
+        - link-story/
+          - route.ts
+        - specstory-webhook/
+          - route.ts
+        - sync-progress/
+          - route.ts
+        - test-integration/
+          - route.ts
+      - ywp/
+        - sync-site/
+      - zwp-sync/
+        - bulk/
+          - posts/
+            - route.ts
+        - posts/
+          - create/
+            - route.ts
+          - update/
+            - route.ts
+        - sites/
+          - register/
+            - route.ts
+          - status/
+            - route.ts
+    - bin45/
+      - cfunc_63_push_images.ts
+      - weplich1/
+        - page.tsx
+        - utils/
+          - cfunc_71_add_sites.ts
+          - cfunc_sync_site.ts
+          - cfunc_test_plugin.ts
+    - bin47/
+      - wepfol/
+        - page.tsx
+    - bin65/
+      - charla1/
+        - page.tsx
+    - components/
+      - AdminRoute.tsx
+      - ContentDataLineageTableHeaderTierSystem1.tsx
+      - DrenjariButtonBarDriggsmanLinks.tsx
+      - Header.tsx
+      - MenjariButtonBarFileGunLinks.tsx
+      - MinimalTable.tsx
+      - ProtectedRoute.tsx
+      - PublicRoute.tsx
+      - README-MenjariButtonBarFileGunLinks.md
+      - SelectedRowStyles.tsx
+      - SidebarMenu.tsx
+      - SitedoriButtonBar.tsx
+      - shared/
+        - FilegunFoldersTable.tsx
+        - InputsExpandEditor.tsx
+    - context/
+      - AuthContext.tsx
+    - create-user/
+    - error.tsx
+    - favicon.ico
+    - forgot-password/
+    - global-error.tsx
+    - globals.css
+    - hooks/
+      - useCustomColors.ts
+      - useRecentPages.ts
+      - useTierColors.ts
+    - icon.png
+    - layout.tsx
+    - lib/
+      - sync/
+        - SyncManager.ts
+        - methods/
+          - PluginApiSync.ts
+          - RestApiSync.ts
+        - types.ts
+    - login/
+    - metadata/
+      - xpage-cache.json
+    - not-found.tsx
+    - page.tsx
+    - papikeys2/
+    - reset-password/
+    - services/
+      - yoshidex/
+        - FileMonitor.ts
+        - SpecstoryService.ts
+        - YoshidexDatabaseService.ts
+        - config/
+          - specstory.config.ts
+        - parsers/
+          - ClaudeCodeParser.ts
+        - types/
+          - specstory.types.ts
+    - setup/
+      - page.tsx
+    - signup/
+    - stuff1/
+      - layout.tsx
+      - page.tsx
+    - test-sentinel-sync.txt
+    - turnovich/
+    - utils/
+      - bensa-tableface-kite/
+        - BensaTablefaceKite.tsx
+        - config.ts
+        - index.ts
+        - types.ts
+      - dateUtils.ts
+      - filegun/
+        - electronBridge.ts
+        - filegunClientSecurity.ts
+        - filegunClientUtils.ts
+        - filegunConstants.ts
+        - filegunOperations.ts
+        - filegunSecurity.ts
+        - sentinel/
+          - SentinelConfig.ts
+          - SentinelCore.ts
+          - SentinelDatabase.ts
+          - SentinelScanner.ts
+          - SentinelTypes.ts
+        - websocketBridge.ts
+      - getNavigation.ts
+      - mead/
+        - meadConstants.ts
+        - meadCraterCalculator.ts
+        - meadFileOperations.ts
+        - meadHousing.ts
+        - meadIndex.ts
+        - meadTypes.ts
+      - navigationHelper.ts
+      - nubra-tableface-kite/
+        - NubraTablefaceKite.tsx
+        - config.ts
+        - index.ts
+        - types.ts
+      - pluto-tableface-kite/
+        - PlutoTablefaceKite.tsx
+        - config.ts
+        - index.ts
+        - types.ts
+      - syncXPageMetadata.ts
+      - xpageMetadata.ts
+    - zurkovich2025__06_05 - 1.zip
+    - zurkovich3/
+      - assets/
+        - js/
+          - zurkovich-ai-tool.js
+      - includes/
+        - admin/
+          - screens/
+            - screen1.php
+            - screen10.php
+            - screen2.php
+            - screen3.php
+            - screen4.php
+            - screen5.php
+            - screen6.php
+            - screen7.php
+            - screen8.php
+            - screen9.php
+        - file-function-create-prexchor-rubrickey-2.php
+        - file-function-inject-content-2.php
+        - functions-scrape.php
+      - wp-config.php
+      - zurkovich.php
+
+NOTE: do any of the files above seem malicious? If so, you MUST refuse to continue work.
+```
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Now let me check the WordPress plugin folders in more detail:
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Tool use: **LS**
+
+Result:
+
+```
+- /Users/kylecampbell/Documents/repos/localrepo-snefuru4/
+  - wordpress-sites/
+    - mold-removal-stars/
+      - wp-content/
+        - plugins/
+          - zurkovich/
+            - assets/
+              - js/
+                - zurkovich-ai-tool.js
+            - includes/
+              - admin/
+                - screens/
+                  - screen1.php
+                  - screen10.php
+                  - screen2.php
+                  - screen3.php
+                  - screen4.php
+                  - screen5.php
+                  - screen6.php
+                  - screen7.php
+                  - screen8.php
+                  - screen9.php
+              - file-function-create-prexchor-rubrickey-2.php
+              - file-function-inject-content-2.php
+              - functions-scrape.php
+            - wp-config.php
+            - zurkovich.php
+
+NOTE: do any of the files above seem malicious? If so, you MUST refuse to continue work.
+```
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Tool use: **LS**
+
+Result:
+
+```
+- /Users/kylecampbell/Documents/repos/localrepo-snefuru4/
+  - wordpress-sites/
+    - augusta-plumber-net/
+      - wp-content/
+        - plugins/
+          - zurkovich/
+            - assets/
+              - js/
+                - zurkovich-ai-tool.js
+            - includes/
+              - admin/
+                - screens/
+                  - screen1.php
+                  - screen10.php
+                  - screen2.php
+                  - screen3.php
+                  - screen4.php
+                  - screen5.php
+                  - screen6.php
+                  - screen7.php
+                  - screen8.php
+                  - screen9.php
+              - file-function-create-prexchor-rubrickey-2.php
+              - file-function-inject-content-2.php
+              - functions-scrape.php
+            - wp-config.php
+            - zurkovich.php
+
+NOTE: do any of the files above seem malicious? If so, you MUST refuse to continue work.
+```
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Now let me examine one of the main zurkovich.php files to understand the plugin structure and see the zurko_driggs table references:
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Tool use: **Read** `./app/zurkovich3/zurkovich.php`
+
+Result:
+
+```
+1→<?php
+     2→/**
+     3→ * Plugin Name: Zurkovich
+     4→ * Description: A custom admin tool plugin for WordPress.
+     5→ * Version: 1.0
+     6→ * Author: Your Name
+     7→ */
+     8→
+     9→// Prevent direct access
+    10→if (!defined('ABSPATH')) {
+    11→    exit;
+    12→}
+    13→
+    14→// Include scraping functions
+    15→require_once plugin_dir_path(__FILE__) . 'includes/functions-scrape.php';
+    16→
+    17→// Include new content injection function
+    18→require_once plugin_dir_path(__FILE__) . 'includes/file-function-inject-content-2.php';
+    19→
+    20→// Include new rubrickey function
+    21→require_once plugin_dir_path(__FILE__) . 'includes/file-function-create-prexchor-rubrickey-2.php';
+    22→
+    23→// Function to save API key
+    24→function zurkovich_save_api_key($api_key) {
+    25→    // Encrypt the API key before saving
+    26→    $encrypted_key = base64_encode($api_key);
+    27→    update_option('zurkovich_openai_api_key', $encrypted_key);
+    28→}
+    29→
+    30→// Function to get API key
+    31→function zurkovich_get_api_key() {
+    32→    $encrypted_key = get_option('zurkovich_openai_api_key');
+    33→    if ($encrypted_key) {
+    34→        return base64_decode($encrypted_key);
+    35→    }
+    36→    return '';
+    37→}
+    38→
+    39→// Create database tables on plugin activation
+    40→function zurkovich_create_tables() {
+    41→    global $wpdb;
+    42→    $charset_collate = $wpdb->get_charset_collate();
+    43→
+    44→    // Table name for driggs
+    45→    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+    46→    
+    47→    // SQL for driggs table
+    48→    $sql_driggs = "CREATE TABLE $table_name_driggs (
+    49→        driggs_id bigint(20) NOT NULL AUTO_INCREMENT,
+    50→        driggs_domain varchar(255) NOT NULL,
+    51→        driggs_industry text NOT NULL,
+    52→        driggs_city varchar(255) NOT NULL,
+    53→        driggs_brand_name_1 varchar(255) NOT NULL,
+    54→        driggs_site_type_or_purpose text NOT NULL,
+    55→        driggs_email_1 varchar(255) NOT NULL,
+    56→        driggs_address_1 text NOT NULL,
+    57→        driggs_phone1 varchar(50) NOT NULL,
+    58→        PRIMARY KEY  (driggs_id)
+    59→    ) $charset_collate;";
+    60→
+    61→    // Table name for pageideas
+    62→    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+    63→    
+    64→    // SQL for pageideas table
+    65→    $sql_pageideas = "CREATE TABLE $table_name_pageideas (
+    66→        id bigint(20) NOT NULL AUTO_INCREMENT,
+    67→        order_for_display_on_interface_1 int(11) NOT NULL,
+    68→        name varchar(255) NOT NULL,
+    69→        rel_wp_post_id_1 bigint(20) NOT NULL,
+    70→        PRIMARY KEY  (id)
+    71→    ) $charset_collate;";
+    72→
+    73→    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    74→    dbDelta($sql_driggs);
+    75→    dbDelta($sql_pageideas);
+    76→}
+    77→
+    78→// Register activation hook
+    79→register_activation_hook(__FILE__, 'zurkovich_create_tables');
+    80→
+    81→// Add admin menu
+    82→function zurkovich_admin_menu() {
+    83→    // Add main menu item
+    84→    add_menu_page(
+    85→        'Zurkovich', // Page title
+    86→        'Zurkovich', // Menu title
+    87→        'manage_options', // Capability
+    88→        'zurkoscreen1', // Menu slug (updated)
+    89→        'zurkovich_screen1', // Function to display the page
+    90→        'dashicons-admin-generic', // Icon
+    91→        2 // Position between Dashboard and Posts
+    92→    );
+    93→
+    94→    // Add submenu pages
+    95→    add_submenu_page(
+    96→        'zurkoscreen1', // Parent slug (updated)
+    97→        'Screen 1 - API Keys', // Page title
+    98→        'Screen 1 - API Keys', // Menu title
+    99→        'manage_options', // Capability
+   100→        'zurkoscreen1', // Menu slug (updated)
+   101→        'zurkovich_screen1' // Function to display the page
+   102→    );
+   103→
+   104→    add_submenu_page(
+   105→        'zurkoscreen1', // Parent slug (updated)
+   106→        'Screen 2 - Driggs', // Page title
+   107→        'Screen 2 - Driggs', // Menu title
+   108→        'manage_options', // Capability
+   109→        'zurkoscreen2', // Menu slug (updated)
+   110→        'zurkovich_screen2' // Function to display the page
+   111→    );
+   112→
+   113→    add_submenu_page(
+   114→        'zurkoscreen1',
+   115→        'Screen 3 - Prex Extract',
+   116→        'Screen 3 - Prex Extract',
+   117→        'manage_options',
+   118→        'zurkoscreen3', // updated
+   119→        'zurkovich_screen3'
+   120→    );
+   121→
+   122→    add_submenu_page(
+   123→        'zurkoscreen1',
+   124→        'Screen 4 - Inject Content 2',
+   125→        'Screen 4 - Inject Content 2',
+   126→        'manage_options',
+   127→        'zurkoscreen4',
+   128→        'zurkovich_screen4'
+   129→    );
+   130→
+   131→    add_submenu_page(
+   132→        'zurkoscreen1',
+   133→        'Screen 5 - Prex All Encompassing',
+   134→        'Screen 5 - Prex All Encompassing',
+   135→        'manage_options',
+   136→        'zurkoscreen5', // updated
+   137→        'zurkovich_screen5'
+   138→    );
+   139→
+   140→    add_submenu_page(
+   141→        'zurkoscreen1',
+   142→        'Screen 6',
+   143→        'Screen 6',
+   144→        'manage_options',
+   145→        'zurkoscreen6', // updated
+   146→        'zurkovich_screen6'
+   147→    );
+   148→
+   149→    add_submenu_page(
+   150→        'zurkoscreen1',
+   151→        'Screen 7',
+   152→        'Screen 7',
+   153→        'manage_options',
+   154→        'zurkoscreen7', // updated
+   155→        'zurkovich_screen7'
+   156→    );
+   157→
+   158→    add_submenu_page(
+   159→        'zurkoscreen1',
+   160→        'Screen 8',
+   161→        'Screen 8',
+   162→        'manage_options',
+   163→        'zurkoscreen8', // updated
+   164→        'zurkovich_screen8'
+   165→    );
+   166→
+   167→    add_submenu_page(
+   168→        'zurkoscreen1',
+   169→        'Screen 9',
+   170→        'Screen 9',
+   171→        'manage_options',
+   172→        'zurkoscreen9', // updated
+   173→        'zurkovich_screen9'
+   174→    );
+   175→
+   176→    add_submenu_page(
+   177→        'zurkoscreen1',
+   178→        'Screen 10',
+   179→        'Screen 10',
+   180→        'manage_options',
+   181→        'zurkoscreen10', // updated
+   182→        'zurkovich_screen10'
+   183→    );
+   184→}
+   185→add_action('admin_menu', 'zurkovich_admin_menu');
+   186→
+   187→// Include screen files
+   188→function zurkovich_screen1() {
+   189→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen1.php';
+   190→}
+   191→
+   192→function zurkovich_screen2() {
+   193→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen2.php';
+   194→}
+   195→
+   196→function zurkovich_screen3() {
+   197→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen3.php';
+   198→}
+   199→
+   200→function zurkovich_screen4() {
+   201→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen4.php';
+   202→}
+   203→
+   204→function zurkovich_screen5() {
+   205→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen5.php';
+   206→}
+   207→
+   208→function zurkovich_screen6() {
+   209→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen6.php';
+   210→}
+   211→
+   212→function zurkovich_screen7() {
+   213→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen7.php';
+   214→}
+   215→
+   216→function zurkovich_screen8() {
+   217→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen8.php';
+   218→}
+   219→
+   220→function zurkovich_screen9() {
+   221→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen9.php';
+   222→}
+   223→
+   224→function zurkovich_screen10() {
+   225→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen10.php';
+   226→}
+   227→
+   228→add_action('wp_ajax_zurkovich_ai_tool_prompt', function() {
+   229→    check_ajax_referer('zurkovich_ai_tool_nonce', 'nonce');
+   230→    $prompt = isset($_POST['prompt']) ? sanitize_textarea_field($_POST['prompt']) : '';
+   231→    if (empty($prompt)) {
+   232→        wp_send_json_error('No prompt provided.');
+   233→    }
+   234→    $output = function_prompt_ai_tool_and_receive_output_1($prompt);
+   235→    wp_send_json_success(['output' => $output]);
+   236→});
+   237→add_action('wp_ajax_nopriv_zurkovich_ai_tool_prompt', function() {
+   238→    check_ajax_referer('zurkovich_ai_tool_nonce', 'nonce');
+   239→    $prompt = isset($_POST['prompt']) ? sanitize_textarea_field($_POST['prompt']) : '';
+   240→    if (empty($prompt)) {
+   241→        wp_send_json_error('No prompt provided.');
+   242→    }
+   243→    $output = function_prompt_ai_tool_and_receive_output_1($prompt);
+   244→    wp_send_json_success(['output' => $output]);
+   245→});
+```
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Let me also check the screen2.php file that specifically references the zurko_driggs table:
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Tool use: **Read** `./app/zurkovich3/includes/admin/screens/screen2.php`
+
+Result:
+
+```
+1→<?php
+     2→if (!defined('ABSPATH')) {
+     3→    exit;
+     4→}
+     5→
+     6→// Handle form submission
+     7→if (isset($_POST['submit_driggs'])) {
+     8→    global $wpdb;
+     9→    $table_name = $wpdb->prefix . 'zurko_driggs';
+    10→    
+    11→    $data = array(
+    12→        'driggs_domain' => sanitize_text_field($_POST['driggs_domain']),
+    13→        'driggs_industry' => sanitize_text_field($_POST['driggs_industry']),
+    14→        'driggs_city' => sanitize_text_field($_POST['driggs_city']),
+    15→        'driggs_brand_name_1' => sanitize_text_field($_POST['driggs_brand_name_1']),
+    16→        'driggs_site_type_or_purpose' => sanitize_textarea_field($_POST['driggs_site_type_or_purpose']),
+    17→        'driggs_email_1' => sanitize_email($_POST['driggs_email_1']),
+    18→        'driggs_address_1' => sanitize_text_field($_POST['driggs_address_1']),
+    19→        'driggs_phone1' => sanitize_text_field($_POST['driggs_phone1'])
+    20→    );
+    21→
+    22→    $wpdb->insert($table_name, $data);
+    23→}
+    24→?>
+    25→<div class="wrap">
+    26→    <h1>Screen 2 - Driggs</h1>
+    27→    <hr>
+    28→    
+    29→    <form method="post" action="">
+    30→        <table class="form-table">
+    31→            <tr>
+    32→                <th scope="row"><label for="driggs_id">driggs_id</label></th>
+    33→                <td><input type="text" name="driggs_id" id="driggs_id" class="regular-text" readonly></td>
+    34→            </tr>
+    35→            <tr>
+    36→                <th scope="row"><label for="driggs_domain">driggs_domain</label></th>
+    37→                <td><input type="text" name="driggs_domain" id="driggs_domain" class="regular-text"></td>
+    38→            </tr>
+    39→            <tr>
+    40→                <th scope="row"><label for="driggs_industry">driggs_industry</label></th>
+    41→                <td><input type="text" name="driggs_industry" id="driggs_industry" class="regular-text"></td>
+    42→            </tr>
+    43→            <tr>
+    44→                <th scope="row"><label for="driggs_city">driggs_city</label></th>
+    45→                <td><input type="text" name="driggs_city" id="driggs_city" class="regular-text"></td>
+    46→            </tr>
+    47→            <tr>
+    48→                <th scope="row"><label for="driggs_brand_name_1">driggs_brand_name_1</label></th>
+    49→                <td><input type="text" name="driggs_brand_name_1" id="driggs_brand_name_1" class="regular-text"></td>
+    50→            </tr>
+    51→            <tr>
+    52→                <th scope="row"><label for="driggs_site_type_or_purpose">driggs_site_type_or_purpose</label></th>
+    53→                <td><textarea name="driggs_site_type_or_purpose" id="driggs_site_type_or_purpose" class="large-text" rows="5"></textarea></td>
+    54→            </tr>
+    55→            <tr>
+    56→                <th scope="row"><label for="driggs_email_1">driggs_email_1</label></th>
+    57→                <td><input type="email" name="driggs_email_1" id="driggs_email_1" class="regular-text"></td>
+    58→            </tr>
+    59→            <tr>
+    60→                <th scope="row"><label for="driggs_address_1">driggs_address_1</label></th>
+    61→                <td><input type="text" name="driggs_address_1" id="driggs_address_1" class="regular-text"></td>
+    62→            </tr>
+    63→            <tr>
+    64→                <th scope="row"><label for="driggs_phone1">driggs_phone1</label></th>
+    65→                <td><input type="text" name="driggs_phone1" id="driggs_phone1" class="regular-text"></td>
+    66→            </tr>
+    67→        </table>
+    68→        
+    69→        <p class="submit">
+    70→            <input type="submit" name="submit_driggs" class="button button-primary" value="Save">
+    71→        </p>
+    72→    </form>
+    73→</div>
+```
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Now let me search for any other database tables that might be related to the zurko/zurkovich system:
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Tool use: **Grep** path `./`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:    $table_name = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:function zurko_extract_elementor_text($element, &$lines) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:            zurko_extract_elementor_text($child, $lines);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:        zurko_extract_elementor_text($element, $lines);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:function zurko_update_elementor_data($page_id, $data) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/zurkovich.php:    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/zurkovich.php:    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php:    $table_name = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/functions-scrape.php:function zurko_extract_elementor_text($element, &$lines) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/functions-scrape.php:            zurko_extract_elementor_text($child, $lines);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/functions-scrape.php:        zurko_extract_elementor_text($element, $lines);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/functions-scrape.php:function zurko_update_elementor_data($page_id, $data) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/zurkovich.php:    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/zurkovich.php:    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php:    $table_name = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/functions-scrape.php:function zurko_extract_elementor_text($element, &$lines) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/functions-scrape.php:            zurko_extract_elementor_text($child, $lines);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/functions-scrape.php:        zurko_extract_elementor_text($element, $lines);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/functions-scrape.php:function zurko_update_elementor_data($page_id, $data) {
+```
+
+_**Agent (claude-sonnet-4-20250514) (sidechain)**_
+
+Perfect! I have thoroughly searched the entire repository and found all the zurkovich folders and zurko_driggs database table references. Here's my comprehensive report:
+
+## Search Results Summary
+
+### Zurkovich Folders Found
+
+I found **4 main zurkovich WordPress plugin folder locations**:
+
+1. **Primary Development Version:**
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/`
+
+2. **WordPress Site Installations:**
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/`
+
+3. **Backup/Archive Files:**
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich2025__06_05 - 1.zip`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich2025__06_05 - 1.zip`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich2025__06_05 - 1.zip`
+
+4. **Empty Directory:**
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(zurkovich)/` (appears to be empty)
+
+### Plugin Structure
+
+Each zurkovich plugin folder contains:
+- **Main plugin file:** `zurkovich.php`
+- **JavaScript assets:** `assets/js/zurkovich-ai-tool.js`
+- **Admin screens:** `includes/admin/screens/screen1.php` through `screen10.php`
+- **Function files:** 
+  - `includes/functions-scrape.php`
+  - `includes/file-function-inject-content-2.php`
+  - `includes/file-function-create-prexchor-rubrickey-2.php`
+- **Configuration:** `wp-config.php`
+
+### Database Table References
+
+I found references to **2 database tables** with the "zurko" prefix:
+
+1. **`zurko_driggs`** - Referenced in 6 files:
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php` (line 45)
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php` (line 9)
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/zurkovich.php`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/zurkovich.php`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php`
+
+2. **`zurko_pageideas`** - Referenced in 3 files (also created by the plugin but not specifically searched for)
+
+### zurko_driggs Table Schema
+
+The `zurko_driggs` table contains these fields:
+- `driggs_id` (bigint, AUTO_INCREMENT, PRIMARY KEY)
+- `driggs_domain` (varchar 255)
+- `driggs_industry` (text)
+- `driggs_city` (varchar 255)
+- `driggs_brand_name_1` (varchar 255)
+- `driggs_site_type_or_purpose` (text)
+- `driggs_email_1` (varchar 255)
+- `driggs_address_1` (text)
+- `driggs_phone1` (varchar 50)
+
+### Plugin Functionality
+
+The Zurkovich plugin appears to be a WordPress admin tool that:
+- Manages OpenAI API keys
+- Provides a data entry interface for business/company information (driggs table)
+- Includes AI-powered content tools
+- Has Elementor integration capabilities
+- Contains content scraping and injection functions
+
+The most actively used version appears to be in `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/` with identical copies deployed to the two WordPress sites.
+
+Result:
+
+```
+Perfect! I have thoroughly searched the entire repository and found all the zurkovich folders and zurko_driggs database table references. Here's my comprehensive report:
+
+## Search Results Summary
+
+### Zurkovich Folders Found
+
+I found **4 main zurkovich WordPress plugin folder locations**:
+
+1. **Primary Development Version:**
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/`
+
+2. **WordPress Site Installations:**
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/`
+
+3. **Backup/Archive Files:**
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich2025__06_05 - 1.zip`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich2025__06_05 - 1.zip`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich2025__06_05 - 1.zip`
+
+4. **Empty Directory:**
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(zurkovich)/` (appears to be empty)
+
+### Plugin Structure
+
+Each zurkovich plugin folder contains:
+- **Main plugin file:** `zurkovich.php`
+- **JavaScript assets:** `assets/js/zurkovich-ai-tool.js`
+- **Admin screens:** `includes/admin/screens/screen1.php` through `screen10.php`
+- **Function files:** 
+  - `includes/functions-scrape.php`
+  - `includes/file-function-inject-content-2.php`
+  - `includes/file-function-create-prexchor-rubrickey-2.php`
+- **Configuration:** `wp-config.php`
+
+### Database Table References
+
+I found references to **2 database tables** with the "zurko" prefix:
+
+1. **`zurko_driggs`** - Referenced in 6 files:
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php` (line 45)
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php` (line 9)
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/zurkovich.php`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/zurkovich.php`
+   - `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php`
+
+2. **`zurko_pageideas`** - Referenced in 3 files (also created by the plugin but not specifically searched for)
+
+### zurko_driggs Table Schema
+
+The `zurko_driggs` table contains these fields:
+- `driggs_id` (bigint, AUTO_INCREMENT, PRIMARY KEY)
+- `driggs_domain` (varchar 255)
+- `driggs_industry` (text)
+- `driggs_city` (varchar 255)
+- `driggs_brand_name_1` (varchar 255)
+- `driggs_site_type_or_purpose` (text)
+- `driggs_email_1` (varchar 255)
+- `driggs_address_1` (text)
+- `driggs_phone1` (varchar 50)
+
+### Plugin Functionality
+
+The Zurkovich plugin appears to be a WordPress admin tool that:
+- Manages OpenAI API keys
+- Provides a data entry interface for business/company information (driggs table)
+- Includes AI-powered content tools
+- Has Elementor integration capabilities
+- Contains content scraping and injection functions
+
+The most actively used version appears to be in `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/` with identical copies deployed to the two WordPress sites.
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Excellent! Now I have a clear understanding of the zurkovich plugin structure. Let me examine the main files to understand how the zurko_driggs table is used.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find zurkovich plugin folder and files
+- [⚡] 🌡️ Identify all components that use _zurko_driggs table
+- [ ] 🌡️ Map out table references and dependencies
+- [ ] 🌡️ Plan clean removal of _zurko_driggs table
+- [ ] 🌡️ Execute removal of table and references
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/zurkovich3/zurkovich.php`
+
+Result:
+
+```
+1→<?php
+     2→/**
+     3→ * Plugin Name: Zurkovich
+     4→ * Description: A custom admin tool plugin for WordPress.
+     5→ * Version: 1.0
+     6→ * Author: Your Name
+     7→ */
+     8→
+     9→// Prevent direct access
+    10→if (!defined('ABSPATH')) {
+    11→    exit;
+    12→}
+    13→
+    14→// Include scraping functions
+    15→require_once plugin_dir_path(__FILE__) . 'includes/functions-scrape.php';
+    16→
+    17→// Include new content injection function
+    18→require_once plugin_dir_path(__FILE__) . 'includes/file-function-inject-content-2.php';
+    19→
+    20→// Include new rubrickey function
+    21→require_once plugin_dir_path(__FILE__) . 'includes/file-function-create-prexchor-rubrickey-2.php';
+    22→
+    23→// Function to save API key
+    24→function zurkovich_save_api_key($api_key) {
+    25→    // Encrypt the API key before saving
+    26→    $encrypted_key = base64_encode($api_key);
+    27→    update_option('zurkovich_openai_api_key', $encrypted_key);
+    28→}
+    29→
+    30→// Function to get API key
+    31→function zurkovich_get_api_key() {
+    32→    $encrypted_key = get_option('zurkovich_openai_api_key');
+    33→    if ($encrypted_key) {
+    34→        return base64_decode($encrypted_key);
+    35→    }
+    36→    return '';
+    37→}
+    38→
+    39→// Create database tables on plugin activation
+    40→function zurkovich_create_tables() {
+    41→    global $wpdb;
+    42→    $charset_collate = $wpdb->get_charset_collate();
+    43→
+    44→    // Table name for driggs
+    45→    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+    46→    
+    47→    // SQL for driggs table
+    48→    $sql_driggs = "CREATE TABLE $table_name_driggs (
+    49→        driggs_id bigint(20) NOT NULL AUTO_INCREMENT,
+    50→        driggs_domain varchar(255) NOT NULL,
+    51→        driggs_industry text NOT NULL,
+    52→        driggs_city varchar(255) NOT NULL,
+    53→        driggs_brand_name_1 varchar(255) NOT NULL,
+    54→        driggs_site_type_or_purpose text NOT NULL,
+    55→        driggs_email_1 varchar(255) NOT NULL,
+    56→        driggs_address_1 text NOT NULL,
+    57→        driggs_phone1 varchar(50) NOT NULL,
+    58→        PRIMARY KEY  (driggs_id)
+    59→    ) $charset_collate;";
+    60→
+    61→    // Table name for pageideas
+    62→    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+    63→    
+    64→    // SQL for pageideas table
+    65→    $sql_pageideas = "CREATE TABLE $table_name_pageideas (
+    66→        id bigint(20) NOT NULL AUTO_INCREMENT,
+    67→        order_for_display_on_interface_1 int(11) NOT NULL,
+    68→        name varchar(255) NOT NULL,
+    69→        rel_wp_post_id_1 bigint(20) NOT NULL,
+    70→        PRIMARY KEY  (id)
+    71→    ) $charset_collate;";
+    72→
+    73→    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    74→    dbDelta($sql_driggs);
+    75→    dbDelta($sql_pageideas);
+    76→}
+    77→
+    78→// Register activation hook
+    79→register_activation_hook(__FILE__, 'zurkovich_create_tables');
+    80→
+    81→// Add admin menu
+    82→function zurkovich_admin_menu() {
+    83→    // Add main menu item
+    84→    add_menu_page(
+    85→        'Zurkovich', // Page title
+    86→        'Zurkovich', // Menu title
+    87→        'manage_options', // Capability
+    88→        'zurkoscreen1', // Menu slug (updated)
+    89→        'zurkovich_screen1', // Function to display the page
+    90→        'dashicons-admin-generic', // Icon
+    91→        2 // Position between Dashboard and Posts
+    92→    );
+    93→
+    94→    // Add submenu pages
+    95→    add_submenu_page(
+    96→        'zurkoscreen1', // Parent slug (updated)
+    97→        'Screen 1 - API Keys', // Page title
+    98→        'Screen 1 - API Keys', // Menu title
+    99→        'manage_options', // Capability
+   100→        'zurkoscreen1', // Menu slug (updated)
+   101→        'zurkovich_screen1' // Function to display the page
+   102→    );
+   103→
+   104→    add_submenu_page(
+   105→        'zurkoscreen1', // Parent slug (updated)
+   106→        'Screen 2 - Driggs', // Page title
+   107→        'Screen 2 - Driggs', // Menu title
+   108→        'manage_options', // Capability
+   109→        'zurkoscreen2', // Menu slug (updated)
+   110→        'zurkovich_screen2' // Function to display the page
+   111→    );
+   112→
+   113→    add_submenu_page(
+   114→        'zurkoscreen1',
+   115→        'Screen 3 - Prex Extract',
+   116→        'Screen 3 - Prex Extract',
+   117→        'manage_options',
+   118→        'zurkoscreen3', // updated
+   119→        'zurkovich_screen3'
+   120→    );
+   121→
+   122→    add_submenu_page(
+   123→        'zurkoscreen1',
+   124→        'Screen 4 - Inject Content 2',
+   125→        'Screen 4 - Inject Content 2',
+   126→        'manage_options',
+   127→        'zurkoscreen4',
+   128→        'zurkovich_screen4'
+   129→    );
+   130→
+   131→    add_submenu_page(
+   132→        'zurkoscreen1',
+   133→        'Screen 5 - Prex All Encompassing',
+   134→        'Screen 5 - Prex All Encompassing',
+   135→        'manage_options',
+   136→        'zurkoscreen5', // updated
+   137→        'zurkovich_screen5'
+   138→    );
+   139→
+   140→    add_submenu_page(
+   141→        'zurkoscreen1',
+   142→        'Screen 6',
+   143→        'Screen 6',
+   144→        'manage_options',
+   145→        'zurkoscreen6', // updated
+   146→        'zurkovich_screen6'
+   147→    );
+   148→
+   149→    add_submenu_page(
+   150→        'zurkoscreen1',
+   151→        'Screen 7',
+   152→        'Screen 7',
+   153→        'manage_options',
+   154→        'zurkoscreen7', // updated
+   155→        'zurkovich_screen7'
+   156→    );
+   157→
+   158→    add_submenu_page(
+   159→        'zurkoscreen1',
+   160→        'Screen 8',
+   161→        'Screen 8',
+   162→        'manage_options',
+   163→        'zurkoscreen8', // updated
+   164→        'zurkovich_screen8'
+   165→    );
+   166→
+   167→    add_submenu_page(
+   168→        'zurkoscreen1',
+   169→        'Screen 9',
+   170→        'Screen 9',
+   171→        'manage_options',
+   172→        'zurkoscreen9', // updated
+   173→        'zurkovich_screen9'
+   174→    );
+   175→
+   176→    add_submenu_page(
+   177→        'zurkoscreen1',
+   178→        'Screen 10',
+   179→        'Screen 10',
+   180→        'manage_options',
+   181→        'zurkoscreen10', // updated
+   182→        'zurkovich_screen10'
+   183→    );
+   184→}
+   185→add_action('admin_menu', 'zurkovich_admin_menu');
+   186→
+   187→// Include screen files
+   188→function zurkovich_screen1() {
+   189→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen1.php';
+   190→}
+   191→
+   192→function zurkovich_screen2() {
+   193→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen2.php';
+   194→}
+   195→
+   196→function zurkovich_screen3() {
+   197→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen3.php';
+   198→}
+   199→
+   200→function zurkovich_screen4() {
+   201→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen4.php';
+   202→}
+   203→
+   204→function zurkovich_screen5() {
+   205→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen5.php';
+   206→}
+   207→
+   208→function zurkovich_screen6() {
+   209→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen6.php';
+   210→}
+   211→
+   212→function zurkovich_screen7() {
+   213→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen7.php';
+   214→}
+   215→
+   216→function zurkovich_screen8() {
+   217→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen8.php';
+   218→}
+   219→
+   220→function zurkovich_screen9() {
+   221→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen9.php';
+   222→}
+   223→
+   224→function zurkovich_screen10() {
+   225→    include plugin_dir_path(__FILE__) . 'includes/admin/screens/screen10.php';
+   226→}
+   227→
+   228→add_action('wp_ajax_zurkovich_ai_tool_prompt', function() {
+   229→    check_ajax_referer('zurkovich_ai_tool_nonce', 'nonce');
+   230→    $prompt = isset($_POST['prompt']) ? sanitize_textarea_field($_POST['prompt']) : '';
+   231→    if (empty($prompt)) {
+   232→        wp_send_json_error('No prompt provided.');
+   233→    }
+   234→    $output = function_prompt_ai_tool_and_receive_output_1($prompt);
+   235→    wp_send_json_success(['output' => $output]);
+   236→});
+   237→add_action('wp_ajax_nopriv_zurkovich_ai_tool_prompt', function() {
+   238→    check_ajax_referer('zurkovich_ai_tool_nonce', 'nonce');
+   239→    $prompt = isset($_POST['prompt']) ? sanitize_textarea_field($_POST['prompt']) : '';
+   240→    if (empty($prompt)) {
+   241→        wp_send_json_error('No prompt provided.');
+   242→    }
+   243→    $output = function_prompt_ai_tool_and_receive_output_1($prompt);
+   244→    wp_send_json_success(['output' => $output]);
+   245→});
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me examine the screen2.php file to see how the zurko_driggs table is used:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/zurkovich3/includes/admin/screens/screen2.php`
+
+Result:
+
+```
+1→<?php
+     2→if (!defined('ABSPATH')) {
+     3→    exit;
+     4→}
+     5→
+     6→// Handle form submission
+     7→if (isset($_POST['submit_driggs'])) {
+     8→    global $wpdb;
+     9→    $table_name = $wpdb->prefix . 'zurko_driggs';
+    10→    
+    11→    $data = array(
+    12→        'driggs_domain' => sanitize_text_field($_POST['driggs_domain']),
+    13→        'driggs_industry' => sanitize_text_field($_POST['driggs_industry']),
+    14→        'driggs_city' => sanitize_text_field($_POST['driggs_city']),
+    15→        'driggs_brand_name_1' => sanitize_text_field($_POST['driggs_brand_name_1']),
+    16→        'driggs_site_type_or_purpose' => sanitize_textarea_field($_POST['driggs_site_type_or_purpose']),
+    17→        'driggs_email_1' => sanitize_email($_POST['driggs_email_1']),
+    18→        'driggs_address_1' => sanitize_text_field($_POST['driggs_address_1']),
+    19→        'driggs_phone1' => sanitize_text_field($_POST['driggs_phone1'])
+    20→    );
+    21→
+    22→    $wpdb->insert($table_name, $data);
+    23→}
+    24→?>
+    25→<div class="wrap">
+    26→    <h1>Screen 2 - Driggs</h1>
+    27→    <hr>
+    28→    
+    29→    <form method="post" action="">
+    30→        <table class="form-table">
+    31→            <tr>
+    32→                <th scope="row"><label for="driggs_id">driggs_id</label></th>
+    33→                <td><input type="text" name="driggs_id" id="driggs_id" class="regular-text" readonly></td>
+    34→            </tr>
+    35→            <tr>
+    36→                <th scope="row"><label for="driggs_domain">driggs_domain</label></th>
+    37→                <td><input type="text" name="driggs_domain" id="driggs_domain" class="regular-text"></td>
+    38→            </tr>
+    39→            <tr>
+    40→                <th scope="row"><label for="driggs_industry">driggs_industry</label></th>
+    41→                <td><input type="text" name="driggs_industry" id="driggs_industry" class="regular-text"></td>
+    42→            </tr>
+    43→            <tr>
+    44→                <th scope="row"><label for="driggs_city">driggs_city</label></th>
+    45→                <td><input type="text" name="driggs_city" id="driggs_city" class="regular-text"></td>
+    46→            </tr>
+    47→            <tr>
+    48→                <th scope="row"><label for="driggs_brand_name_1">driggs_brand_name_1</label></th>
+    49→                <td><input type="text" name="driggs_brand_name_1" id="driggs_brand_name_1" class="regular-text"></td>
+    50→            </tr>
+    51→            <tr>
+    52→                <th scope="row"><label for="driggs_site_type_or_purpose">driggs_site_type_or_purpose</label></th>
+    53→                <td><textarea name="driggs_site_type_or_purpose" id="driggs_site_type_or_purpose" class="large-text" rows="5"></textarea></td>
+    54→            </tr>
+    55→            <tr>
+    56→                <th scope="row"><label for="driggs_email_1">driggs_email_1</label></th>
+    57→                <td><input type="email" name="driggs_email_1" id="driggs_email_1" class="regular-text"></td>
+    58→            </tr>
+    59→            <tr>
+    60→                <th scope="row"><label for="driggs_address_1">driggs_address_1</label></th>
+    61→                <td><input type="text" name="driggs_address_1" id="driggs_address_1" class="regular-text"></td>
+    62→            </tr>
+    63→            <tr>
+    64→                <th scope="row"><label for="driggs_phone1">driggs_phone1</label></th>
+    65→                <td><input type="text" name="driggs_phone1" id="driggs_phone1" class="regular-text"></td>
+    66→            </tr>
+    67→        </table>
+    68→        
+    69→        <p class="submit">
+    70→            <input type="submit" name="submit_driggs" class="button button-primary" value="Save">
+    71→        </p>
+    72→    </form>
+    73→</div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me also check if there are any other functions or files that reference the zurko_driggs table:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/zurkovich3`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:45:    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:9:    $table_name = $wpdb->prefix . 'zurko_driggs';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check if any of the included function files reference the table:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/zurkovich3/includes`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:9:    $table_name = $wpdb->prefix . 'zurko_driggs';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me also check if any functions use the driggs data by searching for database queries that might reference the table indirectly:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/zurkovich3`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:44:    // Table name for driggs
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:45:    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:47:    // SQL for driggs table
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:48:    $sql_driggs = "CREATE TABLE $table_name_driggs (
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:49:        driggs_id bigint(20) NOT NULL AUTO_INCREMENT,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:50:        driggs_domain varchar(255) NOT NULL,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:51:        driggs_industry text NOT NULL,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:52:        driggs_city varchar(255) NOT NULL,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:53:        driggs_brand_name_1 varchar(255) NOT NULL,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:54:        driggs_site_type_or_purpose text NOT NULL,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:55:        driggs_email_1 varchar(255) NOT NULL,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:56:        driggs_address_1 text NOT NULL,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:57:        driggs_phone1 varchar(50) NOT NULL,
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:58:        PRIMARY KEY  (driggs_id)
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php:74:    dbDelta($sql_driggs);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:7:if (isset($_POST['submit_driggs'])) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:9:    $table_name = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:12:        'driggs_domain' => sanitize_text_field($_POST['driggs_domain']),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:13:        'driggs_industry' => sanitize_text_field($_POST['driggs_industry']),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:14:        'driggs_city' => sanitize_text_field($_POST['driggs_city']),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:15:        'driggs_brand_name_1' => sanitize_text_field($_POST['driggs_brand_name_1']),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:16:        'driggs_site_type_or_purpose' => sanitize_textarea_field($_POST['driggs_site_type_or_purpose']),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:17:        'driggs_email_1' => sanitize_email($_POST['driggs_email_1']),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:18:        'driggs_address_1' => sanitize_text_field($_POST['driggs_address_1']),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:19:        'driggs_phone1' => sanitize_text_field($_POST['driggs_phone1'])
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:32:                <th scope="row"><label for="driggs_id">driggs_id</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:33:                <td><input type="text" name="driggs_id" id="driggs_id" class="regular-text" readonly></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:36:                <th scope="row"><label for="driggs_domain">driggs_domain</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:37:                <td><input type="text" name="driggs_domain" id="driggs_domain" class="regular-text"></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:40:                <th scope="row"><label for="driggs_industry">driggs_industry</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:41:                <td><input type="text" name="driggs_industry" id="driggs_industry" class="regular-text"></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:44:                <th scope="row"><label for="driggs_city">driggs_city</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:45:                <td><input type="text" name="driggs_city" id="driggs_city" class="regular-text"></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:48:                <th scope="row"><label for="driggs_brand_name_1">driggs_brand_name_1</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:49:                <td><input type="text" name="driggs_brand_name_1" id="driggs_brand_name_1" class="regular-text"></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:52:                <th scope="row"><label for="driggs_site_type_or_purpose">driggs_site_type_or_purpose</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:53:                <td><textarea name="driggs_site_type_or_purpose" id="driggs_site_type_or_purpose" class="large-text" rows="5"></textarea></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:56:                <th scope="row"><label for="driggs_email_1">driggs_email_1</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:57:                <td><input type="email" name="driggs_email_1" id="driggs_email_1" class="regular-text"></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:60:                <th scope="row"><label for="driggs_address_1">driggs_address_1</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:61:                <td><input type="text" name="driggs_address_1" id="driggs_address_1" class="regular-text"></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:64:                <th scope="row"><label for="driggs_phone1">driggs_phone1</label></th>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:65:                <td><input type="text" name="driggs_phone1" id="driggs_phone1" class="regular-text"></td>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:70:            <input type="submit" name="submit_driggs" class="button button-primary" value="Save">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check if any of the function files might be reading from the zurko_driggs table:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/zurkovich3/includes`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen3.php:96:        <input type="hidden" name="page" value="zurkoscreen3" />
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen3.php:103:                    <select name="balarfi_page_id" id="balarfi_page_id" style="margin-right:12px; min-width: 200px;" onchange="window.location.href='?page=zurkoscreen3&balarfi_page_id=' + this.value;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php:9:    $table_name = $wpdb->prefix . 'zurko_driggs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen1.php:8:    if (check_admin_referer('zurkovich_api_key_nonce')) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen1.php:10:        zurkovich_save_api_key($api_key);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen1.php:16:$current_api_key = zurkovich_get_api_key();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen1.php:22:        <?php wp_nonce_field('zurkovich_api_key_nonce'); ?>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen5.php:96:        <input type="hidden" name="page" value="zurkoscreen5" />
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen5.php:103:                    <select name="balarfi_page_id" id="balarfi_page_id" style="margin-right:12px; min-width: 200px;" onchange="window.location.href='?page=zurkoscreen5&balarfi_page_id=' + this.value;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen4.php:26:        <input type="hidden" name="page" value="zurkoscreen4" />
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen4.php:33:                    <select name="balarfi_page_id" id="balarfi_page_id" style="margin-right:12px; min-width: 200px;" onchange="window.location.href='?page=zurkoscreen4&balarfi_page_id=' + this.value;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:13:function zurko_extract_elementor_text($element, &$lines) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:74:            zurko_extract_elementor_text($child, $lines);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:97:        zurko_extract_elementor_text($element, $lines);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:111:    $api_key = zurkovich_get_api_key();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/functions-scrape.php:151:function zurko_update_elementor_data($page_id, $data) {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me update the todo list and create a comprehensive plan:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find zurkovich plugin folder and files
+- [X] 🌡️ Identify all components that use _zurko_driggs table
+- [X] 🌡️ Map out table references and dependencies
+- [⚡] 🌡️ Plan clean removal of _zurko_driggs table
+- [ ] 🌡️ Execute removal of table and references
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## 📋 **Research Complete - zurko_driggs Table Analysis**
+
+Based on my thorough research of the zurkovich plugin, here's what I found:
+
+### **🎯 Components Using zurko_driggs Table:**
+
+**1. Main Plugin File (`zurkovich.php`):**
+- **Lines 44-59**: Table creation SQL definition 
+- **Line 74**: Table creation via `dbDelta($sql_driggs)`
+- **Line 79**: Activation hook that triggers table creation
+
+**2. Screen 2 Admin Interface (`screen2.php`):**
+- **Line 9**: References table for form submissions
+- **Lines 7-23**: Form handling that INSERTs data into the table
+- **Lines 25-72**: HTML form interface for entering driggs data
+
+### **🗂️ Table Structure:**
+- **Purpose**: Stores business/company information (domain, industry, city, brand name, etc.)
+- **Fields**: 9 fields including driggs_id (auto-increment primary key)
+- **Usage**: Simple data entry form that only INSERTs records (no READ/UPDATE/DELETE operations found)
+
+### **🔗 Dependencies Found:**
+- **No other components read from this table**
+- **No foreign key relationships**
+- **No data retrieval or display functionality**
+- **Screen 2 only writes data, never displays existing records**
+
+### **🎯 Clean Removal Plan:**
+
+The `zurko_driggs` table can be safely removed because:
+1. ✅ **Single-purpose usage**: Only used by Screen 2 for data entry
+2. ✅ **No dependencies**: No other screens or functions reference this table  
+3. ✅ **No data display**: The form never shows existing data from the table
+4. ✅ **No integrations**: No other plugins or systems depend on this table
+
+### **📝 Required Changes for Clean Removal:**
+1. Remove table creation from `zurkovich.php` (lines 44-59, 74)
+2. Remove/modify Screen 2 functionality in `screen2.php` 
+3. Add cleanup function to drop existing tables
+4. Update menu/navigation if Screen 2 becomes non-functional
+
+**Ready to proceed with the clean removal of zurko_driggs table and all references?**
+
+---
+
+_**User**_
+
+yes please proceed with this 
+
+i would like to preserve any screens we have and make modifications to them to keep them funcitonal without any elements related to the delteed db tables. rather than just dleete the screens completely. please proceed with this in mind 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I'll proceed with cleanly removing the zurko_driggs table while preserving all screens and making them functional. Let me implement this step by step.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find zurkovich plugin folder and files
+- [X] 🌡️ Identify all components that use _zurko_driggs table
+- [X] 🌡️ Map out table references and dependencies
+- [X] 🌡️ Plan clean removal of _zurko_driggs table
+- [⚡] 🌡️ Remove table creation from zurkovich.php
+- [ ] 🌡️ Modify Screen 2 to be functional without zurko_driggs table
+- [ ] 🌡️ Add cleanup function to drop existing tables
+- [ ] 🌡️ Apply changes to all zurkovich installations
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## Step 1: Remove zurko_driggs table creation from main plugin file
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    35→    }
+    36→    return '';
+    37→}
+    38→
+    39→// Create database tables on plugin activation
+    40→function zurkovich_create_tables() {
+    41→    global $wpdb;
+    42→    $charset_collate = $wpdb->get_charset_collate();
+    43→
+    44→    // Clean up any unwanted tables that should not exist
+    45→    zurkovich_cleanup_unwanted_tables();
+    46→
+    47→    // Table name for pageideas (keeping this table as it may be used elsewhere)
+    48→    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+    49→    
+    50→    // SQL for pageideas table
+    51→    $sql_pageideas = "CREATE TABLE $table_name_pageideas (
+    52→        id bigint(20) NOT NULL AUTO_INCREMENT,
+    53→        order_for_display_on_interface_1 int(11) NOT NULL,
+    54→        name varchar(255) NOT NULL,
+    55→        rel_wp_post_id_1 bigint(20) NOT NULL,
+    56→        PRIMARY KEY  (id)
+    57→    ) $charset_collate;";
+    58→
+    59→    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    60→    dbDelta($sql_pageideas);
+    61→}
+    62→
+    63→// Register activation hook
+    64→register_activation_hook(__FILE__, 'zurkovich_create_tables');
+    65→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the cleanup function:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/zurkovich.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    59→    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    60→    dbDelta($sql_pageideas);
+    61→}
+    62→
+    63→// Clean up unwanted tables function
+    64→function zurkovich_cleanup_unwanted_tables() {
+    65→    global $wpdb;
+    66→    
+    67→    // Remove zurko_driggs table if it exists (this table should not exist)
+    68→    $zurko_driggs_table = $wpdb->prefix . 'zurko_driggs';
+    69→    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$zurko_driggs_table'") == $zurko_driggs_table;
+    70→    
+    71→    if ($table_exists) {
+    72→        $wpdb->query("DROP TABLE IF EXISTS $zurko_driggs_table");
+    73→        error_log('Zurkovich: Removed unwanted zurko_driggs table during activation');
+    74→    }
+    75→}
+    76→
+    77→// Register activation hook
+    78→register_activation_hook(__FILE__, 'zurkovich_create_tables');
+    79→
+    80→// Add admin menu
+    81→function zurkovich_admin_menu() {
+    82→    // Add main menu item
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## Step 2: Modify Screen 2 to be functional without zurko_driggs table
+
+I'll convert Screen 2 into a useful configuration or information screen instead of a database entry form:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→<?php
+     2→if (!defined('ABSPATH')) {
+     3→    exit;
+     4→}
+     5→
+     6→// Handle configuration form submission
+     7→if (isset($_POST['save_site_config'])) {
+     8→    // Save site configuration as WordPress options instead of database table
+     9→    update_option('zurkovich_site_domain', sanitize_text_field($_POST['site_domain']));
+    10→    update_option('zurkovich_site_industry', sanitize_text_field($_POST['site_industry']));
+    11→    update_option('zurkovich_site_city', sanitize_text_field($_POST['site_city']));
+    12→    update_option('zurkovich_brand_name', sanitize_text_field($_POST['brand_name']));
+    13→    update_option('zurkovich_site_purpose', sanitize_textarea_field($_POST['site_purpose']));
+    14→    update_option('zurkovich_contact_email', sanitize_email($_POST['contact_email']));
+    15→    update_option('zurkovich_business_address', sanitize_text_field($_POST['business_address']));
+    16→    update_option('zurkovich_phone_number', sanitize_text_field($_POST['phone_number']));
+    17→    
+    18→    echo '<div class="notice notice-success is-dismissible"><p>Site configuration saved successfully!</p></div>';
+    19→}
+    20→
+    21→// Get current values
+    22→$site_domain = get_option('zurkovich_site_domain', get_site_url());
+    23→$site_industry = get_option('zurkovich_site_industry', '');
+    24→$site_city = get_option('zurkovich_site_city', '');
+    25→$brand_name = get_option('zurkovich_brand_name', get_bloginfo('name'));
+    26→$site_purpose = get_option('zurkovich_site_purpose', '');
+    27→$contact_email = get_option('zurkovich_contact_email', get_option('admin_email'));
+    28→$business_address = get_option('zurkovich_business_address', '');
+    29→$phone_number = get_option('zurkovich_phone_number', '');
+    30→?>
+    31→<div class="wrap">
+    32→    <h1>Screen 2 - Site Configuration</h1>
+    33→    <p>Configure your site information for use with Zurkovich AI tools.</p>
+    34→    <hr>
+    35→    
+    36→    <form method="post" action="">
+    37→        <table class="form-table">
+    38→            <tr>
+    39→                <th scope="row"><label for="site_domain">Site Domain</label></th>
+    40→                <td><input type="url" name="site_domain" id="site_domain" class="regular-text" value="<?php echo esc_attr($site_domain); ?>" placeholder="https://example.com"></td>
+    41→            </tr>
+    42→            <tr>
+    43→                <th scope="row"><label for="site_industry">Industry</label></th>
+    44→                <td><input type="text" name="site_industry" id="site_industry" class="regular-text" value="<?php echo esc_attr($site_industry); ?>" placeholder="e.g., Plumbing, Real Estate, Consulting"></td>
+    45→            </tr>
+    46→            <tr>
+    47→                <th scope="row"><label for="site_city">City/Location</label></th>
+    48→                <td><input type="text" name="site_city" id="site_city" class="regular-text" value="<?php echo esc_attr($site_city); ?>" placeholder="e.g., New York, NY"></td>
+    49→            </tr>
+    50→            <tr>
+    51→                <th scope="row"><label for="brand_name">Brand Name</label></th>
+    52→                <td><input type="text" name="brand_name" id="brand_name" class="regular-text" value="<?php echo esc_attr($brand_name); ?>" placeholder="Your business name"></td>
+    53→            </tr>
+    54→            <tr>
+    55→                <th scope="row"><label for="site_purpose">Site Purpose/Description</label></th>
+    56→                <td><textarea name="site_purpose" id="site_purpose" class="large-text" rows="5" placeholder="Describe what your website is about and its main purpose"><?php echo esc_textarea($site_purpose); ?></textarea></td>
+    57→            </tr>
+    58→            <tr>
+    59→                <th scope="row"><label for="contact_email">Contact Email</label></th>
+    60→                <td><input type="email" name="contact_email" id="contact_email" class="regular-text" value="<?php echo esc_attr($contact_email); ?>" placeholder="info@example.com"></td>
+    61→            </tr>
+    62→            <tr>
+    63→                <th scope="row"><label for="business_address">Business Address</label></th>
+    64→                <td><input type="text" name="business_address" id="business_address" class="regular-text" value="<?php echo esc_attr($business_address); ?>" placeholder="123 Main St, City, State 12345"></td>
+    65→            </tr>
+    66→            <tr>
+    67→                <th scope="row"><label for="phone_number">Phone Number</label></th>
+    68→                <td><input type="tel" name="phone_number" id="phone_number" class="regular-text" value="<?php echo esc_attr($phone_number); ?>" placeholder="(555) 123-4567"></td>
+    69→            </tr>
+    70→        </table>
+    71→        
+    72→        <p class="submit">
+    73→            <input type="submit" name="save_site_config" class="button button-primary" value="Save Configuration">
+    74→        </p>
+    75→    </form>
+    76→    
+    77→    <div class="card" style="margin-top: 20px;">
+    78→        <h3>How to Use This Information</h3>
+    79→        <p>The information saved here can be used by other Zurkovich AI tools and screens. This configuration replaces the previous database-driven approach with a more flexible WordPress options system.</p>
+    80→        <ul>
+    81→            <li><strong>Site Domain:</strong> Used for API calls and content generation</li>
+    82→            <li><strong>Industry & Location:</strong> Helps AI tools generate relevant content</li>
+    83→            <li><strong>Brand Information:</strong> Used in content personalization</li>
+    84→            <li><strong>Contact Details:</strong> Available for content injection and templates</li>
+    85→        </ul>
+    86→    </div>
+    87→</div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me update the todo list and continue with applying these changes to all zurkovich installations:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find zurkovich plugin folder and files
+- [X] 🌡️ Identify all components that use _zurko_driggs table
+- [X] 🌡️ Map out table references and dependencies
+- [X] 🌡️ Plan clean removal of _zurko_driggs table
+- [X] 🌡️ Remove table creation from zurkovich.php
+- [X] 🌡️ Modify Screen 2 to be functional without zurko_driggs table
+- [X] 🌡️ Add cleanup function to drop existing tables
+- [⚡] 🌡️ Apply changes to mold-removal-stars installation
+- [ ] 🌡️ Apply changes to augusta-plumber-net installation
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## Step 3: Apply changes to mold-removal-stars WordPress installation
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Error:
+
+```
+<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me read the file first:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/zurkovich.php`
+
+Result:
+
+```
+30→// Function to get API key
+    31→function zurkovich_get_api_key() {
+    32→    $encrypted_key = get_option('zurkovich_openai_api_key');
+    33→    if ($encrypted_key) {
+    34→        return base64_decode($encrypted_key);
+    35→    }
+    36→    return '';
+    37→}
+    38→
+    39→// Create database tables on plugin activation
+    40→function zurkovich_create_tables() {
+    41→    global $wpdb;
+    42→    $charset_collate = $wpdb->get_charset_collate();
+    43→
+    44→    // Table name for driggs
+    45→    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+    46→    
+    47→    // SQL for driggs table
+    48→    $sql_driggs = "CREATE TABLE $table_name_driggs (
+    49→        driggs_id bigint(20) NOT NULL AUTO_INCREMENT,
+    50→        driggs_domain varchar(255) NOT NULL,
+    51→        driggs_industry text NOT NULL,
+    52→        driggs_city varchar(255) NOT NULL,
+    53→        driggs_brand_name_1 varchar(255) NOT NULL,
+    54→        driggs_site_type_or_purpose text NOT NULL,
+    55→        driggs_email_1 varchar(255) NOT NULL,
+    56→        driggs_address_1 text NOT NULL,
+    57→        driggs_phone1 varchar(50) NOT NULL,
+    58→        PRIMARY KEY  (driggs_id)
+    59→    ) $charset_collate;";
+    60→
+    61→    // Table name for pageideas
+    62→    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+    63→    
+    64→    // SQL for pageideas table
+    65→    $sql_pageideas = "CREATE TABLE $table_name_pageideas (
+    66→        id bigint(20) NOT NULL AUTO_INCREMENT,
+    67→        order_for_display_on_interface_1 int(11) NOT NULL,
+    68→        name varchar(255) NOT NULL,
+    69→        rel_wp_post_id_1 bigint(20) NOT NULL,
+    70→        PRIMARY KEY  (id)
+    71→    ) $charset_collate;";
+    72→
+    73→    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    74→    dbDelta($sql_driggs);
+    75→    dbDelta($sql_pageideas);
+    76→}
+    77→
+    78→// Register activation hook
+    79→register_activation_hook(__FILE__, 'zurkovich_create_tables');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I can edit the mold-removal-stars installation:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/zurkovich.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    35→    }
+    36→    return '';
+    37→}
+    38→
+    39→// Create database tables on plugin activation
+    40→function zurkovich_create_tables() {
+    41→    global $wpdb;
+    42→    $charset_collate = $wpdb->get_charset_collate();
+    43→
+    44→    // Clean up any unwanted tables that should not exist
+    45→    zurkovich_cleanup_unwanted_tables();
+    46→
+    47→    // Table name for pageideas (keeping this table as it may be used elsewhere)
+    48→    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+    49→    
+    50→    // SQL for pageideas table
+    51→    $sql_pageideas = "CREATE TABLE $table_name_pageideas (
+    52→        id bigint(20) NOT NULL AUTO_INCREMENT,
+    53→        order_for_display_on_interface_1 int(11) NOT NULL,
+    54→        name varchar(255) NOT NULL,
+    55→        rel_wp_post_id_1 bigint(20) NOT NULL,
+    56→        PRIMARY KEY  (id)
+    57→    ) $charset_collate;";
+    58→
+    59→    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    60→    dbDelta($sql_pageideas);
+    61→}
+    62→
+    63→// Clean up unwanted tables function
+    64→function zurkovich_cleanup_unwanted_tables() {
+    65→    global $wpdb;
+    66→    
+    67→    // Remove zurko_driggs table if it exists (this table should not exist)
+    68→    $zurko_driggs_table = $wpdb->prefix . 'zurko_driggs';
+    69→    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$zurko_driggs_table'") == $zurko_driggs_table;
+    70→    
+    71→    if ($table_exists) {
+    72→        $wpdb->query("DROP TABLE IF EXISTS $zurko_driggs_table");
+    73→        error_log('Zurkovich: Removed unwanted zurko_driggs table during activation');
+    74→    }
+    75→}
+    76→
+    77→// Register activation hook
+    78→register_activation_hook(__FILE__, 'zurkovich_create_tables');
+    79→
+    80→// Add admin menu
+    81→function zurkovich_admin_menu() {
+    82→    // Add main menu item
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me copy the updated screen2.php file to the mold-removal-stars installation:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Copy updated screen2.php to mold-removal-stars installation
+
+`cp "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php" "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php"`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## Step 4: Apply changes to augusta-plumber-net WordPress installation
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find zurkovich plugin folder and files
+- [X] 🌡️ Identify all components that use _zurko_driggs table
+- [X] 🌡️ Map out table references and dependencies
+- [X] 🌡️ Plan clean removal of _zurko_driggs table
+- [X] 🌡️ Remove table creation from zurkovich.php
+- [X] 🌡️ Modify Screen 2 to be functional without zurko_driggs table
+- [X] 🌡️ Add cleanup function to drop existing tables
+- [X] 🌡️ Apply changes to mold-removal-stars installation
+- [⚡] 🌡️ Apply changes to augusta-plumber-net installation
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/zurkovich.php`
+
+Result:
+
+```
+30→// Function to get API key
+    31→function zurkovich_get_api_key() {
+    32→    $encrypted_key = get_option('zurkovich_openai_api_key');
+    33→    if ($encrypted_key) {
+    34→        return base64_decode($encrypted_key);
+    35→    }
+    36→    return '';
+    37→}
+    38→
+    39→// Create database tables on plugin activation
+    40→function zurkovich_create_tables() {
+    41→    global $wpdb;
+    42→    $charset_collate = $wpdb->get_charset_collate();
+    43→
+    44→    // Table name for driggs
+    45→    $table_name_driggs = $wpdb->prefix . 'zurko_driggs';
+    46→    
+    47→    // SQL for driggs table
+    48→    $sql_driggs = "CREATE TABLE $table_name_driggs (
+    49→        driggs_id bigint(20) NOT NULL AUTO_INCREMENT,
+    50→        driggs_domain varchar(255) NOT NULL,
+    51→        driggs_industry text NOT NULL,
+    52→        driggs_city varchar(255) NOT NULL,
+    53→        driggs_brand_name_1 varchar(255) NOT NULL,
+    54→        driggs_site_type_or_purpose text NOT NULL,
+    55→        driggs_email_1 varchar(255) NOT NULL,
+    56→        driggs_address_1 text NOT NULL,
+    57→        driggs_phone1 varchar(50) NOT NULL,
+    58→        PRIMARY KEY  (driggs_id)
+    59→    ) $charset_collate;";
+    60→
+    61→    // Table name for pageideas
+    62→    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+    63→    
+    64→    // SQL for pageideas table
+    65→    $sql_pageideas = "CREATE TABLE $table_name_pageideas (
+    66→        id bigint(20) NOT NULL AUTO_INCREMENT,
+    67→        order_for_display_on_interface_1 int(11) NOT NULL,
+    68→        name varchar(255) NOT NULL,
+    69→        rel_wp_post_id_1 bigint(20) NOT NULL,
+    70→        PRIMARY KEY  (id)
+    71→    ) $charset_collate;";
+    72→
+    73→    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    74→    dbDelta($sql_driggs);
+    75→    dbDelta($sql_pageideas);
+    76→}
+    77→
+    78→// Register activation hook
+    79→register_activation_hook(__FILE__, 'zurkovich_create_tables');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/zurkovich.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    35→    }
+    36→    return '';
+    37→}
+    38→
+    39→// Create database tables on plugin activation
+    40→function zurkovich_create_tables() {
+    41→    global $wpdb;
+    42→    $charset_collate = $wpdb->get_charset_collate();
+    43→
+    44→    // Clean up any unwanted tables that should not exist
+    45→    zurkovich_cleanup_unwanted_tables();
+    46→
+    47→    // Table name for pageideas (keeping this table as it may be used elsewhere)
+    48→    $table_name_pageideas = $wpdb->prefix . 'zurko_pageideas';
+    49→    
+    50→    // SQL for pageideas table
+    51→    $sql_pageideas = "CREATE TABLE $table_name_pageideas (
+    52→        id bigint(20) NOT NULL AUTO_INCREMENT,
+    53→        order_for_display_on_interface_1 int(11) NOT NULL,
+    54→        name varchar(255) NOT NULL,
+    55→        rel_wp_post_id_1 bigint(20) NOT NULL,
+    56→        PRIMARY KEY  (id)
+    57→    ) $charset_collate;";
+    58→
+    59→    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    60→    dbDelta($sql_pageideas);
+    61→}
+    62→
+    63→// Clean up unwanted tables function
+    64→function zurkovich_cleanup_unwanted_tables() {
+    65→    global $wpdb;
+    66→    
+    67→    // Remove zurko_driggs table if it exists (this table should not exist)
+    68→    $zurko_driggs_table = $wpdb->prefix . 'zurko_driggs';
+    69→    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$zurko_driggs_table'") == $zurko_driggs_table;
+    70→    
+    71→    if ($table_exists) {
+    72→        $wpdb->query("DROP TABLE IF EXISTS $zurko_driggs_table");
+    73→        error_log('Zurkovich: Removed unwanted zurko_driggs table during activation');
+    74→    }
+    75→}
+    76→
+    77→// Register activation hook
+    78→register_activation_hook(__FILE__, 'zurkovich_create_tables');
+    79→
+    80→// Add admin menu
+    81→function zurkovich_admin_menu() {
+    82→    // Add main menu item
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me copy the updated screen2.php file to the augusta-plumber-net installation:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Copy updated screen2.php to augusta-plumber-net installation
+
+`cp "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/zurkovich3/includes/admin/screens/screen2.php" "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/zurkovich/includes/admin/screens/screen2.php"`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me update the final todo to completed:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find zurkovich plugin folder and files
+- [X] 🌡️ Identify all components that use _zurko_driggs table
+- [X] 🌡️ Map out table references and dependencies
+- [X] 🌡️ Plan clean removal of _zurko_driggs table
+- [X] 🌡️ Remove table creation from zurkovich.php
+- [X] 🌡️ Modify Screen 2 to be functional without zurko_driggs table
+- [X] 🌡️ Add cleanup function to drop existing tables
+- [X] 🌡️ Apply changes to mold-removal-stars installation
+- [X] 🌡️ Apply changes to augusta-plumber-net installation
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## ✅ **Complete zurko_driggs Table Removal - FINISHED**
+
+I have successfully removed the `zurko_driggs` table and all related code from the zurkovich plugin while preserving all screens and functionality. Here's what was accomplished:
+
+### **🗑️ Tables & Code Removed:**
+1. **Removed `zurko_driggs` table creation** from all zurkovich installations
+2. **Added cleanup functions** to automatically drop existing zurko_driggs tables
+3. **Eliminated all database references** to zurko_driggs
+
+### **📋 Files Updated:**
+1. **Main Development Version** (`/app/zurkovich3/`)
+2. **Mold Removal Stars** installation 
+3. **Augusta Plumber Net** installation
+
+### **🔄 Screen 2 Transformation:**
+**Before**: Database-driven form that INSERT-ed records into zurko_driggs table
+**After**: WordPress options-based configuration screen that:
+- ✅ **Saves site configuration** using WordPress `update_option()`
+- ✅ **Displays current values** with proper defaults
+- ✅ **Provides user-friendly interface** with helpful descriptions
+- ✅ **Maintains all original fields** (domain, industry, city, brand, etc.)
+- ✅ **Includes guidance** on how the data is used by other tools
+
+### **🛡️ Automatic Cleanup:**
+- **Plugin activation** now automatically detects and removes any existing zurko_driggs tables
+- **Future installations** will never create the unwanted table
+- **Error logging** tracks when tables are removed for debugging
+
+### **💾 Data Storage Method:**
+**Old**: Custom database table with complex management
+**New**: WordPress options system with keys like:
+- `zurkovich_site_domain`
+- `zurkovich_site_industry` 
+- `zurkovich_brand_name`
+- etc.
+
+### **🎯 Benefits of the Change:**
+1. ✅ **No unwanted database tables** 
+2. ✅ **Simpler data management** using WordPress native functions
+3. ✅ **Better integration** with WordPress ecosystem
+4. ✅ **All screens preserved** and functional
+5. ✅ **Automatic cleanup** of existing installations
+6. ✅ **Data persists** between plugin activations/deactivations
+
+**The zurko_driggs table has been completely eliminated from the zurkovich plugin while maintaining full functionality!**
+
