@@ -1,0 +1,71 @@
+in our snefuruplin wp plugin, we must create new db fields in the wp database for every site that the plugin is installed on	
+
+
+the purpose of this is to hold "cached" data that can be passed to it from the existing sitespren db table that exists in supabase 
+
+so the purpose of this new db table in the db table will be mostly to just hold 1 row of data to "mimick" what exists in the sitespren db table on supabase but make it available directly to the user in their wordpress site
+
+in future prompts, we will work on building functions that can push/pull the data between the 2 systems 
+
+for now, we are just creating the new db table and fields in wp 
+
+———————————————————————
+
+
+please create sql that i can run in supabase to do the following	
+create new db table	
+named	
+(wp prefix)_zen_sitespren	
+	
+	
+
+	
+	
+wppma_db_only_created_at	timestamp with time zone
+wppma_db_only_updated_at	timestamp with time zone
+created_at	timestamp with time zone
+sitespren_base	text
+true_root_domain	text
+full_subdomain	text
+webproperty_type	text
+fk_users_id	uuid
+updated_at	timestamp with time zone
+wpuser1	character varying
+wppass1	character varying
+wp_plugin_installed1	boolean
+wp_plugin_connected2	boolean
+fk_domreg_hostaccount	uuid
+is_wp_site	boolean
+id	uuid
+wp_rest_app_pass	text
+driggs_industry	text
+driggs_city	text
+driggs_brand_name	text
+driggs_site_type_purpose	text
+driggs_email_1	text
+driggs_address_full	text
+driggs_phone_1	text
+driggs_special_note_for_ai_tool	text
+ns_full	text
+ip_address	text
+is_starred1	text
+icon_name	character varying(50)
+icon_color	character varying(7)
+is_bulldozer	boolean
+driggs_phone1_platform_id	integer
+driggs_cgig_id	integer
+driggs_revenue_goal	integer
+driggs_address_species_id	integer
+is_competitor	boolean
+is_external	boolean
+is_internal	boolean
+is_ppx	boolean
+is_ms	boolean
+is_wayback_rebuild	boolean
+is_naked_wp_build	boolean
+is_rnr	boolean
+is_aff	boolean
+is_other1	boolean
+is_other2	boolean
+driggs_citations_done	boolean
+is_flylocal	boolean
