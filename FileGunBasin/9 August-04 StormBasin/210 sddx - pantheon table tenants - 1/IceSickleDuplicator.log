@@ -8,5 +8,31 @@
       "error": null,
       "timestamp": "2025-08-10T14:03:25.485927"
     }
+  ],
+  "history": [
+    {
+      "last_run": "2025-08-10T14:16:32.282102",
+      "conversions": [
+        {
+          "excel_file": "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/9 August-04 StormBasin/210 sddx - pantheon table tenants - 1/210 sddx - pantheon table tenants - 1.xlsx",
+          "csv_file": "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/9 August-04 StormBasin/210 sddx - pantheon table tenants - 1/210 sddx - pantheon table tenants - 1.csv",
+          "success": true,
+          "error": null,
+          "timestamp": "2025-08-10T14:16:32.282075"
+        }
+      ]
+    },
+    {
+      "last_run": "2025-08-10T14:18:55.557864",
+      "conversions": [
+        {
+          "excel_file": "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/9 August-04 StormBasin/210 sddx - pantheon table tenants - 1/210 sddx - pantheon table tenants - 1.xlsx",
+          "csv_file": "/Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/9 August-04 StormBasin/210 sddx - pantheon table tenants - 1/210 sddx - pantheon table tenants - 1.csv",
+          "success": true,
+          "error": null,
+          "timestamp": "2025-08-10T14:18:55.557842"
+        }
+      ]
+    }
   ]
 }
