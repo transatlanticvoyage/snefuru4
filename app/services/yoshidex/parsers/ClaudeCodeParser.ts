@@ -91,22 +91,41 @@ export class ClaudeCodeParser {
   // Parse a single conversation file (JSON or Markdown)
   static async parseConversationFile(filePath: string): Promise<YoshidexSession | null> {
     try {
+      console.log(`[ClaudeCodeParser] Parsing file: ${filePath}`);
       const fileContent = await fs.promises.readFile(filePath, 'utf-8');
+      console.log(`[ClaudeCodeParser] File content length: ${fileContent.length}`);
+      
       const fileExt = path.extname(filePath).toLowerCase();
+      console.log(`[ClaudeCodeParser] File extension: ${fileExt}`);
       
       let conversation: ClaudeCodeConversation;
       
       if (fileExt === '.json') {
+        console.log(`[ClaudeCodeParser] Parsing as JSON`);
         conversation = this.parseJSONConversation(fileContent);
       } else if (fileExt === '.md') {
+        console.log(`[ClaudeCodeParser] Parsing as Markdown`);
         conversation = this.parseMarkdownConversation(fileContent);
       } else {
         throw new Error(`Unsupported file format: ${fileExt}`);
       }
       
-      return this.convertToYoshidexSession(conversation);
+      console.log(`[ClaudeCodeParser] Parsed conversation:`, {
+        id: conversation.id,
+        title: conversation.title,
+        messageCount: conversation.messages?.length || 0
+      });
+      
+      const session = this.convertToYoshidexSession(conversation);
+      console.log(`[ClaudeCodeParser] Converted to session:`, {
+        yoshidex_session_id: session.yoshidex_session_id,
+        claude_session_id: session.claude_session_id,
+        total_messages: session.total_messages
+      });
+      
+      return session;
     } catch (error) {
-      console.error(`Failed to parse conversation file ${filePath}:`, error);
+      console.error(`[ClaudeCodeParser] Failed to parse conversation file ${filePath}:`, error);
       return null;
     }
   }
@@ -132,7 +151,10 @@ export class ClaudeCodeParser {
 
   // Parse Markdown format conversation export (SpecStory format)
   private static parseMarkdownConversation(markdownContent: string): ClaudeCodeConversation {
+    console.log(`[parseMarkdownConversation] Starting markdown parsing`);
     const lines = markdownContent.split('\n');
+    console.log(`[parseMarkdownConversation] Total lines: ${lines.length}`);
+    
     let conversation: ClaudeCodeConversation = {
       id: this.generateId(),
       title: 'Parsed SpecStory Session',
@@ -143,6 +165,7 @@ export class ClaudeCodeParser {
     };
 
     // Extract metadata from SpecStory format
+    console.log(`[parseMarkdownConversation] Extracting metadata from first 20 lines`);
     for (let i = 0; i < Math.min(20, lines.length); i++) {
       const line = lines[i];
       
@@ -150,6 +173,7 @@ export class ClaudeCodeParser {
       if (line.startsWith('## ') && line.includes('Z')) {
         conversation.title = `SpecStory Session ${line.replace('## ', '').trim()}`;
         conversation.created_at = line.replace('## ', '').trim();
+        console.log(`[parseMarkdownConversation] Found timestamp header: ${conversation.title}`);
         continue;
       }
       
@@ -162,6 +186,7 @@ export class ClaudeCodeParser {
           conversation.metadata = {};
         }
         conversation.metadata.originalSessionId = sessionMatch[1];
+        console.log(`[parseMarkdownConversation] Found session ID: ${sessionMatch[1]}`);
       }
     }
 
@@ -169,6 +194,9 @@ export class ClaudeCodeParser {
     let messageSequence = 0;
     let inCodeBlock = false;
     let messageContent: string[] = [];
+    let messagesFound = 0;
+    
+    console.log(`[parseMarkdownConversation] Starting message parsing`);
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -183,6 +211,8 @@ export class ClaudeCodeParser {
       
       // Detect SpecStory message boundaries: _**User**_ or _**Agent**_
       if (line.match(/^_\*\*(User|Agent|Assistant)\*\*_/)) {
+        console.log(`[parseMarkdownConversation] Found message boundary at line ${i}: ${line}`);
+        
         // Save previous message if exists
         if (currentMessage && messageContent.length > 0) {
           currentMessage.content = messageContent.join('\n').trim();
@@ -191,11 +221,14 @@ export class ClaudeCodeParser {
               ...currentMessage,
               content: currentMessage.content
             } as ClaudeCodeMessage);
+            messagesFound++;
+            console.log(`[parseMarkdownConversation] Saved message ${messagesFound}, content length: ${currentMessage.content.length}`);
           }
         }
         
         // Start new message
         const role = this.extractRoleFromSpecStoryHeader(line);
+        console.log(`[parseMarkdownConversation] Starting new message with role: ${role}`);
         currentMessage = {
           id: this.generateId(),
           role,
@@ -226,8 +259,12 @@ export class ClaudeCodeParser {
           ...currentMessage,
           content: currentMessage.content
         } as ClaudeCodeMessage);
+        messagesFound++;
+        console.log(`[parseMarkdownConversation] Saved final message ${messagesFound}, content length: ${currentMessage.content.length}`);
       }
     }
+    
+    console.log(`[parseMarkdownConversation] Parsing complete. Total messages found: ${messagesFound}`);
     
     return conversation;
   }

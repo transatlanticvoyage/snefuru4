@@ -73,6 +73,49 @@ export default function YoshidexSessionsTable() {
   
   const supabase = createClientComponentClient();
 
+  // Debug single SpecStory file
+  const debugSingleFile = async () => {
+    try {
+      setLoading(true);
+      
+      // First get the list of files
+      const listResponse = await fetch('/api/yoshidex/debug-single-file');
+      if (!listResponse.ok) {
+        throw new Error(`Failed to get file list: ${listResponse.status}`);
+      }
+      
+      const fileList = await listResponse.json();
+      if (!fileList.success || !fileList.files || fileList.files.length === 0) {
+        throw new Error('No files found to debug');
+      }
+      
+      // Use the first file for testing
+      const testFile = fileList.files[0].filename;
+      
+      const response = await fetch('/api/yoshidex/debug-single-file', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ filename: testFile })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`Debug Success!\n\nFile: ${testFile}\nSession ID: ${result.session.yoshidex_session_id}\nTitle: ${result.session.session_title}\nMessages: ${result.session.total_messages}\n\nContent Preview:\n${result.fileInfo.contentPreview}`);
+      } else {
+        console.error('Debug failed:', result);
+        alert(`Debug Failed!\n\nFile: ${testFile}\nError: ${result.error}\nDetails: ${result.details || 'N/A'}\n\nContent Preview:\n${result.fileContent?.substring(0, 500) || 'N/A'}`);
+      }
+    } catch (error) {
+      console.error('Debug error:', error);
+      alert(`Debug failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Import SpecStory files
   const importSpecStoryFiles = async () => {
     try {
@@ -346,6 +389,13 @@ export default function YoshidexSessionsTable() {
 
       {/* Action Buttons */}
       <div className="mb-4 flex gap-3">
+        <button
+          onClick={debugSingleFile}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md transition-colors"
+          disabled={loading}
+        >
+          {loading ? 'Debugging...' : 'Debug Single File'}
+        </button>
         <button
           onClick={importSpecStoryFiles}
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-colors"
