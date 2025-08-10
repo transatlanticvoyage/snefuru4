@@ -1844,3 +1844,9 @@ The Stellar Chamber now contains these tabs in order:
 
 The new "Gut. Deployer" tab is positioned correctly between "Gutenberg Elicitor" and "Nimble" with blank content ready for future development.
 
+---
+
+_**User**_
+
+we must revisit the idea i brought up earlier about creaeting a black separator tab or a special 4 px black border that runs vertically on the right edge of some tabs (and on left side potentially at times also - but it needs to be specified on a per tab basis) . pelae remind me where we left off in discussing implementation options for this 
+
