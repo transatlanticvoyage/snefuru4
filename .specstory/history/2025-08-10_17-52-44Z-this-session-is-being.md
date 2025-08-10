@@ -4777,3 +4777,147 @@ Perfect! I have successfully updated all the copy buttons in the denyeep column 
 
 The copy buttons now appear cleanly positioned along the right edge of each textbox, creating a more organized and visually appealing layout in the denyeep column div 1 area.
 
+---
+
+_**User**_
+
+the copy buttons now do not appear to be working anymore. pleaes review their code to ensure that they are functioning properly. 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+You're right! I changed the class name from `snefuru-copy-btn` to `snefuru-copy-btn-right` but didn't update the JavaScript event handlers. Let me check the existing JavaScript and update it:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css:267:.snefuru-copy-btn {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-268-    position: absolute;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-269-    bottom: -40px; /* Position below the header */
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-270-    left: 0;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-271-    width: 400px;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-272-    padding: 10px 16px;
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css:293:.snefuru-copy-btn::before {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-294-    content: "📋";
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-295-    margin-right: 6px;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-296-    font-size: 16px;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-297-}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-298-
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css:299:.snefuru-copy-btn:hover {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-300-    background: linear-gradient(135deg, #4b93d8 0%, #3582c4 100%);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-301-    transform: translateY(-2px);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-302-    box-shadow: 
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-303-        0 -1px 2px rgba(0, 0, 0, 0.1),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-304-        0 4px 12px rgba(34, 113, 177, 0.25);
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css:307:.snefuru-copy-btn:active {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-308-    transform: translateY(0);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-309-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-310-}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-311-
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css:312:.snefuru-copy-btn.copied {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-313-    background: linear-gradient(135deg, #46b450 0%, #00a32a 100%);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-314-    animation: copySuccess 0.5s ease;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-315-}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-316-
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-317-@keyframes copySuccess {
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css:323:.snefuru-copy-btn.copied::before {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-324-    content: "✅";
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-325-}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-326-
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-327-.snefuru-elementor-data-textbox {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.css-328-    width: 400px;
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.js:172:        $(document).off('click.copy-btn').on('click.copy-btn', '.snefuru-copy-btn', function(e) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.js-173-            e.preventDefault();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.js-174-            
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.js-175-            var $button = $(this);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.js-176-            var targetId = $button.data('target');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.js-177-            var $textbox = $('#' + targetId);
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php:186:                                            <button type="button" class="snefuru-copy-btn-right" data-target="copy-all-instances-textbox" style="height: 200px; padding: 8px 12px; background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-187-                                                Copy
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-188-                                            </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-189-                                        </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-190-                                    </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-191-                                </div>
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php:204:                                            <button type="button" class="snefuru-copy-btn-right" data-target="header303-db-mapping-textbox" style="height: 150px; padding: 8px 12px; background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-205-                                                Copy
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-206-                                            </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-207-                                        </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-208-                                    </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-209-                                </div>
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php:222:                                            <button type="button" class="snefuru-copy-btn-right" data-target="header303-textbox" style="height: 100px; padding: 8px 12px; background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-223-                                                Copy
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-224-                                            </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-225-                                        </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-226-                                    </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-227-                                </div>
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php:241:                                            <button type="button" class="snefuru-copy-btn-right" data-target="elementor-data-textbox" style="height: 100px; padding: 8px 12px; background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-242-                                                Copy
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-243-                                            </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-244-                                        </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-245-                                    </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-246-                                </div>
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php:1193:                                <button type="button" class="snefuru-copy-btn" data-target="swipe15-textbox">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-1194-                                    Copy
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-1195-                                </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-1196-                            </div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-1197-                            <textarea 
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-1198-                                id="swipe15-textbox"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the issue. The JavaScript in `hurricane.js` is looking for `.snefuru-copy-btn` but I changed the class to `.snefuru-copy-btn-right`. I need to update the JavaScript to handle both classes:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/assets/hurricane.js`
+
+Result:
+
+```
+170→        
+   171→        // Handle copy button clicks for textboxes
+   172→        $(document).off('click.copy-btn').on('click.copy-btn', '.snefuru-copy-btn', function(e) {
+   173→            e.preventDefault();
+   174→            
+   175→            var $button = $(this);
+   176→            var targetId = $button.data('target');
+   177→            var $textbox = $('#' + targetId);
+   178→            
+   179→            if ($textbox.length && $textbox.val()) {
+   180→                // Select the text
+   181→                $textbox[0].select();
+   182→                $textbox[0].setSelectionRange(0, 99999); // For mobile devices
+   183→                
+   184→                // Copy the text
+   185→                try {
+   186→                    var successful = document.execCommand('copy');
+   187→                    if (successful) {
+   188→                        // Change button text temporarily
+   189→                        var originalText = $button.text();
+   190→                        $button.text('Copied!').addClass('copied');
+   191→                        
+   192→                        setTimeout(function() {
+   193→                            $button.text(originalText).removeClass('copied');
+   194→                        }, 2000);
+   195→                        
+   196→                        console.log('Textbox data copied to clipboard');
+   197→                    } else {
+   198→                        console.error('Failed to copy text');
+   199→                    }
+```
+
