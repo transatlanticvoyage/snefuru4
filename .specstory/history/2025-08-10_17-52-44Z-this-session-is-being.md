@@ -4465,3 +4465,315 @@ The search controls now use `justify-content: flex-end` to align the search box 
 
 The table now has a simpler, cleaner interface that focuses on search functionality only, as requested.
 
+---
+
+_**User**_
+
+under the denyeep column div 1 area under elementor elicitor, please alter the look of the copy buttons so that they now appear along the right side of each text box they accompany (not below it or above it as they currently do) 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+160→                        <div class="snefuru-denyeep-columns-wrapper" style="display: flex; gap: 15px; margin-top: 10px;">
+   161→                            
+   162→                            <!-- Denyeep Column Div 1 -->
+   163→                            <div class="snefuru-denyeep-column" style="border: 1px solid black; padding: 10px; flex: 1; min-width: 420px;">
+   164→                                <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">denyeep column div 1</span>
+   165→                                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+   166→                                
+   167→                                <!-- Replete Instance Wrapper -->
+   168→                                <div class="snefuru-replete-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 20px;">
+   169→                                    <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">replete_instance</span>
+   170→                                    <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+   171→                                    
+   172→                                    <!-- Copy All Instances Container -->
+   173→                                    <div class="snefuru-copy-all-instances-container">
+   174→                                        <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">copy all instances</span>
+   175→                                        <div style="position: relative; display: inline-block;">
+   176→                                            <button type="button" class="snefuru-copy-btn" data-target="copy-all-instances-textbox" style="margin-bottom: 5px;">
+   177→                                                Copy
+   178→                                            </button>
+   179→                                            <textarea 
+   180→                                                id="copy-all-instances-textbox" 
+   181→                                                class="snefuru-header303-db-mapping-textbox" 
+   182→                                                readonly
+   183→                                                style="height: 200px;"
+   184→                                            ><?php 
+   185→                                            // Combine all three instances into one text
+   186→                                            $all_instances_text = $db_mapping_text . "\n\n———————————————————————\n\n" . $header303_content . "\n\n———————————————————————\n\n" . $formatted_data;
+   187→                                            echo esc_textarea($all_instances_text); 
+   188→                                            ?></textarea>
+   189→                                        </div>
+   190→                                    </div>
+   191→                                </div>
+   192→                                
+   193→                                <!-- Instance 1 Wrapper: Header303 DB Mapping -->
+   194→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+   195→                                    <div class="snefuru-header303-db-mapping-container">
+   196→                                        <div class="snefuru-header303-db-mapping-header">
+   197→                                            <span class="snefuru-header303-db-mapping-label">header303_db_mapping</span>
+   198→                                            <button type="button" class="snefuru-copy-btn" data-target="header303-db-mapping-textbox">
+   199→                                                Copy
+   200→                                            </button>
+   201→                                        </div>
+   202→                                        <textarea 
+   203→                                            id="header303-db-mapping-textbox" 
+   204→                                            class="snefuru-header303-db-mapping-textbox" 
+   205→                                            readonly
+   206→                                        ><?php echo esc_textarea($db_mapping_text); ?></textarea>
+   207→                                    </div>
+   208→                                </div>
+   209→                                
+   210→                                <!-- Instance 2 Wrapper: Header303 -->
+   211→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+   212→                                    <div class="snefuru-header303-container">
+   213→                                        <div class="snefuru-header303-header">
+   214→                                            <span class="snefuru-header303-label">header303</span>
+   215→                                            <button type="button" class="snefuru-copy-btn" data-target="header303-textbox">
+   216→                                                Copy
+   217→                                            </button>
+   218→                                        </div>
+   219→                                        <textarea 
+   220→                                            id="header303-textbox" 
+   221→                                            class="snefuru-header303-textbox" 
+   222→                                            readonly
+   223→                                        ><?php echo esc_textarea($header303_content); ?></textarea>
+   224→                                    </div>
+   225→                                </div>
+   226→                                
+   227→                                <!-- Instance 3 Wrapper: Elementor Data -->
+   228→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+   229→                                    <div class="snefuru-elementor-data-container">
+   230→                                        <div class="snefuru-elementor-data-header">
+   231→                                            <span class="snefuru-elementor-data-label">_elementor_data</span>
+   232→                                            <button type="button" class="snefuru-copy-btn" data-target="elementor-data-textbox">
+   233→                                                Copy
+   234→                                            </button>
+   235→                                        </div>
+   236→                                        <textarea 
+   237→                                            id="elementor-data-textbox" 
+   238→                                            class="snefuru-elementor-data-textbox" 
+   239→                                            readonly
+   240→                                            placeholder="No Elementor data found for this page"
+   241→                                        ><?php echo esc_textarea($formatted_data); ?></textarea>
+   242→                                    </div>
+   243→                                </div>
+   244→                            </div>
+   245→                            
+   246→                            <!-- Denyeep Column Div 2 -->
+   247→                            <div class="snefuru-denyeep-column" style="border: 1px solid black; padding: 10px; flex: 1; min-width: 420px;">
+   248→                                <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">denyeep column div 2</span>
+   249→                                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+   250→                                
+   251→                                <!-- Content for column 2 will go here -->
+   252→                            </div>
+   253→                            
+   254→                            <!-- Denyeep Column Div 3 -->
+   255→                            <div class="snefuru-denyeep-column" style="border: 1px solid black; padding: 10px; flex: 1; min-width: 420px;">
+   256→                                <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">denyeep column div 3</span>
+   257→                                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+   258→                                <!-- Content for column 3 will go here -->
+   259→                            </div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the current structure. The copy buttons are currently positioned using absolute positioning in the CSS. I need to modify the layout structure to place the copy buttons on the right side of each textbox. Let me update the HTML structure for each instance:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   168→                                <div class="snefuru-replete-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 20px;">
+   169→                                    <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">replete_instance</span>
+   170→                                    <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+   171→                                    
+   172→                                    <!-- Copy All Instances Container -->
+   173→                                    <div class="snefuru-copy-all-instances-container">
+   174→                                        <span style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">copy all instances</span>
+   175→                                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+   176→                                            <textarea 
+   177→                                                id="copy-all-instances-textbox" 
+   178→                                                class="snefuru-header303-db-mapping-textbox" 
+   179→                                                readonly
+   180→                                                style="height: 200px; flex: 1;"
+   181→                                            ><?php 
+   182→                                            // Combine all three instances into one text
+   183→                                            $all_instances_text = $db_mapping_text . "\n\n———————————————————————\n\n" . $header303_content . "\n\n———————————————————————\n\n" . $formatted_data;
+   184→                                            echo esc_textarea($all_instances_text); 
+   185→                                            ?></textarea>
+   186→                                            <button type="button" class="snefuru-copy-btn-right" data-target="copy-all-instances-textbox" style="height: 200px; padding: 8px 12px; background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;">
+   187→                                                Copy
+   188→                                            </button>
+   189→                                        </div>
+   190→                                    </div>
+   191→                                </div>
+   192→                                
+   193→                                <!-- Instance 1 Wrapper: Header303 DB Mapping -->
+   194→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me update the Instance 1 (Header303 DB Mapping):
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   189→                                        </div>
+   190→                                    </div>
+   191→                                </div>
+   192→                                
+   193→                                <!-- Instance 1 Wrapper: Header303 DB Mapping -->
+   194→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+   195→                                    <div class="snefuru-header303-db-mapping-container">
+   196→                                        <span class="snefuru-header303-db-mapping-label" style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">header303_db_mapping</span>
+   197→                                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+   198→                                            <textarea 
+   199→                                                id="header303-db-mapping-textbox" 
+   200→                                                class="snefuru-header303-db-mapping-textbox" 
+   201→                                                readonly
+   202→                                                style="flex: 1;"
+   203→                                            ><?php echo esc_textarea($db_mapping_text); ?></textarea>
+   204→                                            <button type="button" class="snefuru-copy-btn-right" data-target="header303-db-mapping-textbox" style="height: 150px; padding: 8px 12px; background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;">
+   205→                                                Copy
+   206→                                            </button>
+   207→                                        </div>
+   208→                                    </div>
+   209→                                </div>
+   210→                                
+   211→                                <!-- Instance 2 Wrapper: Header303 -->
+   212→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+   213→                                    <div class="snefuru-header303-container">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me update Instance 2 (Header303):
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   207→                                        </div>
+   208→                                    </div>
+   209→                                </div>
+   210→                                
+   211→                                <!-- Instance 2 Wrapper: Header303 -->
+   212→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+   213→                                    <div class="snefuru-header303-container">
+   214→                                        <span class="snefuru-header303-label" style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">header303</span>
+   215→                                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+   216→                                            <textarea 
+   217→                                                id="header303-textbox" 
+   218→                                                class="snefuru-header303-textbox" 
+   219→                                                readonly
+   220→                                                style="flex: 1;"
+   221→                                            ><?php echo esc_textarea($header303_content); ?></textarea>
+   222→                                            <button type="button" class="snefuru-copy-btn-right" data-target="header303-textbox" style="height: 100px; padding: 8px 12px; background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;">
+   223→                                                Copy
+   224→                                            </button>
+   225→                                        </div>
+   226→                                    </div>
+   227→                                </div>
+   228→                                
+   229→                                <!-- Instance 3 Wrapper: Elementor Data -->
+   230→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+   231→                                    <div class="snefuru-elementor-data-container">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me update Instance 3 (Elementor Data):
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   225→                                        </div>
+   226→                                    </div>
+   227→                                </div>
+   228→                                
+   229→                                <!-- Instance 3 Wrapper: Elementor Data -->
+   230→                                <div class="snefuru-instance-wrapper" style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+   231→                                    <div class="snefuru-elementor-data-container">
+   232→                                        <span class="snefuru-elementor-data-label" style="display: block; font-size: 16px; font-weight: bold; margin-bottom: 10px;">_elementor_data</span>
+   233→                                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+   234→                                            <textarea 
+   235→                                                id="elementor-data-textbox" 
+   236→                                                class="snefuru-elementor-data-textbox" 
+   237→                                                readonly
+   238→                                                placeholder="No Elementor data found for this page"
+   239→                                                style="flex: 1;"
+   240→                                            ><?php echo esc_textarea($formatted_data); ?></textarea>
+   241→                                            <button type="button" class="snefuru-copy-btn-right" data-target="elementor-data-textbox" style="height: 100px; padding: 8px 12px; background: linear-gradient(135deg, #3582c4 0%, #2271b1 100%); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;">
+   242→                                                Copy
+   243→                                            </button>
+   244→                                        </div>
+   245→                                    </div>
+   246→                                </div>
+   247→                            </div>
+   248→                            
+   249→                            <!-- Denyeep Column Div 2 -->
+   250→                            <div class="snefuru-denyeep-column" style="border: 1px solid black; padding: 10px; flex: 1; min-width: 420px;">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully updated all the copy buttons in the denyeep column div 1 area under the Elementor Elicitor tab. Here's a summary of the changes made:
+
+## ✅ **Updated Copy Button Layout - Right-Side Positioning**
+
+### **Changes Made:**
+
+1. **Restructured Layout** - Changed from absolute positioning to flexbox layout
+2. **Side-by-Side Design** - Copy buttons now appear on the right side of each textbox
+3. **Vertical Button Text** - Used `writing-mode: vertical-rl` to make button text vertical
+4. **Height Matching** - Copy buttons match the height of their respective textboxes:
+   - Copy All Instances: 200px height
+   - Header303 DB Mapping: 150px height  
+   - Header303: 100px height
+   - Elementor Data: 100px height
+
+### **New Structure:**
+- **Flexbox Container**: `display: flex; gap: 10px; align-items: flex-start;`
+- **Textbox**: `flex: 1` to take available space
+- **Copy Button**: Fixed width with vertical text, positioned on the right
+
+### **Button Styling:**
+- **New Class**: `snefuru-copy-btn-right` (instead of old `snefuru-copy-btn`)
+- **Gradient Background**: Blue gradient matching the theme
+- **Vertical Text**: Reading top-to-bottom on the right side
+- **Proper Height**: Matches each textbox's height exactly
+
+### **Updated Instances:**
+1. ✅ **Copy All Instances** - 200px tall button
+2. ✅ **Header303 DB Mapping** - 150px tall button  
+3. ✅ **Header303** - 100px tall button
+4. ✅ **Elementor Data** - 100px tall button
+
+The copy buttons now appear cleanly positioned along the right edge of each textbox, creating a more organized and visually appealing layout in the denyeep column div 1 area.
+
