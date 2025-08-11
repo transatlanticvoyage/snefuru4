@@ -1659,3 +1659,360 @@ Perfect! I have fixed the operation201 functionality. Here's what I've updated:
 
 The system now creates a parallel database structure where you can store custom information for each WordPress post/page in your orbitposts table!
 
+---
+
+_**User**_
+
+im still having the same issue where clicking the "operation201 - populate _orbitposts db table for any missing wp_posts" button is not causing anything to change on the screen, no progress bar no page refresh, and most importantly, no new db rows are populating into the _orbitposts db table and/or they're not displaying in the ui table grid at rup_orbit_mar page 
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me debug this step by step. First, let me check if the button is properly rendered and if there are any JavaScript console errors.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Create IceSickleDuplicator system for Excel to CSV conversion
+- [X] 🌡️ Convert 210 sddx spreadsheet to CSV
+- [ ] 🌡️ Create central conversion logic component
+- [X] 🌡️ Read and analyze the CSV data for Pantheon Table implementation
+- [X] 🌡️ Create rup_pantheon_mar admin page
+- [X] 🌡️ Add Pantheon tab to Stellar Chamber
+- [X] 🌡️ Implement Elementor data parsing for frontend text extraction
+- [X] 🌡️ Create widget-specific text extractors for different Elementor widgets
+- [X] 🌡️ Add content separation logic with hyphenated bars
+- [X] 🌡️ Replace current frontend scraping with new parsing method
+- [X] 🌡️ Create zen_orbitposts database table
+- [X] 🌡️ Add database table creation to plugin activation
+- [X] 🌡️ Create database update/migration logic
+- [X] 🌡️ Create rup_orbit_mar admin page
+- [X] 🌡️ Implement UI table grid with inline editing
+- [X] 🌡️ Add pagination controls and search functionality
+- [X] 🌡️ Implement create new (inline and popup) functionality
+- [X] 🌡️ Add rel_wp_post_id field to zen_orbitposts table
+- [X] 🌡️ Update orbit mar UI to display rel_wp_post_id column
+- [X] 🌡️ Create operation201 button with copy functionality
+- [X] 🌡️ Implement operation201 function to populate orbitposts from wp_posts
+- [X] 🌡️ Debug operation201 button click handler
+- [X] 🌡️ Update operation201 to include all posts including drafts
+- [⚡] 🌡️ Troubleshoot operation201 button not responding
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check if the JavaScript file is being loaded properly and add a simpler test. First, let me create a simple alert test on page load to confirm the JavaScript is working:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/orbit-mar-admin.js has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    12→    var totalPages = 1;
+    13→    var searchQuery = '';
+    14→    var selectedRows = [];
+    15→    
+    16→    // Initialize on document ready
+    17→    $(document).ready(function() {
+    18→        console.log('Orbit Mar Admin JS loaded successfully');
+    19→        console.log('orbitMarAjax object:', orbitMarAjax);
+    20→        initializeOrbitMar();
+    21→    });
+    22→    
+    23→    function initializeOrbitMar() {
+    24→        loadTableData();
+    25→        bindEvents();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add a direct click handler using a more basic approach and add a test button to see if the issue is with the button ID or JavaScript loading:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-orbit-mar-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    77→     */
+    78→    public function render_admin_page() {
+    79→        ?>
+    80→        <div class="wrap orbit-mar-admin">
+    81→            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+    82→                <h1 style="margin: 0;">Orbit Mar - Database Management</h1>
+    83→                <div style="display: flex; align-items: center; gap: 10px;">
+    84→                    <button id="operation201-btn" class="button" style="background: maroon; color: white; font-weight: bold; font-size: 16px; padding: 12px 20px; border: none; cursor: pointer;" onclick="testOperation201();">
+    85→                        operation201 - populate _orbitposts db table for any missing wp_posts
+    86→                    </button>
+    87→                    <button id="copy-operation201-btn" class="button" style="background: #666; color: white; padding: 12px 15px; border: none; cursor: pointer;" title="Copy button text">
+    88→                        📋
+    89→                    </button>
+    90→                    <button id="test-btn" class="button" style="background: blue; color: white; padding: 8px 12px;" onclick="alert('Test button works!');">
+    91→                        TEST
+    92→                    </button>
+    93→                </div>
+    94→            </div>
+    95→            
+    96→            <!-- Nubra Tableface Kite -->
+    97→            <div class="nubra-tableface-kite">
+    98→                <span style="font-weight: bold; color: #666; font-size: 12px;">NUBRA-TABLEFACE-KITE: Orbit Posts Grid Interface v1.0</span>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add a global testOperation201 function that will be available directly in the HTML:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-orbit-mar-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   231→                        <button id="orbit-popup-save" class="button button-primary">Save</button>
+   232→                        <button id="orbit-popup-cancel" class="button">Cancel</button>
+   233→                    </div>
+   234→                </div>
+   235→            </div>
+   236→        </div>
+   237→        
+   238→        <script type="text/javascript">
+   239→        // Global function for direct onclick access
+   240→        function testOperation201() {
+   241→            console.log('testOperation201 called directly');
+   242→            
+   243→            if (!confirm('Are you sure you want to run Operation201?\\n\\nThis will create orbitpost records for ALL WordPress posts and pages (including drafts) that don\\'t already have one.')) {
+   244→                return;
+   245→            }
+   246→            
+   247→            var button = document.getElementById('operation201-btn');
+   248→            var originalText = button.textContent;
+   249→            button.disabled = true;
+   250→            button.textContent = 'Running Operation201...';
+   251→            
+   252→            // Use fetch API as backup
+   253→            fetch(ajaxurl, {
+   254→                method: 'POST',
+   255→                headers: {
+   256→                    'Content-Type': 'application/x-www-form-urlencoded',
+   257→                },
+   258→                body: new URLSearchParams({
+   259→                    action: 'orbit_mar_operation201',
+   260→                    nonce: '<?php echo wp_create_nonce('orbit_mar_nonce'); ?>'
+   261→                })
+   262→            })
+   263→            .then(response => response.json())
+   264→            .then(data => {
+   265→                console.log('Operation201 response:', data);
+   266→                if (data.success) {
+   267→                    alert('Operation201 Results:\\n\\n' + data.data.message);
+   268→                    // Reload the page to refresh table
+   269→                    location.reload();
+   270→                } else {
+   271→                    alert('Operation201 failed: ' + (data.data || 'Unknown error'));
+   272→                }
+   273→            })
+   274→            .catch(error => {
+   275→                console.error('Error:', error);
+   276→                alert('Error executing Operation201: ' + error);
+   277→            })
+   278→            .finally(() => {
+   279→                button.disabled = false;
+   280→                button.textContent = originalText;
+   281→            });
+   282→        }
+   283→        </script>
+   284→        <?php
+   285→    }
+   286→    
+   287→    /**
+   288→     * AJAX handler to get table data
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me also check if the table exists and add some direct database debugging. Let me add a simple debug function to show what's in the database:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-orbit-mar-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    24→        add_action('wp_ajax_orbit_mar_get_data', array($this, 'ajax_get_data'));
+    25→        add_action('wp_ajax_orbit_mar_save_row', array($this, 'ajax_save_row'));
+    26→        add_action('wp_ajax_orbit_mar_create_row', array($this, 'ajax_create_row'));
+    27→        add_action('wp_ajax_orbit_mar_delete_rows', array($this, 'ajax_delete_rows'));
+    28→        add_action('wp_ajax_orbit_mar_operation201', array($this, 'ajax_operation201'));
+    29→        add_action('wp_ajax_orbit_mar_debug', array($this, 'ajax_debug'));
+    30→    }
+    31→    
+    32→    /**
+    33→     * Add admin menu page
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the debug function at the end of the class:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-orbit-mar-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   499→                'total_processed' => count($missing_posts),
+   500→                'errors' => $errors
+   501→            ));
+   502→            
+   503→        } catch (Exception $e) {
+   504→            wp_send_json_error('Operation201 failed: ' . $e->getMessage());
+   505→        }
+   506→    }
+   507→    
+   508→    /**
+   509→     * Debug function to check database status
+   510→     */
+   511→    public function ajax_debug() {
+   512→        check_ajax_referer('orbit_mar_nonce', 'nonce');
+   513→        
+   514→        global $wpdb;
+   515→        
+   516→        $debug_info = array();
+   517→        
+   518→        // Check if table exists
+   519→        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->table_name}'") == $this->table_name;
+   520→        $debug_info['table_exists'] = $table_exists;
+   521→        $debug_info['table_name'] = $this->table_name;
+   522→        
+   523→        if ($table_exists) {
+   524→            // Get table structure
+   525→            $columns = $wpdb->get_results("DESCRIBE {$this->table_name}");
+   526→            $debug_info['columns'] = $columns;
+   527→            
+   528→            // Get row count
+   529→            $row_count = $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name}");
+   530→            $debug_info['row_count'] = $row_count;
+   531→            
+   532→            // Get sample rows
+   533→            $sample_rows = $wpdb->get_results("SELECT * FROM {$this->table_name} LIMIT 5");
+   534→            $debug_info['sample_rows'] = $sample_rows;
+   535→        }
+   536→        
+   537→        // Get WordPress posts count
+   538→        $wp_posts_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type IN ('post', 'page') AND post_status NOT IN ('trash', 'auto-draft')");
+   539→        $debug_info['wp_posts_count'] = $wp_posts_count;
+   540→        
+   541→        wp_send_json_success($debug_info);
+   542→    }
+   543→}
+   544→
+   545→// Initialize
+   546→new Snefuru_Orbit_Mar_Admin();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add a debug button to the page to test our database connection and table status:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-orbit-mar-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    87→                    </button>
+    88→                    <button id="copy-operation201-btn" class="button" style="background: #666; color: white; padding: 12px 15px; border: none; cursor: pointer;" title="Copy button text">
+    89→                        📋
+    90→                    </button>
+    91→                    <button id="test-btn" class="button" style="background: blue; color: white; padding: 8px 12px;" onclick="alert('Test button works!');">
+    92→                        TEST
+    93→                    </button>
+    94→                    <button id="debug-btn" class="button" style="background: orange; color: white; padding: 8px 12px;" onclick="debugDatabase();">
+    95→                        DEBUG DB
+    96→                    </button>
+    97→                </div>
+    98→            </div>
+    99→            
+   100→            <!-- Nubra Tableface Kite -->
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the debugDatabase function to the inline script:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-orbit-mar-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   280→                alert('Error executing Operation201: ' + error);
+   281→            })
+   282→            .finally(() => {
+   283→                button.disabled = false;
+   284→                button.textContent = originalText;
+   285→            });
+   286→        }
+   287→        
+   288→        // Debug database function
+   289→        function debugDatabase() {
+   290→            console.log('debugDatabase called');
+   291→            
+   292→            fetch(ajaxurl, {
+   293→                method: 'POST',
+   294→                headers: {
+   295→                    'Content-Type': 'application/x-www-form-urlencoded',
+   296→                },
+   297→                body: new URLSearchParams({
+   298→                    action: 'orbit_mar_debug',
+   299→                    nonce: '<?php echo wp_create_nonce('orbit_mar_nonce'); ?>'
+   300→                })
+   301→            })
+   302→            .then(response => response.json())
+   303→            .then(data => {
+   304→                console.log('Debug response:', data);
+   305→                if (data.success) {
+   306→                    var info = data.data;
+   307→                    var message = 'DATABASE DEBUG INFO:\\n\\n';
+   308→                    message += 'Table Name: ' + info.table_name + '\\n';
+   309→                    message += 'Table Exists: ' + (info.table_exists ? 'YES' : 'NO') + '\\n';
+   310→                    if (info.table_exists) {
+   311→                        message += 'Row Count: ' + info.row_count + '\\n';
+   312→                        message += 'Columns: ' + info.columns.length + '\\n';
+   313→                    }
+   314→                    message += 'WordPress Posts Count: ' + info.wp_posts_count + '\\n';
+   315→                    alert(message);
+   316→                } else {
+   317→                    alert('Debug failed: ' + data.data);
+   318→                }
+   319→            })
+   320→            .catch(error => {
+   321→                console.error('Debug error:', error);
+   322→                alert('Debug error: ' + error);
+   323→            });
+   324→        }
+   325→        </script>
+   326→        <?php
+   327→    }
+   328→    
+   329→    /**
+```
+
