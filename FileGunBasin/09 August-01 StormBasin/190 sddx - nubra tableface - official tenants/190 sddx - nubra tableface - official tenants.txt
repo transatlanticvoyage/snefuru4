@@ -10,15 +10,26 @@ please create a new page at
 		NUBRA TABLEFACES - MAIN TENANTS
 		==========================================================
 		on our existing wp admin plugin page at:
-        page=rup_services_mar
+
+		then, proceed to build the following described things on our page at:
+        page=rup_orbit_mar
 		
+
+
+
+
+
+
+
+       
+
 		———————————————————————
 		please create a robust ui table grid system, and build something similar to what is on our current page at /xpagesmanager1
 		(in terms of general styling, etc.)
 		———————————————————————
     		
         please make sure that this ui table lists every db column from this db table:
-		{wp prefix}_zen_services
+		{wp prefix}_zen_orbitposts
 
 
 		———————————————————————

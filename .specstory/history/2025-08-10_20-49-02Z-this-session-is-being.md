@@ -4862,3 +4862,1029 @@ Simply **deactivate and reactivate** the Snefuruplin plugin, and the table will 
 
 The table is now ready to store redshift data with automatic timestamp tracking!
 
+---
+
+_**User**_
+
+please create a new page in the ruplin wp plugin at:
+?page=rup_orbit_mar
+
+        then, proceed to build the following described things on our page at:
+        page=rup_orbit_mar
+        
+
+
+
+
+
+
+
+       
+
+        ———————————————————————
+        please create a robust ui table grid system, and build something similar to what is on our current page at /xpagesmanager1
+        (in terms of general styling, etc.)
+        ———————————————————————
+            
+        please make sure that this ui table lists every db column from this db table:
+        {wp prefix}_zen_orbitposts
+
+
+        ———————————————————————
+        please make sure there is a checkbox in the far left column of this ui table
+        ———————————————————————
+        please make sure that the user can edit all fields (in a given row) directly in the ui table without having to open an editor popup for "item view"
+        ———————————————————————
+        user must be able to to click and start typing/etc. with "inline editing" functionality for text based fields
+        ———————————————————————
+        please place toggle switches in the ui table for boolean fields
+        
+        ———————————————————————
+        immediate population in ui table upon "create new" functionality
+        
+        please add a button above the ui table grid that says "create new (inline)"
+        
+        when user clicks this button, the ui table grid will populate with a new row immediately without page refresh
+        
+        user will then be able to instantly start editing obviously 
+        ———————————————————————
+        please create another button that occurs just after the other create new button
+        
+        this button will say "create new (popup)"
+        
+        when user clicks this, an individual item editor popup will open for user to edit the db row's individual fields inside of
+        
+        ———————————————————————
+        please place a dynamic call to the nubra-tableface-kite in our app, and place it directly before the start of the main ui table grid on the page
+        
+        this kite is a label that simply labels the style of ui table grid we have constructed for our own reference
+        ———————————————————————
+        please make sure there are pagination controls that feature 2 button bars
+        1 for qty of results per page
+        1 for specific page selected
+        these should not be dropdowns
+        
+        this pair of pagination controls should appear both below and above the ui table grid at the right side of it
+        
+        please make sure the nubra tableface kite appears actually above the pagination controls where the pagination ctonrols appear above the ui table grid
+        
+        please set the default pagination to 100 for this page
+        
+        please give qty per page options of
+        10
+        20
+        50
+        100
+        200
+        500
+        All
+        ———————————————————————
+        please create a search box to the right of the pagination controls and append a square yellow clear button with the text "CL" on it
+        ———————————————————————
+        please make sure the pagination and search box area occurs at the left side of the screen
+        
+        ———————————————————————
+        please make sure that, for the top th header label cells that occur at the top of each column in the ui table grid, the following is true:
+        
+        text is bold
+        text is all lowercase
+        text is the exact name of the db column it corresponds to (if it is a ui column that corresponds directly to a db column)
+        
+        ———————————————————————
+        checkbox styling and functionality
+        please make the checkboxes 20 px by 20 px square
+        
+        please make the "clickable" area that user must click on , in order to select a row, be the entire table cell (whether a td in main table area or th for the "select all" checkbox)
+        
+        so this will give the user a bigger area to click on 
+        
+        
+        
+        ———————————————————————
+        please make sure that inside the pagination button bars, the individual buttons do not have space between them
+        they should adjoin cleanly with no visual gap
+        please make sure that none of these buttons have rounded corners except for the buttons on the ends of the button bars.
+        please make sure that there are no rounded corners anywhere buttons adjoin.
+        ———————————————————————
+        
+        the pagination button bars should show the same mouse behavior as when user is hovering over normal links .   │
+        │   there should also be a button bar hover bg color of light gray for the pagination button bars.
+        
+        ———————————————————————
+        
+        please change the pagination text size to be 14 px . and then alter the top and bottom paddings only (not     │
+        │   right and left) of the individual button bars to be 10 px
+        
+        ———————————————————————
+
+PAGE TO MIMMICK IN YOUR IMPLEMENTATION OF STYLES ETC (important)
+
+        please view our page /filejar in order to see the implementation of exact styling that is desired for both the ui table grid itself and the other elements on the page, such as control systems appearing on the page above the ui table grid, etc.
+
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll create the new page `rup_orbit_mar` with a robust UI table grid system for managing the `zen_orbitposts` table. Let me start by creating the necessary files and implementing all the requested features.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Create IceSickleDuplicator system for Excel to CSV conversion
+- [X] 🌡️ Convert 210 sddx spreadsheet to CSV
+- [ ] 🌡️ Create central conversion logic component
+- [X] 🌡️ Read and analyze the CSV data for Pantheon Table implementation
+- [X] 🌡️ Create rup_pantheon_mar admin page
+- [X] 🌡️ Add Pantheon tab to Stellar Chamber
+- [X] 🌡️ Implement Elementor data parsing for frontend text extraction
+- [X] 🌡️ Create widget-specific text extractors for different Elementor widgets
+- [X] 🌡️ Add content separation logic with hyphenated bars
+- [X] 🌡️ Replace current frontend scraping with new parsing method
+- [X] 🌡️ Create zen_orbitposts database table
+- [X] 🌡️ Add database table creation to plugin activation
+- [X] 🌡️ Create database update/migration logic
+- [⚡] 🌡️ Create rup_orbit_mar admin page
+- [ ] 🌡️ Implement UI table grid with inline editing
+- [ ] 🌡️ Add pagination controls and search functionality
+- [ ] 🌡️ Implement create new (inline and popup) functionality
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+First, let me check if there's an existing admin pages structure to follow:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./`
+
+Result:
+
+```
+No files found
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin`
+
+Result:
+
+```
+No files found
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me check for existing admin page implementations:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin`
+
+Result:
+
+```
+No files found
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now, let me create the new admin page file for rup_orbit_mar:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Write**
+
+```php
+<?php
+/**
+ * Orbit Mar Admin Page
+ * Manages the zen_orbitposts table with robust UI table grid
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class Snefuru_Orbit_Mar_Admin {
+    
+    private $table_name;
+    private $items_per_page = 100;
+    
+    public function __construct() {
+        global $wpdb;
+        $this->table_name = $wpdb->prefix . 'zen_orbitposts';
+        
+        add_action('admin_menu', array($this, 'add_admin_menu'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
+        
+        // AJAX handlers
+        add_action('wp_ajax_orbit_mar_get_data', array($this, 'ajax_get_data'));
+        add_action('wp_ajax_orbit_mar_save_row', array($this, 'ajax_save_row'));
+        add_action('wp_ajax_orbit_mar_create_row', array($this, 'ajax_create_row'));
+        add_action('wp_ajax_orbit_mar_delete_rows', array($this, 'ajax_delete_rows'));
+    }
+    
+    /**
+     * Add admin menu page
+     */
+    public function add_admin_menu() {
+        add_menu_page(
+            'Orbit Mar',
+            'Orbit Mar',
+            'manage_options',
+            'rup_orbit_mar',
+            array($this, 'render_admin_page'),
+            'dashicons-database',
+            30
+        );
+    }
+    
+    /**
+     * Enqueue assets for the admin page
+     */
+    public function enqueue_assets($hook) {
+        if ($hook !== 'toplevel_page_rup_orbit_mar') {
+            return;
+        }
+        
+        wp_enqueue_style(
+            'orbit-mar-admin',
+            SNEFURU_PLUGIN_URL . 'assets/orbit-mar-admin.css',
+            array(),
+            SNEFURU_PLUGIN_VERSION
+        );
+        
+        wp_enqueue_script(
+            'orbit-mar-admin',
+            SNEFURU_PLUGIN_URL . 'assets/orbit-mar-admin.js',
+            array('jquery'),
+            SNEFURU_PLUGIN_VERSION,
+            true
+        );
+        
+        wp_localize_script('orbit-mar-admin', 'orbitMarAjax', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('orbit_mar_nonce')
+        ));
+    }
+    
+    /**
+     * Render the admin page
+     */
+    public function render_admin_page() {
+        ?>
+        <div class="wrap orbit-mar-admin">
+            <h1>Orbit Mar - Database Management</h1>
+            
+            <!-- Nubra Tableface Kite -->
+            <div class="nubra-tableface-kite">
+                <span style="font-weight: bold; color: #666; font-size: 12px;">NUBRA-TABLEFACE-KITE: Orbit Posts Grid Interface v1.0</span>
+            </div>
+            
+            <!-- Top Controls Section -->
+            <div class="orbit-mar-controls-top">
+                <!-- Left Side Controls -->
+                <div class="orbit-mar-controls-left">
+                    <!-- Action Buttons -->
+                    <div class="orbit-mar-action-buttons">
+                        <button id="orbit-create-inline" class="button button-primary">Create New (Inline)</button>
+                        <button id="orbit-create-popup" class="button button-primary">Create New (Popup)</button>
+                        <button id="orbit-delete-selected" class="button button-secondary">Delete Selected</button>
+                    </div>
+                    
+                    <!-- Pagination Controls Top -->
+                    <div class="orbit-mar-pagination-wrapper">
+                        <div class="orbit-mar-pagination-controls">
+                            <div class="orbit-mar-per-page">
+                                <span>Show:</span>
+                                <div class="orbit-mar-button-group">
+                                    <button data-perpage="10">10</button>
+                                    <button data-perpage="20">20</button>
+                                    <button data-perpage="50">50</button>
+                                    <button data-perpage="100" class="active">100</button>
+                                    <button data-perpage="200">200</button>
+                                    <button data-perpage="500">500</button>
+                                    <button data-perpage="all">All</button>
+                                </div>
+                            </div>
+                            
+                            <div class="orbit-mar-page-nav">
+                                <span>Page:</span>
+                                <div class="orbit-mar-button-group page-numbers">
+                                    <!-- Dynamically populated -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Box -->
+                        <div class="orbit-mar-search">
+                            <input type="text" id="orbit-search" placeholder="Search..." />
+                            <button id="orbit-clear-search" class="orbit-clear-btn">CL</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Table Grid -->
+            <div class="orbit-mar-table-wrapper">
+                <table id="orbit-mar-table" class="orbit-mar-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-column">
+                                <div class="checkbox-cell">
+                                    <input type="checkbox" id="orbit-select-all" />
+                                </div>
+                            </th>
+                            <th>orbitpost_id</th>
+                            <th>redshift_datum</th>
+                            <th>created_at</th>
+                            <th>updated_at</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Bottom Pagination Controls -->
+            <div class="orbit-mar-controls-bottom">
+                <div class="orbit-mar-controls-left">
+                    <div class="orbit-mar-pagination-wrapper">
+                        <div class="orbit-mar-pagination-controls">
+                            <div class="orbit-mar-per-page">
+                                <span>Show:</span>
+                                <div class="orbit-mar-button-group bottom-per-page">
+                                    <button data-perpage="10">10</button>
+                                    <button data-perpage="20">20</button>
+                                    <button data-perpage="50">50</button>
+                                    <button data-perpage="100" class="active">100</button>
+                                    <button data-perpage="200">200</button>
+                                    <button data-perpage="500">500</button>
+                                    <button data-perpage="all">All</button>
+                                </div>
+                            </div>
+                            
+                            <div class="orbit-mar-page-nav">
+                                <span>Page:</span>
+                                <div class="orbit-mar-button-group page-numbers-bottom">
+                                    <!-- Dynamically populated -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Box Bottom -->
+                        <div class="orbit-mar-search">
+                            <input type="text" id="orbit-search-bottom" placeholder="Search..." />
+                            <button id="orbit-clear-search-bottom" class="orbit-clear-btn">CL</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Popup Modal for Create/Edit -->
+            <div id="orbit-popup-modal" class="orbit-modal" style="display: none;">
+                <div class="orbit-modal-content">
+                    <div class="orbit-modal-header">
+                        <h2>Edit Orbit Post</h2>
+                        <span class="orbit-modal-close">&times;</span>
+                    </div>
+                    <div class="orbit-modal-body">
+                        <form id="orbit-popup-form">
+                            <input type="hidden" id="popup-orbitpost-id" />
+                            
+                            <div class="orbit-form-group">
+                                <label for="popup-redshift-datum">Redshift Datum:</label>
+                                <textarea id="popup-redshift-datum" rows="10"></textarea>
+                            </div>
+                            
+                            <div class="orbit-form-group">
+                                <label>Created At:</label>
+                                <span id="popup-created-at">-</span>
+                            </div>
+                            
+                            <div class="orbit-form-group">
+                                <label>Updated At:</label>
+                                <span id="popup-updated-at">-</span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="orbit-modal-footer">
+                        <button id="orbit-popup-save" class="button button-primary">Save</button>
+                        <button id="orbit-popup-cancel" class="button">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+    
+    /**
+     * AJAX handler to get table data
+     */
+    public function ajax_get_data() {
+        check_ajax_referer('orbit_mar_nonce', 'nonce');
+        
+        global $wpdb;
+        
+        $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+        $per_page = isset($_POST['per_page']) ? $_POST['per_page'] : 100;
+        $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
+        
+        // Build WHERE clause
+        $where = '';
+        if (!empty($search)) {
+            $where = $wpdb->prepare(" WHERE redshift_datum LIKE %s", '%' . $wpdb->esc_like($search) . '%');
+        }
+        
+        // Get total count
+        $total = $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name}" . $where);
+        
+        // Calculate pagination
+        if ($per_page === 'all') {
+            $limit = '';
+            $total_pages = 1;
+        } else {
+            $per_page = intval($per_page);
+            $offset = ($page - 1) * $per_page;
+            $limit = $wpdb->prepare(" LIMIT %d OFFSET %d", $per_page, $offset);
+            $total_pages = ceil($total / $per_page);
+        }
+        
+        // Get data
+        $query = "SELECT * FROM {$this->table_name}" . $where . " ORDER BY orbitpost_id DESC" . $limit;
+        $results = $wpdb->get_results($query, ARRAY_A);
+        
+        wp_send_json_success(array(
+            'data' => $results,
+            'total' => $total,
+            'total_pages' => $total_pages,
+            'current_page' => $page
+        ));
+    }
+    
+    /**
+     * AJAX handler to save a row
+     */
+    public function ajax_save_row() {
+        check_ajax_referer('orbit_mar_nonce', 'nonce');
+        
+        global $wpdb;
+        
+        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        $field = isset($_POST['field']) ? sanitize_key($_POST['field']) : '';
+        $value = isset($_POST['value']) ? wp_unslash($_POST['value']) : '';
+        
+        if (!$id || !$field) {
+            wp_send_json_error('Invalid parameters');
+        }
+        
+        // Only allow editing of redshift_datum field
+        if ($field !== 'redshift_datum') {
+            wp_send_json_error('Field not editable');
+        }
+        
+        $result = $wpdb->update(
+            $this->table_name,
+            array($field => $value),
+            array('orbitpost_id' => $id)
+        );
+        
+        if ($result === false) {
+            wp_send_json_error('Update failed');
+        }
+        
+        // Get updated row
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->table_name} WHERE orbitpost_id = %d",
+            $id
+        ), ARRAY_A);
+        
+        wp_send_json_success($row);
+    }
+    
+    /**
+     * AJAX handler to create a new row
+     */
+    public function ajax_create_row() {
+        check_ajax_referer('orbit_mar_nonce', 'nonce');
+        
+        global $wpdb;
+        
+        $redshift_datum = isset($_POST['redshift_datum']) ? wp_unslash($_POST['redshift_datum']) : '';
+        
+        $result = $wpdb->insert(
+            $this->table_name,
+            array('redshift_datum' => $redshift_datum)
+        );
+        
+        if ($result === false) {
+            wp_send_json_error('Insert failed');
+        }
+        
+        $new_id = $wpdb->insert_id;
+        
+        // Get the new row
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->table_name} WHERE orbitpost_id = %d",
+            $new_id
+        ), ARRAY_A);
+        
+        wp_send_json_success($row);
+    }
+    
+    /**
+     * AJAX handler to delete selected rows
+     */
+    public function ajax_delete_rows() {
+        check_ajax_referer('orbit_mar_nonce', 'nonce');
+        
+        global $wpdb;
+        
+        $ids = isset($_POST['ids']) ? array_map('intval', $_POST['ids']) : array();
+        
+        if (empty($ids)) {
+            wp_send_json_error('No rows selected');
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+        $query = $wpdb->prepare(
+            "DELETE FROM {$this->table_name} WHERE orbitpost_id IN ($placeholders)",
+            $ids
+        );
+        
+        $result = $wpdb->query($query);
+        
+        if ($result === false) {
+            wp_send_json_error('Delete failed');
+        }
+        
+        wp_send_json_success(array('deleted' => $result));
+    }
+}
+
+// Initialize
+new Snefuru_Orbit_Mar_Admin();
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-orbit-mar-admin.php
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now, let me create the CSS file for styling:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Write**
+
+```css
+/**
+ * Orbit Mar Admin Styles
+ * Robust UI Table Grid System
+ */
+
+/* Main Container */
+.orbit-mar-admin {
+    padding: 20px;
+    max-width: 100%;
+}
+
+/* Nubra Tableface Kite */
+.nubra-tableface-kite {
+    margin: 10px 0 15px 0;
+    padding: 8px 12px;
+    background: #f9f9f9;
+    border-left: 4px solid #007cba;
+}
+
+/* Controls Section */
+.orbit-mar-controls-top,
+.orbit-mar-controls-bottom {
+    margin: 15px 0;
+}
+
+.orbit-mar-controls-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Action Buttons */
+.orbit-mar-action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* Pagination Wrapper */
+.orbit-mar-pagination-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+/* Pagination Controls */
+.orbit-mar-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.orbit-mar-per-page,
+.orbit-mar-page-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.orbit-mar-per-page span,
+.orbit-mar-page-nav span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+}
+
+/* Button Groups */
+.orbit-mar-button-group {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.orbit-mar-button-group button {
+    background: #fff;
+    border: none;
+    border-right: 1px solid #ddd;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-width: 40px;
+}
+
+.orbit-mar-button-group button:last-child {
+    border-right: none;
+}
+
+.orbit-mar-button-group button:hover {
+    background: #f0f0f0;
+}
+
+.orbit-mar-button-group button.active {
+    background: #007cba;
+    color: white;
+}
+
+.orbit-mar-button-group button:first-child {
+    border-radius: 3px 0 0 3px;
+}
+
+.orbit-mar-button-group button:last-child {
+    border-radius: 0 3px 3px 0;
+}
+
+/* Remove rounded corners for middle buttons */
+.orbit-mar-button-group button:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+/* Search Box */
+.orbit-mar-search {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.orbit-mar-search input {
+    width: 200px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 3px 0 0 3px;
+    font-size: 14px;
+}
+
+.orbit-clear-btn {
+    background: #ffeb3b;
+    border: 1px solid #ffc107;
+    border-left: none;
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 0 3px 3px 0;
+    transition: background-color 0.2s;
+}
+
+.orbit-clear-btn:hover {
+    background: #ffc107;
+}
+
+/* Table Wrapper */
+.orbit-mar-table-wrapper {
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    overflow: hidden;
+    background: white;
+}
+
+/* Main Table */
+.orbit-mar-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.orbit-mar-table thead {
+    background: #f5f5f5;
+}
+
+.orbit-mar-table th {
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    text-transform: lowercase;
+}
+
+.orbit-mar-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.orbit-mar-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+.orbit-mar-table tbody tr.new-row {
+    background: #fffde7;
+}
+
+.orbit-mar-table td {
+    padding: 10px 15px;
+}
+
+/* Checkbox Column */
+.checkbox-column {
+    width: 50px;
+    text-align: center !important;
+}
+
+.checkbox-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.checkbox-cell input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Editable Cells */
+.orbit-mar-table td.editable {
+    cursor: text;
+    position: relative;
+}
+
+.orbit-mar-table td.editable:hover {
+    background: #f0f8ff;
+}
+
+.orbit-mar-table td.editing {
+    padding: 0;
+}
+
+.orbit-mar-table td.editing input,
+.orbit-mar-table td.editing textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid #007cba;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+}
+
+.orbit-mar-table td.editing textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* ID Column - Not Editable */
+.orbit-mar-table td:nth-child(2) {
+    color: #666;
+    font-weight: 600;
+}
+
+/* Timestamp Columns - Not Editable */
+.orbit-mar-table td:nth-child(4),
+.orbit-mar-table td:nth-child(5) {
+    color: #888;
+    font-size: 13px;
+}
+
+/* Modal Styles */
+.orbit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.orbit-modal-content {
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+}
+
+.orbit-modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orbit-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.orbit-modal-close {
+    font-size: 30px;
+    cursor: pointer;
+    color: #999;
+    line-height: 20px;
+}
+
+.orbit-modal-close:hover {
+    color: #333;
+}
+
+.orbit-modal-body {
+    padding: 20px;
+}
+
+.orbit-form-group {
+    margin-bottom: 20px;
+}
+
+.orbit-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.orbit-form-group input,
+.orbit-form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.orbit-form-group textarea {
+    resize: vertical;
+    font-family: monospace;
+}
+
+.orbit-modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Loading State */
+.orbit-mar-table.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Empty State */
+.orbit-empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.orbit-empty-state h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .orbit-mar-controls-left {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .orbit-mar-pagination-wrapper {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .orbit-mar-search {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
+
+/* WordPress Admin Compatibility */
+.orbit-mar-admin .button {
+    text-decoration: none;
+}
+
+.orbit-mar-admin h1 {
+    margin-bottom: 15px;
+}
+
+/* Selection Highlight */
+.orbit-mar-table tr.selected {
+    background: #e8f5ff !important;
+}
+
+/* Toggle Switch Styles (for future boolean fields) */
+.orbit-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.orbit-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.orbit-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.orbit-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.orbit-toggle-switch input:checked + .orbit-toggle-slider {
+    background-color: #007cba;
+}
+
+.orbit-toggle-switch input:checked + .orbit-toggle-slider:before {
+    transform: translateX(26px);
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/orbit-mar-admin.css
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now, let me create the JavaScript file for functionality:
+
