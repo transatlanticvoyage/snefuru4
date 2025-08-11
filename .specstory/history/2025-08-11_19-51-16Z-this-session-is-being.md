@@ -4055,3 +4055,21 @@ Perfect! I have successfully implemented the complete hudson_imgplanbatch_id fun
 
 The feature is now fully functional and ready to use! Users can save UUID values that will be stored in the `zen_orbitposts.hudson_imgplanbatch_id` field, associated with their current post/page.
 
+---
+
+_**User**_
+
+pleaes now place a new element below this area:
+
+_zen_orbitposts.hudson_imgplanbatch_id
+ce50f11d-aa3d-445a-8e09-d21bf58d9944
+ Save
+———————————————————————
+below the save button, put a new button that says:
+go to /tebnar2 with param set
+
+this button will be a link that user can use to open the tebnar2 page. the target url must be specially coded to dynamically call the db value from the associated db field in the wp database, so that it becomes a url parameter in the url like this:
+http://localhost:3000/bin34/tebnar2?batchid=ce50f11d-aa3d-445a-8e09-d21bf58d9944
+
+
+
