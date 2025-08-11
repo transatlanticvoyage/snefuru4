@@ -6602,3 +6602,156 @@ Navigate to: **`/wp-admin/admin.php?page=rup_orbit_mar`**
 
 The page is fully functional and ready to manage your `zen_orbitposts` database records with all the requested features!
 
+---
+
+_**User**_
+
+please add a link to this page in the kenli links system 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll add a link to the rup_orbit_mar page in the KenliSidebarLinks system. Let me find where the Kenli links are defined and add the new link.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="image-deployer">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                        Image Deployer
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <div class="snefuru-stellar-tab-separator"></div>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="other">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php:                        KenliSidebarLinks
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="kpages-schema">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                        Asteroid Support
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="pantheon-table">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                        Pantheon Table
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="duplicate-kpage">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                        Duplicate Page
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="driggs">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                        Driggs
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="services">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                        Services
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="locations">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                        Locations
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    </button>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                    <button type="button" class="snefuru-stellar-tab-button" data-tab="swipe15">
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                        <div style="background: white; border: 1px solid #ddd; border-radius: 5px; padding: 20px;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                            <ul style="list-style: none; padding: 0; margin: 0;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                <li style="margin-bottom: 8px;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                    <a href="<?php echo admin_url('admin.php?page=snefuru-kenli-sidebar-links'); ?>" 
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                       style="display: inline-block; padding: 8px 12px; background: #f0f0f0; border-radius: 4px; text-decoration: none; color: #333; transition: background 0.2s;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php:                                        KenliSidebarLinks
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                    </a>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                </li>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                <li style="margin-bottom: 8px;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                    <a href="<?php echo admin_url('admin.php?page=snefuru'); ?>" 
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                       style="display: inline-block; padding: 8px 12px; background: #f0f0f0; border-radius: 4px; text-decoration: none; color: #333; transition: background 0.2s;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                        Dashboard
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                    </a>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                </li>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                <li style="margin-bottom: 8px;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                    <a href="<?php echo admin_url('admin.php?page=snefuru-settings'); ?>" 
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                       style="display: inline-block; padding: 8px 12px; background: #f0f0f0; border-radius: 4px; text-decoration: none; color: #333; transition: background 0.2s;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                        Settings
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                    </a>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                </li>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                <li style="margin-bottom: 8px;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                    <a href="<?php echo admin_url('admin.php?page=snefuru-logs'); ?>" 
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                       style="display: inline-block; padding: 8px 12px; background: #f0f0f0; border-radius: 4px; text-decoration: none; color: #333; transition: background 0.2s;">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                        Logs
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                    </a>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php-                                </li>
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            array($this, 'admin_page'),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>'),
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            30
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        );
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php:        // Add KenliSidebarLinks as a non-clickable label
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        add_submenu_page(
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'snefuru',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php:            'KenliSidebarLinks',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php:            'KenliSidebarLinks',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'manage_options',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'snefuru-kenli-sidebar-links',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            array($this, 'kenli_sidebar_links_page')
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        );
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        add_submenu_page(
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'snefuru',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'Dashboard',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'Dashboard',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'manage_options',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'snefuru',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            array($this, 'admin_page')
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        );
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        add_submenu_page(
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'snefuru',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'Settings',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'Settings',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'manage_options',
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'snefuru-settings',
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-            'nonce' => wp_create_nonce('snefuru_nonce')
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        ));
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-    }
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-    
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-    /**
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php:     * KenliSidebarLinks placeholder page (non-functional)
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-     */
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-    public function kenli_sidebar_links_page() {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        $this->suppress_all_admin_notices();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        echo '<div class="wrap">';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php:        echo '<h1>KenliSidebarLinks</h1>';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        echo '<p>This is a placeholder menu item.</p>';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        echo '</div>';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-    }
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-    
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-    /**
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-     * Main admin dashboard page
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-     */
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-    public function admin_page() {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        $this->suppress_all_admin_notices();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        $api_client = new Snefuru_API_Client();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        $data_collector = new Snefuru_Data_Collector();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        // Get recent logs
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        global $wpdb;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        $table_name = $wpdb->prefix . 'snefuru_logs';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        $recent_logs = $wpdb->get_results("SELECT * FROM {$table_name} ORDER BY timestamp DESC LIMIT 10");
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php-        // Get basic site stats
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! Now I can see where the KenliSidebarLinks are defined. Let me add the link to the rup_orbit_mar page in the KenliSidebarLinks section in the Hurricane class file:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+No matches found
+```
+
