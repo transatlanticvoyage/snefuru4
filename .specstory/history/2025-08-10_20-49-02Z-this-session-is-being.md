@@ -4177,3 +4177,688 @@ Perfect! I've successfully added the UI elements for "operation rover" in the Im
 
 The UI is now ready for functionality implementation. The copy button will already work with the existing JavaScript event handlers since it uses the same classes (`snefuru-copy-btn-right`) as other copy buttons in the interface.
 
+---
+
+_**User**_
+
+please change the tab that says kpages schema to now say:
+
+
+
+asteroid support
+
+please place 3 denyeep column divs complete with their text labels and <hr> below this tab 
+
+then in the first denyeep column area, please create the following
+
+———————————————————————
+
+please add this bold 16 px text label in all lowercase:
+
+asteroid support
+
+underneath it, please place a text box that holds the following values: (hard code the values in, each displaying on a new line)
+
+k_
+g_
+w_
+y_
+
+do not allow the user to edit the box at this point, because we need to make db integration
+
+pleaes put a bold text label below asteroid support that says:
+NoteToSelfKyle:database integration needed
+
+
+
+
+
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll change the "KPages Schema" tab to "Asteroid Support" and add the requested content with 3 denyeep column divs.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+</button>
+                    <button type="button" class="snefuru-stellar-tab-button" data-tab="kpages-schema">
+                        KPages Schema
+                    </button>
+                    <button type="button" class="snefuru-stellar-tab-button" data-tab="pantheon-table">
+--
+                    </div>
+                    <div class="snefuru-stellar-tab-panel" data-panel="kpages-schema">
+                        <!-- KPages Schema content will go here -->
+                    </div>
+                    <div class="snefuru-stellar-tab-panel" data-panel="pantheon-table">
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I'll update the tab text and add the complete denyeep column structure with the asteroid support content:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+Applied 2 edits to /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php:
+1. Replaced "                    <button type="button" class="s..." with "                    <button type="button" class="s..."
+2. Replaced "                    <div class="snefuru-stellar-ta..." with "                    <div class="snefuru-stellar-ta..."
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I've successfully updated the tab and added the asteroid support content. Here's what I implemented:
+
+## ✅ **Changes Completed:**
+
+### **1. Tab Name Change:**
+- **Changed**: "KPages Schema" → **"Asteroid Support"**
+
+### **2. Added 3 Denyeep Column Divs:**
+- Each with proper labels ("denyeep column div 1", "denyeep column div 2", "denyeep column div 3")
+- Each with horizontal rule (`<hr>`) separators
+- Proper black borders and styling matching other tabs
+
+### **3. First Column Content:**
+- **"asteroid support"** label (lowercase as requested, bold, 16px)
+- **Readonly Textbox** containing:
+  ```
+  k_
+  g_
+  w_
+  y_
+  ```
+- **Note Label**: "NoteToSelfKyle:database integration needed" (bold, 16px)
+
+### **Visual Layout:**
+```
+┌──────────────────────────────────────────────────────────────┐
+│ denyeep column div 1                                          │
+├──────────────────────────────────────────────────────────────┤
+│                                                                │
+│ asteroid support                                              │
+│ ┌────────────────────────────────────────────────┐           │
+│ │ k_                                              │           │
+│ │ g_                                              │           │
+│ │ w_                                              │           │
+│ │ y_                                              │           │
+│ └────────────────────────────────────────────────┘           │
+│                                                                │
+│ NoteToSelfKyle:database integration needed                    │
+│                                                                │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### **Key Features:**
+- **Textbox Styling**: 
+  - Readonly (non-editable)
+  - Monospace font for code-like display
+  - Light gray background (#f9f9f9)
+  - 120px height with vertical resize
+- **Hardcoded Values**: Each prefix on its own line
+- **Database Note**: Reminder for future integration
+
+The tab is now fully functional with the requested UI elements ready for future database integration!
+
+---
+
+_**User**_
+
+we need to create a new db table in our wp plugin (in the wp db) 
+
+(wp prefix)_zen_orbitposts
+
+please create these fields:
+orbitpost_id serial integer
+redshift_datum text
+created_at timestamp
+updated_at timestamp
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll create a new database table `zen_orbitposts` for the WordPress plugin. I need to add this to the plugin's activation/installation code. Let me find the appropriate place to add the database table creation.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Create IceSickleDuplicator system for Excel to CSV conversion
+- [X] 🌡️ Convert 210 sddx spreadsheet to CSV
+- [ ] 🌡️ Create central conversion logic component
+- [X] 🌡️ Read and analyze the CSV data for Pantheon Table implementation
+- [X] 🌡️ Create rup_pantheon_mar admin page
+- [X] 🌡️ Add Pantheon tab to Stellar Chamber
+- [X] 🌡️ Implement Elementor data parsing for frontend text extraction
+- [X] 🌡️ Create widget-specific text extractors for different Elementor widgets
+- [X] 🌡️ Add content separation logic with hyphenated bars
+- [X] 🌡️ Replace current frontend scraping with new parsing method
+- [⚡] 🌡️ Create zen_orbitposts database table
+- [ ] 🌡️ Add database table creation to plugin activation
+- [ ] 🌡️ Create database update/migration logic
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin`
+
+Result:
+
+```
+Found 1 file
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php`
+
+Result:
+
+```
+1→<?php
+     2→/**
+     3→ * Plugin Name: Snefuruplin
+     4→ * Plugin URI: https://github.com/transatlanticvoyage/snefuru4
+     5→ * Description: WordPress plugin for handling image uploads to Snefuru system
+     6→ * Version: 4.2.0
+     7→ * Author: Snefuru Team
+     8→ * License: GPL v2 or later
+     9→ * Text Domain: snefuruplin
+    10→ * 
+    11→ * Test comment: Git subtree setup completed successfully!
+    12→ */
+    13→
+    14→// Prevent direct access
+    15→if (!defined('ABSPATH')) {
+    16→    exit;
+    17→}
+    18→
+    19→// Define plugin constants
+    20→define('SNEFURU_PLUGIN_VERSION', '4.2.0');
+    21→define('SNEFURU_PLUGIN_PATH', plugin_dir_path(__FILE__));
+    22→define('SNEFURU_PLUGIN_URL', plugin_dir_url(__FILE__));
+    23→
+    24→// Supabase configuration is now managed through WordPress admin settings
+    25→// Go to Settings → Ketch Width Manager to configure your Supabase credentials
+    26→
+    27→// Main plugin class
+    28→class SnefuruPlugin {
+    29→    
+    30→    public function __construct() {
+    31→        add_action('init', array($this, 'init'));
+    32→        register_activation_hook(__FILE__, array($this, 'activate'));
+    33→        register_deactivation_hook(__FILE__, array($this, 'deactivate'));
+    34→    }
+    35→    
+    36→    public function init() {
+    37→        // Load plugin components
+    38→        $this->load_dependencies();
+    39→        $this->init_hooks();
+    40→    }
+    41→    
+    42→    private function load_dependencies() {
+    43→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-api-client.php';
+    44→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-data-collector.php';
+    45→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-admin.php';
+    46→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-settings.php';
+    47→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-upload-handler.php';
+    48→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-media-tab.php';
+    49→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-css-endpoint.php';
+    50→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-barkro-updater.php';
+    51→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-updater.php';
+    52→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-ketch-settings.php';
+    53→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-ketch-api.php';
+    54→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-debug-log-viewer.php';
+    55→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-dublish-api.php';
+    56→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-ruplin-wppma-database.php';
+    57→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-zen-shortcodes.php';
+    58→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-dynamic-tags.php';
+    59→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-media-workaround.php';
+    60→        require_once SNEFURU_PLUGIN_PATH . 'hurricane/class-hurricane.php';
+    61→    }
+    62→    
+    63→    private function init_hooks() {
+    64→        // Check and update database schema if needed
+    65→        Ruplin_WP_Database_Horse_Class::check_database_version();
+    66→        
+    67→        // Initialize components
+    68→        new Snefuru_API_Client();
+    69→        new Snefuru_Data_Collector();
+    70→        new Snefuru_Admin();
+    71→        new Snefuru_Settings();
+    72→        new Snefuru_Upload_Handler();
+    73→        new Snefuru_Media_Tab();
+    74→        new Snefuru_CSS_Endpoint();
+    75→        new Snefuru_Barkro_Updater();
+    76→        new Snefuru_Elementor_Updater();
+    77→        new Snefuru_Dublish_API();
+    78→        new Zen_Shortcodes();
+    79→        
+    80→        // Initialize Elementor integrations
+    81→        if (did_action('elementor/loaded')) {
+    82→            new Zen_Elementor_Dynamic_Tags();
+    83→        }
+    84→        
+    85→        // Initialize media library workaround (always load for potential Elementor use)
+    86→        new Zen_Elementor_Media_Workaround();
+    87→        
+    88→        // Initialize Hurricane feature
+    89→        new Snefuru_Hurricane();
+    90→        
+    91→        // Add cron jobs for periodic data sync
+    92→        add_action('wp', array($this, 'schedule_events'));
+    93→        add_action('snefuru_sync_data', array($this, 'sync_data_to_cloud'));
+    94→    }
+    95→    
+    96→    public function activate() {
+    97→        // Clean up any mistakenly created zen_driggs table
+    98→        $this->cleanup_unwanted_tables();
+    99→        
+   100→        // Create database tables if needed
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me see what's in the activate method and the database class:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php`
+
+Result:
+
+```
+96→    public function activate() {
+    97→        // Clean up any mistakenly created zen_driggs table
+    98→        $this->cleanup_unwanted_tables();
+    99→        
+   100→        // Create database tables if needed
+   101→        $this->create_tables();
+   102→        
+   103→        // Load the database class before trying to use it
+   104→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-ruplin-wppma-database.php';
+   105→        
+   106→        // Create zen tables
+   107→        Ruplin_WP_Database_Horse_Class::create_tables();
+   108→        
+   109→        // Schedule recurring events
+   110→        if (!wp_next_scheduled('snefuru_sync_data')) {
+   111→            wp_schedule_event(time(), 'hourly', 'snefuru_sync_data');
+   112→        }
+   113→        
+   114→        // Set default upload settings
+   115→        if (get_option('snefuru_upload_enabled') === false) {
+   116→            update_option('snefuru_upload_enabled', 1);
+   117→        }
+   118→        if (get_option('snefuru_upload_max_size') === false) {
+   119→            update_option('snefuru_upload_max_size', '10MB');
+   120→        }
+   121→    }
+   122→    
+   123→    public function deactivate() {
+   124→        // Clear scheduled events
+   125→        wp_clear_scheduled_hook('snefuru_sync_data');
+   126→    }
+   127→    
+   128→    public function schedule_events() {
+   129→        if (!wp_next_scheduled('snefuru_sync_data')) {
+   130→            wp_schedule_event(time(), 'hourly', 'snefuru_sync_data');
+   131→        }
+   132→    }
+   133→    
+   134→    public function sync_data_to_cloud() {
+   135→        $data_collector = new Snefuru_Data_Collector();
+   136→        $api_client = new Snefuru_API_Client();
+   137→        
+   138→        $site_data = $data_collector->collect_site_data();
+   139→        $api_client->send_data_to_cloud($site_data);
+   140→    }
+   141→    
+   142→    private function create_tables() {
+   143→        global $wpdb;
+   144→        
+   145→        $charset_collate = $wpdb->get_charset_collate();
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me check the database class file to understand the structure better:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./class-ruplin-wppma-database.php`
+
+Result:
+
+```
+1→<?php
+     2→
+     3→/**
+     4→ * Ruplin WP Database Horse Class
+     5→ * Handles creation and management of zen_services and zen_locations tables
+     6→ */
+     7→class Ruplin_WP_Database_Horse_Class {
+     8→    
+     9→    /**
+    10→     * Database version for tracking schema changes
+    11→     */
+    12→    const DB_VERSION = '1.0.0';
+    13→    
+    14→    /**
+    15→     * Option name for storing database version
+    16→     */
+    17→    const DB_VERSION_OPTION = 'snefuru_zen_db_version';
+    18→    
+    19→    /**
+    20→     * Create zen tables
+    21→     */
+    22→    public static function create_tables() {
+    23→        global $wpdb;
+    24→        
+    25→        try {
+    26→            $charset_collate = $wpdb->get_charset_collate();
+    27→            
+    28→            // Create zen_services table
+    29→            $services_table = $wpdb->prefix . 'zen_services';
+    30→            $services_sql = "CREATE TABLE $services_table (
+    31→                service_id INT(11) NOT NULL AUTO_INCREMENT,
+    32→                service_name TEXT,
+    33→                service_placard TEXT,
+    34→                service_moniker TEXT,
+    35→                service_sobriquet TEXT,
+    36→                description1_short TEXT,
+    37→                description1_long TEXT,
+    38→                rel_image1_id INT(11),
+    39→                is_pinned_service BOOLEAN DEFAULT FALSE,
+    40→                position_in_custom_order INT(11),
+    41→                PRIMARY KEY (service_id)
+    42→            ) $charset_collate;";
+    43→            
+    44→            // Create zen_locations table
+    45→            $locations_table = $wpdb->prefix . 'zen_locations';
+    46→            $locations_sql = "CREATE TABLE $locations_table (
+    47→                location_id INT(11) NOT NULL AUTO_INCREMENT,
+    48→                location_name TEXT,
+    49→                location_placard TEXT,
+    50→                location_moniker TEXT,
+    51→                location_sobriquet TEXT,
+    52→                street TEXT,
+    53→                city TEXT,
+    54→                state_code TEXT,
+    55→                zip_code TEXT,
+    56→                country TEXT,
+    57→                rel_image1_id INT(11),
+    58→                is_pinned_location BOOLEAN DEFAULT FALSE,
+    59→                position_in_custom_order INT(11),
+    60→                PRIMARY KEY (location_id)
+    61→            ) $charset_collate;";
+    62→            
+    63→            // Use dbDelta to create/update tables
+    64→            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    65→            
+    66→            // Log the SQL for debugging
+    67→            error_log('Snefuru: Creating services table with SQL: ' . $services_sql);
+    68→            error_log('Snefuru: Creating locations table with SQL: ' . $locations_sql);
+    69→            
+    70→            $services_result = dbDelta($services_sql);
+    71→            $locations_result = dbDelta($locations_sql);
+    72→            
+    73→            // Log dbDelta results
+    74→            error_log('Snefuru: Services table dbDelta result: ' . print_r($services_result, true));
+    75→            error_log('Snefuru: Locations table dbDelta result: ' . print_r($locations_result, true));
+    76→            
+    77→            // Update database version
+    78→            update_option(self::DB_VERSION_OPTION, self::DB_VERSION);
+    79→            
+    80→            // Verify tables were created
+    81→            $services_exists = $wpdb->get_var("SHOW TABLES LIKE '$services_table'") == $services_table;
+    82→            $locations_exists = $wpdb->get_var("SHOW TABLES LIKE '$locations_table'") == $locations_table;
+    83→            
+    84→            // Log verification results
+    85→            error_log('Snefuru: Services table exists: ' . ($services_exists ? 'YES' : 'NO'));
+    86→            error_log('Snefuru: Locations table exists: ' . ($locations_exists ? 'YES' : 'NO'));
+    87→            
+    88→            if ($services_exists && $locations_exists) {
+    89→                error_log('Snefuru: Zen tables created/updated successfully');
+    90→                return true;
+    91→            } else {
+    92→                error_log('Snefuru: Table verification failed');
+    93→                return false;
+    94→            }
+    95→            
+    96→        } catch (Exception $e) {
+    97→            error_log('Snefuru: Error creating zen tables: ' . $e->getMessage());
+    98→            return false;
+    99→        }
+   100→    }
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! Now I'll add the new zen_orbitposts table creation to the database class. Let me update it:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-ruplin-wppma-database.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    42→            ) $charset_collate;";
+    43→            
+    44→            // Create zen_locations table
+    45→            $locations_table = $wpdb->prefix . 'zen_locations';
+    46→            $locations_sql = "CREATE TABLE $locations_table (
+    47→                location_id INT(11) NOT NULL AUTO_INCREMENT,
+    48→                location_name TEXT,
+    49→                location_placard TEXT,
+    50→                location_moniker TEXT,
+    51→                location_sobriquet TEXT,
+    52→                street TEXT,
+    53→                city TEXT,
+    54→                state_code TEXT,
+    55→                zip_code TEXT,
+    56→                country TEXT,
+    57→                rel_image1_id INT(11),
+    58→                is_pinned_location BOOLEAN DEFAULT FALSE,
+    59→                position_in_custom_order INT(11),
+    60→                PRIMARY KEY (location_id)
+    61→            ) $charset_collate;";
+    62→            
+    63→            // Create zen_orbitposts table
+    64→            $orbitposts_table = $wpdb->prefix . 'zen_orbitposts';
+    65→            $orbitposts_sql = "CREATE TABLE $orbitposts_table (
+    66→                orbitpost_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    67→                redshift_datum TEXT,
+    68→                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    69→                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    70→                PRIMARY KEY (orbitpost_id)
+    71→            ) $charset_collate;";
+    72→            
+    73→            // Use dbDelta to create/update tables
+    74→            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    75→            
+    76→            // Log the SQL for debugging
+    77→            error_log('Snefuru: Creating services table with SQL: ' . $services_sql);
+    78→            error_log('Snefuru: Creating locations table with SQL: ' . $locations_sql);
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to add the dbDelta call for the orbitposts table and update the verification:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-ruplin-wppma-database.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    72→            
+    73→            // Use dbDelta to create/update tables
+    74→            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    75→            
+    76→            // Log the SQL for debugging
+    77→            error_log('Snefuru: Creating services table with SQL: ' . $services_sql);
+    78→            error_log('Snefuru: Creating locations table with SQL: ' . $locations_sql);
+    79→            error_log('Snefuru: Creating orbitposts table with SQL: ' . $orbitposts_sql);
+    80→            
+    81→            $services_result = dbDelta($services_sql);
+    82→            $locations_result = dbDelta($locations_sql);
+    83→            $orbitposts_result = dbDelta($orbitposts_sql);
+    84→            
+    85→            // Log dbDelta results
+    86→            error_log('Snefuru: Services table dbDelta result: ' . print_r($services_result, true));
+    87→            error_log('Snefuru: Locations table dbDelta result: ' . print_r($locations_result, true));
+    88→            error_log('Snefuru: Orbitposts table dbDelta result: ' . print_r($orbitposts_result, true));
+    89→            
+    90→            // Update database version
+    91→            update_option(self::DB_VERSION_OPTION, self::DB_VERSION);
+    92→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me update the verification section to include the orbitposts table:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-ruplin-wppma-database.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    89→            
+    90→            // Update database version
+    91→            update_option(self::DB_VERSION_OPTION, self::DB_VERSION);
+    92→            
+    93→            // Verify tables were created
+    94→            $services_exists = $wpdb->get_var("SHOW TABLES LIKE '$services_table'") == $services_table;
+    95→            $locations_exists = $wpdb->get_var("SHOW TABLES LIKE '$locations_table'") == $locations_table;
+    96→            $orbitposts_exists = $wpdb->get_var("SHOW TABLES LIKE '$orbitposts_table'") == $orbitposts_table;
+    97→            
+    98→            // Log verification results
+    99→            error_log('Snefuru: Services table exists: ' . ($services_exists ? 'YES' : 'NO'));
+   100→            error_log('Snefuru: Locations table exists: ' . ($locations_exists ? 'YES' : 'NO'));
+   101→            error_log('Snefuru: Orbitposts table exists: ' . ($orbitposts_exists ? 'YES' : 'NO'));
+   102→            
+   103→            if ($services_exists && $locations_exists && $orbitposts_exists) {
+   104→                error_log('Snefuru: Zen tables created/updated successfully');
+   105→                return true;
+   106→            } else {
+   107→                error_log('Snefuru: Table verification failed');
+   108→                return false;
+   109→            }
+   110→            
+   111→        } catch (Exception $e) {
+   112→            error_log('Snefuru: Error creating zen tables: ' . $e->getMessage());
+   113→            return false;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I should update the database version constant since we're adding a new table:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-ruplin-wppma-database.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     5→ * Handles creation and management of zen_services and zen_locations tables
+     6→ */
+     7→class Ruplin_WP_Database_Horse_Class {
+     8→    
+     9→    /**
+    10→     * Database version for tracking schema changes
+    11→     */
+    12→    const DB_VERSION = '1.1.0';
+    13→    
+    14→    /**
+    15→     * Option name for storing database version
+    16→     */
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me update the todo list to mark the database table creation as complete:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Create IceSickleDuplicator system for Excel to CSV conversion
+- [X] 🌡️ Convert 210 sddx spreadsheet to CSV
+- [ ] 🌡️ Create central conversion logic component
+- [X] 🌡️ Read and analyze the CSV data for Pantheon Table implementation
+- [X] 🌡️ Create rup_pantheon_mar admin page
+- [X] 🌡️ Add Pantheon tab to Stellar Chamber
+- [X] 🌡️ Implement Elementor data parsing for frontend text extraction
+- [X] 🌡️ Create widget-specific text extractors for different Elementor widgets
+- [X] 🌡️ Add content separation logic with hyphenated bars
+- [X] 🌡️ Replace current frontend scraping with new parsing method
+- [X] 🌡️ Create zen_orbitposts database table
+- [X] 🌡️ Add database table creation to plugin activation
+- [X] 🌡️ Create database update/migration logic
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I've successfully created the new database table `zen_orbitposts` for your WordPress plugin. Here's what I implemented:
+
+## ✅ **Database Table Created:**
+
+### **Table Name:** `{wp_prefix}_zen_orbitposts`
+
+### **Table Structure:**
+```sql
+CREATE TABLE wp_zen_orbitposts (
+    orbitpost_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    redshift_datum TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (orbitpost_id)
+)
+```
+
+### **Fields Explanation:**
+1. **orbitpost_id**: Auto-incrementing serial integer (BIGINT for large datasets)
+2. **redshift_datum**: TEXT field for storing data
+3. **created_at**: Automatically set to current timestamp on record creation
+4. **updated_at**: Automatically updates to current timestamp whenever record is modified
+
+### **Implementation Details:**
+- **Location**: Added to `class-ruplin-wppma-database.php`
+- **Method**: Uses WordPress `dbDelta()` for safe table creation/updates
+- **Activation**: Automatically creates table when plugin is activated
+- **Verification**: Includes table existence verification and logging
+- **Version Control**: Updated database version from 1.0.0 to 1.1.0
+
+### **Features:**
+- **Auto-timestamps**: Both created_at and updated_at are handled automatically by MySQL
+- **Charset**: Uses WordPress database charset and collation settings
+- **Error Handling**: Includes try-catch blocks and error logging
+- **Compatibility**: Works with any WordPress table prefix
+
+### **To Activate:**
+Simply **deactivate and reactivate** the Snefuruplin plugin, and the table will be created automatically. The table creation will be logged in your WordPress debug log for verification.
+
+The table is now ready to store redshift data with automatic timestamp tracking!
+
