@@ -4073,3 +4073,481 @@ http://localhost:3000/bin34/tebnar2?batchid=ce50f11d-aa3d-445a-8e09-d21bf58d9944
 
 
 
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll add a new button below the Save button that dynamically creates a URL with the hudson_imgplanbatch_id as a parameter.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   992→                                           placeholder="79f1a2d4-ec7e-4f3a-a896-d2e4d0e2d3ba"
+   993→                                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 14px; margin-bottom: 10px;"
+   994→                                           maxlength="36">
+   995→                                    
+   996→                                    <button type="button" 
+   997→                                            id="save-hudson-imgplanbatch-btn"
+   998→                                            class="button button-primary"
+   999→                                            style="background: #00a32a; border-color: #00a32a; padding: 8px 16px; font-size: 14px;">
+  1000→                                        Save
+  1001→                                    </button>
+  1002→                                    
+  1003→                                    <!-- Tebnar2 with Param Button -->
+  1004→                                    <div style="margin-top: 10px;">
+  1005→                                        <?php if ($existing_hudson_id): ?>
+  1006→                                            <a href="http://localhost:3000/bin34/tebnar2?batchid=<?php echo urlencode($existing_hudson_id); ?>" 
+  1007→                                               target="_blank" 
+  1008→                                               id="tebnar2-param-btn"
+  1009→                                               class="button" 
+  1010→                                               style="display: inline-block; padding: 8px 16px; background: #f0ad4e; color: #fff; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500; border-color: #eea236;">
+  1011→                                                go to /tebnar2 with param set
+  1012→                                            </a>
+  1013→                                        <?php else: ?>
+  1014→                                            <button type="button" 
+  1015→                                                    id="tebnar2-param-btn"
+  1016→                                                    class="button" 
+  1017→                                                    disabled
+  1018→                                                    style="padding: 8px 16px; background: #ccc; color: #666; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: not-allowed;"
+  1019→                                                    title="Save a Hudson ImgPlanBatch ID first to enable this button">
+  1020→                                                go to /tebnar2 with param set
+  1021→                                            </button>
+  1022→                                        <?php endif; ?>
+  1023→                                    </div>
+  1024→                                </div>
+  1025→                                
+  1026→                                <script>
+  1027→                                jQuery(document).ready(function($) {
+  1028→                                    $('#save-hudson-imgplanbatch-btn').on('click', function() {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add JavaScript to update the button dynamically after the user saves a new hudson_imgplanbatch_id. Let me update the save success callback:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1052→                                                post_id: postId,
+  1053→                                                hudson_id: hudsonId,
+  1054→                                                nonce: $('#hurricane-nonce').val()
+  1055→                                            },
+  1056→                                            success: function(response) {
+  1057→                                                if (response.success) {
+  1058→                                                    alert('Hudson ImgPlanBatch ID saved successfully!');
+  1059→                                                    
+  1060→                                                    // Update the tebnar2 param button
+  1061→                                                    var newUrl = 'http://localhost:3000/bin34/tebnar2?batchid=' + encodeURIComponent(hudsonId);
+  1062→                                                    var buttonHtml = '<a href="' + newUrl + '" target="_blank" id="tebnar2-param-btn" class="button" style="display: inline-block; padding: 8px 16px; background: #f0ad4e; color: #fff; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500; border-color: #eea236;">go to /tebnar2 with param set</a>';
+  1063→                                                    $('#tebnar2-param-btn').parent().html(buttonHtml);
+  1064→                                                } else {
+  1065→                                                    alert('Error saving ID: ' + (response.data || 'Unknown error'));
+  1066→                                                }
+  1067→                                                $btn.prop('disabled', false).text('Save');
+  1068→                                            },
+  1069→                                            error: function() {
+  1070→                                                alert('AJAX error occurred');
+  1071→                                                $btn.prop('disabled', false).text('Save');
+  1072→                                            }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully added the new "go to /tebnar2 with param set" button with the following features:
+
+## ✅ Tebnar2 Parameter Button Added
+
+### 🎯 Button Functionality
+- ✅ **Button Text:** "go to /tebnar2 with param set"
+- ✅ **Location:** Below the Save button in the Image Deployer tab
+- ✅ **Dynamic URL:** `http://localhost:3000/bin34/tebnar2?batchid={hudson_id}`
+- ✅ **Opens in new tab** (`target="_blank"`)
+
+### 🔧 Smart Behavior
+- ✅ **Active State:** Orange button when hudson_imgplanbatch_id exists in database
+- ✅ **Disabled State:** Gray disabled button when no hudson_imgplanbatch_id is saved
+- ✅ **Tooltip:** Helpful message when disabled: "Save a Hudson ImgPlanBatch ID first to enable this button"
+- ✅ **Dynamic Update:** Button becomes active immediately after saving a new ID
+
+### 📡 Technical Implementation
+- ✅ **URL Encoding:** Properly encodes UUID values using `urlencode()` and `encodeURIComponent()`
+- ✅ **Real-time Update:** JavaScript updates button after successful AJAX save
+- ✅ **Database Integration:** Reads current `hudson_imgplanbatch_id` from `zen_orbitposts` table
+- ✅ **Parameter Format:** Uses `batchid` as the URL parameter name
+
+### 🎨 Visual Design
+- **Active Button:** Orange background (`#f0ad4e`) with white text
+- **Disabled Button:** Gray background (`#ccc`) with darker gray text
+- **Consistent Styling:** Matches other buttons in the interface
+- **Proper Spacing:** 10px margin-top for clean separation
+
+### 📝 Example URLs Generated:
+- **With ID:** `http://localhost:3000/bin34/tebnar2?batchid=ce50f11d-aa3d-445a-8e09-d21bf58d9944`
+- **Without ID:** Button is disabled until user saves an ID
+
+The button now dynamically generates the correct URL with the batchid parameter pulled from the WordPress database, exactly as requested!
+
+---
+
+_**User**_
+
+please find the button that says pendulum screen in the stellar chamber top bar area
+
+please change the style of the button to have a black bg . then please move the button to be to the left of the current button for "open /driggsman" 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+<!-- Pendulum Screen Button with Copy -->
+                <div style="display: flex; align-items: center; margin-left: 15px;">
+                    <a href="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" 
+                       target="_blank" 
+                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+                        pendulum screen
+                    </a>
+                    <button type="button" 
+                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+                            data-copy-url="<?php echo esc_url((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>"
+                            style="background: #800000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me find the "open /driggsman" button to see where I need to move the pendulum screen button:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+global $wpdb;
+                $sitespren_base = $wpdb->get_var("SELECT sitespren_base FROM {$wpdb->prefix}zen_sitespren LIMIT 1");
+                if (empty($sitespren_base)) {
+                    $sitespren_base = 'example.com'; // fallback if no data found
+                }
+                $driggsman_url = 'http://localhost:3000/driggsman?activefilterchamber=daylight&sitesentered=' . urlencode($sitespren_base);
+                $sitejar4_url = 'http://localhost:3000/sitejar4?sitesentered=' . urlencode($sitespren_base);
+                ?>
+                
+                <!-- Driggsman Button with Copy -->
+                <div style="display: flex; align-items: center; margin-left: 15px;">
+                    <a href="<?php echo esc_url($driggsman_url); ?>" 
+                       target="_blank" 
+                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+                        open /driggsman
+                    </a>
+                    <button type="button" 
+                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+                            data-copy-url="<?php echo esc_url($driggsman_url); ?>"
+                            style="background: #800000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+                            title="Copy driggsman URL">
+                        📋
+                    </button>
+                </div>
+                
+                <!-- SiteJar4 Button with Copy -->
+--
+                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+                                                    -
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr data-type="driggsman" data-description="open /driggsman?PARAMETER">
+                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd;">
+                                                    <input type="checkbox" class="stellar-pantheon-checkbox" value="driggsman-1" style="width: 14px; height: 14px;">
+                                                </td>
+                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 10px;">
+                                                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=edit'); ?>" style="color: #0073aa; text-decoration: none; font-family: monospace;">
+                                                        <?php echo home_url(); ?>/wp-admin/post.php?post=<?php echo $post->ID; ?>&action=edit
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">
+                                                    <strong style="color: #0073aa;">open /driggsman?PARAMETER</strong>
+                                                </td>
+                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+                                                    -
+                                                </td>
+                                                <td style="text-align: center; padding: 8px 6px; border: 1px solid #ddd; color: #999; font-size: 10px;">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to find the exact location where these buttons are in the top bar area to move the pendulum screen button. Let me search for the broader context:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+330→                    <span style="color: white; font-size: 16px; font-weight: bold;">
+   331→                        <?php 
+   332→                        global $wpdb;
+   333→                        $driggs_revenue = $wpdb->get_var("SELECT driggs_revenue_goal FROM {$wpdb->prefix}zen_sitespren LIMIT 1");
+   334→                        echo '$' . esc_html($driggs_revenue ? number_format($driggs_revenue, 0) : '0') . '<span style="color: white; font-weight: bold;">/m</span>';
+   335→                        ?>
+   336→                    </span>
+   337→                </div>
+   338→                
+   339→                <?php
+   340→                // Get the sitespren_base domain from the single-row zen_sitespren table
+   341→                global $wpdb;
+   342→                $sitespren_base = $wpdb->get_var("SELECT sitespren_base FROM {$wpdb->prefix}zen_sitespren LIMIT 1");
+   343→                if (empty($sitespren_base)) {
+   344→                    $sitespren_base = 'example.com'; // fallback if no data found
+   345→                }
+   346→                $driggsman_url = 'http://localhost:3000/driggsman?activefilterchamber=daylight&sitesentered=' . urlencode($sitespren_base);
+   347→                $sitejar4_url = 'http://localhost:3000/sitejar4?sitesentered=' . urlencode($sitespren_base);
+   348→                ?>
+   349→                
+   350→                <!-- Driggsman Button with Copy -->
+   351→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   352→                    <a href="<?php echo esc_url($driggsman_url); ?>" 
+   353→                       target="_blank" 
+   354→                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+   355→                        open /driggsman
+   356→                    </a>
+   357→                    <button type="button" 
+   358→                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+   359→                            data-copy-url="<?php echo esc_url($driggsman_url); ?>"
+   360→                            style="background: #800000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+   361→                            title="Copy driggsman URL">
+   362→                        📋
+   363→                    </button>
+   364→                </div>
+   365→                
+   366→                <!-- SiteJar4 Button with Copy -->
+   367→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   368→                    <a href="<?php echo esc_url($sitejar4_url); ?>" 
+   369→                       target="_blank" 
+   370→                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+   371→                        open /sitejar4
+   372→                    </a>
+   373→                    <button type="button" 
+   374→                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+   375→                            data-copy-url="<?php echo esc_url($sitejar4_url); ?>"
+   376→                            style="background: #800000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+   377→                            title="Copy sitejar4 URL">
+   378→                        📋
+   379→                    </button>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me continue reading to find where the pendulum screen button is located:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php`
+
+Result:
+
+```
+380→                </div>
+   381→                
+   382→                <!-- Elementor Editor Button with Copy -->
+   383→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   384→                    <a href="<?php echo admin_url('post.php?post=' . $post->ID . '&action=elementor'); ?>" 
+   385→                       target="_blank" 
+   386→                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+   387→                        elementor screen
+   388→                    </a>
+   389→                    <button type="button" 
+   390→                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+   391→                            data-copy-url="<?php echo admin_url('post.php?post=' . $post->ID . '&action=elementor'); ?>"
+   392→                            style="background: #800000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+   393→                            title="Copy elementor editor URL">
+   394→                        📋
+   395→                    </button>
+   396→                </div>
+   397→                
+   398→                <!-- Pendulum Screen Button with Copy -->
+   399→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   400→                    <a href="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" 
+   401→                       target="_blank" 
+   402→                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+   403→                        pendulum screen
+   404→                    </a>
+   405→                    <button type="button" 
+   406→                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+   407→                            data-copy-url="<?php echo esc_url((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>"
+   408→                            style="background: #800000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+   409→                            title="Copy current page URL">
+   410→                        📋
+   411→                    </button>
+   412→                </div>
+   413→                
+   414→                <!-- Live Frontend Screen Button with Copy -->
+   415→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   416→                    <a href="<?php echo esc_url(get_permalink($post->ID)); ?>" 
+   417→                       target="_blank" 
+   418→                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px 0 0 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+   419→                        livefrontend screen
+   420→                    </a>
+   421→                    <button type="button" 
+   422→                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+   423→                            data-copy-url="<?php echo esc_url(get_permalink($post->ID)); ?>"
+   424→                            style="background: #800000; color: white; border: none; padding: 8px 4px; margin-left: 0; border-radius: 0 4px 4px 0; cursor: pointer; width: 20px; font-size: 12px;"
+   425→                            title="Copy live frontend URL">
+   426→                        📋
+   427→                    </button>
+   428→                </div>
+   429→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I can see the structure. I need to:
+1. Change the pendulum screen button background from `#800000` (maroon) to black
+2. Move the pendulum screen button to be before the driggsman button
+
+Let me first change the background color to black:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   394→                        📋
+   395→                    </button>
+   396→                </div>
+   397→                
+   398→                <!-- Pendulum Screen Button with Copy -->
+   399→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   400→                    <a href="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" 
+   401→                       target="_blank" 
+   402→                       style="background: #000000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+   403→                        pendulum screen
+   404→                    </a>
+   405→                    <button type="button" 
+   406→                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+   407→                            data-copy-url="<?php echo esc_url((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>"
+   408→                            style="background: #000000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+   409→                            title="Copy current page URL">
+   410→                        📋
+   411→                    </button>
+   412→                </div>
+   413→                
+   414→                <!-- Live Frontend Screen Button with Copy -->
+   415→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   416→                    <a href="<?php echo esc_url(get_permalink($post->ID)); ?>"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to move the entire pendulum screen button div to be positioned before the driggsman button. Let me cut the pendulum screen button block and paste it before the driggsman button:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   344→                    $sitespren_base = 'example.com'; // fallback if no data found
+   345→                }
+   346→                $driggsman_url = 'http://localhost:3000/driggsman?activefilterchamber=daylight&sitesentered=' . urlencode($sitespren_base);
+   347→                $sitejar4_url = 'http://localhost:3000/sitejar4?sitesentered=' . urlencode($sitespren_base);
+   348→                ?>
+   349→                
+   350→                <!-- Pendulum Screen Button with Copy -->
+   351→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   352→                    <a href="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" 
+   353→                       target="_blank" 
+   354→                       style="background: #000000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+   355→                        pendulum screen
+   356→                    </a>
+   357→                    <button type="button" 
+   358→                            class="snefuru-copy-btn-right snefuru-locations-copy-btn" 
+   359→                            data-copy-url="<?php echo esc_url((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>"
+   360→                            style="background: #000000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+   361→                            title="Copy current page URL">
+   362→                        📋
+   363→                    </button>
+   364→                </div>
+   365→                
+   366→                <!-- Driggsman Button with Copy -->
+   367→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   368→                    <a href="<?php echo esc_url($driggsman_url); ?>" 
+   369→                       target="_blank" 
+   370→                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to remove the original pendulum screen button that's still located after the elementor screen button. Let me remove that duplicate:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   408→                            style="background: #800000; color: white; border: none; padding: 8px 4px; margin-left: 2px; border-radius: 0 4px 4px 0; cursor: pointer; width: 10px; font-size: 12px;"
+   409→                            title="Copy elementor editor URL">
+   410→                        📋
+   411→                    </button>
+   412→                </div>
+   413→                
+   414→                <!-- Live Frontend Screen Button with Copy -->
+   415→                <div style="display: flex; align-items: center; margin-left: 15px;">
+   416→                    <a href="<?php echo esc_url(get_permalink($post->ID)); ?>" 
+   417→                       target="_blank" 
+   418→                       style="background: #800000; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px 0 0 4px; font-size: 14px; font-weight: 600; text-transform: lowercase;">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully completed both requested changes:
+
+## ✅ Pendulum Screen Button Updated
+
+### 🎨 Style Changes
+- ✅ **Background Color:** Changed from maroon (`#800000`) to **black (`#000000`)**
+- ✅ **Copy Button:** Also updated to black background for consistency
+
+### 📍 Position Changes  
+- ✅ **Moved Left:** Button now appears **before** the "open /driggsman" button
+- ✅ **Order in Top Bar:** Now positioned between the revenue display and driggsman button
+
+### 📋 New Button Order (left to right):
+1. Revenue display (`$0/m`)
+2. **🆕 Pendulum Screen** (black background)
+3. Open /driggsman (maroon background) 
+4. Open /sitejar4 (maroon background)
+5. Elementor screen (maroon background)
+6. Live frontend screen (maroon background)
+
+### 🔧 Technical Details
+- **Button Text:** "pendulum screen" (unchanged)
+- **Functionality:** Still links to current page URL (unchanged)
+- **Copy Button:** Still copies current page URL with black styling
+- **Target:** Opens in new tab (`target="_blank"`)
+
+The pendulum screen button now stands out with its distinctive black background and is positioned exactly where requested - to the left of the driggsman button in the Stellar Chamber top bar area!
+
