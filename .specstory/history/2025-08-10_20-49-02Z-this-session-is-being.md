@@ -3510,3 +3510,19 @@ y_gizmo2_main
 
 **Try the refresh button now** - it should extract all the missing content from your Elementor data!
 
+---
+
+_**User**_
+
+please change the tab from saying "image freeway " to now say "image elicitor"
+
+please add a new tab just to the right of that tab named "image deployer". then place a black separator tab to the right of this image deployer. do not remove any of the tabs from the Stellar Chamber. 
+
+———————————————————————
+next, please place a piece of text under the Stellar Chamber text that says:
+top_bar_area
+
+this text should be white in 16 px bold text and occur on the line below the Stellar Chamber text. 
+
+Of course, this text should still be to the left of the rocket image thing and all of the buttons that come after the rocket. those items should remain unaffected int heir visual positioning on the screen due to this new text being placed on the screen 
+
