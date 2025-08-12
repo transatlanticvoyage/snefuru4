@@ -1183,3 +1183,696 @@ Perfect! I've completed both tasks:
 
 These classes are applied to every `<th>` in their respective rows, including checkbox and tool_buttons columns that don't have direct database column mappings.
 
+---
+
+_**User**_
+
+please add this class to the actual <table> element that makes up the ui table grid at beamraymar
+
+<table class="
+utg_beamray
+
+then place this new class in a comment in the sddx 240 css file 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8126→
+  8127→            <!-- Table Container -->
+  8128→            <div class="beamraymar-table-container">
+  8129→                <div class="beamraymar-table-scroll">
+  8130→                    <table class="beamraymar-table utg_beamray" id="beamraymar-table">
+  8131→                        <thead>
+  8132→                            <tr>
+  8133→                                <th class="column_checkbox row_obtain_db_table"><div class="tcell_inner_wrapper_div"></div></th>
+  8134→                                <th class="column_tool_buttons row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong>misc-uicol-type</strong></div></th>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→/* Custom CSS for Ruplin WordPress Plugin Admin Screens Only */
+     2→/* Created by Kyle - File: sddx_240_ruplin_screens_only_css_by_kyle_1.css */
+     3→
+     4→/* This file stores customizations for Ruplin plugin admin pages */
+     5→/* This CSS is only loaded on Ruplin plugin pages, not on native WP admin pages */
+     6→
+     7→/* BeamRayMar Table Class: utg_beamray */
+     8→
+     9→/*
+    10→BeamRayMar Table Column Class Names (fact_ prefix convention):
+    11→1. fact_checkbox - Checkbox column (no DB equivalent)
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Done! I've:
+
+1. Added the `utg_beamray` class to the `<table>` element in the beamraymar page
+2. Added a comment for this new class in the sddx_240_ruplin_screens_only_css_by_kyle_1.css file
+
+---
+
+_**User**_
+
+under post_status, please make the text like "publish" bold . leave the "draft" text how it is (not bold) 
+
+this is about the ui column on beamraymar page 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8674→                                <td class="beamraymar-editable-cell column_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8675→                                <td class="readonly-cell column_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+  8676→                                <td class="readonly-cell column_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
+  8677→                                <td class="readonly-cell column_wp_posts_post_type"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+  8678→                                <td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status === 'publish' ? '<strong>' + item.post_status + '</strong>' : item.post_status}</div></td>
+  8679→                                <td class="beamraymar-editable-cell column_wp_posts_post_name" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_name || ''}</div></td>
+  8680→                                <td class="readonly-cell column_wp_posts_post_date"><div class="tcell_inner_wrapper_div">${formatDate(item.post_date)}</div></td>
+  8681→                                <td class="readonly-cell column_wp_posts_post_modified"><div class="tcell_inner_wrapper_div">${formatDate(item.post_modified)}</div></td>
+  8682→                                <td class="beamraymar-editable-cell column_wp_posts_post_author" data-field="post_author" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_author}</div></td>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9161→            }
+  9162→            echo '<td class="readonly-cell column_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">' . esc_html($elementor_display) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '" data-editor-type="elementor">ED</button></div></td>';
+  9163→            
+  9164→            echo '<td class="readonly-cell column_wp_posts_post_type"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_type']) . '</div></td>';
+  9165→            $status_display = $item['post_status'] === 'publish' ? '<strong>' . esc_html($item['post_status']) . '</strong>' : esc_html($item['post_status']);
+  9166→            echo '<td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">' . $status_display . '</div></td>';
+  9167→            echo '<td class="beamraymar-editable-cell column_wp_posts_post_name" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_name']) . '</div></td>';
+  9168→            echo '<td class="readonly-cell column_wp_posts_post_date"><div class="tcell_inner_wrapper_div">' . esc_html(date('Y-m-d H:i:s', strtotime($item['post_date']))) . '</div></td>';
+  9169→            echo '<td class="readonly-cell column_wp_posts_post_modified"><div class="tcell_inner_wrapper_div">' . esc_html(date('Y-m-d H:i:s', strtotime($item['post_modified']))) . '</div></td>';
+  9170→            echo '<td class="beamraymar-editable-cell column_wp_posts_post_author" data-field="post_author" data-type="integer"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_author']) . '</div></td>';
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Done! The post_status column now displays "publish" in bold while "draft" and other statuses remain normal (not bold). This has been updated in both the JavaScript rendering and PHP rendering sections.
+
+---
+
+_**User**_
+
+please create a new css file that is named similarly to the sddx 240 css file. please tretrieve the full path and file name for me so i can create a new file. onlyanplease just answer and do not change any of our code right now. we are still in planning phase 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+The full path and file name for the existing CSS file is:
+
+`/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css`
+
+For a new CSS file with a similar naming pattern, you could use:
+
+`/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_240_ruplin_screens_only_css_by_kyle_2.css`
+
+---
+
+_**User**_
+
+sddx_250_beamray_table_grid_1.css
+
+use this name please 
+
+and integrate it on cssmar page as the tab2 now 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Write**
+
+```css
+/* BeamRay Table Grid CSS - sddx_250_beamray_table_grid_1.css */
+/* For BeamRayMar table styling */
+
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_250_beamray_table_grid_1.css
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to find the cssmar page implementation and update it to include this new file as tab2:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+277-            'beamraymar',
+278-            array($this, 'beamraymar_page')
+279-        );
+280-        
+281-        add_submenu_page(
+282-            'snefuru',
+283-            'cssmar',
+284-            'cssmar',
+285-            'manage_options',
+286-            'cssmar',
+287:            array($this, 'cssmar_page')
+288-        );
+289-    }
+290-    
+291-    /**
+292-     * Initialize settings
+293-     */
+294-    public function init_settings() {
+295-        register_setting('snefuru_settings', 'snefuru_ruplin_api_key_1');
+296-        register_setting('snefuru_settings', 'snefuru_api_url');
+297-        register_setting('snefuru_settings', 'snefuru_sync_interval');
+--
+9427-            wp_die();
+9428-        }
+9429-        
+9430-        echo json_encode(array('success' => true, 'post_id' => $result));
+9431-        wp_die();
+9432-    }
+9433-    
+9434-    /**
+9435-     * CSS Editor page (cssmar)
+9436-     */
+9437:    public function cssmar_page() {
+9438-        // AGGRESSIVE NOTICE SUPPRESSION
+9439-        $this->suppress_all_admin_notices();
+9440-        
+9441-        global $wpdb;
+9442-        
+9443-        // Get sitespren_base from database
+9444-        $sitespren_base = '';
+9445-        $zen_sitespren_table = $wpdb->prefix . 'zen_sitespren';
+9446-        if ($wpdb->get_var("SHOW TABLES LIKE '$zen_sitespren_table'") == $zen_sitespren_table) {
+9447-            $result = $wpdb->get_row("SELECT sitespren_base FROM $zen_sitespren_table WHERE wppma_id = 1");
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9437→    public function cssmar_page() {
+  9438→        // AGGRESSIVE NOTICE SUPPRESSION
+  9439→        $this->suppress_all_admin_notices();
+  9440→        
+  9441→        global $wpdb;
+  9442→        
+  9443→        // Get sitespren_base from database
+  9444→        $sitespren_base = '';
+  9445→        $zen_sitespren_table = $wpdb->prefix . 'zen_sitespren';
+  9446→        if ($wpdb->get_var("SHOW TABLES LIKE '$zen_sitespren_table'") == $zen_sitespren_table) {
+  9447→            $result = $wpdb->get_row("SELECT sitespren_base FROM $zen_sitespren_table WHERE wppma_id = 1");
+  9448→            if ($result) {
+  9449→                $sitespren_base = $result->sitespren_base;
+  9450→            }
+  9451→        }
+  9452→        
+  9453→        // Get CSS file content
+  9454→        $css_file_path = SNEFURU_PLUGIN_PATH . 'assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css';
+  9455→        $css_content = '';
+  9456→        if (file_exists($css_file_path)) {
+  9457→            $css_content = file_get_contents($css_file_path);
+  9458→        }
+  9459→        
+  9460→        // Construct full URL
+  9461→        $plugin_url = SNEFURU_PLUGIN_URL . 'assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css';
+  9462→        $full_url = 'https://' . $sitespren_base . '/' . str_replace(home_url('/'), '', $plugin_url);
+  9463→        
+  9464→        ?>
+  9465→        <div class="wrap cssmar-wrapper">
+  9466→            <style>
+  9467→                .cssmar-wrapper {
+  9468→                    background: white;
+  9469→                    padding: 20px;
+  9470→                    margin: 0 0 0 -20px;
+  9471→                }
+  9472→                
+  9473→                .cssmar-tabs {
+  9474→                    display: flex;
+  9475→                    border-bottom: 2px solid #ddd;
+  9476→                    margin-bottom: 20px;
+  9477→                }
+  9478→                
+  9479→                .cssmar-tab {
+  9480→                    padding: 12px 20px;
+  9481→                    background: #f1f1f1;
+  9482→                    border: 1px solid #ddd;
+  9483→                    border-bottom: none;
+  9484→                    cursor: pointer;
+  9485→                    font-weight: 600;
+  9486→                    margin-right: 2px;
+  9487→                }
+  9488→                
+  9489→                .cssmar-tab.active {
+  9490→                    background: white;
+  9491→                    border-bottom: 2px solid white;
+  9492→                    margin-bottom: -2px;
+  9493→                }
+  9494→                
+  9495→                .cssmar-url-container {
+  9496→                    display: flex;
+  9497→                    align-items: center;
+  9498→                    margin-bottom: 15px;
+  9499→                    gap: 10px;
+  9500→                }
+  9501→                
+  9502→                .cssmar-url-input {
+  9503→                    flex: 1;
+  9504→                    padding: 8px 12px;
+  9505→                    border: 1px solid #ddd;
+  9506→                    border-radius: 4px;
+  9507→                    font-size: 14px;
+  9508→                    background: #f9f9f9;
+  9509→                }
+  9510→                
+  9511→                .cssmar-copy-url-btn {
+  9512→                    padding: 8px 16px;
+  9513→                    background: #0073aa;
+  9514→                    color: white;
+  9515→                    border: none;
+  9516→                    border-radius: 4px;
+  9517→                    cursor: pointer;
+  9518→                    font-weight: 600;
+  9519→                }
+  9520→                
+  9521→                .cssmar-copy-url-btn:hover {
+  9522→                    background: #005a87;
+  9523→                }
+  9524→                
+  9525→                .cssmar-editor {
+  9526→                    width: 100%;
+  9527→                    height: 600px;
+  9528→                    font-family: 'Courier New', monospace;
+  9529→                    font-size: 14px;
+  9530→                    border: 1px solid #ddd;
+  9531→                    border-radius: 4px;
+  9532→                    padding: 15px;
+  9533→                    background: #f9f9f9;
+  9534→                    resize: vertical;
+  9535→                }
+  9536→                
+  9537→                .cssmar-save-btn {
+  9538→                    padding: 12px 24px;
+  9539→                    background: #16a085;
+  9540→                    color: white;
+  9541→                    border: none;
+  9542→                    border-radius: 4px;
+  9543→                    cursor: pointer;
+  9544→                    font-weight: 600;
+  9545→                    font-size: 16px;
+  9546→                }
+  9547→                
+  9548→                .cssmar-save-btn:hover {
+  9549→                    background: #138d75;
+  9550→                }
+  9551→                
+  9552→                .cssmar-save-container {
+  9553→                    margin: 15px 0;
+  9554→                }
+  9555→            </style>
+  9556→            
+  9557→            <h1>CSS Editor (cssmar)</h1>
+  9558→            
+  9559→            <!-- Tabs -->
+  9560→            <div class="cssmar-tabs">
+  9561→                <div class="cssmar-tab active" data-tab="sddx-240">SDDX - 240</div>
+  9562→                <div class="cssmar-tab" data-tab="tab2">tab2</div>
+  9563→                <div class="cssmar-tab" data-tab="tab3">tab3</div>
+  9564→                <div class="cssmar-tab" data-tab="tab4">tab4</div>
+  9565→                <div class="cssmar-tab" data-tab="tab5">tab5</div>
+  9566→            </div>
+  9567→            
+  9568→            <!-- URL Display -->
+  9569→            <div class="cssmar-url-container">
+  9570→                <input type="text" class="cssmar-url-input" value="<?php echo esc_attr($full_url); ?>" readonly>
+  9571→                <button type="button" class="cssmar-copy-url-btn" onclick="copyUrlToClipboard()">Copy</button>
+  9572→            </div>
+  9573→            
+  9574→            <!-- Save Button (Top) -->
+  9575→            <div class="cssmar-save-container">
+  9576→                <button type="button" class="cssmar-save-btn" onclick="saveCssFile()">Save</button>
+  9577→            </div>
+  9578→            
+  9579→            <!-- CSS Editor -->
+  9580→            <textarea class="cssmar-editor" id="cssmar-editor"><?php echo esc_textarea($css_content); ?></textarea>
+  9581→            
+  9582→            <!-- Save Button (Bottom) -->
+  9583→            <div class="cssmar-save-container">
+  9584→                <button type="button" class="cssmar-save-btn" onclick="saveCssFile()">Save</button>
+  9585→            </div>
+  9586→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9449→                $sitespren_base = $result->sitespren_base;
+  9450→            }
+  9451→        }
+  9452→        
+  9453→        // Get CSS file content for first tab
+  9454→        $css_file_path = SNEFURU_PLUGIN_PATH . 'assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css';
+  9455→        $css_content = '';
+  9456→        if (file_exists($css_file_path)) {
+  9457→            $css_content = file_get_contents($css_file_path);
+  9458→        }
+  9459→        
+  9460→        // Get CSS file content for second tab
+  9461→        $css_file_path_2 = SNEFURU_PLUGIN_PATH . 'assets/css/sddx_250_beamray_table_grid_1.css';
+  9462→        $css_content_2 = '';
+  9463→        if (file_exists($css_file_path_2)) {
+  9464→            $css_content_2 = file_get_contents($css_file_path_2);
+  9465→        }
+  9466→        
+  9467→        // Construct full URL
+  9468→        $plugin_url = SNEFURU_PLUGIN_URL . 'assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css';
+  9469→        $full_url = 'https://' . $sitespren_base . '/' . str_replace(home_url('/'), '', $plugin_url);
+  9470→        
+  9471→        ?>
+  9472→        <div class="wrap cssmar-wrapper">
+  9473→            <style>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the JavaScript to handle tab switching and load the correct CSS file content, and update the tab label:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9562→            </style>
+  9563→            
+  9564→            <h1>CSS Editor (cssmar)</h1>
+  9565→            
+  9566→            <!-- Tabs -->
+  9567→            <div class="cssmar-tabs">
+  9568→                <div class="cssmar-tab active" data-tab="sddx-240">SDDX - 240</div>
+  9569→                <div class="cssmar-tab" data-tab="sddx-250">SDDX - 250</div>
+  9570→                <div class="cssmar-tab" data-tab="tab3">tab3</div>
+  9571→                <div class="cssmar-tab" data-tab="tab4">tab4</div>
+  9572→                <div class="cssmar-tab" data-tab="tab5">tab5</div>
+  9573→            </div>
+  9574→            
+  9575→            <!-- URL Display -->
+  9576→            <div class="cssmar-url-container">
+  9577→                <input type="text" class="cssmar-url-input" value="<?php echo esc_attr($full_url); ?>" readonly>
+```
+
+_**Agent**_
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to find and update the JavaScript section to handle the tab switching and load the correct content:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9585→            
+  9586→            <!-- CSS Editor -->
+  9587→            <textarea class="cssmar-editor" id="cssmar-editor"><?php echo esc_textarea($css_content); ?></textarea>
+  9588→            
+  9589→            <!-- Save Button (Bottom) -->
+  9590→            <div class="cssmar-save-container">
+  9591→                <button type="button" class="cssmar-save-btn" onclick="saveCssFile()">Save</button>
+  9592→            </div>
+  9593→            
+  9594→            <script>
+  9595→                function copyUrlToClipboard() {
+  9596→                    const urlInput = document.querySelector('.cssmar-url-input');
+  9597→                    urlInput.select();
+  9598→                    document.execCommand('copy');
+  9599→                    
+  9600→                    const button = document.querySelector('.cssmar-copy-url-btn');
+  9601→                    const originalText = button.textContent;
+  9602→                    button.textContent = 'Copied!';
+  9603→                    button.style.background = '#16a085';
+  9604→                    
+  9605→                    setTimeout(() => {
+  9606→                        button.textContent = originalText;
+  9607→                        button.style.background = '#0073aa';
+  9608→                    }, 2000);
+  9609→                }
+  9610→                
+  9611→                function saveCssFile() {
+  9612→                    const content = document.getElementById('cssmar-editor').value;
+  9613→                    const saveButtons = document.querySelectorAll('.cssmar-save-btn');
+  9614→                    
+  9615→                    // Update button states
+  9616→                    saveButtons.forEach(btn => {
+  9617→                        btn.textContent = 'Saving...';
+  9618→                        btn.style.background = '#f39c12';
+  9619→                        btn.disabled = true;
+  9620→                    });
+  9621→                    
+  9622→                    const formData = new FormData();
+  9623→                    formData.append('action', 'cssmar_save_css');
+  9624→                    formData.append('css_content', content);
+  9625→                    formData.append('nonce', '<?php echo wp_create_nonce('cssmar_nonce'); ?>');
+  9626→                    
+  9627→                    fetch(ajaxurl, {
+  9628→                        method: 'POST',
+  9629→                        body: formData
+  9630→                    })
+  9631→                    .then(response => response.json())
+  9632→                    .then(data => {
+  9633→                        if (data.success) {
+  9634→                            saveButtons.forEach(btn => {
+  9635→                                btn.textContent = 'Saved!';
+  9636→                                btn.style.background = '#16a085';
+  9637→                            });
+  9638→                        } else {
+  9639→                            saveButtons.forEach(btn => {
+  9640→                                btn.textContent = 'Error';
+  9641→                                btn.style.background = '#e74c3c';
+  9642→                            });
+  9643→                            alert('Error saving file: ' + (data.message || 'Unknown error'));
+  9644→                        }
+  9645→                        
+  9646→                        setTimeout(() => {
+  9647→                            saveButtons.forEach(btn => {
+  9648→                                btn.textContent = 'Save';
+  9649→                                btn.style.background = '#16a085';
+  9650→                                btn.disabled = false;
+  9651→                            });
+  9652→                        }, 2000);
+  9653→                    })
+  9654→                    .catch(error => {
+  9655→                        console.error('Error:', error);
+  9656→                        saveButtons.forEach(btn => {
+  9657→                            btn.textContent = 'Error';
+  9658→                            btn.style.background = '#e74c3c';
+  9659→                            btn.disabled = false;
+  9660→                        });
+  9661→                        setTimeout(() => {
+  9662→                            saveButtons.forEach(btn => {
+  9663→                                btn.textContent = 'Save';
+  9664→                                btn.style.background = '#16a085';
+  9665→                            });
+  9666→                        }, 2000);
+  9667→                    });
+  9668→                }
+  9669→                
+  9670→                // Tab functionality (currently only SDDX-240 is functional)
+  9671→                document.querySelectorAll('.cssmar-tab').forEach(tab => {
+  9672→                    tab.addEventListener('click', function() {
+  9673→                        if (this.dataset.tab !== 'sddx-240') {
+  9674→                            alert('This tab is not yet implemented.');
+  9675→                            return;
+  9676→                        }
+  9677→                        
+  9678→                        document.querySelectorAll('.cssmar-tab').forEach(t => t.classList.remove('active'));
+  9679→                        this.classList.add('active');
+  9680→                    });
+  9681→                });
+  9682→            </script>
+  9683→        </div>
+  9684→        <?php
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the JavaScript to handle the tab switching for the new SDDX-250 tab and also update the URL display and content loading:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9590→            <div class="cssmar-save-container">
+  9591→                <button type="button" class="cssmar-save-btn" onclick="saveCssFile()">Save</button>
+  9592→            </div>
+  9593→            
+  9594→            <script>
+  9595→                const tabData = {
+  9596→                    'sddx-240': {
+  9597→                        content: <?php echo json_encode($css_content); ?>,
+  9598→                        url: '<?php echo esc_js($full_url); ?>'
+  9599→                    },
+  9600→                    'sddx-250': {
+  9601→                        content: <?php echo json_encode($css_content_2); ?>,
+  9602→                        url: '<?php echo esc_js('https://' . $sitespren_base . '/' . str_replace(home_url('/'), '', SNEFURU_PLUGIN_URL . 'assets/css/sddx_250_beamray_table_grid_1.css')); ?>'
+  9603→                    }
+  9604→                };
+  9605→                
+  9606→                function copyUrlToClipboard() {
+  9607→                    const urlInput = document.querySelector('.cssmar-url-input');
+  9608→                    urlInput.select();
+  9609→                    document.execCommand('copy');
+  9610→                    
+  9611→                    const button = document.querySelector('.cssmar-copy-url-btn');
+  9612→                    const originalText = button.textContent;
+  9613→                    button.textContent = 'Copied!';
+  9614→                    button.style.background = '#16a085';
+  9615→                    
+  9616→                    setTimeout(() => {
+  9617→                        button.textContent = originalText;
+  9618→                        button.style.background = '#0073aa';
+  9619→                    }, 2000);
+  9620→                }
+  9621→                
+  9622→                function saveCssFile() {
+  9623→                    const content = document.getElementById('cssmar-editor').value;
+  9624→                    const saveButtons = document.querySelectorAll('.cssmar-save-btn');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the tab functionality to handle both SDDX-240 and SDDX-250 tabs:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9677→                        }, 2000);
+  9678→                    });
+  9679→                }
+  9680→                
+  9681→                // Tab functionality
+  9682→                document.querySelectorAll('.cssmar-tab').forEach(tab => {
+  9683→                    tab.addEventListener('click', function() {
+  9684→                        const tabKey = this.dataset.tab;
+  9685→                        
+  9686→                        if (!tabData[tabKey]) {
+  9687→                            alert('This tab is not yet implemented.');
+  9688→                            return;
+  9689→                        }
+  9690→                        
+  9691→                        // Update active tab
+  9692→                        document.querySelectorAll('.cssmar-tab').forEach(t => t.classList.remove('active'));
+  9693→                        this.classList.add('active');
+  9694→                        
+  9695→                        // Update content and URL
+  9696→                        document.getElementById('cssmar-editor').value = tabData[tabKey].content;
+  9697→                        document.querySelector('.cssmar-url-input').value = tabData[tabKey].url;
+  9698→                    });
+  9699→                });
+  9700→            </script>
+  9701→        </div>
+  9702→        <?php
+  9703→    }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Done! I've successfully:
+
+1. **Created the new CSS file** `sddx_250_beamray_table_grid_1.css` at `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_250_beamray_table_grid_1.css`
+
+2. **Integrated it as tab2** in the cssmar page with the label "SDDX - 250" 
+
+3. **Updated the tab functionality** to:
+   - Load the content of the new CSS file when the SDDX-250 tab is clicked
+   - Update the URL display to show the correct path for the new CSS file
+   - Switch the editor content between the two files when tabs are clicked
+   - Maintain the existing SDDX-240 tab functionality
+
+The cssmar page now has functional tabs for both CSS files, allowing you to edit either `sddx_240_ruplin_screens_only_css_by_kyle_1.css` or `sddx_250_beamray_table_grid_1.css`.
+
