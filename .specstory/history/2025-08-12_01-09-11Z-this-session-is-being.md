@@ -3035,3 +3035,22 @@ Perfect! I have successfully implemented the original request with the constrain
 
 All table cells now have the special inner wrapper div with the fixed 38px height applied only to `<td>` elements, exactly as originally requested, without changing anything else on the page.
 
+---
+
+_**User**_
+
+i dont see a set pixel height for the tecell_inner_wrapper_div when it occurs inside of a <td> element. the tcell inner wrapper div is supposed to have a set height of 38 px when it occurs inside of a <td> element . 
+
+noerratic———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+please add the fixed height rule that is described above in this prompt for the beamraymar page 
+
