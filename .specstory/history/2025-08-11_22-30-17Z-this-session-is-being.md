@@ -3580,3 +3580,1483 @@ _**Agent (claude-sonnet-4-20250514)**_
 
 This reference file now contains the complete problematic interaction sequence, so you can refer to it in the future to identify exactly where things went wrong and what changes to avoid.
 
+---
+
+_**User**_
+
+storeplease review my db table schema total export and store it in your memory for reference. do not do anything yet. i just want you to have this information for future prompts.please review my db table schema total export and store it in your memory for reference. do not do anything yet. i just want you to have this information for future prompts.| table_name                     | column_name                        | data_type                   |
+| ------------------------------ | ---------------------------------- | --------------------------- |
+| address_species                | aspecies_id                        | integer                     |
+| address_species                | aspecies_name                      | text                        |
+| address_species                | aspecies_code                      | text                        |
+| address_species                | address_format                     | text                        |
+| address_species                | country_code                       | text                        |
+| address_species                | is_active                          | boolean                     |
+| address_species                | created_at                         | timestamp without time zone |
+| address_species                | updated_at                         | timestamp without time zone |
+| admin_options                  | id                                 | uuid                        |
+| admin_options                  | option_name                        | character varying           |
+| admin_options                  | description                        | text                        |
+| admin_options                  | category                           | character varying           |
+| admin_options                  | json1                              | jsonb                       |
+| admin_options                  | is_active                          | boolean                     |
+| admin_options                  | created_by                         | uuid                        |
+| admin_options                  | created_at                         | timestamp without time zone |
+| admin_options                  | updated_at                         | timestamp without time zone |
+| admin_random_storage           | rstor_body                         | jsonb                       |
+| admin_random_storage           | rstor_substance                    | text                        |
+| admin_random_storage           | fk_app_page                        | character varying           |
+| admin_random_storage           | created_at                         | timestamp with time zone    |
+| admin_random_storage           | updated_at                         | timestamp with time zone    |
+| admin_random_storage           | rstor_id                           | integer                     |
+| admin_random_storage           | rstor_name                         | text                        |
+| ai_models                      | model_id                           | uuid                        |
+| ai_models                      | model_name                         | text                        |
+| ai_models                      | provider                           | text                        |
+| ai_models                      | created_at                         | timestamp with time zone    |
+| ai_models                      | model_slug                         | text                        |
+| ai_models                      | fk_provider_id                     | uuid                        |
+| api_key_slots                  | slot_id                            | uuid                        |
+| api_key_slots                  | slot_name                          | text                        |
+| api_key_slots                  | m1platcodehandle                   | text                        |
+| api_key_slots                  | m1inuse                            | boolean                     |
+| api_key_slots                  | m2platcodehandle                   | text                        |
+| api_key_slots                  | m2inuse                            | boolean                     |
+| api_key_slots                  | m3platcodehandle                   | text                        |
+| api_key_slots                  | m3inuse                            | boolean                     |
+| api_key_slots                  | created_at                         | timestamp with time zone    |
+| api_key_slots                  | updated_at                         | timestamp with time zone    |
+| api_key_slots                  | fk_iservices_provider_id           | uuid                        |
+| api_key_slots                  | slot_publicly_shown                | boolean                     |
+| api_key_slots                  | fk_ai_model_id                     | uuid                        |
+| api_key_slots                  | count_active_modules_on_slot       | integer                     |
+| api_key_slots                  | is_ai_model                        | boolean                     |
+| api_key_slots                  | test_endpoint_url                  | text                        |
+| api_key_slots                  | test_method                        | text                        |
+| api_keys_t1                    | id                                 | uuid                        |
+| api_keys_t1                    | fk_users_id                        | uuid                        |
+| api_keys_t1                    | key_type                           | text                        |
+| api_keys_t1                    | key_value                          | text                        |
+| api_keys_t1                    | key_name                           | text                        |
+| api_keys_t1                    | is_active                          | boolean                     |
+| api_keys_t1                    | created_at                         | timestamp with time zone    |
+| api_keys_t1                    | updated_at                         | timestamp with time zone    |
+| api_keys_t1                    | fk_ai_model_id                     | uuid                        |
+| api_keys_t1                    | hfid_ai_model_slug                 | text                        |
+| api_keys_t2                    | api_key_id                         | uuid                        |
+| api_keys_t2                    | fk_user_id                         | uuid                        |
+| api_keys_t2                    | fk_provider_id                     | uuid                        |
+| api_keys_t2                    | api_key_datum                      | text                        |
+| api_keys_t2                    | key_name                           | text                        |
+| api_keys_t2                    | is_active                          | boolean                     |
+| api_keys_t2                    | created_at                         | timestamp with time zone    |
+| api_keys_t2                    | updated_at                         | timestamp with time zone    |
+| api_keys_t3                    | api_key_id                         | uuid                        |
+| api_keys_t3                    | fk_user_id                         | uuid                        |
+| api_keys_t3                    | fk_slot_id                         | uuid                        |
+| api_keys_t3                    | created_at                         | timestamp with time zone    |
+| api_keys_t3                    | updated_at                         | timestamp with time zone    |
+| api_keys_t3                    | d_m1platcodehandle                 | text                        |
+| api_keys_t3                    | d_m2platcodehandle                 | text                        |
+| api_keys_t3                    | d_m3platcodehandle                 | text                        |
+| api_keys_t3                    | d_slot_name                        | text                        |
+| api_keys_t3                    | d_user_email                       | text                        |
+| api_keys_t3                    | m1datum                            | text                        |
+| api_keys_t3                    | m2datum                            | text                        |
+| api_keys_t3                    | m3datum                            | text                        |
+| api_keys_t3                    | m1ueplatlabel                      | text                        |
+| api_keys_t3                    | m2ueplatlabel                      | text                        |
+| api_keys_t3                    | m3ueplatlabel                      | text                        |
+| api_keys_t3                    | poke_response1                     | text                        |
+| api_keys_t3                    | poke_last_attempted                | timestamp without time zone |
+| api_keys_t3                    | poke_success_count                 | integer                     |
+| api_keys_t3                    | poke_failure_count                 | integer                     |
+| api_keys_t3                    | poke_last_success                  | timestamp without time zone |
+| atitems1                       | id                                 | bigint                      |
+| atitems1                       | created_at                         | timestamp with time zone    |
+| aval_dorlis                    | dorli_id                           | uuid                        |
+| aval_dorlis                    | fk_gcon_piece_id                   | uuid                        |
+| aval_dorlis                    | tag                                | text                        |
+| aval_dorlis                    | placeholder                        | text                        |
+| aval_dorlis                    | raw                                | text                        |
+| aval_dorlis                    | line_count                         | integer                     |
+| aval_dorlis                    | created_at                         | timestamp without time zone |
+| aval_unit_types                | type_id                            | text                        |
+| aval_unit_types                | description                        | text                        |
+| aval_units                     | unit_id                            | uuid                        |
+| aval_units                     | fk_gcon_piece_id                   | uuid                        |
+| aval_units                     | line_key1                          | text                        |
+| aval_units                     | unit_type                          | text                        |
+| aval_units                     | line_order                         | integer                     |
+| aval_units                     | payload                            | jsonb                       |
+| aval_units                     | created_by                         | uuid                        |
+| aval_units                     | created_at                         | timestamp without time zone |
+| aval_units                     | updated_at                         | timestamp without time zone |
+| background_jobs                | id                                 | uuid                        |
+| background_jobs                | user_id                            | uuid                        |
+| background_jobs                | job_type                           | character varying           |
+| background_jobs                | status                             | character varying           |
+| background_jobs                | priority                           | integer                     |
+| background_jobs                | data                               | jsonb                       |
+| background_jobs                | result                             | jsonb                       |
+| background_jobs                | error_message                      | text                        |
+| background_jobs                | attempts                           | integer                     |
+| background_jobs                | max_attempts                       | integer                     |
+| background_jobs                | created_at                         | timestamp with time zone    |
+| background_jobs                | updated_at                         | timestamp with time zone    |
+| background_jobs                | scheduled_for                      | timestamp with time zone    |
+| bakli_mockup_shares            | share_id                           | uuid                        |
+| bakli_mockup_shares            | fk_bakli_id                        | uuid                        |
+| bakli_mockup_shares            | fk_shared_with_user_id             | uuid                        |
+| bakli_mockup_shares            | share_type                         | character varying           |
+| bakli_mockup_shares            | created_at                         | timestamp with time zone    |
+| bakli_mockup_shares            | expires_at                         | timestamp with time zone    |
+| bakli_mockup_versions          | version_id                         | uuid                        |
+| bakli_mockup_versions          | fk_bakli_id                        | uuid                        |
+| bakli_mockup_versions          | version_number                     | integer                     |
+| bakli_mockup_versions          | bakli_content                      | text                        |
+| bakli_mockup_versions          | bakli_css                          | text                        |
+| bakli_mockup_versions          | created_at                         | timestamp with time zone    |
+| bakli_mockup_versions          | change_notes                       | text                        |
+| bakli_mockups                  | bakli_id                           | uuid                        |
+| bakli_mockups                  | fk_user_id                         | uuid                        |
+| bakli_mockups                  | bakli_name                         | character varying           |
+| bakli_mockups                  | bakli_description                  | text                        |
+| bakli_mockups                  | bakli_content                      | text                        |
+| bakli_mockups                  | bakli_css                          | text                        |
+| bakli_mockups                  | bakli_status                       | character varying           |
+| bakli_mockups                  | bakli_tags                         | ARRAY                       |
+| bakli_mockups                  | is_public                          | boolean                     |
+| bakli_mockups                  | created_at                         | timestamp with time zone    |
+| bakli_mockups                  | updated_at                         | timestamp with time zone    |
+| bakli_mockups                  | bakli_version                      | integer                     |
+| bakli_mockups                  | bakli_preview_image_url            | text                        |
+| bakli_mockups                  | bakli_notes                        | text                        |
+| bakli_mockups                  | view_count                         | integer                     |
+| bakli_mockups                  | last_viewed_at                     | timestamp with time zone    |
+| bakli_mockups                  | bakli_folder                       | character varying           |
+| bakli_mockups                  | bakli_priority                     | integer                     |
+| barkro_plugin_versions         | version_id                         | integer                     |
+| barkro_plugin_versions         | version_number                     | character varying           |
+| barkro_plugin_versions         | plugin_file_path                   | character varying           |
+| barkro_plugin_versions         | changelog                          | text                        |
+| barkro_plugin_versions         | min_wp_version                     | character varying           |
+| barkro_plugin_versions         | min_php_version                    | character varying           |
+| barkro_plugin_versions         | release_date                       | timestamp with time zone    |
+| barkro_plugin_versions         | is_current                         | boolean                     |
+| barkro_plugin_versions         | download_count                     | integer                     |
+| barkro_plugin_versions         | created_at                         | timestamp with time zone    |
+| barkro_site_status             | status_id                          | integer                     |
+| barkro_site_status             | fk_sitespren_id                    | uuid                        |
+| barkro_site_status             | current_plugin_version             | character varying           |
+| barkro_site_status             | last_check_date                    | timestamp with time zone    |
+| barkro_site_status             | auto_update_enabled                | boolean                     |
+| barkro_site_status             | plugin_active                      | boolean                     |
+| barkro_site_status             | wp_version                         | character varying           |
+| barkro_site_status             | php_version                        | character varying           |
+| barkro_site_status             | last_successful_update             | timestamp with time zone    |
+| barkro_site_status             | update_method                      | character varying           |
+| barkro_update_pushes           | push_id                            | integer                     |
+| barkro_update_pushes           | fk_sitespren_id                    | uuid                        |
+| barkro_update_pushes           | version_id                         | integer                     |
+| barkro_update_pushes           | push_status                        | character varying           |
+| barkro_update_pushes           | push_date                          | timestamp with time zone    |
+| barkro_update_pushes           | response_message                   | text                        |
+| barkro_update_pushes           | site_current_version               | character varying           |
+| barkro_update_pushes           | site_updated_version               | character varying           |
+| barkro_update_pushes           | error_details                      | text                        |
+| barkro_update_pushes           | completed_at                       | timestamp with time zone    |
+| bipitems1                      | id                                 | bigint                      |
+| bipitems1                      | created_at                         | timestamp with time zone    |
+| calendaritems1                 | id                                 | bigint                      |
+| calendaritems1                 | created_at                         | timestamp with time zone    |
+| call_platforms                 | platform_id                        | integer                     |
+| call_platforms                 | platform_name                      | character varying           |
+| call_platforms                 | platform_url                       | character varying           |
+| call_platforms                 | api_endpoint                       | character varying           |
+| call_platforms                 | api_key_encrypted                  | text                        |
+| call_platforms                 | is_active                          | boolean                     |
+| call_platforms                 | user_id                            | uuid                        |
+| call_platforms                 | created_at                         | timestamp with time zone    |
+| call_platforms                 | updated_at                         | timestamp with time zone    |
+| chat_messages                  | message_id                         | uuid                        |
+| chat_messages                  | fk_chat_id                         | uuid                        |
+| chat_messages                  | role                               | text                        |
+| chat_messages                  | message_main                       | text                        |
+| chat_messages                  | message_json                       | jsonb                       |
+| chat_messages                  | index_in_chat                      | integer                     |
+| chat_messages                  | created_at                         | timestamp with time zone    |
+| chat_metadata                  | metadata_id                        | uuid                        |
+| chat_metadata                  | fk_chat_message_id                 | uuid                        |
+| chat_metadata                  | temperature                        | double precision            |
+| chat_metadata                  | top_p                              | double precision            |
+| chat_metadata                  | tokens_used                        | integer                     |
+| chat_metadata                  | response_time_ms                   | integer                     |
+| chat_metadata                  | model_snapshot                     | text                        |
+| chat_metadata                  | created_at                         | timestamp with time zone    |
+| chats                          | chat_id                            | uuid                        |
+| chats                          | fk_user_id                         | uuid                        |
+| chats                          | fk_model_id                        | uuid                        |
+| chats                          | chat_title                         | text                        |
+| chats                          | chat_status                        | text                        |
+| chats                          | created_at                         | timestamp with time zone    |
+| chats                          | updated_at                         | timestamp with time zone    |
+| chats                          | fk_context_zone_id                 | uuid                        |
+| citation_gigs                  | cgig_id                            | integer                     |
+| citation_gigs                  | user_id                            | uuid                        |
+| citation_gigs                  | cgig_title                         | character varying           |
+| citation_gigs                  | cgig_description                   | text                        |
+| citation_gigs                  | seller_name                        | character varying           |
+| citation_gigs                  | seller_profile_url                 | text                        |
+| citation_gigs                  | cgig_url                           | text                        |
+| citation_gigs                  | marketplace                        | character varying           |
+| citation_gigs                  | marketplace_category               | character varying           |
+| citation_gigs                  | base_price                         | numeric                     |
+| citation_gigs                  | currency                           | character varying           |
+| citation_gigs                  | citations_included                 | integer                     |
+| citation_gigs                  | turnaround_days                    | integer                     |
+| citation_gigs                  | seller_rating                      | numeric                     |
+| citation_gigs                  | total_reviews                      | integer                     |
+| citation_gigs                  | da_range                           | character varying           |
+| citation_gigs                  | provides_report                    | boolean                     |
+| citation_gigs                  | quality_score                      | integer                     |
+| citation_gigs                  | orders_placed                      | integer                     |
+| citation_gigs                  | last_order_date                    | timestamp with time zone    |
+| citation_gigs                  | is_active                          | boolean                     |
+| citation_gigs                  | internal_notes                     | text                        |
+| citation_gigs                  | icon_name                          | character varying           |
+| citation_gigs                  | icon_color                         | character varying           |
+| citation_gigs                  | created_at                         | timestamp with time zone    |
+| citation_gigs                  | updated_at                         | timestamp with time zone    |
+| citation_gigs                  | inputs_v1                          | text                        |
+| citation_gigs                  | inputs_v2                          | text                        |
+| citation_gigs                  | inputs_v3                          | text                        |
+| cities                         | city_id                            | integer                     |
+| cities                         | city_name                          | text                        |
+| cities                         | state_code                         | text                        |
+| cities                         | state_full                         | text                        |
+| cities                         | country                            | text                        |
+| cities                         | rank_in_pop                        | integer                     |
+| cities                         | gmaps_link                         | text                        |
+| cities                         | is_suburb                          | boolean                     |
+| cities                         | city_and_state_code                | text                        |
+| cities                         | city_population                    | bigint                      |
+| cities                         | population_last_updated            | timestamp without time zone |
+| cities                         | created_at                         | timestamp without time zone |
+| cities                         | updated_at                         | timestamp without time zone |
+| cities                         | latitude                           | numeric                     |
+| cities                         | longitude                          | numeric                     |
+| cities                         | rel_metro_id                       | integer                     |
+| cncglub                        | cncg_id                            | integer                     |
+| cncglub                        | rel_city_id                        | integer                     |
+| cncglub                        | rel_industry_id                    | integer                     |
+| cncglub                        | created_at                         | timestamp without time zone |
+| cncglub                        | updated_at                         | timestamp without time zone |
+| cncglub                        | is_sko                             | boolean                     |
+| code_ranges                    | range_id                           | integer                     |
+| code_ranges                    | range_rel_filepath                 | character varying           |
+| code_ranges                    | range_lines                        | character varying           |
+| code_ranges                    | range_title                        | character varying           |
+| code_ranges                    | range_description                  | text                        |
+| code_ranges                    | range_context                      | character varying           |
+| code_ranges                    | range_category                     | character varying           |
+| code_ranges                    | range_priority                     | integer                     |
+| code_ranges                    | range_status                       | character varying           |
+| code_ranges                    | is_bookmarked                      | boolean                     |
+| code_ranges                    | created_at                         | timestamp without time zone |
+| code_ranges                    | updated_at                         | timestamp without time zone |
+| code_ranges                    | created_by                         | character varying           |
+| coltemp_rackui_relations       | relation_id                        | integer                     |
+| coltemp_rackui_relations       | fk_coltemp_id                      | integer                     |
+| coltemp_rackui_relations       | fk_rackui_column_id                | integer                     |
+| coltemp_rackui_relations       | column_position                    | integer                     |
+| coltemp_rackui_relations       | is_visible                         | boolean                     |
+| coltemp_rackui_relations       | column_width                       | character varying           |
+| coltemp_rackui_relations       | created_at                         | timestamp without time zone |
+| coltemps                       | coltemp_id                         | integer                     |
+| coltemps                       | rel_utg_id                         | character varying           |
+| coltemps                       | coltemp_name                       | character varying           |
+| coltemps                       | coltemp_category                   | character varying           |
+| coltemps                       | coltemp_display_name               | character varying           |
+| coltemps                       | is_default                         | boolean                     |
+| coltemps                       | created_at                         | timestamp without time zone |
+| coltemps                       | updated_at                         | timestamp without time zone |
+| coltemps                       | button_text                        | character varying           |
+| coltemps                       | tooltip_text                       | text                        |
+| coltemps                       | default_header_row_color           | character varying           |
+| coltemps                       | fk_user_id                         | uuid                        |
+| coltemps                       | coltemp_color                      | character varying           |
+| coltemps                       | coltemp_icon                       | character varying           |
+| coltemps                       | count_of_columns                   | integer                     |
+| coltemps                       | coltemp_description                | text                        |
+| coltemps                       | coltemp_settings                   | jsonb                       |
+| coltemps                       | icon_name                          | character varying           |
+| coltemps                       | icon_color                         | character varying           |
+| coltemps                       | cached_rackui_count                | integer                     |
+| coltemps                       | cached_rackui_json                 | jsonb                       |
+| context_zone_relations         | id                                 | uuid                        |
+| context_zone_relations         | fk_zone_id                         | uuid                        |
+| context_zone_relations         | fk_chat_id                         | uuid                        |
+| context_zone_relations         | added_at                           | timestamp with time zone    |
+| context_zones                  | zone_id                            | uuid                        |
+| context_zones                  | fk_user_id                         | uuid                        |
+| context_zones                  | zone_name                          | text                        |
+| context_zones                  | zone_description                   | text                        |
+| context_zones                  | created_at                         | timestamp with time zone    |
+| cricket_matches                | match_id                           | integer                     |
+| cricket_matches                | match_format                       | character varying           |
+| cricket_matches                | tournament_name                    | character varying           |
+| cricket_matches                | series_name                        | character varying           |
+| cricket_matches                | match_number                       | integer                     |
+| cricket_matches                | venue_name                         | character varying           |
+| cricket_matches                | city                               | character varying           |
+| cricket_matches                | country                            | character varying           |
+| cricket_matches                | match_date                         | date                        |
+| cricket_matches                | start_time                         | time without time zone      |
+| cricket_matches                | team_1                             | character varying           |
+| cricket_matches                | team_2                             | character varying           |
+| cricket_matches                | toss_winner                        | character varying           |
+| cricket_matches                | toss_decision                      | character varying           |
+| cricket_matches                | winning_team                       | character varying           |
+| cricket_matches                | losing_team                        | character varying           |
+| cricket_matches                | match_result                       | character varying           |
+| cricket_matches                | winning_margin_type                | character varying           |
+| cricket_matches                | winning_margin_value               | integer                     |
+| cricket_matches                | man_of_match                       | character varying           |
+| cricket_matches                | total_runs_scored                  | integer                     |
+| cricket_matches                | total_wickets_fallen               | integer                     |
+| cricket_matches                | total_overs_bowled                 | numeric                     |
+| cricket_matches                | highest_individual_score           | integer                     |
+| cricket_matches                | best_bowling_figures               | character varying           |
+| cricket_matches                | boundaries_hit                     | integer                     |
+| cricket_matches                | sixes_hit                          | integer                     |
+| cricket_matches                | day_night_match                    | boolean                     |
+| cricket_matches                | rain_affected                      | boolean                     |
+| cricket_matches                | dls_applied                        | boolean                     |
+| cricket_matches                | created_at                         | timestamp with time zone    |
+| cricket_matches                | updated_at                         | timestamp with time zone    |
+| custom_colors                  | color_id                           | uuid                        |
+| custom_colors                  | color_name                         | character varying           |
+| custom_colors                  | color_ref_code                     | character varying           |
+| custom_colors                  | hex_value                          | character varying           |
+| custom_colors                  | created_at                         | timestamp with time zone    |
+| custom_colors                  | updated_at                         | timestamp with time zone    |
+| dfs_locations                  | location_code                      | integer                     |
+| dfs_locations                  | location_name                      | text                        |
+| dfs_locations                  | country_iso_code                   | character varying           |
+| dfs_locations                  | location_type                      | character varying           |
+| dfs_locations                  | created_at                         | timestamp with time zone    |
+| dfs_locations                  | location_id                        | integer                     |
+| dfs_locations                  | location_code_parent               | integer                     |
+| dfs_locations                  | available_sources                  | text                        |
+| dfs_locations                  | is_available_google_ads            | boolean                     |
+| dfs_locations                  | is_available_bing_ads              | boolean                     |
+| dfs_locations                  | is_available_google_trends         | boolean                     |
+| dfs_locations                  | is_available_google_search         | boolean                     |
+| dfs_locations                  | updated_at                         | timestamp with time zone    |
+| dfs_locations                  | created_by                         | text                        |
+| dfs_locations                  | last_updated_by                    | text                        |
+| domains1                       | id                                 | uuid                        |
+| domains1                       | domain_base                        | character varying           |
+| domains1                       | note1                              | text                        |
+| domains1                       | fk_user_id                         | uuid                        |
+| domains1                       | created_at                         | timestamp with time zone    |
+| domains1                       | updated_at                         | timestamp with time zone    |
+| domains1                       | wpuser1                            | character varying           |
+| domains1                       | wppass1                            | character varying           |
+| domains1                       | wp_plugin_installed1               | boolean                     |
+| domains1                       | wp_plugin_connected2               | boolean                     |
+| domains1                       | fk_domreg_hostaccount              | uuid                        |
+| favorite_prompts               | favorite_id                        | uuid                        |
+| favorite_prompts               | fk_user_id                         | uuid                        |
+| favorite_prompts               | title                              | text                        |
+| favorite_prompts               | prompt_text                        | text                        |
+| favorite_prompts               | description                        | text                        |
+| favorite_prompts               | category                           | text                        |
+| favorite_prompts               | tags                               | ARRAY                       |
+| favorite_prompts               | created_at                         | timestamp with time zone    |
+| favorite_prompts               | updated_at                         | timestamp with time zone    |
+| filegun_files                  | file_id                            | bigint                      |
+| filegun_files                  | file_path                          | text                        |
+| filegun_files                  | file_name                          | text                        |
+| filegun_files                  | file_parent_path                   | text                        |
+| filegun_files                  | extension                          | text                        |
+| filegun_files                  | mime_type                          | text                        |
+| filegun_files                  | file_size                          | bigint                      |
+| filegun_files                  | encoding                           | text                        |
+| filegun_files                  | created_at                         | timestamp with time zone    |
+| filegun_files                  | modified_at                        | timestamp with time zone    |
+| filegun_files                  | last_accessed_at                   | timestamp with time zone    |
+| filegun_files                  | file_system_created                | timestamp with time zone    |
+| filegun_files                  | file_system_modified               | timestamp with time zone    |
+| filegun_files                  | is_protected                       | boolean                     |
+| filegun_files                  | permissions                        | text                        |
+| filegun_files                  | owner_user                         | text                        |
+| filegun_files                  | owner_group                        | text                        |
+| filegun_files                  | is_hidden                          | boolean                     |
+| filegun_files                  | is_executable                      | boolean                     |
+| filegun_files                  | line_count                         | integer                     |
+| filegun_files                  | character_count                    | integer                     |
+| filegun_files                  | word_count                         | integer                     |
+| filegun_files                  | checksum                           | text                        |
+| filegun_files                  | content_preview                    | text                        |
+| filegun_files                  | is_code_file                       | boolean                     |
+| filegun_files                  | programming_language               | text                        |
+| filegun_files                  | git_status                         | text                        |
+| filegun_files                  | last_git_commit                    | text                        |
+| filegun_files                  | tags                               | jsonb                       |
+| filegun_files                  | custom_metadata                    | jsonb                       |
+| filegun_files                  | user_notes                         | text                        |
+| filegun_files                  | color_label                        | text                        |
+| filegun_files                  | importance_level                   | integer                     |
+| filegun_files                  | sync_status                        | text                        |
+| filegun_files                  | last_sync_at                       | timestamp with time zone    |
+| filegun_files                  | is_zepulus_docs                    | boolean                     |
+| filegun_folders                | folder_id                          | bigint                      |
+| filegun_folders                | folder_path                        | text                        |
+| filegun_folders                | folder_name                        | text                        |
+| filegun_folders                | folder_parent_path                 | text                        |
+| filegun_folders                | depth                              | integer                     |
+| filegun_folders                | full_path_hash                     | text                        |
+| filegun_folders                | created_at                         | timestamp with time zone    |
+| filegun_folders                | modified_at                        | timestamp with time zone    |
+| filegun_folders                | last_accessed_at                   | timestamp with time zone    |
+| filegun_folders                | file_system_created                | timestamp with time zone    |
+| filegun_folders                | file_system_modified               | timestamp with time zone    |
+| filegun_folders                | is_protected                       | boolean                     |
+| filegun_folders                | permissions                        | text                        |
+| filegun_folders                | owner_user                         | text                        |
+| filegun_folders                | owner_group                        | text                        |
+| filegun_folders                | total_files                        | integer                     |
+| filegun_folders                | total_subfolders                   | integer                     |
+| filegun_folders                | total_size                         | bigint                      |
+| filegun_folders                | tags                               | jsonb                       |
+| filegun_folders                | custom_metadata                    | jsonb                       |
+| filegun_folders                | user_notes                         | text                        |
+| filegun_folders                | color_label                        | text                        |
+| filegun_folders                | sync_status                        | text                        |
+| filegun_folders                | last_sync_at                       | timestamp with time zone    |
+| filegun_folders                | checksum                           | text                        |
+| filegun_folders                | is_pinned                          | boolean                     |
+| frenzi_field_metadata          | table_name                         | character varying           |
+| frenzi_field_metadata          | field_name                         | character varying           |
+| frenzi_field_metadata          | starred                            | boolean                     |
+| frenzi_field_metadata          | flagged                            | boolean                     |
+| frenzi_field_metadata          | priority                           | integer                     |
+| frenzi_field_metadata          | notes                              | text                        |
+| frenzi_field_metadata          | created_at                         | timestamp without time zone |
+| frenzi_field_metadata          | chain_of_custody_desc              | text                        |
+| gcon_pieces                    | id                                 | uuid                        |
+| gcon_pieces                    | fk_users_id                        | uuid                        |
+| gcon_pieces                    | meta_title                         | text                        |
+| gcon_pieces                    | h1title                            | text                        |
+| gcon_pieces                    | pgb_h1title                        | text                        |
+| gcon_pieces                    | corpus1                            | text                        |
+| gcon_pieces                    | corpus2                            | text                        |
+| gcon_pieces                    | asn_sitespren_base                 | text                        |
+| gcon_pieces                    | asn_nwpi_posts_id                  | text                        |
+| gcon_pieces                    | image_pack1                        | jsonb                       |
+| gcon_pieces                    | created_at                         | timestamp with time zone    |
+| gcon_pieces                    | updated_at                         | timestamp with time zone    |
+| gcon_pieces                    | asn_imgplanbatch_id                | uuid                        |
+| gcon_pieces                    | pub_status                         | character varying           |
+| gcon_pieces                    | date_time_pub_carry                | timestamp with time zone    |
+| gcon_pieces                    | pageslug                           | character varying           |
+| gcon_pieces                    | pageurl                            | text                        |
+| gcon_pieces                    | pelementor_cached                  | jsonb                       |
+| gcon_pieces                    | pelementor_edits                   | jsonb                       |
+| gcon_pieces                    | is_starred1                        | text                        |
+| gcon_pieces                    | is_starred2                        | text                        |
+| gcon_pieces                    | g_post_id                          | text                        |
+| gcon_pieces                    | g_post_status                      | text                        |
+| gcon_pieces                    | g_post_type                        | text                        |
+| gcon_pieces                    | response1_model_used               | text                        |
+| gcon_pieces                    | response1_raw                      | text                        |
+| gcon_pieces                    | response1_meat_extracted           | text                        |
+| gcon_pieces                    | pelementor_parsed_slots            | jsonb                       |
+| gcon_pieces                    | aval_metadata_mode                 | boolean                     |
+| gcon_pieces                    | aval_content                       | text                        |
+| gcon_pieces                    | aval_title                         | text                        |
+| gcon_pieces                    | aval_fk_featured_image_plan_id     | uuid                        |
+| gcon_pieces                    | aval_fk_imgplan_batch_id           | uuid                        |
+| gcon_pieces                    | post_name                          | character varying           |
+| gcon_pieces                    | mud_content                        | text                        |
+| gcon_pieces                    | mud_title                          | text                        |
+| gcon_pieces                    | mudfk_image_plan_batch_id          | uuid                        |
+| gcon_pieces                    | mud_document                       | text                        |
+| gcon_pieces                    | asn_image_plan_batch_id            | uuid                        |
+| host_account                   | username                           | character varying           |
+| host_account                   | pass                               | character varying           |
+| host_account                   | hostacct_apikey1                   | character varying           |
+| host_account                   | fk_user_id                         | uuid                        |
+| host_account                   | fk_host_company_id                 | uuid                        |
+| host_account                   | id                                 | uuid                        |
+| host_company                   | name                               | character varying           |
+| host_company                   | portal_url1                        | character varying           |
+| host_company                   | fk_user_id                         | uuid                        |
+| host_company                   | notes1                             | text                        |
+| host_company                   | notes2                             | text                        |
+| host_company                   | notes3                             | text                        |
+| host_company                   | id                                 | uuid                        |
+| host_panel                     | panel_url1                         | character varying           |
+| host_panel                     | panel_user                         | character varying           |
+| host_panel                     | panel_pass                         | character varying           |
+| host_panel                     | panel_type                         | character varying           |
+| host_panel                     | panel_ns                           | character varying           |
+| host_panel                     | fk_user_id                         | uuid                        |
+| host_panel                     | panel_note1                        | text                        |
+| host_panel                     | flag_nsduplicate                   | boolean                     |
+| host_panel                     | fk_host_plan_id                    | uuid                        |
+| host_panel                     | id                                 | uuid                        |
+| host_plan                      | paymentdate_first                  | date                        |
+| host_plan                      | payment_method                     | character varying           |
+| host_plan                      | price                              | numeric                     |
+| host_plan                      | currency                           | character varying           |
+| host_plan                      | price_term                         | character varying           |
+| host_plan                      | subscribed                         | boolean                     |
+| host_plan                      | cc_added                           | boolean                     |
+| host_plan                      | paymentdate_next                   | date                        |
+| host_plan                      | fk_user_id                         | uuid                        |
+| host_plan                      | ue_identifier_1                    | integer                     |
+| host_plan                      | fk_host_account_id                 | uuid                        |
+| host_plan                      | id                                 | uuid                        |
+| images                         | id                                 | uuid                        |
+| images                         | rel_users_id                       | uuid                        |
+| images                         | created_at                         | timestamp with time zone    |
+| images                         | rel_images_plans_id                | uuid                        |
+| images                         | img_file_url1                      | text                        |
+| images                         | img_file_extension                 | text                        |
+| images                         | img_file_size                      | integer                     |
+| images                         | width                              | integer                     |
+| images                         | height                             | integer                     |
+| images                         | prompt1                            | text                        |
+| images                         | status                             | text                        |
+| images                         | function_used_to_fetch_the_image   | text                        |
+| images_plans                   | id                                 | uuid                        |
+| images_plans                   | rel_users_id                       | uuid                        |
+| images_plans                   | rel_images_plans_batches_id        | uuid                        |
+| images_plans                   | created_at                         | timestamp with time zone    |
+| images_plans                   | e_zpf_img_code                     | text                        |
+| images_plans                   | e_width                            | integer                     |
+| images_plans                   | e_height                           | integer                     |
+| images_plans                   | e_associated_content1              | text                        |
+| images_plans                   | e_file_name1                       | text                        |
+| images_plans                   | e_more_instructions1               | text                        |
+| images_plans                   | e_prompt1                          | text                        |
+| images_plans                   | e_ai_tool1                         | text                        |
+| images_plans                   | fk_image1_id                       | uuid                        |
+| images_plans                   | fk_image2_id                       | uuid                        |
+| images_plans                   | fk_image3_id                       | uuid                        |
+| images_plans                   | fk_image4_id                       | uuid                        |
+| images_plans                   | submission_order                   | integer                     |
+| images_plans                   | int1                               | character varying           |
+| images_plans                   | int2                               | character varying           |
+| images_plans                   | int3                               | character varying           |
+| images_plans                   | int4                               | character varying           |
+| images_plans_batches           | id                                 | uuid                        |
+| images_plans_batches           | rel_users_id                       | uuid                        |
+| images_plans_batches           | created_at                         | timestamp with time zone    |
+| images_plans_batches           | note1                              | text                        |
+| images_plans_batches           | xlslike_original_submission        | jsonb                       |
+| images_plans_batches           | fk_domains_id                      | uuid                        |
+| images_plans_batches           | nufu_page_type_1                   | character varying           |
+| images_plans_batches           | asn_gcon_piece_id                  | uuid                        |
+| images_plans_batches           | name                               | text                        |
+| images_plans_batches           | asn_sitespren_id                   | uuid                        |
+| images_plans_batches           | d_sitesprenbase                    | text                        |
+| images_plans_batches           | d_gcon_pieces_meta_title           | text                        |
+| industries                     | industry_id                        | integer                     |
+| industries                     | industry_name                      | text                        |
+| industries                     | industry_description               | text                        |
+| industries                     | created_at                         | timestamp without time zone |
+| industries                     | updated_at                         | timestamp without time zone |
+| iservice_providers             | provider_id                        | uuid                        |
+| iservice_providers             | provider_name                      | text                        |
+| iservice_providers             | provider_slug                      | text                        |
+| iservice_providers             | created_at                         | timestamp with time zone    |
+| iservice_providers             | is_ai_provider                     | boolean                     |
+| jexplanations                  | jexpl_id                           | uuid                        |
+| jexplanations                  | jexpl_content                      | jsonb                       |
+| jexplanations                  | jexpl_note                         | text                        |
+| jexplanations                  | jexpl_description                  | text                        |
+| jexplanations                  | created_at                         | timestamp with time zone    |
+| jexplanations                  | updated_at                         | timestamp with time zone    |
+| ketch_settings                 | setting_id                         | uuid                        |
+| ketch_settings                 | app_page                           | character varying           |
+| ketch_settings                 | ancestor_element                   | character varying           |
+| ketch_settings                 | element_tag                        | character varying           |
+| ketch_settings                 | id                                 | character varying           |
+| ketch_settings                 | class                              | character varying           |
+| ketch_settings                 | other_rules_needed                 | text                        |
+| ketch_settings                 | width                              | character varying           |
+| ketch_settings                 | height                             | character varying           |
+| ketch_settings                 | min_width                          | character varying           |
+| ketch_settings                 | min_height                         | character varying           |
+| ketch_settings                 | max_width                          | character varying           |
+| ketch_settings                 | max_height                         | character varying           |
+| ketch_settings                 | margin                             | character varying           |
+| ketch_settings                 | margin_top                         | character varying           |
+| ketch_settings                 | margin_bottom                      | character varying           |
+| ketch_settings                 | margin_left                        | character varying           |
+| ketch_settings                 | margin_right                       | character varying           |
+| ketch_settings                 | padding                            | character varying           |
+| ketch_settings                 | padding_top                        | character varying           |
+| ketch_settings                 | padding_bottom                     | character varying           |
+| ketch_settings                 | padding_left                       | character varying           |
+| ketch_settings                 | padding_right                      | character varying           |
+| ketch_settings                 | border                             | character varying           |
+| ketch_settings                 | border_width                       | character varying           |
+| ketch_settings                 | border_style                       | character varying           |
+| ketch_settings                 | border_color                       | character varying           |
+| ketch_settings                 | border_top                         | character varying           |
+| ketch_settings                 | border_top_width                   | character varying           |
+| ketch_settings                 | border_top_style                   | character varying           |
+| ketch_settings                 | border_top_color                   | character varying           |
+| ketch_settings                 | border_bottom                      | character varying           |
+| ketch_settings                 | border_left                        | character varying           |
+| ketch_settings                 | border_right                       | character varying           |
+| ketch_settings                 | border_radius                      | character varying           |
+| ketch_settings                 | box_shadow                         | character varying           |
+| ketch_settings                 | outline                            | character varying           |
+| ketch_settings                 | outline_width                      | character varying           |
+| ketch_settings                 | outline_style                      | character varying           |
+| ketch_settings                 | outline_color                      | character varying           |
+| ketch_settings                 | background                         | character varying           |
+| ketch_settings                 | background_color                   | character varying           |
+| ketch_settings                 | background_image                   | character varying           |
+| ketch_settings                 | background_position                | character varying           |
+| ketch_settings                 | background_size                    | character varying           |
+| ketch_settings                 | background_repeat                  | character varying           |
+| ketch_settings                 | background_attachment              | character varying           |
+| ketch_settings                 | color                              | character varying           |
+| ketch_settings                 | font_size                          | character varying           |
+| ketch_settings                 | font_family                        | character varying           |
+| ketch_settings                 | font_weight                        | character varying           |
+| ketch_settings                 | font_style                         | character varying           |
+| ketch_settings                 | text_align                         | character varying           |
+| ketch_settings                 | text_transform                     | character varying           |
+| ketch_settings                 | text_decoration                    | character varying           |
+| ketch_settings                 | letter_spacing                     | character varying           |
+| ketch_settings                 | line_height                        | character varying           |
+| ketch_settings                 | white_space                        | character varying           |
+| ketch_settings                 | word_break                         | character varying           |
+| ketch_settings                 | overflow                           | character varying           |
+| ketch_settings                 | overflow_x                         | character varying           |
+| ketch_settings                 | overflow_y                         | character varying           |
+| ketch_settings                 | display                            | character varying           |
+| ketch_settings                 | visibility                         | character varying           |
+| ketch_settings                 | position                           | character varying           |
+| ketch_settings                 | top                                | character varying           |
+| ketch_settings                 | bottom                             | character varying           |
+| ketch_settings                 | left                               | character varying           |
+| ketch_settings                 | right                              | character varying           |
+| ketch_settings                 | z_index                            | character varying           |
+| ketch_settings                 | flex_direction                     | character varying           |
+| ketch_settings                 | justify_content                    | character varying           |
+| ketch_settings                 | align_items                        | character varying           |
+| ketch_settings                 | align_content                      | character varying           |
+| ketch_settings                 | flex_wrap                          | character varying           |
+| ketch_settings                 | flex_grow                          | character varying           |
+| ketch_settings                 | flex_shrink                        | character varying           |
+| ketch_settings                 | order                              | character varying           |
+| ketch_settings                 | gap                                | character varying           |
+| ketch_settings                 | grid_template_columns              | character varying           |
+| ketch_settings                 | grid_template_rows                 | character varying           |
+| ketch_settings                 | grid_gap                           | character varying           |
+| ketch_settings                 | grid_column                        | character varying           |
+| ketch_settings                 | grid_row                           | character varying           |
+| ketch_settings                 | cursor                             | character varying           |
+| ketch_settings                 | pointer_events                     | character varying           |
+| ketch_settings                 | created_at                         | timestamp with time zone    |
+| ketch_settings                 | updated_at                         | timestamp with time zone    |
+| ketch_settings                 | is_active                          | boolean                     |
+| ketch_settings                 | lev1                               | text                        |
+| ketch_settings                 | lev2                               | text                        |
+| ketch_settings                 | lev3                               | text                        |
+| ketch_settings                 | lev4                               | text                        |
+| ketch_settings                 | lev5                               | text                        |
+| ketch_width_settings           | setting_id                         | uuid                        |
+| ketch_width_settings           | rel_ui_table_grid                  | text                        |
+| ketch_width_settings           | rel_db_table                       | text                        |
+| ketch_width_settings           | rel_db_field                       | text                        |
+| ketch_width_settings           | width_pon                          | integer                     |
+| ketch_width_settings           | is_kustom_col                      | boolean                     |
+| ketch_width_settings           | kustom_col_id                      | text                        |
+| ketch_width_settings           | created_at                         | timestamp with time zone    |
+| ketch_width_settings           | updated_at                         | timestamp with time zone    |
+| keywordshub                    | keyword_id                         | integer                     |
+| keywordshub                    | keyword_datum                      | text                        |
+| keywordshub                    | search_volume                      | integer                     |
+| keywordshub                    | cpc                                | numeric                     |
+| keywordshub                    | location_code                      | integer                     |
+| keywordshub                    | location_display_name              | text                        |
+| keywordshub                    | location_coordinate                | text                        |
+| keywordshub                    | language_code                      | text                        |
+| keywordshub                    | language_name                      | text                        |
+| keywordshub                    | competition                        | text                        |
+| keywordshub                    | competition_index                  | integer                     |
+| keywordshub                    | low_top_of_page_bid                | numeric                     |
+| keywordshub                    | high_top_of_page_bid               | numeric                     |
+| keywordshub                    | api_fetched_at                     | timestamp with time zone    |
+| keywordshub                    | created_at                         | timestamp with time zone    |
+| keywordshub                    | updated_at                         | timestamp with time zone    |
+| keywordshub                    | created_by                         | uuid                        |
+| keywordshub                    | last_updated_by                    | uuid                        |
+| kw_scaffolds                   | scaffold_global_id                 | integer                     |
+| kw_scaffolds                   | scaffold_datum                     | text                        |
+| kw_scaffolds                   | rel_industry_id                    | integer                     |
+| kw_scaffolds                   | scaffold_packet_id                 | integer                     |
+| kw_scaffolds                   | created_at                         | timestamp with time zone    |
+| kw_scaffolds                   | updated_at                         | timestamp with time zone    |
+| kw_scaffolds                   | created_by                         | text                        |
+| kw_scaffolds                   | last_updated_by                    | text                        |
+| linksharn                      | backlink_id                        | integer                     |
+| linksharn                      | source_url                         | text                        |
+| linksharn                      | source_domain                      | text                        |
+| linksharn                      | target_url                         | text                        |
+| linksharn                      | target_domain                      | text                        |
+| linksharn                      | backlink_anchor                    | text                        |
+| linksharn                      | backlink_wppostid                  | integer                     |
+| linksharn                      | first_seen                         | timestamp with time zone    |
+| linksharn                      | last_seen                          | timestamp with time zone    |
+| linksharn                      | first_lost                         | timestamp with time zone    |
+| linksharn                      | link_tet                           | text                        |
+| linksharn                      | link_before                        | text                        |
+| linksharn                      | link_after                         | text                        |
+| linksharn                      | fetch_method                       | text                        |
+| linksharn                      | backlink_location                  | text                        |
+| linksharn                      | is_nofollow                        | boolean                     |
+| linksharn                      | fk_user_id                         | uuid                        |
+| metros                         | metro_id                           | integer                     |
+| metros                         | metro_name                         | text                        |
+| metros                         | metro_population                   | bigint                      |
+| metros                         | main_city_name                     | text                        |
+| metros                         | state_code                         | text                        |
+| metros                         | state_full                         | text                        |
+| metros                         | country                            | text                        |
+| metros                         | created_at                         | timestamp without time zone |
+| metros                         | updated_at                         | timestamp without time zone |
+| moons                          | mrm_id                             | integer                     |
+| moons                          | mrm_name                           | text                        |
+| moons                          | mrm_description                    | text                        |
+| moons                          | mrm_note1                          | text                        |
+| moons                          | created_at                         | timestamp with time zone    |
+| moons                          | updated_at                         | timestamp with time zone    |
+| mud_actions                    | action_id                          | uuid                        |
+| mud_actions                    | action_category                    | character varying           |
+| mud_actions                    | action_name                        | character varying           |
+| mud_actions                    | action_description                 | text                        |
+| mud_actions                    | expected_behavior                  | text                        |
+| mud_actions                    | current_behavior                   | text                        |
+| mud_actions                    | status                             | character varying           |
+| mud_actions                    | priority                           | integer                     |
+| mud_actions                    | editor_mode                        | character varying           |
+| mud_actions                    | context_notes                      | text                        |
+| mud_actions                    | test_steps                         | text                        |
+| mud_actions                    | created_at                         | timestamp with time zone    |
+| mud_actions                    | updated_at                         | timestamp with time zone    |
+| mud_actions                    | assigned_to                        | uuid                        |
+| mud_actions                    | related_issue_url                  | text                        |
+| mud_actions                    | is_starred                         | text                        |
+| mud_actions                    | is_circled                         | text                        |
+| mud_actions                    | is_squared                         | text                        |
+| mud_actions                    | is_pentagoned                      | text                        |
+| mud_actions                    | is_horsed                          | text                        |
+| mud_actions                    | is_waiting                         | text                        |
+| mud_actions                    | is_blocked                         | text                        |
+| mud_actions                    | is_fixed                           | text                        |
+| mud_actions                    | is_flagged                         | text                        |
+| mud_deplines                   | depline_id                         | uuid                        |
+| mud_deplines                   | fk_gcon_piece_id                   | uuid                        |
+| mud_deplines                   | depline_jnumber                    | integer                     |
+| mud_deplines                   | depline_knumber                    | integer                     |
+| mud_deplines                   | content_raw                        | text                        |
+| mud_deplines                   | html_tags_detected                 | text                        |
+| mud_deplines                   | created_at                         | timestamp without time zone |
+| mud_deplines                   | is_morli                           | text                        |
+| mud_dorlis                     | mud_dorli_id                       | uuid                        |
+| mud_dorlis                     | fk_gcon_piece_id                   | uuid                        |
+| mud_dorlis                     | fk_mud_depline_id                  | uuid                        |
+| mud_dorlis                     | dorli_type                         | character varying           |
+| mud_dorlis                     | dorli_content                      | text                        |
+| mud_dorlis                     | position_index                     | integer                     |
+| mud_dorlis                     | is_active                          | boolean                     |
+| mud_dorlis                     | created_at                         | timestamp with time zone    |
+| mud_dorlis                     | updated_at                         | timestamp with time zone    |
+| mud_dorlis                     | html_tag                           | text                        |
+| narpi_pushes                   | id                                 | uuid                        |
+| narpi_pushes                   | push_name                          | character varying           |
+| narpi_pushes                   | push_desc                          | text                        |
+| narpi_pushes                   | created_at                         | timestamp with time zone    |
+| narpi_pushes                   | push_status1                       | character varying           |
+| narpi_pushes                   | fk_batch_id                        | uuid                        |
+| narpi_pushes                   | kareench1                          | json                        |
+| nemtor_units                   | unit_id                            | uuid                        |
+| nemtor_units                   | fk_gcon_piece_id                   | uuid                        |
+| nemtor_units                   | unit_marker                        | text                        |
+| nemtor_units                   | el_id                              | text                        |
+| nemtor_units                   | el_type                            | text                        |
+| nemtor_units                   | widget_type                        | text                        |
+| nemtor_units                   | parent_el_id                       | text                        |
+| nemtor_units                   | position_order                     | integer                     |
+| nemtor_units                   | depth_level                        | integer                     |
+| nemtor_units                   | sort_index                         | integer                     |
+| nemtor_units                   | summary_text                       | text                        |
+| nemtor_units                   | unit_label                         | text                        |
+| nemtor_units                   | settings_json                      | jsonb                       |
+| nemtor_units                   | style_json                         | jsonb                       |
+| nemtor_units                   | globals_json                       | jsonb                       |
+| nemtor_units                   | raw_json                           | jsonb                       |
+| nemtor_units                   | created_at                         | timestamp without time zone |
+| nemtor_units                   | updated_at                         | timestamp without time zone |
+| nemtor_units                   | full_text_cached                   | text                        |
+| nemtor_units                   | full_text_edits                    | text                        |
+| nemtor_units                   | image_type                         | character varying           |
+| nemtor_units                   | image_id                           | character varying           |
+| nemtor_units                   | image_url                          | text                        |
+| nemtor_units                   | image_alt                          | text                        |
+| nemtor_units                   | image_size                         | character varying           |
+| nemtor_units                   | image_source                       | character varying           |
+| nemtor_units                   | carousel_position                  | integer                     |
+| nemtor_units                   | image_context                      | text                        |
+| nemtor_units                   | has_img_slot                       | boolean                     |
+| nemtor_units                   | img_slot_qty                       | integer                     |
+| nemtor_units                   | tar_description_text               | text                        |
+| nemtor_units                   | tar_description_text_edits         | text                        |
+| noitems1                       | id                                 | bigint                      |
+| noitems1                       | created_at                         | timestamp with time zone    |
+| nonotes1                       | id                                 | bigint                      |
+| nonotes1                       | created_at                         | timestamp with time zone    |
+| nwpi_content                   | internal_post_id                   | uuid                        |
+| nwpi_content                   | fk_users_id                        | uuid                        |
+| nwpi_content                   | fk_sitespren_id                    | uuid                        |
+| nwpi_content                   | fk_sitespren_base                  | text                        |
+| nwpi_content                   | post_id                            | bigint                      |
+| nwpi_content                   | post_author                        | bigint                      |
+| nwpi_content                   | post_date                          | timestamp with time zone    |
+| nwpi_content                   | post_date_gmt                      | timestamp with time zone    |
+| nwpi_content                   | post_modified                      | timestamp with time zone    |
+| nwpi_content                   | int_post_date_gmt                  | timestamp without time zone |
+| nwpi_content                   | int_post_modified_gmt              | timestamp without time zone |
+| nwpi_content                   | post_content                       | text                        |
+| nwpi_content                   | post_content_filtered              | text                        |
+| nwpi_content                   | post_title                         | text                        |
+| nwpi_content                   | post_excerpt                       | text                        |
+| nwpi_content                   | post_status                        | character varying           |
+| nwpi_content                   | post_type                          | character varying           |
+| nwpi_content                   | post_name                          | character varying           |
+| nwpi_content                   | post_password                      | character varying           |
+| nwpi_content                   | comment_status                     | character varying           |
+| nwpi_content                   | ping_status                        | character varying           |
+| nwpi_content                   | to_ping                            | text                        |
+| nwpi_content                   | pinged                             | text                        |
+| nwpi_content                   | guid                               | character varying           |
+| nwpi_content                   | post_parent                        | bigint                      |
+| nwpi_content                   | menu_order                         | integer                     |
+| nwpi_content                   | post_mime_type                     | character varying           |
+| nwpi_content                   | comment_count                      | bigint                      |
+| nwpi_content                   | a_elementor_substance              | jsonb                       |
+| nwpi_content                   | i_raw_metadata                     | jsonb                       |
+| nwpi_content                   | i_created_at                       | timestamp with time zone    |
+| nwpi_content                   | i_updated_at                       | timestamp with time zone    |
+| nwpi_content                   | i_deleted_at                       | timestamp with time zone    |
+| nwpi_content                   | i_sync_method                      | character varying           |
+| nwpi_content                   | i_sync_version                     | integer                     |
+| nwpi_content                   | i_sync_status                      | character varying           |
+| nwpi_content                   | i_revision_number                  | integer                     |
+| nwpi_content                   | i_wp_revision_id                   | bigint                      |
+| nwpi_content                   | i_sync_started_at                  | timestamp with time zone    |
+| nwpi_content                   | i_sync_completed_at                | timestamp with time zone    |
+| nwpi_content                   | i_sync_error_message               | text                        |
+| nwpi_content                   | i_sync_attempt_count               | integer                     |
+| pimages1                       | id                                 | bigint                      |
+| pimages1                       | created_at                         | timestamp with time zone    |
+| rackui_columns                 | column_id                          | integer                     |
+| rackui_columns                 | rel_utg_id                         | character varying           |
+| rackui_columns                 | column_name                        | text                        |
+| rackui_columns                 | display_name                       | text                        |
+| rackui_columns                 | data_type                          | text                        |
+| rackui_columns                 | is_available                       | boolean                     |
+| rackui_columns                 | default_position                   | integer                     |
+| rackui_columns                 | created_at                         | timestamp with time zone    |
+| rackui_columns                 | updated_at                         | timestamp with time zone    |
+| rackui_columns                 | rackuicol_width                    | text                        |
+| rackui_columns                 | user_id                            | uuid                        |
+| rackui_columns                 | is_sortable                        | boolean                     |
+| rackui_columns                 | is_searchable                      | boolean                     |
+| rackui_columns                 | is_editable                        | boolean                     |
+| rackui_columns                 | column_group                       | character varying           |
+| rackui_columns                 | source_table                       | character varying           |
+| rackui_columns                 | cached_coltemp_ids                 | ARRAY                       |
+| rackuic                        | rcolumn_global_id                  | integer                     |
+| rackuic                        | rel_utg_id                         | text                        |
+| rackuic                        | rcolumn_packet_id                  | integer                     |
+| rackuic                        | rcolumn_default_position           | integer                     |
+| rackuic                        | rcolumn_name                       | text                        |
+| rackuic                        | rcolumn_handle                     | text                        |
+| rackuic                        | rcolumn_dbcolumn                   | text                        |
+| rackuic                        | rcolumn_dbtable                    | text                        |
+| rackuic                        | rcolumn_display_name               | text                        |
+| rackuic                        | rcolumn_data_type                  | text                        |
+| rackuic                        | rcolumn_group                      | text                        |
+| rackuic                        | rcolumn_width                      | text                        |
+| rackuic                        | is_available                       | boolean                     |
+| rackuic                        | is_sortable                        | boolean                     |
+| rackuic                        | is_searchable                      | boolean                     |
+| rackuic                        | is_editable                        | boolean                     |
+| rackuic                        | is_special_notsimplyonedbcolumn    | boolean                     |
+| rackuic                        | rcolumn_special_cell_config        | jsonb                       |
+| rackuic                        | cached_coltemp_ids                 | ARRAY                       |
+| rackuic                        | user_id                            | uuid                        |
+| rackuic                        | created_at                         | timestamp with time zone    |
+| rackuic                        | updated_at                         | timestamp with time zone    |
+| rackuic_backup_20250803        | rcolumn_id                         | integer                     |
+| rackuic_backup_20250803        | rcolumn_name                       | text                        |
+| rackuic_backup_20250803        | rcolumn_handle                     | text                        |
+| rackuic_backup_20250803        | rel_utg_id                         | text                        |
+| rackuic_backup_20250803        | rcolumn_dbcolumn                   | text                        |
+| rackuic_backup_20250803        | rcolumn_dbtable                    | text                        |
+| rackuic_backup_20250803        | rcolumn_display_name               | text                        |
+| rackuic_backup_20250803        | rcolumn_data_type                  | text                        |
+| rackuic_backup_20250803        | rcolumn_default_position           | integer                     |
+| rackuic_backup_20250803        | is_available                       | boolean                     |
+| rackuic_backup_20250803        | created_at                         | timestamp with time zone    |
+| rackuic_backup_20250803        | updated_at                         | timestamp with time zone    |
+| rackuic_backup_20250803        | rcolumn_group                      | text                        |
+| rackuic_backup_20250803        | rcolumn_width                      | text                        |
+| rackuic_backup_20250803        | user_id                            | uuid                        |
+| rackuic_backup_20250803        | is_sortable                        | boolean                     |
+| rackuic_backup_20250803        | is_searchable                      | boolean                     |
+| rackuic_backup_20250803        | is_editable                        | boolean                     |
+| rackuic_backup_20250803        | cached_coltemp_ids                 | ARRAY                       |
+| rackuic_backup_20250803        | is_special_notsimplyonedbcolumn    | boolean                     |
+| rackuic_backup_20250803        | rcolumn_special_cell_config        | jsonb                       |
+| redditurls1                    | id                                 | bigint                      |
+| redditurls1                    | created_at                         | timestamp with time zone    |
+| redditurls1_tags               | id                                 | bigint                      |
+| redditurls1_tags               | created_at                         | timestamp with time zone    |
+| redditurls1_tags_relations     | id                                 | bigint                      |
+| redditurls1_tags_relations     | created_at                         | timestamp with time zone    |
+| rocombos                       | id                                 | bigint                      |
+| rocombos                       | created_at                         | timestamp with time zone    |
+| rocombos_tags                  | id                                 | bigint                      |
+| rocombos_tags                  | created_at                         | timestamp with time zone    |
+| rocombos_tags_relations        | id                                 | bigint                      |
+| rocombos_tags_relations        | created_at                         | timestamp with time zone    |
+| rtkeywords                     | id                                 | bigint                      |
+| rtkeywords                     | created_at                         | timestamp with time zone    |
+| rtprojects                     | id                                 | bigint                      |
+| rtprojects                     | created_at                         | timestamp with time zone    |
+| rtrankings                     | id                                 | bigint                      |
+| rtrankings                     | created_at                         | timestamp with time zone    |
+| rtsitesbear                    | id                                 | bigint                      |
+| rtsitesbear                    | created_at                         | timestamp with time zone    |
+| rtsitesbear                    | bearbase1                          | text                        |
+| rtsitesbear                    | fk_users_id                        | uuid                        |
+| sitespren                      | created_at                         | timestamp with time zone    |
+| sitespren                      | sitespren_base                     | text                        |
+| sitespren                      | true_root_domain                   | text                        |
+| sitespren                      | full_subdomain                     | text                        |
+| sitespren                      | webproperty_type                   | text                        |
+| sitespren                      | fk_users_id                        | uuid                        |
+| sitespren                      | updated_at                         | timestamp with time zone    |
+| sitespren                      | wpuser1                            | character varying           |
+| sitespren                      | wppass1                            | character varying           |
+| sitespren                      | wp_plugin_installed1               | boolean                     |
+| sitespren                      | wp_plugin_connected2               | boolean                     |
+| sitespren                      | fk_domreg_hostaccount              | uuid                        |
+| sitespren                      | is_wp_site                         | boolean                     |
+| sitespren                      | id                                 | uuid                        |
+| sitespren                      | wp_rest_app_pass                   | text                        |
+| sitespren                      | driggs_industry                    | text                        |
+| sitespren                      | driggs_city                        | text                        |
+| sitespren                      | driggs_brand_name                  | text                        |
+| sitespren                      | driggs_site_type_purpose           | text                        |
+| sitespren                      | driggs_email_1                     | text                        |
+| sitespren                      | driggs_address_full                | text                        |
+| sitespren                      | driggs_phone_1                     | text                        |
+| sitespren                      | driggs_special_note_for_ai_tool    | text                        |
+| sitespren                      | ns_full                            | text                        |
+| sitespren                      | ip_address                         | text                        |
+| sitespren                      | is_starred1                        | text                        |
+| sitespren                      | icon_name                          | character varying           |
+| sitespren                      | icon_color                         | character varying           |
+| sitespren                      | is_bulldozer                       | boolean                     |
+| sitespren                      | driggs_phone1_platform_id          | integer                     |
+| sitespren                      | driggs_cgig_id                     | integer                     |
+| sitespren                      | driggs_revenue_goal                | integer                     |
+| sitespren                      | driggs_address_species_id          | integer                     |
+| sitespren                      | is_competitor                      | boolean                     |
+| sitespren                      | is_external                        | boolean                     |
+| sitespren                      | is_internal                        | boolean                     |
+| sitespren                      | is_ppx                             | boolean                     |
+| sitespren                      | is_ms                              | boolean                     |
+| sitespren                      | is_wayback_rebuild                 | boolean                     |
+| sitespren                      | is_naked_wp_build                  | boolean                     |
+| sitespren                      | is_rnr                             | boolean                     |
+| sitespren                      | is_aff                             | boolean                     |
+| sitespren                      | is_other1                          | boolean                     |
+| sitespren                      | is_other2                          | boolean                     |
+| sitespren                      | driggs_citations_done              | boolean                     |
+| sitespren                      | is_flylocal                        | boolean                     |
+| sitespren                      | driggs_logo_url                    | text                        |
+| sitespren_large_view_1         | id                                 | uuid                        |
+| sitespren_large_view_1         | created_at                         | timestamp with time zone    |
+| sitespren_large_view_1         | sitespren_base                     | text                        |
+| sitespren_large_view_1         | ns_full                            | text                        |
+| sitespren_large_view_1         | ip_address                         | text                        |
+| sitespren_large_view_1         | true_root_domain                   | text                        |
+| sitespren_large_view_1         | full_subdomain                     | text                        |
+| sitespren_large_view_1         | webproperty_type                   | text                        |
+| sitespren_large_view_1         | fk_users_id                        | uuid                        |
+| sitespren_large_view_1         | updated_at                         | timestamp with time zone    |
+| sitespren_large_view_1         | wpuser1                            | character varying           |
+| sitespren_large_view_1         | wppass1                            | character varying           |
+| sitespren_large_view_1         | wp_rest_app_pass                   | text                        |
+| sitespren_large_view_1         | wp_plugin_installed1               | boolean                     |
+| sitespren_large_view_1         | wp_plugin_connected2               | boolean                     |
+| sitespren_large_view_1         | fk_domreg_hostaccount              | uuid                        |
+| sitespren_large_view_1         | is_wp_site                         | boolean                     |
+| sitespren_large_view_1         | is_starred1                        | text                        |
+| sitespren_large_view_1         | registrar_username                 | character varying           |
+| sitespren_large_view_1         | registrar_company_id               | uuid                        |
+| sitespren_large_view_1         | registrar_company_name             | character varying           |
+| sitespren_large_view_1         | registrar_portal_url               | character varying           |
+| sitespren_tags                 | tag_id                             | uuid                        |
+| sitespren_tags                 | tag_name                           | text                        |
+| sitespren_tags                 | tag_order                          | integer                     |
+| sitespren_tags                 | created_at                         | timestamp with time zone    |
+| sitespren_tags                 | updated_at                         | timestamp with time zone    |
+| sitespren_tags                 | fk_user_id                         | uuid                        |
+| sitespren_tags_relations       | relation_id                        | uuid                        |
+| sitespren_tags_relations       | fk_sitespren_id                    | uuid                        |
+| sitespren_tags_relations       | fk_tag_id                          | uuid                        |
+| sitespren_tags_relations       | tag_position                       | integer                     |
+| sitespren_tags_relations       | created_at                         | timestamp with time zone    |
+| sitespren_tags_relations       | updated_at                         | timestamp with time zone    |
+| sitespren_tags_relations       | fk_user_id                         | uuid                        |
+| stcustomers                    | id                                 | bigint                      |
+| stcustomers                    | created_at                         | timestamp with time zone    |
+| suns                           | srs_global_id                      | integer                     |
+| suns                           | srs_packet_id                      | integer                     |
+| suns                           | rel_utg_id                         | text                        |
+| suns                           | rel_mrm_id                         | integer                     |
+| suns                           | created_at                         | timestamp with time zone    |
+| suns                           | updated_at                         | timestamp with time zone    |
+| tableshells                    | tableshell_id                      | integer                     |
+| tableshells                    | tableshell_name                    | character varying           |
+| tableshells                    | flagship_xpage_id                  | integer                     |
+| tableshells                    | tableshell_tenants                 | text                        |
+| tableshells                    | description                        | text                        |
+| tableshells                    | is_active                          | boolean                     |
+| tableshells                    | created_at                         | timestamp with time zone    |
+| tableshells                    | updated_at                         | timestamp with time zone    |
+| tableshells                    | d_xpages_pagepath_url              | text                        |
+| tableshells                    | d_xpages_pagepath_long             | text                        |
+| tableshells                    | d_xpages_pagepath_short            | text                        |
+| tableshells                    | d_xpages_main_url                  | text                        |
+| tapikeys2                      | id                                 | uuid                        |
+| tapikeys2                      | fk_users_id                        | uuid                        |
+| tapikeys2                      | key_type                           | text                        |
+| tapikeys2                      | key_value                          | text                        |
+| tapikeys2                      | key_name                           | text                        |
+| tapikeys2                      | is_active                          | boolean                     |
+| tapikeys2                      | created_at                         | timestamp with time zone    |
+| tapikeys2                      | updated_at                         | timestamp with time zone    |
+| tonarhousing                   | id                                 | bigint                      |
+| tonarhousing                   | created_at                         | timestamp with time zone    |
+| ui_icons                       | icon_id                            | integer                     |
+| ui_icons                       | icon_name                          | character varying           |
+| ui_icons                       | display_name                       | character varying           |
+| ui_icons                       | category                           | character varying           |
+| ui_icons                       | usage_contexts                     | ARRAY                       |
+| ui_icons                       | created_at                         | timestamp without time zone |
+| users                          | id                                 | uuid                        |
+| users                          | created_at                         | timestamp with time zone    |
+| users                          | email                              | text                        |
+| users                          | auth_id                            | uuid                        |
+| users                          | background_processing_settings     | jsonb                       |
+| users                          | is_admin                           | boolean                     |
+| users                          | sidebar_menu_active                | boolean                     |
+| users                          | ruplin_api_key_1                   | character varying           |
+| utgs                           | utg_id                             | character varying           |
+| utgs                           | utg_name                           | character varying           |
+| utgs                           | utg_description                    | text                        |
+| utgs                           | rel_xpage                          | character varying           |
+| utgs                           | main_db_table                      | character varying           |
+| utgs                           | sql_view                           | character varying           |
+| utgs                           | associated_files                   | jsonb                       |
+| utgs                           | utg_class                          | character varying           |
+| utgs                           | created_at                         | timestamp with time zone    |
+| utgs                           | updated_at                         | timestamp with time zone    |
+| utgs                           | is_active                          | boolean                     |
+| utgs                           | sort_order                         | integer                     |
+| utgs                           | utg_columns_definition_location    | text                        |
+| utgs                           | rel_xpage_id                       | integer                     |
+| utgs                           | horomi_active                      | boolean                     |
+| utgs                           | vertomi_active                     | boolean                     |
+| utgs                           | header_rows_definition_fantasy     | jsonb                       |
+| utgs                           | utg_columns_definition_file_link   | text                        |
+| utility_prompts                | prompt_id                          | uuid                        |
+| utility_prompts                | fk_user_id                         | uuid                        |
+| utility_prompts                | is_special_public_prompt           | boolean                     |
+| utility_prompts                | prompt_content                     | text                        |
+| utility_prompts                | created_at                         | timestamp with time zone    |
+| utility_prompts                | updated_at                         | timestamp with time zone    |
+| utility_prompts                | main_model_intended                | text                        |
+| utility_prompts                | prompt_name                        | text                        |
+| utility_prompts                | prompt_desc                        | text                        |
+| xpages                         | title1                             | text                        |
+| xpages                         | title2                             | text                        |
+| xpages                         | desc1                              | text                        |
+| xpages                         | caption                            | text                        |
+| xpages                         | pagepath_url                       | text                        |
+| xpages                         | pagepath_long                      | text                        |
+| xpages                         | pagepath_short                     | text                        |
+| xpages                         | position_marker                    | integer                     |
+| xpages                         | show_in_all_pages_nav_area1        | boolean                     |
+| xpages                         | broad_parent_container             | text                        |
+| xpages                         | created_at                         | timestamp with time zone    |
+| xpages                         | updated_at                         | timestamp with time zone    |
+| xpages                         | xpage_id                           | integer                     |
+| xpages                         | meta_title                         | text                        |
+| xpages                         | urlparam_total_keys_listed         | jsonb                       |
+| xpages                         | main_url                           | character varying           |
+| xpages                         | has_mutation_observer              | text                        |
+| xpages                         | goal_for_meta_title_system         | text                        |
+| xpages                         | starred                            | boolean                     |
+| xpages                         | flagged                            | boolean                     |
+| xpages                         | penatgoned                         | boolean                     |
+| xpages                         | circled                            | boolean                     |
+| xpages                         | current_state_of_meta_title_system | text                        |
+| xpages                         | icon_name                          | character varying           |
+| xpages                         | icon_color                         | character varying           |
+| yoshidex_file_operations       | operation_id                       | uuid                        |
+| yoshidex_file_operations       | yoshidex_message_id                | uuid                        |
+| yoshidex_file_operations       | yoshidex_session_id                | uuid                        |
+| yoshidex_file_operations       | operation_type                     | character varying           |
+| yoshidex_file_operations       | file_path                          | text                        |
+| yoshidex_file_operations       | file_name                          | text                        |
+| yoshidex_file_operations       | file_extension                     | text                        |
+| yoshidex_file_operations       | file_size                          | bigint                      |
+| yoshidex_file_operations       | operation_timestamp                | timestamp with time zone    |
+| yoshidex_file_operations       | operation_success                  | boolean                     |
+| yoshidex_file_operations       | operation_error                    | text                        |
+| yoshidex_file_operations       | content_preview                    | text                        |
+| yoshidex_file_operations       | content_hash                       | text                        |
+| yoshidex_file_operations       | line_count                         | integer                     |
+| yoshidex_file_operations       | character_count                    | integer                     |
+| yoshidex_file_operations       | programming_language               | text                        |
+| yoshidex_file_operations       | detected_frameworks                | jsonb                       |
+| yoshidex_file_operations       | functions_detected                 | jsonb                       |
+| yoshidex_file_operations       | classes_detected                   | jsonb                       |
+| yoshidex_file_operations       | lines_added                        | integer                     |
+| yoshidex_file_operations       | lines_removed                      | integer                     |
+| yoshidex_file_operations       | lines_modified                     | integer                     |
+| yoshidex_file_operations       | created_at                         | timestamp with time zone    |
+| yoshidex_messages              | yoshidex_message_id                | uuid                        |
+| yoshidex_messages              | yoshidex_session_id                | uuid                        |
+| yoshidex_messages              | claude_message_id                  | text                        |
+| yoshidex_messages              | message_sequence                   | integer                     |
+| yoshidex_messages              | role                               | character varying           |
+| yoshidex_messages              | content                            | text                        |
+| yoshidex_messages              | content_type                       | character varying           |
+| yoshidex_messages              | message_timestamp                  | timestamp with time zone    |
+| yoshidex_messages              | response_time_ms                   | integer                     |
+| yoshidex_messages              | input_tokens                       | integer                     |
+| yoshidex_messages              | output_tokens                      | integer                     |
+| yoshidex_messages              | total_tokens                       | integer                     |
+| yoshidex_messages              | model_used                         | text                        |
+| yoshidex_messages              | temperature                        | numeric                     |
+| yoshidex_messages              | max_tokens                         | integer                     |
+| yoshidex_messages              | tools_used                         | jsonb                       |
+| yoshidex_messages              | tool_results                       | jsonb                       |
+| yoshidex_messages              | files_read                         | jsonb                       |
+| yoshidex_messages              | files_written                      | jsonb                       |
+| yoshidex_messages              | files_analyzed                     | jsonb                       |
+| yoshidex_messages              | working_directory                  | text                        |
+| yoshidex_messages              | command_executed                   | text                        |
+| yoshidex_messages              | command_output                     | text                        |
+| yoshidex_messages              | addresses_story_requirement        | boolean                     |
+| yoshidex_messages              | story_progress_notes               | text                        |
+| yoshidex_messages              | created_at                         | timestamp with time zone    |
+| yoshidex_messages              | content_search_vector              | tsvector                    |
+| yoshidex_messages              | message_hash                       | text                        |
+| yoshidex_messages              | message_metadata                   | jsonb                       |
+| yoshidex_messages              | is_error                           | boolean                     |
+| yoshidex_messages              | error_details                      | text                        |
+| yoshidex_sessions              | yoshidex_session_id                | uuid                        |
+| yoshidex_sessions              | user_id                            | uuid                        |
+| yoshidex_sessions              | claude_session_id                  | text                        |
+| yoshidex_sessions              | specstory_project_id               | text                        |
+| yoshidex_sessions              | session_title                      | text                        |
+| yoshidex_sessions              | session_description                | text                        |
+| yoshidex_sessions              | project_context                    | text                        |
+| yoshidex_sessions              | model_used                         | text                        |
+| yoshidex_sessions              | session_status                     | character varying           |
+| yoshidex_sessions              | total_messages                     | integer                     |
+| yoshidex_sessions              | total_tokens_used                  | integer                     |
+| yoshidex_sessions              | session_started_at                 | timestamp with time zone    |
+| yoshidex_sessions              | session_ended_at                   | timestamp with time zone    |
+| yoshidex_sessions              | created_at                         | timestamp with time zone    |
+| yoshidex_sessions              | updated_at                         | timestamp with time zone    |
+| yoshidex_sessions              | claude_version                     | text                        |
+| yoshidex_sessions              | operating_system                   | text                        |
+| yoshidex_sessions              | workspace_path                     | text                        |
+| yoshidex_sessions              | git_repository_url                 | text                        |
+| yoshidex_sessions              | git_branch                         | text                        |
+| yoshidex_sessions              | git_commit_hash                    | text                        |
+| yoshidex_sessions              | specstory_story_id                 | text                        |
+| yoshidex_sessions              | story_status                       | character varying           |
+| yoshidex_sessions              | story_priority                     | character varying           |
+| yoshidex_sessions              | estimated_hours                    | numeric                     |
+| yoshidex_sessions              | actual_hours                       | numeric                     |
+| yoshidex_sessions              | session_metadata                   | jsonb                       |
+| yoshidex_sessions              | file_attachments                   | jsonb                       |
+| yoshidex_sessions              | tags                               | ARRAY                       |
+| yoshidex_sessions              | is_archived                        | boolean                     |
+| yoshidex_specstory_integration | integration_id                     | uuid                        |
+| yoshidex_specstory_integration | yoshidex_session_id                | uuid                        |
+| yoshidex_specstory_integration | specstory_story_id                 | text                        |
+| yoshidex_specstory_integration | story_title                        | text                        |
+| yoshidex_specstory_integration | story_description                  | text                        |
+| yoshidex_specstory_integration | story_acceptance_criteria          | jsonb                       |
+| yoshidex_specstory_integration | story_status                       | character varying           |
+| yoshidex_specstory_integration | story_priority                     | character varying           |
+| yoshidex_specstory_integration | requirements_addressed             | jsonb                       |
+| yoshidex_specstory_integration | completion_percentage              | numeric                     |
+| yoshidex_specstory_integration | blockers_encountered               | jsonb                       |
+| yoshidex_specstory_integration | decisions_made                     | jsonb                       |
+| yoshidex_specstory_integration | estimated_effort_hours             | numeric                     |
+| yoshidex_specstory_integration | actual_effort_hours                | numeric                     |
+| yoshidex_specstory_integration | time_logged_at                     | timestamp with time zone    |
+| yoshidex_specstory_integration | related_pull_requests              | jsonb                       |
+| yoshidex_specstory_integration | related_issues                     | jsonb                       |
+| yoshidex_specstory_integration | related_documentation              | jsonb                       |
+| yoshidex_specstory_integration | created_at                         | timestamp with time zone    |
+| yoshidex_specstory_integration | updated_at                         | timestamp with time zone    |
+| ywp_content                    | id                                 | uuid                        |
+| ywp_content                    | fk_site_id                         | uuid                        |
+| ywp_content                    | post_id                            | integer                     |
+| ywp_content                    | post_title                         | text                        |
+| ywp_content                    | post_content                       | text                        |
+| ywp_content                    | post_excerpt                       | text                        |
+| ywp_content                    | post_status                        | character varying           |
+| ywp_content                    | post_type                          | character varying           |
+| ywp_content                    | post_date                          | timestamp with time zone    |
+| ywp_content                    | post_modified                      | timestamp with time zone    |
+| ywp_content                    | post_author                        | integer                     |
+| ywp_content                    | post_slug                          | text                        |
+| ywp_content                    | post_parent                        | integer                     |
+| ywp_content                    | menu_order                         | integer                     |
+| ywp_content                    | comment_status                     | character varying           |
+| ywp_content                    | ping_status                        | character varying           |
+| ywp_content                    | post_password                      | text                        |
+| ywp_content                    | post_name                          | text                        |
+| ywp_content                    | to_ping                            | text                        |
+| ywp_content                    | pinged                             | text                        |
+| ywp_content                    | post_content_filtered              | text                        |
+| ywp_content                    | guid                               | text                        |
+| ywp_content                    | post_mime_type                     | character varying           |
+| ywp_content                    | comment_count                      | integer                     |
+| ywp_content                    | created_at                         | timestamp with time zone    |
+| ywp_content                    | updated_at                         | timestamp with time zone    |
+| ywp_content                    | sync_method                        | character varying           |
+| ywp_content                    | raw_metadata                       | jsonb                       |
+| ywp_content                    | sync_version                       | integer                     |
+| ywp_media                      | id                                 | uuid                        |
+| ywp_media                      | site_id                            | uuid                        |
+| ywp_media                      | wp_attachment_id                   | bigint                      |
+| ywp_media                      | post_id                            | uuid                        |
+| ywp_media                      | file_name                          | text                        |
+| ywp_media                      | file_path                          | text                        |
+| ywp_media                      | file_url                           | text                        |
+| ywp_media                      | mime_type                          | text                        |
+| ywp_media                      | file_size                          | bigint                      |
+| ywp_media                      | image_width                        | integer                     |
+| ywp_media                      | image_height                       | integer                     |
+| ywp_media                      | alt_text                           | text                        |
+| ywp_media                      | caption                            | text                        |
+| ywp_media                      | description                        | text                        |
+| ywp_media                      | upload_date                        | timestamp with time zone    |
+| ywp_media                      | created_at                         | timestamp with time zone    |
+| ywp_media                      | updated_at                         | timestamp with time zone    |
+| ywp_post_meta                  | id                                 | uuid                        |
+| ywp_post_meta                  | post_id                            | uuid                        |
+| ywp_post_meta                  | site_id                            | uuid                        |
+| ywp_post_meta                  | wp_meta_id                         | bigint                      |
+| ywp_post_meta                  | meta_key                           | text                        |
+| ywp_post_meta                  | meta_value                         | text                        |
+| ywp_post_meta                  | created_at                         | timestamp with time zone    |
+| ywp_post_meta                  | updated_at                         | timestamp with time zone    |
+| ywp_post_taxonomies            | id                                 | uuid                        |
+| ywp_post_taxonomies            | post_id                            | uuid                        |
+| ywp_post_taxonomies            | taxonomy_id                        | uuid                        |
+| ywp_post_taxonomies            | site_id                            | uuid                        |
+| ywp_post_taxonomies            | term_order                         | integer                     |
+| ywp_post_taxonomies            | created_at                         | timestamp with time zone    |
+| ywp_posts                      | id                                 | uuid                        |
+| ywp_posts                      | site_id                            | uuid                        |
+| ywp_posts                      | wp_post_id                         | bigint                      |
+| ywp_posts                      | post_author                        | uuid                        |
+| ywp_posts                      | post_date                          | timestamp with time zone    |
+| ywp_posts                      | post_date_gmt                      | timestamp with time zone    |
+| ywp_posts                      | post_content                       | text                        |
+| ywp_posts                      | post_title                         | text                        |
+| ywp_posts                      | post_excerpt                       | text                        |
+| ywp_posts                      | post_status                        | text                        |
+| ywp_posts                      | comment_status                     | text                        |
+| ywp_posts                      | ping_status                        | text                        |
+| ywp_posts                      | post_password                      | text                        |
+| ywp_posts                      | post_name                          | text                        |
+| ywp_posts                      | post_modified                      | timestamp with time zone    |
+| ywp_posts                      | post_modified_gmt                  | timestamp with time zone    |
+| ywp_posts                      | post_content_filtered              | text                        |
+| ywp_posts                      | post_parent                        | bigint                      |
+| ywp_posts                      | guid                               | text                        |
+| ywp_posts                      | menu_order                         | integer                     |
+| ywp_posts                      | post_type                          | text                        |
+| ywp_posts                      | post_mime_type                     | text                        |
+| ywp_posts                      | comment_count                      | bigint                      |
+| ywp_posts                      | featured_image_url                 | text                        |
+| ywp_posts                      | seo_title                          | text                        |
+| ywp_posts                      | seo_description                    | text                        |
+| ywp_posts                      | created_at                         | timestamp with time zone    |
+| ywp_posts                      | updated_at                         | timestamp with time zone    |
+| ywp_sites                      | id                                 | uuid                        |
+| ywp_sites                      | site_url                           | text                        |
+| ywp_sites                      | site_name                          | text                        |
+| ywp_sites                      | admin_email                        | text                        |
+| ywp_sites                      | wp_version                         | text                        |
+| ywp_sites                      | api_key                            | text                        |
+| ywp_sites                      | last_sync_at                       | timestamp with time zone    |
+| ywp_sites                      | sync_enabled                       | boolean                     |
+| ywp_sites                      | created_at                         | timestamp with time zone    |
+| ywp_sites                      | updated_at                         | timestamp with time zone    |
+| ywp_sites                      | fk_user_id                         | uuid                        |
+| ywp_sites                      | fk_images_plans_batches_id         | uuid                        |
+| ywp_sync_log                   | id                                 | uuid                        |
+| ywp_sync_log                   | site_id                            | uuid                        |
+| ywp_sync_log                   | sync_type                          | text                        |
+| ywp_sync_log                   | operation                          | text                        |
+| ywp_sync_log                   | wp_object_id                       | bigint                      |
+| ywp_sync_log                   | object_type                        | text                        |
+| ywp_sync_log                   | status                             | text                        |
+| ywp_sync_log                   | error_message                      | text                        |
+| ywp_sync_log                   | records_processed                  | integer                     |
+| ywp_sync_log                   | records_total                      | integer                     |
+| ywp_sync_log                   | sync_data                          | jsonb                       |
+| ywp_sync_log                   | started_at                         | timestamp with time zone    |
+| ywp_sync_log                   | completed_at                       | timestamp with time zone    |
+| ywp_sync_log                   | created_at                         | timestamp with time zone    |
+| ywp_taxonomies                 | id                                 | uuid                        |
+| ywp_taxonomies                 | site_id                            | uuid                        |
+| ywp_taxonomies                 | wp_term_id                         | bigint                      |
+| ywp_taxonomies                 | wp_term_taxonomy_id                | bigint                      |
+| ywp_taxonomies                 | name                               | text                        |
+| ywp_taxonomies                 | slug                               | text                        |
+| ywp_taxonomies                 | taxonomy                           | text                        |
+| ywp_taxonomies                 | description                        | text                        |
+| ywp_taxonomies                 | parent_id                          | uuid                        |
+| ywp_taxonomies                 | count                              | integer                     |
+| ywp_taxonomies                 | created_at                         | timestamp with time zone    |
+| ywp_taxonomies                 | updated_at                         | timestamp with time zone    |
+| ywp_users                      | id                                 | uuid                        |
+| ywp_users                      | site_id                            | uuid                        |
+| ywp_users                      | wp_user_id                         | bigint                      |
+| ywp_users                      | user_login                         | text                        |
+| ywp_users                      | user_email                         | text                        |
+| ywp_users                      | user_nicename                      | text                        |
+| ywp_users                      | display_name                       | text                        |
+| ywp_users                      | user_role                          | text                        |
+| ywp_users                      | user_status                        | integer                     |
+| ywp_users                      | user_registered                    | timestamp with time zone    |
+| ywp_users                      | avatar_url                         | text                        |
+| ywp_users                      | created_at                         | timestamp with time zone    |
+| ywp_users                      | updated_at                         | timestamp with time zone    |
+| zarnos                         | zarno_id                           | integer                     |
+| zarnos                         | fk_xpage_id                        | integer                     |
+| zarnos                         | zarno_type                         | character varying           |
+| zarnos                         | zarno_name                         | character varying           |
+| zarnos                         | zarno_path                         | text                        |
+| zarnos                         | zarno_status                       | character varying           |
+| zarnos                         | zarno_config                       | jsonb                       |
+| zarnos                         | execution_order                    | integer                     |
+| zarnos                         | dependencies                       | jsonb                       |
+| zarnos                         | metadata                           | jsonb                       |
+| zarnos                         | is_enabled                         | boolean                     |
+| zarnos                         | created_at                         | timestamp without time zone |
+| zarnos                         | updated_at                         | timestamp without time zone |
+| zarnos                         | created_by                         | uuid                        |
+| zephix_audit_log               | id                                 | uuid                        |
+| zephix_audit_log               | operation                          | text                        |
+| zephix_audit_log               | table_name                         | text                        |
+| zephix_audit_log               | record_id                          | text                        |
+| zephix_audit_log               | user_id                            | text                        |
+| zephix_audit_log               | timestamp                          | timestamp with time zone    |
+| zephix_audit_log               | query                              | text                        |
+| zephix_audit_log               | params                             | jsonb                       |
+| zephix_audit_log               | changes                            | jsonb                       |
+| zephix_audit_log               | error                              | jsonb                       |
+| zephix_audit_log               | duration_ms                        | integer                     |
+| zephix_audit_log               | row_count                          | integer                     |
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I have reviewed and stored your complete database schema in my memory for future reference. The schema contains **135 tables** with a rich structure covering multiple domains:
+
+## **Key Table Categories Identified:**
+
+### **Core System Tables:**
+- **Users & Authentication**: `users`, `api_keys_t1/t2/t3`, `api_key_slots`
+- **Content Management**: `gcon_pieces`, `nwpi_content`, `ywp_content`
+- **File Management**: `filegun_files`, `filegun_folders`
+- **Site Management**: `sitespren`, `domains1`, `host_account`
+
+### **AI & Content Generation:**
+- **AI Models**: `ai_models`, `iservice_providers`
+- **Content Generation**: `images`, `images_plans`, `images_plans_batches`
+- **Chat System**: `chats`, `chat_messages`, `chat_metadata`
+- **Yoshidex System**: `yoshidex_sessions`, `yoshidex_messages`, `yoshidex_file_operations`
+
+### **Data & Analytics:**
+- **Keywords**: `keywordshub`, `kw_scaffolds`
+- **Location Data**: `cities`, `metros`, `dfs_locations`
+- **Industries**: `industries`, `cncglub`
+
+### **UI & Configuration:**
+- **UI Management**: `utgs`, `xpages`, `rackuic`, `coltemps`
+- **Settings**: `ketch_settings`, `admin_options`, `custom_colors`
+
+### **Specialized Features:**
+- **Mockups**: `bakli_mockups`, `bakli_mockup_versions`
+- **Content Processing**: `aval_units`, `nemtor_units`, `mud_actions`
+- **WordPress Integration**: `ywp_posts`, `ywp_sites`, `ywp_sync_log`
+
+### **Notable Patterns:**
+- Heavy use of **UUID** primary keys
+- **JSONB** columns for flexible data storage
+- **Timestamp tracking** (created_at/updated_at)
+- **Foreign key relationships** with `fk_` prefix
+- **Boolean flags** for feature toggles (is_active, is_starred, etc.)
+
+This schema represents a comprehensive content management and AI-powered application platform with sophisticated data relationships and flexible storage patterns. I'll reference this structure for any future database-related questions or modifications.
+
+---
+
+_**User**_
+
+pleaes locate the area in the stellar chamber that contains content like this:
+driggs_revenue_goal $350/m
+
+please then create a similar implementation directly above it visually
+
+it should say:
+sitespren_base (insert db value here from _zen_sitespren where wppma_id = 1)
+
+this should have the same styling as the existing elements in the area at:
+driggs_revenue_goal $350/m
+
+
