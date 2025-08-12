@@ -4829,3 +4829,410 @@ ONLY do what is explicitly requested. Do NOT:
 
 
 
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add ED button and popup editor for _elementor_data column
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+First, I'll add the popup HTML for the elementor data editor, using the same styling as the post_content editor:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8150→                    </form>
+  8151→                </div>
+  8152→            </div>
+  8153→
+  8154→            <!-- Post Content Editor Modal -->
+  8155→            <div id="beamraymar-content-editor-modal" class="beamraymar-content-editor-modal">
+  8156→                <div class="beamraymar-content-editor-content">
+  8157→                    <div class="beamraymar-content-editor-header">post_content</div>
+  8158→                    <textarea id="beamraymar-content-editor-textarea" class="beamraymar-content-editor-textarea"></textarea>
+  8159→                    <div class="beamraymar-content-editor-actions">
+  8160→                        <button type="button" class="beamraymar-content-editor-btn cancel" id="beamraymar-content-editor-cancel">Cancel</button>
+  8161→                        <button type="button" class="beamraymar-content-editor-btn save" id="beamraymar-content-editor-save">Save</button>
+  8162→                    </div>
+  8163→                </div>
+  8164→            </div>
+  8165→
+  8166→            <!-- Elementor Data Editor Modal -->
+  8167→            <div id="beamraymar-elementor-editor-modal" class="beamraymar-content-editor-modal">
+  8168→                <div class="beamraymar-content-editor-content">
+  8169→                    <div class="beamraymar-content-editor-header">_elementor_data</div>
+  8170→                    <textarea id="beamraymar-elementor-editor-textarea" class="beamraymar-content-editor-textarea"></textarea>
+  8171→                    <div class="beamraymar-content-editor-actions">
+  8172→                        <button type="button" class="beamraymar-content-editor-btn cancel" id="beamraymar-elementor-editor-cancel">Cancel</button>
+  8173→                        <button type="button" class="beamraymar-content-editor-btn save" id="beamraymar-elementor-editor-save">Save</button>
+  8174→                    </div>
+  8175→                </div>
+  8176→            </div>
+  8177→
+  8178→            <script>
+  8179→                // Beamraymar JavaScript functionality
+  8180→                (function($) {
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now update the PHP rendering to add the ED button to the elementor data column:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8890→                    $line_count = substr_count($item['_elementor_data'], "\n") + 1;
+  8891→                    $elementor_display = $line_count . ' lines';
+  8892→                }
+  8893→            }
+  8894→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($elementor_display) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '" data-editor-type="elementor">ED</button></div></td>';
+  8895→            
+  8896→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_type']) . '</div></td>';
+  8897→            echo '<td class="beamraymar-editable-cell" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_status']) . '</div></td>';
+  8898→            echo '<td class="beamraymar-editable-cell" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_name']) . '</div></td>';
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now update the JavaScript rendering to add the ED button:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8494→                                </td>
+  8495→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  8496→                                <td class="beamraymar-editable-cell" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8497→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+  8498→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
+  8499→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+  8500→                                <td class="beamraymar-editable-cell" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status}</div></td>
+  8501→                                <td class="beamraymar-editable-cell" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_name || ''}</div></td>
+  8502→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${formatDate(item.post_date)}</div></td>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now update the JavaScript event handler to handle both types of ED buttons:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8340→                            e.preventDefault();
+  8341→                            saveModalData();
+  8342→                        });
+  8343→                        
+  8344→                        // Post content editor handlers
+  8345→                        $(document).on('click', '.beamraymar-content-edit-btn', function(e) {
+  8346→                            e.stopPropagation();
+  8347→                            const postId = $(this).data('post-id');
+  8348→                            const editorType = $(this).data('editor-type');
+  8349→                            
+  8350→                            if (editorType === 'elementor') {
+  8351→                                openElementorEditor(postId);
+  8352→                            } else {
+  8353→                                openContentEditor(postId);
+  8354→                            }
+  8355→                        });
+  8356→                        
+  8357→                        $('#beamraymar-content-editor-cancel').on('click', function() {
+  8358→                            closeContentEditor();
+  8359→                        });
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now add event handlers for the elementor editor buttons:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8357→                        $('#beamraymar-content-editor-cancel').on('click', function() {
+  8358→                            closeContentEditor();
+  8359→                        });
+  8360→                        
+  8361→                        $('#beamraymar-content-editor-save').on('click', function() {
+  8362→                            saveContentEditor();
+  8363→                        });
+  8364→                        
+  8365→                        // Elementor data editor handlers
+  8366→                        $('#beamraymar-elementor-editor-cancel').on('click', function() {
+  8367→                            closeElementorEditor();
+  8368→                        });
+  8369→                        
+  8370→                        $('#beamraymar-elementor-editor-save').on('click', function() {
+  8371→                            saveElementorEditor();
+  8372→                        });
+  8373→                        
+  8374→                        // Table column sorting
+  8375→                        $('.beamraymar-table th[data-field]').on('click', function() {
+  8376→                            const field = $(this).data('field');
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now add a variable to track the current elementor edit post ID:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8182→                    
+  8183→                    let currentPage = 1;
+  8184→                    let itemsPerPage = 100;
+  8185→                    let currentSearch = '';
+  8186→                    let allData = <?php echo json_encode($posts_pages); ?>;
+  8187→                    let filteredData = [...allData];
+  8188→                    let selectedRows = new Set();
+  8189→                    let editingCell = null;
+  8190→                    let currentContentEditPostId = null;
+  8191→                    let currentElementorEditPostId = null;
+  8192→                    
+  8193→                    // Initialize page
+  8194→                    $(document).ready(function() {
+  8195→                        initializeEventHandlers();
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now add the JavaScript functions for the elementor editor:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8778→                        const lineCount = (elementorData.match(/\n/g) || []).length + 1;
+  8779→                        return lineCount + ' lines';
+  8780→                    }
+  8781→                    
+  8782→                    // Elementor data editor functions
+  8783→                    function openElementorEditor(postId) {
+  8784→                        currentElementorEditPostId = postId;
+  8785→                        const post = allData.find(item => item.ID == postId);
+  8786→                        
+  8787→                        if (post) {
+  8788→                            $('#beamraymar-elementor-editor-textarea').val(post._elementor_data || '');
+  8789→                            $('#beamraymar-elementor-editor-modal').addClass('active');
+  8790→                        }
+  8791→                    }
+  8792→                    
+  8793→                    function closeElementorEditor() {
+  8794→                        $('#beamraymar-elementor-editor-modal').removeClass('active');
+  8795→                        $('#beamraymar-elementor-editor-textarea').val('');
+  8796→                        currentElementorEditPostId = null;
+  8797→                    }
+  8798→                    
+  8799→                    function saveElementorEditor() {
+  8800→                        if (!currentElementorEditPostId) return;
+  8801→                        
+  8802→                        const newElementorData = $('#beamraymar-elementor-editor-textarea').val();
+  8803→                        
+  8804→                        // Send AJAX request to save
+  8805→                        $.ajax({
+  8806→                            url: ajaxurl,
+  8807→                            type: 'POST',
+  8808→                            data: {
+  8809→                                action: 'beamraymar_update_elementor_data',
+  8810→                                post_id: currentElementorEditPostId,
+  8811→                                elementor_data: newElementorData,
+  8812→                                nonce: '<?php echo wp_create_nonce('beamraymar_nonce'); ?>'
+  8813→                            },
+  8814→                            success: function(response) {
+  8815→                                if (response.success) {
+  8816→                                    // Update local data
+  8817→                                    const post = allData.find(item => item.ID == currentElementorEditPostId);
+  8818→                                    if (post) {
+  8819→                                        post._elementor_data = newElementorData;
+  8820→                                    }
+  8821→                                    
+  8822→                                    // Refresh table
+  8823→                                    updateTable();
+  8824→                                    
+  8825→                                    // Close editor
+  8826→                                    closeElementorEditor();
+  8827→                                } else {
+  8828→                                    alert('Failed to save: ' + (response.data || 'Unknown error'));
+  8829→                                }
+  8830→                            },
+  8831→                            error: function() {
+  8832→                                alert('Failed to save elementor data');
+  8833→                            }
+  8834→                        });
+  8835→                    }
+  8836→                    
+  8837→                    // Post content editor functions
+  8838→                    function openContentEditor(postId) {
+  8839→                        currentContentEditPostId = postId;
+  8840→                        const post = allData.find(item => item.ID == postId);
+  8841→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now add the AJAX action handler for updating elementor data:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    54→        
+    55→        // Bulk duplication AJAX action
+    56→        add_action('wp_ajax_rup_duplicate_single_post', array($this, 'rup_duplicate_single_post'));
+    57→        
+    58→        // AJAX handler for beamraymar post content update
+    59→        add_action('wp_ajax_beamraymar_update_post_content', array($this, 'beamraymar_update_post_content'));
+    60→        
+    61→        // AJAX handler for beamraymar elementor data update
+    62→        add_action('wp_ajax_beamraymar_update_elementor_data', array($this, 'beamraymar_update_elementor_data'));
+    63→        
+    64→        // Add Elementor data viewer
+    65→        add_action('add_meta_boxes', array($this, 'add_elementor_data_metabox'));
+    66→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now add the PHP function to handle elementor data updates:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8982→            $count++;
+  8983→        }
+  8984→    }
+  8985→    
+  8986→    /**
+  8987→     * AJAX handler for updating elementor data from beamraymar editor
+  8988→     */
+  8989→    public function beamraymar_update_elementor_data() {
+  8990→        // Verify nonce
+  8991→        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+  8992→            wp_send_json_error('Security check failed');
+  8993→            return;
+  8994→        }
+  8995→        
+  8996→        // Check permissions
+  8997→        if (!current_user_can('edit_posts')) {
+  8998→            wp_send_json_error('Permission denied');
+  8999→            return;
+  9000→        }
+  9001→        
+  9002→        // Get and validate post ID
+  9003→        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+  9004→        if (!$post_id) {
+  9005→            wp_send_json_error('Invalid post ID');
+  9006→            return;
+  9007→        }
+  9008→        
+  9009→        // Get new elementor data
+  9010→        $new_elementor_data = isset($_POST['elementor_data']) ? $_POST['elementor_data'] : '';
+  9011→        
+  9012→        // Update the post meta
+  9013→        if ($new_elementor_data === '' || $new_elementor_data === null) {
+  9014→            delete_post_meta($post_id, '_elementor_data');
+  9015→            wp_send_json_success('Elementor data cleared');
+  9016→        } else {
+  9017→            update_post_meta($post_id, '_elementor_data', $new_elementor_data);
+  9018→            wp_send_json_success('Elementor data updated successfully');
+  9019→        }
+  9020→    }
+  9021→    
+  9022→    /**
+  9023→     * AJAX handler for updating post content from beamraymar editor
+  9024→     */
+  9025→    public function beamraymar_update_post_content() {
+  9026→        // Verify nonce
+  9027→        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+  9028→            wp_send_json_error('Security check failed');
+  9029→            return;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Add ED button and popup editor for _elementor_data column
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I've successfully added the ED button and popup editor for the _elementor_data column:
+
+## ✅ **Changes Completed - ONLY what was requested:**
+
+### 1. **Added ED Button to _elementor_data Column:**
+- **20px × 20px square button** with text "ED"
+- Added to every `<td>` in the _elementor_data column
+- Uses same CSS class as post_content ED button
+- Includes `data-editor-type="elementor"` attribute to differentiate
+
+### 2. **Created Elementor Data Popup:**
+- Uses **exact same styling** as post_content editor popup
+- Header shows "_elementor_data" in bold 16px font
+- Large textarea for editing JSON data
+- Save and Cancel buttons at bottom
+
+### 3. **JavaScript Functionality:**
+- Added `currentElementorEditPostId` variable
+- Created `openElementorEditor()`, `closeElementorEditor()`, `saveElementorEditor()` functions
+- Modified click handler to detect editor type and open correct popup
+- Added event handlers for elementor editor Cancel and Save buttons
+
+### 4. **AJAX Handler:**
+- Added `beamraymar_update_elementor_data` action
+- Verifies nonce and permissions
+- Updates `_elementor_data` post meta
+- Handles both updates and deletions (if data is empty)
+
+### 5. **Data Flow:**
+- Clicking ED button opens popup with full _elementor_data JSON
+- User can edit the raw JSON data
+- Save button updates the database via AJAX
+- Table refreshes to show updated line count
+- Cancel closes without saving
+
+The _elementor_data column now has the same editing functionality as post_content, with a dedicated ED button and full-screen editor popup using identical styling.
+
