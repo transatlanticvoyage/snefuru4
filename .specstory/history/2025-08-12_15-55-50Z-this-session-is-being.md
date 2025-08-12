@@ -188,3 +188,28 @@ The implementation successfully handles:
 
 All files are properly updated and the column is positioned at the far left as requested.
 
+---
+
+_**User**_
+
+crate a new toolbutton of 20 px by 20 px that occurs to the left of the f button in our new tool_buttons ui column on beamraymar page
+
+on this toolbutton, place an icon of a pendulum 
+
+something that looks like a circle with a little vertical bar extending upward off the circle a few pixels 
+
+i will refer to this as the pendulum button
+
+this button should open as a link the main wp editor page for that page/post
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
