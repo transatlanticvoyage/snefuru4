@@ -4481,3 +4481,351 @@ Perfect! I've successfully implemented all the requested changes for the post_co
 
 The post_content column now has a clean, read-only display with truncated plain text, and users can edit the full HTML content through the dedicated ED button and popup editor.
 
+---
+
+_**User**_
+
+please add a new ui column to our ui table at:
+beamraymar
+
+place this column to the immediate right of column:
+post_content
+
+use this <th> label for the columN:
+_elementor_data
+
+pleaes display the _elementor_data from wp posts meta db table here if the page/post is using elementor 
+
+actually, do not display any live data from the db directly in our ui table grid here at beamraymar
+
+instead post text like this in each <td>
+
+110 lines
+44 lines
+0 lines
+etc
+
+place a quanity plus the text "lines" to indicate the amount of lines in the json field that stores the _elementor_data
+
+if there is an associated _elementor_data entry for the page/post, but it is empty, then please put "0 lines"
+
+if there is no associated _elementor_data entry for the page/post, then please put the text "none" in this ui table cell at beamraymar page
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add _elementor_data column to beamraymar table showing line count
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+First, I need to add the new column header to the table. Let me find the table headers and add the new column after post_content:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8032→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox" id="select-all"></div>
+  8033→                                </th>
+  8034→                                <th data-field="ID" data-type="integer"><div class="tcell_inner_wrapper_div">id</div></th>
+  8035→                                <th data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">post_title</div></th>
+  8036→                                <th data-field="post_content" data-type="longtext"><div class="tcell_inner_wrapper_div">post_content</div></th>
+  8037→                                <th data-field="_elementor_data" data-type="text"><div class="tcell_inner_wrapper_div">_elementor_data</div></th>
+  8038→                                <th data-field="post_type" data-type="text"><div class="tcell_inner_wrapper_div">post_type</div></th>
+  8039→                                <th data-field="post_status" data-type="text"><div class="tcell_inner_wrapper_div">post_status</div></th>
+  8040→                                <th data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">post_name</div></th>
+  8041→                                <th data-field="post_date" data-type="datetime"><div class="tcell_inner_wrapper_div">post_date</div></th>
+  8042→                                <th data-field="post_modified" data-type="datetime"><div class="tcell_inner_wrapper_div">post_modified</div></th>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the `get_posts_and_pages_data` function to include the _elementor_data from post meta:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8801→    
+  8802→    /**
+  8803→     * Get posts and pages data for beamraymar table
+  8804→     */
+  8805→    private function get_posts_and_pages_data() {
+  8806→        global $wpdb;
+  8807→        
+  8808→        $results = $wpdb->get_results(
+  8809→            "SELECT p.ID, p.post_title, p.post_content, p.post_type, p.post_status, p.post_name, 
+  8810→                    p.post_date, p.post_modified, p.post_author, p.post_parent, p.menu_order, 
+  8811→                    p.comment_status, p.ping_status,
+  8812→                    pm.meta_value as _elementor_data
+  8813→             FROM {$wpdb->posts} p
+  8814→             LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_elementor_data'
+  8815→             WHERE p.post_type IN ('post', 'page') 
+  8816→             AND p.post_status NOT IN ('trash', 'auto-draft') 
+  8817→             ORDER BY p.post_modified DESC",
+  8818→            ARRAY_A
+  8819→        );
+  8820→        
+  8821→        return $results ? $results : array();
+  8822→    }
+  8823→    
+  8824→    /**
+  8825→     * Render table rows for beamraymar table
+  8826→     */
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the PHP rendering to add the elementor data column with line count:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8853→            echo '<div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="' . esc_attr($item['ID']) . '"></div>';
+  8854→            echo '</td>';
+  8855→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+  8856→            echo '<td class="beamraymar-editable-cell" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+  8857→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
+  8858→            
+  8859→            // Calculate elementor data line count
+  8860→            $elementor_display = 'none';
+  8861→            if (isset($item['_elementor_data']) && $item['_elementor_data'] !== null) {
+  8862→                if (empty($item['_elementor_data']) || $item['_elementor_data'] === '[]') {
+  8863→                    $elementor_display = '0 lines';
+  8864→                } else {
+  8865→                    $line_count = substr_count($item['_elementor_data'], "\n") + 1;
+  8866→                    $elementor_display = $line_count . ' lines';
+  8867→                }
+  8868→            }
+  8869→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($elementor_display) . '</div></td>';
+  8870→            
+  8871→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_type']) . '</div></td>';
+  8872→            echo '<td class="beamraymar-editable-cell" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_status']) . '</div></td>';
+  8873→            echo '<td class="beamraymar-editable-cell" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_name']) . '</div></td>';
+  8874→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html(date('Y-m-d H:i:s', strtotime($item['post_date']))) . '</div></td>';
+  8875→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html(date('Y-m-d H:i:s', strtotime($item['post_modified']))) . '</div></td>';
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the empty state message to account for the new column (change colspan from 14 to 15):
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8825→     * Render table rows for beamraymar table
+  8826→     */
+  8827→    private function render_beamraymar_table_rows($posts_pages) {
+  8828→        if (empty($posts_pages)) {
+  8829→            echo '<tr><td colspan="15" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+  8830→            return;
+  8831→        }
+  8832→        
+  8833→        $count = 0;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the JavaScript rendering to include the elementor data column. First, let me add a helper function to calculate line count:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8732→                        }
+  8733→                        return firstLine;
+  8734→                    }
+  8735→                    
+  8736→                    function formatDate(dateString) {
+  8737→                        if (!dateString) return '';
+  8738→                        return new Date(dateString).toLocaleString();
+  8739→                    }
+  8740→                    
+  8741→                    function formatElementorData(elementorData) {
+  8742→                        if (elementorData === null || elementorData === undefined) {
+  8743→                            return 'none';
+  8744→                        }
+  8745→                        if (elementorData === '' || elementorData === '[]') {
+  8746→                            return '0 lines';
+  8747→                        }
+  8748→                        const lineCount = (elementorData.match(/\n/g) || []).length + 1;
+  8749→                        return lineCount + ' lines';
+  8750→                    }
+  8751→                    
+  8752→                    // Post content editor functions
+  8753→                    function openContentEditor(postId) {
+  8754→                        currentContentEditPostId = postId;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now update the JavaScript table rendering to include the new column:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8480→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+  8481→                                </td>
+  8482→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  8483→                                <td class="beamraymar-editable-cell" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8484→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+  8485→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}</div></td>
+  8486→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+  8487→                                <td class="beamraymar-editable-cell" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status}</div></td>
+  8488→                                <td class="beamraymar-editable-cell" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_name || ''}</div></td>
+  8489→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${formatDate(item.post_date)}</div></td>
+  8490→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${formatDate(item.post_modified)}</div></td>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Finally, I need to update the column pagination logic to account for the new column (total columns is now 15 instead of 14):
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8394→                        currentColumnGroup = groupNumber;
+  8395→                        updateColumnVisibility();
+  8396→                    }
+  8397→                    
+  8398→                    function handleColumnNavigation(action) {
+  8399→                        const totalGroups = Math.ceil(15 / columnsPerGroup); // 15 total columns
+  8400→                        
+  8401→                        switch(action) {
+  8402→                            case 'first':
+  8403→                                currentColumnGroup = 1;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Also need to update the column group bar labels since we now have more columns:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  7992→                    <div class="beamraymar-nubra-kite">nubra-tableface-kite</div>
+  7993→                    
+  7994→                    <!-- Column Pagination Controls -->
+  7995→                    <div class="beamraymar-column-pagination-controls">
+  7996→                        <div class="beamraymar-column-pagination-bar" id="beamraymar-column-group-bar">
+  7997→                            <a href="#" class="beamraymar-column-pagination-btn active" data-column-group="1">Columns 1-7</a>
+  7998→                            <a href="#" class="beamraymar-column-pagination-btn" data-column-group="2">Columns 8-14</a>
+  7999→                            <a href="#" class="beamraymar-column-pagination-btn" data-column-group="3">Column 15</a>
+  8000→                        </div>
+  8001→                        
+  8002→                        <div class="beamraymar-column-pagination-bar" id="beamraymar-column-nav-bar">
+  8003→                            <a href="#" class="beamraymar-column-pagination-btn" data-column-nav="first">First</a>
+  8004→                            <a href="#" class="beamraymar-column-pagination-btn" data-column-nav="prev">Prev</a>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Add _elementor_data column to beamraymar table showing line count
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I've successfully added the `_elementor_data` column to the beamraymar table:
+
+## ✅ **Changes Completed - ONLY what was requested:**
+
+### 1. **Added New Column Header:**
+- Added `<th>` with label `_elementor_data`
+- Positioned immediately to the right of `post_content` column
+
+### 2. **Database Query Updated:**
+- Modified SQL to LEFT JOIN with `wp_postmeta` table
+- Retrieves `_elementor_data` meta value for each post/page
+
+### 3. **Column Display Logic:**
+- **"none"** - if no _elementor_data entry exists for the post/page
+- **"0 lines"** - if _elementor_data exists but is empty or just "[]"
+- **"X lines"** - shows actual line count for populated _elementor_data (e.g., "110 lines", "44 lines")
+
+### 4. **Line Count Calculation:**
+- PHP: Uses `substr_count($item['_elementor_data'], "\n") + 1`
+- JavaScript: Uses `(elementorData.match(/\n/g) || []).length + 1`
+
+### 5. **Updated Table Structure:**
+- Increased colspan from 14 to 15 for empty state message
+- Updated column pagination to handle 15 total columns
+- Added third column group button for "Column 15"
+
+### 6. **No Direct Data Display:**
+- Does NOT show the actual JSON data in the table
+- Only shows the line count as specified
+
+The new column is fully integrated with existing table functionality including column pagination, filtering, and data updates.
+
+---
+
+_**User**_
+
+pleaes place a square 20 px by 20 px div to be used as a button inside the _elementor_data ui column inside every <td> in that column
+
+when user clicks, display popup that dislays full _elementor_data json in a large text box (use the styling from the exisitng "ed" popup from the post_content column for this popup ui elements) where user can edit and save 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+
+
