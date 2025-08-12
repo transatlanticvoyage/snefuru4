@@ -3517,3 +3517,1148 @@ Each column now has consistent `fact_` prefixed class names that reflect the dat
 
 This enables precise CSS targeting for any specific column across all table cells.
 
+---
+
+_**User**_
+
+plae create a new page in the ruplin wp plugin at
+page=cssmar
+
+this will allow the user to edit the css file of sddx 240 live on their specific site
+
+i will use it to speed up dev time right now and then i will manually reverse integrate the changes into vscode in the local file once happy, then push through github 
+
+but, for now, this cssmar should be a publicly visible page just like any other screen of our ruplin wp plugin 
+
+on the page, please place a large text box css editor area 
+
+above this area, please place 5 horizontal tabs named:
+SDDX - 240
+tab2
+tab3
+tab4
+tab5
+
+of course, our editor box should appear on the sddx - 240 tab and load the contents of that specific css file associated
+
+also please display the full path, comlete with the domain name called in from _zen_sitespren.sitespren_base dynamically to contstruct the full path, of this css file where it resides . include https:// on the beginning of this too 
+
+allow this url bar to be copied 
+
+this url bar will be in a text box that sits (with its own copy button), above the top edge of the css editor box and below the tabs 
+
+user should be able to edit that file directly and click the "save" button (save button will be cloned to 2 places both above and below the css editor box 
+
+———————————————————————
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Create cssmar page with CSS editor, tabs, URL display and save functionality
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+120→            array($this, 'settings_page')
+   121→        );
+   122→        
+   123→        
+   124→        add_submenu_page(
+   125→            'snefuru',
+   126→            'Logs',
+   127→            'Logs',
+   128→            'manage_options',
+   129→            'snefuru-logs',
+   130→            array($this, 'logs_page')
+   131→        );
+   132→        
+   133→        add_submenu_page(
+   134→            'snefuru',
+   135→            'Dublish Logs',
+   136→            'Dublish Logs',
+   137→            'manage_options',
+   138→            'snefuru-dublish-logs',
+   139→            array($this, 'dublish_logs_page')
+   140→        );
+   141→        
+   142→        add_submenu_page(
+   143→            'snefuru',
+   144→            'screen 4 - manage',
+   145→            'screen 4 - manage',
+   146→            'manage_options',
+   147→            'snefuru-screen4-manage',
+   148→            array($this, 'screen4_manage_page')
+   149→        );
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+240→        );
+   241→        
+   242→        add_submenu_page(
+   243→            'snefuru',
+   244→            'document_outlook_aug9',
+   245→            'document_outlook_aug9',
+   246→            'manage_options',
+   247→            'document_outlook_aug9',
+   248→            array($this, 'document_outlook_aug9_page')
+   249→        );
+   250→        
+   251→        add_submenu_page(
+   252→            'snefuru',
+   253→            'dynamic_images_man',
+   254→            'dynamic_images_man',
+   255→            'manage_options',
+   256→            'dynamic_images_man',
+   257→            array($this, 'dynamic_images_man_page')
+   258→        );
+   259→        
+   260→        add_submenu_page(
+   261→            'snefuru',
+   262→            'Sitespren Export',
+   263→            'Sitespren Export',
+   264→            'manage_options',
+   265→            'rup_sitespren_export',
+   266→            array($this, 'rup_sitespren_export_page')
+   267→        );
+   268→        
+   269→        add_submenu_page(
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me find a good spot to add the cssmar page menu item. Let me look for the beamraymar page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+55-        // Bulk duplication AJAX action
+56-        add_action('wp_ajax_rup_duplicate_single_post', array($this, 'rup_duplicate_single_post'));
+57-        
+58:        // AJAX handler for beamraymar post content update
+59:        add_action('wp_ajax_beamraymar_update_post_content', array($this, 'beamraymar_update_post_content'));
+60-        
+61:        // AJAX handler for beamraymar elementor data update
+62:        add_action('wp_ajax_beamraymar_update_elementor_data', array($this, 'beamraymar_update_elementor_data'));
+63-        
+64-        // Add Elementor data viewer
+65-        add_action('add_meta_boxes', array($this, 'add_elementor_data_metabox'));
+--
+268-        
+269-        add_submenu_page(
+270-            'snefuru',
+271:            'beamraymar',
+272:            'beamraymar',
+273-            'manage_options',
+274:            'beamraymar',
+275:            array($this, 'beamraymar_page')
+276-        );
+277-    }
+278-    
+--
+7253-            array('title' => 'document_outlook_aug9', 'slug' => 'document_outlook_aug9'),
+7254-            array('title' => 'dynamic_images_man', 'slug' => 'dynamic_images_man'),
+7255-            array('title' => 'Sitespren Export', 'slug' => 'rup_sitespren_export'),
+7256:            array('title' => 'beamraymar', 'slug' => 'beamraymar'),
+7257-        );
+7258-        
+7259-        // Add the separate menu pages
+--
+7287-    /**
+7288-     * Beamraymar admin page - WordPress Posts & Pages Manager
+7289-     */
+7290:    public function beamraymar_page() {
+7291-        // AGGRESSIVE NOTICE SUPPRESSION
+7292-        $this->suppress_all_admin_notices();
+7293-        
+7294-        // Handle AJAX requests
+7295-        if (isset($_POST['action']) && in_array($_POST['action'], ['create_new_post', 'update_post_field', 'create', 'edit'])) {
+7296:            $this->handle_beamraymar_ajax();
+7297-            return;
+7298-        }
+7299-        
+--
+7301-        $posts_pages = $this->get_posts_and_pages_data();
+7302-        
+7303-        ?>
+7304:        <div class="wrap beamraymar-wrapper">
+7305-            <style>
+7306-                /* Beamraymar Custom Styles - Mimicking FileJar Design */
+7307:                .beamraymar-wrapper {
+7308-                    background: white;
+7309-                    padding: 0;
+7310-                    margin: 0 0 0 -20px;
+7311-                }
+7312-                
+7313:                .beamraymar-top-controls {
+7314-                    background-color: white;
+7315-                    border-bottom: 1px solid #ddd;
+7316-                    padding: 12px 20px;
+--
+7321-                    gap: 16px;
+7322-                }
+7323-                
+7324:                .beamraymar-controls-left {
+7325-                    display: flex;
+7326-                    align-items: center;
+7327-                    gap: 24px;
+--
+7346-                    display: inline-block;
+7347-                }
+7348-                
+7349:                .beamraymar-controls-right {
+7350-                    display: flex;
+7351-                    align-items: center;
+7352-                    gap: 12px;
+7353-                }
+7354-                
+7355:                .beamraymar-info-text {
+7356-                    font-size: 14px;
+7357-                    color: #666;
+7358-                }
+7359-                
+7360:                .beamraymar-pagination-controls {
+7361-                    display: flex;
+7362-                    align-items: center;
+7363-                }
+7364-                
+7365:                .beamraymar-pagination-bar {
+7366-                    display: flex;
+7367-                }
+7368-                
+7369:                .beamraymar-pagination-btn {
+7370-                    padding: 10px 12px;
+7371-                    font-size: 14px;
+7372-                    border: 1px solid #ddd;
+--
+7378-                    transition: background-color 0.2s;
+7379-                }
+7380-                
+7381:                .beamraymar-pagination-btn:hover {
+7382-                    background-color: #f5f5f5;
+7383-                }
+7384-                
+7385:                .beamraymar-pagination-btn.active {
+7386-                    background-color: #0073aa;
+7387-                    color: white;
+7388-                }
+7389-                
+7390:                .beamraymar-pagination-btn:first-child {
+7391-                    border-top-left-radius: 4px;
+7392-                    border-bottom-left-radius: 4px;
+7393-                }
+7394-                
+7395:                .beamraymar-pagination-btn:last-child {
+7396-                    border-top-right-radius: 4px;
+7397-                    border-bottom-right-radius: 4px;
+7398-                }
+7399-                
+7400:                .beamraymar-pagination-divider {
+7401-                    width: 1px;
+7402-                    height: 20px;
+7403-                    background: #ddd;
+7404-                    margin: 0 12px;
+7405-                }
+7406-                
+7407:                .beamraymar-search-container {
+7408-                    position: relative;
+7409-                }
+7410-                
+7411:                .beamraymar-search-input {
+7412-                    width: 320px;
+7413-                    padding: 8px 40px 8px 12px;
+7414-                    border: 1px solid #ddd;
+--
+7416-                    font-size: 14px;
+7417-                }
+7418-                
+7419:                .beamraymar-clear-btn {
+7420-                    position: absolute;
+7421-                    right: 6px;
+7422-                    top: 50%;
+--
+7431-                    cursor: pointer;
+7432-                }
+7433-                
+7434:                .beamraymar-clear-btn:hover {
+7435-                    background: #ffed4e;
+7436-                }
+7437-                
+7438:                .beamraymar-create-buttons {
+7439-                    display: flex;
+7440-                    gap: 8px;
+7441-                }
+7442-                
+7443:                .beamraymar-create-btn {
+7444-                    padding: 8px 16px;
+7445-                    font-size: 14px;
+7446-                    font-weight: 600;
+--
+7451-                    transition: all 0.2s;
+7452-                }
+7453-                
+7454:                .beamraymar-create-inline-post {
+7455-                    background: #16a085;
+7456-                    color: white;
+7457-                }
+7458-                
+7459:                .beamraymar-create-inline-post:hover {
+7460-                    background: #138d75;
+7461-                }
+7462-                
+7463:                .beamraymar-create-inline-page {
+7464-                    background: #2980b9;
+7465-                    color: white;
+7466-                }
+7467-                
+7468:                .beamraymar-create-inline-page:hover {
+7469-                    background: #2471a3;
+7470-                }
+7471-                
+7472:                .beamraymar-create-popup {
+7473-                    background: #8e44ad;
+7474-                    color: white;
+7475-                }
+7476-                
+7477:                .beamraymar-create-popup:hover {
+7478-                    background: #7d3c98;
+7479-                }
+7480-                
+7481:                .beamraymar-nubra-kite {
+7482-                    background: #f39c12;
+7483-                    color: black;
+7484-                    padding: 6px 12px;
+--
+7488-                    font-weight: bold;
+7489-                }
+7490-                
+7491:                .beamraymar-table-container {
+7492-                    background: white;
+7493-                    overflow: hidden;
+7494-                }
+7495-                
+7496:                .beamraymar-table-scroll {
+7497-                    overflow-x: auto;
+7498-                }
+7499-                
+7500:                .beamraymar-table {
+7501-                    width: 100%;
+7502-                    border-collapse: collapse;
+7503-                    border: 1px solid #ddd;
+7504-                    min-width: 1600px;
+7505-                }
+7506-                
+7507:                .beamraymar-table thead {
+7508-                    background: #f8f9fa;
+7509-                }
+7510-                
+7511:                .beamraymar-table th,
+7512:                .beamraymar-table td {
+7513-                    border: 1px solid #ddd;
+7514-                    padding: 8px 12px;
+7515-                    text-align: left;
+7516-                    font-size: 14px;
+7517-                }
+7518-                
+7519:                .beamraymar-table th {
+7520-                    font-weight: bold;
+7521-                    font-size: 12px;
+7522-                    text-transform: lowercase;
+--
+7524-                    position: relative;
+7525-                }
+7526-                
+7527:                .beamraymar-table th:hover {
+7528-                    background: #e9ecef;
+7529-                }
+7530-                
+7531:                .beamraymar-table tbody tr:hover {
+7532-                    background: #f8f9fa;
+7533-                }
+7534-                
+7535:                .beamraymar-checkbox-cell {
+7536-                    width: 40px;
+7537-                    text-align: center;
+7538-                    cursor: pointer;
+7539-                }
+7540-                
+7541:                .beamraymar-checkbox {
+7542-                    width: 20px;
+7543-                    height: 20px;
+7544-                    cursor: pointer;
+7545-                }
+7546-                
+7547:                .beamraymar-editable-cell {
+7548-                    cursor: pointer;
+7549-                    min-height: 20px;
+7550-                    word-wrap: break-word;
+7551-                    overflow-wrap: break-word;
+7552-                }
+7553-                
+7554:                .beamraymar-editable-cell:hover {
+7555-                    background: #f0f8ff;
+7556-                    outline: 1px solid #cce7ff;
+7557-                }
+7558-                
+7559:                .beamraymar-editing-input {
+7560-                    width: 100%;
+7561-                    padding: 4px 6px;
+7562-                    border: 2px solid #0073aa;
+--
+7565-                    background: white;
+7566-                }
+7567-                
+7568:                .beamraymar-editing-textarea {
+7569-                    width: 100%;
+7570-                    padding: 4px 6px;
+7571-                    border: 2px solid #0073aa;
+--
+7576-                    min-height: 60px;
+7577-                }
+7578-                
+7579:                .beamraymar-toggle-switch {
+7580-                    width: 48px;
+7581-                    height: 24px;
+7582-                    border-radius: 12px;
+--
+7586-                    display: inline-block;
+7587-                }
+7588-                
+7589:                .beamraymar-toggle-switch.on {
+7590-                    background: #16a085;
+7591-                }
+7592-                
+7593:                .beamraymar-toggle-switch.off {
+7594-                    background: #bdc3c7;
+7595-                }
+7596-                
+7597:                .beamraymar-toggle-handle {
+7598-                    width: 20px;
+7599-                    height: 20px;
+7600-                    background: white;
+--
+7605-                    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+7606-                }
+7607-                
+7608:                .beamraymar-toggle-switch.on .beamraymar-toggle-handle {
+7609-                    transform: translateX(24px);
+7610-                }
+7611-                
+7612:                .beamraymar-toggle-switch.off .beamraymar-toggle-handle {
+7613-                    transform: translateX(2px);
+7614-                }
+7615-                
+7616:                .beamraymar-sort-indicator {
+7617-                    margin-left: 8px;
+7618-                    color: #666;
+7619-                }
+7620-                
+7621:                .beamraymar-loading {
+7622-                    text-align: center;
+7623-                    padding: 40px;
+7624-                    font-size: 16px;
+--
+7626-                }
+7627-                
+7628-                /* Bottom controls */
+7629:                .beamraymar-bottom-controls {
+7630-                    background-color: white;
+7631-                    border-top: 1px solid #ddd;
+7632-                    padding: 12px 20px;
+--
+7636-                }
+7637-                
+7638-                /* Modal styles */
+7639:                .beamraymar-modal {
+7640-                    display: none;
+7641-                    position: fixed;
+7642-                    z-index: 999999;
+--
+7647-                    background: rgba(0,0,0,0.5);
+7648-                }
+7649-                
+7650:                .beamraymar-modal.active {
+7651-                    display: flex;
+7652-                    align-items: center;
+7653-                    justify-content: center;
+7654-                }
+7655-                
+7656:                .beamraymar-modal-content {
+7657-                    background: white;
+7658-                    padding: 30px;
+7659-                    border-radius: 6px;
+--
+7663-                    overflow-y: auto;
+7664-                }
+7665-                
+7666:                .beamraymar-modal-header {
+7667-                    display: flex;
+7668-                    justify-content: space-between;
+7669-                    align-items: center;
+--
+7672-                    padding-bottom: 15px;
+7673-                }
+7674-                
+7675:                .beamraymar-modal-title {
+7676-                    font-size: 20px;
+7677-                    font-weight: bold;
+7678-                    margin: 0;
+7679-                }
+7680-                
+7681:                .beamraymar-modal-close {
+7682-                    font-size: 24px;
+7683-                    background: none;
+7684-                    border: none;
+--
+7686-                    color: #666;
+7687-                }
+7688-                
+7689:                .beamraymar-modal-close:hover {
+7690-                    color: #333;
+7691-                }
+7692-                
+7693:                .beamraymar-form-grid {
+7694-                    display: grid;
+7695-                    grid-template-columns: 1fr 1fr;
+7696-                    gap: 20px;
+7697-                    margin-bottom: 20px;
+7698-                }
+7699-                
+7700:                .beamraymar-form-field {
+7701-                    display: flex;
+7702-                    flex-direction: column;
+7703-                }
+7704-                
+7705:                .beamraymar-form-field.full-width {
+7706-                    grid-column: 1 / -1;
+7707-                }
+7708-                
+7709:                .beamraymar-form-label {
+7710-                    font-weight: 600;
+7711-                    margin-bottom: 6px;
+7712-                    color: #333;
+7713-                }
+7714-                
+7715:                .beamraymar-form-input,
+7716:                .beamraymar-form-textarea,
+7717:                .beamraymar-form-select {
+7718-                    padding: 8px 12px;
+7719-                    border: 1px solid #ddd;
+7720-                    border-radius: 4px;
+7721-                    font-size: 14px;
+7722-                }
+7723-                
+7724:                .beamraymar-form-textarea {
+7725-                    min-height: 100px;
+7726-                    resize: vertical;
+7727-                }
+7728-                
+7729:                .beamraymar-modal-actions {
+7730-                    display: flex;
+7731-                    justify-content: flex-end;
+7732-                    gap: 12px;
+7733-                    margin-top: 24px;
+7734-                }
+7735-                
+7736:                .beamraymar-modal-btn {
+7737-                    padding: 10px 20px;
+7738-                    border: none;
+7739-                    border-radius: 4px;
+--
+7743-                    transition: all 0.2s;
+7744-                }
+7745-                
+7746:                .beamraymar-modal-btn.primary {
+7747-                    background: #0073aa;
+7748-                    color: white;
+7749-                }
+7750-                
+7751:                .beamraymar-modal-btn.primary:hover {
+7752-                    background: #005a87;
+7753-                }
+7754-                
+7755:                .beamraymar-modal-btn.secondary {
+7756-                    background: #f1f1f1;
+7757-                    color: #333;
+7758-                    border: 1px solid #ddd;
+7759-                }
+7760-                
+7761:                .beamraymar-modal-btn.secondary:hover {
+7762-                    background: #e0e0e0;
+7763-                }
+7764-                
+7765:                .beamraymar-table td .tcell_inner_wrapper_div {
+7766-                    height: 38px;
+7767-                }
+7768-                
+7769-                /* Column pagination styles */
+7770:                .beamraymar-column-pagination-controls {
+7771-                    display: flex;
+7772-                    flex-direction: column;
+7773-                    align-items: flex-start;
+--
+7775-                    margin-left: 15px;
+7776-                }
+7777-                
+7778:                .beamraymar-column-pagination-bar {
+7779-                    display: flex;
+7780-                }
+7781-                
+7782:                .beamraymar-column-pagination-btn {
+7783-                    padding: 10px 12px;
+7784-                    font-size: 14px;
+7785-                    border: 1px solid #ddd;
+--
+7791-                    transition: background-color 0.2s;
+7792-                }
+7793-                
+7794:                .beamraymar-column-pagination-btn:hover {
+7795-                    background-color: #f5f5f5;
+7796-                }
+7797-                
+7798:                .beamraymar-column-pagination-btn.active {
+7799-                    background-color: #ffd700;
+7800-                    color: black;
+7801-                }
+7802-                
+7803:                .beamraymar-column-pagination-btn:first-child {
+7804-                    border-top-left-radius: 4px;
+7805-                    border-bottom-left-radius: 4px;
+7806-                }
+7807-                
+7808:                .beamraymar-column-pagination-btn:last-child {
+7809-                    border-top-right-radius: 4px;
+7810-                    border-bottom-right-radius: 4px;
+7811-                }
+7812-                
+7813-                /* Filter button bars */
+7814:                .beamraymar-filter-controls {
+7815-                    display: flex;
+7816-                    flex-direction: column;
+7817-                    align-items: flex-start;
+--
+7819-                    margin-left: 15px;
+7820-                }
+7821-                
+7822:                .beamraymar-filter-bar {
+7823-                    display: flex;
+7824-                }
+7825-                
+7826:                .beamraymar-filter-btn {
+7827-                    padding: 10px 12px;
+7828-                    font-size: 14px;
+7829-                    border: 1px solid #ddd;
+--
+7835-                    transition: background-color 0.2s;
+7836-                }
+7837-                
+7838:                .beamraymar-filter-btn:hover {
+7839-                    background-color: #f5f5f5;
+7840-                }
+7841-                
+7842:                .beamraymar-filter-btn.active {
+7843-                    background-color: #0073aa;
+7844-                    color: white;
+7845-                }
+7846-                
+7847:                .beamraymar-filter-btn:first-child {
+7848-                    border-top-left-radius: 4px;
+7849-                    border-bottom-left-radius: 4px;
+7850-                }
+7851-                
+7852:                .beamraymar-filter-btn:last-child {
+7853-                    border-top-right-radius: 4px;
+7854-                    border-bottom-right-radius: 4px;
+7855-                }
+7856-                
+7857-                /* ED
+
+... [733 lines truncated] ...
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me add the cssmar page to the menu structure. First, I'll add it to the menu:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   265→            'rup_sitespren_export',
+   266→            array($this, 'rup_sitespren_export_page')
+   267→        );
+   268→        
+   269→        add_submenu_page(
+   270→            'snefuru',
+   271→            'beamraymar',
+   272→            'beamraymar',
+   273→            'manage_options',
+   274→            'beamraymar',
+   275→            array($this, 'beamraymar_page')
+   276→        );
+   277→        
+   278→        add_submenu_page(
+   279→            'snefuru',
+   280→            'cssmar',
+   281→            'cssmar',
+   282→            'manage_options',
+   283→            'cssmar',
+   284→            array($this, 'cssmar_page')
+   285→        );
+   286→    }
+   287→    
+   288→    /**
+   289→     * Initialize settings
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the AJAX handler for saving the CSS file. Let me find where other AJAX handlers are defined:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    57→        
+    58→        // AJAX handler for beamraymar post content update
+    59→        add_action('wp_ajax_beamraymar_update_post_content', array($this, 'beamraymar_update_post_content'));
+    60→        
+    61→        // AJAX handler for beamraymar elementor data update
+    62→        add_action('wp_ajax_beamraymar_update_elementor_data', array($this, 'beamraymar_update_elementor_data'));
+    63→        
+    64→        // AJAX handler for cssmar CSS file save
+    65→        add_action('wp_ajax_cssmar_save_css', array($this, 'cssmar_save_css'));
+    66→        
+    67→        // Add Elementor data viewer
+    68→        add_action('add_meta_boxes', array($this, 'add_elementor_data_metabox'));
+    69→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the cssmar page method and the AJAX handler. Let me find the end of the file to add these methods:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9250→            'post_name' => sanitize_title($_POST['post_name']),
+  9251→            'post_parent' => intval($_POST['post_parent'])
+  9252→        );
+  9253→        
+  9254→        if ($action === 'edit') {
+  9255→            $post_data['ID'] = intval($_POST['post_id']);
+  9256→            $result = wp_update_post($post_data);
+  9257→        } else {
+  9258→            $post_data['post_author'] = get_current_user_id();
+  9259→            $result = wp_insert_post($post_data);
+  9260→        }
+  9261→        
+  9262→        if (is_wp_error($result)) {
+  9263→            echo json_encode(array('success' => false, 'message' => $result->get_error_message()));
+  9264→            wp_die();
+  9265→        }
+  9266→        
+  9267→        echo json_encode(array('success' => true, 'post_id' => $result));
+  9268→        wp_die();
+  9269→    }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9260→        }
+  9261→        
+  9262→        if (is_wp_error($result)) {
+  9263→            echo json_encode(array('success' => false, 'message' => $result->get_error_message()));
+  9264→            wp_die();
+  9265→        }
+  9266→        
+  9267→        echo json_encode(array('success' => true, 'post_id' => $result));
+  9268→        wp_die();
+  9269→    }
+  9270→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the cssmar page method and AJAX handler before the closing brace:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9263→            echo json_encode(array('success' => false, 'message' => $result->get_error_message()));
+  9264→            wp_die();
+  9265→        }
+  9266→        
+  9267→        echo json_encode(array('success' => true, 'post_id' => $result));
+  9268→        wp_die();
+  9269→    }
+  9270→    
+  9271→    /**
+  9272→     * CSS Editor page (cssmar)
+  9273→     */
+  9274→    public function cssmar_page() {
+  9275→        // AGGRESSIVE NOTICE SUPPRESSION
+  9276→        $this->suppress_all_admin_notices();
+  9277→        
+  9278→        global $wpdb;
+  9279→        
+  9280→        // Get sitespren_base from database
+  9281→        $sitespren_base = '';
+  9282→        $zen_sitespren_table = $wpdb->prefix . 'zen_sitespren';
+  9283→        if ($wpdb->get_var("SHOW TABLES LIKE '$zen_sitespren_table'") == $zen_sitespren_table) {
+  9284→            $result = $wpdb->get_row("SELECT sitespren_base FROM $zen_sitespren_table WHERE wppma_id = 1");
+  9285→            if ($result) {
+  9286→                $sitespren_base = $result->sitespren_base;
+  9287→            }
+  9288→        }
+  9289→        
+  9290→        // Get CSS file content
+  9291→        $css_file_path = SNEFURU_PLUGIN_PATH . 'assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css';
+  9292→        $css_content = '';
+  9293→        if (file_exists($css_file_path)) {
+  9294→            $css_content = file_get_contents($css_file_path);
+  9295→        }
+  9296→        
+  9297→        // Construct full URL
+  9298→        $plugin_url = SNEFURU_PLUGIN_URL . 'assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css';
+  9299→        $full_url = 'https://' . $sitespren_base . '/' . str_replace(home_url('/'), '', $plugin_url);
+  9300→        
+  9301→        ?>
+  9302→        <div class="wrap cssmar-wrapper">
+  9303→            <style>
+  9304→                .cssmar-wrapper {
+  9305→                    background: white;
+  9306→                    padding: 20px;
+  9307→                    margin: 0 0 0 -20px;
+  9308→                }
+  9309→                
+  9310→                .cssmar-tabs {
+  9311→                    display: flex;
+  9312→                    border-bottom: 2px solid #ddd;
+  9313→                    margin-bottom: 20px;
+  9314→                }
+  9315→                
+  9316→                .cssmar-tab {
+  9317→                    padding: 12px 20px;
+  9318→                    background: #f1f1f1;
+  9319→                    border: 1px solid #ddd;
+  9320→                    border-bottom: none;
+  9321→                    cursor: pointer;
+  9322→                    font-weight: 600;
+  9323→                    margin-right: 2px;
+  9324→                }
+  9325→                
+  9326→                .cssmar-tab.active {
+  9327→                    background: white;
+  9328→                    border-bottom: 2px solid white;
+  9329→                    margin-bottom: -2px;
+  9330→                }
+  9331→                
+  9332→                .cssmar-url-container {
+  9333→                    display: flex;
+  9334→                    align-items: center;
+  9335→                    margin-bottom: 15px;
+  9336→                    gap: 10px;
+  9337→                }
+  9338→                
+  9339→                .cssmar-url-input {
+  9340→                    flex: 1;
+  9341→                    padding: 8px 12px;
+  9342→                    border: 1px solid #ddd;
+  9343→                    border-radius: 4px;
+  9344→                    font-size: 14px;
+  9345→                    background: #f9f9f9;
+  9346→                }
+  9347→                
+  9348→                .cssmar-copy-url-btn {
+  9349→                    padding: 8px 16px;
+  9350→                    background: #0073aa;
+  9351→                    color: white;
+  9352→                    border: none;
+  9353→                    border-radius: 4px;
+  9354→                    cursor: pointer;
+  9355→                    font-weight: 600;
+  9356→                }
+  9357→                
+  9358→                .cssmar-copy-url-btn:hover {
+  9359→                    background: #005a87;
+  9360→                }
+  9361→                
+  9362→                .cssmar-editor {
+  9363→                    width: 100%;
+  9364→                    height: 600px;
+  9365→                    font-family: 'Courier New', monospace;
+  9366→                    font-size: 14px;
+  9367→                    border: 1px solid #ddd;
+  9368→                    border-radius: 4px;
+  9369→                    padding: 15px;
+  9370→                    background: #f9f9f9;
+  9371→                    resize: vertical;
+  9372→                }
+  9373→                
+  9374→                .cssmar-save-btn {
+  9375→                    padding: 12px 24px;
+  9376→                    background: #16a085;
+  9377→                    color: white;
+  9378→                    border: none;
+  9379→                    border-radius: 4px;
+  9380→                    cursor: pointer;
+  9381→                    font-weight: 600;
+  9382→                    font-size: 16px;
+  9383→                }
+  9384→                
+  9385→                .cssmar-save-btn:hover {
+  9386→                    background: #138d75;
+  9387→                }
+  9388→                
+  9389→                .cssmar-save-container {
+  9390→                    margin: 15px 0;
+  9391→                }
+  9392→            </style>
+  9393→            
+  9394→            <h1>CSS Editor (cssmar)</h1>
+  9395→            
+  9396→            <!-- Tabs -->
+  9397→            <div class="cssmar-tabs">
+  9398→                <div class="cssmar-tab active" data-tab="sddx-240">SDDX - 240</div>
+  9399→                <div class="cssmar-tab" data-tab="tab2">tab2</div>
+  9400→                <div class="cssmar-tab" data-tab="tab3">tab3</div>
+  9401→                <div class="cssmar-tab" data-tab="tab4">tab4</div>
+  9402→                <div class="cssmar-tab" data-tab="tab5">tab5</div>
+  9403→            </div>
+  9404→            
+  9405→            <!-- URL Display -->
+  9406→            <div class="cssmar-url-container">
+  9407→                <input type="text" class="cssmar-url-input" value="<?php echo esc_attr($full_url); ?>" readonly>
+  9408→                <button type="button" class="cssmar-copy-url-btn" onclick="copyUrlToClipboard()">Copy</button>
+  9409→            </div>
+  9410→            
+  9411→            <!-- Save Button (Top) -->
+  9412→            <div class="cssmar-save-container">
+  9413→                <button type="button" class="cssmar-save-btn" onclick="saveCssFile()">Save</button>
+  9414→            </div>
+  9415→            
+  9416→            <!-- CSS Editor -->
+  9417→            <textarea class="cssmar-editor" id="cssmar-editor"><?php echo esc_textarea($css_content); ?></textarea>
+  9418→            
+  9419→            <!-- Save Button (Bottom) -->
+  9420→            <div class="cssmar-save-container">
+  9421→                <button type="button" class="cssmar-save-btn" onclick="saveCssFile()">Save</button>
+  9422→            </div>
+  9423→            
+  9424→            <script>
+  9425→                function copyUrlToClipboard() {
+  9426→                    const urlInput = document.querySelector('.cssmar-url-input');
+  9427→                    urlInput.select();
+  9428→                    document.execCommand('copy');
+  9429→                    
+  9430→                    const button = document.querySelector('.cssmar-copy-url-btn');
+  9431→                    const originalText = button.textContent;
+  9432→                    button.textContent = 'Copied!';
+  9433→                    button.style.background = '#16a085';
+  9434→                    
+  9435→                    setTimeout(() => {
+  9436→                        button.textContent = originalText;
+  9437→                        button.style.background = '#0073aa';
+  9438→                    }, 2000);
+  9439→                }
+  9440→                
+  9441→                function saveCssFile() {
+  9442→                    const content = document.getElementById('cssmar-editor').value;
+  9443→                    const saveButtons = document.querySelectorAll('.cssmar-save-btn');
+  9444→                    
+  9445→                    // Update button states
+  9446→                    saveButtons.forEach(btn => {
+  9447→                        btn.textContent = 'Saving...';
+  9448→                        btn.style.background = '#f39c12';
+  9449→                        btn.disabled = true;
+  9450→                    });
+  9451→                    
+  9452→                    const formData = new FormData();
+  9453→                    formData.append('action', 'cssmar_save_css');
+  9454→                    formData.append('css_content', content);
+  9455→                    formData.append('nonce', '<?php echo wp_create_nonce('cssmar_nonce'); ?>');
+  9456→                    
+  9457→                    fetch(ajaxurl, {
+  9458→                        method: 'POST',
+  9459→                        body: formData
+  9460→                    })
+  9461→                    .then(response => response.json())
+  9462→                    .then(data => {
+  9463→                        if (data.success) {
+  9464→                            saveButtons.forEach(btn => {
+  9465→                                btn.textContent = 'Saved!';
+  9466→                                btn.style.background = '#16a085';
+  9467→                            });
+  9468→                        } else {
+  9469→                            saveButtons.forEach(btn => {
+  9470→                                btn.textContent = 'Error';
+  9471→                                btn.style.background = '#e74c3c';
+  9472→                            });
+  9473→                            alert('Error saving file: ' + (data.message || 'Unknown error'));
+  9474→                        }
+  9475→                        
+  9476→                        setTimeout(() => {
+  9477→                            saveButtons.forEach(btn => {
+  9478→                                btn.textContent = 'Save';
+  9479→                                btn.style.background = '#16a085';
+  9480→                                btn.disabled = false;
+  9481→                            });
+  9482→                        }, 2000);
+  9483→                    })
+  9484→                    .catch(error => {
+  9485→                        console.error('Error:', error);
+  9486→                        saveButtons.forEach(btn => {
+  9487→                            btn.textContent = 'Error';
+  9488→                            btn.style.background = '#e74c3c';
+  9489→                            btn.disabled = false;
+  9490→                        });
+  9491→                        setTimeout(() => {
+  9492→                            saveButtons.forEach(btn => {
+  9493→                                btn.textContent = 'Save';
+  9494→                                btn.style.background = '#16a085';
+  9495→                            });
+  9496→                        }, 2000);
+  9497→                    });
+  9498→                }
+  9499→                
+  9500→                // Tab functionality (currently only SDDX-240 is functional)
+  9501→                document.querySelectorAll('.cssmar-tab').forEach(tab => {
+  9502→                    tab.addEventListener('click', function() {
+  9503→                        if (this.dataset.tab !== 'sddx-240') {
+  9504→                            alert('This tab is not yet implemented.');
+  9505→                            return;
+  9506→                        }
+  9507→                        
+  9508→                        document.querySelectorAll('.cssmar-tab').forEach(t => t.classList.remove('active'));
+  9509→                        this.classList.add('active');
+  9510→                    });
+  9511→                });
+  9512→            </script>
+  9513→        </div>
+  9514→        <?php
+  9515→    }
+  9516→    
+  9517→    /**
+  9518→     * AJAX handler for saving CSS file
+  9519→     */
+  9520→    public function cssmar_save_css() {
+  9521→        // Verify nonce
+  9522→        if (!wp_verify_nonce($_POST['nonce'], 'cssmar_nonce')) {
+  9523→            wp_die('Security check failed');
+  9524→        }
+  9525→        
+  9526→        // Check permissions
+  9527→        if (!current_user_can('manage_options')) {
+  9528→            wp_die('Insufficient permissions');
+  9529→        }
+  9530→        
+  9531→        $css_content = stripslashes($_POST['css_content']);
+  9532→        $css_file_path = SNEFURU_PLUGIN_PATH . 'assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css';
+  9533→        
+  9534→        // Save the file
+  9535→        $result = file_put_contents($css_file_path, $css_content);
+  9536→        
+  9537→        if ($result !== false) {
+  9538→            wp_send_json_success(array('message' => 'CSS file saved successfully'));
+  9539→        } else {
+  9540→            wp_send_json_error(array('message' => 'Failed to save CSS file'));
+  9541→        }
+  9542→    }
+  9543→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Create cssmar page with CSS editor, tabs, URL display and save functionality
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Done. I've successfully created the cssmar page with all the requested features:
+
+## Created Components:
+
+1. **Menu Item**: Added `cssmar` to the admin menu at `snefuruplin/includes/class-admin.php:278-285`
+
+2. **AJAX Handler Registration**: Added at `snefuruplin/includes/class-admin.php:64-65`
+
+3. **Main Page Method**: `cssmar_page()` at `snefuruplin/includes/class-admin.php:9274-9515` with:
+   - **5 horizontal tabs**: SDDX - 240, tab2, tab3, tab4, tab5
+   - **Dynamic URL construction**: Uses `_zen_sitespren.sitespren_base` to build full https:// URL
+   - **Copyable URL bar**: Text input with copy button above the editor
+   - **Large CSS editor**: 600px height textarea with monospace font
+   - **Dual save buttons**: One above and one below the editor
+   - **Tab functionality**: Only SDDX-240 tab is functional (others show alert)
+
+4. **AJAX Save Handler**: `cssmar_save_css()` at `snefuruplin/includes/class-admin.php:9520-9542` with:
+   - **Security**: Nonce verification and capability checks
+   - **File writing**: Directly saves to the CSS file
+   - **Response handling**: Success/error JSON responses
+
+5. **JavaScript Features**:
+   - **Copy URL**: Clipboard copy with visual feedback
+   - **Save functionality**: AJAX file saving with button state changes
+   - **Tab switching**: Visual tab switching (only SDDX-240 functional)
+
+The page loads the current CSS file content and allows live editing with immediate file saving for rapid development workflow.
+
