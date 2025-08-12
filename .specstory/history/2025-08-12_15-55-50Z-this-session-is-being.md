@@ -1876,3 +1876,1809 @@ Done! I've successfully:
 
 The cssmar page now has functional tabs for both CSS files, allowing you to edit either `sddx_240_ruplin_screens_only_css_by_kyle_1.css` or `sddx_250_beamray_table_grid_1.css`.
 
+---
+
+_**User**_
+
+please add these db fields to
+_zen_orbitposts
+
+is_pinned
+is_flagged
+is_starred
+is_squared
+
+bolean default false
+
+then integrate new columns for them in the ui table grid on beamraymar page
+
+then integrate a point and click icon system like we have on our page in our main saas app at /xpagesmanager1
+
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add boolean fields (is_pinned, is_flagged, is_starred, is_squared) to zen_orbitposts table
+- [ ] 🌡️ Add new columns for zen_orbitposts boolean fields in beamraymar UI table
+- [ ] 🌡️ Implement point-and-click icon system for the new boolean fields
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me first add the boolean fields to the zen_orbitposts table. I'll use a Node.js script since we've been working with that approach for database modifications:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Add boolean fields to zen_orbitposts table
+
+`SUPABASE_URL=https://jerylujyofmmjukwlwvn.supabase.co SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcnlsdWp5b2ZtbWp1a3dsd3ZuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODU2Nzg5NiwiZXhwIjoyMDY0MTQzODk2fQ.2k2QscWwwJ7QmtY0aEOeb0FcpbB9qOtuykkY3zg5lmw node -e "
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+async function addBooleanFieldsToZenOrbitposts() {
+  try {
+    console.log('Adding boolean fields to zen_orbitposts table...');
+    
+    // SQL to add the four boolean columns
+    const alterTableSQL = \`
+      ALTER TABLE zen_orbitposts 
+      ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS is_flagged BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS is_starred BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS is_squared BOOLEAN DEFAULT FALSE;
+    \`;
+    
+    console.log('Running SQL:', alterTableSQL);
+    
+    // Note: Since RPC functions may not be available, this will show the SQL to run manually
+    console.log('');
+    console.log('SQL to run in Supabase dashboard SQL editor:');
+    console.log('');
+    console.log('ALTER TABLE zen_orbitposts');
+    console.log('ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE,');
+    console.log('ADD COLUMN IF NOT EXISTS is_flagged BOOLEAN DEFAULT FALSE,'); 
+    console.log('ADD COLUMN IF NOT EXISTS is_starred BOOLEAN DEFAULT FALSE,');
+    console.log('ADD COLUMN IF NOT EXISTS is_squared BOOLEAN DEFAULT FALSE;');
+    console.log('');
+    
+    // Try to verify if columns exist by querying the table
+    console.log('Checking if zen_orbitposts table is accessible...');
+    const { data: testData, error: testError } = await supabase
+      .from('zen_orbitposts')
+      .select('*')
+      .limit(1);
+    
+    if (!testError) {
+      console.log('✅ zen_orbitposts table is accessible');
+      if (testData && testData.length > 0) {
+        const columns = Object.keys(testData[0]);
+        console.log('Current columns:', columns.join(', '));
+        
+        // Check for new columns
+        const newColumns = ['is_pinned', 'is_flagged', 'is_starred', 'is_squared'];
+        const existingNewColumns = newColumns.filter(col => columns.includes(col));
+        const missingColumns = newColumns.filter(col => !columns.includes(col));
+        
+        if (existingNewColumns.length > 0) {
+          console.log('✅ Already exist:', existingNewColumns.join(', '));
+        }
+        if (missingColumns.length > 0) {
+          console.log('❌ Still missing:', missingColumns.join(', '));
+        }
+      }
+    } else {
+      console.log('❌ Error accessing zen_orbitposts table:', testError.message);
+    }
+    
+  } catch (err) {
+    console.error('💥 Error:', err.message);
+  }
+}
+
+addBooleanFieldsToZenOrbitposts();"`
+
+Error:
+
+```
+[eval]:38
+    if (\!testError) {
+        ^
+
+SyntaxError: Invalid or unexpected token
+    at makeContextifyScript (node:internal/vm:185:14)
+    at node:internal/process/execution:107:22
+    at [eval]-wrapper:6:24
+    at runScript (node:internal/process/execution:101:62)
+    at evalScript (node:internal/process/execution:133:3)
+    at node:internal/main/eval_string:51:3
+
+Node.js v20.18.1
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me fix the script issue:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```javascript
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+async function addBooleanFieldsToZenOrbitposts() {
+  try {
+    console.log('Adding boolean fields to zen_orbitposts table...');
+    
+    // SQL to add the four boolean columns
+    const alterTableSQL = `
+      ALTER TABLE zen_orbitposts 
+      ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS is_flagged BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS is_starred BOOLEAN DEFAULT FALSE,
+      ADD COLUMN IF NOT EXISTS is_squared BOOLEAN DEFAULT FALSE;
+    `;
+    
+    console.log('Running SQL:', alterTableSQL);
+    
+    // Note: Since RPC functions may not be available, this will show the SQL to run manually
+    console.log('');
+    console.log('SQL to run in Supabase dashboard SQL editor:');
+    console.log('');
+    console.log('ALTER TABLE zen_orbitposts');
+    console.log('ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE,');
+    console.log('ADD COLUMN IF NOT EXISTS is_flagged BOOLEAN DEFAULT FALSE,'); 
+    console.log('ADD COLUMN IF NOT EXISTS is_starred BOOLEAN DEFAULT FALSE,');
+    console.log('ADD COLUMN IF NOT EXISTS is_squared BOOLEAN DEFAULT FALSE;');
+    console.log('');
+    
+    // Try to verify if columns exist by querying the table
+    console.log('Checking if zen_orbitposts table is accessible...');
+    const { data: testData, error: testError } = await supabase
+      .from('zen_orbitposts')
+      .select('*')
+      .limit(1);
+    
+    if (!testError) {
+      console.log('✅ zen_orbitposts table is accessible');
+      if (testData && testData.length > 0) {
+        const columns = Object.keys(testData[0]);
+        console.log('Current columns:', columns.join(', '));
+        
+        // Check for new columns
+        const newColumns = ['is_pinned', 'is_flagged', 'is_starred', 'is_squared'];
+        const existingNewColumns = newColumns.filter(col => columns.includes(col));
+        const missingColumns = newColumns.filter(col => !columns.includes(col));
+        
+        if (existingNewColumns.length > 0) {
+          console.log('✅ Already exist:', existingNewColumns.join(', '));
+        }
+        if (missingColumns.length > 0) {
+          console.log('❌ Still missing:', missingColumns.join(', '));
+        }
+      }
+    } else {
+      console.log('❌ Error accessing zen_orbitposts table:', testError.message);
+    }
+    
+  } catch (err) {
+    console.error('💥 Error:', err.message);
+  }
+}
+
+addBooleanFieldsToZenOrbitposts();
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/temp_add_zen_fields.js
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Add boolean fields to zen_orbitposts table
+
+`SUPABASE_URL=https://jerylujyofmmjukwlwvn.supabase.co SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcnlsdWp5b2ZtbWp1a3dsd3ZuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODU2Nzg5NiwiZXhwIjoyMDY0MTQzODk2fQ.2k2QscWwwJ7QmtY0aEOeb0FcpbB9qOtuykkY3zg5lmw node temp_add_zen_fields.js`
+
+Error:
+
+```
+The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). STOP what you are doing and wait for the user to tell you how to proceed.
+```
+
+_**User**_
+
+[Request interrupted by user for tool use]
+
+_**User**_
+
+were talking about only the wp native db in every site that has our ruplin wp plugin isntalled 
+
+not the supaabase database (hudson database as i refer to it) 
+
+lets discuss more first 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I understand now - you want to add the boolean fields to the WordPress native `wp_zen_orbitposts` table (using `$wpdb->prefix`) in each WordPress site that has the ruplin plugin installed, not the Supabase/Hudson database.
+
+So we're talking about:
+- Adding `is_pinned`, `is_flagged`, `is_starred`, `is_squared` (all BOOLEAN DEFAULT FALSE) to the `{$wpdb->prefix}zen_orbitposts` table
+- Then adding these as new columns in the beamraymar UI table grid
+- Implementing a point-and-click icon system for these boolean fields similar to what you have at `/xpagesmanager1`
+
+Should I proceed with creating the WordPress database migration for the `wp_zen_orbitposts` table, or would you like to discuss the approach first?
+
+---
+
+_**User**_
+
+pleaes proceed to implement this
+
+noerra———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add boolean fields (is_pinned, is_flagged, is_starred, is_squared) to wp_zen_orbitposts table
+- [ ] 🌡️ Add new columns for zen_orbitposts boolean fields in beamraymar UI table
+- [ ] 🌡️ Implement point-and-click icon system for the new boolean fields
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+First, I need to add the database migration to create the new boolean fields in the wp_zen_orbitposts table. Let me find where database operations are handled in the plugin:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin`
+
+Result:
+
+```
+Found 5 files
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/hurricane/class-hurricane.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-ruplin-wppma-database.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-orbit-mar-admin.php
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check the database class file:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-ruplin-wppma-database.php`
+
+Result:
+
+```
+1→<?php
+     2→
+     3→/**
+     4→ * Ruplin WP Database Horse Class
+     5→ * Handles creation and management of zen_services and zen_locations tables
+     6→ */
+     7→class Ruplin_WP_Database_Horse_Class {
+     8→    
+     9→    /**
+    10→     * Database version for tracking schema changes
+    11→     */
+    12→    const DB_VERSION = '1.6.0';
+    13→    
+    14→    /**
+    15→     * Option name for storing database version
+    16→     */
+    17→    const DB_VERSION_OPTION = 'snefuru_zen_db_version';
+    18→    
+    19→    /**
+    20→     * Create zen tables
+    21→     */
+    22→    public static function create_tables() {
+    23→        global $wpdb;
+    24→        
+    25→        try {
+    26→            $charset_collate = $wpdb->get_charset_collate();
+    27→            
+    28→            // Create zen_services table
+    29→            $services_table = $wpdb->prefix . 'zen_services';
+    30→            $services_sql = "CREATE TABLE $services_table (
+    31→                service_id INT(11) NOT NULL AUTO_INCREMENT,
+    32→                service_name TEXT,
+    33→                service_placard TEXT,
+    34→                service_moniker TEXT,
+    35→                service_sobriquet TEXT,
+    36→                description1_short TEXT,
+    37→                description1_long TEXT,
+    38→                rel_image1_id INT(11),
+    39→                is_pinned_service BOOLEAN DEFAULT FALSE,
+    40→                position_in_custom_order INT(11),
+    41→                PRIMARY KEY (service_id)
+    42→            ) $charset_collate;";
+    43→            
+    44→            // Create zen_locations table
+    45→            $locations_table = $wpdb->prefix . 'zen_locations';
+    46→            $locations_sql = "CREATE TABLE $locations_table (
+    47→                location_id INT(11) NOT NULL AUTO_INCREMENT,
+    48→                location_name TEXT,
+    49→                location_placard TEXT,
+    50→                location_moniker TEXT,
+    51→                location_sobriquet TEXT,
+    52→                street TEXT,
+    53→                city TEXT,
+    54→                state_code TEXT,
+    55→                zip_code TEXT,
+    56→                country TEXT,
+    57→                rel_image1_id INT(11),
+    58→                is_pinned_location BOOLEAN DEFAULT FALSE,
+    59→                position_in_custom_order INT(11),
+    60→                PRIMARY KEY (location_id)
+    61→            ) $charset_collate;";
+    62→            
+    63→            // Create zen_orbitposts table
+    64→            $orbitposts_table = $wpdb->prefix . 'zen_orbitposts';
+    65→            $orbitposts_sql = "CREATE TABLE $orbitposts_table (
+    66→                orbitpost_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    67→                rel_wp_post_id BIGINT(20) UNSIGNED,
+    68→                redshift_datum TEXT,
+    69→                rover_datum JSON,
+    70→                hudson_imgplanbatch_id VARCHAR(36),
+    71→                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    72→                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    73→                PRIMARY KEY (orbitpost_id),
+    74→                KEY rel_wp_post_id (rel_wp_post_id),
+    75→                KEY hudson_imgplanbatch_id (hudson_imgplanbatch_id)
+    76→            ) $charset_collate;";
+    77→            
+    78→            // Use dbDelta to create/update tables
+    79→            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    80→            
+    81→            // Log the SQL for debugging
+    82→            error_log('Snefuru: Creating services table with SQL: ' . $services_sql);
+    83→            error_log('Snefuru: Creating locations table with SQL: ' . $locations_sql);
+    84→            error_log('Snefuru: Creating orbitposts table with SQL: ' . $orbitposts_sql);
+    85→            
+    86→            $services_result = dbDelta($services_sql);
+    87→            $locations_result = dbDelta($locations_sql);
+    88→            $orbitposts_result = dbDelta($orbitposts_sql);
+    89→            
+    90→            // Log dbDelta results
+    91→            error_log('Snefuru: Services table dbDelta result: ' . print_r($services_result, true));
+    92→            error_log('Snefuru: Locations table dbDelta result: ' . print_r($locations_result, true));
+    93→            error_log('Snefuru: Orbitposts table dbDelta result: ' . print_r($orbitposts_result, true));
+    94→            
+    95→            // Update database version
+    96→            update_option(self::DB_VERSION_OPTION, self::DB_VERSION);
+    97→            
+    98→            // Verify tables were created
+    99→            $services_exists = $wpdb->get_var("SHOW TABLES LIKE '$services_table'") == $services_table;
+   100→            $locations_exists = $wpdb->get_var("SHOW TABLES LIKE '$locations_table'") == $locations_table;
+   101→            $orbitposts_exists = $wpdb->get_var("SHOW TABLES LIKE '$orbitposts_table'") == $orbitposts_table;
+   102→            
+   103→            // Log verification results
+   104→            error_log('Snefuru: Services table exists: ' . ($services_exists ? 'YES' : 'NO'));
+   105→            error_log('Snefuru: Locations table exists: ' . ($locations_exists ? 'YES' : 'NO'));
+   106→            error_log('Snefuru: Orbitposts table exists: ' . ($orbitposts_exists ? 'YES' : 'NO'));
+   107→            
+   108→            if ($services_exists && $locations_exists && $orbitposts_exists) {
+   109→                error_log('Snefuru: Zen tables created/updated successfully');
+   110→                return true;
+   111→            } else {
+   112→                error_log('Snefuru: Table verification failed');
+   113→                return false;
+   114→            }
+   115→            
+   116→        } catch (Exception $e) {
+   117→            error_log('Snefuru: Error creating zen tables: ' . $e->getMessage());
+   118→            return false;
+   119→        }
+   120→    }
+   121→    
+   122→    /**
+   123→     * Check if tables exist
+   124→     */
+   125→    public static function tables_exist() {
+   126→        global $wpdb;
+   127→        
+   128→        $services_table = $wpdb->prefix . 'zen_services';
+   129→        $locations_table = $wpdb->prefix . 'zen_locations';
+   130→        
+   131→        $services_exists = $wpdb->get_var("SHOW TABLES LIKE '$services_table'") == $services_table;
+   132→        $locations_exists = $wpdb->get_var("SHOW TABLES LIKE '$locations_table'") == $locations_table;
+   133→        
+   134→        return $services_exists && $locations_exists;
+   135→    }
+   136→    
+   137→    /**
+   138→     * Drop zen tables (for uninstall)
+   139→     */
+   140→    public static function drop_tables() {
+   141→        global $wpdb;
+   142→        
+   143→        $services_table = $wpdb->prefix . 'zen_services';
+   144→        $locations_table = $wpdb->prefix . 'zen_locations';
+   145→        
+   146→        $wpdb->query("DROP TABLE IF EXISTS $services_table");
+   147→        $wpdb->query("DROP TABLE IF EXISTS $locations_table");
+   148→        
+   149→        // Delete database version option
+   150→        delete_option(self::DB_VERSION_OPTION);
+   151→        
+   152→        error_log('Snefuru Zen tables dropped');
+   153→    }
+   154→    
+   155→    /**
+   156→     * Check and update database schema if needed
+   157→     */
+   158→    public static function check_database_version() {
+   159→        $current_version = get_option(self::DB_VERSION_OPTION, '0.0.0');
+   160→        
+   161→        if (version_compare($current_version, self::DB_VERSION, '<')) {
+   162→            self::create_tables();
+   163→        }
+   164→    }
+   165→    
+   166→    /**
+   167→     * Get all services
+   168→     */
+   169→    public static function get_services($args = array()) {
+   170→        global $wpdb;
+   171→        $table = $wpdb->prefix . 'zen_services';
+   172→        
+   173→        $defaults = array(
+   174→            'orderby' => 'position_in_custom_order',
+   175→            'order' => 'ASC',
+   176→            'pinned_first' => true
+   177→        );
+   178→        
+   179→        $args = wp_parse_args($args, $defaults);
+   180→        
+   181→        $orderby = $args['pinned_first'] ? 'is_pinned_service DESC, position_in_custom_order' : $args['orderby'];
+   182→        $order = $args['order'];
+   183→        
+   184→        $query = "SELECT * FROM $table ORDER BY $orderby $order";
+   185→        return $wpdb->get_results($query);
+   186→    }
+   187→    
+   188→    /**
+   189→     * Get all locations
+   190→     */
+   191→    public static function get_locations($args = array()) {
+   192→        global $wpdb;
+   193→        $table = $wpdb->prefix . 'zen_locations';
+   194→        
+   195→        $defaults = array(
+   196→            'orderby' => 'position_in_custom_order',
+   197→            'order' => 'ASC',
+   198→            'pinned_first' => true
+   199→        );
+   200→        
+   201→        $args = wp_parse_args($args, $defaults);
+   202→        
+   203→        $orderby = $args['pinned_first'] ? 'is_pinned_location DESC, position_in_custom_order' : $args['orderby'];
+   204→        $order = $args['order'];
+   205→        
+   206→        $query = "SELECT * FROM $table ORDER BY $orderby $order";
+   207→        return $wpdb->get_results($query);
+   208→    }
+   209→    
+   210→    /**
+   211→     * Insert a service
+   212→     */
+   213→    public static function insert_service($data) {
+   214→        global $wpdb;
+   215→        $table = $wpdb->prefix . 'zen_services';
+   216→        
+   217→        return $wpdb->insert($table, $data);
+   218→    }
+   219→    
+   220→    /**
+   221→     * Insert a location
+   222→     */
+   223→    public static function insert_location($data) {
+   224→        global $wpdb;
+   225→        $table = $wpdb->prefix . 'zen_locations';
+   226→        
+   227→        return $wpdb->insert($table, $data);
+   228→    }
+   229→    
+   230→    /**
+   231→     * Update a service
+   232→     */
+   233→    public static function update_service($service_id, $data) {
+   234→        global $wpdb;
+   235→        $table = $wpdb->prefix . 'zen_services';
+   236→        
+   237→        return $wpdb->update($table, $data, array('service_id' => $service_id));
+   238→    }
+   239→    
+   240→    /**
+   241→     * Update a location
+   242→     */
+   243→    public static function update_location($location_id, $data) {
+   244→        global $wpdb;
+   245→        $table = $wpdb->prefix . 'zen_locations';
+   246→        
+   247→        return $wpdb->update($table, $data, array('location_id' => $location_id));
+   248→    }
+   249→    
+   250→    /**
+   251→     * Delete a service
+   252→     */
+   253→    public static function delete_service($service_id) {
+   254→        global $wpdb;
+   255→        $table = $wpdb->prefix . 'zen_services';
+   256→        
+   257→        return $wpdb->delete($table, array('service_id' => $service_id));
+   258→    }
+   259→    
+   260→    /**
+   261→     * Delete a location
+   262→     */
+   263→    public static function delete_location($location_id) {
+   264→        global $wpdb;
+   265→        $table = $wpdb->prefix . 'zen_locations';
+   266→        
+   267→        return $wpdb->delete($table, array('location_id' => $location_id));
+   268→    }
+   269→    
+   270→    /**
+   271→     * Get service by ID
+   272→     */
+   273→    public static function get_service($service_id) {
+   274→        global $wpdb;
+   275→        $table = $wpdb->prefix . 'zen_services';
+   276→        
+   277→        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE service_id = %d", $service_id));
+   278→    }
+   279→    
+   280→    /**
+   281→     * Get location by ID
+   282→     */
+   283→    public static function get_location($location_id) {
+   284→        global $wpdb;
+   285→        $table = $wpdb->prefix . 'zen_locations';
+   286→        
+   287→        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE location_id = %d", $location_id));
+   288→    }
+   289→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see the zen_orbitposts table is created in the database class. Now I need to update it to include the new boolean fields. I'll need to:
+
+1. Update the CREATE TABLE SQL to include the new boolean fields
+2. Bump the DB_VERSION to trigger an update
+3. Update the beamraymar table to include these new columns
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-ruplin-wppma-database.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     8→    
+     9→    /**
+    10→     * Database version for tracking schema changes
+    11→     */
+    12→    const DB_VERSION = '1.7.0';
+    13→    
+    14→    /**
+    15→     * Option name for storing database version
+    16→     */
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-ruplin-wppma-database.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    59→                position_in_custom_order INT(11),
+    60→                PRIMARY KEY (location_id)
+    61→            ) $charset_collate;";
+    62→            
+    63→            // Create zen_orbitposts table
+    64→            $orbitposts_table = $wpdb->prefix . 'zen_orbitposts';
+    65→            $orbitposts_sql = "CREATE TABLE $orbitposts_table (
+    66→                orbitpost_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    67→                rel_wp_post_id BIGINT(20) UNSIGNED,
+    68→                redshift_datum TEXT,
+    69→                rover_datum JSON,
+    70→                hudson_imgplanbatch_id VARCHAR(36),
+    71→                is_pinned BOOLEAN DEFAULT FALSE,
+    72→                is_flagged BOOLEAN DEFAULT FALSE,
+    73→                is_starred BOOLEAN DEFAULT FALSE,
+    74→                is_squared BOOLEAN DEFAULT FALSE,
+    75→                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    76→                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    77→                PRIMARY KEY (orbitpost_id),
+    78→                KEY rel_wp_post_id (rel_wp_post_id),
+    79→                KEY hudson_imgplanbatch_id (hudson_imgplanbatch_id)
+    80→            ) $charset_collate;";
+    81→            
+    82→            // Use dbDelta to create/update tables
+    83→            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    84→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add boolean fields (is_pinned, is_flagged, is_starred, is_squared) to wp_zen_orbitposts table
+- [⚡] 🌡️ Add new columns for zen_orbitposts boolean fields in beamraymar UI table
+- [ ] 🌡️ Implement point-and-click icon system for the new boolean fields
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the new columns to the beamraymar UI table. First, let me find where the zen_orbitposts columns are currently defined:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8151-                                <th class="column_zen_orbitposts_redshift_datum row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8152-                                <th class="column_zen_orbitposts_rover_datum row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8153-                                <th class="column_zen_orbitposts_hudson_imgplanbatch_id row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8154:                                <th class="column_zen_orbitposts_created_at row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8155-                                <th class="column_zen_orbitposts_updated_at row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8156-                            </tr>
+8157-                            <tr class="beamraymar-main-header-row">
+--
+8178-                                <th data-field="redshift_datum" data-type="text" class="column_zen_orbitposts_redshift_datum row_obtain_db_column"><div class="tcell_inner_wrapper_div">redshift_datum</div></th>
+8179-                                <th data-field="rover_datum" data-type="text" class="column_zen_orbitposts_rover_datum row_obtain_db_column"><div class="tcell_inner_wrapper_div">rover_datum</div></th>
+8180-                                <th data-field="hudson_imgplanbatch_id" data-type="integer" class="column_zen_orbitposts_hudson_imgplanbatch_id row_obtain_db_column"><div class="tcell_inner_wrapper_div">hudson_imgplanbatch_id</div></th>
+8181:                                <th data-field="created_at" data-type="datetime" class="column_zen_orbitposts_created_at row_obtain_db_column"><div class="tcell_inner_wrapper_div">created_at</div></th>
+8182-                                <th data-field="updated_at" data-type="datetime" class="column_zen_orbitposts_updated_at row_obtain_db_column"><div class="tcell_inner_wrapper_div">updated_at</div></th>
+8183-                            </tr>
+8184-                        </thead>
+--
+8689-                                <td class="readonly-cell column_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">${item.redshift_datum || ''}</div></td>
+8690-                                <td class="readonly-cell column_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">${item.rover_datum || ''}</div></td>
+8691-                                <td class="readonly-cell column_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">${item.hudson_imgplanbatch_id || ''}</div></td>
+8692:                                <td class="readonly-cell column_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">${formatDate(item.created_at)}</div></td>
+8693-                                <td class="readonly-cell column_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">${formatDate(item.updated_at)}</div></td>
+8694-                            </tr>`;
+8695-                        });
+--
+9177-            echo '<td class="readonly-cell column_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">' . esc_html($item['redshift_datum'] ?: '') . '</div></td>';
+9178-            echo '<td class="readonly-cell column_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">' . esc_html($item['rover_datum'] ?: '') . '</div></td>';
+9179-            echo '<td class="readonly-cell column_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['hudson_imgplanbatch_id'] ?: '') . '</div></td>';
+9180:            echo '<td class="readonly-cell column_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">' . esc_html($item['created_at'] ? date('Y-m-d H:i:s', strtotime($item['created_at'])) : '') . '</div></td>';
+9181-            echo '<td class="readonly-cell column_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">' . esc_html($item['updated_at'] ? date('Y-m-d H:i:s', strtotime($item['updated_at'])) : '') . '</div></td>';
+9182-            echo '</tr>';
+9183-
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the new boolean columns to the headers. I'll add them before the created_at and updated_at columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8149→                                <th class="column_zen_orbitposts_rel_wp_post_id row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8150→                                <th class="column_zen_orbitposts_orbitpost_id row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8151→                                <th class="column_zen_orbitposts_redshift_datum row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8152→                                <th class="column_zen_orbitposts_rover_datum row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8153→                                <th class="column_zen_orbitposts_hudson_imgplanbatch_id row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8154→                                <th class="column_zen_orbitposts_is_pinned row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8155→                                <th class="column_zen_orbitposts_is_flagged row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8156→                                <th class="column_zen_orbitposts_is_starred row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8157→                                <th class="column_zen_orbitposts_is_squared row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8158→                                <th class="column_zen_orbitposts_created_at row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8159→                                <th class="column_zen_orbitposts_updated_at row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8160→                            </tr>
+  8161→                            <tr class="beamraymar-main-header-row">
+  8162→                                <th class="beamraymar-checkbox-cell column_checkbox row_obtain_db_column">
+  8163→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox" id="select-all"></div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the second header row entries:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8180→                                <th data-field="rel_wp_post_id" data-type="integer" class="column_zen_orbitposts_rel_wp_post_id row_obtain_db_column"><div class="tcell_inner_wrapper_div">rel_wp_post_id</div></th>
+  8181→                                <th data-field="orbitpost_id" data-type="integer" class="column_zen_orbitposts_orbitpost_id row_obtain_db_column"><div class="tcell_inner_wrapper_div">orbitpost_id</div></th>
+  8182→                                <th data-field="redshift_datum" data-type="text" class="column_zen_orbitposts_redshift_datum row_obtain_db_column"><div class="tcell_inner_wrapper_div">redshift_datum</div></th>
+  8183→                                <th data-field="rover_datum" data-type="text" class="column_zen_orbitposts_rover_datum row_obtain_db_column"><div class="tcell_inner_wrapper_div">rover_datum</div></th>
+  8184→                                <th data-field="hudson_imgplanbatch_id" data-type="integer" class="column_zen_orbitposts_hudson_imgplanbatch_id row_obtain_db_column"><div class="tcell_inner_wrapper_div">hudson_imgplanbatch_id</div></th>
+  8185→                                <th data-field="is_pinned" data-type="boolean" class="column_zen_orbitposts_is_pinned row_obtain_db_column"><div class="tcell_inner_wrapper_div">is_pinned</div></th>
+  8186→                                <th data-field="is_flagged" data-type="boolean" class="column_zen_orbitposts_is_flagged row_obtain_db_column"><div class="tcell_inner_wrapper_div">is_flagged</div></th>
+  8187→                                <th data-field="is_starred" data-type="boolean" class="column_zen_orbitposts_is_starred row_obtain_db_column"><div class="tcell_inner_wrapper_div">is_starred</div></th>
+  8188→                                <th data-field="is_squared" data-type="boolean" class="column_zen_orbitposts_is_squared row_obtain_db_column"><div class="tcell_inner_wrapper_div">is_squared</div></th>
+  8189→                                <th data-field="created_at" data-type="datetime" class="column_zen_orbitposts_created_at row_obtain_db_column"><div class="tcell_inner_wrapper_div">created_at</div></th>
+  8190→                                <th data-field="updated_at" data-type="datetime" class="column_zen_orbitposts_updated_at row_obtain_db_column"><div class="tcell_inner_wrapper_div">updated_at</div></th>
+  8191→                            </tr>
+  8192→                        </thead>
+  8193→                        <tbody id="beamraymar-tbody">
+  8194→                            <?php $this->render_beamraymar_table_rows($posts_pages); ?>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the JavaScript rendering to include the new columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8695→                                <td class="readonly-cell column_zen_orbitposts_rel_wp_post_id"><div class="tcell_inner_wrapper_div">${item.rel_wp_post_id || ''}</div></td>
+  8696→                                <td class="readonly-cell column_zen_orbitposts_orbitpost_id"><div class="tcell_inner_wrapper_div">${item.orbitpost_id || ''}</div></td>
+  8697→                                <td class="readonly-cell column_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">${item.redshift_datum || ''}</div></td>
+  8698→                                <td class="readonly-cell column_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">${item.rover_datum || ''}</div></td>
+  8699→                                <td class="readonly-cell column_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">${item.hudson_imgplanbatch_id || ''}</div></td>
+  8700→                                <td class="readonly-cell column_zen_orbitposts_is_pinned"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_pinned" data-post-id="${item.ID}" data-value="${item.is_pinned || 0}">📌</span></div></td>
+  8701→                                <td class="readonly-cell column_zen_orbitposts_is_flagged"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_flagged" data-post-id="${item.ID}" data-value="${item.is_flagged || 0}">🚩</span></div></td>
+  8702→                                <td class="readonly-cell column_zen_orbitposts_is_starred"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_starred" data-post-id="${item.ID}" data-value="${item.is_starred || 0}">⭐</span></div></td>
+  8703→                                <td class="readonly-cell column_zen_orbitposts_is_squared"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_squared" data-post-id="${item.ID}" data-value="${item.is_squared || 0}">⬜</span></div></td>
+  8704→                                <td class="readonly-cell column_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">${formatDate(item.created_at)}</div></td>
+  8705→                                <td class="readonly-cell column_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">${formatDate(item.updated_at)}</div></td>
+  8706→                            </tr>`;
+  8707→                        });
+  8708→                        
+  8709→                        $('#beamraymar-tbody').html(html);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the PHP rendering section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9187→            echo '<td class="readonly-cell column_zen_orbitposts_rel_wp_post_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['rel_wp_post_id'] ?: '') . '</div></td>';
+  9188→            echo '<td class="readonly-cell column_zen_orbitposts_orbitpost_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['orbitpost_id'] ?: '') . '</div></td>';
+  9189→            echo '<td class="readonly-cell column_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">' . esc_html($item['redshift_datum'] ?: '') . '</div></td>';
+  9190→            echo '<td class="readonly-cell column_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">' . esc_html($item['rover_datum'] ?: '') . '</div></td>';
+  9191→            echo '<td class="readonly-cell column_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['hudson_imgplanbatch_id'] ?: '') . '</div></td>';
+  9192→            echo '<td class="readonly-cell column_zen_orbitposts_is_pinned"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_pinned" data-post-id="' . esc_attr($item['ID']) . '" data-value="' . esc_attr($item['is_pinned'] ?: 0) . '">📌</span></div></td>';
+  9193→            echo '<td class="readonly-cell column_zen_orbitposts_is_flagged"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_flagged" data-post-id="' . esc_attr($item['ID']) . '" data-value="' . esc_attr($item['is_flagged'] ?: 0) . '">🚩</span></div></td>';
+  9194→            echo '<td class="readonly-cell column_zen_orbitposts_is_starred"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_starred" data-post-id="' . esc_attr($item['ID']) . '" data-value="' . esc_attr($item['is_starred'] ?: 0) . '">⭐</span></div></td>';
+  9195→            echo '<td class="readonly-cell column_zen_orbitposts_is_squared"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_squared" data-post-id="' . esc_attr($item['ID']) . '" data-value="' . esc_attr($item['is_squared'] ?: 0) . '">⬜</span></div></td>';
+  9196→            echo '<td class="readonly-cell column_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">' . esc_html($item['created_at'] ? date('Y-m-d H:i:s', strtotime($item['created_at'])) : '') . '</div></td>';
+  9197→            echo '<td class="readonly-cell column_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">' . esc_html($item['updated_at'] ? date('Y-m-d H:i:s', strtotime($item['updated_at'])) : '') . '</div></td>';
+  9198→            echo '</tr>';
+  9199→            
+  9200→            $count++;
+  9201→        }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the colspan in the "No posts found" message to account for the 4 new columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9109:            echo '<tr><td colspan="23" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9105→     * Render table rows for beamraymar table
+  9106→     */
+  9107→    private function render_beamraymar_table_rows($posts_pages) {
+  9108→        if (empty($posts_pages)) {
+  9109→            echo '<tr><td colspan="27" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+  9110→            return;
+  9111→        }
+  9112→        
+  9113→        $count = 0;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add boolean fields (is_pinned, is_flagged, is_starred, is_squared) to wp_zen_orbitposts table
+- [X] 🌡️ Add new columns for zen_orbitposts boolean fields in beamraymar UI table
+- [⚡] 🌡️ Implement point-and-click icon system for the new boolean fields
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to implement the point-and-click icon system. First, I'll add the CSS styling for the icon buttons:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8021→                    color: white;
+  8022→                    text-decoration: none;
+  8023→                }
+  8024→                
+  8025→                .beamraymar-elementor-btn.disabled {
+  8026→                    background: #ccc;
+  8027→                    color: #999;
+  8028→                    cursor: not-allowed;
+  8029→                    pointer-events: none;
+  8030→                }
+  8031→                
+  8032→                /* Icon button styling */
+  8033→                .beamray-icon-btn {
+  8034→                    display: inline-block;
+  8035→                    font-size: 16px;
+  8036→                    cursor: pointer;
+  8037→                    padding: 2px;
+  8038→                    opacity: 0.3;
+  8039→                    transition: all 0.2s ease;
+  8040→                    user-select: none;
+  8041→                }
+  8042→                
+  8043→                .beamray-icon-btn:hover {
+  8044→                    opacity: 0.7;
+  8045→                    transform: scale(1.1);
+  8046→                }
+  8047→                
+  8048→                .beamray-icon-btn.active {
+  8049→                    opacity: 1.0;
+  8050→                }
+  8051→                
+  8052→                .beamray-icon-btn.active:hover {
+  8053→                    opacity: 1.0;
+  8054→                    transform: scale(1.2);
+  8055→                }
+  8056→            </style>
+  8057→
+  8058→            <!-- Top Controls -->
+  8059→            <div class="beamraymar-top-controls">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add JavaScript to handle the icon clicks and add the active class based on the data-value. First, let me add the JavaScript to initialize the icon states and handle clicks:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8710→                                <td class="readonly-cell column_wp_posts_post_type"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+  8711→                                <td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status === 'publish' ? '<strong>' + item.post_status + '</strong>' : item.post_status}</div></td>
+  8712→                                <td class="beamraymar-editable-cell column_wp_posts_post_name" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_name || ''}</div></td>
+  8713→                                <td class="readonly-cell column_wp_posts_post_date"><div class="tcell_inner_wrapper_div">${formatDate(item.post_date)}</div></td>
+  8714→                                <td class="readonly-cell column_wp_posts_post_modified"><div class="tcell_inner_wrapper_div">${formatDate(item.post_modified)}</div></td>
+  8715→                                <td class="beamraymar-editable-cell column_wp_posts_post_author" data-field="post_author" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_author}</div></td>
+  8716→                                <td class="beamraymar-editable-cell column_wp_posts_post_parent" data-field="post_parent" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_parent || '0'}</div></td>
+  8717→                                <td class="beamraymar-editable-cell column_wp_posts_menu_order" data-field="menu_order" data-type="integer"><div class="tcell_inner_wrapper_div">${item.menu_order || '0'}</div></td>
+  8718→                                <td class="beamraymar-editable-cell column_wp_posts_comment_status" data-field="comment_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.comment_status}</div></td>
+  8719→                                <td class="beamraymar-editable-cell column_wp_posts_ping_status" data-field="ping_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.ping_status}</div></td>
+  8720→                                <td class="readonly-cell column_zen_orbitposts_rel_wp_post_id"><div class="tcell_inner_wrapper_div">${item.rel_wp_post_id || ''}</div></td>
+  8721→                                <td class="readonly-cell column_zen_orbitposts_orbitpost_id"><div class="tcell_inner_wrapper_div">${item.orbitpost_id || ''}</div></td>
+  8722→                                <td class="readonly-cell column_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">${item.redshift_datum || ''}</div></td>
+  8723→                                <td class="readonly-cell column_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">${item.rover_datum || ''}</div></td>
+  8724→                                <td class="readonly-cell column_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">${item.hudson_imgplanbatch_id || ''}</div></td>
+  8725→                                <td class="readonly-cell column_zen_orbitposts_is_pinned"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_pinned" data-post-id="${item.ID}" data-value="${item.is_pinned || 0}">📌</span></div></td>
+  8726→                                <td class="readonly-cell column_zen_orbitposts_is_flagged"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_flagged" data-post-id="${item.ID}" data-value="${item.is_flagged || 0}">🚩</span></div></td>
+  8727→                                <td class="readonly-cell column_zen_orbitposts_is_starred"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_starred" data-post-id="${item.ID}" data-value="${item.is_starred || 0}">⭐</span></div></td>
+  8728→                                <td class="readonly-cell column_zen_orbitposts_is_squared"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_squared" data-post-id="${item.ID}" data-value="${item.is_squared || 0}">⬜</span></div></td>
+  8729→                                <td class="readonly-cell column_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">${formatDate(item.created_at)}</div></td>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add a function to initialize icon states and handle clicks. Let me find where the JavaScript ends to add the new functions:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8730→                                <td class="readonly-cell column_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">${formatDate(item.updated_at)}</div></td>
+  8731→                            </tr>`;
+  8732→                        });
+  8733→                        
+  8734→                        $('#beamraymar-tbody').html(html);
+  8735→                    }
+  8736→                    
+  8737→                    function attachRowEventHandlers() {
+  8738→                        // Row checkbox handling
+  8739→                        $('.row-checkbox').on('change', function() {
+  8740→                            const id = parseInt($(this).val());
+  8741→                            if ($(this).is(':checked')) {
+  8742→                                selectedRows.add(id);
+  8743→                            } else {
+  8744→                                selectedRows.delete(id);
+  8745→                            }
+  8746→                        });
+  8747→                        
+  8748→                        // Inline editing
+  8749→                        $('.beamraymar-editable-cell').on('click', function() {
+  8750→                            if (editingCell) return; // Don't start new edit if already editing
+  8751→                            
+  8752→                            const $cell = $(this);
+  8753→                            const field = $cell.data('field');
+  8754→                            const type = $cell.data('type');
+  8755→                            const currentValue = $cell.text().trim();
+  8756→                            const postId = $cell.closest('tr').data('id');
+  8757→                            
+  8758→                            startInlineEdit($cell, field, type, currentValue, postId);
+  8759→                        });
+  8760→                    }
+  8761→                    
+  8762→                    function startInlineEdit($cell, field, type, currentValue, postId) {
+  8763→                        editingCell = { $cell, field, type, postId, originalValue: currentValue };
+  8764→                        
+  8765→                        let input;
+  8766→                        if (type === 'longtext') {
+  8767→                            input = $(`<textarea class="beamraymar-editing-textarea">${currentValue}</textarea>`);
+  8768→                        } else if (type === 'select') {
+  8769→                            let options = '';
+  8770→                            if (field === 'post_status') {
+  8771→                                options = '<option value="draft">draft</option><option value="publish">publish</option><option value="private">private</option>';
+  8772→                            } else if (field === 'comment_status' || field === 'ping_status') {
+  8773→                                options = '<option value="open">open</option><option value="closed">closed</option>';
+  8774→                            }
+  8775→                            input = $(`<select class="beamraymar-editing-input">${options}</select>`);
+  8776→                            input.val(currentValue);
+  8777→                        } else {
+  8778→                            input = $(`<input type="text" class="beamraymar-editing-input" value="${currentValue}">`);
+  8779→                        }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to add the icon button functionality to the attachRowEventHandlers function:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8730→                                <td class="readonly-cell column_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">${formatDate(item.updated_at)}</div></td>
+  8731→                            </tr>`;
+  8732→                        });
+  8733→                        
+  8734→                        $('#beamraymar-tbody').html(html);
+  8735→                        
+  8736→                        // Initialize icon button states
+  8737→                        initializeIconButtons();
+  8738→                    }
+  8739→                    
+  8740→                    function attachRowEventHandlers() {
+  8741→                        // Row checkbox handling
+  8742→                        $('.row-checkbox').on('change', function() {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8757→                            const type = $cell.data('type');
+  8758→                            const currentValue = $cell.text().trim();
+  8759→                            const postId = $cell.closest('tr').data('id');
+  8760→                            
+  8761→                            startInlineEdit($cell, field, type, currentValue, postId);
+  8762→                        });
+  8763→                        
+  8764→                        // Icon button handling
+  8765→                        $('.beamray-icon-btn').on('click', function() {
+  8766→                            const $icon = $(this);
+  8767→                            const field = $icon.data('field');
+  8768→                            const postId = $icon.data('post-id');
+  8769→                            const currentValue = parseInt($icon.data('value'));
+  8770→                            const newValue = currentValue ? 0 : 1;
+  8771→                            
+  8772→                            // Update zen_orbitposts field
+  8773→                            updateZenOrbitpostField(postId, field, newValue, $icon);
+  8774→                        });
+  8775→                    }
+  8776→                    
+  8777→                    function startInlineEdit($cell, field, type, currentValue, postId) {
+  8778→                        editingCell = { $cell, field, type, postId, originalValue: currentValue };
+  8779→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the initializeIconButtons function and the updateZenOrbitpostField function. Let me find a good place to add them:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8950→                            }
+  8951→                        });
+  8952→                    }
+  8953→                    
+  8954→                    function sortData(field) {
+  8955→                        // Simple sorting implementation
+  8956→                        filteredData.sort((a, b) => {
+  8957→                            const aVal = a[field] || '';
+  8958→                            const bVal = b[field] || '';
+  8959→                            return aVal.toString().localeCompare(bVal.toString());
+  8960→                        });
+  8961→                    }
+  8962→                    
+  8963→                    // Utility functions
+  8964→                    function truncateText(text, length) {
+  8965→                        if (!text) return '';
+  8966→                        return text.length > length ? text.substring(0, length) + '...' : text;
+  8967→                    }
+  8968→                    
+  8969→                    function truncatePostContent(text) {
+  8970→                        if (!text) return '';
+  8971→                        
+  8972→                        // Strip HTML tags to get plain text
+  8973→                        const tempDiv = document.createElement('div');
+  8974→                        tempDiv.innerHTML = text;
+  8975→                        const plainText = tempDiv.textContent || tempDiv.innerText || '';
+  8976→                        
+  8977→                        // Get first line only
+  8978→                        let firstLine = plainText.split(/\r?\n/)[0] || '';
+  8979→                        
+  8980→                        // Truncate to 50 characters with conditional ellipsis
+  8981→                        if (firstLine.length > 50) {
+  8982→                            return firstLine.substring(0, 50) + '...';
+  8983→                        }
+  8984→                        return firstLine;
+  8985→                    }
+  8986→                    
+  8987→                    function formatDate(dateString) {
+  8988→                        if (!dateString) return '';
+  8989→                        return new Date(dateString).toLocaleString();
+  8990→                    }
+  8991→                    
+  8992→                    function formatElementorData(elementorData) {
+  8993→                        if (elementorData === null || elementorData === undefined) {
+  8994→                            return 'none';
+  8995→                        }
+  8996→                        if (elementorData === '' || elementorData === '[]') {
+  8997→                            return '0 lines';
+  8998→                        }
+  8999→                        const lineCount = (elementorData.match(/\n/g) || []).length + 1;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me add the new functions after the utility functions:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8995→                        }
+  8996→                        if (elementorData === '' || elementorData === '[]') {
+  8997→                            return '0 lines';
+  8998→                        }
+  8999→                        const lineCount = (elementorData.match(/\n/g) || []).length + 1;
+  9000→                        return lineCount + ' lines';
+  9001→                    }
+  9002→                    
+  9003→                    // Elementor data editor functions
+  9004→                    function openElementorEditor(postId) {
+  9005→                        currentElementorEditPostId = postId;
+  9006→                        const post = allData.find(item => item.ID == postId);
+  9007→                        
+  9008→                        if (post) {
+  9009→                            $('#beamraymar-elementor-editor-textarea').val(post._elementor_data || '');
+  9010→                            $('#beamraymar-elementor-editor-modal').addClass('active');
+  9011→                        }
+  9012→                    }
+  9013→                    
+  9014→                    function closeElementorEditor() {
+  9015→                        $('#beamraymar-elementor-editor-modal').removeClass('active');
+  9016→                        $('#beamraymar-elementor-editor-textarea').val('');
+  9017→                        currentElementorEditPostId = null;
+  9018→                    }
+  9019→                    
+  9020→                    function saveElementorEditor() {
+  9021→                        if (!currentElementorEditPostId) return;
+  9022→                        
+  9023→                        const newElementorData = $('#beamraymar-elementor-editor-textarea').val();
+  9024→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8996→                        if (elementorData === '' || elementorData === '[]') {
+  8997→                            return '0 lines';
+  8998→                        }
+  8999→                        const lineCount = (elementorData.match(/\n/g) || []).length + 1;
+  9000→                        return lineCount + ' lines';
+  9001→                    }
+  9002→                    
+  9003→                    // Icon button functions
+  9004→                    function initializeIconButtons() {
+  9005→                        $('.beamray-icon-btn').each(function() {
+  9006→                            const $icon = $(this);
+  9007→                            const value = parseInt($icon.data('value'));
+  9008→                            if (value) {
+  9009→                                $icon.addClass('active');
+  9010→                            } else {
+  9011→                                $icon.removeClass('active');
+  9012→                            }
+  9013→                        });
+  9014→                    }
+  9015→                    
+  9016→                    function updateZenOrbitpostField(postId, field, newValue, $icon) {
+  9017→                        // Show loading state
+  9018→                        $icon.css('opacity', '0.5');
+  9019→                        
+  9020→                        $.ajax({
+  9021→                            url: ajaxurl,
+  9022→                            method: 'POST',
+  9023→                            data: {
+  9024→                                action: 'beamraymar_update_zen_orbitpost_field',
+  9025→                                post_id: postId,
+  9026→                                field: field,
+  9027→                                value: newValue,
+  9028→                                nonce: beamraymarAjax.nonce
+  9029→                            },
+  9030→                            success: function(response) {
+  9031→                                if (response.success) {
+  9032→                                    // Update the icon state
+  9033→                                    $icon.data('value', newValue);
+  9034→                                    if (newValue) {
+  9035→                                        $icon.addClass('active');
+  9036→                                    } else {
+  9037→                                        $icon.removeClass('active');
+  9038→                                    }
+  9039→                                    $icon.css('opacity', '');
+  9040→                                } else {
+  9041→                                    alert('Error updating field: ' + (response.data || 'Unknown error'));
+  9042→                                    $icon.css('opacity', '');
+  9043→                                }
+  9044→                            },
+  9045→                            error: function() {
+  9046→                                alert('Error updating field');
+  9047→                                $icon.css('opacity', '');
+  9048→                            }
+  9049→                        });
+  9050→                    }
+  9051→                    
+  9052→                    // Elementor data editor functions
+  9053→                    function openElementorEditor(postId) {
+  9054→                        currentElementorEditPostId = postId;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the AJAX handler for updating the zen_orbitposts fields. Let me find where AJAX handlers are defined:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+56-        add_action('wp_ajax_rup_duplicate_single_post', array($this, 'rup_duplicate_single_post'));
+57-        
+58-        // AJAX handler for beamraymar post content update
+59:        add_action('wp_ajax_beamraymar_update_post_content', array($this, 'beamraymar_update_post_content'));
+60-        
+61-        // AJAX handler for beamraymar elementor data update
+62:        add_action('wp_ajax_beamraymar_update_elementor_data', array($this, 'beamraymar_update_elementor_data'));
+63-        
+64-        // AJAX handler for cssmar CSS file save
+65-        add_action('wp_ajax_cssmar_save_css', array($this, 'cssmar_save_css'));
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see where the AJAX handlers are added. Let me add the new handler:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    60→        
+    61→        // AJAX handler for beamraymar elementor data update
+    62→        add_action('wp_ajax_beamraymar_update_elementor_data', array($this, 'beamraymar_update_elementor_data'));
+    63→        
+    64→        // AJAX handler for cssmar CSS file save
+    65→        add_action('wp_ajax_cssmar_save_css', array($this, 'cssmar_save_css'));
+    66→        
+    67→        // AJAX handler for zen_orbitposts field update
+    68→        add_action('wp_ajax_beamraymar_update_zen_orbitpost_field', array($this, 'beamraymar_update_zen_orbitpost_field'));
+    69→        
+    70→        // Add Elementor data viewer
+    71→        add_action('add_meta_boxes', array($this, 'add_elementor_data_metabox'));
+    72→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the actual AJAX handler method. Let me find where the other AJAX handlers are implemented:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9296-    /**
+9297-     * AJAX handler for updating elementor data from beamraymar editor
+9298-     */
+9299:    public function beamraymar_update_elementor_data() {
+9300-        // Verify nonce
+9301-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+9302-            wp_send_json_error('Security check failed');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me read that section to understand the pattern:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9295→    
+  9296→    /**
+  9297→     * AJAX handler for updating elementor data from beamraymar editor
+  9298→     */
+  9299→    public function beamraymar_update_elementor_data() {
+  9300→        // Verify nonce
+  9301→        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+  9302→            wp_send_json_error('Security check failed');
+  9303→            return;
+  9304→        }
+  9305→        
+  9306→        // Check permissions
+  9307→        if (!current_user_can('edit_posts')) {
+  9308→            wp_send_json_error('Permission denied');
+  9309→            return;
+  9310→        }
+  9311→        
+  9312→        // Get and validate post ID
+  9313→        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+  9314→        if (!$post_id) {
+  9315→            wp_send_json_error('Invalid post ID');
+  9316→            return;
+  9317→        }
+  9318→        
+  9319→        // Get new elementor data
+  9320→        $new_elementor_data = isset($_POST['elementor_data']) ? $_POST['elementor_data'] : '';
+  9321→        
+  9322→        // Update the post meta
+  9323→        if ($new_elementor_data === '' || $new_elementor_data === null) {
+  9324→            delete_post_meta($post_id, '_elementor_data');
+  9325→            wp_send_json_success('Elementor data cleared');
+  9326→        } else {
+  9327→            update_post_meta($post_id, '_elementor_data', $new_elementor_data);
+  9328→            wp_send_json_success('Elementor data updated successfully');
+  9329→        }
+  9330→    }
+  9331→    
+  9332→    /**
+  9333→     * AJAX handler for updating post content from beamraymar editor
+  9334→     */
+  9335→    public function beamraymar_update_post_content() {
+  9336→        // Verify nonce
+  9337→        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+  9338→            wp_send_json_error('Security check failed');
+  9339→            return;
+  9340→        }
+  9341→        
+  9342→        // Check permissions
+  9343→        if (!current_user_can('edit_posts')) {
+  9344→            wp_send_json_error('Permission denied');
+  9345→            return;
+  9346→        }
+  9347→        
+  9348→        // Get and validate post ID
+  9349→        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+  9350→        if (!$post_id) {
+  9351→            wp_send_json_error('Invalid post ID');
+  9352→            return;
+  9353→        }
+  9354→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the new AJAX handler method following the same pattern. Let me find a good place to add it:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9370→    
+  9371→    /**
+  9372→     * Handle AJAX requests for beamraymar page
+  9373→     */
+  9374→    private function handle_beamraymar_ajax() {
+  9375→        // Verify nonce
+  9376→        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+  9377→            echo json_encode(array('success' => false, 'message' => 'Security check failed'));
+  9378→            wp_die();
+  9379→        }
+  9380→        
+  9381→        $action = sanitize_text_field($_POST['action']);
+  9382→        
+  9383→        switch ($action) {
+  9384→            case 'create_new_post':
+  9385→                $this->ajax_create_new_post();
+  9386→                break;
+  9387→                
+  9388→            case 'update_post_field':
+  9389→                $this->ajax_update_post_field();
+  9390→                break;
+  9391→                
+  9392→            case 'create':
+  9393→            case 'edit':
+  9394→                $this->ajax_create_or_edit_post();
+  9395→                break;
+  9396→                
+  9397→            default:
+  9398→                wp_die('Invalid action');
+  9399→        }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me add the new AJAX handler after the existing handlers:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9324→            delete_post_meta($post_id, '_elementor_data');
+  9325→            wp_send_json_success('Elementor data cleared');
+  9326→        } else {
+  9327→            update_post_meta($post_id, '_elementor_data', $new_elementor_data);
+  9328→            wp_send_json_success('Elementor data updated successfully');
+  9329→        }
+  9330→    }
+  9331→    
+  9332→    /**
+  9333→     * AJAX handler for updating zen_orbitposts boolean fields
+  9334→     */
+  9335→    public function beamraymar_update_zen_orbitpost_field() {
+  9336→        // Verify nonce
+  9337→        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+  9338→            wp_send_json_error('Security check failed');
+  9339→            return;
+  9340→        }
+  9341→        
+  9342→        // Check permissions
+  9343→        if (!current_user_can('edit_posts')) {
+  9344→            wp_send_json_error('Permission denied');
+  9345→            return;
+  9346→        }
+  9347→        
+  9348→        // Get and validate post ID
+  9349→        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+  9350→        if (!$post_id) {
+  9351→            wp_send_json_error('Invalid post ID');
+  9352→            return;
+  9353→        }
+  9354→        
+  9355→        // Get and validate field name
+  9356→        $field = isset($_POST['field']) ? sanitize_text_field($_POST['field']) : '';
+  9357→        $allowed_fields = array('is_pinned', 'is_flagged', 'is_starred', 'is_squared');
+  9358→        if (!in_array($field, $allowed_fields)) {
+  9359→            wp_send_json_error('Invalid field name');
+  9360→            return;
+  9361→        }
+  9362→        
+  9363→        // Get and validate value
+  9364→        $value = isset($_POST['value']) ? intval($_POST['value']) : 0;
+  9365→        $value = $value ? 1 : 0; // Ensure boolean 0 or 1
+  9366→        
+  9367→        global $wpdb;
+  9368→        $table_name = $wpdb->prefix . 'zen_orbitposts';
+  9369→        
+  9370→        // Check if record exists
+  9371→        $existing_record = $wpdb->get_row($wpdb->prepare(
+  9372→            "SELECT * FROM $table_name WHERE rel_wp_post_id = %d",
+  9373→            $post_id
+  9374→        ));
+  9375→        
+  9376→        if ($existing_record) {
+  9377→            // Update existing record
+  9378→            $result = $wpdb->update(
+  9379→                $table_name,
+  9380→                array($field => $value),
+  9381→                array('rel_wp_post_id' => $post_id),
+  9382→                array('%d'),
+  9383→                array('%d')
+  9384→            );
+  9385→        } else {
+  9386→            // Create new record
+  9387→            $result = $wpdb->insert(
+  9388→                $table_name,
+  9389→                array(
+  9390→                    'rel_wp_post_id' => $post_id,
+  9391→                    $field => $value
+  9392→                ),
+  9393→                array('%d', '%d')
+  9394→            );
+  9395→        }
+  9396→        
+  9397→        if ($result !== false) {
+  9398→            wp_send_json_success('Field updated successfully');
+  9399→        } else {
+  9400→            wp_send_json_error('Database update failed');
+  9401→        }
+  9402→    }
+  9403→    
+  9404→    /**
+  9405→     * AJAX handler for updating post content from beamraymar editor
+  9406→     */
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to make sure the PHP rendering also calls initializeIconButtons when the table is loaded. Let me add a call to initializeIconButtons in the JavaScript that runs after the PHP table is rendered:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9250→            echo '<a href="' . esc_url($frontend_url) . '" target="_blank" class="beamraymar-tool-btn">F</a>';
+  9251→            echo '</div></td>';
+  9252→            echo '<td class="readonly-cell column_wp_posts_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+  9253→            echo '<td class="beamraymar-editable-cell column_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+  9254→            echo '<td class="readonly-cell column_wp_posts_post_content"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
+  9255→            
+  9256→            // Calculate elementor data line count
+  9257→            $elementor_display = 'none';
+  9258→            if (isset($item['_elementor_data']) && $item['_elementor_data'] !== null) {
+  9259→                if (empty($item['_elementor_data']) || $item['_elementor_data'] === '[]') {
+  9260→                    $elementor_display = '0 lines';
+  9261→                } else {
+  9262→                    $line_count = substr_count($item['_elementor_data'], "\n") + 1;
+  9263→                    $elementor_display = $line_count . ' lines';
+  9264→                }
+  9265→            }
+  9266→            echo '<td class="readonly-cell column_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">' . esc_html($elementor_display) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '" data-editor-type="elementor">ED</button></div></td>';
+  9267→            
+  9268→            echo '<td class="readonly-cell column_wp_posts_post_type"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_type']) . '</div></td>';
+  9269→            $status_display = $item['post_status'] === 'publish' ? '<strong>' . esc_html($item['post_status']) . '</strong>' : esc_html($item['post_status']);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to find where the JavaScript is initialized on page load. Let me look for document ready:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+588-                </p>
+589-            </div>
+590-        </div>
+591-        
+592-        <script>
+593:        jQuery(document).ready(function($) {
+594-            var originalApiKey = $('#ruplin-api-key').data('full-key');
+595-            var isKeyVisible = false;
+596-            
+597-            // Function to mask API key
+598-            function maskApiKey(key) {
+--
+1864-            </div>
+1865-            </div> <!-- Close padding wrapper -->
+1866-        </div>
+1867-
+1868-        <script type="text/javascript">
+1869:        jQuery(document).ready(function($) {
+1870-            let currentPage = 1;
+1871-            let itemsPerPage = 100;
+1872-            let searchTerm = '';
+1873-            let sortField = 'location_id';
+1874-            let sortOrder = 'asc';
+--
+2704-            </div>
+2705-            </div> <!-- Close padding wrapper -->
+2706-        </div>
+2707-
+2708-        <script type="text/javascript">
+2709:        jQuery(document).ready(function($) {
+2710-            let currentPage = 1;
+2711-            let itemsPerPage = 100;
+2712-            let searchTerm = '';
+2713-            let sortField = 'service_id';
+2714-            let sortOrder = 'asc';
+--
+3548-            background-color: #f9f9f9 !important;
+3549-        }
+3550-        </style>
+3551-        
+3552-        <script type="text/javascript">
+3553:        jQuery(document).ready(function($) {
+3554-            let currentData = {};
+3555-            let hasChanges = false;
+3556-            
+3557-            // Load initial data
+3558-            loadDriggsData();
+--
+4200-            margin: 10px 0;
+4201-        }
+4202-        </style>
+4203-        
+4204-        <script>
+4205:        jQuery(document).ready(function($) {
+4206-            var selectedCount = 0;
+4207-            
+4208-            // Update selection count
+4209-            function updateSelectionCount() {
+4210-                selectedCount = $('.rup-post-checkbox:checked').length;
+--
+4660-            margin: 10px 0;
+4661-        }
+4662-        </style>
+4663-        
+4664-        <script>
+4665:        jQuery(document).ready(function($) {
+4666-            var selectedCount = 0;
+4667-            
+4668-            // Update selection count
+4669-            function updateSelectionCount() {
+4670-                selectedCount = $('.pantheon-checkbox:checked').length;
+--
+4901-        echo '</div>';
+4902-        
+4903-        // Add JavaScript for button functionality
+4904-        ?>
+4905-        <script type="text/javascript">
+4906:        jQuery(document).ready(function($) {
+4907-            $('#rebuild-zen-tables').on('click', function(e) {
+4908-                e.preventDefault();
+4909-                
+4910-                if (!confirm('This will rebuild the _zen_services and _zen_locations tables. Continue?')) {
+4911-                    return;
+--
+6270-                </div>
+6271-            </div>
+6272-        </div>
+6273-        
+6274-        <script type="text/javascript">
+6275:        jQuery(document).ready(function($) {
+6276-            // Select all functionality
+6277-            $('#select-all-formats').on('change', function() {
+6278-                var isChecked = $(this).is(':checked');
+6279-                $('.format-checkbox').prop('checked', isChecked);
+6280-            });
+--
+6691-        }, 0);
+6692-        
+6693-        // Final cleanup - remove any remaining notices via JavaScript
+6694-        add_action('admin_footer', function() {
+6695-            echo '<script type="text/javascript">
+6696:                jQuery(document).ready(function($) {
+6697-                    // Remove all notice elements
+6698-                    $(".notice, .notice-warning, .notice-error, .notice-success, .notice-info").remove();
+6699-                    $(".updated, .error, .update-nag, .admin-notice").remove();
+6700-                    $("#update-nag, #deprecation-warning").remove();
+6701-                    $(".update-php, .php-update-nag").remove();
+--
+6843-        });
+6844-        
+6845-        // JavaScript to dynamically filter notices
+6846-        add_action('admin_footer', function() {
+6847-            echo '<script type="text/javascript">
+6848:                jQuery(document).ready(function($) {
+6849-                    // Function to check if notice is from WP Pusher or related to page actions
+6850-                    function isWPPusherNotice(element) {
+6851-                        var $el = $(element);
+6852-                        var text = $el.text().toLowerCase();
+6853-                        var html = $el.html().toLowerCase();
+--
+8359-                    let editingCell = null;
+8360-                    let currentContentEditPostId = null;
+8361-                    let currentElementorEditPostId = null;
+8362-                    
+8363-                    // Initialize page
+8364:                    $(document).ready(function() {
+8365-                        initializeEventHandlers();
+8366-                        updateTable();
+8367-                        updateColumnVisibility(); // Initialize column pagination
+8368-                    });
+8369-
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the beamraymar page's document ready function. I need to add the initializeIconButtons call there:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8359→                    let editingCell = null;
+  8360→                    let currentContentEditPostId = null;
+  8361→                    let currentElementorEditPostId = null;
+  8362→                    
+  8363→                    // Initialize page
+  8364→                    $(document).ready(function() {
+  8365→                        initializeEventHandlers();
+  8366→                        updateTable();
+  8367→                        updateColumnVisibility(); // Initialize column pagination
+  8368→                        initializeIconButtons(); // Initialize icon button states
+  8369→                    });
+  8370→                    
+  8371→                    function initializeEventHandlers() {
+  8372→                        // Pagination controls
+  8373→                        $('.beamraymar-pagination-btn').on('click', function(e) {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add boolean fields (is_pinned, is_flagged, is_starred, is_squared) to wp_zen_orbitposts table
+- [X] 🌡️ Add new columns for zen_orbitposts boolean fields in beamraymar UI table
+- [X] 🌡️ Implement point-and-click icon system for the new boolean fields
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully implemented the complete feature as requested:
+
+## ✅ Implementation Complete
+
+### 1. **Database Schema Update**
+- Added 4 new boolean fields to `wp_zen_orbitposts` table:
+  - `is_pinned` (BOOLEAN DEFAULT FALSE)
+  - `is_flagged` (BOOLEAN DEFAULT FALSE) 
+  - `is_starred` (BOOLEAN DEFAULT FALSE)
+  - `is_squared` (BOOLEAN DEFAULT FALSE)
+- Incremented DB_VERSION to `1.7.0` to trigger table updates
+
+### 2. **UI Table Integration**
+- Added 4 new columns to the beamraymar table grid
+- Updated both header rows with proper class names:
+  - First row: `row_obtain_db_table` class + database table names
+  - Second row: `row_obtain_db_column` class + field names
+- Updated colspan from 23 to 27 for empty states
+
+### 3. **Point-and-Click Icon System**
+- **Icons**: 📌 (pinned), 🚩 (flagged), ⭐ (starred), ⬜ (squared)
+- **Visual States**: 
+  - Inactive: 30% opacity
+  - Active: 100% opacity with hover effects
+  - Hover: Scale and opacity transitions
+- **Functionality**:
+  - Click to toggle boolean state (0↔1)
+  - AJAX updates to `wp_zen_orbitposts` table
+  - Real-time UI state updates
+  - Proper nonce verification and permissions checking
+
+### 4. **Technical Features**
+- **CSS Styling**: Added `.beamray-icon-btn` classes with hover effects
+- **JavaScript Functions**:
+  - `initializeIconButtons()` - Sets active state based on data values
+  - `updateZenOrbitpostField()` - Handles AJAX toggle requests
+- **AJAX Handler**: `beamraymar_update_zen_orbitpost_field()` with security checks
+- **Database Logic**: Handles both INSERT (new records) and UPDATE (existing records)
+
+The implementation provides a smooth, responsive icon-based toggle system similar to modern SaaS interfaces, allowing users to quickly mark posts with different boolean flags directly from the table grid.
+
