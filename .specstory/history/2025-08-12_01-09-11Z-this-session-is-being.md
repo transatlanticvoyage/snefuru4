@@ -3494,3 +3494,105 @@ function truncateToFirstLine(text) {
 
 The current system has **inconsistent truncation** between PHP (15 words) and JavaScript (100 characters), so standardizing this would be beneficial.
 
+---
+
+_**User**_
+
+lets write a rule for the post_content field on /beamray mar page
+
+only include the first 1 line in our ui table grid on this page (for this column) 
+
+so the first "line" of text from the post_content field is all thats allowed to display
+
+also please cut it off at 50 characters and put a "..." ellipsis of 3 periods after those 50 characters 
+
+if there are not 50 characters (if there are less than 50 characters) in this first line from the text of the post_content field, do not show any ellipsis periods 
+
+_**User**_
+
+[Request interrupted by user]
+
+_**User**_
+
+before you proceed on my prompt i gave you above, i wanted to remind you of this:
+
+———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Update post_content truncation to show only first line, max 50 characters with conditional ellipsis
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll update the truncation logic for the post_content field in both PHP and JavaScript to show only the first line, max 50 characters, with ellipsis only if needed.
+
+First, let me update the PHP truncation in the `render_beamraymar_table_rows` function:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8639→        $count = 0;
+  8640→        foreach ($posts_pages as $item) {
+  8641→            if ($count >= 100) break; // Default pagination limit
+  8642→            
+  8643→            // Get first line only
+  8644→            $first_line = explode("\n", $item['post_content'])[0];
+  8645→            $first_line = explode("\r", $first_line)[0]; // Handle Windows line breaks
+  8646→            
+  8647→            // Truncate to 50 characters with conditional ellipsis
+  8648→            if (strlen($first_line) > 50) {
+  8649→                $content_preview = substr($first_line, 0, 50) . '...';
+  8650→            } else {
+  8651→                $content_preview = $first_line;
+  8652→            }
+  8653→            
+  8654→            echo '<tr data-id="' . esc_attr($item['ID']) . '">';
+  8655→            echo '<td class="beamraymar-checkbox-cell">';
+  8656→            echo '<div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="' . esc_attr($item['ID']) . '"></div>';
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the JavaScript `truncateText` function call for the post_content field:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8361→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+  8362→                                </td>
+  8363→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  8364→                                <td class="beamraymar-editable-cell" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8365→                                <td class="beamraymar-editable-cell" data-field="post_content" data-type="longtext"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}</div></td>
+  8366→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+  8367→                                <td class="beamraymar-editable-cell" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status}</div></td>
+  8368→                                <td class="beamraymar-editable-cell" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_name || ''}</div></td>
+  8369→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${formatDate(item.post_date)}</div></td>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to add the new `truncatePostContent` function to the JavaScript:
+
