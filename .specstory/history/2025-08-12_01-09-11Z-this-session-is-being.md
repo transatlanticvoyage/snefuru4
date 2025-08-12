@@ -3596,3 +3596,446 @@ _**Agent (claude-opus-4-1-20250805)**_
 
 Now I need to add the new `truncatePostContent` function to the JavaScript:
 
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8589→                            return aVal.toString().localeCompare(bVal.toString());
+  8590→                        });
+  8591→                    }
+  8592→                    
+  8593→                    // Utility functions
+  8594→                    function truncateText(text, length) {
+  8595→                        if (!text) return '';
+  8596→                        return text.length > length ? text.substring(0, length) + '...' : text;
+  8597→                    }
+  8598→                    
+  8599→                    function truncatePostContent(text) {
+  8600→                        if (!text) return '';
+  8601→                        
+  8602→                        // Get first line only
+  8603→                        let firstLine = text.split(/\r?\n/)[0] || '';
+  8604→                        
+  8605→                        // Truncate to 50 characters with conditional ellipsis
+  8606→                        if (firstLine.length > 50) {
+  8607→                            return firstLine.substring(0, 50) + '...';
+  8608→                        }
+  8609→                        return firstLine;
+  8610→                    }
+  8611→                    
+  8612→                    function formatDate(dateString) {
+  8613→                        if (!dateString) return '';
+  8614→                        return new Date(dateString).toLocaleString();
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Update post_content truncation to show only first line, max 50 characters with conditional ellipsis
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I've successfully updated the post_content truncation rule for the beamraymar page:
+
+## ✅ **Changes Completed - ONLY post_content truncation:**
+
+### 1. **PHP Truncation (server-side):**
+- Takes only the **first line** of post_content (splits on `\n` or `\r`)
+- Truncates to **50 characters maximum**
+- Adds `...` **only if** the first line exceeds 50 characters
+- No ellipsis if the first line is 50 characters or less
+
+### 2. **JavaScript Truncation (client-side):**
+- Added new `truncatePostContent()` function
+- Takes only the **first line** using regex `/\r?\n/` to handle all line break types
+- Truncates to **50 characters maximum**
+- Adds `...` **only if** the first line exceeds 50 characters
+- No ellipsis if the first line is 50 characters or less
+
+### 3. **Logic Summary:**
+```
+IF first line > 50 characters:
+    Display: first 50 characters + "..."
+ELSE:
+    Display: entire first line (no ellipsis)
+```
+
+The post_content column in the beamraymar UI table grid now consistently shows only the first line of content, capped at 50 characters with conditional ellipsis, in both the initial PHP render and any JavaScript updates.
+
+---
+
+_**User**_
+
+next we must work on altering the actual html tags that are allowed to be output on the frontend in our ui table grid at /beamraymar page (under the ui column's <td> cells for ui column "post_content" only) 
+
+please write a rule that no h1, h2, h* tags, etc. can be shown in the post_content column on beamraymar ui table grid 
+
+the first line in post_content is often an h1, for example, and this shows obnoxiously big on our management screen
+
+we dont want this 
+
+we want all db values to be somehow "flattened" when displaying under post_content column in beamraymay ui table grid 
+
+by flattened, I mean, that these <td> area will only display basically the "plain text" version of what comes from that db field post_content 
+
+so instead of displaying this in our ui table gride at beamraymar page under post_content ui column:
+<h1>plumbers in washington</h1>
+
+it will display:
+plumbers in washington
+
+and it will look clean like the rest of our ui columns
+
+so please write a rule to disable bold, or any styling whatsoever for this column's frontend output
+
+Important note: do not change what is actually stored in the db field post_content itself - since the full code is needed for rendering to live users in the actual wp pages/posts themselves. these instructions just pertain to our ui table grid at beamraymar page
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Strip HTML tags from post_content column display in beamraymar UI table grid
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll update both the PHP and JavaScript to strip all HTML tags from the post_content before displaying it in the UI table grid.
+
+First, let me update the PHP rendering to strip HTML tags:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8652→        $count = 0;
+  8653→        foreach ($posts_pages as $item) {
+  8654→            if ($count >= 100) break; // Default pagination limit
+  8655→            
+  8656→            // Strip all HTML tags to get plain text
+  8657→            $plain_text = strip_tags($item['post_content']);
+  8658→            
+  8659→            // Get first line only
+  8660→            $first_line = explode("\n", $plain_text)[0];
+  8661→            $first_line = explode("\r", $first_line)[0]; // Handle Windows line breaks
+  8662→            
+  8663→            // Truncate to 50 characters with conditional ellipsis
+  8664→            if (strlen($first_line) > 50) {
+  8665→                $content_preview = substr($first_line, 0, 50) . '...';
+  8666→            } else {
+  8667→                $content_preview = $first_line;
+  8668→            }
+  8669→            
+  8670→            echo '<tr data-id="' . esc_attr($item['ID']) . '">';
+  8671→            echo '<td class="beamraymar-checkbox-cell">';
+  8672→            echo '<div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="' . esc_attr($item['ID']) . '"></div>';
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the JavaScript `truncatePostContent` function to also strip HTML tags:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8595→                        if (!text) return '';
+  8596→                        return text.length > length ? text.substring(0, length) + '...' : text;
+  8597→                    }
+  8598→                    
+  8599→                    function truncatePostContent(text) {
+  8600→                        if (!text) return '';
+  8601→                        
+  8602→                        // Strip HTML tags to get plain text
+  8603→                        const tempDiv = document.createElement('div');
+  8604→                        tempDiv.innerHTML = text;
+  8605→                        const plainText = tempDiv.textContent || tempDiv.innerText || '';
+  8606→                        
+  8607→                        // Get first line only
+  8608→                        let firstLine = plainText.split(/\r?\n/)[0] || '';
+  8609→                        
+  8610→                        // Truncate to 50 characters with conditional ellipsis
+  8611→                        if (firstLine.length > 50) {
+  8612→                            return firstLine.substring(0, 50) + '...';
+  8613→                        }
+  8614→                        return firstLine;
+  8615→                    }
+  8616→                    
+  8617→                    function formatDate(dateString) {
+  8618→                        if (!dateString) return '';
+  8619→                        return new Date(dateString).toLocaleString();
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Strip HTML tags from post_content column display in beamraymar UI table grid
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I've successfully implemented HTML stripping for the post_content column in the beamraymar UI table grid:
+
+## ✅ **Changes Completed - ONLY HTML stripping for post_content column:**
+
+### 1. **PHP (server-side):**
+- Added `strip_tags()` function to remove ALL HTML tags before processing
+- Converts HTML like `<h1>plumbers in washington</h1>` to plain text `plumbers in washington`
+- Applied BEFORE getting first line and truncating
+
+### 2. **JavaScript (client-side):**
+- Creates temporary DOM element to parse HTML
+- Extracts plain text using `textContent` or `innerText`
+- Removes all HTML tags, formatting, and styling
+- Applied BEFORE getting first line and truncating
+
+### 3. **Result:**
+- **Before**: `<h1>plumbers in washington</h1>` (displays as large heading)
+- **After**: `plumbers in washington` (displays as plain text)
+
+### 4. **What this removes:**
+- All heading tags (h1, h2, h3, etc.)
+- Bold, italic, underline formatting
+- Links, images, spans, divs
+- Any and all HTML markup
+
+### 5. **Important:**
+- Database content remains **unchanged** - full HTML is preserved in the database
+- Only the **display** in the beamraymar UI table grid is affected
+- Actual WordPress pages/posts continue to render with full HTML formatting
+
+The post_content column now displays clean, plain text without any HTML formatting, making it consistent with other columns in the UI table grid.
+
+---
+
+_**User**_
+
+please disable the inline editing itself for the post_content ui column only at beamraymar page 
+
+please create a square div button that is 20 px by 20 px square and has the text "ED" on it. please make this button sit to the right side of the post_content column's <td> areas (still inside the <td> itself) 
+
+this button will appear in every ui row in our table 
+
+when user clicks the button, a large (almost full screen) popup will appear that displays the text
+post_content in bold 16 px font at top of popup and then has a large text editor / code editor kind of area where the user can see the raw db content of the db field post_content and make real edits to it and save it
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Disable inline editing for post_content column and add ED button with popup editor
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+First, I'll add the CSS for the ED button and the popup:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  7841→                    border-top-left-radius: 4px;
+  7842→                    border-bottom-left-radius: 4px;
+  7843→                }
+  7844→                
+  7845→                .beamraymar-filter-btn:last-child {
+  7846→                    border-top-right-radius: 4px;
+  7847→                    border-bottom-right-radius: 4px;
+  7848→                }
+  7849→                
+  7850→                /* ED button for post_content */
+  7851→                .beamraymar-content-edit-btn {
+  7852→                    width: 20px;
+  7853→                    height: 20px;
+  7854→                    background: #0073aa;
+  7855→                    color: white;
+  7856→                    border: none;
+  7857→                    cursor: pointer;
+  7858→                    font-size: 10px;
+  7859→                    font-weight: bold;
+  7860→                    float: right;
+  7861→                    margin-left: 8px;
+  7862→                }
+  7863→                
+  7864→                .beamraymar-content-edit-btn:hover {
+  7865→                    background: #005a87;
+  7866→                }
+  7867→                
+  7868→                /* Post content editor popup */
+  7869→                .beamraymar-content-editor-modal {
+  7870→                    display: none;
+  7871→                    position: fixed;
+  7872→                    z-index: 999999;
+  7873→                    left: 0;
+  7874→                    top: 0;
+  7875→                    width: 100%;
+  7876→                    height: 100%;
+  7877→                    background: rgba(0,0,0,0.7);
+  7878→                }
+  7879→                
+  7880→                .beamraymar-content-editor-modal.active {
+  7881→                    display: flex;
+  7882→                    align-items: center;
+  7883→                    justify-content: center;
+  7884→                }
+  7885→                
+  7886→                .beamraymar-content-editor-content {
+  7887→                    background: white;
+  7888→                    padding: 30px;
+  7889→                    border-radius: 6px;
+  7890→                    width: 90%;
+  7891→                    height: 85%;
+  7892→                    display: flex;
+  7893→                    flex-direction: column;
+  7894→                }
+  7895→                
+  7896→                .beamraymar-content-editor-header {
+  7897→                    font-size: 16px;
+  7898→                    font-weight: bold;
+  7899→                    margin-bottom: 15px;
+  7900→                }
+  7901→                
+  7902→                .beamraymar-content-editor-textarea {
+  7903→                    width: 100%;
+  7904→                    flex: 1;
+  7905→                    padding: 10px;
+  7906→                    border: 1px solid #ddd;
+  7907→                    font-family: monospace;
+  7908→                    font-size: 14px;
+  7909→                    resize: none;
+  7910→                }
+  7911→                
+  7912→                .beamraymar-content-editor-actions {
+  7913→                    display: flex;
+  7914→                    justify-content: flex-end;
+  7915→                    gap: 10px;
+  7916→                    margin-top: 15px;
+  7917→                }
+  7918→                
+  7919→                .beamraymar-content-editor-btn {
+  7920→                    padding: 10px 20px;
+  7921→                    border: none;
+  7922→                    border-radius: 4px;
+  7923→                    cursor: pointer;
+  7924→                    font-weight: 600;
+  7925→                }
+  7926→                
+  7927→                .beamraymar-content-editor-btn.save {
+  7928→                    background: #0073aa;
+  7929→                    color: white;
+  7930→                }
+  7931→                
+  7932→                .beamraymar-content-editor-btn.cancel {
+  7933→                    background: #f1f1f1;
+  7934→                    color: #333;
+  7935→                }
+  7936→            </style>
+  7937→
+  7938→            <!-- Top Controls -->
+  7939→            <div class="beamraymar-top-controls">
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I'll add the popup HTML after the existing modal:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8143→                            <button type="submit" class="beamraymar-modal-btn primary" id="beamraymar-modal-save">Save</button>
+  8144→                        </div>
+  8145→                    </form>
+  8146→                </div>
+  8147→            </div>
+  8148→
+  8149→            <!-- Post Content Editor Modal -->
+  8150→            <div id="beamraymar-content-editor-modal" class="beamraymar-content-editor-modal">
+  8151→                <div class="beamraymar-content-editor-content">
+  8152→                    <div class="beamraymar-content-editor-header">post_content</div>
+  8153→                    <textarea id="beamraymar-content-editor-textarea" class="beamraymar-content-editor-textarea"></textarea>
+  8154→                    <div class="beamraymar-content-editor-actions">
+  8155→                        <button type="button" class="beamraymar-content-editor-btn cancel" id="beamraymar-content-editor-cancel">Cancel</button>
+  8156→                        <button type="button" class="beamraymar-content-editor-btn save" id="beamraymar-content-editor-save">Save</button>
+  8157→                    </div>
+  8158→                </div>
+  8159→            </div>
+  8160→
+  8161→            <script>
+  8162→                // Beamraymar JavaScript functionality
+  8163→                (function($) {
+  8164→                    'use strict';
+  8165→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to modify the PHP rendering to change post_content from editable to non-editable and add the ED button:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8776→            echo '<div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="' . esc_attr($item['ID']) . '"></div>';
+  8777→            echo '</td>';
+  8778→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+  8779→            echo '<td class="beamraymar-editable-cell" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+  8780→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
+  8781→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_type']) . '</div></td>';
+  8782→            echo '<td class="beamraymar-editable-cell" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_status']) . '</div></td>';
+  8783→            echo '<td class="beamraymar-editable-cell" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_name']) . '</div></td>';
+  8784→            echo '<td class="readonly-cell"><div class="tcell_inner_wrapper_div">' . esc_html(date('Y-m-d H:i:s', strtotime($item['post_date']))) . '</div></td>';
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now update the JavaScript rendering to match:
+
