@@ -4039,3 +4039,445 @@ _**Agent (claude-opus-4-1-20250805)**_
 
 Now update the JavaScript rendering to match:
 
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8460→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+  8461→                                </td>
+  8462→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  8463→                                <td class="beamraymar-editable-cell" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8464→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+  8465→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+  8466→                                <td class="beamraymar-editable-cell" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status}</div></td>
+  8467→                                <td class="beamraymar-editable-cell" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_name || ''}</div></td>
+  8468→                                <td class="readonly-cell"><div class="tcell_inner_wrapper_div">${formatDate(item.post_date)}</div></td>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to add the JavaScript event handlers for the ED button and popup functionality:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8165→                    
+  8166→                    let currentPage = 1;
+  8167→                    let itemsPerPage = 100;
+  8168→                    let currentSearch = '';
+  8169→                    let allData = <?php echo json_encode($posts_pages); ?>;
+  8170→                    let filteredData = [...allData];
+  8171→                    let selectedRows = new Set();
+  8172→                    let editingCell = null;
+  8173→                    let currentContentEditPostId = null;
+  8174→                    
+  8175→                    // Initialize page
+  8176→                    $(document).ready(function() {
+  8177→                        initializeEventHandlers();
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now add the event handlers for the ED button and popup:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8318→                                closeModal();
+  8319→                            }
+  8320→                        });
+  8321→                        
+  8322→                        $('#beamraymar-modal-form').on('submit', function(e) {
+  8323→                            e.preventDefault();
+  8324→                            saveModalData();
+  8325→                        });
+  8326→                        
+  8327→                        // Post content editor handlers
+  8328→                        $(document).on('click', '.beamraymar-content-edit-btn', function(e) {
+  8329→                            e.stopPropagation();
+  8330→                            const postId = $(this).data('post-id');
+  8331→                            openContentEditor(postId);
+  8332→                        });
+  8333→                        
+  8334→                        $('#beamraymar-content-editor-cancel').on('click', function() {
+  8335→                            closeContentEditor();
+  8336→                        });
+  8337→                        
+  8338→                        $('#beamraymar-content-editor-save').on('click', function() {
+  8339→                            saveContentEditor();
+  8340→                        });
+  8341→                        
+  8342→                        // Table column sorting
+  8343→                        $('.beamraymar-table th[data-field]').on('click', function() {
+  8344→                            const field = $(this).data('field');
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to add the functions for opening, closing, and saving the content editor. Let me find a good spot to add them:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8728→                        }
+  8729→                        return firstLine;
+  8730→                    }
+  8731→                    
+  8732→                    function formatDate(dateString) {
+  8733→                        if (!dateString) return '';
+  8734→                        return new Date(dateString).toLocaleString();
+  8735→                    }
+  8736→                    
+  8737→                    // Post content editor functions
+  8738→                    function openContentEditor(postId) {
+  8739→                        currentContentEditPostId = postId;
+  8740→                        const post = allData.find(item => item.ID == postId);
+  8741→                        
+  8742→                        if (post) {
+  8743→                            $('#beamraymar-content-editor-textarea').val(post.post_content || '');
+  8744→                            $('#beamraymar-content-editor-modal').addClass('active');
+  8745→                        }
+  8746→                    }
+  8747→                    
+  8748→                    function closeContentEditor() {
+  8749→                        $('#beamraymar-content-editor-modal').removeClass('active');
+  8750→                        $('#beamraymar-content-editor-textarea').val('');
+  8751→                        currentContentEditPostId = null;
+  8752→                    }
+  8753→                    
+  8754→                    function saveContentEditor() {
+  8755→                        if (!currentContentEditPostId) return;
+  8756→                        
+  8757→                        const newContent = $('#beamraymar-content-editor-textarea').val();
+  8758→                        
+  8759→                        // Send AJAX request to save
+  8760→                        $.ajax({
+  8761→                            url: ajaxurl,
+  8762→                            type: 'POST',
+  8763→                            data: {
+  8764→                                action: 'beamraymar_update_post_content',
+  8765→                                post_id: currentContentEditPostId,
+  8766→                                post_content: newContent,
+  8767→                                nonce: '<?php echo wp_create_nonce('beamraymar_nonce'); ?>'
+  8768→                            },
+  8769→                            success: function(response) {
+  8770→                                if (response.success) {
+  8771→                                    // Update local data
+  8772→                                    const post = allData.find(item => item.ID == currentContentEditPostId);
+  8773→                                    if (post) {
+  8774→                                        post.post_content = newContent;
+  8775→                                    }
+  8776→                                    
+  8777→                                    // Refresh table
+  8778→                                    updateTable();
+  8779→                                    
+  8780→                                    // Close editor
+  8781→                                    closeContentEditor();
+  8782→                                } else {
+  8783→                                    alert('Failed to save: ' + (response.data || 'Unknown error'));
+  8784→                                }
+  8785→                            },
+  8786→                            error: function() {
+  8787→                                alert('Failed to save content');
+  8788→                            }
+  8789→                        });
+  8790→                    }
+  8791→                    
+  8792→                })(jQuery);
+  8793→            </script>
+  8794→        </div>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to add the AJAX handler for saving post_content. Let me find where the AJAX handlers are and add a new one:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+270→        );
+   271→    }
+   272→    
+   273→    /**
+   274→     * Initialize settings
+   275→     */
+   276→    public function init_settings() {
+   277→        register_setting('snefuru_settings', 'snefuru_ruplin_api_key_1');
+   278→        register_setting('snefuru_settings', 'snefuru_api_url');
+   279→        register_setting('snefuru_settings', 'snefuru_sync_interval');
+   280→        register_setting('snefuru_settings', 'snefuru_auto_sync');
+   281→        register_setting('snefuru_settings', 'snefuru_upload_enabled');
+   282→        register_setting('snefuru_settings', 'snefuru_upload_max_size');
+   283→    }
+   284→    
+   285→    /**
+   286→     * Enqueue admin scripts and styles
+   287→     */
+   288→    public function enqueue_admin_scripts($hook) {
+   289→        if (strpos($hook, 'snefuru') === false) {
+   290→            return;
+   291→        }
+   292→        
+   293→        wp_enqueue_style('snefuru-admin', SNEFURU_PLUGIN_URL . 'assets/css/admin.css', array(), SNEFURU_PLUGIN_VERSION);
+   294→        wp_enqueue_script('snefuru-admin', SNEFURU_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), SNEFURU_PLUGIN_VERSION, true);
+   295→        
+   296→        wp_localize_script('snefuru-admin', 'snefuru_ajax', array(
+   297→            'ajax_url' => admin_url('admin-ajax.php'),
+   298→            'nonce' => wp_create_nonce('snefuru_nonce')
+   299→        ));
+   300→    }
+   301→    
+   302→    /**
+   303→     * KenliSidebarLinks placeholder page (non-functional)
+   304→     */
+   305→    public function kenli_sidebar_links_page() {
+   306→        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+   307→        $this->suppress_all_admin_notices();
+   308→        
+   309→        echo '<div class="wrap">';
+   310→        echo '<h1>KenliSidebarLinks</h1>';
+   311→        echo '<p>This is a placeholder menu item.</p>';
+   312→        echo '</div>';
+   313→    }
+   314→    
+   315→    /**
+   316→     * Main admin dashboard page
+   317→     */
+   318→    public function admin_page() {
+   319→        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me look for where AJAX actions are registered in the constructor:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+16:        add_action('wp_ajax_snefuru_test_connection', array($this, 'test_api_connection'));
+17:        add_action('wp_ajax_snefuru_sync_now', array($this, 'manual_sync'));
+18:        add_action('wp_ajax_snefuru_clear_upload_logs', array($this, 'clear_upload_logs'));
+19:        add_action('wp_ajax_snefuru_test_upload_endpoint', array($this, 'test_upload_endpoint'));
+20:        add_action('wp_ajax_fetch_site_data', array($this, 'fetch_site_data'));
+21:        add_action('wp_ajax_sync_data_now', array($this, 'sync_data_now'));
+22:        add_action('wp_ajax_clear_logs', array($this, 'clear_logs'));
+23:        add_action('wp_ajax_snefuru_save_api_key', array($this, 'save_api_key'));
+24:        add_action('wp_ajax_snefuru_clear_update_debug', array($this, 'clear_update_debug'));
+25:        add_action('wp_ajax_snefuru_rebuild_zen_tables', array($this, 'rebuild_zen_tables'));
+28:        add_action('wp_ajax_rup_locations_get_data', array($this, 'rup_locations_get_data'));
+29:        add_action('wp_ajax_rup_locations_update_field', array($this, 'rup_locations_update_field'));
+30:        add_action('wp_ajax_rup_locations_create', array($this, 'rup_locations_create'));
+31:        add_action('wp_ajax_rup_locations_get_image_url', array($this, 'rup_locations_get_image_url'));
+34:        add_action('wp_ajax_rup_services_get_data', array($this, 'rup_services_get_data'));
+35:        add_action('wp_ajax_rup_services_update_field', array($this, 'rup_services_update_field'));
+36:        add_action('wp_ajax_rup_services_create', array($this, 'rup_services_create'));
+37:        add_action('wp_ajax_rup_services_get_image_url', array($this, 'rup_services_get_image_url'));
+40:        add_action('wp_ajax_rup_driggs_get_data', array($this, 'rup_driggs_get_data'));
+41:        add_action('wp_ajax_rup_driggs_update_field', array($this, 'rup_driggs_update_field'));
+44:        add_action('wp_ajax_export_sitespren', array($this, 'handle_sitespren_export'));
+47:        add_action('wp_ajax_save_hudson_imgplanbatch_id', array($this, 'save_hudson_imgplanbatch_id'));
+50:        add_action('wp_ajax_snefuru_inject_content', array($this, 'snefuru_inject_content'));
+53:        // add_action('wp_ajax_snefuru_duplicate_page', array($this, 'snefuru_duplicate_page'));
+56:        add_action('wp_ajax_rup_duplicate_single_post', array($this, 'rup_duplicate_single_post'));
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to add the new AJAX action for updating post content. Let me add it after the other ajax actions:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Error:
+
+```
+<tool_use_error>String to replace not found in file.
+String:         // AJAX handler for single post duplication
+        add_action('wp_ajax_rup_duplicate_single_post', array($this, 'rup_duplicate_single_post'));</tool_use_error>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me search for the correct location:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+55-        // Bulk duplication AJAX action
+56:        add_action('wp_ajax_rup_duplicate_single_post', array($this, 'rup_duplicate_single_post'));
+57-        
+--
+4344-                        data: {
+4345:                            action: 'rup_duplicate_single_post',
+4346-                            post_id: postId,
+--
+4779-     */
+4780:    public function rup_duplicate_single_post() {
+4781-        check_ajax_referer('rup_duplicate_single_nonce', 'nonce');
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    51→        
+    52→        // Page duplication AJAX action - TEMPORARILY DISABLED FOR DEBUGGING
+    53→        // add_action('wp_ajax_snefuru_duplicate_page', array($this, 'snefuru_duplicate_page'));
+    54→        
+    55→        // Bulk duplication AJAX action
+    56→        add_action('wp_ajax_rup_duplicate_single_post', array($this, 'rup_duplicate_single_post'));
+    57→        
+    58→        // AJAX handler for beamraymar post content update
+    59→        add_action('wp_ajax_beamraymar_update_post_content', array($this, 'beamraymar_update_post_content'));
+    60→        
+    61→        // Add Elementor data viewer
+    62→        add_action('add_meta_boxes', array($this, 'add_elementor_data_metabox'));
+    63→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to add the actual AJAX handler function. Let me find a good place after the other AJAX handlers:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8867→            $count++;
+  8868→        }
+  8869→    }
+  8870→    
+  8871→    /**
+  8872→     * AJAX handler for updating post content from beamraymar editor
+  8873→     */
+  8874→    public function beamraymar_update_post_content() {
+  8875→        // Verify nonce
+  8876→        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+  8877→            wp_send_json_error('Security check failed');
+  8878→            return;
+  8879→        }
+  8880→        
+  8881→        // Check permissions
+  8882→        if (!current_user_can('edit_posts')) {
+  8883→            wp_send_json_error('Permission denied');
+  8884→            return;
+  8885→        }
+  8886→        
+  8887→        // Get and validate post ID
+  8888→        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+  8889→        if (!$post_id) {
+  8890→            wp_send_json_error('Invalid post ID');
+  8891→            return;
+  8892→        }
+  8893→        
+  8894→        // Get new content
+  8895→        $new_content = isset($_POST['post_content']) ? wp_kses_post($_POST['post_content']) : '';
+  8896→        
+  8897→        // Update the post
+  8898→        $updated = wp_update_post(array(
+  8899→            'ID' => $post_id,
+  8900→            'post_content' => $new_content
+  8901→        ));
+  8902→        
+  8903→        if (is_wp_error($updated)) {
+  8904→            wp_send_json_error($updated->get_error_message());
+  8905→        } else {
+  8906→            wp_send_json_success('Content updated successfully');
+  8907→        }
+  8908→    }
+  8909→    
+  8910→    /**
+  8911→     * Handle AJAX requests for beamraymar page
+  8912→     */
+  8913→    private function handle_beamraymar_ajax() {
+  8914→        // Verify nonce
+  8915→        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'beamraymar_nonce')) {
+  8916→            echo json_encode(array('success' => false, 'message' => 'Security check failed'));
+  8917→            wp_die();
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Disable inline editing for post_content column and add ED button with popup editor
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I've successfully implemented all the requested changes for the post_content column on the beamraymar page:
+
+## ✅ **Changes Completed - ONLY what was requested:**
+
+### 1. **Disabled Inline Editing for post_content:**
+- Changed from `beamraymar-editable-cell` to `readonly-cell` class
+- Removed `data-field` and `data-type` attributes
+- Post content is no longer editable inline
+
+### 2. **Added ED Button:**
+- **20px × 20px square button** with text "ED"
+- **Positioned to the right** inside each post_content `<td>` cell
+- Blue background (`#0073aa`) matching other buttons
+- Appears in every row of the table
+
+### 3. **Created Full-Screen Popup Editor:**
+- **Almost full screen** (90% width, 85% height)
+- **"post_content" label** in bold 16px font at top
+- **Large textarea** with monospace font for code editing
+- Shows **raw database content** (with all HTML)
+- **Save and Cancel buttons** at bottom
+
+### 4. **Functionality:**
+- Clicking ED button opens the popup with the full post_content
+- User can edit the raw HTML content
+- Save button updates the database via AJAX
+- Updates are reflected in the table immediately
+- Cancel button closes without saving
+
+### 5. **AJAX Handler:**
+- Added `beamraymar_update_post_content` AJAX action
+- Verifies nonce and user permissions
+- Updates post_content in database
+- Returns success/error response
+
+The post_content column now has a clean, read-only display with truncated plain text, and users can edit the full HTML content through the dedicated ED button and popup editor.
+
