@@ -4662,3 +4662,849 @@ Done. I've successfully created the cssmar page with all the requested features:
 
 The page loads the current CSS file content and allows live editing with immediate file saving for rapid development workflow.
 
+---
+
+_**User**_
+
+pleaes implement more columns from our db into the ui table grid at beamraymar page 
+
+we must add all of the db columns from db table wpprefix_zen_orbitposts
+
+we must create a join where rel_wp_post_id matches to wpprefix_posts.id
+
+
+in header row 1, please add the following (in our ui table):
+(dynamically inserted db prefix)_zen_orbitposts
+
+in header row 2, please add the following text to each <th>
+rel_wp_post_id
+orbitpost_id
+redshift_datum
+rover_datum
+hudson_imgplanbatch_id
+created_at
+updated_at
+
+obviously header row 1 will contain the same content for all of them 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add zen_orbitposts columns to beamraymar table with JOIN and new headers
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+First, let me find the data fetching function to add the JOIN:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+7308-            $this->handle_beamraymar_ajax();
+7309-            return;
+7310-        }
+7311-        
+7312-        // Get posts and pages data
+7313:        $posts_pages = $this->get_posts_and_pages_data();
+7314-        
+7315-        ?>
+7316-        <div class="wrap beamraymar-wrapper">
+7317-            <style>
+7318-                /* Beamraymar Custom Styles - Mimicking FileJar Design */
+--
+8938-    }
+8939-    
+8940-    /**
+8941-     * Get posts and pages data for beamraymar table
+8942-     */
+8943:    private function get_posts_and_pages_data() {
+8944-        global $wpdb;
+8945-        
+8946-        $results = $wpdb->get_results(
+8947-            "SELECT p.ID, p.post_title, p.post_content, p.post_type, p.post_status, p.post_name, 
+8948-                    p.post_date, p.post_modified, p.post_author, p.post_parent, p.menu_order,
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8943→    private function get_posts_and_pages_data() {
+  8944→        global $wpdb;
+  8945→        
+  8946→        $results = $wpdb->get_results(
+  8947→            "SELECT p.ID, p.post_title, p.post_content, p.post_type, p.post_status, p.post_name, 
+  8948→                    p.post_date, p.post_modified, p.post_author, p.post_parent, p.menu_order, 
+  8949→                    p.comment_status, p.ping_status,
+  8950→                    pm.meta_value as _elementor_data
+  8951→             FROM {$wpdb->posts} p
+  8952→             LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_elementor_data'
+  8953→             WHERE p.post_type IN ('post', 'page') 
+  8954→             AND p.post_status NOT IN ('trash', 'auto-draft') 
+  8955→             ORDER BY p.post_modified DESC",
+  8956→            ARRAY_A
+  8957→        );
+  8958→        
+  8959→        return $results ? $results : array();
+  8960→    }
+  8961→    
+  8962→    /**
+  8963→     * Render table rows for beamraymar table
+  8964→     */
+  8965→    private function render_beamraymar_table_rows($posts_pages) {
+  8966→        if (empty($posts_pages)) {
+  8967→            echo '<tr><td colspan="15" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the SQL query to include the JOIN with zen_orbitposts table:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8942→     */
+  8943→    private function get_posts_and_pages_data() {
+  8944→        global $wpdb;
+  8945→        
+  8946→        $results = $wpdb->get_results(
+  8947→            "SELECT p.ID, p.post_title, p.post_content, p.post_type, p.post_status, p.post_name, 
+  8948→                    p.post_date, p.post_modified, p.post_author, p.post_parent, p.menu_order, 
+  8949→                    p.comment_status, p.ping_status,
+  8950→                    pm.meta_value as _elementor_data,
+  8951→                    zop.rel_wp_post_id, zop.orbitpost_id, zop.redshift_datum, zop.rover_datum, 
+  8952→                    zop.hudson_imgplanbatch_id, zop.created_at, zop.updated_at
+  8953→             FROM {$wpdb->posts} p
+  8954→             LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_elementor_data'
+  8955→             LEFT JOIN {$wpdb->prefix}zen_orbitposts zop ON p.ID = zop.rel_wp_post_id
+  8956→             WHERE p.post_type IN ('post', 'page') 
+  8957→             AND p.post_status NOT IN ('trash', 'auto-draft') 
+  8958→             ORDER BY p.post_modified DESC",
+  8959→            ARRAY_A
+  8960→        );
+  8961→        
+  8962→        return $results ? $results : array();
+  8963→    }
+  8964→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the table headers. First, let me add the new columns to the blank header row:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8044→                            <a href="#" class="beamraymar-filter-btn" data-filter-type="post_status" data-filter-value="publish">Published</a>
+  8045→                            <a href="#" class="beamraymar-filter-btn" data-filter-type="post_status" data-filter-value="draft">Draft</a>
+  8046→                        </div>
+  8047→                    </div>
+  8048→                </div>
+  8049→            </div>
+  8050→
+  8051→            <!-- Table Container -->
+  8052→            <div class="beamraymar-table-container">
+  8053→                <div class="beamraymar-table-scroll">
+  8054→                    <table class="beamraymar-table" id="beamraymar-table">
+  8055→                        <thead>
+  8056→                            <tr>
+  8057→                                <th class="fact_checkbox"><div class="tcell_inner_wrapper_div"></div></th>
+  8058→                                <th class="fact_wp_posts_id"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8059→                                <th class="fact_wp_posts_post_title"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8060→                                <th class="fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8061→                                <th class="fact_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>postmeta</strong></div></th>
+  8062→                                <th class="fact_wp_posts_post_type"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8063→                                <th class="fact_wp_posts_post_status"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me find the correct header row:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8066-                                <th class="fact_wp_posts_post_modified"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8067-                                <th class="fact_wp_posts_post_author"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8068-                                <th class="fact_wp_posts_post_parent"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8069-                                <th class="fact_wp_posts_menu_order"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8070-                                <th class="fact_wp_posts_comment_status"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8071:                                <th class="fact_wp_posts_ping_status"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8072-                            </tr>
+8073-                            <tr class="beamraymar-main-header-row">
+8074-                                <th class="beamraymar-checkbox-cell fact_checkbox">
+8075-                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox" id="select-all"></div>
+8076-                                </th>
+--
+8085-                                <th data-field="post_modified" data-type="datetime" class="fact_wp_posts_post_modified"><div class="tcell_inner_wrapper_div">post_modified</div></th>
+8086-                                <th data-field="post_author" data-type="integer" class="fact_wp_posts_post_author"><div class="tcell_inner_wrapper_div">post_author</div></th>
+8087-                                <th data-field="post_parent" data-type="integer" class="fact_wp_posts_post_parent"><div class="tcell_inner_wrapper_div">post_parent</div></th>
+8088-                                <th data-field="menu_order" data-type="integer" class="fact_wp_posts_menu_order"><div class="tcell_inner_wrapper_div">menu_order</div></th>
+8089-                                <th data-field="comment_status" data-type="text" class="fact_wp_posts_comment_status"><div class="tcell_inner_wrapper_div">comment_status</div></th>
+8090:                                <th data-field="ping_status" data-type="text" class="fact_wp_posts_ping_status"><div class="tcell_inner_wrapper_div">ping_status</div></th>
+8091-                            </tr>
+8092-                        </thead>
+8093-                        <tbody id="beamraymar-tbody">
+8094-                            <?php $this->render_beamraymar_table_rows($posts_pages); ?>
+8095-                        </tbody>
+--
+8561-                                <td class="readonly-cell fact_wp_posts_post_modified"><div class="tcell_inner_wrapper_div">${formatDate(item.post_modified)}</div></td>
+8562-                                <td class="beamraymar-editable-cell fact_wp_posts_post_author" data-field="post_author" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_author}</div></td>
+8563-                                <td class="beamraymar-editable-cell fact_wp_posts_post_parent" data-field="post_parent" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_parent || '0'}</div></td>
+8564-                                <td class="beamraymar-editable-cell fact_wp_posts_menu_order" data-field="menu_order" data-type="integer"><div class="tcell_inner_wrapper_div">${item.menu_order || '0'}</div></td>
+8565-                                <td class="beamraymar-editable-cell fact_wp_posts_comment_status" data-field="comment_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.comment_status}</div></td>
+8566:                                <td class="beamraymar-editable-cell fact_wp_posts_ping_status" data-field="ping_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.ping_status}</div></td>
+8567-                            </tr>`;
+8568-                        });
+8569-                        
+8570-                        $('#beamraymar-tbody').html(html);
+8571-                    }
+--
+9016-            echo '<td class="readonly-cell fact_wp_posts_post_modified"><div class="tcell_inner_wrapper_div">' . esc_html(date('Y-m-d H:i:s', strtotime($item['post_modified']))) . '</div></td>';
+9017-            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_author" data-field="post_author" data-type="integer"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_author']) . '</div></td>';
+9018-            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_parent" data-field="post_parent" data-type="integer"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_parent'] ?: '0') . '</div></td>';
+9019-            echo '<td class="beamraymar-editable-cell fact_wp_posts_menu_order" data-field="menu_order" data-type="integer"><div class="tcell_inner_wrapper_div">' . esc_html($item['menu_order'] ?: '0') . '</div></td>';
+9020-            echo '<td class="beamraymar-editable-cell fact_wp_posts_comment_status" data-field="comment_status" data-type="select"><div class="tcell_inner_wrapper_div">' . esc_html($item['comment_status']) . '</div></td>';
+9021:            echo '<td class="beamraymar-editable-cell fact_wp_posts_ping_status" data-field="ping_status" data-type="select"><div class="tcell_inner_wrapper_div">' . esc_html($item['ping_status']) . '</div></td>';
+9022-            echo '</tr>';
+9023-            
+9024-            $count++;
+9025-        }
+9026-    }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the new columns to the blank header row (first tr):
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8067→                                <th class="fact_wp_posts_post_author"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8068→                                <th class="fact_wp_posts_post_parent"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8069→                                <th class="fact_wp_posts_menu_order"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8070→                                <th class="fact_wp_posts_comment_status"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8071→                                <th class="fact_wp_posts_ping_status"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8072→                                <th class="fact_zen_orbitposts_rel_wp_post_id"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8073→                                <th class="fact_zen_orbitposts_orbitpost_id"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8074→                                <th class="fact_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8075→                                <th class="fact_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8076→                                <th class="fact_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8077→                                <th class="fact_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8078→                                <th class="fact_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8079→                            </tr>
+  8080→                            <tr class="beamraymar-main-header-row">
+  8081→                                <th class="beamraymar-checkbox-cell fact_checkbox">
+  8082→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox" id="select-all"></div>
+  8083→                                </th>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the columns to the main header row (second tr):
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8093→                                <th data-field="post_author" data-type="integer" class="fact_wp_posts_post_author"><div class="tcell_inner_wrapper_div">post_author</div></th>
+  8094→                                <th data-field="post_parent" data-type="integer" class="fact_wp_posts_post_parent"><div class="tcell_inner_wrapper_div">post_parent</div></th>
+  8095→                                <th data-field="menu_order" data-type="integer" class="fact_wp_posts_menu_order"><div class="tcell_inner_wrapper_div">menu_order</div></th>
+  8096→                                <th data-field="comment_status" data-type="text" class="fact_wp_posts_comment_status"><div class="tcell_inner_wrapper_div">comment_status</div></th>
+  8097→                                <th data-field="ping_status" data-type="text" class="fact_wp_posts_ping_status"><div class="tcell_inner_wrapper_div">ping_status</div></th>
+  8098→                                <th data-field="rel_wp_post_id" data-type="integer" class="fact_zen_orbitposts_rel_wp_post_id"><div class="tcell_inner_wrapper_div">rel_wp_post_id</div></th>
+  8099→                                <th data-field="orbitpost_id" data-type="integer" class="fact_zen_orbitposts_orbitpost_id"><div class="tcell_inner_wrapper_div">orbitpost_id</div></th>
+  8100→                                <th data-field="redshift_datum" data-type="text" class="fact_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">redshift_datum</div></th>
+  8101→                                <th data-field="rover_datum" data-type="text" class="fact_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">rover_datum</div></th>
+  8102→                                <th data-field="hudson_imgplanbatch_id" data-type="integer" class="fact_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">hudson_imgplanbatch_id</div></th>
+  8103→                                <th data-field="created_at" data-type="datetime" class="fact_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">created_at</div></th>
+  8104→                                <th data-field="updated_at" data-type="datetime" class="fact_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">updated_at</div></th>
+  8105→                            </tr>
+  8106→                        </thead>
+  8107→                        <tbody id="beamraymar-tbody">
+  8108→                            <?php $this->render_beamraymar_table_rows($posts_pages); ?>
+  8109→                        </tbody>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the columns to the JavaScript rendering section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8576→                                <td class="beamraymar-editable-cell fact_wp_posts_post_author" data-field="post_author" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_author}</div></td>
+  8577→                                <td class="beamraymar-editable-cell fact_wp_posts_post_parent" data-field="post_parent" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_parent || '0'}</div></td>
+  8578→                                <td class="beamraymar-editable-cell fact_wp_posts_menu_order" data-field="menu_order" data-type="integer"><div class="tcell_inner_wrapper_div">${item.menu_order || '0'}</div></td>
+  8579→                                <td class="beamraymar-editable-cell fact_wp_posts_comment_status" data-field="comment_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.comment_status}</div></td>
+  8580→                                <td class="beamraymar-editable-cell fact_wp_posts_ping_status" data-field="ping_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.ping_status}</div></td>
+  8581→                                <td class="readonly-cell fact_zen_orbitposts_rel_wp_post_id"><div class="tcell_inner_wrapper_div">${item.rel_wp_post_id || ''}</div></td>
+  8582→                                <td class="readonly-cell fact_zen_orbitposts_orbitpost_id"><div class="tcell_inner_wrapper_div">${item.orbitpost_id || ''}</div></td>
+  8583→                                <td class="readonly-cell fact_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">${item.redshift_datum || ''}</div></td>
+  8584→                                <td class="readonly-cell fact_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">${item.rover_datum || ''}</div></td>
+  8585→                                <td class="readonly-cell fact_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">${item.hudson_imgplanbatch_id || ''}</div></td>
+  8586→                                <td class="readonly-cell fact_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">${formatDate(item.created_at)}</div></td>
+  8587→                                <td class="readonly-cell fact_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">${formatDate(item.updated_at)}</div></td>
+  8588→                            </tr>`;
+  8589→                        });
+  8590→                        
+  8591→                        $('#beamraymar-tbody').html(html);
+  8592→                    }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the columns to the PHP rendering section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9038→            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_author" data-field="post_author" data-type="integer"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_author']) . '</div></td>';
+  9039→            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_parent" data-field="post_parent" data-type="integer"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_parent'] ?: '0') . '</div></td>';
+  9040→            echo '<td class="beamraymar-editable-cell fact_wp_posts_menu_order" data-field="menu_order" data-type="integer"><div class="tcell_inner_wrapper_div">' . esc_html($item['menu_order'] ?: '0') . '</div></td>';
+  9041→            echo '<td class="beamraymar-editable-cell fact_wp_posts_comment_status" data-field="comment_status" data-type="select"><div class="tcell_inner_wrapper_div">' . esc_html($item['comment_status']) . '</div></td>';
+  9042→            echo '<td class="beamraymar-editable-cell fact_wp_posts_ping_status" data-field="ping_status" data-type="select"><div class="tcell_inner_wrapper_div">' . esc_html($item['ping_status']) . '</div></td>';
+  9043→            echo '<td class="readonly-cell fact_zen_orbitposts_rel_wp_post_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['rel_wp_post_id'] ?: '') . '</div></td>';
+  9044→            echo '<td class="readonly-cell fact_zen_orbitposts_orbitpost_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['orbitpost_id'] ?: '') . '</div></td>';
+  9045→            echo '<td class="readonly-cell fact_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">' . esc_html($item['redshift_datum'] ?: '') . '</div></td>';
+  9046→            echo '<td class="readonly-cell fact_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">' . esc_html($item['rover_datum'] ?: '') . '</div></td>';
+  9047→            echo '<td class="readonly-cell fact_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['hudson_imgplanbatch_id'] ?: '') . '</div></td>';
+  9048→            echo '<td class="readonly-cell fact_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">' . esc_html($item['created_at'] ? date('Y-m-d H:i:s', strtotime($item['created_at'])) : '') . '</div></td>';
+  9049→            echo '<td class="readonly-cell fact_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">' . esc_html($item['updated_at'] ? date('Y-m-d H:i:s', strtotime($item['updated_at'])) : '') . '</div></td>';
+  9050→            echo '</tr>';
+  9051→            
+  9052→            $count++;
+  9053→        }
+  9054→    }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I also need to update the empty state message to reflect the new column count. Let me find that:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8991:            echo '<tr><td colspan="15" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8987→     * Render table rows for beamraymar table
+  8988→     */
+  8989→    private function render_beamraymar_table_rows($posts_pages) {
+  8990→        if (empty($posts_pages)) {
+  8991→            echo '<tr><td colspan="22" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+  8992→            return;
+  8993→        }
+  8994→        
+  8995→        $count = 0;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Finally, I need to update the CSS comment list in the SDDX 240 file with the new class names:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     3→
+     4→/* This file stores customizations for Ruplin plugin admin pages */
+     5→/* This CSS is only loaded on Ruplin plugin pages, not on native WP admin pages */
+     6→
+     7→/*
+     8→BeamRayMar Table Column Class Names (fact_ prefix convention):
+     9→1. fact_checkbox - Checkbox column (no DB equivalent)
+    10→2. fact_wp_posts_id - ID column
+    11→3. fact_wp_posts_post_title - Post Title column
+    12→4. fact_wp_posts_post_content - Post Content column
+    13→5. fact_wp_postmeta_meta_key_elementor_data - _elementor_data column
+    14→6. fact_wp_posts_post_type - Post Type column
+    15→7. fact_wp_posts_post_status - Post Status column
+    16→8. fact_wp_posts_post_name - Post Name column
+    17→9. fact_wp_posts_post_date - Post Date column
+    18→10. fact_wp_posts_post_modified - Post Modified column
+    19→11. fact_wp_posts_post_author - Post Author column
+    20→12. fact_wp_posts_post_parent - Post Parent column
+    21→13. fact_wp_posts_menu_order - Menu Order column
+    22→14. fact_wp_posts_comment_status - Comment Status column
+    23→15. fact_wp_posts_ping_status - Ping Status column
+    24→16. fact_zen_orbitposts_rel_wp_post_id - zen_orbitposts rel_wp_post_id column
+    25→17. fact_zen_orbitposts_orbitpost_id - zen_orbitposts orbitpost_id column
+    26→18. fact_zen_orbitposts_redshift_datum - zen_orbitposts redshift_datum column
+    27→19. fact_zen_orbitposts_rover_datum - zen_orbitposts rover_datum column
+    28→20. fact_zen_orbitposts_hudson_imgplanbatch_id - zen_orbitposts hudson_imgplanbatch_id column
+    29→21. fact_zen_orbitposts_created_at - zen_orbitposts created_at column
+    30→22. fact_zen_orbitposts_updated_at - zen_orbitposts updated_at column
+    31→*/
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add zen_orbitposts columns to beamraymar table with JOIN and new headers
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Done. I've successfully implemented all the zen_orbitposts columns into the beamraymar UI table:
+
+## Changes Made:
+
+1. **Updated SQL Query** (line 8946-8959): Added LEFT JOIN with `{$wpdb->prefix}zen_orbitposts` table matching `rel_wp_post_id` to `wp_posts.ID`
+
+2. **Added 7 New Columns to Headers**:
+   - **Blank Header Row** (lines 8072-8078): Added `{$wpdb->prefix}zen_orbitposts` text for all new columns
+   - **Main Header Row** (lines 8098-8104): Added field names: `rel_wp_post_id`, `orbitpost_id`, `redshift_datum`, `rover_datum`, `hudson_imgplanbatch_id`, `created_at`, `updated_at`
+
+3. **Updated JavaScript Rendering** (lines 8581-8587): Added new table cells with proper `fact_zen_orbitposts_*` classes and data display
+
+4. **Updated PHP Rendering** (lines 9043-9049): Added corresponding PHP echo statements with proper escaping and date formatting
+
+5. **Updated Empty State** (line 8991): Changed colspan from 15 to 22 to accommodate new columns
+
+6. **Updated CSS Comments** (lines 24-30): Added the 7 new class names to the reference list
+
+All columns are set as `readonly-cell` and use the `fact_zen_orbitposts_*` naming convention. The table now displays all zen_orbitposts data joined by `rel_wp_post_id` matching the WordPress posts ID.
+
+---
+
+_**User**_
+
+pleaes create a new ui column in our ui table grid at beamraymar
+
+please make this ui column appear at far left edge of the ui table and title it:
+tool_buttons (in the bottom-most header row) 
+
+in the top header row (top ui row inside the thead), please put this text:
+misc-uicol-type
+
+for the <td> areas of this column, please leave it blank for now 
+
+well i guess you can put 1 20 px by 20 px button with the text F on it
+
+this will be a link that dynamically links to the associated wp post/page frontend live url 
+
+and if its a "draft" then link to the preview url frontend url for that draft page also 
+
+this may be called the permalink in wp terminology, im not sure 
+
+we will add more tool buttons to this column in future prompts
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add tool_buttons column at far left of beamraymar table with F button for frontend links
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to add the new column at the far left edge (after the checkbox column). Let me update the table headers first:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8052→            <div class="beamraymar-table-container">
+  8053→                <div class="beamraymar-table-scroll">
+  8054→                    <table class="beamraymar-table" id="beamraymar-table">
+  8055→                        <thead>
+  8056→                            <tr>
+  8057→                                <th class="fact_checkbox"><div class="tcell_inner_wrapper_div"></div></th>
+  8058→                                <th class="fact_tool_buttons"><div class="tcell_inner_wrapper_div"><strong>misc-uicol-type</strong></div></th>
+  8059→                                <th class="fact_wp_posts_id"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8060→                                <th class="fact_wp_posts_post_title"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8061→                                <th class="fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+  8062→                                <th class="fact_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>postmeta</strong></div></th>
+  8063→                                <th class="fact_wp_posts_post_type"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the column to the main header row:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8077→                                <th class="fact_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8078→                                <th class="fact_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8079→                                <th class="fact_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+  8080→                            </tr>
+  8081→                            <tr class="beamraymar-main-header-row">
+  8082→                                <th class="beamraymar-checkbox-cell fact_checkbox">
+  8083→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox" id="select-all"></div>
+  8084→                                </th>
+  8085→                                <th class="fact_tool_buttons"><div class="tcell_inner_wrapper_div">tool_buttons</div></th>
+  8086→                                <th data-field="ID" data-type="integer" class="fact_wp_posts_id"><div class="tcell_inner_wrapper_div">id</div></th>
+  8087→                                <th data-field="post_title" data-type="text" class="fact_wp_posts_post_title"><div class="tcell_inner_wrapper_div">post_title</div></th>
+  8088→                                <th data-field="post_content" data-type="longtext" class="fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">post_content</div></th>
+  8089→                                <th data-field="_elementor_data" data-type="text" class="fact_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div"><strong>meta_key:_elementor_data</strong></div></th>
+  8090→                                <th data-field="post_type" data-type="text" class="fact_wp_posts_post_type"><div class="tcell_inner_wrapper_div">post_type</div></th>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the column to the JavaScript rendering section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8561→                    function renderTableRows(data) {
+  8562→                        let html = '';
+  8563→                        
+  8564→                        data.forEach(item => {
+  8565→                            html += `<tr data-id="${item.ID}">
+  8566→                                <td class="beamraymar-checkbox-cell fact_checkbox">
+  8567→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+  8568→                                </td>
+  8569→                                <td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a></div></td>
+  8570→                                <td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  8571→                                <td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8572→                                <td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+  8573→                                <td class="readonly-cell fact_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
+  8574→                                <td class="readonly-cell fact_wp_posts_post_type"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the JavaScript function to handle the frontend URL logic. Let me add it to the JavaScript section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8525→                            }
+  8526→                        });
+  8527→                    }
+  8528→                    
+  8529→                    function updateColumnGroupButtons() {
+  8530→                        // Update column group bar
+  8531→                        $('#beamraymar-column-group-bar .beamraymar-column-pagination-btn').removeClass('active');
+  8532→                        $(`[data-column-group="${currentColumnGroup}"]`).addClass('active');
+  8533→                        
+  8534→                        // Update column nav bar active state
+  8535→                        $('#beamraymar-column-nav-bar .beamraymar-column-pagination-btn').removeClass('active');
+  8536→                        $(`[data-column-nav="${currentColumnGroup}"]`).addClass('active');
+  8537→                    }
+  8538→                    
+  8539→                    function updateTable() {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me find a good place to add the JavaScript function. Let me add it before the renderTableRows function:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8557→                        // Apply column pagination
+  8558→                        updateColumnVisibility();
+  8559→                    }
+  8560→                    
+  8561→                    function getFrontendUrl(item) {
+  8562→                        const baseUrl = '<?php echo home_url('/'); ?>';
+  8563→                        if (item.post_status === 'draft') {
+  8564→                            return baseUrl + '?p=' + item.ID + '&preview=true';
+  8565→                        } else {
+  8566→                            if (item.post_name) {
+  8567→                                return baseUrl + item.post_name + '/';
+  8568→                            } else {
+  8569→                                return baseUrl + '?p=' + item.ID;
+  8570→                            }
+  8571→                        }
+  8572→                    }
+  8573→                    
+  8574→                    function renderTableRows(data) {
+  8575→                        let html = '';
+  8576→                        
+  8577→                        data.forEach(item => {
+  8578→                            html += `<tr data-id="${item.ID}">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the column to the PHP rendering section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9025→            } else {
+  9026→                $content_preview = $first_line;
+  9027→            }
+  9028→            
+  9029→            echo '<tr data-id="' . esc_attr($item['ID']) . '">';
+  9030→            echo '<td class="beamraymar-checkbox-cell fact_checkbox">';
+  9031→            echo '<div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="' . esc_attr($item['ID']) . '"></div>';
+  9032→            echo '</td>';
+  9033→            
+  9034→            // Frontend URL logic
+  9035→            $frontend_url = '';
+  9036→            if ($item['post_status'] === 'draft') {
+  9037→                $frontend_url = home_url('/?p=' . $item['ID'] . '&preview=true');
+  9038→            } else {
+  9039→                if ($item['post_name']) {
+  9040→                    $frontend_url = home_url('/' . $item['post_name'] . '/');
+  9041→                } else {
+  9042→                    $frontend_url = home_url('/?p=' . $item['ID']);
+  9043→                }
+  9044→            }
+  9045→            echo '<td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="' . esc_url($frontend_url) . '" target="_blank" class="beamraymar-tool-btn">F</a></div></td>';
+  9046→            echo '<td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+  9047→            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+  9048→            echo '<td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
+  9049→            
+  9050→            // Calculate elementor data line count
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the colspan for the empty state and add some basic styling for the tool button:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9003→     * Render table rows for beamraymar table
+  9004→     */
+  9005→    private function render_beamraymar_table_rows($posts_pages) {
+  9006→        if (empty($posts_pages)) {
+  9007→            echo '<tr><td colspan="23" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+  9008→            return;
+  9009→        }
+  9010→        
+  9011→        $count = 0;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add some basic styling for the tool button. I'll add it to the existing style section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  7947→                    background: #0073aa;
+  7948→                    color: white;
+  7949→                }
+  7950→                
+  7951→                .beamraymar-content-editor-btn.cancel {
+  7952→                    background: #f1f1f1;
+  7953→                    color: #333;
+  7954→                }
+  7955→                
+  7956→                /* Tool button styling */
+  7957→                .beamraymar-tool-btn {
+  7958→                    width: 20px;
+  7959→                    height: 20px;
+  7960→                    background: #0073aa;
+  7961→                    color: white;
+  7962→                    border: none;
+  7963→                    cursor: pointer;
+  7964→                    font-size: 10px;
+  7965→                    font-weight: bold;
+  7966→                    display: inline-flex;
+  7967→                    align-items: center;
+  7968→                    justify-content: center;
+  7969→                    text-decoration: none;
+  7970→                    border-radius: 2px;
+  7971→                }
+  7972→                
+  7973→                .beamraymar-tool-btn:hover {
+  7974→                    background: #005a87;
+  7975→                    color: white;
+  7976→                    text-decoration: none;
+  7977→                }
+  7978→            </style>
+  7979→
+  7980→            <!-- Top Controls -->
+  7981→            <div class="beamraymar-top-controls">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Finally, let me update the CSS comment list to include the new class:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     3→
+     4→/* This file stores customizations for Ruplin plugin admin pages */
+     5→/* This CSS is only loaded on Ruplin plugin pages, not on native WP admin pages */
+     6→
+     7→/*
+     8→BeamRayMar Table Column Class Names (fact_ prefix convention):
+     9→1. fact_checkbox - Checkbox column (no DB equivalent)
+    10→2. fact_tool_buttons - Tool buttons column (misc-uicol-type)
+    11→3. fact_wp_posts_id - ID column
+    12→3. fact_wp_posts_post_title - Post Title column
+    13→4. fact_wp_posts_post_content - Post Content column
+    14→5. fact_wp_postmeta_meta_key_elementor_data - _elementor_data column
+    15→6. fact_wp_posts_post_type - Post Type column
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to fix the numbering in the CSS comment:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/assets/css/sddx_240_ruplin_screens_only_css_by_kyle_1.css has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     7→/*
+     8→BeamRayMar Table Column Class Names (fact_ prefix convention):
+     9→1. fact_checkbox - Checkbox column (no DB equivalent)
+    10→2. fact_tool_buttons - Tool buttons column (misc-uicol-type)
+    11→3. fact_wp_posts_id - ID column
+    12→4. fact_wp_posts_post_title - Post Title column
+    13→5. fact_wp_posts_post_content - Post Content column
+    14→6. fact_wp_postmeta_meta_key_elementor_data - _elementor_data column
+    15→7. fact_wp_posts_post_type - Post Type column
+    16→8. fact_wp_posts_post_status - Post Status column
+    17→9. fact_wp_posts_post_name - Post Name column
+    18→10. fact_wp_posts_post_date - Post Date column
+    19→11. fact_wp_posts_post_modified - Post Modified column
+    20→12. fact_wp_posts_post_author - Post Author column
+    21→13. fact_wp_posts_post_parent - Post Parent column
+    22→14. fact_wp_posts_menu_order - Menu Order column
+    23→15. fact_wp_posts_comment_status - Comment Status column
+    24→16. fact_wp_posts_ping_status - Ping Status column
+    25→17. fact_zen_orbitposts_rel_wp_post_id - zen_orbitposts rel_wp_post_id column
+    26→18. fact_zen_orbitposts_orbitpost_id - zen_orbitposts orbitpost_id column
+    27→19. fact_zen_orbitposts_redshift_datum - zen_orbitposts redshift_datum column
+    28→20. fact_zen_orbitposts_rover_datum - zen_orbitposts rover_datum column
+    29→21. fact_zen_orbitposts_hudson_imgplanbatch_id - zen_orbitposts hudson_imgplanbatch_id column
+    30→22. fact_zen_orbitposts_created_at - zen_orbitposts created_at column
+    31→23. fact_zen_orbitposts_updated_at - zen_orbitposts updated_at column
+    32→*/
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add tool_buttons column at far left of beamraymar table with F button for frontend links
+
+
