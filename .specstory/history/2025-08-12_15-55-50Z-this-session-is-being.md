@@ -4390,3 +4390,475 @@ Perfect! I've updated the CSS editor pane styling on the cssmar page with the fo
 
 These changes apply to all tabs on the cssmar page, making the editor panes display with proper text proportions in dark mode by default.
 
+---
+
+_**User**_
+
+the text in the editor stil looks squashed. it hasnt changed for some reason. please investigte further into this issue on cssmar page 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me investigate further. The issue might be related to CSS specificity or the font itself. Let me make the CSS more specific and try a different font approach:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9722→                .cssmar-copy-url-btn:hover {
+  9723→                    background: #005a87;
+  9724→                }
+  9725→                
+  9726→                .cssmar-editor {
+  9727→                    width: 100%;
+  9728→                    height: 600px;
+  9729→                    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace !important;
+  9730→                    font-size: 14px !important;
+  9731→                    line-height: 1.8 !important;
+  9732→                    letter-spacing: 1px !important;
+  9733→                    font-weight: normal !important;
+  9734→                    border: 1px solid #ddd;
+  9735→                    border-radius: 4px;
+  9736→                    padding: 15px;
+  9737→                    background: #000000 !important;
+  9738→                    color: #ffffff !important;
+  9739→                    resize: vertical;
+  9740→                }
+  9741→                
+  9742→                .cssmar-save-btn {
+  9743→                    padding: 12px 24px;
+  9744→                    background: #16a085;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I've made the CSS more aggressive to override any conflicting styles:
+
+## ✅ Enhanced CSS Editor Styling
+
+### **Changes Made:**
+1. **Font Stack**: Changed to `'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace` - Better proportioned fonts
+2. **Increased Specificity**: Added `!important` to key properties to override any WordPress or browser defaults
+3. **Enhanced Spacing**: 
+   - `line-height: 1.8 !important` - More vertical space between lines
+   - `letter-spacing: 1px !important` - More space between characters
+4. **Font Weight**: `font-weight: normal !important` - Ensures text isn't compressed by bold styling
+5. **Dark Mode**: Forced with `!important` declarations
+
+The `!important` declarations should override any WordPress admin CSS that might be interfering with the text appearance. The new font stack prioritizes Monaco and Menlo which have better character proportions than Courier New.
+
+---
+
+_**User**_
+
+960 px
+
+please alter the editor panes that appear on cssmar to be this exact width (and show towards left side of screen - not centered)
+
+pleaes also expand the height of each editor pane to be 735 px 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9722→                .cssmar-copy-url-btn:hover {
+  9723→                    background: #005a87;
+  9724→                }
+  9725→                
+  9726→                .cssmar-editor {
+  9727→                    width: 960px;
+  9728→                    height: 735px;
+  9729→                    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace !important;
+  9730→                    font-size: 14px !important;
+  9731→                    line-height: 1.8 !important;
+  9732→                    letter-spacing: 1px !important;
+  9733→                    font-weight: normal !important;
+  9734→                    border: 1px solid #ddd;
+  9735→                    border-radius: 4px;
+  9736→                    padding: 15px;
+  9737→                    background: #000000 !important;
+  9738→                    color: #ffffff !important;
+  9739→                    resize: vertical;
+  9740→                    margin-left: 0;
+  9741→                }
+  9742→                
+  9743→                .cssmar-save-btn {
+  9744→                    padding: 12px 24px;
+  9745→                    background: #16a085;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've updated the CSS editor panes on the cssmar page with the requested dimensions:
+
+## ✅ CSSMar Editor Dimensions Updated
+
+### **Changes Made:**
+- **Width**: Changed from `100%` to `960px` (exact width)
+- **Height**: Changed from `600px` to `735px` (expanded height)
+- **Position**: Added `margin-left: 0` to align to the left side of screen (not centered)
+
+The editor panes on all tabs of the cssmar page now display at exactly 960px wide by 735px tall and are positioned towards the left side of the screen.
+
+---
+
+_**User**_
+
+please find the page at rup_locations_mar
+
+
+find these buttons:
+Create New (Inline)
+Create New (Popup)
+please add a "Delete Selected" button to the right of these buttons 
+
+and add the function for the user to be able to do that on this page (delete selected locations)
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+166-        // New Ruplin pages
+167-        add_submenu_page(
+168-            'snefuru',
+169:            'rup_locations_mar',
+170:            'rup_locations_mar',
+171-            'manage_options',
+172:            'rup_locations_mar',
+173:            array($this, 'rup_locations_mar_page')
+174-        );
+175-        
+176-        add_submenu_page(
+--
+1667-    }
+1668-    
+1669-    /**
+1670:     * rup_locations_mar page - Locations Management
+1671-     */
+1672:    public function rup_locations_mar_page() {
+1673-        global $wpdb;
+1674-        $table_name = $wpdb->prefix . 'zen_locations';
+1675-        
+--
+6070-                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 5px; margin: 30px 0;">
+6071-                        <h4 style="margin-top: 0; color: #856404;">💡 Pro Tip: Finding IDs</h4>
+6072-                        <p style="margin-bottom: 0; color: #856404; line-height: 1.6;">
+6073:                            To find Service IDs and Location IDs, visit your <strong>rup_services_mar</strong> and <strong>rup_locations_mar</strong> admin pages. 
+6074-                            The ID numbers are shown in the first column of each table. You can also use the <strong>SH</strong> copy buttons to quickly copy shortcodes with the correct IDs.
+6075-                        </p>
+6076-                    </div>
+--
+6148-                        <h4 style="color: #0073aa;">Quick Links to Data Management:</h4>
+6149-                        <ul style="line-height: 1.6;">
+6150-                            <li><a href="<?php echo admin_url('admin.php?page=rup_services_mar'); ?>" class="button button-secondary">Manage Services & Images →</a></li>
+6151:                            <li style="margin-top: 10px;"><a href="<?php echo admin_url('admin.php?page=rup_locations_mar'); ?>" class="button button-secondary">Manage Locations & Images →</a></li>
+6152-                        </ul>
+6153-                    </div>
+6154-                    
+--
+6417-            'snefuru_page_screen4_manage',
+6418-            'snefuru_page_bespoke_css_editor',
+6419-            'snefuru_page_dublish_logs',
+6420:            'snefuru_page_rup_locations_mar',
+6421-            'snefuru_page_rup_services_mar',
+6422-            'snefuru_page_rup_driggs_mar',
+6423-            'snefuru_page_rup_service_tags_mar',
+--
+7256-            array('title' => 'Dublish Logs', 'slug' => 'snefuru-dublish-logs'),
+7257-            array('title' => 'screen 4 - manage', 'slug' => 'snefuru-screen4-manage'),
+7258-            array('title' => 'Bespoke CSS Editor', 'slug' => 'snefuruplin-bespoke-css-1'),
+7259:            array('title' => 'rup_locations_mar', 'slug' => 'rup_locations_mar'),
+7260-            array('title' => 'rup_services_mar', 'slug' => 'rup_services_mar'),
+7261-            array('title' => 'rup_driggs_mar', 'slug' => 'rup_driggs_mar'),
+7262-            array('title' => 'rup_service_tags_mar', 'slug' => 'rup_service_tags_mar'),
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me find the rup_locations_mar_page function to locate the buttons:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+1670→     * rup_locations_mar page - Locations Management
+  1671→     */
+  1672→    public function rup_locations_mar_page() {
+  1673→        global $wpdb;
+  1674→        $table_name = $wpdb->prefix . 'zen_locations';
+  1675→        
+  1676→        // AGGRESSIVE NOTICE SUPPRESSION - Remove ALL WordPress admin notices
+  1677→        $this->suppress_all_admin_notices();
+  1678→        
+  1679→        // Handle AJAX requests
+  1680→        if (isset($_POST['action'])) {
+  1681→            $this->handle_locations_ajax();
+  1682→            return;
+  1683→        }
+  1684→        
+  1685→        // Enqueue WordPress media scripts
+  1686→        wp_enqueue_media();
+  1687→        
+  1688→        ?>
+  1689→        <div class="wrap" style="margin: 0; padding: 0;">
+  1690→            <!-- Allow space for WordPress notices -->
+  1691→            <div style="height: 20px;"></div>
+  1692→            
+  1693→            <div style="padding: 20px;">
+  1694→                <h1 style="margin-bottom: 20px;">📍 Zen Locations Manager</h1>
+  1695→            
+  1696→            <!-- Control Bar -->
+  1697→            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+  1698→                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+  1699→                    <div style="display: flex; gap: 10px; align-items: center;">
+  1700→                        <button id="create-inline-btn" class="button button-primary">Create New (Inline)</button>
+  1701→                        <button id="create-popup-btn" class="button button-secondary">Create New (Popup)</button>
+  1702→                    </div>
+  1703→                </div>
+  1704→                
+  1705→                <!-- Nubra Tableface Kite -->
+  1706→                <div id="nubra-tableface-kite" style="margin-bottom: 15px;"></div>
+  1707→                
+  1708→                <!-- Pagination and Search Controls -->
+  1709→                <div style="display: flex; justify-content: space-between; align-items: center;">
+  1710→                    <div style="display: flex; gap: 15px; align-items: center;">
+  1711→                        <!-- Items per page -->
+  1712→                        <div style="display: flex; gap: 0; border: 1px solid #ccc;">
+  1713→                            <button class="per-page-btn" data-value="10" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px;">10</button>
+  1714→                            <button class="per-page-btn" data-value="20" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">20</button>
+  1715→                            <button class="per-page-btn" data-value="50" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">50</button>
+  1716→                            <button class="per-page-btn active" data-value="100" style="border: none; padding: 10px 15px; background: #0073aa; color: white; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">100</button>
+  1717→                            <button class="per-page-btn" data-value="200" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">200</button>
+  1718→                            <button class="per-page-btn" data-value="500" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc;">500</button>
+  1719→                            <button class="per-page-btn" data-value="all" style="border: none; padding: 10px 15px; background: #f9f9f9; cursor: pointer; font-size: 14px; border-left: 1px solid #ccc; border-top-right-radius: 4px; border-bottom-right-radius: 4px;">All</button>
+  1720→                        </div>
+  1721→                        
+  1722→                        <!-- Page navigation -->
+  1723→                        <div id="page-nav" style="display: flex; gap: 0; border: 1px solid #ccc;">
+  1724→                            <!-- Dynamic page buttons will go here -->
+  1725→                        </div>
+  1726→                    </div>
+  1727→                    
+  1728→                    <!-- Search -->
+  1729→                    <div style="position: relative;">
+  1730→                        <input type="text" id="search-box" placeholder="Search locations..." style="padding: 8px 40px 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 250px; font-size: 14px;">
+  1731→                        <button id="clear-search" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #ffeb3b; border: none; padding: 4px 8px; font-size: 12px; font-weight: bold; border-radius: 3px; cursor: pointer;">CL</button>
+  1732→                    </div>
+  1733→                </div>
+  1734→            </div>
+  1735→            
+  1736→            <!-- Main Table -->
+  1737→            <div style="background: white; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+  1738→                <div style="overflow-x: auto;">
+  1739→                    <table id="locations-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+  1740→                        <thead style="background: #f8f9fa;">
+  1741→                            <tr>
+  1742→                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-align: left; background: #f0f0f0; width: 50px; cursor: pointer;" onclick="toggleSelectAll()">
+  1743→                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+  1744→                                        <input type="checkbox" id="select-all" style="width: 20px; height: 20px;">
+  1745→                                    </div>
+  1746→                                </th>
+  1747→                                <th data-sort="location_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_id</th>
+  1748→                                <th data-sort="location_name" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_name</th>
+  1749→                                <th data-sort="location_placard" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_placard</th>
+  1750→                                <th data-sort="location_moniker" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_moniker</th>
+  1751→                                <th data-sort="location_sobriquet" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">location_sobriquet</th>
+  1752→                                <th data-sort="street" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">street</th>
+  1753→                                <th data-sort="city" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">city</th>
+  1754→                                <th data-sort="state_code" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">state_code</th>
+  1755→                                <th data-sort="zip_code" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">zip_code</th>
+  1756→                                <th data-sort="country" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">country</th>
+  1757→                                <th data-sort="rel_image1_id" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">rel_image1_id</th>
+  1758→                                <th style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; background: #f8f9fa;">pick image1</th>
+  1759→                                <th data-sort="is_pinned_location" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">is_pinned_location</th>
+  1760→                                <th data-sort="position_in_custom_order" style="padding: 12px 8px; border: 1px solid #ddd; font-weight: bold; text-transform: lowercase; cursor: pointer; background: #f8f9fa;">position_in_custom_order</th>
+  1761→                            </tr>
+  1762→                        </thead>
+  1763→                        <tbody id="table-body">
+  1764→                            <!-- Data will be loaded here via AJAX -->
+  1765→                        </tbody>
+  1766→                    </table>
+  1767→                </div>
+  1768→            </div>
+  1769→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the buttons. Now I need to add the "Delete Selected" button to the right of the existing buttons and implement the functionality:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Error:
+
+```
+<tool_use_error>Found 2 matches of the string to replace, but replace_all is false. To replace all occurrences, set replace_all to true. To replace only one occurrence, please provide more context to uniquely identify the instance.
+String:                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="create-inline-btn" class="button button-primary">Create New (Inline)</button>
+                        <button id="create-popup-btn" class="button button-secondary">Create New (Popup)</button>
+                    </div>
+                </div></tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to provide more context to identify the specific location in the rup_locations_mar page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Error:
+
+```
+<tool_use_error>Found 2 matches of the string to replace, but replace_all is false. To replace all occurrences, set replace_all to true. To replace only one occurrence, please provide more context to uniquely identify the instance.
+String:             <!-- Control Bar -->
+            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="create-inline-btn" class="button button-primary">Create New (Inline)</button>
+                        <button id="create-popup-btn" class="button button-secondary">Create New (Popup)</button>
+                    </div>
+                </div></tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me find more unique context around the rup_locations_mar page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1690→            <!-- Allow space for WordPress notices -->
+  1691→            <div style="height: 20px;"></div>
+  1692→            
+  1693→            <div style="padding: 20px;">
+  1694→                <h1 style="margin-bottom: 20px;">📍 Zen Locations Manager</h1>
+  1695→            
+  1696→            <!-- Control Bar -->
+  1697→            <div style="background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+  1698→                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+  1699→                    <div style="display: flex; gap: 10px; align-items: center;">
+  1700→                        <button id="create-inline-btn" class="button button-primary">Create New (Inline)</button>
+  1701→                        <button id="create-popup-btn" class="button button-secondary">Create New (Popup)</button>
+  1702→                        <button id="delete-selected-btn" class="button" style="background: #dc3545; color: white; border-color: #dc3545;">Delete Selected</button>
+  1703→                    </div>
+  1704→                </div>
+  1705→                
+  1706→                <!-- Nubra Tableface Kite -->
+  1707→                <div id="nubra-tableface-kite" style="margin-bottom: 15px;"></div>
+  1708→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Good! Now I need to add the JavaScript functionality for the delete button. Let me find the JavaScript section for this page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+1860→                    <div style="text-align: right; border-top: 1px solid #eee; padding-top: 20px;">
+  1861→                        <button type="button" id="cancel-create" style="margin-right: 10px; padding: 8px 20px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer;">Cancel</button>
+  1862→                        <button type="submit" style="padding: 8px 20px; background: #0073aa; color: white; border: none; border-radius: 4px; cursor: pointer;">Create Location</button>
+  1863→                    </div>
+  1864→                </form>
+  1865→            </div>
+  1866→            </div> <!-- Close padding wrapper -->
+  1867→        </div>
+  1868→
+  1869→        <script type="text/javascript">
+  1870→        jQuery(document).ready(function($) {
+  1871→            let currentPage = 1;
+  1872→            let itemsPerPage = 100;
+  1873→            let searchTerm = '';
+  1874→            let sortField = 'location_id';
+  1875→            let sortOrder = 'asc';
+  1876→            let selectedRows = new Set();
+  1877→            let allData = [];
+  1878→            let filteredData = [];
+  1879→            let editingCell = null;
+  1880→            
+  1881→            // Load Nubra Tableface Kite
+  1882→            loadNubraTablefaceKite();
+  1883→            
+  1884→            // Initial load
+  1885→            loadData();
+  1886→            
+  1887→            // Search functionality
+  1888→            $('#search-box, #search-box-bottom').on('input', function() {
+  1889→                searchTerm = $(this).val();
+  1890→                $('#search-box, #search-box-bottom').val(searchTerm); // Sync both search boxes
+  1891→                currentPage = 1;
+  1892→                filterAndDisplay();
+  1893→            });
+  1894→            
+  1895→            $('#clear-search, #clear-search-bottom').click(function() {
+  1896→                searchTerm = '';
+  1897→                $('#search-box, #search-box-bottom').val('');
+  1898→                currentPage = 1;
+  1899→                filterAndDisplay();
+  1900→            });
+  1901→            
+  1902→            // Per page buttons
+  1903→            $('.per-page-btn, .per-page-btn-bottom').click(function() {
+  1904→                itemsPerPage = $(this).data('value') === 'all' ? 999999 : $(this).data('value');
+  1905→                $('.per-page-btn, .per-page-btn-bottom').removeClass('active').css({'background': '#f9f9f9', 'color': 'black'});
+  1906→                $(`.per-page-btn[data-value="${$(this).data('value')}"], .per-page-btn-bottom[data-value="${$(this).data('value')}"]`).addClass('active').css({'background': '#0073aa', 'color': 'white'});
+  1907→                currentPage = 1;
+  1908→                filterAndDisplay();
+  1909→            });
+```
+
