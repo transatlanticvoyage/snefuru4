@@ -530,3 +530,374 @@ The pendulum button has been successfully added. I created:
 
 The pendulum button appears to the left of the F button in the tool_buttons column and opens the main WordPress editor page for each post/page.
 
+---
+
+_**User**_
+
+pleae create another button to the right of the current f button
+
+on this button, just put the letter "e"
+
+this will open a link to the elementor editor url for that post/page 
+
+if the page/post is not an elementor type, then gray the button out so it can't be clicked and doesn't work
+
+keep the button there but do not color it blue in the default button styling for the tool_buttons column at beamraymar 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Add tool_buttons column at far left of beamraymar table with F button for frontend links
+- [X] 🌡️ Add new pendulum button (20x20px) to the left of F button in tool_buttons column
+- [⚡] 🌡️ Add new E button (Elementor editor) to the right of F button in tool_buttons column
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  7992→                    margin-right: 2px;
+  7993→                    border-radius: 2px;
+  7994→                }
+  7995→                
+  7996→                .beamraymar-pendulum-btn:hover {
+  7997→                    background: #005a87;
+  7998→                    color: white;
+  7999→                    text-decoration: none;
+  8000→                }
+  8001→                
+  8002→                /* Elementor button styling */
+  8003→                .beamraymar-elementor-btn {
+  8004→                    width: 20px;
+  8005→                    height: 20px;
+  8006→                    background: #0073aa;
+  8007→                    color: white;
+  8008→                    border: none;
+  8009→                    text-decoration: none;
+  8010→                    display: inline-flex;
+  8011→                    align-items: center;
+  8012→                    justify-content: center;
+  8013→                    font-size: 10px;
+  8014→                    cursor: pointer;
+  8015→                    margin-left: 2px;
+  8016→                    border-radius: 2px;
+  8017→                }
+  8018→                
+  8019→                .beamraymar-elementor-btn:hover {
+  8020→                    background: #005a87;
+  8021→                    color: white;
+  8022→                    text-decoration: none;
+  8023→                }
+  8024→                
+  8025→                .beamraymar-elementor-btn.disabled {
+  8026→                    background: #ccc;
+  8027→                    color: #999;
+  8028→                    cursor: not-allowed;
+  8029→                    pointer-events: none;
+  8030→                }
+  8031→            </style>
+  8032→
+  8033→            <!-- Top Controls -->
+  8034→            <div class="beamraymar-top-controls">
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to add a function to get the Elementor editor URL and update the JavaScript rendering to include the E button.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8646→                            }
+  8647→                        }
+  8648→                    }
+  8649→                    
+  8650→                    function getAdminEditUrl(item) {
+  8651→                        const adminUrl = '<?php echo admin_url('post.php'); ?>';
+  8652→                        return adminUrl + '?post=' + item.ID + '&action=edit';
+  8653→                    }
+  8654→                    
+  8655→                    function getElementorEditUrl(item) {
+  8656→                        const adminUrl = '<?php echo admin_url('post.php'); ?>';
+  8657→                        return adminUrl + '?post=' + item.ID + '&action=elementor';
+  8658→                    }
+  8659→                    
+  8660→                    function isElementorPost(item) {
+  8661→                        return item._elementor_data && item._elementor_data !== '' && item._elementor_data !== '[]';
+  8662→                    }
+  8663→                    
+  8664→                    function renderTableRows(data) {
+  8665→                        let html = '';
+  8666→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the JavaScript rendering to include the E button with conditional disabled state.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8668→                            html += `<tr data-id="${item.ID}">
+  8669→                                <td class="beamraymar-checkbox-cell fact_checkbox">
+  8670→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+  8671→                                </td>
+  8672→                                <td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getAdminEditUrl(item)}" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a><a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a>${isElementorPost(item) ? `<a href="${getElementorEditUrl(item)}" target="_blank" class="beamraymar-elementor-btn">E</a>` : '<span class="beamraymar-elementor-btn disabled">E</span>'}</div></td>
+  8673→                                <td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  8674→                                <td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8675→                                <td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+  8676→                                <td class="readonly-cell fact_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the PHP rendering section to include the E button with conditional disabled state.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9131→                } else {
+  9132→                    $frontend_url = home_url('/?p=' . $item['ID']);
+  9133→                }
+  9134→            }
+  9135→            $admin_edit_url = admin_url('post.php?post=' . $item['ID'] . '&action=edit');
+  9136→            $elementor_edit_url = admin_url('post.php?post=' . $item['ID'] . '&action=elementor');
+  9137→            $is_elementor = !empty($item['_elementor_data']) && $item['_elementor_data'] !== '[]';
+  9138→            
+  9139→            echo '<td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div">';
+  9140→            echo '<a href="' . esc_url($admin_edit_url) . '" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a>';
+  9141→            echo '<a href="' . esc_url($frontend_url) . '" target="_blank" class="beamraymar-tool-btn">F</a>';
+  9142→            if ($is_elementor) {
+  9143→                echo '<a href="' . esc_url($elementor_edit_url) . '" target="_blank" class="beamraymar-elementor-btn">E</a>';
+  9144→            } else {
+  9145→                echo '<span class="beamraymar-elementor-btn disabled">E</span>';
+  9146→            }
+  9147→            echo '</div></td>';
+  9148→            echo '<td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+  9149→            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+  9150→            echo '<td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
+  9151→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Add tool_buttons column at far left of beamraymar table with F button for frontend links
+- [X] 🌡️ Add new pendulum button (20x20px) to the left of F button in tool_buttons column
+- [X] 🌡️ Add new E button (Elementor editor) to the right of F button in tool_buttons column
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+The E button for Elementor editor has been successfully added. I created:
+
+1. **CSS styling** for `.beamraymar-elementor-btn` with 20x20px dimensions and a `.disabled` state in gray
+2. **JavaScript functions** `getElementorEditUrl()` and `isElementorPost()` to handle Elementor logic
+3. **Updated JavaScript rendering** to conditionally show active or disabled E button
+4. **Updated PHP rendering** to check for Elementor data and render appropriate button state
+
+The E button appears to the right of the F button and:
+- Shows as blue and clickable when the post has Elementor data
+- Shows as gray and non-clickable when the post is not an Elementor type
+
+---
+
+_**User**_
+
+please style the elementor buttons in a maroon color for the rows that have them not grayed out / disabled 
+
+this is for the tool buttons ui column at beamraymar page
+
+referring to the e button 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  7998→                    color: white;
+  7999→                    text-decoration: none;
+  8000→                }
+  8001→                
+  8002→                /* Elementor button styling */
+  8003→                .beamraymar-elementor-btn {
+  8004→                    width: 20px;
+  8005→                    height: 20px;
+  8006→                    background: #800020;
+  8007→                    color: white;
+  8008→                    border: none;
+  8009→                    text-decoration: none;
+  8010→                    display: inline-flex;
+  8011→                    align-items: center;
+  8012→                    justify-content: center;
+  8013→                    font-size: 10px;
+  8014→                    cursor: pointer;
+  8015→                    margin-left: 2px;
+  8016→                    border-radius: 2px;
+  8017→                }
+  8018→                
+  8019→                .beamraymar-elementor-btn:hover {
+  8020→                    background: #5c0016;
+  8021→                    color: white;
+  8022→                    text-decoration: none;
+  8023→                }
+  8024→                
+  8025→                .beamraymar-elementor-btn.disabled {
+  8026→                    background: #ccc;
+  8027→                    color: #999;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+The Elementor button (E) styling has been updated to maroon color (#800020) with a darker maroon on hover (#5c0016) for non-disabled buttons in the tool_buttons column.
+
+---
+
+_**User**_
+
+please move the e buttons to be left of the f buttons in the column now 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8668→                            html += `<tr data-id="${item.ID}">
+  8669→                                <td class="beamraymar-checkbox-cell fact_checkbox">
+  8670→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+  8671→                                </td>
+  8672→                                <td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getAdminEditUrl(item)}" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a>${isElementorPost(item) ? `<a href="${getElementorEditUrl(item)}" target="_blank" class="beamraymar-elementor-btn">E</a>` : '<span class="beamraymar-elementor-btn disabled">E</span>'}<a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a></div></td>
+  8673→                                <td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  8674→                                <td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8675→                                <td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+  8676→                                <td class="readonly-cell fact_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9135→            $admin_edit_url = admin_url('post.php?post=' . $item['ID'] . '&action=edit');
+  9136→            $elementor_edit_url = admin_url('post.php?post=' . $item['ID'] . '&action=elementor');
+  9137→            $is_elementor = !empty($item['_elementor_data']) && $item['_elementor_data'] !== '[]';
+  9138→            
+  9139→            echo '<td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div">';
+  9140→            echo '<a href="' . esc_url($admin_edit_url) . '" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a>';
+  9141→            if ($is_elementor) {
+  9142→                echo '<a href="' . esc_url($elementor_edit_url) . '" target="_blank" class="beamraymar-elementor-btn">E</a>';
+  9143→            } else {
+  9144→                echo '<span class="beamraymar-elementor-btn disabled">E</span>';
+  9145→            }
+  9146→            echo '<a href="' . esc_url($frontend_url) . '" target="_blank" class="beamraymar-tool-btn">F</a>';
+  9147→            echo '</div></td>';
+  9148→            echo '<td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+  9149→            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+  9150→            echo '<td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
+  9151→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  7999→                    text-decoration: none;
+  8000→                }
+  8001→                
+  8002→                /* Elementor button styling */
+  8003→                .beamraymar-elementor-btn {
+  8004→                    width: 20px;
+  8005→                    height: 20px;
+  8006→                    background: #800020;
+  8007→                    color: white;
+  8008→                    border: none;
+  8009→                    text-decoration: none;
+  8010→                    display: inline-flex;
+  8011→                    align-items: center;
+  8012→                    justify-content: center;
+  8013→                    font-size: 10px;
+  8014→                    cursor: pointer;
+  8015→                    margin-right: 2px;
+  8016→                    border-radius: 2px;
+  8017→                }
+  8018→                
+  8019→                .beamraymar-elementor-btn:hover {
+  8020→                    background: #5c0016;
+  8021→                    color: white;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+The E button has been moved to the left of the F button in the tool_buttons column. The order is now: Pendulum → E → F. Also updated the CSS margin from `margin-left` to `margin-right` to maintain proper spacing.
+
