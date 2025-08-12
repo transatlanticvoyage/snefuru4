@@ -213,3 +213,320 @@ ONLY do what is explicitly requested. Do NOT:
   PRESERVE everything else exactly as-is.
 ———————————————————————
 
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add tool_buttons column at far left of beamraymar table with F button for frontend links
+- [⚡] 🌡️ Add new pendulum button (20x20px) to the left of F button in tool_buttons column
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8560→                    }
+  8561→                    
+  8562→                    function updateTable() {
+  8563→                        const startIndex = (currentPage - 1) * itemsPerPage;
+  8564→                        const endIndex = itemsPerPage === filteredData.length ? filteredData.length : startIndex + itemsPerPage;
+  8565→                        const pageData = filteredData.slice(startIndex, endIndex);
+  8566→                        
+  8567→                        // Update table rows
+  8568→                        renderTableRows(pageData);
+  8569→                        
+  8570→                        // Update info text
+  8571→                        const infoText = `${startIndex + 1}-${Math.min(endIndex, filteredData.length)} of ${filteredData.length} posts/pages`;
+  8572→                        $('#beamraymar-results-info, #beamraymar-results-info-bottom').text(infoText);
+  8573→                        
+  8574→                        // Update pagination buttons
+  8575→                        updatePaginationButtons();
+  8576→                        
+  8577→                        // Reattach event handlers for new rows
+  8578→                        attachRowEventHandlers();
+  8579→                        
+  8580→                        // Apply column pagination
+  8581→                        updateColumnVisibility();
+  8582→                    }
+  8583→                    
+  8584→                    function getFrontendUrl(item) {
+  8585→                        const baseUrl = '<?php echo home_url('/'); ?>';
+  8586→                        if (item.post_status === 'draft') {
+  8587→                            return baseUrl + '?p=' + item.ID + '&preview=true';
+  8588→                        } else {
+  8589→                            if (item.post_name) {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9030→            echo '<tr><td colspan="23" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+  9031→            return;
+  9032→        }
+  9033→        
+  9034→        $count = 0;
+  9035→        foreach ($posts_pages as $item) {
+  9036→            if ($count >= 100) break; // Default pagination limit
+  9037→            
+  9038→            // Strip all HTML tags to get plain text
+  9039→            $plain_text = strip_tags($item['post_content']);
+  9040→            
+  9041→            // Get first line only
+  9042→            $first_line = explode("\n", $plain_text)[0];
+  9043→            $first_line = explode("\r", $first_line)[0]; // Handle Windows line breaks
+  9044→            
+  9045→            // Truncate to 50 characters with conditional ellipsis
+  9046→            if (strlen($first_line) > 50) {
+  9047→                $content_preview = substr($first_line, 0, 50) . '...';
+  9048→            } else {
+  9049→                $content_preview = $first_line;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8579-                        
+8580-                        // Apply column pagination
+8581-                        updateColumnVisibility();
+8582-                    }
+8583-                    
+8584:                    function getFrontendUrl(item) {
+8585-                        const baseUrl = '<?php echo home_url('/'); ?>';
+8586-                        if (item.post_status === 'draft') {
+8587-                            return baseUrl + '?p=' + item.ID + '&preview=true';
+8588-                        } else {
+8589-                            if (item.post_name) {
+--
+8600-                        data.forEach(item => {
+8601-                            html += `<tr data-id="${item.ID}">
+8602-                                <td class="beamraymar-checkbox-cell fact_checkbox">
+8603-                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+8604-                                </td>
+8605:                                <td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a></div></td>
+8606-                                <td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+8607-                                <td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+8608-                                <td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+8609-                                <td class="readonly-cell fact_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
+8610-                                <td class="readonly-cell fact_wp_posts_post_type"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to find where the tool button is styled and where the admin editor URL should be generated.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+7954-                }
+7955-                
+7956-                /* Tool button styling */
+7957:                .beamraymar-tool-btn {
+7958-                    width: 20px;
+7959-                    height: 20px;
+7960-                    background: #0073aa;
+--
+7970-                    border-radius: 2px;
+7971-                }
+7972-                
+7973:                .beamraymar-tool-btn:hover {
+7974-                    background: #005a87;
+7975-                    color: white;
+7976-                    text-decoration: none;
+--
+8602-                                <td class="beamraymar-checkbox-cell fact_checkbox">
+8603-                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+8604-                                </td>
+8605:                                <td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a></div></td>
+8606-                                <td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+8607-                                <td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+8608-                                <td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+--
+9065-                    $frontend_url = home_url('/?p=' . $item['ID']);
+9066-                }
+9067-            }
+9068:            echo '<td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="' . esc_url($frontend_url) . '" target="_blank" class="beamraymar-tool-btn">F</a></div></td>';
+9069-            echo '<td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+9070-            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+9071-            echo '<td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I can see where the tool button is implemented. I need to add the pendulum button to the left of the F button in both the JavaScript and PHP sections. Let me first add the CSS styling for the pendulum button.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  7969→                    text-decoration: none;
+  7970→                    border-radius: 2px;
+  7971→                }
+  7972→                
+  7973→                .beamraymar-tool-btn:hover {
+  7974→                    background: #005a87;
+  7975→                    color: white;
+  7976→                    text-decoration: none;
+  7977→                }
+  7978→                
+  7979→                /* Pendulum button styling */
+  7980→                .beamraymar-pendulum-btn {
+  7981→                    width: 20px;
+  7982→                    height: 20px;
+  7983→                    background: #0073aa;
+  7984→                    color: white;
+  7985→                    border: none;
+  7986→                    text-decoration: none;
+  7987→                    display: inline-flex;
+  7988→                    align-items: center;
+  7989→                    justify-content: center;
+  7990→                    font-size: 10px;
+  7991→                    cursor: pointer;
+  7992→                    margin-right: 2px;
+  7993→                    border-radius: 2px;
+  7994→                }
+  7995→                
+  7996→                .beamraymar-pendulum-btn:hover {
+  7997→                    background: #005a87;
+  7998→                    color: white;
+  7999→                    text-decoration: none;
+  8000→                }
+  8001→            </style>
+  8002→
+  8003→            <!-- Top Controls -->
+  8004→            <div class="beamraymar-top-controls">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add a function to get the admin editor URL and update both the JavaScript and PHP sections to include the pendulum button.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8603→                        // Apply column pagination
+  8604→                        updateColumnVisibility();
+  8605→                    }
+  8606→                    
+  8607→                    function getFrontendUrl(item) {
+  8608→                        const baseUrl = '<?php echo home_url('/'); ?>';
+  8609→                        if (item.post_status === 'draft') {
+  8610→                            return baseUrl + '?p=' + item.ID + '&preview=true';
+  8611→                        } else {
+  8612→                            if (item.post_name) {
+  8613→                                return baseUrl + item.post_name + '/';
+  8614→                            } else {
+  8615→                                return baseUrl + '?p=' + item.ID;
+  8616→                            }
+  8617→                        }
+  8618→                    }
+  8619→                    
+  8620→                    function getAdminEditUrl(item) {
+  8621→                        const adminUrl = '<?php echo admin_url('post.php'); ?>';
+  8622→                        return adminUrl + '?post=' + item.ID + '&action=edit';
+  8623→                    }
+  8624→                    
+  8625→                    function renderTableRows(data) {
+  8626→                        let html = '';
+  8627→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the JavaScript section to include the pendulum button with the pendulum icon before the F button.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8629→                            html += `<tr data-id="${item.ID}">
+  8630→                                <td class="beamraymar-checkbox-cell fact_checkbox">
+  8631→                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+  8632→                                </td>
+  8633→                                <td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getAdminEditUrl(item)}" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a><a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a></div></td>
+  8634→                                <td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  8635→                                <td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  8636→                                <td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+  8637→                                <td class="readonly-cell fact_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the PHP section that renders the table rows to include the pendulum button as well.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  9092→                } else {
+  9093→                    $frontend_url = home_url('/?p=' . $item['ID']);
+  9094→                }
+  9095→            }
+  9096→            $admin_edit_url = admin_url('post.php?post=' . $item['ID'] . '&action=edit');
+  9097→            echo '<td class="readonly-cell fact_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="' . esc_url($admin_edit_url) . '" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a><a href="' . esc_url($frontend_url) . '" target="_blank" class="beamraymar-tool-btn">F</a></div></td>';
+  9098→            echo '<td class="readonly-cell fact_wp_posts_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+  9099→            echo '<td class="beamraymar-editable-cell fact_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+  9100→            echo '<td class="readonly-cell fact_wp_posts_post_content"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
+  9101→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add tool_buttons column at far left of beamraymar table with F button for frontend links
+- [X] 🌡️ Add new pendulum button (20x20px) to the left of F button in tool_buttons column
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+The pendulum button has been successfully added. I created:
+
+1. **CSS styling** for `.beamraymar-pendulum-btn` with 20x20px dimensions
+2. **JavaScript function** `getAdminEditUrl()` to generate WP editor URLs
+3. **Updated JavaScript rendering** to include pendulum button with `&#9675;&#124;` icon (circle + vertical bar)
+4. **Updated PHP rendering** to include pendulum button with the same icon
+
+The pendulum button appears to the left of the F button in the tool_buttons column and opens the main WordPress editor page for each post/page.
+
