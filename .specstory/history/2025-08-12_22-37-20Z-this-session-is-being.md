@@ -8479,3 +8479,9 @@ I've successfully created the **rupcacheman** cache management page with all the
 
 The page is now available in your WordPress admin and ready to help troubleshoot caching issues that might prevent updates from appearing!
 
+---
+
+_**User**_
+
+which caches should i clear first? tell me what to do . onlyanplease just answer and do not change any of our code right now. 
+
