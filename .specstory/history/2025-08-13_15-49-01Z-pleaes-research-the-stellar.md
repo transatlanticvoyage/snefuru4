@@ -6416,3 +6416,17 @@ Move the `include_page_files()` call from the constructor to the `admin_init` ho
 
 The error is on both frontend and admin because the class constructor runs on every page load, not just admin pages.
 
+---
+
+_**User**_
+
+i renamed by plugin folder on https://www.augustapestcontrol.net/wp-admin/ and im still getting this error
+
+There has been a critical error on this website. Please check your site admin email inbox for instructions. If you continue to have problems, please try the support forums.
+
+Learn more about troubleshooting WordPress.
+
+
+———————————————————————
+i mean i renamed the snefuruplin wp plugin folder in wp admin but it didnt fix the error. any other ideas what i shoudl do next? 
+
