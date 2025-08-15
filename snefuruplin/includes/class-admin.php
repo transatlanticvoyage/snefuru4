@@ -7547,11 +7547,6 @@ class Snefuru_Admin {
      * AJAX: Handle page duplication
      */
     public function snefuru_duplicate_page() {
-        // Temporary simple implementation to test if this method is causing the error
-        wp_send_json_error('Page duplication temporarily disabled for debugging');
-        return;
-        
-        /*
         check_ajax_referer('snefuru_duplicate_page_nonce', 'nonce');
         
         if (!current_user_can('edit_pages') && !current_user_can('edit_posts')) {
@@ -7559,98 +7554,96 @@ class Snefuru_Admin {
             return;
         }
         
-        // Get the post ID from AJAX request
-        $current_post_id = 0;
-        if (isset($_POST['post_id'])) {
-            $current_post_id = intval($_POST['post_id']);
-        } else {
-            // Fallback: try other methods
-            $current_post_id = get_the_ID();
-            if (!$current_post_id) {
-                global $post;
-                if ($post && $post->ID) {
-                    $current_post_id = $post->ID;
-                }
-            }
-        }
+        // Get post IDs from AJAX request
+        $post_ids = isset($_POST['post_ids']) ? $_POST['post_ids'] : array();
         
-        if (!$current_post_id) {
-            wp_send_json_error('Unable to determine current page/post ID');
+        if (empty($post_ids)) {
+            wp_send_json_error('No posts selected for duplication');
             return;
         }
         
-        // Get the original post
-        $original_post = get_post($current_post_id);
-        if (!$original_post) {
-            wp_send_json_error('Original page/post not found');
-            return;
-        }
+        $duplicated_posts = array();
+        $errors = array();
         
-        // Create the duplicate post data
-        $duplicate_post_data = array(
-            'post_title'     => 'Copy of ' . $original_post->post_title,
-            'post_content'   => $original_post->post_content,
-            'post_status'    => 'draft', // Always create as draft for safety
-            'post_type'      => $original_post->post_type,
-            'post_author'    => get_current_user_id(),
-            'post_excerpt'   => $original_post->post_excerpt,
-            'post_parent'    => $original_post->post_parent,
-            'menu_order'     => $original_post->menu_order,
-            'comment_status' => $original_post->comment_status,
-            'ping_status'    => $original_post->ping_status
-        );
-        
-        // Insert the duplicate post
-        $duplicate_post_id = wp_insert_post($duplicate_post_data, true);
-        
-        if (is_wp_error($duplicate_post_id)) {
-            wp_send_json_error('Failed to create duplicate: ' . $duplicate_post_id->get_error_message());
-            return;
-        }
-        
-        // Copy all post meta, including Elementor data
-        $post_meta = get_post_meta($current_post_id);
-        foreach ($post_meta as $meta_key => $meta_values) {
-            // Skip certain meta keys that should be unique
-            if (in_array($meta_key, array('_edit_lock', '_edit_last'))) {
+        foreach ($post_ids as $post_id) {
+            $post_id = intval($post_id);
+            
+            // Get the original post
+            $original_post = get_post($post_id);
+            if (!$original_post) {
+                $errors[] = "Post ID $post_id not found";
                 continue;
             }
             
-            foreach ($meta_values as $meta_value) {
-                add_post_meta($duplicate_post_id, $meta_key, maybe_unserialize($meta_value));
+            // Create the duplicate post data
+            $duplicate_post_data = array(
+                'post_title'     => 'Copy of ' . $original_post->post_title,
+                'post_content'   => $original_post->post_content,
+                'post_status'    => 'draft',
+                'post_type'      => $original_post->post_type,
+                'post_author'    => get_current_user_id(),
+                'post_excerpt'   => $original_post->post_excerpt,
+                'post_parent'    => $original_post->post_parent,
+                'menu_order'     => $original_post->menu_order,
+                'comment_status' => $original_post->comment_status,
+                'ping_status'    => $original_post->ping_status
+            );
+            
+            // Insert the duplicate post
+            $duplicate_post_id = wp_insert_post($duplicate_post_data, true);
+            
+            if (is_wp_error($duplicate_post_id)) {
+                $errors[] = 'Failed to duplicate "' . $original_post->post_title . '": ' . $duplicate_post_id->get_error_message();
+                continue;
             }
+            
+            // Copy all post meta, including Elementor data
+            $post_meta = get_post_meta($post_id);
+            foreach ($post_meta as $meta_key => $meta_values) {
+                // Skip certain meta keys that should be unique
+                if (in_array($meta_key, array('_edit_lock', '_edit_last'))) {
+                    continue;
+                }
+                
+                foreach ($meta_values as $meta_value) {
+                    add_post_meta($duplicate_post_id, $meta_key, maybe_unserialize($meta_value));
+                }
+            }
+            
+            // Copy taxonomies (categories, tags, etc.)
+            $taxonomies = get_object_taxonomies($original_post->post_type);
+            foreach ($taxonomies as $taxonomy) {
+                $terms = wp_get_post_terms($post_id, $taxonomy, array('fields' => 'ids'));
+                if (!is_wp_error($terms) && !empty($terms)) {
+                    wp_set_post_terms($duplicate_post_id, $terms, $taxonomy);
+                }
+            }
+            
+            $duplicated_posts[] = array(
+                'original_id' => $post_id,
+                'original_title' => $original_post->post_title,
+                'duplicate_id' => $duplicate_post_id,
+                'duplicate_title' => 'Copy of ' . $original_post->post_title
+            );
         }
         
-        // Copy taxonomies (categories, tags, etc.)
-        $taxonomies = get_object_taxonomies($original_post->post_type);
-        foreach ($taxonomies as $taxonomy) {
-            $terms = wp_get_post_terms($current_post_id, $taxonomy, array('fields' => 'ids'));
-            if (!is_wp_error($terms) && !empty($terms)) {
-                wp_set_post_terms($duplicate_post_id, $terms, $taxonomy);
-            }
-        }
-        
-        // Clear any Elementor cache for the new post
+        // Clear Elementor cache
         if (class_exists('\\Elementor\\Plugin')) {
             if (method_exists('\\Elementor\\Plugin::$instance->files_manager', 'clear_cache')) {
                 \\Elementor\\Plugin::$instance->files_manager->clear_cache();
             }
         }
         
-        // Generate URLs for the response
-        $edit_url = admin_url('post.php?action=edit&post=' . $duplicate_post_id);
-        $view_url = get_permalink($duplicate_post_id);
+        $message = sprintf('Successfully duplicated %d post(s)', count($duplicated_posts));
+        if (!empty($errors)) {
+            $message .= '. Errors: ' . implode(', ', $errors);
+        }
         
-        // Return success response
         wp_send_json_success(array(
-            'message' => sprintf('Successfully created duplicate of "%s"', $original_post->post_title),
-            'duplicate_id' => $duplicate_post_id,
-            'duplicate_title' => 'Copy of ' . $original_post->post_title,
-            'edit_url' => $edit_url,
-            'view_url' => $view_url,
-            'original_title' => $original_post->post_title
+            'message' => $message,
+            'duplicated_posts' => $duplicated_posts,
+            'errors' => $errors
         ));
-        */
     }
     
     /**
@@ -8655,6 +8648,7 @@ class Snefuru_Admin {
                             <button class="beamraymar-create-btn beamraymar-create-inline-post" id="create-post-inline">Create New (Inline)</button>
                             <button class="beamraymar-create-btn beamraymar-create-inline-page" id="create-page-inline">Create New (Inline) WP Page</button>
                             <button class="beamraymar-create-btn beamraymar-create-popup" id="create-popup">Create New (Popup)</button>
+                            <button class="beamraymar-create-btn beamraymar-duplicate-btn" id="duplicate-selected">Duplicate</button>
                         </div>
                     </div>
                     <div class="beamraymar-nubra-kite">nubra-tableface-kite</div>
@@ -9026,6 +9020,38 @@ class Snefuru_Admin {
                         
                         $('#create-popup').on('click', function() {
                             openModal('create');
+                        });
+                        
+                        $('#duplicate-selected').on('click', function() {
+                            if (selectedRows.size === 0) {
+                                alert('Please select pages/posts to duplicate.');
+                                return;
+                            }
+                            
+                            if (confirm('Are you sure you want to duplicate ' + selectedRows.size + ' selected item(s)?')) {
+                                const selectedIds = Array.from(selectedRows);
+                                
+                                $.ajax({
+                                    url: ajaxurl,
+                                    type: 'POST',
+                                    data: {
+                                        action: 'snefuru_duplicate_page',
+                                        post_ids: selectedIds,
+                                        nonce: '<?php echo wp_create_nonce('snefuru_duplicate_page_nonce'); ?>'
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            alert('Pages/posts duplicated successfully!');
+                                            loadTableData(currentPage);
+                                        } else {
+                                            alert('Error duplicating pages/posts: ' + (response.data || 'Unknown error'));
+                                        }
+                                    },
+                                    error: function() {
+                                        alert('Failed to duplicate pages/posts. Please try again.');
+                                    }
+                                });
+                            }
                         });
                         
                         // Select all checkbox
