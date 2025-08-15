@@ -8120,3 +8120,19 @@ The massive monolithic `class-admin.php` file has been reduced by over 2,000 lin
 
 **Try your site now!** The critical error should be resolved. The beamraymar page is now completely independent and much more maintainable.
 
+---
+
+_**User**_
+
+when i tried to activate the plugin it said this:
+
+
+There has been a critical error on this website. Please check your site admin email inbox for instructions. If you continue to have problems, please try the support forums.
+
+Learn more about troubleshooting WordPress.
+
+
+
+
+please note: i deleted entire folder from cpanel for the plugin before this. plase recommend what we should do next . onlyanplease just answer and do not change any of our code right now. we are still in planning phase 
+
