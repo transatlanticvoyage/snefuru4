@@ -1,0 +1,44 @@
+
+
+on the page at beamraymar, please add a column that says:
+
+top <th> row in <thead> should say:
+non-db
+the next <th> row in <thead> should say:
+replex_submit
+
+
+———————————————————————
+
+enlarge the text of post_title slightly more than the other text
+
+
+
+———————————————————————
+fix the alignment of buttons visually in this column
+
+
+add duplicate button to tool buttons
+
+add 3 copy buttons to the tool buttons ui column
+
+———————————————————————
+enlarge checkboxes
+
+make entire checkbox <td> clickable - not just checkbox itself
+
+———————————————————————
+color code the table <th> area
+
+
+———————————————————————
+create a repeating column
+
+
+
+
+———————————————————————
+create a column template system
+
+
+
