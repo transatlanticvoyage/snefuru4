@@ -129,7 +129,7 @@ class Snefuru_Admin {
     public function add_admin_menu() {
         add_menu_page(
             'Snefuruplin Dashboard',
-            'Snefuruplin',
+            'Ruplin Dashboard',
             'manage_options',
             'snefuru',
             array($this, 'admin_page'),
@@ -147,6 +147,15 @@ class Snefuru_Admin {
             array($this, 'rup_kenli_mar_page')
         );
         
+        add_submenu_page(
+            'snefuru',
+            'Dashboard',
+            'Ruplin Dashboard',
+            'manage_options',
+            'snefuru',
+            array($this, 'admin_page')
+        );
+        
         // Add KenliSidebarLinks as a non-clickable label
         add_submenu_page(
             'snefuru',
@@ -155,15 +164,6 @@ class Snefuru_Admin {
             'manage_options',
             'snefuru-kenli-sidebar-links',
             array($this, 'kenli_sidebar_links_page')
-        );
-        
-        add_submenu_page(
-            'snefuru',
-            'Dashboard',
-            'Dashboard',
-            'manage_options',
-            'snefuru',
-            array($this, 'admin_page')
         );
         
         add_submenu_page(

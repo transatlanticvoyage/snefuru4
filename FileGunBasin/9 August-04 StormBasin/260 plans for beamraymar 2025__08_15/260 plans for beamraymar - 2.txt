@@ -53,4 +53,18 @@ create a repeating column
 create a column template system
 
 
+———————————————————————
+lanes
+
+channels
+
+jtags (not tags)
+
+clone the existing system and rebuild it in the plugin to be called jtags only
+
+
+
+
+———————————————————————
+
 
