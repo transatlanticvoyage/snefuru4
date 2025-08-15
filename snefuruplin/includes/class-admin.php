@@ -8296,6 +8296,10 @@ class Snefuru_Admin {
                     font-weight: bold;
                 }
                 
+                .beamraymar-table td.column_wp_posts_post_status[data-status="publish"] {
+                    background-color: #efddbb;
+                }
+                
                 /* Column pagination styles */
                 .beamraymar-column-pagination-controls {
                     display: flex;
@@ -9279,7 +9283,7 @@ class Snefuru_Admin {
                                 </td>
                                 <td class="readonly-cell column_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getAdminEditUrl(item)}" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a>${isElementorPost(item) ? `<a href="${getElementorEditUrl(item)}" target="_blank" class="beamraymar-elementor-btn">E</a>` : '<span class="beamraymar-elementor-btn disabled">E</span>'}<a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a><span class="beamraymar-c-btn">C1</span><span class="beamraymar-c-btn">C2</span><span class="beamraymar-c-btn">C3</span></div></td>
                                 <td class="readonly-cell column_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
-                                <td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status === 'publish' ? '<strong>' + item.post_status + '</strong>' : item.post_status}</div></td>
+                                <td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select" data-status="${item.post_status}"><div class="tcell_inner_wrapper_div">${item.post_status === 'publish' ? '<strong>' + item.post_status + '</strong>' : item.post_status}</div></td>
                                 <td class="beamraymar-editable-cell column_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
                                 <td class="readonly-cell column_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
                                 <td class="readonly-cell column_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
@@ -9826,7 +9830,7 @@ class Snefuru_Admin {
             echo '</div></td>';
             echo '<td class="readonly-cell column_wp_posts_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
             $status_display = $item['post_status'] === 'publish' ? '<strong>' . esc_html($item['post_status']) . '</strong>' : esc_html($item['post_status']);
-            echo '<td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">' . $status_display . '</div></td>';
+            echo '<td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select" data-status="' . esc_attr($item['post_status']) . '"><div class="tcell_inner_wrapper_div">' . $status_display . '</div></td>';
             echo '<td class="beamraymar-editable-cell column_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
             echo '<td class="readonly-cell column_wp_posts_post_content"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="beamraymar-content-edit-btn" data-post-id="' . esc_attr($item['ID']) . '">ED</button></div></td>';
             
