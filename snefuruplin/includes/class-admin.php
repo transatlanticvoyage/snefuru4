@@ -8298,6 +8298,10 @@ class Snefuru_Admin {
                     height: auto;
                 }
                 
+                .beamraymar-table td.column_wp_posts_post_title {
+                    font-size: 18px;
+                }
+                
                 /* Column pagination styles */
                 .beamraymar-column-pagination-controls {
                     display: flex;

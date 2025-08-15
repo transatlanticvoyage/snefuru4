@@ -5256,3 +5256,409 @@ Result:
    207→            'snefuru',
 ```
 
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I understand the structure. To make "Cockpit" appear first and change "Snefuruplin" to "Ruplin Dashboard", I need to:
+1. Change the main menu title from "Snefuruplin" to "Ruplin Dashboard"
+2. Add "Cockpit" as the first submenu item (before the dashboard)
+3. The dashboard submenu will automatically follow
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   125→    
+   126→    /**
+   127→     * Add admin menu pages
+   128→     */
+   129→    public function add_admin_menu() {
+   130→        add_menu_page(
+   131→            'Snefuruplin Dashboard',
+   132→            'Ruplin Dashboard',
+   133→            'manage_options',
+   134→            'snefuru',
+   135→            array($this, 'admin_page'),
+   136→            'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>'),
+   137→            30
+   138→        );
+   139→        
+   140→        // Add Cockpit as the first submenu item
+   141→        add_submenu_page(
+   142→            'snefuru',
+   143→            'Cockpit - rup_kenli_mar',
+   144→            'Cockpit - rup_kenli_mar',
+   145→            'manage_options',
+   146→            'rup_kenli_mar',
+   147→            array($this, 'rup_kenli_mar_page')
+   148→        );
+   149→        
+   150→        add_submenu_page(
+   151→            'snefuru',
+   152→            'Dashboard',
+   153→            'Ruplin Dashboard',
+   154→            'manage_options',
+   155→            'snefuru',
+   156→            array($this, 'admin_page')
+   157→        );
+   158→        
+   159→        // Add KenliSidebarLinks as a non-clickable label
+   160→        add_submenu_page(
+   161→            'snefuru',
+   162→            'KenliSidebarLinks',
+   163→            'KenliSidebarLinks',
+   164→            'manage_options',
+   165→            'snefuru-kenli-sidebar-links',
+   166→            array($this, 'kenli_sidebar_links_page')
+   167→        );
+   168→        
+   169→        add_submenu_page(
+   170→            'snefuru',
+   171→            'Settings',
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Commit menu reorder changes
+
+`git add -A && git commit -m "Reorder Snefuruplin admin menu and rename to Ruplin Dashboard
+
+- Changed main menu title from 'Snefuruplin' to 'Ruplin Dashboard'
+- Moved 'Cockpit - rup_kenli_mar' to be the first submenu item
+- 'Ruplin Dashboard' now appears as second submenu item
+- Menu order is now: Cockpit → Ruplin Dashboard → KenliSidebarLinks → Settings → etc."`
+
+Result:
+
+```
+[main 9bef3979] Reorder Snefuruplin admin menu and rename to Ruplin Dashboard
+ 2 files changed, 24 insertions(+), 10 deletions(-)
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Push menu changes to GitHub
+
+`git push origin main`
+
+Result:
+
+```
+To https://github.com/transatlanticvoyage/snefuru4.git
+   84068194..9bef3979  main -> main
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Done! I've modified the Snefuruplin admin menu structure as requested:
+
+1. **"Cockpit - rup_kenli_mar"** is now the first (#1) link in the sidebar menu
+2. **"Ruplin Dashboard"** (formerly "Snefuruplin") appears as the second link
+3. The main menu title has been changed from "Snefuruplin" to "Ruplin Dashboard"
+
+The new menu order in the WordPress admin sidebar is:
+- **Ruplin Dashboard** (main menu)
+  - Cockpit - rup_kenli_mar (first submenu item)
+  - Ruplin Dashboard (second submenu item)
+  - KenliSidebarLinks
+  - Settings
+  - (remaining menu items...)
+
+---
+
+_**User**_
+
+pleaes modify the tool buttons in the tool buttons ui column on page of beamraymar
+
+please get rid of the line wrap (or whatever similar mechanism) is causing the "F" button to appear "below" the other 2 buttons visually
+
+if the <td> must be expanded horizontally or something of this nature , please do that
+
+please let me know of the entire element structure of this td area including all div, button, etc that occur with example html output here in the chat window for me to see 
+
+noerrati———————————————————————
+ONLY do what is explicitly requested. Do NOT:
+  - Fix, improve, or optimize anything else
+  - Change any existing styling, structure, or functionality
+  - Add, remove, or modify any elements not specifically mentioned
+  - Make any assumptions about what needs improvement
+  - Touch any code outside the exact scope described
+
+  PRESERVE everything else exactly as-is.
+———————————————————————
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll fix the tool buttons wrapping issue and show you the HTML structure. Let me first examine the current structure and styling:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+9220→                                <td class="readonly-cell column_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getAdminEditUrl(item)}" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a>${isElementorPost(item) ? `<a href="${getElementorEditUrl(item)}" target="_blank" class="beamraymar-elementor-btn">E</a>` : '<span class="beamraymar-elementor-btn disabled">E</span>'}<a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a></div></td>
+  9221→                                <td class="readonly-cell column_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+  9222→                                <td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status === 'publish' ? '<strong>' + item.post_status + '</strong>' : item.post_status}</div></td>
+  9223→                                <td class="beamraymar-editable-cell column_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+  9224→                                <td class="readonly-cell column_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me check the CSS for the tool buttons column and wrapper:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+8283-                }
+8284-                
+8285:                .beamraymar-table td .tcell_inner_wrapper_div {
+8286-                    height: 38px;
+8287-                }
+--
+8670-                        <thead>
+8671-                            <tr>
+8672:                                <th class="column_checkbox row_obtain_db_table"><div class="tcell_inner_wrapper_div"></div></th>
+8673:                                <th class="column_tool_buttons row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong>misc-uicol-type</strong></div></th>
+8674:                                <th class="column_wp_posts_id row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8675:                                <th class="column_wp_posts_post_status row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8676:                                <th class="column_wp_posts_post_title row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8677:                                <th class="column_wp_posts_post_content row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8678:                                <th class="column_wp_postmeta_meta_key_elementor_data row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>postmeta</strong></div></th>
+8679:                                <th class="column_wp_posts_post_type row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8680:                                <th class="column_wp_posts_post_name row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8681:                                <th class="column_wp_posts_post_date row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8682:                                <th class="column_wp_posts_post_modified row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8683:                                <th class="column_wp_posts_post_author row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8684:                                <th class="column_wp_posts_post_parent row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8685:                                <th class="column_wp_posts_menu_order row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8686:                                <th class="column_wp_posts_comment_status row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8687:                                <th class="column_wp_posts_ping_status row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>posts</strong></div></th>
+8688:                                <th class="column_zen_orbitposts_rel_wp_post_id row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8689:                                <th class="column_zen_orbitposts_orbitpost_id row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8690:                                <th class="column_zen_orbitposts_redshift_datum row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8691:                                <th class="column_zen_orbitposts_rover_datum row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8692:                                <th class="column_zen_orbitposts_hudson_imgplanbatch_id row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8693:                                <th class="column_zen_orbitposts_is_pinned row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8694:                                <th class="column_zen_orbitposts_is_flagged row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8695:                                <th class="column_zen_orbitposts_is_starred row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8696:                                <th class="column_zen_orbitposts_is_squared row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8697:                                <th class="column_zen_orbitposts_created_at row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8698:                                <th class="column_zen_orbitposts_updated_at row_obtain_db_table"><div class="tcell_inner_wrapper_div"><strong><?php echo esc_html($wpdb->prefix); ?>zen_orbitposts</strong></div></th>
+8699-                            </tr>
+8700-                            <tr class="beamraymar-main-header-row">
+8701-                                <th class="beamraymar-checkbox-cell column_checkbox row_obtain_db_column">
+8702:                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox" id="select-all"></div>
+8703-                                </th>
+8704:                                <th class="column_tool_buttons row_obtain_db_column"><div class="tcell_inner_wrapper_div">tool_buttons</div></th>
+8705:                                <th data-field="ID" data-type="integer" class="column_wp_posts_id row_obtain_db_column"><div class="tcell_inner_wrapper_div">id</div></th>
+8706:                                <th data-field="post_status" data-type="text" class="column_wp_posts_post_status row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_status</div></th>
+8707:                                <th data-field="post_title" data-type="text" class="column_wp_posts_post_title row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_title</div></th>
+8708:                                <th data-field="post_content" data-type="longtext" class="column_wp_posts_post_content row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_content</div></th>
+8709:                                <th data-field="_elementor_data" data-type="text" class="column_wp_postmeta_meta_key_elementor_data row_obtain_db_column"><div class="tcell_inner_wrapper_div"><strong>meta_key:_elementor_data</strong></div></th>
+8710:                                <th data-field="post_type" data-type="text" class="column_wp_posts_post_type row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_type</div></th>
+8711:                                <th data-field="post_name" data-type="text" class="column_wp_posts_post_name row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_name</div></th>
+8712:                                <th data-field="post_date" data-type="datetime" class="column_wp_posts_post_date row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_date</div></th>
+8713:                                <th data-field="post_modified" data-type="datetime" class="column_wp_posts_post_modified row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_modified</div></th>
+8714:                                <th data-field="post_author" data-type="integer" class="column_wp_posts_post_author row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_author</div></th>
+8715:                                <th data-field="post_parent" data-type="integer" class="column_wp_posts_post_parent row_obtain_db_column"><div class="tcell_inner_wrapper_div">post_parent</div></th>
+8716:                                <th data-field="menu_order" data-type="integer" class="column_wp_posts_menu_order row_obtain_db_column"><div class="tcell_inner_wrapper_div">menu_order</div></th>
+8717:                                <th data-field="comment_status" data-type="text" class="column_wp_posts_comment_status row_obtain_db_column"><div class="tcell_inner_wrapper_div">comment_status</div></th>
+8718:                                <th data-field="ping_status" data-type="text" class="column_wp_posts_ping_status row_obtain_db_column"><div class="tcell_inner_wrapper_div">ping_status</div></th>
+8719:                                <th data-field="rel_wp_post_id" data-type="integer" class="column_zen_orbitposts_rel_wp_post_id row_obtain_db_column"><div class="tcell_inner_wrapper_div">rel_wp_post_id</div></th>
+8720:                                <th data-field="orbitpost_id" data-type="integer" class="column_zen_orbitposts_orbitpost_id row_obtain_db_column"><div class="tcell_inner_wrapper_div">orbitpost_id</div></th>
+8721:                                <th data-field="redshift_datum" data-type="text" class="column_zen_orbitposts_redshift_datum row_obtain_db_column"><div class="tcell_inner_wrapper_div">redshift_datum</div></th>
+8722:                                <th data-field="rover_datum" data-type="text" class="column_zen_orbitposts_rover_datum row_obtain_db_column"><div class="tcell_inner_wrapper_div">rover_datum</div></th>
+8723:                                <th data-field="hudson_imgplanbatch_id" data-type="integer" class="column_zen_orbitposts_hudson_imgplanbatch_id row_obtain_db_column"><div class="tcell_inner_wrapper_div">hudson_imgplanbatch_id</div></th>
+8724:                                <th data-field="is_pinned" data-type="boolean" class="column_zen_orbitposts_is_pinned row_obtain_db_column"><div class="tcell_inner_wrapper_div">is_pinned</div></th>
+8725:                                <th data-field="is_flagged" data-type="boolean" class="column_zen_orbitposts_is_flagged row_obtain_db_column"><div class="tcell_inner_wrapper_div">is_flagged</div></th>
+8726:                                <th data-field="is_starred" data-type="boolean" class="column_zen_orbitposts_is_starred row_obtain_db_column"><div class="tcell_inner_wrapper_div">is_starred</div></th>
+8727:                                <th data-field="is_squared" data-type="boolean" class="column_zen_orbitposts_is_squared row_obtain_db_column"><div class="tcell_inner_wrapper_div">is_squared</div></th>
+8728:                                <th data-field="created_at" data-type="datetime" class="column_zen_orbitposts_created_at row_obtain_db_column"><div class="tcell_inner_wrapper_div">created_at</div></th>
+8729:                                <th data-field="updated_at" data-type="datetime" class="column_zen_orbitposts_updated_at row_obtain_db_column"><div class="tcell_inner_wrapper_div">updated_at</div></th>
+8730-                            </tr>
+8731-                        </thead>
+--
+9216-                            html += `<tr data-id="${item.ID}">
+9217-                                <td class="beamraymar-checkbox-cell column_checkbox">
+9218:                                    <div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="${item.ID}"></div>
+9219-                                </td>
+9220:                                <td class="readonly-cell column_tool_buttons"><div class="tcell_inner_wrapper_div"><a href="${getAdminEditUrl(item)}" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a>${isElementorPost(item) ? `<a href="${getElementorEditUrl(item)}" target="_blank" class="beamraymar-elementor-btn">E</a>` : '<span class="beamraymar-elementor-btn disabled">E</span>'}<a href="${getFrontendUrl(item)}" target="_blank" class="beamraymar-tool-btn">F</a></div></td>
+9221:                                <td class="readonly-cell column_wp_posts_id"><div class="tcell_inner_wrapper_div">${item.ID}</div></td>
+9222:                                <td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.post_status === 'publish' ? '<strong>' + item.post_status + '</strong>' : item.post_status}</div></td>
+9223:                                <td class="beamraymar-editable-cell column_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_title || ''}</div></td>
+9224:                                <td class="readonly-cell column_wp_posts_post_content"><div class="tcell_inner_wrapper_div">${truncatePostContent(item.post_content || '')}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}">ED</button></div></td>
+9225:                                <td class="readonly-cell column_wp_postmeta_meta_key_elementor_data"><div class="tcell_inner_wrapper_div">${formatElementorData(item._elementor_data)}<button class="beamraymar-content-edit-btn" data-post-id="${item.ID}" data-editor-type="elementor">ED</button></div></td>
+9226:                                <td class="readonly-cell column_wp_posts_post_type"><div class="tcell_inner_wrapper_div">${item.post_type}</div></td>
+9227:                                <td class="beamraymar-editable-cell column_wp_posts_post_name" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">${item.post_name || ''}</div></td>
+9228:                                <td class="readonly-cell column_wp_posts_post_date"><div class="tcell_inner_wrapper_div">${formatDate(item.post_date)}</div></td>
+9229:                                <td class="readonly-cell column_wp_posts_post_modified"><div class="tcell_inner_wrapper_div">${formatDate(item.post_modified)}</div></td>
+9230:                                <td class="beamraymar-editable-cell column_wp_posts_post_author" data-field="post_author" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_author}</div></td>
+9231:                                <td class="beamraymar-editable-cell column_wp_posts_post_parent" data-field="post_parent" data-type="integer"><div class="tcell_inner_wrapper_div">${item.post_parent || '0'}</div></td>
+9232:                                <td class="beamraymar-editable-cell column_wp_posts_menu_order" data-field="menu_order" data-type="integer"><div class="tcell_inner_wrapper_div">${item.menu_order || '0'}</div></td>
+9233:                                <td class="beamraymar-editable-cell column_wp_posts_comment_status" data-field="comment_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.comment_status}</div></td>
+9234:                                <td class="beamraymar-editable-cell column_wp_posts_ping_status" data-field="ping_status" data-type="select"><div class="tcell_inner_wrapper_div">${item.ping_status}</div></td>
+9235:                                <td class="readonly-cell column_zen_orbitposts_rel_wp_post_id"><div class="tcell_inner_wrapper_div">${item.rel_wp_post_id || ''}</div></td>
+9236:                                <td class="readonly-cell column_zen_orbitposts_orbitpost_id"><div class="tcell_inner_wrapper_div">${item.orbitpost_id || ''}</div></td>
+9237:                                <td class="readonly-cell column_zen_orbitposts_redshift_datum"><div class="tcell_inner_wrapper_div">${item.redshift_datum || ''}</div></td>
+9238:                                <td class="readonly-cell column_zen_orbitposts_rover_datum"><div class="tcell_inner_wrapper_div">${item.rover_datum || ''}</div></td>
+9239:                                <td class="readonly-cell column_zen_orbitposts_hudson_imgplanbatch_id"><div class="tcell_inner_wrapper_div">${item.hudson_imgplanbatch_id || ''}</div></td>
+9240:                                <td class="readonly-cell column_zen_orbitposts_is_pinned"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_pinned" data-post-id="${item.ID}" data-value="${item.is_pinned || 0}">📌</span></div></td>
+9241:                                <td class="readonly-cell column_zen_orbitposts_is_flagged"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_flagged" data-post-id="${item.ID}" data-value="${item.is_flagged || 0}">🚩</span></div></td>
+9242:                                <td class="readonly-cell column_zen_orbitposts_is_starred"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_starred" data-post-id="${item.ID}" data-value="${item.is_starred || 0}">⭐</span></div></td>
+9243:                                <td class="readonly-cell column_zen_orbitposts_is_squared"><div class="tcell_inner_wrapper_div"><span class="beamray-icon-btn" data-field="is_squared" data-post-id="${item.ID}" data-value="${item.is_squared || 0}">⬜</span></div></td>
+9244:                                <td class="readonly-cell column_zen_orbitposts_created_at"><div class="tcell_inner_wrapper_div">${formatDate(item.created_at)}</div></td>
+9245:                                <td class="readonly-cell column_zen_orbitposts_updated_at"><div class="tcell_inner_wrapper_div">${formatDate(item.updated_at)}</div></td>
+9246-                            </tr>`;
+9247-                        });
+--
+9711-    private function render_beamraymar_table_rows($posts_pages) {
+9712-        if (empty($posts_pages)) {
+9713:            echo '<tr><td colspan="27" style="text-align: center; padding: 40px;"><div class="tcell_inner_wrapper_div">No posts or pages found.</div></td></tr>';
+9714-            return;
+9715-        }
+--
+9735-            echo '<tr data-id="' . esc_attr($item['ID']) . '">';
+9736-            echo '<td class="beamraymar-checkbox-cell column_checkbox">';
+9737:            echo '<div class="tcell_inner_wrapper_div"><input type="checkbox" class="beamraymar-checkbox row-checkbox" value="' . esc_attr($item['ID']) . '"></div>';
+9738-            echo '</td>';
+9739-            
+--
+9753-            $is_elementor = !empty($item['_elementor_data']) && $item['_elementor_data'] !== '[]';
+9754-            
+9755:            echo '<td class="readonly-cell column_tool_buttons"><div class="tcell_inner_wrapper_div">';
+9756-            echo '<a href="' . esc_url($admin_edit_url) . '" target="_blank" class="beamraymar-pendulum-btn">&#9675;&#124;</a>';
+9757-            if ($is_elementor) {
+--
+9762-            echo '<a href="' . esc_url($frontend_url) . '" target="_blank" class="beamraymar-tool-btn">F</a>';
+9763-            echo '</div></td>';
+9764:            echo '<td class="readonly-cell column_wp_posts_id"><div class="tcell_inner_wrapper_div">' . esc_html($item['ID']) . '</div></td>';
+9765-            $status_display = $item['post_status'] === 'publish' ? '<strong>' . esc_html($item['post_status']) . '</strong>' : esc_html($item['post_status']);
+9766:            echo '<td class="beamraymar-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="select"><div class="tcell_inner_wrapper_div">' . $status_display . '</div></td>';
+9767:            echo '<td class="beamraymar-editable-cell column_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+9768:  
+
+... [30 lines truncated] ...
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me check if there's specific CSS for the column_tool_buttons:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+The wrapping is happening because the buttons are now 36px each (108px total) plus margins, but the tcell_inner_wrapper_div has a fixed height of 38px. Let me add CSS to prevent wrapping and expand the column width:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  8281→                .beamraymar-modal-btn.secondary:hover {
+  8282→                    background: #e0e0e0;
+  8283→                }
+  8284→                
+  8285→                .beamraymar-table td .tcell_inner_wrapper_div {
+  8286→                    height: 38px;
+  8287→                }
+  8288→                
+  8289→                .column_tool_buttons {
+  8290→                    min-width: 120px;
+  8291→                    white-space: nowrap;
+  8292→                }
+  8293→                
+  8294→                .column_tool_buttons .tcell_inner_wrapper_div {
+  8295→                    display: flex;
+  8296→                    align-items: center;
+  8297→                    gap: 2px;
+  8298→                    height: auto;
+  8299→                }
+  8300→                
+  8301→                /* Column pagination styles */
+  8302→                .beamraymar-column-pagination-controls {
+  8303→                    display: flex;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Commit tool buttons fix
+
+`git add -A && git commit -m "Fix tool buttons wrapping in beamraymar table
+
+- Added min-width: 120px to column_tool_buttons to prevent column collapse
+- Added white-space: nowrap to prevent button wrapping
+- Made tool buttons cell use flexbox with gap for proper alignment
+- Set height: auto for tool buttons wrapper to accommodate 36px buttons"`
+
+Result:
+
+```
+[main 12f05482] Fix tool buttons wrapping in beamraymar table
+ 1 file changed, 12 insertions(+)
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Push to GitHub
+
+`git push origin main`
+
+Result:
+
+```
+To https://github.com/transatlanticvoyage/snefuru4.git
+   9bef3979..12f05482  main -> main
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+## Fixed! Here's the complete HTML structure of the tool buttons TD:
+
+```html
+<td class="readonly-cell column_tool_buttons">
+    <div class="tcell_inner_wrapper_div">
+        <a href="[admin_edit_url]" target="_blank" class="beamraymar-pendulum-btn">◯|</a>
+        <a href="[elementor_edit_url]" target="_blank" class="beamraymar-elementor-btn">E</a>
+        <!-- OR if not Elementor: -->
+        <span class="beamraymar-elementor-btn disabled">E</span>
+        <a href="[frontend_url]" target="_blank" class="beamraymar-tool-btn">F</a>
+    </div>
+</td>
+```
+
+## What was changed to fix the wrapping:
+
+1. **Added `min-width: 120px`** to `.column_tool_buttons` - ensures the column has enough horizontal space for all three 36px buttons
+2. **Added `white-space: nowrap`** to `.column_tool_buttons` - prevents line wrapping within the cell
+3. **Changed `.column_tool_buttons .tcell_inner_wrapper_div` to use flexbox**:
+   - `display: flex` - makes buttons align horizontally
+   - `align-items: center` - vertically centers the buttons
+   - `gap: 2px` - adds consistent spacing between buttons
+   - `height: auto` - allows the wrapper to expand to fit the 36px buttons (instead of being limited to 38px)
+
+The buttons will now always appear in a single horizontal row without wrapping.
+
