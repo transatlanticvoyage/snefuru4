@@ -4008,3 +4008,11 @@ Looking at the replex textarea in the Stellar Chamber, I can see:
 
 **In practice**, you should be able to enter substantial amounts of content (thousands of words) without hitting limits, but there's no explicit UI feedback about any limits that might exist at the server level.
 
+---
+
+_**User**_
+
+please locate the tool buttons ui column at page of beamraymar 
+
+please enlarge the buttons from their current size to now be 2
+
