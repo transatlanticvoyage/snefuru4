@@ -8300,6 +8300,7 @@ class Snefuru_Admin {
                 
                 .beamraymar-table td.column_wp_posts_post_title {
                     font-size: 18px;
+                    font-weight: bold;
                 }
                 
                 /* Column pagination styles */
