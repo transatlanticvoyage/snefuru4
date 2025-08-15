@@ -8286,6 +8286,18 @@ class Snefuru_Admin {
                     height: 38px;
                 }
                 
+                .column_tool_buttons {
+                    min-width: 120px;
+                    white-space: nowrap;
+                }
+                
+                .column_tool_buttons .tcell_inner_wrapper_div {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    height: auto;
+                }
+                
                 /* Column pagination styles */
                 .beamraymar-column-pagination-controls {
                     display: flex;
