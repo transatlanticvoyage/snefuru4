@@ -2292,3 +2292,2110 @@ define( 'WP_DEBUG_DISPLAY', false ); // Don't show on screen
 
 The activation debug info will be in the error log, not the browser console. Check cPanel error logs first!
 
+---
+
+_**User**_
+
+i made my config liek this :
+
+<?php
+define('WP_CACHE', true); // Added by SpeedyCache
+
+/**
+ * The base configuration for WordPress
+ *
+ * The wp-config.php creation script uses this file during the installation.
+ * You don't have to use the website, you can copy this file to "wp-config.php"
+ * and fill in the values.
+ *
+ * This file contains the following configurations:
+ *
+ * * Database settings
+ * * Secret keys
+ * * Database table prefix
+ * * ABSPATH
+ *
+ * @link https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
+ *
+ * @package WordPress
+ */
+
+// ** Database settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'wphostin_wp226' );
+
+/** Database username */
+define( 'DB_USER', 'wphostin_wp226' );
+
+/** Database password */
+define( 'DB_PASSWORD', 'a93!2ISpa)' );
+
+/** Database hostname */
+define( 'DB_HOST', 'localhost' );
+
+/** Database charset to use in creating database tables. */
+define( 'DB_CHARSET', 'utf8mb4' );
+
+/** The database collate type. Don't change this if in doubt. */
+define( 'DB_COLLATE', '' );
+
+/**#@+
+ * Authentication unique keys and salts.
+ *
+ * Change these to different unique phrases! You can generate these using
+ * the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}.
+ *
+ * You can change these at any point in time to invalidate all existing cookies.
+ * This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define( 'AUTH_KEY',         'fvct6nmcqs2gnnir9gkzailkfywkbqrumtxos3siwvjdgmzgpzbn1mxxoxg9gse2' );
+define( 'SECURE_AUTH_KEY',  'wepmfrwf7wmeoset827wu7hcmdecp6itqamwn2st8zq1t3corydz8an2iixxrpck' );
+define( 'LOGGED_IN_KEY',    'qhhymp2ov9yqk1thxghoufusn66qwecqwrm2qklixsnoywnpq68rhzgje0gkt9el' );
+define( 'NONCE_KEY',        's7safhsxcdbahc001pkt7nptvlaamgimjwpoepxhpkpjkldr6goyvt73uzijbjyu' );
+define( 'AUTH_SALT',        'cnl4beaffqzhoqfq7a6cw5fjismczdzqb62k7kkbhb024avy4nfniaesriesvwbd' );
+define( 'SECURE_AUTH_SALT', 'vrzk3qhrfrqggyueyxjxtxokfttoepmdnpr0cfif6aax7rps4ruziifs2arp3gtk' );
+define( 'LOGGED_IN_SALT',   'c6lsvemma1w4pcemmnkm9q5tfurdp5qtclwzxn0hscwsuq3nkmfnlavs2jbtihvi' );
+define( 'NONCE_SALT',       'zm74cfaeawvbn4clenbxzwjftgni2kz8kogdty4qzqqt7n86mrydsmw7iz1rwdlq' );
+
+/**#@-*/
+
+/**
+ * WordPress database table prefix.
+ *
+ * You can have multiple installations in one database if you give each
+ * a unique prefix. Only numbers, letters, and underscores please!
+ *
+ * At the installation time, database tables are created with the specified prefix.
+ * Changing this value after WordPress is installed will make your site think
+ * it has not been installed.
+ *
+ * @link https://developer.wordpress.org/advanced-administration/wordpress/wp-config/#table-prefix
+ */
+$table_prefix = 'wpwx_';
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ *
+ * For information on other constants that can be used for debugging,
+ * visit the documentation.
+ *
+ * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
+ */
+define( 'WP_DEBUG', true );
+
+/* Add any custom values between this line and the "stop editing" line. */
+
+/** Enable debug logging to /wp-content/debug.log */
+define( 'WP_DEBUG_LOG', true );
+
+/** Display errors on screen (use only on development sites) */
+define( 'WP_DEBUG_DISPLAY', true );
+
+/** Use dev versions of core JS and CSS files */
+define( 'SCRIPT_DEBUG', true );
+
+/** PHP error logging/display */
+@ini_set( 'log_errors', 'On' );
+@ini_set( 'display_errors', 'On' );
+@ini_set( 'error_reporting', E_ALL );
+
+/* That's all, stop editing! Happy publishing. */
+
+/** Absolute path to the WordPress directory. */
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', __DIR__ . '/' );
+}
+
+/** Sets up WordPress vars and included files. */
+require_once ABSPATH . 'wp-settings.php';
+
+
+bb———————————————————————
+
+the error log doesnt show anything new
+[16-Aug-2025 12:05:14 UTC] PHP Warning:  Constant PASSWORD_DEFAULT already defined in /home/wphostin/ftmyerspestcontrol.net/update_pass.php on line 17
+
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>The user has configured their wp-config.php file for debugging, but they're still not seeing the debug logs from our activation debugging. The error they showed earlier indicates that the fatal error happens before our activation hook even gets called.
+
+Looking at the fatal error:
+```
+Fatal error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+```
+
+This happens at line 91, which is in the `init_hooks()` method, not during activation. Let me think about this:
+
+1. The error happens during plugin initialization, not activation
+2. Line 91 tries to instantiate `Zen_Elementor_Media_Workaround` 
+3. But our conditional loading fix prevents the file from loading when Elementor isn't available
+4. So the class doesn't exist, but the code still tries to use it
+
+The issue is that line 91 is trying to create an instance of `Zen_Elementor_Media_Workaround` but that class is only loaded if Elementor is available. We need to also make the instantiation conditional.
+
+Also, the user isn't seeing the debug logs because the fatal error happens during plugin initialization (in `init_hooks()`) not during activation. The activation hook probably never gets called because the plugin fails to load completely.
+
+The debug logs should be in:
+1. `/wp-content/debug.log` file
+2. cPanel error logs 
+3. The PHP error log
+
+But since they're not seeing anything new, it suggests the fatal error is preventing our debug code from running.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+The debug logs aren't showing because **the fatal error happens before our activation debugging code can run**. The error occurs during plugin **initialization** (line 91), not during **activation**.
+
+## **The Issue:**
+
+Looking at the error:
+```
+Fatal error: Class "Zen_Elementor_Media_Workaround" not found in snefuruplin.php:91
+```
+
+Line 91 tries to instantiate `Zen_Elementor_Media_Workaround`, but our conditional loading fix prevents that file from loading when Elementor isn't available.
+
+## **Where to Check for Debug Logs:**
+
+1. **File Manager in cPanel**:
+   - Go to File Manager
+   - Navigate to `public_html/wp-content/` 
+   - Look for `debug.log` file
+   - Download and open it
+
+2. **Alternative locations**:
+   - `public_html/error_log` 
+   - `public_html/wp-content/error_log`
+
+## **The Real Problem:**
+
+The code tries to use `Zen_Elementor_Media_Workaround` on line 91 regardless of whether Elementor is available. We need to make that instantiation **conditional** too.
+
+Our activation debugging will only show up **if** the plugin successfully initializes. Since it's failing at line 91 during `init_hooks()`, the activation never happens.
+
+**Solution**: We need to fix line 91 to also check if Elementor is available before trying to instantiate the media workaround class, just like we did with the file loading.
+
+The logs might be there - check the `wp-content/debug.log` file in File Manager first!
+
+---
+
+_**User**_
+
+this is debug log under wp-content 
+
+[16-Aug-2025 12:38:53 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:38:53 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:38:53 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:38:53 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:38:53 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:38:53 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:15 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:15 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:15 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:39:15 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:15 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:15 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:39:15 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:39:15 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:30 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:30 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:30 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:39:30 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:30 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:30 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:39 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:39 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:39 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:39:39 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:39 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:39 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:50 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:50 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:50 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:39:50 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:50 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:50 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property CookieAdminInfo_3_2::$author_profile is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/cookieadmin-pro/includes/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property CookieAdminInfo_3_2::$contributors is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/cookieadmin-pro/includes/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property CookieAdminInfo_3_2::$compatibility is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/cookieadmin-pro/includes/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property CookieAdminInfo_3_2::$ratings is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/cookieadmin-pro/includes/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property CookieAdminInfo_3_2::$download_link is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/cookieadmin-pro/includes/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property CookieAdminInfo_3_2::$tags is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/cookieadmin-pro/includes/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property GosmtpInfo_3_2::$author_profile is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property GosmtpInfo_3_2::$contributors is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property GosmtpInfo_3_2::$compatibility is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property GosmtpInfo_3_2::$ratings is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property GosmtpInfo_3_2::$download_link is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:52 UTC] PHP Deprecated:  Creation of dynamic property GosmtpInfo_3_2::$tags is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:53 UTC] PHP Deprecated:  Creation of dynamic property PagelayerInfo_3_2::$author_profile is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/pagelayer-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:53 UTC] PHP Deprecated:  Creation of dynamic property PagelayerInfo_3_2::$contributors is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/pagelayer-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:53 UTC] PHP Deprecated:  Creation of dynamic property PagelayerInfo_3_2::$compatibility is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/pagelayer-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:53 UTC] PHP Deprecated:  Creation of dynamic property PagelayerInfo_3_2::$ratings is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/pagelayer-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:53 UTC] PHP Deprecated:  Creation of dynamic property PagelayerInfo_3_2::$short_description is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/pagelayer-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:53 UTC] PHP Deprecated:  Creation of dynamic property PagelayerInfo_3_2::$tags is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/pagelayer-pro/main/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:54 UTC] PHP Deprecated:  Creation of dynamic property SoftaculousProInfo_3_2::$author_profile is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/softaculous-pro/lib/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:54 UTC] PHP Deprecated:  Creation of dynamic property SoftaculousProInfo_3_2::$contributors is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/softaculous-pro/lib/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:54 UTC] PHP Deprecated:  Creation of dynamic property SoftaculousProInfo_3_2::$compatibility is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/softaculous-pro/lib/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:54 UTC] PHP Deprecated:  Creation of dynamic property SoftaculousProInfo_3_2::$ratings is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/softaculous-pro/lib/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:54 UTC] PHP Deprecated:  Creation of dynamic property SoftaculousProInfo_3_2::$short_description is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/softaculous-pro/lib/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:54 UTC] PHP Deprecated:  Creation of dynamic property SoftaculousProInfo_3_2::$tags is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/softaculous-pro/lib/plugin-update-checker.php on line 1046
+[16-Aug-2025 12:39:54 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:39:54 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php:1046) in /home/wphostin/ftmyerspestcontrol.net/wp-includes/functions.php on line 7168
+[16-Aug-2025 12:39:54 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php:1046) in /home/wphostin/ftmyerspestcontrol.net/wp-includes/functions.php on line 7144
+[16-Aug-2025 12:39:54 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php:1046) in /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-header.php on line 14
+[16-Aug-2025 12:39:54 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php:1046) in /home/wphostin/ftmyerspestcontrol.net/wp-includes/option.php on line 1740
+[16-Aug-2025 12:39:54 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/gosmtp-pro/main/plugin-update-checker.php:1046) in /home/wphostin/ftmyerspestcontrol.net/wp-includes/option.php on line 1741
+[16-Aug-2025 12:40:16 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:16 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:16 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:40:16 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:16 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:16 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:40:16 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:40:16 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:40:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:31 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:40:31 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:40:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:55 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:55 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:55 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:40:55 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:55 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:40:55 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:40:55 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:40:55 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] === SNEFURU ACTIVATION START ===
+[16-Aug-2025 12:41:27 UTC] PHP Version: 8.2.29
+[16-Aug-2025 12:41:27 UTC] WordPress Version: 6.8.2
+[16-Aug-2025 12:41:27 UTC] Active Plugins: Array
+(
+    [0] => backuply-pro/backuply-pro.php
+    [1] => backuply/backuply.php
+    [2] => cookieadmin-pro/cookieadmin-pro.php
+    [3] => cookieadmin/cookieadmin.php
+    [4] => gosmtp-pro/gosmtp-pro.php
+    [5] => gosmtp/gosmtp.php
+    [6] => loginizer-security/loginizer-security.php
+    [7] => loginizer/loginizer.php
+    [8] => pagelayer-pro/pagelayer-pro.php
+    [9] => pagelayer/pagelayer.php
+    [10] => siteseo-pro/siteseo-pro.php
+    [11] => siteseo/siteseo.php
+    [12] => softaculous-pro/softaculous-pro.php
+    [13] => speedycache-pro/speedycache-pro.php
+    [14] => speedycache/speedycache.php
+    [15] => wppusher/wppusher.php
+)
+
+[16-Aug-2025 12:41:27 UTC] Elementor: NOT ACTIVE
+[16-Aug-2025 12:41:27 UTC] Loaded: snefuruplin.php
+[16-Aug-2025 12:41:27 UTC] Snefuru: Creating services table with SQL: CREATE TABLE wpwx_zen_services (
+                service_id INT(11) NOT NULL AUTO_INCREMENT,
+                service_name TEXT,
+                service_placard TEXT,
+                service_moniker TEXT,
+                service_sobriquet TEXT,
+                description1_short TEXT,
+                description1_long TEXT,
+                rel_image1_id INT(11),
+                is_pinned_service BOOLEAN DEFAULT FALSE,
+                position_in_custom_order INT(11),
+                PRIMARY KEY (service_id)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+[16-Aug-2025 12:41:27 UTC] Snefuru: Creating locations table with SQL: CREATE TABLE wpwx_zen_locations (
+                location_id INT(11) NOT NULL AUTO_INCREMENT,
+                location_name TEXT,
+                location_placard TEXT,
+                location_moniker TEXT,
+                location_sobriquet TEXT,
+                street TEXT,
+                city TEXT,
+                state_code TEXT,
+                zip_code TEXT,
+                country TEXT,
+                rel_image1_id INT(11),
+                is_pinned_location BOOLEAN DEFAULT FALSE,
+                position_in_custom_order INT(11),
+                PRIMARY KEY (location_id)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+[16-Aug-2025 12:41:27 UTC] Snefuru: Creating orbitposts table with SQL: CREATE TABLE wpwx_zen_orbitposts (
+                orbitpost_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+                rel_wp_post_id BIGINT(20) UNSIGNED,
+                redshift_datum TEXT,
+                rover_datum JSON,
+                hudson_imgplanbatch_id VARCHAR(36),
+                is_pinned BOOLEAN DEFAULT FALSE,
+                is_flagged BOOLEAN DEFAULT FALSE,
+                is_starred BOOLEAN DEFAULT FALSE,
+                is_squared BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (orbitpost_id),
+                KEY rel_wp_post_id (rel_wp_post_id),
+                KEY hudson_imgplanbatch_id (hudson_imgplanbatch_id)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+[16-Aug-2025 12:41:27 UTC] Snefuru: Creating cache_reports table with SQL: CREATE TABLE wpwx_zen_cache_reports (
+                report_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+                user_id BIGINT(20) UNSIGNED,
+                operation_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                cache_type VARCHAR(50),
+                operation_status VARCHAR(20),
+                items_cleared INT(11) DEFAULT 0,
+                memory_before BIGINT(20) DEFAULT 0,
+                memory_after BIGINT(20) DEFAULT 0,
+                execution_time_ms INT(11) DEFAULT 0,
+                error_message TEXT,
+                additional_data JSON,
+                PRIMARY KEY (report_id),
+                KEY user_id (user_id),
+                KEY cache_type (cache_type),
+                KEY operation_timestamp (operation_timestamp)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+[16-Aug-2025 12:41:27 UTC] Snefuru: Services table dbDelta result: Array
+(
+    [wpwx_zen_services] => Created table wpwx_zen_services
+)
+
+[16-Aug-2025 12:41:27 UTC] Snefuru: Locations table dbDelta result: Array
+(
+    [wpwx_zen_locations] => Created table wpwx_zen_locations
+)
+
+[16-Aug-2025 12:41:27 UTC] Snefuru: Orbitposts table dbDelta result: Array
+(
+    [wpwx_zen_orbitposts] => Created table wpwx_zen_orbitposts
+)
+
+[16-Aug-2025 12:41:27 UTC] Snefuru: Cache reports table dbDelta result: Array
+(
+    [wpwx_zen_cache_reports] => Created table wpwx_zen_cache_reports
+)
+
+[16-Aug-2025 12:41:27 UTC] Snefuru: Services table exists: YES
+[16-Aug-2025 12:41:27 UTC] Snefuru: Locations table exists: YES
+[16-Aug-2025 12:41:27 UTC] Snefuru: Orbitposts table exists: YES
+[16-Aug-2025 12:41:27 UTC] Snefuru: Cache reports table exists: YES
+[16-Aug-2025 12:41:27 UTC] Snefuru: Zen tables created/updated successfully
+[16-Aug-2025 12:41:27 UTC] === SNEFURU ACTIVATION END ===
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:41:27 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin.php(35): require_once('/home/wphostin/...')
+#8 /home/wphostin/ftmyerspestcontrol.net/wp-admin/plugins.php(10): require_once('/home/wphostin/...')
+#9 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:41:27 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin.php(35): require_once('/home/wphostin/...')
+#8 /home/wphostin/ftmyerspestcontrol.net/wp-admin/plugins.php(10): require_once('/home/wphostin/...')
+#9 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:42:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:42:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:42:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:42:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:42:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:42:18 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:42:18 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:42:18 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:42:18 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:42:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:42:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:42:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:42:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:42:31 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:42:31 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:42:31 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:42:31 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:42:31 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:44:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:44:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:44:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:44:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:44:18 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:44:18 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:44:18 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:44:18 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:44:18 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:44:32 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:44:32 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:44:32 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:44:32 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:44:32 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:44:32 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:44:32 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:44:32 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:44:32 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:46:19 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:46:19 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:46:19 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:46:19 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:46:19 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:46:19 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:46:19 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:46:19 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:46:19 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:46:33 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:46:33 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:46:33 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:46:33 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:46:33 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:46:33 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:46:33 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:46:33 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:46:33 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:48:21 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:48:21 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:48:21 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:48:21 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:48:21 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:48:21 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:48:21 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:48:21 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:48:21 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:48:34 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:48:34 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:48:34 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:48:34 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:48:34 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:48:34 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:48:34 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:48:34 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:48:34 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+[16-Aug-2025 12:50:35 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:50:35 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:50:35 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Dashboard::$pusher is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Dashboard.php on line 68
+[16-Aug-2025 12:50:35 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:50:35 UTC] PHP Deprecated:  Creation of dynamic property Pusher\Log\Logger::$file is deprecated in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/wppusher/Pusher/Log/Logger.php on line 18
+[16-Aug-2025 12:50:35 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo-pro/main/ajax.php on line 40
+[16-Aug-2025 12:50:35 UTC] PHP Warning:  Undefined array key "action" in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/siteseo/main/ajax.php on line 37
+[16-Aug-2025 12:50:36 UTC] PHP Fatal error:  Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php on line 91
+[16-Aug-2025 12:50:36 UTC] SNEFURU FATAL ERROR: Array
+(
+    [type] => 1
+    [message] => Uncaught Error: Class "Zen_Elementor_Media_Workaround" not found in /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php:91
+Stack trace:
+#0 /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(39): SnefuruPlugin->init_hooks()
+#1 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#2 /home/wphostin/ftmyerspestcontrol.net/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#3 /home/wphostin/ftmyerspestcontrol.net/wp-includes/plugin.php(517): WP_Hook->do_action()
+#4 /home/wphostin/ftmyerspestcontrol.net/wp-settings.php(727): do_action()
+#5 /home/wphostin/ftmyerspestcontrol.net/wp-config.php(116): require_once('/home/wphostin/...')
+#6 /home/wphostin/ftmyerspestcontrol.net/wp-load.php(50): require_once('/home/wphostin/...')
+#7 /home/wphostin/ftmyerspestcontrol.net/wp-admin/admin-ajax.php(22): require_once('/home/wphostin/...')
+#8 {main}
+  thrown
+    [file] => /home/wphostin/ftmyerspestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php
+    [line] => 91
+)
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! The debug logs show exactly what's happening:
+
+## **Great News:**
+1. **Activation actually succeeded!** - You can see `=== SNEFURU ACTIVATION START ===` and `=== SNEFURU ACTIVATION END ===`
+2. **Elementor detection works correctly** - Shows `Elementor: NOT ACTIVE` 
+3. **Database tables created successfully** - All zen tables were created
+
+## **The Problem:**
+The fatal error happens **after activation** when WordPress tries to **initialize** the plugin. Line 91 tries to instantiate `Zen_Elementor_Media_Workaround` but that file wasn't loaded because Elementor isn't active.
+
+## **The Root Cause:**
+Our conditional loading fix prevented the Elementor files from loading, but line 91 in `init_hooks()` still tries to instantiate the class unconditionally.
+
+We need to make **line 91** conditional too:
+
+```php
+// Current line 91 (problematic):
+new Zen_Elementor_Media_Workaround();
+
+// Should be:
+if (class_exists('Elementor\Plugin')) {
+    new Zen_Elementor_Media_Workaround();
+}
+```
+
+The plugin **activates successfully** but **fails to initialize** because of this inconsistency between conditional file loading and unconditional class instantiation.
+
+The debug logs show this happens every time WordPress loads (not just activation) - line 91 fails during the `init` hook.
+
+**Bottom line**: We need to fix line 91 to also be conditional like the file loading we already fixed.
+
+---
+
+_**User**_
+
+ok please fix this . and also pleaes explain to me: what is the elementor media workaround? 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Fix line 91 - make Zen_Elementor_Media_Workaround instantiation conditional
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin.php`
+
+Result:
+
+```
+85→        // Initialize Elementor integrations
+    86→        if (did_action('elementor/loaded')) {
+    87→            new Zen_Elementor_Dynamic_Tags();
+    88→        }
+    89→        
+    90→        // Initialize media library workaround (always load for potential Elementor use)
+    91→        new Zen_Elementor_Media_Workaround();
+    92→        
+    93→        // Initialize Hurricane feature
+    94→        new Snefuru_Hurricane();
+    95→        
+    96→        // Add cron jobs for periodic data sync
+    97→        add_action('wp', array($this, 'schedule_events'));
+    98→        add_action('snefuru_sync_data', array($this, 'sync_data_to_cloud'));
+    99→    }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me fix line 91 to be conditional:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/snefuruplin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    86→        if (did_action('elementor/loaded')) {
+    87→            new Zen_Elementor_Dynamic_Tags();
+    88→        }
+    89→        
+    90→        // Initialize media library workaround (only if Elementor is available)
+    91→        if (class_exists('Elementor\Plugin')) {
+    92→            new Zen_Elementor_Media_Workaround();
+    93→        }
+    94→        
+    95→        // Initialize Hurricane feature
+    96→        new Snefuru_Hurricane();
+    97→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check what the Elementor Media Workaround actually does by reading that file:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./includes/class-elementor-media-workaround.php`
+
+Result:
+
+```
+1→<?php
+     2→
+     3→/**
+     4→ * Elementor Media Library Workaround
+     5→ * Adds custom zen data options to WordPress media library when accessed from Elementor
+     6→ * Provides Dynamic Tags functionality without requiring Elementor Pro
+     7→ */
+     8→
+     9→if (!defined('ABSPATH')) {
+    10→    exit; // Exit if accessed directly
+    11→}
+    12→
+    13→class Zen_Elementor_Media_Workaround {
+    14→    
+    15→    public function __construct() {
+    16→        add_action('wp_enqueue_media', array($this, 'enqueue_media_scripts'));
+    17→        add_action('wp_ajax_zen_get_services_for_media', array($this, 'ajax_get_services_for_media'));
+    18→        add_action('wp_ajax_zen_get_locations_for_media', array($this, 'ajax_get_locations_for_media'));
+    19→        add_action('wp_ajax_zen_get_service_image_data', array($this, 'ajax_get_service_image_data'));
+    20→        add_action('wp_ajax_zen_get_location_image_data', array($this, 'ajax_get_location_image_data'));
+    21→        add_action('print_media_templates', array($this, 'add_zen_media_templates'));
+    22→    }
+    23→    
+    24→    /**
+    25→     * Enqueue scripts for media library enhancement
+    26→     */
+    27→    public function enqueue_media_scripts() {
+    28→        // Only load on admin pages where media library might be used
+    29→        if (is_admin()) {
+    30→            wp_enqueue_script(
+    31→                'zen-media-workaround',
+    32→                SNEFURU_PLUGIN_URL . 'assets/zen-media-workaround.js',
+    33→                array('jquery', 'media-views'),
+    34→                SNEFURU_PLUGIN_VERSION,
+    35→                true
+    36→            );
+    37→            
+    38→            wp_localize_script('zen-media-workaround', 'zenMediaAjax', array(
+    39→                'ajaxurl' => admin_url('admin-ajax.php'),
+    40→                'nonce' => wp_create_nonce('zen_media_nonce'),
+    41→                'plugin_url' => SNEFURU_PLUGIN_URL
+    42→            ));
+    43→            
+    44→            wp_enqueue_style(
+    45→                'zen-media-workaround',
+    46→                SNEFURU_PLUGIN_URL . 'assets/zen-media-workaround.css',
+    47→                array(),
+    48→                SNEFURU_PLUGIN_VERSION
+    49→            );
+    50→        }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./includes/class-elementor-media-workaround.php`
+
+Result:
+
+```
+50→        }
+    51→    }
+    52→    
+    53→    /**
+    54→     * AJAX handler to get services data for media library
+    55→     */
+    56→    public function ajax_get_services_for_media() {
+    57→        check_ajax_referer('zen_media_nonce', 'nonce');
+    58→        
+    59→        $services = Ruplin_WP_Database_Horse_Class::get_services(array(
+    60→            'orderby' => 'position_in_custom_order',
+    61→            'order' => 'ASC'
+    62→        ));
+    63→        
+    64→        $formatted_services = array();
+    65→        
+    66→        foreach ($services as $service) {
+    67→            $image_url = '';
+    68→            $image_id = 0;
+    69→            
+    70→            if ($service->rel_image1_id) {
+    71→                $image_url = wp_get_attachment_image_url($service->rel_image1_id, 'medium');
+    72→                $image_id = $service->rel_image1_id;
+    73→            }
+    74→            
+    75→            $formatted_services[] = array(
+    76→                'id' => $service->service_id,
+    77→                'name' => $service->service_name,
+    78→                'placard' => $service->service_placard,
+    79→                'description' => $service->description1_short,
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Fix line 91 - make Zen_Elementor_Media_Workaround instantiation conditional
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've fixed the issue and can explain what the Elementor Media Workaround does:
+
+## **Fix Applied:**
+Changed line 91 from:
+```php
+// OLD (always loads, causing fatal error):
+new Zen_Elementor_Media_Workaround();
+
+// NEW (conditional):
+if (class_exists('Elementor\Plugin')) {
+    new Zen_Elementor_Media_Workaround();
+}
+```
+
+## **What the Elementor Media Workaround Does:**
+
+The `Zen_Elementor_Media_Workaround` class enhances WordPress's media library specifically when used with Elementor. Here's what it provides:
+
+### **Purpose:**
+- **Adds custom zen data options** to the WordPress media library when accessed from Elementor
+- **Provides Dynamic Tags functionality** without requiring Elementor Pro
+- Integrates your **zen_services** and **zen_locations** data with Elementor's media picker
+
+### **Functionality:**
+1. **Enqueues custom JavaScript and CSS** that modifies the media library interface
+2. **AJAX handlers** that fetch your zen services and locations data
+3. **Media templates** that add zen-specific options to the media picker
+4. **Service/Location image data** integration for dynamic content
+
+### **What Users See:**
+When editing with Elementor, users can select images from the media library and get additional options to:
+- Link images to specific **zen services** (pest control services)
+- Link images to specific **zen locations** (service areas)
+- Access **dynamic data** like service descriptions, location details, etc.
+- Use your **custom zen data** without needing Elementor Pro's dynamic tags
+
+### **Why It's Called a "Workaround":**
+- Elementor Pro has built-in dynamic tags, but they're expensive
+- This provides similar functionality by **extending the media library** instead
+- It "works around" the limitation of not having Elementor Pro
+
+Now the plugin should activate successfully since both the file loading AND class instantiation are properly conditional!
+
+---
+
+_**User**_
+
+how expensive are elementor pro's dynamic tags? 
+
+please tell me the general prices 
+
+also please answer this othe question: is it proper practice for me to just "delete the plugin folder" from cpanel once the activation error occurs? this allows me to access the wp-admin area and use wp pusher to pull the next new ruplin version from github. but could this deletion process be improper in some way that's causing issues for us when activating the next version, etc.? onlyanplease just answer and do not change any of our code right now. we are still in planning phase.
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## **Elementor Pro Pricing:**
+
+**Elementor Pro costs:**
+- **Personal**: ~$59/year (1 site)
+- **Plus**: ~$99/year (3 sites) 
+- **Expert**: ~$199/year (1000 sites)
+- **Studio**: ~$499/year (1000 sites + advanced features)
+
+**Dynamic Tags** are included in all Elementor Pro plans, so the cheapest way to get them is $59/year per site.
+
+Your workaround provides similar functionality for free, which is significant cost savings, especially if you have multiple sites.
+
+## **Deleting Plugin Folder - Is It Proper?**
+
+**Short answer**: It's generally fine for development/testing, but not ideal for production.
+
+**Potential issues with folder deletion:**
+1. **Database remains intact** - Plugin tables, options, and data stay in WordPress database even after folder deletion
+2. **Orphaned database entries** - WordPress still thinks the plugin exists in the database until you properly deactivate it
+3. **Activation hooks skip** - When you reinstall, WordPress might not run activation hooks properly because it thinks the plugin was never fully deactivated
+4. **Settings persistence** - Old plugin settings might interfere with new versions
+5. **Transients and cache** - Old cached data might cause conflicts
+
+**Better approach for development:**
+1. **Deactivate plugin first** (if possible) through WP Admin → Plugins
+2. **Then delete folder** 
+3. **Or use WP-CLI**: `wp plugin deactivate snefuruplin-wp-plugin && wp plugin delete snefuruplin-wp-plugin`
+
+**Why it might cause activation issues:**
+- WordPress database still has plugin activation state
+- Activation hooks might not fire properly on reinstall
+- Old database schema might conflict with new version expectations
+
+For production sites, always deactivate properly before updating. For development/testing, folder deletion usually works but can leave database inconsistencies.
+
+---
+
+_**User**_
+
+i have elementor pro for like plus or expert level. do you think this level has elementor dynamic tags? 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+<think><details>The user is asking if their Elementor Pro Plus or Expert level subscription includes dynamic tags. From what I mentioned earlier:
+
+- Personal: ~$59/year (1 site)
+- Plus: ~$99/year (3 sites) 
+- Expert: ~$199/year (1000 sites)
+- Studio: ~$499/year (1000 sites + advanced features)
+
+I said that Dynamic Tags are included in all Elementor Pro plans. So if they have Plus or Expert level, they definitely have dynamic tags.
+
+Let me be clear about this - dynamic tags are a core Elementor Pro feature available in ALL paid plans, not just the higher tiers.</details></think>
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Yes, absolutely!** 
+
+Dynamic Tags are included in **ALL Elementor Pro plans**, including Plus and Expert levels. They're a core Elementor Pro feature, not a premium add-on.
+
+**What this means for your plugin:**
+
+Since you already have Elementor Pro with dynamic tags, the `Zen_Elementor_Media_Workaround` might be **redundant** for your use case. You could potentially:
+
+1. **Use native Elementor Pro dynamic tags** instead of the workaround
+2. **Simplify your plugin** by removing the media workaround entirely
+3. **Create custom Elementor Pro dynamic tags** that connect directly to your zen_services and zen_locations data
+
+**The workaround was likely built because:**
+- The original developer didn't have Elementor Pro
+- It was meant for users without Elementor Pro
+- It provides a fallback for sites that only have free Elementor
+
+**Recommendation:**
+Since you have Elementor Pro, you might want to consider:
+- Building **proper Elementor Pro dynamic tags** instead of the media workaround
+- This would be cleaner, more native, and better integrated
+- Users could use `{{zen_service_name}}`, `{{zen_location_address}}`, etc. directly in Elementor
+
+The media workaround is essentially reinventing functionality you already paid for and have access to.
+
+---
+
+_**User**_
+
+the plugin seems to have activated for the first time in a long time. but the wp sidebar menu is messed up (it was messed up even before i activated the plugin so it has some weird other error). please give me a list of urls that represent our plugin's pages in the wp admin area (wp admin screens). give them in full url form for this site:
+https://www.ftmyerspestcontrol.net/wp-admin/
+
+that way i can paste them in my browser to visit the pages for beamraymar etc 
+
+onlyanplease just answer and do not change any of our code right now. we are still in planning phase. please generate this list for me in chat 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Based on your plugin's admin menu structure, here are the direct URLs for your Snefuru plugin pages:
+
+## **Main Plugin Pages:**
+
+**Main Snefuru Dashboard:**
+`https://www.ftmyerspestcontrol.net/wp-admin/admin.php?page=snefuru`
+
+**BeamRayMar (Original):**
+`https://www.ftmyerspestcontrol.net/wp-admin/admin.php?page=beamraymar`
+
+**BCenter (New Modular Version):**
+`https://www.ftmyerspestcontrol.net/wp-admin/admin.php?page=bcenter`
+
+## **Settings/Configuration Pages:**
+
+**Ketch Width Manager (Supabase Settings):**
+`https://www.ftmyerspestcontrol.net/wp-admin/admin.php?page=ketch-width-manager`
+
+**Debug Log Viewer:**
+`https://www.ftmyerspestcontrol.net/wp-admin/admin.php?page=debug-log-viewer`
+
+## **Hurricane Feature:**
+`https://www.ftmyerspestcontrol.net/wp-admin/admin.php?page=hurricane`
+
+## **If these don't work, try these alternatives:**
+
+**Settings submenu approach:**
+`https://www.ftmyerspestcontrol.net/wp-admin/options-general.php?page=ketch-width-manager`
+
+**Tools submenu approach:**
+`https://www.ftmyerspestcontrol.net/wp-admin/tools.php?page=debug-log-viewer`
+
+The most important ones to test are **beamraymar** and **bcenter** since those were the main focus of our recent work. If the sidebar menu is broken, these direct URLs should still work to access your plugin's functionality.
+
+---
+
+_**User**_
+
+please create a plan for how we can rename the bcenter namespace to something else
+
+the page should not be at wp admin url of page=bcenter anymore. it should now be at
+page=dynomar
+
+then for the files, we could replace the word "dyno" in them (and must update all referncing files, etc. too obviously). . please propose a plan for how we can do this. 
+
+onlyanplease just answer and do not change any of our code right now. we are still in planning phase.
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+# **Plan to Rename BCenter → DynoMar**
+
+## **Phase 1: File Renaming**
+1. **Rename the main file:**
+   - `includes/pages/bcenter-page.php` → `includes/pages/dynomar-page.php`
+
+2. **Update file inclusion reference:**
+   - In `snefuruplin.php` (around line 61-62): Update the `require_once` path
+
+## **Phase 2: Function & Variable Renaming**
+**In `dynomar-page.php`:**
+1. **Main function:** `snefuru_bcenter_page()` → `snefuru_dynomar_page()`
+2. **AJAX handlers:** Any functions like `bcenter_*` → `dynomar_*`
+3. **JavaScript variables:** Any `bcenter` references → `dynomar`
+4. **CSS classes:** `.bcenter-*` → `.dynomar-*`
+5. **HTML IDs:** `id="bcenter-*"` → `id="dynomar-*"`
+
+## **Phase 3: WordPress Menu Integration**
+**In `class-admin.php` (around lines where bcenter menu is added):**
+1. **Menu slug:** `'bcenter'` → `'dynomar'`
+2. **Menu title:** `'BCenter'` → `'DynoMar'`
+3. **Callback function:** `array($this, 'bcenter_page')` → `array($this, 'dynomar_page')`
+4. **Add new method:** `public function dynomar_page()` that includes the new file
+
+## **Phase 4: Database/Options Updates**
+**If any WordPress options or database references exist:**
+1. **Option names:** `bcenter_*` → `dynomar_*`
+2. **Transient keys:** `bcenter_*` → `dynomar_*`
+3. **User meta keys:** Any stored preferences with `bcenter` → `dynomar`
+
+## **Phase 5: JavaScript/AJAX References**
+**In any JavaScript files:**
+1. **AJAX action names:** `bcenter_*` → `dynomar_*`
+2. **JavaScript function names:** `bcenter*()` → `dynomar*()`
+3. **Event handlers:** Any element selectors with `bcenter` → `dynomar`
+
+## **Phase 6: CSS/Styling Updates**
+**In any CSS files:**
+1. **Class selectors:** `.bcenter-*` → `.dynomar-*`
+2. **ID selectors:** `#bcenter-*` → `#dynomar-*`
+
+## **Files Likely Needing Updates:**
+1. `snefuruplin.php` (file inclusion)
+2. `includes/class-admin.php` (menu registration + callback method)
+3. `includes/pages/bcenter-page.php` → `includes/pages/dynomar-page.php` (all internal references)
+4. Any CSS files in `assets/` folder
+5. Any JavaScript files in `assets/` folder
+
+## **Testing Checklist:**
+- [ ] Page loads at `?page=dynomar`
+- [ ] Menu appears as "DynoMar" in WordPress admin
+- [ ] All AJAX functionality works
+- [ ] No JavaScript console errors
+- [ ] All styling displays correctly
+- [ ] No PHP errors in debug log
+
+**Estimated Complexity:** Medium - Mainly find/replace operations but need to be thorough to avoid breaking functionality.
+
+---
+
+_**User**_
+
+i want dynomar to be the page only
+
+everything else should not use the text "dynomar", but instead, dynolen, 
+
+such as dynolen-page.php
+
+actually use dynolan-page.php
+
+and use dynolan rather than dynolen to refer to this system
+
+dynomar is just the page
+
+please propose a new system to implement so i can approve it
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+# **Plan to Rename BCenter → DynoLan System with DynoMar Page**
+
+## **Naming Convention:**
+- **Page URL:** `?page=dynomar` (what users see in browser)
+- **Everything else:** `dynolan` (files, functions, classes, variables)
+
+## **Phase 1: File Renaming**
+1. **Rename the main file:**
+   - `includes/pages/bcenter-page.php` → `includes/pages/dynolan-page.php`
+
+2. **Update file inclusion reference:**
+   - In `snefuruplin.php` (around line 61-62): Update the `require_once` path
+
+## **Phase 2: Function & Variable Renaming**
+**In `dynolan-page.php`:**
+1. **Main function:** `snefuru_bcenter_page()` → `snefuru_dynolan_page()`
+2. **AJAX handlers:** Any functions like `bcenter_*` → `dynolan_*`
+3. **JavaScript variables:** Any `bcenter` references → `dynolan`
+4. **CSS classes:** `.bcenter-*` → `.dynolan-*`
+5. **HTML IDs:** `id="bcenter-*"` → `id="dynolan-*"`
+
+## **Phase 3: WordPress Menu Integration**
+**In `class-admin.php`:**
+1. **Menu slug:** `'bcenter'` → `'dynomar'` (this is what appears in URL)
+2. **Menu title:** `'BCenter'` → `'DynoMar'` (this is what users see in sidebar)
+3. **Callback function:** `array($this, 'bcenter_page')` → `array($this, 'dynolan_page')`
+4. **Add new method:** `public function dynolan_page()` that includes the dynolan-page.php file
+
+## **Phase 4: Internal System References**
+**All backend code uses "dynolan":**
+1. **Option names:** `bcenter_*` → `dynolan_*`
+2. **Transient keys:** `bcenter_*` → `dynolan_*`
+3. **User meta keys:** `bcenter_*` → `dynolan_*`
+4. **Database table references:** Any `bcenter` → `dynolan`
+
+## **Phase 5: JavaScript/AJAX References**
+**In any JavaScript files:**
+1. **AJAX action names:** `bcenter_*` → `dynolan_*`
+2. **JavaScript function names:** `bcenter*()` → `dynolan*()`
+3. **Event handlers:** Any element selectors with `bcenter` → `dynolan`
+
+## **Phase 6: CSS/Styling Updates**
+**In any CSS files:**
+1. **Class selectors:** `.bcenter-*` → `.dynolan-*`
+2. **ID selectors:** `#bcenter-*` → `#dynolan-*`
+
+## **Key Files Needing Updates:**
+1. `snefuruplin.php` (file inclusion path)
+2. `includes/class-admin.php` (menu: slug=dynomar, callback=dynolan_page)
+3. `includes/pages/bcenter-page.php` → `includes/pages/dynolan-page.php` (all internal references)
+4. Any CSS files in `assets/` folder
+5. Any JavaScript files in `assets/` folder
+
+## **Result:**
+- **User sees:** "DynoMar" in admin menu, `?page=dynomar` in URL
+- **Code uses:** `dynolan` everywhere (files, functions, classes, variables)
+- **Clean separation:** Public-facing name vs internal system name
+
+**Does this naming structure work for you?**
+
+---
+
+_**User**_
+
+ok please proceed to implement this new naming 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Phase 1: Rename bcenter-page.php to dynolan-page.php
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Rename bcenter-page.php to dynolan-page.php
+
+`mv /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/bcenter-page.php /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/dynolan-page.php`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Phase 1: Rename bcenter-page.php to dynolan-page.php
+- [⚡] 🌡️ Phase 2: Update file inclusion path in snefuruplin.php
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin.php`
+
+Result:
+
+```
+60→        if (class_exists('Elementor\Plugin')) {
+    61→            require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-dynamic-tags.php';
+    62→            require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-media-workaround.php';
+    63→        }
+    64→        require_once SNEFURU_PLUGIN_PATH . 'hurricane/class-hurricane.php';
+    65→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-orbit-mar-admin.php';
+    66→    }
+    67→    
+    68→    private function init_hooks() {
+    69→        // Check and update database schema if needed
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to find where bcenter-page.php is included. Let me search for it:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/dynolan-page.php:841:                    <div class="bcenter-pagination-bar" id="bcenter-page-bar">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/dynolan-page.php:1009:                    <div class="bcenter-pagination-bar" id="bcenter-page-bar-bottom">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php:11354:        require_once SNEFURU_PLUGIN_PATH . 'includes/pages/bcenter-page.php';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Found it! Line 11354 in class-admin.php. Let me update that:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+ 11350→     * BCenter page - Enhanced beamraymar with modular architecture
+ 11351→     */
+ 11352→    public function bcenter_page() {
+ 11353→        // Include the independent bcenter page file
+ 11354→        require_once SNEFURU_PLUGIN_PATH . 'includes/pages/dynolan-page.php';
+ 11355→        snefuru_bcenter_page();
+ 11356→    }
+ 11357→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Phase 1: Rename bcenter-page.php to dynolan-page.php
+- [X] 🌡️ Phase 2: Update file inclusion path in snefuruplin.php
+- [⚡] 🌡️ Phase 3: Update WordPress menu integration in class-admin.php
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the WordPress menu integration. Let me find where the bcenter menu is registered:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./includes/class-admin.php`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./includes/class-admin.php`
+
+Result:
+
+```
+79:        // BCenter AJAX handlers (independent from beamraymar)
+340:            'BCenter',
+341:            'BCenter',
+11210:     * BCenter AJAX handler for updating post content
+11249:     * BCenter AJAX handler for updating elementor data
+11278:     * BCenter AJAX handler for updating zen_orbitposts boolean fields
+11350:     * BCenter page - Enhanced beamraymar with modular architecture
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Found it! Line 340-341. Let me see the full menu registration:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./includes/class-admin.php`
+
+Result:
+
+```
+335→            array($this, 'beamraymar_page')
+   336→        );
+   337→        
+   338→        add_submenu_page(
+   339→            'snefuru',
+   340→            'BCenter',
+   341→            'BCenter',
+   342→            'manage_options',
+   343→            'bcenter',
+   344→            array($this, 'bcenter_page')
+   345→        );
+   346→        
+   347→        add_submenu_page(
+   348→            'snefuru',
+   349→            'rupcacheman',
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the menu registration to use dynomar for the page slug and DynoMar for the display name, but keep the callback as bcenter_page for now (I'll rename that next):
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   334→            'beamraymar',
+   335→            array($this, 'beamraymar_page')
+   336→        );
+   337→        
+   338→        add_submenu_page(
+   339→            'snefuru',
+   340→            'DynoMar',
+   341→            'DynoMar',
+   342→            'manage_options',
+   343→            'dynomar',
+   344→            array($this, 'dynolan_page')
+   345→        );
+   346→        
+   347→        add_submenu_page(
+   348→            'snefuru',
+   349→            'rupcacheman',
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to rename the callback method from bcenter_page to dynolan_page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+ 11345→            wp_send_json_error('Database update failed');
+ 11346→        }
+ 11347→    }
+ 11348→    
+ 11349→    /**
+ 11350→     * DynoLan page - Enhanced beamraymar with modular architecture
+ 11351→     */
+ 11352→    public function dynolan_page() {
+ 11353→        // Include the independent dynolan page file
+ 11354→        require_once SNEFURU_PLUGIN_PATH . 'includes/pages/dynolan-page.php';
+ 11355→        snefuru_dynolan_page();
+ 11356→    }
+ 11357→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Phase 1: Rename bcenter-page.php to dynolan-page.php
+- [X] 🌡️ Phase 2: Update file inclusion path in snefuruplin.php
+- [X] 🌡️ Phase 3: Update WordPress menu integration in class-admin.php
+- [⚡] 🌡️ Phase 4: Update main function name in dynolan-page.php
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the main function in dynolan-page.php from snefuru_bcenter_page to snefuru_dynolan_page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./includes/pages/dynolan-page.php`
+
+Result:
+
+```
+1→<?php
+     2→/**
+     3→ * Independent bcenter page
+     4→ * Extracted from class-admin.php for better maintainability
+     5→ */
+     6→
+     7→if (!defined('ABSPATH')) {
+     8→    exit;
+     9→}
+    10→
+    11→// Make sure we can access WordPress functions and globals
+    12→global $wpdb;
+    13→
+    14→/**
+    15→ * Main bcenter page function - completely independent
+    16→ */
+    17→function snefuru_bcenter_page() {
+    18→    // AGGRESSIVE NOTICE SUPPRESSION
+    19→    snefuru_suppress_all_admin_notices();
+    20→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/dynolan-page.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→<?php
+     2→/**
+     3→ * Independent dynolan page
+     4→ * Extracted from class-admin.php for better maintainability
+     5→ */
+     6→
+     7→if (!defined('ABSPATH')) {
+     8→    exit;
+     9→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/dynolan-page.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    10→
+    11→// Make sure we can access WordPress functions and globals
+    12→global $wpdb;
+    13→
+    14→/**
+    15→ * Main dynolan page function - completely independent
+    16→ */
+    17→function snefuru_dynolan_page() {
+    18→    // AGGRESSIVE NOTICE SUPPRESSION
+    19→    snefuru_suppress_all_admin_notices();
+    20→    
+    21→    // Handle AJAX requests
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to find and replace all the bcenter references within the dynolan-page.php file. Let me search for them:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./includes/pages/dynolan-page.php`
+
+Result:
+
+```
+23:        snefuru_handle_bcenter_ajax();
+31:    <div class="wrap bcenter-wrapper">
+34:            .bcenter-wrapper {
+40:            .bcenter-top-controls {
+51:            .bcenter-controls-left {
+76:            .bcenter-controls-right {
+82:            .bcenter-info-text {
+87:            .bcenter-pagination-controls {
+92:            .bcenter-pagination-bar {
+96:            .bcenter-pagination-btn {
+108:            .bcenter-pagination-btn:hover {
+112:            .bcenter-pagination-btn.active {
+117:            .bcenter-pagination-btn:first-child {
+122:            .bcenter-pagination-btn:last-child {
+127:            .bcenter-pagination-divider {
+134:            .bcenter-search-container {
+138:            .bcenter-search-input {
+146:            .bcenter-clear-btn {
+161:            .bcenter-clear-btn:hover {
+165:            .bcenter-create-buttons {
+170:            .bcenter-create-btn {
+181:            .bcenter-create-inline-post {
+186:            .bcenter-create-inline-post:hover {
+190:            .bcenter-create-inline-page {
+195:            .bcenter-create-inline-page:hover {
+199:            .bcenter-create-popup {
+204:            .bcenter-create-popup:hover {
+208:            .bcenter-nubra-kite {
+218:            .bcenter-table-container {
+223:            .bcenter-table-scroll {
+227:            .bcenter-table {
+234:            .bcenter-table thead {
+238:            .bcenter-table th,
+239:            .bcenter-table td {
+246:            .bcenter-table th {
+254:            .bcenter-table th:hover {
+258:            .bcenter-table tbody tr:hover {
+262:            .bcenter-checkbox-cell {
+268:            .bcenter-checkbox {
+274:            .bcenter-editable-cell {
+281:            .bcenter-editable-cell:hover {
+286:            .bcenter-editing-input {
+295:            .bcenter-editing-textarea {
+306:            .bcenter-toggle-switch {
+316:            .bcenter-toggle-switch.on {
+320:            .bcenter-toggle-switch.off {
+324:            .bcenter-toggle-handle {
+335:            .bcenter-toggle-switch.on .bcenter-toggle-handle {
+339:            .bcenter-toggle-switch.off .bcenter-toggle-handle {
+343:            .bcenter-sort-indicator {
+348:            .bcenter-loading {
+356:            .bcenter-bottom-controls {
+366:            .bcenter-modal {
+377:            .bcenter-modal.active {
+383:            .bcenter-modal-content {
+393:            .bcenter-modal-header {
+402:            .bcenter-modal-title {
+408:            .bcenter-modal-close {
+416:            .bcenter-modal-close:hover {
+420:            .bcenter-form-grid {
+427:            .bcenter-form-field {
+432:            .bcenter-form-field.full-width {
+436:            .bcenter-form-label {
+442:            .bcenter-form-input,
+443:            .bcenter-form-textarea,
+444:            .bcenter-form-select {
+451:            .bcenter-form-textarea {
+456:            .bcenter-modal-actions {
+463:            .bcenter-modal-btn {
+473:            .bcenter-modal-btn.primary {
+478:            .bcenter-modal-btn.primary:hover {
+482:            .bcenter-modal-btn.secondary {
+488:            .bcenter-modal-btn.secondary:hover {
+492:            .bcenter-table td .tcell_inner_wrapper_div {
+508:            .bcenter-table td.column_wp_posts_post_title {
+513:            .bcenter-table td.column_wp_posts_post_status[data-status="publish"] {
+518:            .bcenter-column-pagination-controls {
+526:            .bcenter-column-pagination-bar {
+530:            .bcenter-column-pagination-btn {
+542:            .bcenter-column-pagination-btn:hover {
+546:            .bcenter-column-pagination-btn.active {
+551:            .bcenter-column-pagination-btn:first-child {
+556:            .bcenter-column-pagination-btn:last-child {
+562:            .bcenter-filter-controls {
+570:            .bcenter-filter-bar {
+574:            .bcenter-filter-btn {
+586:            .bcenter-filter-btn:hover {
+590:            .bcenter-filter-btn.active {
+595:            .bcenter-filter-btn:first-child {
+600:            .bcenter-filter-btn:last-child {
+606:            .bcenter-content-edit-btn {
+619:            .bcenter-content-edit-btn:hover {
+624:            .bcenter-content-editor-modal {
+635:            .bcenter-content-editor-modal.active {
+641:            .bcenter-content-editor-content {
+651:            .bcenter-content-editor-header {
+657:            .bcenter-content-editor-textarea {
+667:            .bcenter-content-editor-actions {
+674:            .bcenter-content-editor-btn {
+682:            .bcenter-content-editor-btn.save {
+687:            .bcenter-content-editor-btn.cancel {
+693:            .bcenter-tool-btn {
+709:            .bcenter-tool-btn:hover {
+716:            .bcenter-pendulum-btn {
+732:            .bcenter-pendulum-btn:hover {
+739:            .bcenter-elementor-btn {
+755:            .bcenter-elementor-btn:hover {
+761:            .bcenter-elementor-btn.disabled {
+769:            .bcenter-c-btn {
+812:        <div class="bcenter-top-controls">
+813:            <div class="bcenter-controls-left">
+824:                <div class="bcenter-info-text">
+825:                    <span id="bcenter-results-info">1-<?php echo min(100, count($posts_pages)); ?> of <?php echo count($posts_pages); ?> posts/pages</span>
+828:                <div class="bcenter-pagination-controls">
+829:                    <div class="bcenter-pagination-bar" id="bcenter-per-page-bar">
+830:                        <a href="#" class="bcenter-pagination-btn" data-per-page="10">10</a>
+831:                        <a href="#" class="bcenter-pagination-btn" data-per-page="20">20</a>
+832:                        <a href="#" class="bcenter-pagination-btn" data-per-page="50">50</a>
+833:                        <a href="#" class="bcenter-pagination-btn active" data-per-page="100">100</a>
+834:                        <a href="#" class="bcenter-pagination-btn" data-per-page="200">200</a>
+835:                        <a href="#" class="bcenter-pagination-btn" data-per-page="500">500</a>
+836:                        <a href="#" class="bcenter-pagination-btn" data-per-page="all">All</a>
+839:                    <div class="bcenter-pagination-divider"></div>
+841:                    <div class="bcenter-pagination-bar" id="bcenter-page-bar">
+842:                        <a href="#" class="bcenter-pagination-btn" data-page="first">First</a>
+843:                        <a href="#" class="bcenter-pagination-btn" data-page="prev">Prev</a>
+844:                        <a href="#" class="bcenter-pagination-btn active" data-page="1">1</a>
+845:                        <a href="#" class="bcenter-pagination-btn" data-page="next">Next</a>
+846:                        <a href="#" class="bcenter-pagination-btn" data-page="last">Last</a>
+850:                <div class="bcenter-search-container">
+851:                    <input type="text" id="bcenter-search" class="bcenter-search-input" placeholder="Search all fields...">
+852:                    <button class="bcenter-clear-btn" id="bcenter-clear">CL</button>
+856:            <div class="bcenter-controls-right">
+865:                    <div class="bcenter-create-buttons">
+866:                        <button class="bcenter-create-btn bcenter-create-inline-post" id="create-post-inline">Create New (Inline)</button>
+867:                        <button class="bcenter-create-btn bcenter-create-inline-page" id="create-page-inline">Create New (Inline) WP Page</button>
+868:                        <button class="bcenter-create-btn bcenter-create-popup" id="create-popup">Create New (Popup)</button>
+869:                        <button class="bcenter-create-btn bcenter-duplicate-btn" id="duplicate-selected">Duplicate</button>
+872:                <div class="bcenter-nubra-kite">nubra-tableface-kite</div>
+875:                <div class="bcenter-column-pagination-controls">
+876:                    <div class="bcenter-column-pagination-bar" id="bcenter-column-group-bar">
+877:                        <a href="#" class="bcenter-column-pagination-btn active" data-column-group="1">Columns 1-7</a>
+878:                        <a href="#" class="bcenter-column-pagination-btn" data-column-group="2">Columns 8-14</a>
+879:                        <a href="#" class="bcenter-column-pagination-btn" data-column-group="3">Columns 15-21</a>
+880:                        <a href="#" class="bcenter-column-pagination-btn" data-column-group="4">Columns 22-28</a>
+881:                        <a href="#" class="bcenter-column-pagination-btn" data-column-group="5">Columns 29-35</a>
+884:                    <div class="bcenter-column-pagination-bar" id="bcenter-column-nav-bar">
+885:                        <a href="#" class="bcenter-column-pagination-btn" data-column-nav="first">First</a>
+886:                        <a href="#" class="bcenter-column-pagination-btn" data-column-nav="prev">Prev</a>
+887:                        <a href="#" class="bcenter-column-pagination-btn active" data-column-nav="1">1</a>
+888:                        <a href="#" class="bcenter-column-pagination-btn" data-column-nav="2">2</a>
+889:                        <a href="#" class="bcenter-column-pagination-btn" data-column-nav="3">3</a>
+890:                        <a href="#" class="bcenter-column-pagination-btn" data-column-nav="4">4</a>
+891:                        <a href="#" class="bcenter-column-pagination-btn" data-column-nav="5">5</a>
+892:                        <a href="#" class="bcenter-column-pagination-btn" data-column-nav="next">Next</a>
+893:                        <a href="#" class="bcenter-column-pagination-btn" data-column-nav="last">Last</a>
+898:                <div class="bcenter-filter-controls">
+899:                    <div class="bcenter-filter-bar" id="bcenter-post-type-filter">
+900:                        <a href="#" class="bcenter-filter-btn" data-filter-type="post_type" data-filter-value="page">Page</a>
+901:                        <a href="#" class="bcenter-filter-btn" data-filter-type="post_type" data-filter-value="post">Post</a>
+904:                    <div class="bcenter-filter-bar" id="bcenter-post-status-filter">
+905:                        <a href="#" class="bcenter-filter-btn" data-filter-type="post_status" data-filter-value="publish">Published</a>
+906:                        <a href="#" class="bcenter-filter-btn" data-filter-type="post_status" data-filter-value="draft">Draft</a>
+914:        <div class="bcenter-table-container">
+915:            <div class="bcenter-table-scroll">
+916:                <table class="bcenter-table utg_beamray" id="bcenter-table">
+948:                        <tr class="bcenter-main-header-row">
+949:                            <th class="bcenter-checkbox-cell column_checkbox row_obtain_db_column">
+950:                                <div class="tcell_inner_wrapper_div"><input type="checkbox" class="bcenter-checkbox" id="select-all"></div>
+981:                    <tbody id="bcenter-tbody">
+982:                        <?php snefuru_render_bcenter_table_rows($posts_pages); ?>
+990:        <div class="bcenter-bottom-controls">
+991:            <div class="bcenter-controls-left">
+992:                <div class="bcenter-info-text">
+993:                    <span id="bcenter-results-info-bottom">1-<?php echo min(100, count($posts_pages)); ?> of <?php echo count($posts_pages); ?> posts/pages</span>
+996:                <div class="bcenter-pagination-controls">
+997:                    <div class="bcenter-pagination-bar" id="bcenter-per-page-bar-bottom">
+998:                        <a href="#" class="bcenter-pagination-btn" data-per-page="10">10</a>
+999:                        <a href="#" class="bcenter-pagination-btn" data-per-page="20">20</a>
+1000:                        <a href="#" class="bcenter-pagination-btn" data-per-page="50">50</a>
+1001:                        <a href="#" class="bcenter-pagination-btn active" data-per-page="100">100</a>
+1002:                        <a href="#" class="bcenter-pagination-btn" data-per-page="200">200</a>
+1003:                        <a href="#" class="bcenter-pagination-btn" data-per-page="500">500</a>
+1004:                        <a href="#" class="bcenter-pagination-btn" data-per-page="all">All</a>
+1007:                    <div class="bcenter-pagination-divider"></div>
+1009:                    <div class="bcenter-pagination-bar" id="bcenter-page-bar-bottom">
+1010:                        <a href="#" class="bcenter-pagination-btn" data-page="first">First</a>
+1011:                        <a href="#" class="bcenter-pagination-btn" data-page="prev">Prev</a>
+1012:                        <a href="#" class="bcenter-pagination-btn active" data-page="1">1</a>
+1013:                        <a href="#" class="bcenter-pagination-btn" data-page="next">Next</a>
+1014:                        <a href="#" class="bcenter-pagination-btn" data-page="last">Last</a>
+1018:                <div class="bcenter-search-container">
+1019:                    <input type="text" id="bcenter-search-bottom" class="bcenter-search-input" placeholder="Search all fields...">
+1020:                    <button class="bcenter-clear-btn" id="bcenter-clear-bottom">CL</button>
+1029:        <div id="bcenter-modal" class="bcenter-modal">
+1030:            <div class="bcenter-modal-content">
+1031:                <div class="bcenter-modal-header">
+1032:                    <h2 class="bcenter-modal-title" id="bcenter-modal-title">Create New Post/Page</h2>
+1033:                    <button class="bcenter-modal-close" id="bcenter-modal-close">&times;</button>
+1036:                <form id="bcenter-modal-form">
+1040:                    <div class="bcenter-form-grid">
+1041:                        <div class="bcenter-form-field">
+1042:                            <label class="bcenter-form-label">Post Type</label>
+1043:                            <select id="modal-post-type" name="post_type" class="bcenter-form-select">
+1049:                        <div class="bcenter-form-field">
+1050:                            <label class="bcenter-form-label">Status</label>
+1051:                            <select id="modal-post-status" name="post_status" class="bcenter-form-select">
+1058:                        <div class="bcenter-form-field full-width">
+1059:                            <label class="bcenter-form-label">Title</label>
+1060:                            <input type="text" id="modal-post-title" name="post_title" class="bcenter-form-input">
+1063:                        <div class="bcenter-form-field full-width">
+1064:                            <label class="bcenter-form-label">Content</label>
+1065:                            <textarea id="modal-post-content" name="post_content" class="bcenter-form-textarea"></textarea>
+1068:                        <div class="bcenter-form-field">
+1069:                            <label class="bcenter-form-label">Slug</label>
+1070:                            <input type="text" id="modal-post-name" name="post_name" class="bcenter-form-input">
+1073:                        <div class="bcenter-form-field">
+1074:                            <label class="bcenter-form-label">Parent ID</label>
+1075:                            <input type="number" id="modal-post-parent" name="post_parent" class="bcenter-form-input" value="0">
+1079:                    <div class="bcenter-modal-actions">
+1080:                        <button type="button" class="bcenter-modal-btn secondary" id="bcenter-modal-cancel">Cancel</button>
+1081:                        <button type="submit" class="bcenter-modal-btn primary" id="bcenter-modal-save">Save</button>
+1088:        <div id="bcenter-content-editor-modal" class="bcenter-content-editor-modal">
+1089:            <div class="bcenter-content-editor-content">
+1090:                <div class="bcenter-content-editor-header">post_content</div>
+1091:                <textarea id="bcenter-content-editor-textarea" class="bcenter-content-editor-textarea"></textarea>
+1092:                <div class="bcenter-content-editor-actions">
+1093:                    <button type="button" class="bcenter-content-editor-btn cancel" id="bcenter-content-editor-cancel">Cancel</button>
+1094:                    <button type="button" class="bcenter-content-editor-btn save" id="bcenter-content-editor-save">Save</button>
+1100:        <div id="bcenter-elementor-editor-modal" class="bcenter-content-editor-modal">
+1101:            <div class="bcenter-content-editor-content">
+1102:                <div class="bcenter-content-editor-header">_elementor_data</div>
+1103:                <textarea id="bcenter-elementor-editor-textarea" class="bcenter-content-editor-textarea"></textarea>
+1104:                <div class="bcenter-content-editor-actions">
+1105:                    <button type="button" class="bcenter-content-editor-btn cancel" id="bcenter-elementor-editor-cancel">Cancel</button>
+1106:                    <button type="button" class="bcenter-content-editor-btn save" id="bcenter-elementor-editor-save">Save</button>
+1139:                    $(document).on('click', '.bcenter-pagination-btn', function(e) {
+1147:                            $('.bcenter-pagination-btn[data-per-page]').removeClass('active');
+1180:                    $(document).on('input', '.bcenter-search-input', function() {
+1189:                    $(document).on('click', '.bcenter-clear-btn', function(e) {
+1191:                        $('.bcenter-search-input').val('');
+1229:                    $('.bcenter-pagination-btn[data-page]').removeClass('active');
+1230:                    $(`.bcenter-pagination-btn[data-page="${currentPage}"]`).addClass('active');
+1273:function snefuru_handle_bcenter_ajax() {
+1275:    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'bcenter_nonce')) {
+1355: * Helper function to render bcenter table rows
+1357:function snefuru_render_bcenter_table_rows($posts_pages) {
+1359:        echo '<tr><td colspan="28" class="bcenter-loading">No posts or pages found.</td></tr>';
+1373:        echo '<td class="bcenter-checkbox-cell column_checkbox"><div class="tcell_inner_wrapper_div">';
+1374:        echo '<input type="checkbox" class="bcenter-checkbox" value="' . esc_attr($post_id) . '">';
+1379:        echo '<a href="' . get_edit_post_link($post_id) . '" class="bcenter-tool-btn" title="Edit">ED</a>';
+1380:        echo '<a href="' . get_permalink($post_id) . '" class="bcenter-pendulum-btn" title="View">VW</a>';
+1382:            echo '<button class="bcenter-elementor-btn" data-post-id="' . esc_attr($post_id) . '" title="Elementor">EL</button>';
+1384:            echo '<button class="bcenter-elementor-btn disabled" title="No Elementor Data">EL</button>';
+1386:        echo '<button class="bcenter-c-btn" title="C1">C1</button>';
+1387:        echo '<button class="bcenter-c-btn" title="C2">C2</button>';
+1388:        echo '<button class="bcenter-c-btn" title="C3">C3</button>';
+1395:        echo '<td class="bcenter-editable-cell column_wp_posts_post_status" data-field="post_status" data-type="text" data-status="' . esc_attr($item['post_status']) . '">';
+1399:        echo '<td class="bcenter-editable-cell column_wp_posts_post_title" data-field="post_title" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_title']) . '</div></td>';
+1402:        echo '<td class="bcenter-editable-cell column_wp_posts_post_name" data-field="post_name" data-type="text"><div class="tcell_inner_wrapper_div">' . esc_html($item['post_name']) . '</div></td>';
+1408:        echo '<td class="readonly-cell column_wp_posts_post_content"><div class="tcell_inner_wrapper_div">' . esc_html($content_preview) . '<button class="bcenter-content-edit-btn" data-post-id="' . esc_attr($post_id) . '">ED</button></div></td>';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+This is a lot of bcenter references! I need to replace them all with dynolan. Let me do this systematically with a global replace:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/dynolan-page.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    19→    snefuru_suppress_all_admin_notices();
+    20→    
+    21→    // Handle AJAX requests
+    22→    if (isset($_POST['action']) && in_array($_POST['action'], ['create_new_post', 'update_post_field', 'create', 'edit'])) {
+    23→        snefuru_handle_dynolan_ajax();
+    24→        return;
+    25→    }
+    26→    
+    27→    // Get posts and pages data
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me do a bulk replace of all bcenter references to dynolan. This is a lot of repetitive changes, so I'll use the replace_all option:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/pages/dynolan-page.php has been updated. All occurrences of 'bcenter' were successfully replaced with 'dynolan'.
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the function names at the bottom of the file. Let me check them:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./includes/pages/dynolan-page.php`
+
+Result:
+
+```
+1270→/**
+  1271→ * Helper function to handle AJAX requests
+  1272→ */
+  1273→function snefuru_handle_dynolan_ajax() {
+  1274→    // Verify nonce
+  1275→    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'dynolan_nonce')) {
+  1276→        echo json_encode(array('success' => false, 'message' => 'Security check failed'));
+  1277→        wp_die();
+  1278→    }
+  1279→
+  1280→    $action = sanitize_text_field($_POST['action']);
+  1281→
+  1282→    switch ($action) {
+  1283→        case 'create_new_post':
+  1284→            $post_data = array(
+  1285→                'post_title' => sanitize_text_field($_POST['post_title']),
+  1286→                'post_content' => wp_kses_post($_POST['post_content']),
+  1287→                'post_status' => sanitize_text_field($_POST['post_status']),
+  1288→                'post_type' => sanitize_text_field($_POST['post_type']),
+  1289→                'post_name' => sanitize_text_field($_POST['post_name']),
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Good! Now let me check the render function:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./includes/pages/dynolan-page.php`
+
+Result:
+
+```
+1355→ * Helper function to render dynolan table rows
+  1356→ */
+  1357→function snefuru_render_dynolan_table_rows($posts_pages) {
+  1358→    if (empty($posts_pages)) {
+  1359→        echo '<tr><td colspan="28" class="dynolan-loading">No posts or pages found.</td></tr>';
+  1360→        return;
+  1361→    }
+  1362→
+  1363→    $count = 0;
+  1364→    foreach ($posts_pages as $item) {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I need to update the call to this function in the table. Let me find where it's called:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./includes/pages/dynolan-page.php`
+
+Result:
+
+```
+982:                        <?php snefuru_render_dynolan_table_rows($posts_pages); ?>
+1357:function snefuru_render_dynolan_table_rows($posts_pages) {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Great! That's already updated. Now I need to update the AJAX handlers in class-admin.php to match the new names. Let me find where the bcenter AJAX handlers are defined:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Phase 1: Rename bcenter-page.php to dynolan-page.php
+- [X] 🌡️ Phase 2: Update file inclusion path in snefuruplin.php
+- [X] 🌡️ Phase 3: Update WordPress menu integration in class-admin.php
+- [X] 🌡️ Phase 4: Update main function name in dynolan-page.php
+- [⚡] 🌡️ Phase 5: Update AJAX handlers in class-admin.php
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./includes/class-admin.php`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./includes/class-admin.php`
+
+Result:
+
+```
+79:        // BCenter AJAX handlers (independent from beamraymar)
+11210:     * BCenter AJAX handler for updating post content
+11249:     * BCenter AJAX handler for updating elementor data
+11278:     * BCenter AJAX handler for updating zen_orbitposts boolean fields
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check where the BCenter AJAX handlers are registered:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./includes/class-admin.php`
+
+Result:
+
+```
+75→        
+    76→        // AJAX handler for zen_orbitposts field update
+    77→        add_action('wp_ajax_beamraymar_update_zen_orbitpost_field', array($this, 'beamraymar_update_zen_orbitpost_field'));
+    78→        
+    79→        // BCenter AJAX handlers (independent from beamraymar)
+    80→        add_action('wp_ajax_bcenter_update_post_content', array($this, 'bcenter_update_post_content'));
+    81→        add_action('wp_ajax_bcenter_update_elementor_data', array($this, 'bcenter_update_elementor_data'));
+    82→        add_action('wp_ajax_bcenter_update_zen_orbitpost_field', array($this, 'bcenter_update_zen_orbitpost_field'));
+    83→        
+    84→        // Cache management AJAX actions
+    85→        add_action('wp_ajax_rup_clear_object_cache', array($this, 'rup_clear_object_cache'));
+    86→        add_action('wp_ajax_rup_clear_transients', array($this, 'rup_clear_transients'));
+    87→        add_action('wp_ajax_rup_clear_rewrite_rules', array($this, 'rup_clear_rewrite_rules'));
+    88→        add_action('wp_ajax_rup_clear_opcache', array($this, 'rup_clear_opcache'));
+    89→        add_action('wp_ajax_rup_clear_plugin_cache', array($this, 'rup_clear_plugin_cache'));
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update these AJAX handler registrations to use dynolan instead of bcenter:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/includes/class-admin.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    75→        
+    76→        // AJAX handler for zen_orbitposts field update
+    77→        add_action('wp_ajax_beamraymar_update_zen_orbitpost_field', array($this, 'beamraymar_update_zen_orbitpost_field'));
+    78→        
+    79→        // DynoLan AJAX handlers (independent from beamraymar)
+    80→        add_action('wp_ajax_dynolan_update_post_content', array($this, 'dynolan_update_post_content'));
+    81→        add_action('wp_ajax_dynolan_update_elementor_data', array($this, 'dynolan_update_elementor_data'));
+    82→        add_action('wp_ajax_dynolan_update_zen_orbitpost_field', array($this, 'dynolan_update_zen_orbitpost_field'));
+    83→        
+    84→        // Cache management AJAX actions
+    85→        add_action('wp_ajax_rup_clear_object_cache', array($this, 'rup_clear_object_cache'));
+    86→        add_action('wp_ajax_rup_clear_transients', array($this, 'rup_clear_transients'));
+```
+
