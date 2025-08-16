@@ -1121,3 +1121,774 @@ _**Agent (claude-sonnet-4-20250514)**_
 
 **Next step**: Push these changes to GitHub and test plugin activation through WP Pusher.
 
+---
+
+_**User**_
+
+it still triggered another activation error
+
+[15-Aug-2025 17:16:22 UTC] PHP Warning:  Undefined array key "titles_single_titles" in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/siteseo/siteseo.php on line 191
+[15-Aug-2025 17:16:22 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:16:27 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:21:32 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:25:07 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:25:15 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:51:02 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:53:41 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:53:55 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:10 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:31 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:31 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:32 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:32 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:32 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:32 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:33 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:33 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 17:54:33 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:02:59 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:03:02 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:03:13 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:25:53 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:25:54 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:25:58 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:25:59 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:25:59 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:26:27 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 18:28:42 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:13 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:17 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:25 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:52 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:52 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:52 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:52 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:53 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:53 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:16:53 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:34:39 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:38:36 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:38:38 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:38:54 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:59:35 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:59:36 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 19:59:38 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 20:31:52 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 20:42:58 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 20:51:05 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 21:12:42 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 21:15:02 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 21:15:02 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 21:15:11 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 21:20:13 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 21:20:14 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 21:20:25 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[15-Aug-2025 21:24:37 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:02:54 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:05:56 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:05:57 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:05:59 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:06:03 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:22:27 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:30:42 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:34:30 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:39:17 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:40:20 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:42:50 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:47:17 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:50:23 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:54:16 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 00:54:45 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 01:09:52 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 01:09:52 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 01:10:00 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 01:10:26 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 01:10:29 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 01:10:43 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 01:31:16 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 02:00:20 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 02:00:21 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 02:00:30 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 02:03:37 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 02:33:00 UTC] WordPress database error Table 'wphostin_wp326.wpo8_cookieadmin_cookies' doesn't exist for query SELECT cookie_name, category, expires, description, patterns FROM wpo8_cookieadmin_cookies made by require('wp-blog-header.php'), require_once('wp-includes/template-loader.php'), include('wp-includes/template-canvas.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_scripts, do_action('wp_enqueue_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, CookieAdmin\Enduser::enqueue_scripts
+[16-Aug-2025 02:34:27 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:38:32 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:47:57 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 03:06:29 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 03:21:42 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 05:30:28 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 05:54:28 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 05:54:30 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 05:54:32 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 06:22:14 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 06:50:14 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 09:24:13 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 09:53:39 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 09:53:43 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 09:56:47 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 09:56:51 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 11:00:41 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 11:01:12 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 11:18:29 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 11:18:30 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 11:18:36 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 11:18:39 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+[16-Aug-2025 11:18:41 UTC] PHP Fatal error:  Uncaught Error: Class "Elementor\Core\DynamicTags\Data_Tag" not found in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php:46
+Stack trace:
+#0 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(58): require_once()
+#1 /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/snefuruplin.php(38): SnefuruPlugin->load_dependencies()
+#2 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(324): SnefuruPlugin->init()
+#3 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/class-wp-hook.php(348): WP_Hook->apply_filters()
+#4 /home/wphostin/pestcontrolpembrokepines.com/wp-includes/plugin.php(517): WP_Hook->do_action()
+#5 /home/wphostin/pestcontrolpembrokepines.com/wp-settings.php(727): do_action()
+#6 /home/wphostin/pestcontrolpembrokepines.com/wp-config.php(102): require_once('/home/wphostin/...')
+#7 /home/wphostin/pestcontrolpembrokepines.com/wp-load.php(50): require_once('/home/wphostin/...')
+#8 /home/wphostin/pestcontrolpembrokepines.com/wp-blog-header.php(13): require_once('/home/wphostin/...')
+#9 /home/wphostin/pestcontrolpembrokepines.com/index.php(17): require('/home/wphostin/...')
+#10 {main}
+  thrown in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-elementor-dynamic-tags.php on line 46
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see there are still the same two problems:
+
+1. **Line 7647 syntax error**: Still shows `PHP Parse error: syntax error, unexpected token "\" in /home/wphostin/pestcontrolpembrokepines.com/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647`
+
+2. **Elementor Dynamic Tags error**: Still shows the fatal error on line 58 of `snefuruplin.php`
+
+This indicates that **the deployed version on your server doesn't have our latest fixes**. The problem is that your local changes haven't been pushed to GitHub or WP Pusher hasn't pulled the latest version.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Verify deployment - server still has old buggy version
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+The error log shows that line 58 is still `require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-dynamic-tags.php';` but our fix moved this to a conditional block around lines 60-63.
+
+**The issue is deployment** - you need to:
+
+1. **Push the changes to GitHub** from your local repository
+2. **Pull the latest version** through WP Pusher on your WordPress site
+
+To verify our fixes are correct locally, let's check the current state:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/snefuruplin.php`
+
+Result:
+
+```
+55→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-dublish-api.php';
+    56→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-ruplin-wppma-database.php';
+    57→        require_once SNEFURU_PLUGIN_PATH . 'includes/class-zen-shortcodes.php';
+    58→        
+    59→        // Load Elementor components only if Elementor is available
+    60→        if (class_exists('Elementor\Plugin')) {
+    61→            require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-dynamic-tags.php';
+    62→            require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-media-workaround.php';
+    63→        }
+    64→        require_once SNEFURU_PLUGIN_PATH . 'hurricane/class-hurricane.php';
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Our local fixes are correct. Now let's verify the class-admin.php line 7647:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./snefuruplin/includes/class-admin.php`
+
+Result:
+
+```
+7645→        // Clear Elementor cache
+  7646→        if (class_exists('Elementor\Plugin')) {
+  7647→            $elementor_instance = \Elementor\Plugin::$instance;
+  7648→            if (isset($elementor_instance->files_manager) && method_exists($elementor_instance->files_manager, 'clear_cache')) {
+  7649→                $elementor_instance->files_manager->clear_cache();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Our local fixes are both correct. The issue is definitely deployment.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Verify deployment - server still has old buggy version
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## **The Problem is Deployment** 
+
+Your **local files are correctly fixed**, but the **server still has the old buggy version**. The error log shows:
+
+- Line 58 still has `require_once` for Elementor dynamic tags (should be conditional around line 60-63)
+- Line 7647 still has the old backslash syntax error (should be our fixed version)
+
+## **Solution:**
+
+1. **Push your changes to GitHub** (the fixes we made are only local)
+2. **Pull the latest version through WP Pusher** on your WordPress site
+3. **Test activation again**
+
+The cookieadmin and siteseo errors in your log are from **other plugins**, not from snefuruplin. Once you deploy our fixes, the plugin should activate successfully.
+
+All the PHP syntax and Elementor loading issues have been resolved in your local codebase - they just need to be deployed to the server.
+
+---
+
+_**User**_
+
+i already did push the changes before my last prompt 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+If you already pushed the changes but still getting errors, then either:
+
+1. **WP Pusher didn't pull the latest version** from GitHub
+2. **The push didn't include all the changes** 
+3. **The server has cached old versions** of the files
+
+Let me check the git status to see if all changes were committed and pushed:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Debug why server still has old version after push
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Check git status for uncommitted changes
+
+`git status`
+
+Result:
+
+```
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .specstory/history/2025-08-16_02-36-58Z-this-session-is-being.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Check git status in snefuruplin subdirectory
+
+`cd snefuruplin && git status`
+
+Result:
+
+```
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Both repositories show as up to date. Let me check when the last commits were made:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Check recent commits in snefuruplin repo
+
+`cd snefuruplin && git log --oneline -5`
+
+Error:
+
+```
+(eval):cd:1: no such file or directory: snefuruplin
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Check recent commits in snefuruplin repo with full path
+
+`git log --oneline -5`
+
+Result:
+
+```
+7502097 attempted fix for activation error
+305aa45 sdf
+28eda9b backslash syntax fix
+b424238 Restore dual beamraymar system: original embedded + BCenter modular
+c6b8e31 dsf
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I see commit `7502097 attempted fix for activation error` - let me check what changes were included in that commit:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Show what files were changed in the last commit
+
+`git show --stat 7502097`
+
+Result:
+
+```
+commit 750209711ea4eefa64d725d214ef7c2605f8467a
+Author: transatlanticvoyage <sandbagexpert@gmail.com>
+Date:   Sat Aug 16 07:38:49 2025 -0400
+
+    attempted fix for activation error
+
+ includes/class-elementor-dynamic-tags.php | 5 +++++
+ snefuruplin.php                           | 8 ++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Good, those changes were committed. Let me check what the actual deployed files look like to verify they match our fixes:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Check if the committed version has our fixes around line 58
+
+`git show 7502097:snefuruplin/snefuruplin.php | sed -n '55,65p'`
+
+Result:
+
+```
+fatal: path 'snefuruplin/snefuruplin.php' does not exist in '7502097'
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Check if the committed version has our fixes around line 58
+
+`git show 7502097:snefuruplin.php | sed -n '55,65p'`
+
+Result:
+
+```
+require_once SNEFURU_PLUGIN_PATH . 'includes/class-dublish-api.php';
+        require_once SNEFURU_PLUGIN_PATH . 'includes/class-ruplin-wppma-database.php';
+        require_once SNEFURU_PLUGIN_PATH . 'includes/class-zen-shortcodes.php';
+        
+        // Load Elementor components only if Elementor is available
+        if (class_exists('Elementor\Plugin')) {
+            require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-dynamic-tags.php';
+            require_once SNEFURU_PLUGIN_PATH . 'includes/class-elementor-media-workaround.php';
+        }
+        require_once SNEFURU_PLUGIN_PATH . 'hurricane/class-hurricane.php';
+        require_once SNEFURU_PLUGIN_PATH . 'includes/class-orbit-mar-admin.php';
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! The Elementor loading fix is in the commit. But the error log shows the server still has line 58 as the direct require_once. This means:
+
+**WP Pusher hasn't pulled the latest changes from GitHub yet.**
+
+Try these steps:
+
+1. **In WP Pusher**, go to the plugin and click **"Update Plugin"** to force a pull from GitHub
+2. If that doesn't work, try **"Clear cache"** in WP Pusher if that option exists
+3. As a last resort, you could **deactivate and delete** the plugin through WP Pusher, then **reinstall** it fresh
+
+The issue is definitely that the server still has the old code even though GitHub has the new code.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Debug why server still has old version after push
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+The commits are correct in GitHub. WP Pusher needs to pull the latest version to your WordPress site.
+
+---
+
+_**User**_
+
+is there a way to add more debugging somehow for the activation errors? the "confirmed new" files are causing activation errors on new sites i install the ruplin plugin on.
+
+onlyanplease just answer and do not change any of our code right now. we are still in planning phase.
+
+also please give me the code for the wp config to enable the error log to show us errors 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Yes, there are several ways to add more debugging for activation errors:
+
+## **Enable WordPress Debug Logging**
+
+Add these lines to your `wp-config.php` file (before the line that says `/* That's all, stop editing! */`):
+
+```php
+// Enable debug mode
+define( 'WP_DEBUG', true );
+
+// Enable debug logging to /wp-content/debug.log
+define( 'WP_DEBUG_LOG', true );
+
+// Display errors on screen (only use on development sites)
+define( 'WP_DEBUG_DISPLAY', true );
+
+// Use dev versions of core JS and CSS files
+define( 'SCRIPT_DEBUG', true );
+
+// Log all errors
+@ini_set( 'log_errors', 'On' );
+@ini_set( 'display_errors', 'On' );
+@ini_set( 'error_reporting', E_ALL );
+```
+
+## **Add Activation Hook Debugging**
+
+You could add a custom activation hook in your plugin that logs exactly what happens during activation:
+
+```php
+register_activation_hook(__FILE__, 'snefuru_activation_debug');
+
+function snefuru_activation_debug() {
+    error_log('=== SNEFURU ACTIVATION START ===');
+    error_log('PHP Version: ' . phpversion());
+    error_log('WordPress Version: ' . get_bloginfo('version'));
+    error_log('Active Plugins: ' . print_r(get_option('active_plugins'), true));
+    
+    // Check if Elementor is active
+    if (class_exists('Elementor\Plugin')) {
+        error_log('Elementor: ACTIVE');
+    } else {
+        error_log('Elementor: NOT ACTIVE');
+    }
+    
+    // Check which files are being loaded
+    $included_files = get_included_files();
+    foreach ($included_files as $file) {
+        if (strpos($file, 'snefuruplin') !== false) {
+            error_log('Loaded: ' . $file);
+        }
+    }
+    
+    error_log('=== SNEFURU ACTIVATION END ===');
+}
+```
+
+## **Add Try-Catch Blocks**
+
+Wrap the plugin initialization in try-catch to capture any exceptions:
+
+```php
+try {
+    // Your plugin initialization code
+} catch (Exception $e) {
+    error_log('SNEFURU ERROR: ' . $e->getMessage());
+    error_log('SNEFURU TRACE: ' . $e->getTraceAsString());
+}
+```
+
+## **Check for Fatal Errors**
+
+Add a shutdown function to catch fatal errors:
+
+```php
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && ($error['type'] === E_ERROR || $error['type'] === E_PARSE)) {
+        error_log('SNEFURU FATAL: ' . print_r($error, true));
+    }
+});
+```
+
+## **The Real Issue**
+
+Based on your error logs, the activation error is happening because:
+1. The Elementor class is being referenced before Elementor plugin is loaded
+2. This happens because WordPress loads plugins alphabetically, so 'snefuruplin' loads before 'elementor'
+
+The proper fix would be to delay loading Elementor-dependent code until after all plugins are loaded using the `plugins_loaded` hook instead of loading everything immediately.
+
+---
+
+_**User**_
+
+how do you for sure that this is the issue? onlyplease just answer and do not change any of our code right now. we are still in planning phase.
+
