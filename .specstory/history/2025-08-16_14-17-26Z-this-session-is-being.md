@@ -21870,3 +21870,423 @@ I've fixed the remaining PHP syntax errors and added comprehensive debugging fea
 
 The page should now work properly and provide you with detailed debugging information to monitor its operation!
 
+---
+
+_**User**_
+
+now it triggered an activation error
+
+There has been a critical error on this website. Please check your site admin email inbox for instructions. If you continue to have problems, please try the support forums.
+
+Learn more about troubleshooting WordPress.
+
+the error log shows this
+
+not sure if anything is new 
+
+[09-Aug-2025 16:16:16 UTC] PHP Warning:  Constant PASSWORD_DEFAULT already defined in /home/wphostin/flintpestcontrol.net/update_pass.php on line 17
+[11-Aug-2025 15:18:16 UTC] Cron reschedule event error for hook: action_scheduler_run_queue, Error code: invalid_schedule, Error message: Event schedule does not exist., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
+[11-Aug-2025 15:18:24 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/flintpestcontrol.net/wp-content/plugins/sateewa-notes-plugin-2/sateewa-notes-plugin.php:1) in /home/wphostin/flintpestcontrol.net/wp-login.php on line 515
+[11-Aug-2025 15:18:24 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/flintpestcontrol.net/wp-content/plugins/sateewa-notes-plugin-2/sateewa-notes-plugin.php:1) in /home/wphostin/flintpestcontrol.net/wp-login.php on line 531
+[11-Aug-2025 15:18:24 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/flintpestcontrol.net/wp-content/plugins/sateewa-notes-plugin-2/sateewa-notes-plugin.php:1) in /home/wphostin/flintpestcontrol.net/wp-login.php on line 538
+[11-Aug-2025 15:18:24 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/flintpestcontrol.net/wp-content/plugins/sateewa-notes-plugin-2/sateewa-notes-plugin.php:1) in /home/wphostin/flintpestcontrol.net/wp-includes/functions.php on line 7144
+[11-Aug-2025 15:18:24 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/wphostin/flintpestcontrol.net/wp-content/plugins/sateewa-notes-plugin-2/sateewa-notes-plugin.php:1) in /home/wphostin/flintpestcontrol.net/wp-includes/functions.php on line 7168
+[11-Aug-2025 15:20:26 UTC] Snefuru API Error: HTTP 405 - 
+[11-Aug-2025 16:21:14 UTC] Snefuru API Error: HTTP 405 - 
+[11-Aug-2025 17:21:44 UTC] Snefuru API Error: HTTP 405 - 
+[11-Aug-2025 18:20:13 UTC] Snefuru API Error: HTTP 405 - 
+[11-Aug-2025 19:20:42 UTC] Snefuru API Error: HTTP 405 - 
+[11-Aug-2025 20:28:55 UTC] Snefuru API Error: HTTP 405 - 
+[11-Aug-2025 22:06:11 UTC] Snefuru API Error: HTTP 405 - 
+[11-Aug-2025 22:32:10 UTC] Snefuru API Error: HTTP 405 - 
+[11-Aug-2025 23:35:55 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 00:27:53 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 01:28:10 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 02:22:25 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 03:36:02 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 04:36:19 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 05:33:27 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 06:22:16 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 07:30:42 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 08:22:31 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 09:38:17 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 10:27:52 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 11:32:24 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 12:26:30 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 13:24:51 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 14:26:53 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 15:25:02 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 16:37:38 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 17:34:17 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 18:30:38 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 19:21:07 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 20:17:40 UTC] Snefuru: Creating services table with SQL: CREATE TABLE wpw8_zen_services (
+                service_id INT(11) NOT NULL AUTO_INCREMENT,
+                service_name TEXT,
+                service_placard TEXT,
+                service_moniker TEXT,
+                service_sobriquet TEXT,
+                description1_short TEXT,
+                description1_long TEXT,
+                rel_image1_id INT(11),
+                is_pinned_service BOOLEAN DEFAULT FALSE,
+                position_in_custom_order INT(11),
+                PRIMARY KEY (service_id)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+[12-Aug-2025 20:17:40 UTC] Snefuru: Creating locations table with SQL: CREATE TABLE wpw8_zen_locations (
+                location_id INT(11) NOT NULL AUTO_INCREMENT,
+                location_name TEXT,
+                location_placard TEXT,
+                location_moniker TEXT,
+                location_sobriquet TEXT,
+                street TEXT,
+                city TEXT,
+                state_code TEXT,
+                zip_code TEXT,
+                country TEXT,
+                rel_image1_id INT(11),
+                is_pinned_location BOOLEAN DEFAULT FALSE,
+                position_in_custom_order INT(11),
+                PRIMARY KEY (location_id)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+[12-Aug-2025 20:17:40 UTC] Snefuru: Creating orbitposts table with SQL: CREATE TABLE wpw8_zen_orbitposts (
+                orbitpost_id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+                rel_wp_post_id BIGINT(20) UNSIGNED,
+                redshift_datum TEXT,
+                rover_datum JSON,
+                hudson_imgplanbatch_id VARCHAR(36),
+                is_pinned BOOLEAN DEFAULT FALSE,
+                is_flagged BOOLEAN DEFAULT FALSE,
+                is_starred BOOLEAN DEFAULT FALSE,
+                is_squared BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (orbitpost_id),
+                KEY rel_wp_post_id (rel_wp_post_id),
+                KEY hudson_imgplanbatch_id (hudson_imgplanbatch_id)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+[12-Aug-2025 20:17:40 UTC] Snefuru: Services table dbDelta result: Array
+(
+    [wpw8_zen_services.service_id] => Changed type of wpw8_zen_services.service_id from int(11) to INT(11)
+    [wpw8_zen_services.service_name] => Changed type of wpw8_zen_services.service_name from text to TEXT
+    [wpw8_zen_services.service_placard] => Changed type of wpw8_zen_services.service_placard from text to TEXT
+    [wpw8_zen_services.service_moniker] => Changed type of wpw8_zen_services.service_moniker from text to TEXT
+    [wpw8_zen_services.service_sobriquet] => Changed type of wpw8_zen_services.service_sobriquet from text to TEXT
+    [wpw8_zen_services.description1_short] => Changed type of wpw8_zen_services.description1_short from text to TEXT
+    [wpw8_zen_services.description1_long] => Changed type of wpw8_zen_services.description1_long from text to TEXT
+    [wpw8_zen_services.rel_image1_id] => Changed type of wpw8_zen_services.rel_image1_id from int(11) to INT(11)
+    [wpw8_zen_services.is_pinned_service] => Changed type of wpw8_zen_services.is_pinned_service from tinyint(1) to BOOLEAN
+    [wpw8_zen_services.position_in_custom_order] => Changed type of wpw8_zen_services.position_in_custom_order from int(11) to INT(11)
+)
+
+[12-Aug-2025 20:17:40 UTC] Snefuru: Locations table dbDelta result: Array
+(
+    [wpw8_zen_locations.location_id] => Changed type of wpw8_zen_locations.location_id from int(11) to INT(11)
+    [wpw8_zen_locations.location_name] => Changed type of wpw8_zen_locations.location_name from text to TEXT
+    [wpw8_zen_locations.location_placard] => Changed type of wpw8_zen_locations.location_placard from text to TEXT
+    [wpw8_zen_locations.location_moniker] => Changed type of wpw8_zen_locations.location_moniker from text to TEXT
+    [wpw8_zen_locations.location_sobriquet] => Changed type of wpw8_zen_locations.location_sobriquet from text to TEXT
+    [wpw8_zen_locations.street] => Changed type of wpw8_zen_locations.street from text to TEXT
+    [wpw8_zen_locations.city] => Changed type of wpw8_zen_locations.city from text to TEXT
+    [wpw8_zen_locations.state_code] => Changed type of wpw8_zen_locations.state_code from text to TEXT
+    [wpw8_zen_locations.zip_code] => Changed type of wpw8_zen_locations.zip_code from text to TEXT
+    [wpw8_zen_locations.country] => Changed type of wpw8_zen_locations.country from text to TEXT
+    [wpw8_zen_locations.rel_image1_id] => Changed type of wpw8_zen_locations.rel_image1_id from int(11) to INT(11)
+    [wpw8_zen_locations.is_pinned_location] => Changed type of wpw8_zen_locations.is_pinned_location from tinyint(1) to BOOLEAN
+    [wpw8_zen_locations.position_in_custom_order] => Changed type of wpw8_zen_locations.position_in_custom_order from int(11) to INT(11)
+)
+
+[12-Aug-2025 20:17:40 UTC] Snefuru: Orbitposts table dbDelta result: Array
+(
+    [wpw8_zen_orbitposts.orbitpost_id] => Changed type of wpw8_zen_orbitposts.orbitpost_id from bigint(20) unsigned to BIGINT(20) UNSIGNED
+    [wpw8_zen_orbitposts.redshift_datum] => Changed type of wpw8_zen_orbitposts.redshift_datum from text to TEXT
+    [wpw8_zen_orbitposts.created_at] => Changed type of wpw8_zen_orbitposts.created_at from timestamp to TIMESTAMP
+    [wpw8_zen_orbitposts.updated_at] => Changed type of wpw8_zen_orbitposts.updated_at from timestamp to TIMESTAMP
+    [wpw8_zen_orbitposts.rel_wp_post_id] => Changed type of wpw8_zen_orbitposts.rel_wp_post_id from bigint(20) unsigned to BIGINT(20) UNSIGNED
+    [wpw8_zen_orbitposts.rover_datum] => Changed type of wpw8_zen_orbitposts.rover_datum from longtext to JSON
+    [wpw8_zen_orbitposts.hudson_imgplanbatch_id] => Added column wpw8_zen_orbitposts.hudson_imgplanbatch_id
+    [wpw8_zen_orbitposts.is_pinned] => Added column wpw8_zen_orbitposts.is_pinned
+    [wpw8_zen_orbitposts.is_flagged] => Added column wpw8_zen_orbitposts.is_flagged
+    [wpw8_zen_orbitposts.is_starred] => Added column wpw8_zen_orbitposts.is_starred
+    [wpw8_zen_orbitposts.is_squared] => Added column wpw8_zen_orbitposts.is_squared
+    [0] => Added index wpw8_zen_orbitposts KEY `hudson_imgplanbatch_id` (`hudson_imgplanbatch_id`)
+)
+
+[12-Aug-2025 20:17:40 UTC] Snefuru: Services table exists: YES
+[12-Aug-2025 20:17:40 UTC] Snefuru: Locations table exists: YES
+[12-Aug-2025 20:17:40 UTC] Snefuru: Orbitposts table exists: YES
+[12-Aug-2025 20:17:40 UTC] Snefuru: Zen tables created/updated successfully
+[12-Aug-2025 20:20:36 UTC] Snefuru API Error: HTTP 405 - 
+[12-Aug-2025 20:30:29 UTC] Cron reschedule event error for hook: action_scheduler_run_queue, Error code: invalid_schedule, Error message: Event schedule does not exist., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
+[12-Aug-2025 20:33:30 UTC] Snefuru: API key not configured
+[12-Aug-2025 21:41:51 UTC] Snefuru: API key not configured
+[12-Aug-2025 22:33:29 UTC] Snefuru: API key not configured
+[12-Aug-2025 23:37:00 UTC] Snefuru: API key not configured
+[13-Aug-2025 00:33:23 UTC] Snefuru: API key not configured
+[13-Aug-2025 01:33:25 UTC] Snefuru: API key not configured
+[13-Aug-2025 02:33:54 UTC] Snefuru: API key not configured
+[13-Aug-2025 03:34:43 UTC] Snefuru: API key not configured
+[13-Aug-2025 04:37:48 UTC] Snefuru: API key not configured
+[13-Aug-2025 05:33:49 UTC] Snefuru: API key not configured
+[13-Aug-2025 06:42:29 UTC] Snefuru: API key not configured
+[13-Aug-2025 07:44:49 UTC] Snefuru: API key not configured
+[13-Aug-2025 08:37:07 UTC] Snefuru: API key not configured
+[13-Aug-2025 09:45:23 UTC] Snefuru: API key not configured
+[13-Aug-2025 10:39:31 UTC] Snefuru: API key not configured
+[13-Aug-2025 11:41:42 UTC] Snefuru: API key not configured
+[13-Aug-2025 12:33:27 UTC] Snefuru: API key not configured
+[13-Aug-2025 13:33:57 UTC] Snefuru: API key not configured
+[13-Aug-2025 14:33:26 UTC] Snefuru: API key not configured
+[13-Aug-2025 15:35:17 UTC] Snefuru: API key not configured
+[13-Aug-2025 16:38:07 UTC] Snefuru: API key not configured
+[13-Aug-2025 17:40:59 UTC] Snefuru: API key not configured
+[13-Aug-2025 18:34:42 UTC] Snefuru: API key not configured
+[13-Aug-2025 19:40:18 UTC] Snefuru: API key not configured
+[13-Aug-2025 20:33:27 UTC] Snefuru: API key not configured
+[13-Aug-2025 21:52:24 UTC] Snefuru: API key not configured
+[13-Aug-2025 22:35:03 UTC] Snefuru: API key not configured
+[13-Aug-2025 23:40:31 UTC] Snefuru: API key not configured
+[14-Aug-2025 00:40:45 UTC] Snefuru: API key not configured
+[14-Aug-2025 01:46:41 UTC] Snefuru: API key not configured
+[14-Aug-2025 02:34:20 UTC] Snefuru: API key not configured
+[14-Aug-2025 03:33:47 UTC] Snefuru: API key not configured
+[14-Aug-2025 04:40:57 UTC] Snefuru: API key not configured
+[14-Aug-2025 05:51:31 UTC] Snefuru: API key not configured
+[14-Aug-2025 06:35:41 UTC] Snefuru: API key not configured
+[14-Aug-2025 07:45:08 UTC] Snefuru: API key not configured
+[14-Aug-2025 08:40:07 UTC] Snefuru: API key not configured
+[14-Aug-2025 09:36:38 UTC] Snefuru: API key not configured
+[14-Aug-2025 10:40:40 UTC] Snefuru: API key not configured
+[14-Aug-2025 11:44:16 UTC] Snefuru: API key not configured
+[14-Aug-2025 12:42:15 UTC] Snefuru: API key not configured
+[14-Aug-2025 13:44:51 UTC] Snefuru: API key not configured
+[14-Aug-2025 14:35:00 UTC] Snefuru: API key not configured
+[14-Aug-2025 15:38:33 UTC] Snefuru: API key not configured
+[14-Aug-2025 16:41:49 UTC] Snefuru: API key not configured
+[14-Aug-2025 17:45:44 UTC] Snefuru: API key not configured
+[14-Aug-2025 18:41:02 UTC] Snefuru: API key not configured
+[14-Aug-2025 19:38:24 UTC] Snefuru: API key not configured
+[14-Aug-2025 20:45:06 UTC] Snefuru: API key not configured
+[14-Aug-2025 21:38:23 UTC] Snefuru: API key not configured
+[14-Aug-2025 22:33:45 UTC] Snefuru: API key not configured
+[14-Aug-2025 23:33:49 UTC] Snefuru: API key not configured
+[15-Aug-2025 00:45:16 UTC] Snefuru: API key not configured
+[15-Aug-2025 01:45:30 UTC] Snefuru: API key not configured
+[15-Aug-2025 02:40:16 UTC] Snefuru: API key not configured
+[15-Aug-2025 03:46:42 UTC] Snefuru: API key not configured
+[15-Aug-2025 04:33:29 UTC] Snefuru: API key not configured
+[15-Aug-2025 05:34:44 UTC] Snefuru: API key not configured
+[15-Aug-2025 06:35:25 UTC] Snefuru: API key not configured
+[15-Aug-2025 07:35:13 UTC] Snefuru: API key not configured
+[15-Aug-2025 08:36:08 UTC] Snefuru: API key not configured
+[15-Aug-2025 09:43:38 UTC] Snefuru: API key not configured
+[15-Aug-2025 10:41:33 UTC] Snefuru: API key not configured
+[15-Aug-2025 11:43:07 UTC] Snefuru: API key not configured
+[15-Aug-2025 12:43:29 UTC] Snefuru: API key not configured
+[15-Aug-2025 13:31:57 UTC] Cron reschedule event error for hook: action_scheduler_run_queue, Error code: invalid_schedule, Error message: Event schedule does not exist., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
+[15-Aug-2025 13:35:14 UTC] Snefuru: API key not configured
+[15-Aug-2025 13:52:41 UTC] Cron reschedule event error for hook: action_scheduler_run_queue, Error code: invalid_schedule, Error message: Event schedule does not exist., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
+[15-Aug-2025 14:13:28 UTC] Snefuru: API key not configured
+[15-Aug-2025 14:50:50 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 14:51:31 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:04:08 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:04:08 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:08:44 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:11:19 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:31:12 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:32:02 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:33:35 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:50:45 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 15:53:29 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:18:54 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:19:32 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:20:02 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:30:49 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:30:50 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:34:19 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:34:59 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:42:42 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:43:10 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:43:11 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:46:31 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7633
+[15-Aug-2025 16:53:47 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 16:55:08 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 16:57:17 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 17:03:02 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 17:14:01 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 17:17:38 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 17:22:13 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 17:22:25 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 17:22:25 UTC] PHP Parse error:  syntax error, unexpected token "public" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7821
+[15-Aug-2025 17:34:52 UTC] PHP Parse error:  syntax error, unexpected token ".", expecting "function" or "const" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7970
+[15-Aug-2025 17:36:43 UTC] PHP Parse error:  syntax error, unexpected token ".", expecting "function" or "const" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7970
+[15-Aug-2025 17:37:28 UTC] PHP Parse error:  syntax error, unexpected token ".", expecting "function" or "const" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7970
+[15-Aug-2025 17:43:35 UTC] PHP Parse error:  syntax error, unexpected token ".", expecting "function" or "const" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7970
+[15-Aug-2025 17:45:24 UTC] PHP Parse error:  syntax error, unexpected token ".", expecting "function" or "const" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7945
+[15-Aug-2025 17:45:25 UTC] PHP Parse error:  syntax error, unexpected token ".", expecting "function" or "const" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7945
+[15-Aug-2025 17:48:28 UTC] PHP Parse error:  syntax error, unexpected token ".", expecting "function" or "const" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7945
+[15-Aug-2025 18:15:05 UTC] Snefuru: API key not configured
+[15-Aug-2025 19:13:56 UTC] Snefuru: API key not configured
+[15-Aug-2025 20:17:55 UTC] Snefuru: API key not configured
+[15-Aug-2025 21:21:05 UTC] Snefuru: API key not configured
+[15-Aug-2025 22:14:40 UTC] Snefuru: API key not configured
+[15-Aug-2025 23:14:43 UTC] Snefuru: API key not configured
+[16-Aug-2025 00:14:03 UTC] Snefuru: API key not configured
+[16-Aug-2025 01:15:31 UTC] Snefuru: API key not configured
+[16-Aug-2025 02:13:24 UTC] Snefuru: API key not configured
+[16-Aug-2025 02:32:04 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:34:38 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:38:32 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:39:59 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:40:00 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:47:58 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:52:21 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 02:55:55 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 03:14:36 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 03:15:35 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 03:32:37 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 03:33:52 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 03:52:47 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 03:53:37 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 03:55:40 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:07:43 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:07:44 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:12:45 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:14:30 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:15:42 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:33:04 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:34:07 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:39:37 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:39:37 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:53:37 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 04:55:07 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:14:56 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:15:55 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:02 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:06 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:21 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:28 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:28 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:35 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:37:35 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:54:41 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 05:55:11 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 06:04:11 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 06:06:41 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 06:24:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 06:26:06 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 06:41:27 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 06:41:27 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 06:46:31 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 06:46:40 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:04:09 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:04:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:04:35 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:04:37 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:04:39 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:07:17 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:07:37 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:24:57 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:26:37 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:37:19 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:37:19 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:46:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 07:49:49 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 08:06:56 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 08:09:01 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 08:31:11 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 08:31:11 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 08:41:03 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 08:41:03 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 08:50:10 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 08:52:57 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:11:49 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:13:14 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:22:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:23:52 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:30:18 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:33:57 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:35:51 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:48:17 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:53:44 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 09:54:40 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:17:20 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:18:31 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:38:50 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:39:27 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:41:06 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:41:07 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:54:38 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:59:03 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 10:59:40 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 11:02:01 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 11:05:23 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 11:19:39 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 11:21:34 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 11:38:52 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 11:43:10 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 11:44:15 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:01:17 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:01:47 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:20:00 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:23:36 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:36:08 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:41:15 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:41:16 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:45:10 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:46:38 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:47:09 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 12:55:14 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 13:04:59 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 13:05:43 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 13:27:31 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 13:27:31 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 13:28:58 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 13:47:19 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 13:47:43 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 14:01:06 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 14:01:06 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7647
+[16-Aug-2025 14:13:17 UTC] Snefuru: API key not configured
+[16-Aug-2025 15:14:00 UTC] Snefuru: API key not configured
+[16-Aug-2025 16:13:31 UTC] Snefuru: API key not configured
+[16-Aug-2025 16:15:24 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7404
+[16-Aug-2025 16:15:48 UTC] PHP Parse error:  syntax error, unexpected token "\" in /home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php on line 7404
+
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I can see the issue - the PHP parse errors are still occurring, and now there's a new error on line 7404. The problem is that the changes we made locally haven't been deployed to the server. The server still has the old code with the syntax errors.
+
+Looking at the error log, the parse errors are happening on the **server** at `/home/wphostin/flintpestcontrol.net/wp-content/plugins/snefuruplin-wp-plugin/includes/class-admin.php`, not in your local repository.
+
+## The Issue:
+The changes we made are in your **local repository** at `/Users/kylecampbell/Documents/repos/localrepo-snefuru4/snefuruplin/`, but they haven't been deployed to the **live server**.
+
+## You need to:
+
+1. **Commit the changes** to Git (which you may have already done)
+2. **Push the changes** to GitHub/remote repository
+3. **Deploy the changes** to the server (via WP Pusher or your deployment method)
+
+The error on line 7404 shows that the server still has the old code with improper Elementor namespace escaping.
+
+Let me verify what line 7404 looks like in our local version to confirm it's fixed:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./includes/class-admin.php`
+
+Result:
+
+```
+7403→        if (class_exists('Elementor\\\\Plugin')) {
+  7404→            $elementor_instance = \\Elementor\\Plugin::$instance;
+  7405→            $document = $elementor_instance->documents->get($post_id);
+```
+
