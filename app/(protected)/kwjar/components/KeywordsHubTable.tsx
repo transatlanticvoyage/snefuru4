@@ -32,6 +32,7 @@ interface KeywordRecord {
 }
 
 const columns = [
+  { key: 'keyword_id', label: 'keyword_id', type: 'number' },
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
   { key: 'search_volume', label: 'search_volume', type: 'number' },
   { key: 'cpc', label: 'cpc', type: 'number' },
