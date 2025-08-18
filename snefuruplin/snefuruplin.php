@@ -82,13 +82,14 @@ class SnefuruPlugin {
         new Snefuru_Dublish_API();
         new Zen_Shortcodes();
         
-        // Initialize Elementor integrations only if Elementor is active and loaded
-        if (class_exists('Elementor\Plugin') && did_action('elementor/loaded')) {
+        // Initialize Elementor integrations
+        if (did_action('elementor/loaded')) {
             new Zen_Elementor_Dynamic_Tags();
+        }
+        
+        // Initialize media library workaround (only if Elementor is available)
+        if (class_exists('Elementor\Plugin')) {
             new Zen_Elementor_Media_Workaround();
-        } else {
-            // Add delayed initialization for Elementor components
-            add_action('elementor/loaded', array($this, 'init_elementor_components'));
         }
         
         // Initialize Hurricane feature
@@ -97,18 +98,6 @@ class SnefuruPlugin {
         // Add cron jobs for periodic data sync
         add_action('wp', array($this, 'schedule_events'));
         add_action('snefuru_sync_data', array($this, 'sync_data_to_cloud'));
-    }
-    
-    /**
-     * Initialize Elementor components when Elementor is loaded
-     */
-    public function init_elementor_components() {
-        if (class_exists('Zen_Elementor_Dynamic_Tags')) {
-            new Zen_Elementor_Dynamic_Tags();
-        }
-        if (class_exists('Zen_Elementor_Media_Workaround')) {
-            new Zen_Elementor_Media_Workaround();
-        }
     }
     
     public function activate() {
