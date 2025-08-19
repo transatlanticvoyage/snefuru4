@@ -129,7 +129,7 @@ export default function DfsLocationsTable() {
     fetchData();
   }, []);
 
-  // Server-side search function
+  // Server-side search function with improved relevance ordering
   const performSearch = async (term: string) => {
     if (!term.trim()) {
       setSearchData([]);
@@ -144,12 +144,52 @@ export default function DfsLocationsTable() {
         .from('dfs_locations')
         .select('*')
         .or(`location_name.ilike.%${term}%,location_code.eq.${parseInt(term) || 0},country_iso_code.ilike.%${term}%,location_type.ilike.%${term}%`)
-        .order(sortField, { ascending: sortOrder === 'asc' })
         .limit(10000); // Limit search results to prevent performance issues
 
       if (error) throw error;
       
-      setSearchData(results || []);
+      // Sort results by relevance (client-side sorting for better relevance)
+      const sortedResults = (results || []).sort((a, b) => {
+        const termLower = term.toLowerCase();
+        const aName = (a.location_name || '').toLowerCase();
+        const bName = (b.location_name || '').toLowerCase();
+        
+        // Exact matches first
+        if (aName === termLower && bName !== termLower) return -1;
+        if (bName === termLower && aName !== termLower) return 1;
+        
+        // Starts with term second
+        if (aName.startsWith(termLower) && !bName.startsWith(termLower)) return -1;
+        if (bName.startsWith(termLower) && !aName.startsWith(termLower)) return 1;
+        
+        // Exact location code matches
+        if (a.location_code === parseInt(term) && b.location_code !== parseInt(term)) return -1;
+        if (b.location_code === parseInt(term) && a.location_code !== parseInt(term)) return 1;
+        
+        // Prioritize main cities over neighborhoods/townships
+        const aIsMainCity = a.location_type === 'City' || a.location_type === 'DMA Region';
+        const bIsMainCity = b.location_type === 'City' || b.location_type === 'DMA Region';
+        
+        if (aIsMainCity && !bIsMainCity) return -1;
+        if (bIsMainCity && !aIsMainCity) return 1;
+        
+        // Then sort by the current sort field
+        if (sortField && sortOrder) {
+          const aValue = a[sortField];
+          const bValue = b[sortField];
+          
+          if (aValue === null && bValue === null) return 0;
+          if (aValue === null) return sortOrder === 'asc' ? 1 : -1;
+          if (bValue === null) return sortOrder === 'asc' ? -1 : 1;
+          
+          if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+          if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+        }
+        
+        return 0;
+      });
+      
+      setSearchData(sortedResults);
     } catch (err) {
       console.error('Search error:', err);
       setSearchData([]);
