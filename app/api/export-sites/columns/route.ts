@@ -12,7 +12,7 @@ export interface ColumnDefinition {
   description?: string;
 }
 
-export const columnGroups: ColumnGroup[] = [
+const columnGroups: ColumnGroup[] = [
   {
     id: 'core',
     name: 'Core Fields',

@@ -71,6 +71,9 @@ export default function KeywordsHubTable() {
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   
+  // DataForSEO refresh states
+  const [refreshingKeywords, setRefreshingKeywords] = useState<Set<number>>(new Set());
+  
   // Form data for creating
   const [formData, setFormData] = useState({
     keyword_datum: '',
@@ -244,6 +247,51 @@ export default function KeywordsHubTable() {
     setEditingValue('');
   };
 
+  // DataForSEO refresh function
+  const refreshDataForSEO = async (keywordId: number) => {
+    setRefreshingKeywords(prev => new Set([...prev, keywordId]));
+    
+    try {
+      const response = await fetch('/api/dataforseo-refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ keyword_id: keywordId }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to refresh data');
+      }
+
+      // Update local data with refreshed values
+      setData(prevData => 
+        prevData.map(item => 
+          item.keyword_id === keywordId 
+            ? { 
+                ...item, 
+                ...result.data,
+                updated_at: new Date().toISOString() 
+              }
+            : item
+        )
+      );
+
+      console.log('✅ DataForSEO data refreshed for keyword:', keywordId);
+    } catch (error) {
+      console.error('❌ Failed to refresh DataForSEO data:', error);
+      alert(`Failed to refresh data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setRefreshingKeywords(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(keywordId);
+        return newSet;
+      });
+    }
+  };
+
   // Create new inline record
   const createNewInline = async () => {
     if (!userInternalId) return;
@@ -389,12 +437,92 @@ export default function KeywordsHubTable() {
     }
 
     if (column.type === 'number' && value !== null) {
+      // Special handling for search_volume and cpc columns with refresh buttons
+      if (column.key === 'search_volume' || column.key === 'cpc') {
+        const isRefreshing = refreshingKeywords.has(item.keyword_id);
+        
+        return (
+          <div className="flex items-center justify-between space-x-2">
+            <div
+              className={cellClass}
+              onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+            >
+              {typeof value === 'number' ? value.toLocaleString() : value}
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                refreshDataForSEO(item.keyword_id);
+              }}
+              disabled={isRefreshing}
+              className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-white transition-colors ${
+                isRefreshing 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-gray-600 hover:bg-gray-700'
+              }`}
+              title="Refresh data from DataForSEO"
+            >
+              {isRefreshing ? (
+                <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              )}
+            </button>
+          </div>
+        );
+      }
+      
       return (
         <div
           className={cellClass}
           onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
         >
-          {typeof value === 'number' ? value.toLocaleString() : value}
+          {typeof value === 'number' ? (column.key === 'location_code' ? value.toString() : value.toLocaleString()) : value}
+        </div>
+      );
+    }
+
+    // Special handling for search_volume and cpc columns with refresh buttons (when null/empty)
+    if (column.key === 'search_volume' || column.key === 'cpc') {
+      const isRefreshing = refreshingKeywords.has(item.keyword_id);
+      
+      return (
+        <div className="flex items-center justify-between space-x-2">
+          <div
+            className={cellClass}
+            onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+          >
+            {value?.toString() || ''}
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              refreshDataForSEO(item.keyword_id);
+            }}
+            disabled={isRefreshing}
+            className={`flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-white transition-colors ${
+              isRefreshing 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-gray-600 hover:bg-gray-700'
+            }`}
+            title="Refresh data from DataForSEO"
+          >
+            {isRefreshing ? (
+              <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            )}
+          </button>
         </div>
       );
     }
