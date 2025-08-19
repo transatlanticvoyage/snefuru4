@@ -73,6 +73,7 @@ export default function KeywordsHubTable() {
   
   // DataForSEO refresh states
   const [refreshingKeywords, setRefreshingKeywords] = useState<Set<number>>(new Set());
+  const [bulkRefreshing, setBulkRefreshing] = useState(false);
   
   // Form data for creating
   const [formData, setFormData] = useState({
@@ -247,12 +248,12 @@ export default function KeywordsHubTable() {
     setEditingValue('');
   };
 
-  // DataForSEO refresh function
+  // DataForSEO refresh function (Live endpoint)
   const refreshDataForSEO = async (keywordId: number) => {
     setRefreshingKeywords(prev => new Set([...prev, keywordId]));
     
     try {
-      const response = await fetch('/api/dataforseo-refresh', {
+      const response = await fetch('/api/dataforseo-refresh-live', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -289,6 +290,93 @@ export default function KeywordsHubTable() {
         newSet.delete(keywordId);
         return newSet;
       });
+    }
+  };
+
+  // Bulk refresh functions (Task-based)
+  const bulkRefreshVolume = async () => {
+    setBulkRefreshing(true);
+    
+    try {
+      // Get selected keywords
+      const selectedKeywordIds = Array.from(selectedRows);
+      if (selectedKeywordIds.length === 0) {
+        alert('Please select keywords to refresh');
+        return;
+      }
+
+      const response = await fetch('/api/dataforseo-refresh-bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          keyword_ids: selectedKeywordIds,
+          field: 'search_volume'
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to start bulk refresh');
+      }
+
+      alert(`Bulk refresh started for ${selectedKeywordIds.length} keywords. Results will be available shortly.`);
+      
+      // Refresh the table data after a delay
+      setTimeout(() => {
+        fetchData();
+      }, 5000);
+
+    } catch (error) {
+      console.error('❌ Failed to start bulk refresh:', error);
+      alert(`Failed to start bulk refresh: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setBulkRefreshing(false);
+    }
+  };
+
+  const bulkRefreshCPC = async () => {
+    setBulkRefreshing(true);
+    
+    try {
+      // Get selected keywords
+      const selectedKeywordIds = Array.from(selectedRows);
+      if (selectedKeywordIds.length === 0) {
+        alert('Please select keywords to refresh');
+        return;
+      }
+
+      const response = await fetch('/api/dataforseo-refresh-bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          keyword_ids: selectedKeywordIds,
+          field: 'cpc'
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to start bulk refresh');
+      }
+
+      alert(`Bulk refresh started for ${selectedKeywordIds.length} keywords. Results will be available shortly.`);
+      
+      // Refresh the table data after a delay
+      setTimeout(() => {
+        fetchData();
+      }, 5000);
+
+    } catch (error) {
+      console.error('❌ Failed to start bulk refresh:', error);
+      alert(`Failed to start bulk refresh: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setBulkRefreshing(false);
     }
   };
 
@@ -655,6 +743,45 @@ export default function KeywordsHubTable() {
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
               >
                 CL
+              </button>
+            </div>
+            
+            {/* DataForSEO Bulk Refresh Controls */}
+            <div className="flex items-center space-x-2">
+              {/* Tooltip label */}
+              <div className="relative group">
+                <button className="bg-gray-100 text-gray-600 px-3 py-2 rounded-md text-sm font-medium cursor-help border border-gray-300">
+                  DFS Task Post/Get
+                </button>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                  Task Post/Get: Asynchronous processing
+                </div>
+              </div>
+              
+              {/* Refresh Volume Button */}
+              <button
+                onClick={bulkRefreshVolume}
+                disabled={bulkRefreshing || selectedRows.size === 0}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  bulkRefreshing || selectedRows.size === 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {bulkRefreshing ? 'Processing...' : 'Refresh Volume'}
+              </button>
+              
+              {/* Refresh CPC Button */}
+              <button
+                onClick={bulkRefreshCPC}
+                disabled={bulkRefreshing || selectedRows.size === 0}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  bulkRefreshing || selectedRows.size === 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
+              >
+                {bulkRefreshing ? 'Processing...' : 'Refresh CPC'}
               </button>
             </div>
           </div>
