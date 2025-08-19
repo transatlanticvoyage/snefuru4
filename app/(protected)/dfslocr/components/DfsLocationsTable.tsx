@@ -143,10 +143,13 @@ export default function DfsLocationsTable() {
       console.log(`🔍 Searching for: "${term}"`);
       
       // Search across multiple columns using Supabase's or operator
+      // Handle multi-word searches by replacing spaces with wildcards
+      const searchPattern = term.replace(/\s+/g, '%');
+      
       const { data: results, error } = await supabase
         .from('dfs_locations')
         .select('*')
-        .or(`location_name.ilike.%${term}%,location_code.eq.${parseInt(term) || 0},country_iso_code.ilike.%${term}%,location_type.ilike.%${term}%`)
+        .or(`location_name.ilike.%${searchPattern}%,location_code.eq.${parseInt(term) || 0},country_iso_code.ilike.%${searchPattern}%,location_type.ilike.%${searchPattern}%`)
         .limit(10000); // Limit search results to prevent performance issues
 
       console.log(`📊 Raw search results for "${term}":`, results?.length || 0);
@@ -198,7 +201,7 @@ export default function DfsLocationsTable() {
       });
       
       console.log(`🎯 Sorted search results for "${term}" (first 5):`, 
-        sortedResults.slice(0, 5).map(loc => `${loc.location_name} (${loc.location_code})`));
+        sortedResults.slice(0, 5).map((loc, i) => `[${i+1}] ${loc.location_name} (${loc.location_code})`));
       
       // Check specifically for Georgia results
       const georgiaResults = sortedResults.filter(loc => 
