@@ -49,7 +49,9 @@ const columns = [
 export default function DfsLocationsTable() {
   const { user } = useAuth();
   const [data, setData] = useState<DfsLocationRecord[]>([]);
+  const [searchData, setSearchData] = useState<DfsLocationRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -108,10 +110,12 @@ export default function DfsLocationsTable() {
       const { data: locations, error } = await supabase
         .from('dfs_locations')
         .select('*')
+        .limit(300000) // Increase limit to 300k to fetch more records
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
+      console.log(`📊 Fetched ${locations?.length || 0} locations for search`);
       setData(locations || []);
     } catch (err) {
       console.error('Error fetching locations:', err);
@@ -125,31 +129,72 @@ export default function DfsLocationsTable() {
     fetchData();
   }, []);
 
-  // Filter and sort data
+  // Server-side search function
+  const performSearch = async (term: string) => {
+    if (!term.trim()) {
+      setSearchData([]);
+      return;
+    }
+
+    try {
+      setSearching(true);
+      
+      // Search across multiple columns using Supabase's or operator
+      const { data: results, error } = await supabase
+        .from('dfs_locations')
+        .select('*')
+        .or(`location_name.ilike.%${term}%,location_code.eq.${parseInt(term) || 0},country_iso_code.ilike.%${term}%,location_type.ilike.%${term}%`)
+        .order(sortField, { ascending: sortOrder === 'asc' })
+        .limit(10000); // Limit search results to prevent performance issues
+
+      if (error) throw error;
+      
+      setSearchData(results || []);
+    } catch (err) {
+      console.error('Search error:', err);
+      setSearchData([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm) {
+        performSearch(searchTerm);
+      } else {
+        setSearchData([]);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, sortField, sortOrder]);
+
+  // Filter and sort data - now with server-side search when search term is provided
   const filteredAndSortedData = useMemo(() => {
-    let filtered = data.filter(item => {
-      if (!searchTerm) return true;
-      return Object.values(item).some(value => 
-        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
+    // If no search term, use local data
+    if (!searchTerm) {
+      let sorted = [...data];
+      // Sort data
+      sorted.sort((a, b) => {
+        const aValue = a[sortField];
+        const bValue = b[sortField];
+        
+        if (aValue === null && bValue === null) return 0;
+        if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
+        if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
+        
+        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+      return sorted;
+    }
 
-    // Sort data
-    filtered.sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      
-      if (aValue === null && bValue === null) return 0;
-      if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
-      if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
-      
-      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    return filtered;
-  }, [data, searchTerm, sortField, sortOrder]);
+    // If we have a search term, use the searchData instead
+    return searchData;
+  }, [data, searchData, searchTerm, sortField, sortOrder]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === 0 ? filteredAndSortedData.length : itemsPerPage));
@@ -557,6 +602,11 @@ export default function DfsLocationsTable() {
                 }}
                 className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
               />
+              {searching && (
+                <div className="absolute right-14 top-1/2 transform -translate-y-1/2 text-blue-500 text-xs">
+                  Searching...
+                </div>
+              )}
               <button
                 onClick={() => {
                   setSearchTerm('');
@@ -682,6 +732,11 @@ export default function DfsLocationsTable() {
                 }}
                 className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
               />
+              {searching && (
+                <div className="absolute right-14 top-1/2 transform -translate-y-1/2 text-blue-500 text-xs">
+                  Searching...
+                </div>
+              )}
               <button
                 onClick={() => {
                   setSearchTerm('');
