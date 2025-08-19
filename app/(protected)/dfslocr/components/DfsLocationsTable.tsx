@@ -107,6 +107,7 @@ export default function DfsLocationsTable() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      console.log('📡 Starting DFS locations fetch...');
       const { data: locations, error } = await supabase
         .from('dfs_locations')
         .select('*')
@@ -139,6 +140,8 @@ export default function DfsLocationsTable() {
     try {
       setSearching(true);
       
+      console.log(`🔍 Searching for: "${term}"`);
+      
       // Search across multiple columns using Supabase's or operator
       const { data: results, error } = await supabase
         .from('dfs_locations')
@@ -146,7 +149,12 @@ export default function DfsLocationsTable() {
         .or(`location_name.ilike.%${term}%,location_code.eq.${parseInt(term) || 0},country_iso_code.ilike.%${term}%,location_type.ilike.%${term}%`)
         .limit(10000); // Limit search results to prevent performance issues
 
-      if (error) throw error;
+      console.log(`📊 Raw search results for "${term}":`, results?.length || 0);
+      
+      if (error) {
+        console.error('❌ Search error:', error);
+        throw error;
+      }
       
       // Sort results by relevance (client-side sorting for better relevance)
       const sortedResults = (results || []).sort((a, b) => {
@@ -188,6 +196,17 @@ export default function DfsLocationsTable() {
         
         return 0;
       });
+      
+      console.log(`🎯 Sorted search results for "${term}" (first 5):`, 
+        sortedResults.slice(0, 5).map(loc => `${loc.location_name} (${loc.location_code})`));
+      
+      // Check specifically for Georgia results
+      const georgiaResults = sortedResults.filter(loc => 
+        loc.location_name.toLowerCase().includes('georgia') || 
+        loc.location_name.toLowerCase().includes(', ga')
+      );
+      console.log(`🏛️ Georgia results for "${term}":`, georgiaResults.length, 
+        georgiaResults.slice(0, 3).map(loc => `${loc.location_name} (${loc.location_code})`));
       
       setSearchData(sortedResults);
     } catch (err) {
