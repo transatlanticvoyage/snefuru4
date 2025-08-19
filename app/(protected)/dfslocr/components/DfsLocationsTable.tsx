@@ -184,6 +184,12 @@ export default function DfsLocationsTable() {
         if (aIsMainCity && !bIsMainCity) return -1;
         if (bIsMainCity && !aIsMainCity) return 1;
         
+        // When both are main cities, prioritize City over DMA Region (more specific)
+        if (aIsMainCity && bIsMainCity) {
+          if (a.location_type === 'City' && b.location_type === 'DMA Region') return -1;
+          if (b.location_type === 'City' && a.location_type === 'DMA Region') return 1;
+        }
+        
         // Then sort by the current sort field
         if (sortField && sortOrder) {
           const aValue = a[sortField];
