@@ -502,9 +502,22 @@ export default function DfsLocationsTable() {
               if (e.key === 'Enter') saveEdit();
               if (e.key === 'Escape') cancelEdit();
             }}
-            className="w-full px-2 py-1 text-xs border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className={column.key === 'location_code' ? "w-32 px-2 py-1 text-xs border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" : "w-full px-2 py-1 text-xs border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"}
+            style={column.key === 'location_code' ? { width: '100px' } : {}}
             autoFocus
           />
+          {column.key === 'location_code' && (
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(editingValue);
+              }}
+              className="text-gray-600 hover:text-gray-800 hover:bg-yellow-300 border border-gray-300 rounded p-1 cursor-pointer transition-colors"
+              style={{ width: '24px', height: '24px', minWidth: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
+              title="Copy to clipboard"
+            >
+              C
+            </button>
+          )}
           <button
             onClick={saveEdit}
             className="text-green-600 hover:text-green-800 text-xs"
@@ -535,6 +548,32 @@ export default function DfsLocationsTable() {
     }
 
     if (column.type === 'number' && value !== null) {
+      // Special handling for location_code column
+      if (column.key === 'location_code') {
+        return (
+          <div className="flex items-center space-x-1">
+            <div
+              className={cellClass}
+              style={{ width: '100px' }}
+              onClick={() => !isReadOnly && startEditing(item.location_id, column.key, value)}
+            >
+              {typeof value === 'number' ? value.toLocaleString() : value}
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(value.toString());
+              }}
+              className="text-gray-600 hover:text-gray-800 hover:bg-yellow-300 border border-gray-300 rounded p-1 cursor-pointer transition-colors"
+              style={{ width: '24px', height: '24px', minWidth: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
+              title="Copy to clipboard"
+            >
+              C
+            </button>
+          </div>
+        );
+      }
+      
       return (
         <div
           className={cellClass}
