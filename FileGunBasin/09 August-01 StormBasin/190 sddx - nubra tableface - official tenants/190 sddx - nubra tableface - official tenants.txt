@@ -45,6 +45,15 @@ this must create a new wp post by default (including in the native wp posts db t
 we also must add an additional button beyond this that says "Create new (inline) WP Page". when user clicks this, it will do the same thing as I just described, but not for a "wp post", obviously this one is for a "wp page".
 
 
+==========================================================
+============== REAL BEGIN ON 2025__08_21 -  =================================
+==========================================================
+
+for our page at
+/kwtagzar
+
+please create a ui table that displays every db column from the db table:
+keywordshub_tags
 
 
 //////////////////////////////////////////////////////////
