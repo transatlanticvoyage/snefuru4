@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/app/context/AuthContext';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
@@ -836,21 +835,6 @@ export default function KeywordsHubTable() {
                 {bulkRefreshing ? 'Processing...' : 'Refresh CPC'}
               </button>
               
-              {/* DFS Locations Link Button */}
-              <Link
-                href="/dfslocr"
-                className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/dfslocr</span>
-              </Link>
-              
-              {/* Keywords Tags Link Button */}
-              <Link
-                href="/kwtagzar"
-                className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/kwtagzar</span>
-              </Link>
             </div>
           </div>
           <div className="flex items-center space-x-4">
