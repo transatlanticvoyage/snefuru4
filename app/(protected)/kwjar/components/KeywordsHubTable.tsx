@@ -32,18 +32,26 @@ interface KeywordRecord {
   last_updated_by: string | null;
 }
 
-const columns = [
+interface ColumnDefinition {
+  key: string;
+  label: string;
+  type: string;
+  leftSeparator?: string;
+  rightSeparator?: string;
+}
+
+const columns: ColumnDefinition[] = [
   { key: 'keyword_id', label: 'keyword_id', type: 'number' },
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
   { key: 'search_volume', label: 'search_volume', type: 'number' },
-  { key: 'cpc', label: 'cpc', type: 'number' },
+  { key: 'cpc', label: 'cpc', type: 'number', rightSeparator: 'black-4px' },
   { key: 'location_code', label: 'location_code', type: 'number' },
   { key: 'rel_dfs_location_code', label: 'rel_dfs_location_code', type: 'number' },
   { key: 'location_display_name', label: 'location_display_name', type: 'text' },
   { key: 'location_coordinate', label: 'location_coordinate', type: 'text' },
-  { key: 'language_code', label: 'language_code', type: 'text' },
+  { key: 'language_code', label: 'language_code', type: 'text', leftSeparator: 'black-4px' },
   { key: 'language_name', label: 'language_name', type: 'text' },
-  { key: 'competition', label: 'competition', type: 'text' },
+  { key: 'competition', label: 'competition', type: 'text', leftSeparator: 'black-4px' },
   { key: 'competition_index', label: 'competition_index', type: 'number' },
   { key: 'low_top_of_page_bid', label: 'low_top_of_page_bid', type: 'number' },
   { key: 'high_top_of_page_bid', label: 'high_top_of_page_bid', type: 'number' },
@@ -572,7 +580,7 @@ export default function KeywordsHubTable() {
           className={cellClass}
           onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
         >
-          {typeof value === 'number' ? (column.key === 'location_code' ? value.toString() : value.toLocaleString()) : value}
+          {typeof value === 'number' ? (column.key === 'location_code' || column.key === 'rel_dfs_location_code' ? value.toString() : value.toLocaleString()) : value}
         </div>
       );
     }
@@ -863,6 +871,24 @@ export default function KeywordsHubTable() {
         <div className="h-full overflow-auto">
           <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '2500px' }}>
             <thead className="bg-gray-50 sticky top-0">
+              {/* New keywordshub header row */}
+              <tr>
+                <th className="px-2 py-3 text-left border border-gray-200 bg-[#bcc4f1]" style={{ width: '20px' }}>
+                  {/* Empty cell for checkbox column */}
+                </th>
+                {columns.map((column) => (
+                  <th
+                    key={`keywordshub-${column.key}`}
+                    className={`px-2 py-3 text-left border border-gray-200 bg-[#bcc4f1] ${
+                      column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
+                    } ${
+                      column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
+                    }`}
+                  >
+                    <span className="font-bold text-xs">keywordshub</span>
+                  </th>
+                ))}
+              </tr>
               <tr>
                 <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '20px' }}>
                   <div 
@@ -887,7 +913,11 @@ export default function KeywordsHubTable() {
                 {columns.map((column) => (
                   <th
                     key={column.key}
-                    className="px-2 py-3 text-left border border-gray-200 cursor-pointer hover:bg-gray-100"
+                    className={`px-2 py-3 text-left border border-gray-200 cursor-pointer hover:bg-gray-100 ${
+                      column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
+                    } ${
+                      column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
+                    }`}
                     onClick={() => handleSort(column.key as keyof KeywordRecord)}
                   >
                     <div className="flex items-center space-x-1">
@@ -926,7 +956,14 @@ export default function KeywordsHubTable() {
                     </div>
                   </td>
                   {columns.map((column) => (
-                    <td key={column.key} className="border border-gray-200">
+                    <td 
+                      key={column.key} 
+                      className={`border border-gray-200 ${
+                        column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
+                      } ${
+                        column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
+                      }`}
+                    >
                       {renderCell(item, column)}
                     </td>
                   ))}
