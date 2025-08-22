@@ -62,7 +62,7 @@ export default function Cnjar1Table() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [sortField, setSortField] = useState<keyof Cncglub>('created_at');
+  const [sortField, setSortField] = useState<keyof Cncglub | string>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Modal states
@@ -81,6 +81,8 @@ export default function Cnjar1Table() {
   
   // Filter states
   const [citySizeFilter, setCitySizeFilter] = useState('all');
+  const [stateFilter, setStateFilter] = useState('all');
+  const [industryFilter, setIndustryFilter] = useState('all');
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
@@ -114,7 +116,7 @@ export default function Cnjar1Table() {
     { key: 'cities.gmaps_link', label: 'gmaps_link', type: 'text', readOnly: true, isJoined: true, width: '100px' },
     { key: 'cities.is_suburb', label: 'is_suburb', type: 'boolean', readOnly: true, isJoined: true },
     { key: 'cities.city_and_state_code', label: 'city_and_state_code', type: 'text', readOnly: true, isJoined: true },
-    { key: 'cities.city_population', label: 'city_population', type: 'number', readOnly: true, isJoined: true },
+    { key: 'cities.city_population', label: 'city_population', type: 'number', readOnly: true, isJoined: true, sortable: true },
     { key: 'cities.latitude', label: 'latitude', type: 'number', readOnly: true, isJoined: true },
     { key: 'cities.longitude', label: 'longitude', type: 'number', readOnly: true, isJoined: true },
     { key: 'cities.rel_metro_id', label: 'rel_metro_id', type: 'number', readOnly: true, isJoined: true },
@@ -250,6 +252,89 @@ export default function Cnjar1Table() {
     }
   };
 
+  // Helper function to check if cncglub record's related city state matches filter
+  const matchesStateFilter = (item: Cncglub) => {
+    if (stateFilter === 'all') {
+      return true;
+    }
+    
+    const stateCode = item.cities?.state_code;
+    if (!stateCode) {
+      return false;
+    }
+    
+    return stateCode.toLowerCase() === stateFilter.toLowerCase();
+  };
+
+  // Helper function to check if cncglub record's related industry matches filter
+  const matchesIndustryFilter = (item: Cncglub) => {
+    if (industryFilter === 'all') {
+      return true;
+    }
+    
+    const industryName = item.industries?.industry_name;
+    if (!industryName) {
+      return false;
+    }
+    
+    return industryName === industryFilter;
+  };
+
+  // US States list with codes and full names, ordered alphabetically by full name
+  const usStates = [
+    { code: 'AL', name: 'Alabama' },
+    { code: 'AK', name: 'Alaska' },
+    { code: 'AZ', name: 'Arizona' },
+    { code: 'AR', name: 'Arkansas' },
+    { code: 'CA', name: 'California' },
+    { code: 'CO', name: 'Colorado' },
+    { code: 'CT', name: 'Connecticut' },
+    { code: 'DE', name: 'Delaware' },
+    { code: 'FL', name: 'Florida' },
+    { code: 'GA', name: 'Georgia' },
+    { code: 'HI', name: 'Hawaii' },
+    { code: 'ID', name: 'Idaho' },
+    { code: 'IL', name: 'Illinois' },
+    { code: 'IN', name: 'Indiana' },
+    { code: 'IA', name: 'Iowa' },
+    { code: 'KS', name: 'Kansas' },
+    { code: 'KY', name: 'Kentucky' },
+    { code: 'LA', name: 'Louisiana' },
+    { code: 'ME', name: 'Maine' },
+    { code: 'MD', name: 'Maryland' },
+    { code: 'MA', name: 'Massachusetts' },
+    { code: 'MI', name: 'Michigan' },
+    { code: 'MN', name: 'Minnesota' },
+    { code: 'MS', name: 'Mississippi' },
+    { code: 'MO', name: 'Missouri' },
+    { code: 'MT', name: 'Montana' },
+    { code: 'NE', name: 'Nebraska' },
+    { code: 'NV', name: 'Nevada' },
+    { code: 'NH', name: 'New Hampshire' },
+    { code: 'NJ', name: 'New Jersey' },
+    { code: 'NM', name: 'New Mexico' },
+    { code: 'NY', name: 'New York' },
+    { code: 'NC', name: 'North Carolina' },
+    { code: 'ND', name: 'North Dakota' },
+    { code: 'OH', name: 'Ohio' },
+    { code: 'OK', name: 'Oklahoma' },
+    { code: 'OR', name: 'Oregon' },
+    { code: 'PA', name: 'Pennsylvania' },
+    { code: 'RI', name: 'Rhode Island' },
+    { code: 'SC', name: 'South Carolina' },
+    { code: 'SD', name: 'South Dakota' },
+    { code: 'TN', name: 'Tennessee' },
+    { code: 'TX', name: 'Texas' },
+    { code: 'UT', name: 'Utah' },
+    { code: 'VT', name: 'Vermont' },
+    { code: 'VA', name: 'Virginia' },
+    { code: 'WA', name: 'Washington' },
+    { code: 'WV', name: 'West Virginia' },
+    { code: 'WI', name: 'Wisconsin' },
+    { code: 'WY', name: 'Wyoming' },
+    { code: 'DC', name: 'Washington DC' }
+  ];
+
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
     let filtered = data;
@@ -276,6 +361,20 @@ export default function Cnjar1Table() {
       console.log('Filtered data length after city size filter:', filtered.length);
     }
     
+    // Apply state filtering only if not 'all'
+    if (stateFilter !== 'all') {
+      console.log('Applying state filter...');
+      filtered = filtered.filter(item => matchesStateFilter(item));
+      console.log('Filtered data length after state filter:', filtered.length);
+    }
+    
+    // Apply industry filtering only if not 'all'
+    if (industryFilter !== 'all') {
+      console.log('Applying industry filter...');
+      filtered = filtered.filter(item => matchesIndustryFilter(item));
+      console.log('Filtered data length after industry filter:', filtered.length);
+    }
+    
     if (searchTerm) {
       filtered = filtered.filter(item => {
         const searchLower = searchTerm.toLowerCase();
@@ -294,8 +393,22 @@ export default function Cnjar1Table() {
     }
 
     return filtered.sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
+      let aValue, bValue;
+      
+      // Handle joined column sorting
+      if (typeof sortField === 'string' && sortField.includes('.')) {
+        aValue = getJoinedValue(a, sortField);
+        bValue = getJoinedValue(b, sortField);
+        
+        // Special handling for city_population - convert to numbers for proper sorting
+        if (sortField === 'cities.city_population') {
+          aValue = aValue ? Number(aValue) : null;
+          bValue = bValue ? Number(bValue) : null;
+        }
+      } else {
+        aValue = a[sortField as keyof Cncglub];
+        bValue = b[sortField as keyof Cncglub];
+      }
       
       if (aValue === null && bValue === null) return 0;
       if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
@@ -305,7 +418,7 @@ export default function Cnjar1Table() {
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [data, searchTerm, sortField, sortOrder, cities, industries, citySizeFilter]);
+  }, [data, searchTerm, sortField, sortOrder, cities, industries, citySizeFilter, stateFilter, industryFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));
@@ -313,7 +426,7 @@ export default function Cnjar1Table() {
   const paginatedData = itemsPerPage === -1 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Handle sorting
-  const handleSort = (field: keyof Cncglub) => {
+  const handleSort = (field: keyof Cncglub | string) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -705,6 +818,15 @@ export default function Cnjar1Table() {
       );
     }
 
+    // Special formatting for city_population column
+    if (column.key === 'cities.city_population' && value) {
+      return (
+        <div className="px-2 py-1 cursor-default">
+          {Number(value).toLocaleString()}
+        </div>
+      );
+    }
+
     return (
       <div
         onClick={() => !isReadOnly && !column.isJoined && handleCellClick(item.cncg_id, column.key, value)}
@@ -850,6 +972,47 @@ export default function Cnjar1Table() {
             </select>
           </div>
           
+          <div className="flex items-center space-x-3">
+            <label className="font-bold text-sm text-gray-700">State:</label>
+            <select
+              value={stateFilter}
+              onChange={(e) => {
+                setStateFilter(e.target.value);
+                setCurrentPage(1); // Reset to first page when filtering
+              }}
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">All States</option>
+              {usStates.map(state => (
+                <option key={state.code} value={state.code}>
+                  {state.code} - {state.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <label className="font-bold text-sm text-gray-700">Industry Name:</label>
+            <select
+              value={industryFilter}
+              onChange={(e) => {
+                setIndustryFilter(e.target.value);
+                setCurrentPage(1); // Reset to first page when filtering
+              }}
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">All Industries</option>
+              {industries
+                .slice() // Create a copy to avoid mutating the original array
+                .sort((a, b) => (a.industry_name || '').localeCompare(b.industry_name || ''))
+                .map(industry => (
+                  <option key={industry.industry_id} value={industry.industry_name || ''}>
+                    {industry.industry_name}
+                  </option>
+                ))}
+            </select>
+          </div>
+          
           {/* Debug info */}
           <div className="text-xs text-gray-500">
             Debug: {data.length} total, {filteredAndSortedData.length} filtered
@@ -936,9 +1099,9 @@ export default function Cnjar1Table() {
 
       {/* Table */}
       <div className="bg-white overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" style={{ maxHeight: '720px', overflowY: 'auto' }}>
           <table className="w-full border-collapse border border-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 sticky top-0 z-10">
               {/* Additional blank header row */}
               <tr>
                 <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
@@ -997,14 +1160,14 @@ export default function Cnjar1Table() {
                 {allColumns.map((column) => (
                   <th
                     key={column.key}
-                    className={`text-left ${!column.isJoined ? 'cursor-pointer hover:bg-gray-100' : ''} border border-gray-200 px-2 py-1 ${
+                    className={`text-left ${(!column.isJoined || column.sortable) ? 'cursor-pointer hover:bg-gray-100' : ''} border border-gray-200 px-2 py-1 ${
                       column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
                     }`}
-                    onClick={() => !column.isJoined && handleSort(column.key)}
+                    onClick={() => (!column.isJoined || column.sortable) && handleSort(column.key)}
                   >
                     <div className="flex items-center space-x-1">
                       <span className="font-bold text-xs lowercase">{column.label}</span>
-                      {!column.isJoined && sortField === column.key && (
+                      {(!column.isJoined || column.sortable) && sortField === column.key && (
                         <span className="text-xs">
                           {sortOrder === 'asc' ? '↑' : '↓'}
                         </span>
