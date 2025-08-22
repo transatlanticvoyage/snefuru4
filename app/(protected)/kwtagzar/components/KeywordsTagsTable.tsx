@@ -22,7 +22,17 @@ interface KeywordTag {
 
 const columns = [
   { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
-  { key: 'fabrication_launch_created_from', label: 'fabrication_launch_created_from', type: 'number', width: '120px' },
+  { 
+    key: 'fabrication_launch_created_from', 
+    label: 'fabrication_launch_created_from', 
+    labelLines: [
+      'fabrication_launch_created_from',
+      '(reverse lookup)',
+      'fabrication_launches.rel_keywordshub_tag_id'
+    ],
+    type: 'number', 
+    width: '180px' 
+  },
   { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
   { key: 'tag_order', label: 'tag_order', type: 'number', width: '120px' },
   { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
@@ -590,7 +600,7 @@ export default function KeywordsTagsTable() {
                     </div>
                   </div>
                 </th>
-                {columns.map((column) => (
+                {columns.map((column: any) => (
                   <th
                     key={column.key}
                     className="px-2 py-3 text-left border border-gray-200 cursor-pointer hover:bg-gray-100"
@@ -598,7 +608,17 @@ export default function KeywordsTagsTable() {
                     style={{ width: column.width }}
                   >
                     <div className="flex items-center space-x-1">
-                      <span className="font-bold text-xs lowercase">{column.label}</span>
+                      {column.labelLines ? (
+                        <div className="flex flex-col">
+                          {column.labelLines.map((line: string, index: number) => (
+                            <span key={index} className="font-bold text-xs lowercase">
+                              {line}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="font-bold text-xs lowercase">{column.label}</span>
+                      )}
                       {sortField === column.key && (
                         <span className="text-xs">
                           {sortOrder === 'asc' ? '↑' : '↓'}

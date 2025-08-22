@@ -255,8 +255,9 @@ export default function FabricPage() {
 
               {/* Codebox area */}
               <div className="mt-6 w-[700px] border border-gray-300 rounded">
-                {/* Copy button */}
-                <div className="bg-gray-100 border-b border-gray-300 p-2">
+                {/* Header with label and copy button */}
+                <div className="bg-gray-100 border-b border-gray-300 p-2 flex items-center">
+                  <span className="font-bold mr-3">process description box</span>
                   <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
                     Copy
                   </button>
