@@ -15,7 +15,6 @@ interface KeywordRecord {
   keyword_datum: string;
   search_volume: number | null;
   cpc: number | null;
-  location_code: number | null;
   rel_dfs_location_code: number | null;
   location_display_name: string | null;
   location_coordinate: string | null;
@@ -45,7 +44,6 @@ const columns: ColumnDefinition[] = [
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
   { key: 'search_volume', label: 'search_volume', type: 'number' },
   { key: 'cpc', label: 'cpc', type: 'number', rightSeparator: 'black-4px' },
-  { key: 'location_code', label: 'location_code', type: 'number' },
   { key: 'rel_dfs_location_code', label: 'rel_dfs_location_code', type: 'number' },
   { key: 'location_display_name', label: 'location_display_name', type: 'text' },
   { key: 'location_coordinate', label: 'location_coordinate', type: 'text' },
@@ -90,7 +88,6 @@ export default function KeywordsHubTable() {
     keyword_datum: '',
     search_volume: 0,
     cpc: 0,
-    location_code: 0,
     location_display_name: '',
     location_coordinate: '',
     language_code: 'en',
@@ -399,7 +396,6 @@ export default function KeywordsHubTable() {
         keyword_datum: 'New Keyword',
         search_volume: null,
         cpc: null,
-        location_code: null,
         location_display_name: null,
         location_coordinate: null,
         language_code: 'en',
@@ -444,7 +440,6 @@ export default function KeywordsHubTable() {
         ...formData,
         search_volume: formData.search_volume || null,
         cpc: formData.cpc || null,
-        location_code: formData.location_code || null,
         competition_index: formData.competition_index || null,
         low_top_of_page_bid: formData.low_top_of_page_bid || null,
         high_top_of_page_bid: formData.high_top_of_page_bid || null,
@@ -473,7 +468,6 @@ export default function KeywordsHubTable() {
       keyword_datum: '',
       search_volume: 0,
       cpc: 0,
-      location_code: 0,
       location_display_name: '',
       location_coordinate: '',
       language_code: '',
@@ -580,7 +574,7 @@ export default function KeywordsHubTable() {
           className={cellClass}
           onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
         >
-          {typeof value === 'number' ? (column.key === 'location_code' || column.key === 'rel_dfs_location_code' ? value.toString() : value.toLocaleString()) : value}
+          {typeof value === 'number' ? (column.key === 'rel_dfs_location_code' ? value.toString() : value.toLocaleString()) : value}
         </div>
       );
     }
@@ -1042,16 +1036,6 @@ export default function KeywordsHubTable() {
                     onChange={(e) => setFormData({...formData, cpc: parseFloat(e.target.value) || 0})}
                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                     placeholder="0.00"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location Code</label>
-                  <input
-                    type="number"
-                    value={formData.location_code}
-                    onChange={(e) => setFormData({...formData, location_code: parseInt(e.target.value) || 0})}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                    placeholder="2840"
                   />
                 </div>
                 <div>

@@ -41,13 +41,13 @@ export async function POST(request: NextRequest) {
 
     // Validate all records have required fields
     const invalidRecords = keywordRecords.filter(record => 
-      !record.keyword_datum || !record.location_code || !record.language_code
+      !record.keyword_datum || !record.rel_dfs_location_code || !record.language_code
     );
 
     if (invalidRecords.length > 0) {
       return NextResponse.json(
         { 
-          error: `${invalidRecords.length} keywords missing required fields (keyword_datum, location_code, language_code)`,
+          error: `${invalidRecords.length} keywords missing required fields (keyword_datum, rel_dfs_location_code, language_code)`,
           invalid_keyword_ids: invalidRecords.map(r => r.keyword_id)
         },
         { status: 400 }
@@ -107,10 +107,10 @@ export async function POST(request: NextRequest) {
     // Group by location and language for optimal API calls
     const locationGroups = new Map();
     keywordRecords.forEach(record => {
-      const key = `${record.location_code}-${record.language_code}`;
+      const key = `${record.rel_dfs_location_code}-${record.language_code}`;
       if (!locationGroups.has(key)) {
         locationGroups.set(key, {
-          location_code: record.location_code,
+          location_code: record.rel_dfs_location_code,
           language_code: record.language_code,
           keywords: [],
           keyword_ids: []

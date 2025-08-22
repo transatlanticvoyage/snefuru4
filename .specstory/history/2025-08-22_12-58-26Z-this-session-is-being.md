@@ -4264,3 +4264,836 @@ The separators will appear as 4px wide black vertical lines in both the header r
 
 Now we can return to the migration plan whenever you're ready!
 
+---
+
+_**User**_
+
+on kwjar page, pleae alter the text rel_dfs_location_code so that it is not showing commas for thousand and million separators (i mean for actual db values output as text in frontend) 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Remove thousand/million separators from rel_dfs_location_code display on /kwjar page
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me find where the number formatting happens in the renderCell function:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/(protected)/kwjar/components/KeywordsHubTable.tsx`
+
+Result:
+
+```
+530-          onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+531-        >
+532:          {new Date(value as string).toLocaleString()}
+533-        </div>
+534-      );
+--
+546-              onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+547-            >
+548:              {typeof value === 'number' ? value.toLocaleString() : value}
+549-            </div>
+550-            <button
+--
+581-          onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+582-        >
+583:          {typeof value === 'number' ? (column.key === 'location_code' ? value.toString() : value.toLocaleString()) : value}
+584-        </div>
+585-      );
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I can see that on line 583, there's already special handling for `location_code` to not use thousand separators. I need to add the same for `rel_dfs_location_code`. Let me update that line:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwjar/components/KeywordsHubTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   579→        <div
+   580→          className={cellClass}
+   581→          onClick={() => !isReadOnly && startEditing(item.keyword_id, column.key, value)}
+   582→        >
+   583→          {typeof value === 'number' ? (column.key === 'location_code' || column.key === 'rel_dfs_location_code' ? value.toString() : value.toLocaleString()) : value}
+   584→        </div>
+   585→      );
+   586→    }
+   587→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Remove thousand/million separators from rel_dfs_location_code display on /kwjar page
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I've updated the display logic for `rel_dfs_location_code` on the /kwjar page. 
+
+The change ensures that `rel_dfs_location_code` values will now display as plain numbers without thousand/million separators (e.g., "2840" instead of "2,840"), just like the existing `location_code` column.
+
+This makes sense since location codes are identifiers rather than quantities, so they shouldn't have number formatting applied.
+
+---
+
+_**User**_
+
+ok lets continue with our migration plan 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Migration Phase 2A: Check and create indexes for rel_dfs_location_code
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Great! Let's continue with the migration plan. We're now at **Phase 2A: Index & Constraint Migration**.
+
+Here's the SQL to check existing indexes on `location_code` and create equivalent ones for `rel_dfs_location_code`:
+
+## **Phase 2A: Check Existing Indexes & Create New Ones**
+
+```sql
+-- 1. Check what indexes exist on location_code
+SELECT 
+    indexname, 
+    indexdef 
+FROM pg_indexes 
+WHERE tablename = 'keywordshub' 
+AND indexdef ILIKE '%location_code%';
+
+-- 2. Create index for rel_dfs_location_code (if not already exists)
+CREATE INDEX IF NOT EXISTS idx_keywordshub_rel_dfs_location_code 
+ON keywordshub(rel_dfs_location_code);
+
+-- 3. Check if there are any unique constraints on location_code
+SELECT 
+    conname,
+    pg_get_constraintdef(oid) 
+FROM pg_constraint 
+WHERE conrelid = 'keywordshub'::regclass 
+AND pg_get_constraintdef(oid) ILIKE '%location_code%';
+```
+
+Run these queries first to see what indexes/constraints exist on `location_code`, then we'll know what needs to be replicated for `rel_dfs_location_code`.
+
+## **Phase 2B: Verify Data Migration**
+
+After you've checked the indexes, run this verification:
+
+```sql
+-- Verify all data was copied correctly
+SELECT 
+  COUNT(*) as total_records,
+  COUNT(location_code) as old_field_populated,
+  COUNT(rel_dfs_location_code) as new_field_populated,
+  COUNT(CASE WHEN location_code = rel_dfs_location_code THEN 1 END) as matching_values,
+  COUNT(CASE WHEN location_code IS NOT NULL AND rel_dfs_location_code IS NULL THEN 1 END) as missing_migrations
+FROM keywordshub;
+```
+
+Once you run these queries, let me know the results and we'll proceed to **Phase 3: Backend API Updates**.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Migration Phase 2A: Check and create indexes for rel_dfs_location_code
+
+
+_**User**_
+
+all i did yet was run number 1 and it returned this
+
+| indexname                        | indexdef                                                                                                                             |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| idx_keywordshub_location_code    | CREATE INDEX idx_keywordshub_location_code ON public.keywordshub USING btree (location_code)                                         |
+| idx_keywordshub_keyword_location | CREATE INDEX idx_keywordshub_keyword_location ON public.keywordshub USING btree (keyword_datum, location_code)                       |
+| unique_keyword_location_language | CREATE UNIQUE INDEX unique_keyword_location_language ON public.keywordshub USING btree (keyword_datum, location_code, language_code) |
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Create equivalent indexes for rel_dfs_location_code based on existing location_code indexes
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! Now we can see there are 3 indexes that use `location_code`:
+1. A simple btree index on `location_code` alone
+2. A composite index on `(keyword_datum, location_code)`
+3. A unique constraint on `(keyword_datum, location_code, language_code)`
+
+Here's the SQL to create equivalent indexes for `rel_dfs_location_code`:
+
+```sql
+-- Create equivalent indexes for rel_dfs_location_code
+
+-- 1. Simple index on rel_dfs_location_code
+CREATE INDEX IF NOT EXISTS idx_keywordshub_rel_dfs_location_code 
+ON public.keywordshub USING btree (rel_dfs_location_code);
+
+-- 2. Composite index on keyword_datum and rel_dfs_location_code
+CREATE INDEX IF NOT EXISTS idx_keywordshub_keyword_rel_dfs_location 
+ON public.keywordshub USING btree (keyword_datum, rel_dfs_location_code);
+
+-- 3. Unique constraint on keyword_datum, rel_dfs_location_code, language_code
+CREATE UNIQUE INDEX IF NOT EXISTS unique_keyword_rel_dfs_location_language 
+ON public.keywordshub USING btree (keyword_datum, rel_dfs_location_code, language_code);
+```
+
+**⚠️ IMPORTANT NOTE:** The third index (unique constraint) might fail if you have any duplicate combinations of `(keyword_datum, rel_dfs_location_code, language_code)`. You may want to check for duplicates first:
+
+```sql
+-- Check if creating the unique constraint would cause issues
+SELECT 
+    keyword_datum, 
+    rel_dfs_location_code, 
+    language_code, 
+    COUNT(*) as duplicate_count
+FROM keywordshub
+WHERE rel_dfs_location_code IS NOT NULL
+GROUP BY keyword_datum, rel_dfs_location_code, language_code
+HAVING COUNT(*) > 1;
+```
+
+If this returns any rows, you'll need to decide how to handle the duplicates before creating the unique index.
+
+After creating the indexes, run the verification query to ensure all data is properly migrated:
+
+```sql
+-- Verify data migration
+SELECT 
+  COUNT(*) as total_records,
+  COUNT(location_code) as old_field_populated,
+  COUNT(rel_dfs_location_code) as new_field_populated,
+  COUNT(CASE WHEN location_code = rel_dfs_location_code THEN 1 END) as matching_values,
+  COUNT(CASE WHEN location_code IS NOT NULL AND rel_dfs_location_code IS NULL THEN 1 END) as missing_migrations
+FROM keywordshub;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Create equivalent indexes for rel_dfs_location_code based on existing location_code indexes
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Once you've run these SQL commands, let me know the results and we'll move on to **Phase 3: Backend API Updates** to update the API routes!
+
+---
+
+_**User**_
+
+ok i completed these. please continue 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Migration Phase 3: Update Backend API routes to use rel_dfs_location_code
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Great! Now let's proceed with **Phase 3: Backend API Updates**. We need to update the API routes that use `location_code` to use `rel_dfs_location_code` instead.
+
+Let me start with the DataForSEO refresh API:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/api/dataforseo-refresh/route.ts`
+
+Result:
+
+```
+40→        { status: 400 }
+    41→      );
+    42→    }
+    43→
+    44→    if (!keywordRecord.location_code) {
+    45→      return NextResponse.json(
+    46→        { error: 'location_code is required. Please set location first.' },
+    47→        { status: 400 }
+    48→      );
+    49→    }
+    50→
+    51→    if (!keywordRecord.language_code) {
+    52→      return NextResponse.json(
+    53→        { error: 'language_code is required. Please set language first.' },
+    54→        { status: 400 }
+    55→      );
+    56→    }
+    57→
+    58→    // Get DataForSEO credentials from environment (fallback method)
+    59→    let username = process.env.DFS_USERNAME;
+    60→    let password = process.env.DFS_PASSWORD;
+    61→
+    62→    // Try to get credentials from clevnar3 API key system
+    63→    if (!username || !password) {
+    64→      console.log('🔍 Looking for DataForSEO credentials in clevnar3 system...');
+    65→      
+    66→      // Find DataForSEO slot in api_key_slots
+    67→      const { data: dfsSlot, error: slotError } = await supabase
+    68→        .from('api_key_slots')
+    69→        .select('*')
+    70→        .ilike('slot_name', '%dataforseo%')
+    71→        .eq('slot_publicly_shown', true)
+    72→        .single();
+    73→
+    74→      if (!slotError && dfsSlot) {
+    75→        console.log(`📋 Found DataForSEO slot: ${dfsSlot.slot_name}`);
+    76→        
+    77→        // Get user's API key for this slot
+    78→        const { data: userData } = await supabase
+    79→          .from('users')
+    80→          .select('id')
+    81→          .eq('auth_id', request.headers.get('user-auth-id'))
+    82→          .single();
+    83→
+    84→        if (userData) {
+    85→          const { data: userApiKey } = await supabase
+    86→            .from('api_keys_t3')
+    87→            .select('*')
+    88→            .eq('fk_user_id', userData.id)
+    89→            .eq('fk_slot_id', dfsSlot.slot_id)
+    90→            .single();
+    91→
+    92→          if (userApiKey && userApiKey.m1datum && userApiKey.m2datum) {
+    93→            username = userApiKey.m1datum; // Assuming m1 is username
+    94→            password = userApiKey.m2datum; // Assuming m2 is password
+    95→            console.log('✅ Using credentials from clevnar3 system');
+    96→          }
+    97→        }
+    98→      }
+    99→    }
+   100→
+   101→    if (!username || !password) {
+   102→      return NextResponse.json(
+   103→        { error: 'DataForSEO credentials not configured. Please set up in /clevnar3 or environment variables.' },
+   104→        { status: 400 }
+   105→      );
+   106→    }
+   107→
+   108→    console.log('📡 Making DataForSEO API request...');
+   109→
+   110→    // Make DataForSEO API request
+   111→    const dfsResponse = await fetch('https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/task_post', {
+   112→      method: 'POST',
+   113→      headers: {
+   114→        'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+   115→        'Content-Type': 'application/json'
+   116→      },
+   117→      body: JSON.stringify([{
+   118→        keywords: [keywordRecord.keyword_datum],
+   119→        location_code: keywordRecord.location_code,
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I'll update this file to use `rel_dfs_location_code`:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `./app/api/dataforseo-refresh/route.ts`
+
+Result:
+
+```
+Applied 2 edits to /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/api/dataforseo-refresh/route.ts:
+1. Replaced "    if (!keywordRecord.location_code) {
+      retu..." with "    if (!keywordRecord.rel_dfs_location_code) {
+  ..."
+2. Replaced "        location_code: keywordRecord.location_code..." with "        location_code: keywordRecord.rel_dfs_locat..."
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let's update the bulk refresh API:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/api/dataforseo-refresh-bulk/route.ts`
+
+Result:
+
+```
+40→    }
+    41→
+    42→    // Validate all records have required fields
+    43→    const invalidRecords = keywordRecords.filter(record => 
+    44→      !record.keyword_datum || !record.location_code || !record.language_code
+    45→    );
+    46→
+    47→    if (invalidRecords.length > 0) {
+    48→      return NextResponse.json(
+    49→        { 
+    50→          error: `${invalidRecords.length} keywords missing required fields (keyword_datum, location_code, language_code)`,
+    51→          invalid_keyword_ids: invalidRecords.map(r => r.keyword_id)
+    52→        },
+    53→        { status: 400 }
+    54→      );
+    55→    }
+    56→
+    57→    // Get DataForSEO credentials
+    58→    let username = process.env.DFS_USERNAME;
+    59→    let password = process.env.DFS_PASSWORD;
+    60→
+    61→    if (!username || !password) {
+    62→      console.log('🔍 Looking for DataForSEO credentials in clevnar3 system...');
+    63→      
+    64→      const { data: dfsSlot, error: slotError } = await supabase
+    65→        .from('api_key_slots')
+    66→        .select('*')
+    67→        .ilike('slot_name', '%dataforseo%')
+    68→        .eq('slot_publicly_shown', true)
+    69→        .single();
+    70→
+    71→      if (!slotError && dfsSlot) {
+    72→        console.log(`📋 Found DataForSEO slot: ${dfsSlot.slot_name}`);
+    73→        
+    74→        const { data: userData } = await supabase
+    75→          .from('users')
+    76→          .select('id')
+    77→          .eq('auth_id', request.headers.get('user-auth-id'))
+    78→          .single();
+    79→
+    80→        if (userData) {
+    81→          const { data: userApiKey } = await supabase
+    82→            .from('api_keys_t3')
+    83→            .select('*')
+    84→            .eq('fk_user_id', userData.id)
+    85→            .eq('fk_slot_id', dfsSlot.slot_id)
+    86→            .single();
+    87→
+    88→          if (userApiKey && userApiKey.m1datum && userApiKey.m2datum) {
+    89→            username = userApiKey.m1datum;
+    90→            password = userApiKey.m2datum;
+    91→            console.log('✅ Using credentials from clevnar3 system');
+    92→          }
+    93→        }
+    94→      }
+    95→    }
+    96→
+    97→    if (!username || !password) {
+    98→      return NextResponse.json(
+    99→        { error: 'DataForSEO credentials not configured. Please set up in /clevnar3 or environment variables.' },
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/api/dataforseo-refresh-bulk/route.ts`
+
+Result:
+
+```
+44:      !record.keyword_datum || !record.location_code || !record.language_code
+50:          error: `${invalidRecords.length} keywords missing required fields (keyword_datum, location_code, language_code)`,
+110:      const key = `${record.location_code}-${record.language_code}`;
+113:          location_code: record.location_code,
+139:            location_code: group.location_code,
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `./app/api/dataforseo-refresh-bulk/route.ts`
+
+Error:
+
+```
+<tool_use_error>No changes to make: old_string and new_string are exactly the same.</tool_use_error>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me check the context around line 139 to understand the group structure:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/api/dataforseo-refresh-bulk/route.ts`
+
+Result:
+
+```
+105→    const keywords = keywordRecords.map(record => record.keyword_datum);
+   106→    
+   107→    // Group by location and language for optimal API calls
+   108→    const locationGroups = new Map();
+   109→    keywordRecords.forEach(record => {
+   110→      const key = `${record.location_code}-${record.language_code}`;
+   111→      if (!locationGroups.has(key)) {
+   112→        locationGroups.set(key, {
+   113→          location_code: record.location_code,
+   114→          language_code: record.language_code,
+   115→          keywords: [],
+   116→          keyword_ids: []
+   117→        });
+   118→      }
+   119→      locationGroups.get(key).keywords.push(record.keyword_datum);
+   120→      locationGroups.get(key).keyword_ids.push(record.keyword_id);
+   121→    });
+   122→
+   123→    console.log(`📡 Making bulk DataForSEO API requests for ${locationGroups.size} location/language groups...`);
+   124→
+   125→    const taskIds = [];
+   126→    const errors = [];
+   127→
+   128→    // Submit tasks for each location/language group
+   129→    for (const [key, group] of locationGroups) {
+   130→      try {
+   131→        const dfsResponse = await fetch('https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/task_post', {
+   132→          method: 'POST',
+   133→          headers: {
+   134→            'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+   135→            'Content-Type': 'application/json'
+   136→          },
+   137→          body: JSON.stringify([{
+   138→            keywords: group.keywords,
+   139→            location_code: group.location_code,
+   140→            language_code: group.language_code
+   141→          }])
+   142→        });
+   143→
+   144→        if (!dfsResponse.ok) {
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I can see the context. Let me update all references properly:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `./app/api/dataforseo-refresh-bulk/route.ts`
+
+Result:
+
+```
+Applied 3 edits to /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/api/dataforseo-refresh-bulk/route.ts:
+1. Replaced "      !record.keyword_datum || !record.location_co..." with "      !record.keyword_datum || !record.rel_dfs_loc..."
+2. Replaced "          error: `${invalidRecords.length} keyword..." with "          error: `${invalidRecords.length} keyword..."
+3. Replaced "      const key = `${record.location_code}-${recor..." with "      const key = `${record.rel_dfs_location_code}..."
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let's check and update the dataforseo-refresh-live API:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/api/dataforseo-refresh-live/route.ts`
+
+Result:
+
+```
+44:    if (!keywordRecord.location_code) {
+46:        { error: 'location_code is required. Please set location first.' },
+119:        location_code: keywordRecord.location_code,
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `./app/api/dataforseo-refresh-live/route.ts`
+
+Error:
+
+```
+<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/api/dataforseo-refresh-live/route.ts`
+
+Result:
+
+```
+1→import { NextRequest, NextResponse } from 'next/server';
+     2→import { createClient } from '@supabase/supabase-js';
+     3→
+     4→export async function POST(request: NextRequest) {
+     5→  const supabase = createClient(
+     6→    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+     7→    process.env.SUPABASE_SERVICE_ROLE_KEY!
+     8→  );
+     9→
+    10→  try {
+    11→    const { keyword_id } = await request.json();
+    12→
+    13→    if (!keyword_id) {
+    14→      return NextResponse.json(
+    15→        { error: 'keyword_id is required' },
+    16→        { status: 400 }
+    17→      );
+    18→    }
+    19→
+    20→    console.log(`🔄 Refreshing DataForSEO data (LIVE) for keyword_id: ${keyword_id}`);
+    21→
+    22→    // Get the keyword record
+    23→    const { data: keywordRecord, error: keywordError } = await supabase
+    24→      .from('keywordshub')
+    25→      .select('*')
+    26→      .eq('keyword_id', keyword_id)
+    27→      .single();
+    28→
+    29→    if (keywordError || !keywordRecord) {
+    30→      return NextResponse.json(
+    31→        { error: 'Keyword not found' },
+    32→        { status: 404 }
+    33→      );
+    34→    }
+    35→
+    36→    // Validate required fields for DataForSEO
+    37→    if (!keywordRecord.keyword_datum) {
+    38→      return NextResponse.json(
+    39→        { error: 'keyword_datum is required' },
+    40→        { status: 400 }
+    41→      );
+    42→    }
+    43→
+    44→    if (!keywordRecord.location_code) {
+    45→      return NextResponse.json(
+    46→        { error: 'location_code is required. Please set location first.' },
+    47→        { status: 400 }
+    48→      );
+    49→    }
+    50→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `./app/api/dataforseo-refresh-live/route.ts`
+
+Result:
+
+```
+Applied 2 edits to /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/api/dataforseo-refresh-live/route.ts:
+1. Replaced "    if (!keywordRecord.location_code) {
+      retu..." with "    if (!keywordRecord.rel_dfs_location_code) {
+  ..."
+2. Replaced "        location_code: keywordRecord.location_code..." with "        location_code: keywordRecord.rel_dfs_locat..."
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let's move to **Phase 4: Frontend UI Updates**. We need to update the KeywordsHubTable component to remove the old `location_code` field:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `./app/(protected)/kwjar/components/KeywordsHubTable.tsx`
+
+Error:
+
+```
+<tool_use_error>Found 2 matches of the string to replace, but replace_all is false. To replace all occurrences, set replace_all to true. To replace only one occurrence, please provide more context to uniquely identify the instance.
+String:     location_code: 0,</tool_use_error>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me be more specific with the context:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `./app/(protected)/kwjar/components/KeywordsHubTable.tsx`
+
+Result:
+
+```
+Applied 4 edits to /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwjar/components/KeywordsHubTable.tsx:
+1. Replaced "interface KeywordRecord {
+  keyword_id: number;
+  ..." with "interface KeywordRecord {
+  keyword_id: number;
+  ..."
+2. Replaced "  { key: 'cpc', label: 'cpc', type: 'number', righ..." with "  { key: 'cpc', label: 'cpc', type: 'number', righ..."
+3. Replaced "  const [formData, setFormData] = useState({
+    k..." with "  const [formData, setFormData] = useState({
+    k..."
+4. Replaced "          {typeof value === 'number' ? (column.key..." with "          {typeof value === 'number' ? (column.key..."
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me find and remove other references to location_code in the component:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/(protected)/kwjar/components/KeywordsHubTable.tsx`
+
+Result:
+
+```
+18:  rel_dfs_location_code: number | null;
+47:  { key: 'rel_dfs_location_code', label: 'rel_dfs_location_code', type: 'number' },
+399:        location_code: null,
+444:        location_code: formData.location_code || null,
+473:      location_code: 0,
+580:          {typeof value === 'number' ? (column.key === 'rel_dfs_location_code' ? value.toString() : value.toLocaleString()) : value}
+1048:                    value={formData.location_code}
+1049:                    onChange={(e) => setFormData({...formData, location_code: parseInt(e.target.value) || 0})}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me remove the remaining location_code references:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **MultiEdit** `./app/(protected)/kwjar/components/KeywordsHubTable.tsx`
+
+Result:
+
+```
+Applied 3 edits to /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwjar/components/KeywordsHubTable.tsx:
+1. Replaced "        search_volume: null,
+        cpc: null,
+  ..." with "        search_volume: null,
+        cpc: null,"
+2. Replaced "        search_volume: formData.search_volume || n..." with "        search_volume: formData.search_volume || n..."
+3. Replaced "      keyword_datum: '',
+      search_volume: 0,
+ ..." with "      keyword_datum: '',
+      search_volume: 0,
+ ..."
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me find and remove the location_code input field from the modal:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/kwjar/components/KeywordsHubTable.tsx`
+
+Result:
+
+```
+1040→                </div>
+  1041→                <div>
+  1042→                  <label className="block text-sm font-medium text-gray-700 mb-1">Location Code</label>
+  1043→                  <input
+  1044→                    type="number"
+  1045→                    value={formData.location_code}
+  1046→                    onChange={(e) => setFormData({...formData, location_code: parseInt(e.target.value) || 0})}
+  1047→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1048→                    placeholder="2840"
+  1049→                  />
+  1050→                </div>
+  1051→                <div>
+  1052→                  <label className="block text-sm font-medium text-gray-700 mb-1">Location Display Name</label>
+  1053→                  <input
+  1054→                    type="text"
+  1055→                    value={formData.location_display_name}
+  1056→                    onChange={(e) => setFormData({...formData, location_display_name: e.target.value})}
+  1057→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1058→                    placeholder="United States"
+  1059→                  />
+  1060→                </div>
+  1061→                <div>
+  1062→                  <label className="block text-sm font-medium text-gray-700 mb-1">Language Code</label>
+  1063→                  <input
+  1064→                    type="text"
+  1065→                    value={formData.language_code}
+  1066→                    onChange={(e) => setFormData({...formData, language_code: e.target.value})}
+  1067→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1068→                    placeholder="en"
+  1069→                  />
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwjar/components/KeywordsHubTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1036→                    onChange={(e) => setFormData({...formData, cpc: parseFloat(e.target.value) || 0})}
+  1037→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1038→                    placeholder="0.00"
+  1039→                  />
+  1040→                </div>
+  1041→                <div>
+  1042→                  <label className="block text-sm font-medium text-gray-700 mb-1">Location Display Name</label>
+  1043→                  <input
+  1044→                    type="text"
+  1045→                    value={formData.location_display_name}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Migration Phase 3: Update Backend API routes to use rel_dfs_location_code
+- [X] 🌡️ Migration Phase 4: Update Frontend UI to remove location_code
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Excellent! We've completed the major migration phases:
+
+## **✅ Completed Migration Steps:**
+
+### **Phase 2: Database Schema**
+- Created indexes for `rel_dfs_location_code`
+- Copied all data from `location_code` to `rel_dfs_location_code`
+
+### **Phase 3: Backend APIs Updated**
+- ✅ `/api/dataforseo-refresh/route.ts`
+- ✅ `/api/dataforseo-refresh-bulk/route.ts`
+- ✅ `/api/dataforseo-refresh-live/route.ts`
+
+### **Phase 4: Frontend UI Updated**
+- ✅ Removed `location_code` from KeywordRecord interface
+- ✅ Removed `location_code` from columns array
+- ✅ Removed `location_code` from formData
+- ✅ Removed `location_code` input field from modal
+- ✅ Updated number formatting logic
+
+## **Next Steps - Phase 6: Testing**
+
+Before removing the old `location_code` field from the database, please test:
+
+1. **Create a new keyword** - Verify it works without location_code
+2. **Refresh DataForSEO data** - Test single refresh button
+3. **Bulk refresh** - Test bulk refresh functionality
+4. **Edit existing records** - Make sure inline editing still works
+
+## **Phase 7: Final Cleanup (After Testing)**
+
+Once everything is working, run this SQL to remove the old field:
+
+```sql
+-- ONLY run this after thorough testing!
+ALTER TABLE keywordshub DROP COLUMN location_code;
+
+-- Also drop the old indexes (they're no longer needed)
+DROP INDEX IF EXISTS idx_keywordshub_location_code;
+DROP INDEX IF EXISTS idx_keywordshub_keyword_location;
+DROP INDEX IF EXISTS unique_keyword_location_language;
+```
+
+The migration is now functionally complete! The system should work entirely with `rel_dfs_location_code` instead of `location_code`. Test everything thoroughly before running the final cleanup SQL.
+
+---
+
+_**User**_
+
+everything seems to work except for another issue that might be unrelated. it seems like the bulk "refresh volume" button does nothing. then after clicking the bulk "refresh cpc" button, it successfully refreshes both volume and cpc. any idea why this owuld be? 
+

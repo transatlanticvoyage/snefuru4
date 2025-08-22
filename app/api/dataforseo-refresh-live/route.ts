@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!keywordRecord.location_code) {
+    if (!keywordRecord.rel_dfs_location_code) {
       return NextResponse.json(
-        { error: 'location_code is required. Please set location first.' },
+        { error: 'rel_dfs_location_code is required. Please set location first.' },
         { status: 400 }
       );
     }
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify([{
         keywords: [keywordRecord.keyword_datum],
-        location_code: keywordRecord.location_code,
+        location_code: keywordRecord.rel_dfs_location_code,
         language_code: keywordRecord.language_code
       }])
     });
