@@ -1,0 +1,22 @@
+
+create new page
+
+select cncglub rows to populate |
+kw style | type root of kw (city_name) (state_code)
+Select kwslot to populate |  kwslot1 , kwslot2, etc
+rel_dfs_location_code | 
+language_code
+
+
+
+Run 370 populate kwslot* in cncglub
+
+
+———————————————————————
+this process will:
+
+create new keywords in db table keywordshub (if they do not exist)
+
+create kw style by referring to cncglub -> cncglub.rel_city_id -> cities.city_name / cities.state_code
+
+tag all kws with a special tag (including ones that did previously exist(if any) that match the criteria set here)
