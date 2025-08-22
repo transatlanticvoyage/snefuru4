@@ -5660,3 +5660,585 @@ async function executeAlterTable() {
 
 executeAlterTable();"`
 
+Result:
+
+```
+Attempting to execute ALTER TABLE via Supabase...
+❌ Failed to execute ALTER TABLE
+Status: 404
+Response: {"code":"PGRST202","details":"Searched for the function public.exec_sql with parameter query or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"message":"Could not find the function public.exec_sql(query) in the schema cache"}
+
+Trying alternative approach with different RPC function...
+Alternative attempt status: 404
+Alternative result: {"code":"PGRST202","details":"Searched for the function public.execute_sql with parameter sql or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"message":"Could not find the function public.execute_sql(sql) in the schema cache"}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Unfortunately, I cannot directly execute ALTER TABLE commands through our available connections:
+
+1. **MCP/Zephix**: These commands are not available in the current environment
+2. **Supabase Client SDK**: Doesn't support DDL operations (ALTER TABLE, CREATE TABLE, etc.)
+3. **Supabase REST API**: No RPC functions like `exec_sql` or `execute_sql` are configured in your database
+
+**The only ways to add these columns are:**
+
+1. **Supabase Dashboard** (Manual):
+   - Go to SQL Editor in your Supabase Dashboard
+   - Paste and run the SQL I provided
+
+2. **Supabase CLI** (if installed locally):
+   ```bash
+   supabase db push
+   ```
+
+3. **Create a Database Function** (one-time setup):
+   You could create a PL/pgSQL function in Supabase that accepts DDL commands, but this requires dashboard access initially
+
+For security reasons, Supabase doesn't allow direct DDL operations via client libraries - it's a deliberate design choice to prevent accidental schema modifications from application code.
+
+**You'll need to manually run this SQL in the Supabase Dashboard SQL Editor:**
+
+```sql
+ALTER TABLE cncglub 
+ADD COLUMN IF NOT EXISTS kwslot1 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot2 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot3 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot4 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot5 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot6 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot7 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot8 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot9 INTEGER REFERENCES keywordshub(keyword_id),
+ADD COLUMN IF NOT EXISTS kwslot10 INTEGER REFERENCES keywordshub(keyword_id);
+```
+
+---
+
+_**User**_
+
+ok i ran this sql 
+
+now please do the following
+
+on our ui table grid at /cnjar1 
+
+please add a ui column to the right of updated_at but still to the left of the black separator
+
+in thead row 1, keep the same class as the rest of the section for styling purposes (cncglub columns section)
+
+place text cncglub in the <th> in the first row
+    
+    in second thead row, in <th>, place text "kwslot1" in bold
+        
+this field should display the actual number value of the id like "45" etc 
+
+
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add kwslot1 column to cnjar1 UI table grid
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    10→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    11→  { ssr: false }
+    12→);
+    13→
+    14→interface Cncglub {
+    15→  cncg_id: number;
+    16→  rel_city_id: number;
+    17→  rel_industry_id: number;
+    18→  is_sko: boolean;
+    19→  created_at: string;
+    20→  updated_at: string | null;
+    21→  kwslot1: number | null;
+    22→  // Joined city data
+    23→  cities?: {
+    24→    city_name: string | null;
+    25→    state_code: string | null;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    96→  });
+    97→
+    98→  const supabase = createClientComponentClient();
+    99→
+   100→  // Define columns
+   101→  const columns = [
+   102→    { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
+   103→    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
+   104→    { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+   105→    { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
+   106→    { key: 'created_at' as keyof Cncglub, label: 'created_at', type: 'datetime', readOnly: true },
+   107→    { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true },
+   108→    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', separator: 'black-3px' }
+   109→  ];
+   110→
+   111→  // City columns from cityjar
+   112→  const cityColumns = [
+   113→    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to verify that the columns are combined correctly and the kwslot1 field will be fetched:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let's verify the column is displaying properly. Let me check if we need to update any other parts of the code for proper rendering:
+Tool use: **Bash** Verify kwslot1 column exists in database
+
+`SUPABASE_URL=https://jerylujyofmmjukwlwvn.supabase.co SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcnlsdWp5b2ZtbWp1a3dsd3ZuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDQyNTE1MCwiZXhwIjoyMDcwMDAxMTUwfQ.09zsgogOOCZeaJ9R6K5D4q2_jzKXFh54f-CNBfwrEQc node -e "
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+async function verifyKwslotColumn() {
+  try {
+    console.log('Verifying kwslot1 column in cncglub table...');
+    
+    const { data, error } = await supabase
+      .from('cncglub')
+      .select('cncg_id, kwslot1')
+      .limit(5);
+    
+    if (error) {
+      console.log('Error:', error.message);
+    } else {
+      console.log('✅ kwslot1 column exists!');
+      console.log('Sample data:');
+      data.forEach(row => {
+        console.log('  cncg_id:', row.cncg_id, '- kwslot1:', row.kwslot1);
+      });
+    }
+    
+  } catch (err) {
+    console.error('Error:', err.message);
+  }
+}
+
+verifyKwslotColumn();"`
+
+Result:
+
+```
+Verifying kwslot1 column in cncglub table...
+✅ kwslot1 column exists!
+Sample data:
+  cncg_id: 41001 - kwslot1: null
+  cncg_id: 41002 - kwslot1: null
+  cncg_id: 41003 - kwslot1: null
+  cncg_id: 41004 - kwslot1: null
+  cncg_id: 41005 - kwslot1: null
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Good! The column exists in the database. Now let me check the table header structure to ensure the column appears with the correct styling in both header rows:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+1095→            >
+  1096→              Create New (Popup)
+  1097→            </button>
+  1098→          </div>
+  1099→        </div>
+  1100→      </div>
+  1101→
+  1102→      {/* Table */}
+  1103→      <div className="bg-white overflow-hidden">
+  1104→        <div className="overflow-x-auto" style={{ maxHeight: '720px', overflowY: 'auto' }}>
+  1105→          <table className="w-full border-collapse border border-gray-200">
+  1106→            <thead className="bg-gray-50 sticky top-0 z-10">
+  1107→              {/* Additional blank header row */}
+  1108→              <tr>
+  1109→                <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
+  1110→                  {/* Blank cell corresponding to checkbox column */}
+  1111→                </th>
+  1112→                {allColumns.map((column, index) => {
+  1113→                  let bgColorClass = '';
+  1114→                  let tableText = '';
+  1115→                  
+  1116→                  if (column.isJoined) {
+  1117→                    if (column.key.startsWith('cities.')) {
+  1118→                      bgColorClass = 'bg-[#bff8e8]';
+  1119→                      tableText = 'cities';
+  1120→                    } else if (column.key.startsWith('industries.')) {
+  1121→                      bgColorClass = 'bg-[#f8ebbf]';
+  1122→                      tableText = 'industries';
+  1123→                    }
+  1124→                  } else {
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! The table structure is already set up correctly. The kwslot1 column has been added with:
+- Position after `updated_at` 
+- `separator: 'black-3px'` to add the black separator line after it
+- It will automatically get the "cncglub" label in the first header row (purple background)
+- The bold "kwslot1" label in the second header row
+
+Let me verify it renders the actual ID values correctly by checking the renderCell function:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+830→    }
+   831→
+   832→    return (
+   833→      <div
+   834→        onClick={() => !isReadOnly && !column.isJoined && handleCellClick(item.cncg_id, column.key, value)}
+   835→        className={`px-2 py-1 ${!isReadOnly && !column.isJoined ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} ${column.type === 'boolean' ? 'cursor-pointer' : 'cursor-text'}`}
+   836→      >
+   837→        {column.type === 'boolean' ? 
+   838→          (value ? '✓' : '✗') :
+   839→          column.type === 'datetime' && value ? 
+   840→            new Date(value).toLocaleString() : 
+   841→            value?.toString() || ''
+   842→        }
+   843→      </div>
+   844→    );
+   845→  };
+   846→
+   847→  // Pagination Controls Component
+   848→  const PaginationControls = () => (
+   849→    <div className="flex items-center space-x-4">
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+The renderCell function will already handle the kwslot1 column correctly since it's defined as type 'number' and will display the value using `value?.toString() || ''`. This means:
+- If kwslot1 has a value like 45, it will display "45"
+- If kwslot1 is null, it will display an empty string
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Add kwslot1 column to cnjar1 UI table grid
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+✅ **kwslot1 column successfully added to the cnjar1 UI table grid!**
+
+**Changes implemented:**
+
+1. **Added kwslot1 to Cncglub interface**: `kwslot1: number | null`
+
+2. **Added kwslot1 to columns array**:
+   - Positioned after `updated_at` column
+   - Added `separator: 'black-3px'` to create the black separator line after it
+   - Type set to 'number' for proper rendering
+
+3. **Automatic header row handling**:
+   - **First header row**: Shows "cncglub" with purple background (bg-[#f6bff8])
+   - **Second header row**: Shows bold "kwslot1" label
+   - Both rows styled consistently with other cncglub columns
+
+4. **Value display**: 
+   - Shows the actual numeric ID value (e.g., "45")
+   - Shows empty string when value is null
+   - Editable like other non-readonly cncglub columns
+
+The column is now fully integrated into the table with:
+- Proper positioning (after updated_at, before the black separator)
+- Correct styling matching the cncglub section
+- Display of actual keyword ID values when populated
+- Full editing capability for assigning keyword IDs
+
+---
+
+_**User**_
+
+pleae tell me the class name of the <th> for the first header row in our table (for each of the 3 column se3ctions) 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Looking at the code for the first header row in the cnjar1 table, here are the class names for each of the 3 column sections:
+
+## **First Header Row `<th>` Classes:**
+
+### 1. **cncglub columns** (purple section):
+```jsx
+className={`text-left border border-gray-200 px-2 py-1 bg-[#f6bff8] ${
+  column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+}`}
+```
+- Background: `bg-[#f6bff8]` (purple)
+- Base classes: `text-left border border-gray-200 px-2 py-1`
+- Separator: `border-r-black border-r-[3px]` (on kwslot1 column only)
+
+### 2. **cities columns** (green section):
+```jsx
+className={`text-left border border-gray-200 px-2 py-1 bg-[#bff8e8] ${
+  column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+}`}
+```
+- Background: `bg-[#bff8e8]` (green/teal)
+- Base classes: `text-left border border-gray-200 px-2 py-1`
+- Separator: `border-r-black border-r-[3px]` (on population_last_updated column)
+
+### 3. **industries columns** (yellow section):
+```jsx
+className={`text-left border border-gray-200 px-2 py-1 bg-[#f8ebbf] ${
+  column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+}`}
+```
+- Background: `bg-[#f8ebbf]` (yellow)
+- Base classes: `text-left border border-gray-200 px-2 py-1`
+- No separator on industries columns
+
+**Summary of background colors:**
+- **cncglub**: `bg-[#f6bff8]` (purple)
+- **cities**: `bg-[#bff8e8]` (green/teal)
+- **industries**: `bg-[#f8ebbf]` (yellow)
+
+---
+
+_**User**_
+
+please create a new column to the right of the ui column we just added
+
+pleaes make the top header row have a th class that gives it this background color:
+bcc4f1
+
+keep this ui column still to the left of the black separator in the region
+
+in the top header row, place text that says:
+keywordshub
+
+in the second header row, place the text in bold:
+keyword_datum
+
+this column should display the value of the keyword_datum field as pulled through the relationship from the field kwslot1 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add keyword_datum column that shows related keyword from kwslot1
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    10→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    11→  { ssr: false }
+    12→);
+    13→
+    14→interface Cncglub {
+    15→  cncg_id: number;
+    16→  rel_city_id: number;
+    17→  rel_industry_id: number;
+    18→  is_sko: boolean;
+    19→  created_at: string;
+    20→  updated_at: string | null;
+    21→  kwslot1: number | null;
+    22→  // Joined keyword data for kwslot1
+    23→  kwslot1_keyword?: {
+    24→    keyword_datum: string | null;
+    25→  } | null;
+    26→  // Joined city data
+    27→  cities?: {
+    28→    city_name: string | null;
+    29→    state_code: string | null;
+    30→    state_full: string | null;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   100→  });
+   101→
+   102→  const supabase = createClientComponentClient();
+   103→
+   104→  // Define columns
+   105→  const columns = [
+   106→    { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
+   107→    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
+   108→    { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+   109→    { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
+   110→    { key: 'created_at' as keyof Cncglub, label: 'created_at', type: 'datetime', readOnly: true },
+   111→    { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true },
+   112→    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number' }
+   113→  ];
+   114→
+   115→  // Keyword columns (new section with different background)
+   116→  const keywordColumns = [
+   117→    { key: 'kwslot1_keyword.keyword_datum', label: 'keyword_datum', type: 'text', readOnly: true, isJoined: true, isKeyword: true, separator: 'black-3px' }
+   118→  ];
+   119→
+   120→  // City columns from cityjar
+   121→  const cityColumns = [
+   122→    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   139→    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
+   140→    { key: 'industries.industry_description', label: 'industry_description', type: 'text', readOnly: true, isJoined: true }
+   141→  ];
+   142→
+   143→  // Combine all columns
+   144→  const allColumns = [...columns, ...keywordColumns, ...cityColumns, ...industryColumns];
+   145→
+   146→  // Fetch data from Supabase
+   147→  const fetchData = async () => {
+   148→    try {
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   147→  const fetchData = async () => {
+   148→    try {
+   149→      setLoading(true);
+   150→      
+   151→      // Fetch main data with joins
+   152→      const { data: cncglubData, error: cncglubError } = await supabase
+   153→        .from('cncglub')
+   154→        .select(`
+   155→          *,
+   156→          kwslot1_keyword:keywordshub!kwslot1 (
+   157→            keyword_datum
+   158→          ),
+   159→          cities!rel_city_id (
+   160→            city_name, state_code, state_full, country, rank_in_pop, 
+   161→            gmaps_link, is_suburb, city_and_state_code, city_population, 
+   162→            latitude, longitude, rel_metro_id, population_last_updated
+   163→          ),
+   164→          industries!rel_industry_id (
+   165→            industry_name, industry_description
+   166→          )
+   167→        `)
+   168→        .order('created_at', { ascending: false })
+   169→        .limit(50000); // Set explicit limit to handle up to 50k records
+   170→
+   171→      if (cncglubError) throw cncglubError;
+   172→      
+   173→      // Fetch cities for reference (still needed for dropdowns)
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   212→    const industry = industries.find(i => i.industry_id === industryId);
+   213→    return industry ? industry.industry_name : `Industry ID: ${industryId}`;
+   214→  };
+   215→
+   216→  // Helper function to get joined column value
+   217→  const getJoinedValue = (item: Cncglub, columnKey: string) => {
+   218→    const [table, field] = columnKey.split('.');
+   219→    if (table === 'cities' && item.cities) {
+   220→      return (item.cities as any)[field];
+   221→    }
+   222→    if (table === 'industries' && item.industries) {
+   223→      return (item.industries as any)[field];
+   224→    }
+   225→    if (table === 'kwslot1_keyword' && item.kwslot1_keyword) {
+   226→      return (item.kwslot1_keyword as any)[field];
+   227→    }
+   228→    return null;
+   229→  };
+   230→
+   231→  // Helper function to check if cncglub record's related city population matches filter
+   232→  const matchesCitySizeFilter = (item: Cncglub) => {
+   233→    const cityPopulation = item.cities?.city_population;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the table header rendering to include the new background color for the keyword section:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1123→              <tr>
+  1124→                <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
+  1125→                  {/* Blank cell corresponding to checkbox column */}
+  1126→                </th>
+  1127→                {allColumns.map((column, index) => {
+  1128→                  let bgColorClass = '';
+  1129→                  let tableText = '';
+  1130→                  
+  1131→                  if (column.isJoined) {
+  1132→                    if (column.isKeyword) {
+  1133→                      bgColorClass = 'bg-[#bcc4f1]';
+  1134→                      tableText = 'keywordshub';
+  1135→                    } else if (column.key.startsWith('cities.')) {
+  1136→                      bgColorClass = 'bg-[#bff8e8]';
+  1137→                      tableText = 'cities';
+  1138→                    } else if (column.key.startsWith('industries.')) {
+  1139→                      bgColorClass = 'bg-[#f8ebbf]';
+  1140→                      tableText = 'industries';
+  1141→                    }
+  1142→                  } else {
+  1143→                    bgColorClass = 'bg-[#f6bff8]';
+  1144→                    tableText = 'cncglub';
+  1145→                  }
+  1146→                  
+  1147→                  return (
+  1148→                    <th
+  1149→                      key={`blank-${column.key}`}
+```
+

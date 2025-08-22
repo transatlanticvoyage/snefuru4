@@ -19,6 +19,12 @@ interface Cncglub {
   created_at: string;
   updated_at: string | null;
   kwslot1: number | null;
+  // Joined keyword data for kwslot1
+  kwslot1_keyword?: {
+    keyword_datum: string | null;
+    search_volume: number | null;
+    cpc: number | null;
+  } | null;
   // Joined city data
   cities?: {
     city_name: string | null;
@@ -105,7 +111,14 @@ export default function Cnjar1Table() {
     { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
     { key: 'created_at' as keyof Cncglub, label: 'created_at', type: 'datetime', readOnly: true },
     { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true },
-    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', separator: 'black-3px' }
+    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', leftSeparator: 'black-3px' }
+  ];
+
+  // Keyword columns (new section with different background)
+  const keywordColumns = [
+    { key: 'kwslot1_keyword.keyword_datum', label: 'keyword_datum', type: 'text', readOnly: true, isJoined: true, isKeyword: true },
+    { key: 'kwslot1_keyword.search_volume', label: 'search_volume', type: 'number', readOnly: true, isJoined: true, isKeyword: true },
+    { key: 'kwslot1_keyword.cpc', label: 'cpc', type: 'number', readOnly: true, isJoined: true, isKeyword: true, separator: 'black-3px' }
   ];
 
   // City columns from cityjar
@@ -132,7 +145,7 @@ export default function Cnjar1Table() {
   ];
 
   // Combine all columns
-  const allColumns = [...columns, ...cityColumns, ...industryColumns];
+  const allColumns = [...columns, ...keywordColumns, ...cityColumns, ...industryColumns];
 
   // Fetch data from Supabase
   const fetchData = async () => {
@@ -144,6 +157,11 @@ export default function Cnjar1Table() {
         .from('cncglub')
         .select(`
           *,
+          kwslot1_keyword:keywordshub!kwslot1 (
+            keyword_datum,
+            search_volume,
+            cpc
+          ),
           cities!rel_city_id (
             city_name, state_code, state_full, country, rank_in_pop, 
             gmaps_link, is_suburb, city_and_state_code, city_population, 
@@ -209,6 +227,9 @@ export default function Cnjar1Table() {
     }
     if (table === 'industries' && item.industries) {
       return (item.industries as any)[field];
+    }
+    if (table === 'kwslot1_keyword' && item.kwslot1_keyword) {
+      return (item.kwslot1_keyword as any)[field];
     }
     return null;
   };
@@ -829,6 +850,33 @@ export default function Cnjar1Table() {
       );
     }
 
+    // Special formatting for keyword_datum column
+    if (column.key === 'kwslot1_keyword.keyword_datum') {
+      return (
+        <div className="px-2 py-1 cursor-default text-xs">
+          {value || '-'}
+        </div>
+      );
+    }
+
+    // Special formatting for search_volume column
+    if (column.key === 'kwslot1_keyword.search_volume') {
+      return (
+        <div className="px-2 py-1 cursor-default text-xs">
+          {value !== null && value !== undefined ? Number(value).toLocaleString() : '-'}
+        </div>
+      );
+    }
+
+    // Special formatting for cpc column
+    if (column.key === 'kwslot1_keyword.cpc') {
+      return (
+        <div className="px-2 py-1 cursor-default text-xs">
+          {value !== null && value !== undefined ? `$${Number(value).toFixed(2)}` : '-'}
+        </div>
+      );
+    }
+
     return (
       <div
         onClick={() => !isReadOnly && !column.isJoined && handleCellClick(item.cncg_id, column.key, value)}
@@ -1114,7 +1162,10 @@ export default function Cnjar1Table() {
                   let tableText = '';
                   
                   if (column.isJoined) {
-                    if (column.key.startsWith('cities.')) {
+                    if (column.isKeyword) {
+                      bgColorClass = 'bg-[#bcc4f1]';
+                      tableText = 'keywordshub';
+                    } else if (column.key.startsWith('cities.')) {
                       bgColorClass = 'bg-[#bff8e8]';
                       tableText = 'cities';
                     } else if (column.key.startsWith('industries.')) {
@@ -1131,6 +1182,8 @@ export default function Cnjar1Table() {
                       key={`blank-${column.key}`}
                       className={`text-left border border-gray-200 px-2 py-1 ${bgColorClass} ${
                         column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+                      } ${
+                        column.leftSeparator === 'black-3px' ? 'border-l-black border-l-[3px]' : ''
                       }`}
                     >
                       <span className="text-xs font-normal text-gray-600">{tableText}</span>
@@ -1164,6 +1217,8 @@ export default function Cnjar1Table() {
                     key={column.key}
                     className={`text-left ${(!column.isJoined || column.sortable) ? 'cursor-pointer hover:bg-gray-100' : ''} border border-gray-200 px-2 py-1 ${
                       column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+                    } ${
+                      column.leftSeparator === 'black-3px' ? 'border-l-black border-l-[3px]' : ''
                     }`}
                     onClick={() => (!column.isJoined || column.sortable) && handleSort(column.key)}
                   >
@@ -1208,6 +1263,8 @@ export default function Cnjar1Table() {
                       key={column.key} 
                       className={`border border-gray-200 ${
                         column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+                      } ${
+                        column.leftSeparator === 'black-3px' ? 'border-l-black border-l-[3px]' : ''
                       }`}
                     >
                       {renderCell(item, column)}
