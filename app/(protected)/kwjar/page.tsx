@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
 import KeywordsHubTable from './components/KeywordsHubTable';
 
 export default function KwjarPage() {
@@ -30,39 +30,9 @@ export default function KwjarPage() {
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <h1 className="text-2xl font-bold text-gray-800">🔍 Keywords Hub</h1>
-            
-            {/* Navigation buttons moved here */}
-            <div className="flex space-x-2">
-              <Link
-                href="/dfslocr"
-                className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/dfslocr</span>
-              </Link>
-              
-              <Link
-                href="/kwtagzar"
-                className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/kwtagzar</span>
-              </Link>
-              
-              <Link
-                href="/serpjar"
-                className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/serpjar</span>
-              </Link>
-              
-              <Link
-                href="/zhefetchjar"
-                className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/zhefetchjar</span>
-              </Link>
-            </div>
+            <ZhedoriButtonBar />
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-500">DataForSEO Integration</div>

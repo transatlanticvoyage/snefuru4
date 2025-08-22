@@ -402,3 +402,248 @@ Perfect! Based on my search through your system, here are the words/names that c
 
 The most relevant ones for your application appear to be **drenjari** and **menjari**, which seem to be part of your navigation system naming convention. These appear to be custom terms you've created for your button bar components that provide navigation links throughout your application.
 
+---
+
+_**User**_
+
+please grep for things ending in -ori and then list them here 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-10_18-33-03Z-this-session-is-being.md:1669:   701→      {/* Sitedori Navigation Links */}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_15-46-20Z-this-session-is-being.md:2467:   701→      {/* Sitedori Navigation Links */}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4902:name it the sitedori component
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4908:please give the sitedori a text label of:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4909:sitedori
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4915:then please place this sitedori (call it dynamically from the central component) on to the /sitejar4 page and on to the /driggsman page 
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4917:on both pages, the sitedori component should apppear above the drenjari component . 
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4923:I'll create the sitedori central component similar to drenjari and integrate it into the specified pages.
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4928:- [⚡] 🌡️ Create sitedori central component with styling similar to drenjari
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4929:- [ ] 🌡️ Add /sitejar4 and /driggsman links to sitedori component
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4930:- [ ] 🌡️ Integrate sitedori component into /sitejar4 page above drenjari
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:4931:- [ ] 🌡️ Integrate sitedori component into /driggsman page above drenjari
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5054:Perfect! Now I'll create the sitedori component using the same styling structure. I'll create it in the same components directory:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5069:        <span className="text-sm font-bold text-black mr-4">sitedori</span>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5098:Now I need to integrate this sitedori component into both /sitejar4 and /driggsman pages, placing it above the drenjari component. Let me start with the /sitejar4 page:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5148:Now I need to add the sitedori component above the drenjari component in the page layout:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5189:   701→      {/* Sitedori Navigation Links */}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5206:Great! Now I need to add the sitedori component to the /driggsman page as well. Let me read that page first:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5270:I notice that the driggsman page doesn't have the drenjari component yet. Let me check if there are other driggsman pages or if I need to add both sitedori and drenjari components. Let me first add the necessary imports:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5305:Now I need to add both components to the driggsman page layout, with sitedori above drenjari. I'll add them in the header area:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5339:    58→        {/* Sitedori Navigation Links */}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5366:- [X] 🌡️ Create sitedori central component with styling similar to drenjari
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5367:- [X] 🌡️ Add /sitejar4 and /driggsman links to sitedori component
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5368:- [X] 🌡️ Integrate sitedori component into /sitejar4 page above drenjari
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5369:- [X] 🌡️ Integrate sitedori component into /driggsman page above drenjari
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5374:## ✅ **Sitedori Central Component Implementation Complete!**
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5376:I have successfully created and implemented the sitedori central component with all requested specifications:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5378:### **1. Created Sitedori Central Component** ✅
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5380:- **Label**: "sitedori" in bold text
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5399:- Order: Sitedori → Drenjari → Chamber Controlyar → Functions
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5404:- **Sitedori positioned above drenjari** as requested
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5414:The sitedori component is now ready to be dynamically called into other UI locations as needed, just like the drenjari component system!
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5661:- /driggsman page should work with the new sitedori component
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5667:You can now test the frontend app pages. The sitedori component should be visible on both /driggsman and /sitejar4 pages (once the syntax issue is resolved).
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5797:  - **Sitedori component** (new navigation bar with /sitejar4 and /driggsman links)
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:5802:The Next.js development server should automatically detect the file changes and recompile. Try refreshing the /sitejar4 page now - the 500 errors should be gone and you should see the new sitedori component at the top of the page!
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:6485:- ✅ **Sitedori component** (navigation bar with /sitejar4 and /driggsman links)
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:6492:The Next.js development server should now compile the page without errors. Try refreshing /sitejar4 on port 3001 - you should see the complete interface with the new sitedori component at the top!
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:6893:- ✅ **Page structure**: Sitedori and Drenjari components still work
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_18-50-48Z-this-session-is-being.md:6900:  - **Sitedori component** (navigation with /sitejar4 and /driggsman links)
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_13-08-14Z-this-session-is-being.md:503:    58→        {/* Sitedori Navigation Links */}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_20-49-31Z-this-session-is-being.md:21:5. User then requested creation of a sitedori central component similar to drenjari, which I successfully created and integrated into both /sitejar4 and /driggsman pages.
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_20-49-31Z-this-session-is-being.md:44:   - Create sitedori central component similar to drenjari with:
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_20-49-31Z-this-session-is-being.md:46:     - Label "sitedori"
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_20-49-31Z-this-session-is-being.md:76:             <span className="text-sm font-bold text-black mr-4">sitedori</span>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_20-49-31Z-this-session-is-being.md:138:   - Created and integrated sitedori component across multiple pages
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_20-49-31Z-this-session-is-being.md:150:   - "pleaes create a new central component similar to the drenjari component name it the sitedori component..."
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-07-05_18-42-56Z-you-currently-able-to.md:2327:/Users/kylecampbell/Dropbox/Resources/Backups Barge/Aff Sites/tpi-nice_org/2022_12__12 -  after tons of manual work wayback rebuild/tpi-nice.org save after tons of manual work/collection/photos/claude_nori
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/ajv/dist/ajv.min.js.map:1:{"version":3,"file":"ajv.min.js","sources":["0"],"names":["f","exports","module","define","amd","window","global","self","this","Ajv","r","e","n","t","o","i","c","require","u","a","Error","code","p","call","length","1","Cache","_cache","prototype","put","key","value","get","del","clear","2","MissingRefError","MissingRef","compileAsync","schema","meta","callback","_opts","loadSchema","undefined","loadMetaSchemaOf","then","schemaObj","_addSchema","validate","_compileAsync","_compile","loadMissingSchema","ref","missingSchema","added","missingRef","schemaPromise","_loadingSchemas","removePromise","sch","addSchema","_refs","_schemas","v","$schema","getSchema","$ref","Promise","resolve","./error_classes","3","baseId","message","url","normalizeId","fullPath","errorSubclass","Subclass","Object","create","constructor","Validation","errors","ajv","validation","./resolve","4","util","DATE","DAYS","TIME","HOSTNAME","URI","URITEMPLATE","URL","UUID","JSON_POINTER","JSON_POINTER_URI_FRAGMENT","RELATIVE_JSON_POINTER","formats","mode","copy","date","str","matches","match","year","month","day","time","full","hour","minute","second","fast","date-time","uri","uri-reference","uri-template","email","hostname","ipv4","ipv6","regex","uuid","json-pointer","json-pointer-uri-fragment","relative-json-pointer","dateTime","split","DATE_TIME_SEPARATOR","NOT_URI_FRAGMENT","test","Z_ANCHOR","RegExp","./util","5","errorClasses","stableStringify","validateGenerator","ucs2length","equal","ValidationError","compile","root","localRefs","opts","refVal","refs","patterns","patternsHash","defaults","defaultsHash","customRules","index","compIndex","compiling","_compilations","compilation","callValidate","_formats","RULES","localCompile","cv","$async","sourceCode","source","splice","result","apply","arguments","_schema","_root","isRoot","isTop","schemaPath","errSchemaPath","errorPath","resolveRef","usePattern","useDefault","useCustomRule","logger","vars","refValCode","patternCode","defaultCode","customRuleCode","processCode","Function","makeValidate","error","_refVal","refCode","refIndex","resolvedRef","rootRefId","addLocalRef","localSchema","inlineRef","inlineRefs","refId","inline","regexStr","toQuotedString","valueStr","rule","parentSchema","it","validateSchema","deps","definition","dependencies","every","keyword","hasOwnProperty","join","errorsText","macro","arr","statement","../dotjs/validate","fast-deep-equal","fast-json-stable-stringify","6","SchemaObject","traverse","res","resolveSchema","parse","refPath","_getFullPath","getFullPath","_getId","keys","id","parsedRef","resolveUrl","getJsonPointer","ids","schemaId","baseIds","","fullPaths","allKeys","jsonPtr","rootSchema","parentJsonPtr","parentKeyword","keyIndex","escapeFragment","PREVENT_SCOPE_CHANGE","toHash","fragment","slice","parts","part","unescapeFragment","SIMPLE_INLINED","limit","checkNoRef","item","Array","isArray","countKeys","count","Infinity","normalize","serialize","TRAILING_SLASH_HASH","replace","./schema_obj","json-schema-traverse","uri-js","7","ruleModules","type","rules","maximum","minimum","properties","ALL","all","types","forEach","group","map","implKeywords","k","push","implements","$comment","keywords","concat","custom","../dotjs","8","obj","9","len","pos","charCodeAt","10","checkDataType","dataType","data","strictNumbers","negate","EQUAL","AND","OK","NOT","to","checkDataTypes","dataTypes","array","object","null","number","integer","coerceToTypes","optionCoerceTypes","COERCE_TO_TYPES","getProperty","escapeQuotes","varOccurences","dataVar","varReplace","expr","schemaHasRules","schemaHasRulesExcept","exceptKeyword","schemaUnknownRules","getPathExpr","currentPath","jsonPointers","isNumber","joinPaths","getPath","prop","path","escapeJsonPointer","getData","$data","lvl","paths","up","jsonPointer","segments","segment","unescapeJsonPointer","decodeURIComponent","encodeURIComponent","hash","IDENTIFIER","SINGLE_QUOTE","b","./ucs2length","11","KEYWORDS","metaSchema","keywordsJsonPointers","JSON","stringify","j","anyOf","12","$id","definitions","simpleTypes","statements","valid","not","required","items","modifying","async","const","./refs/json-schema-draft-07.json","13","$keyword","$schemaValueExcl","$exclusive","$exclType","$exclIsNumber","$opStr","$opExpr","$$outStack","out","$lvl","level","$dataLvl","dataLevel","$schemaPath","$errSchemaPath","$breakOnError","allErrors","$isData","$schemaValue","dataPathArr","$isMax","$exclusiveKeyword","$schemaExcl","$isDataExcl","$op","$notOp","$errorKeyword","createErrors","messages","verbose","__err","pop","compositeRule","Math","14","15","unicode","16","17","$it","$closingBraces","$nextValid","$currentBaseId","$allSchemasEmpty","arr1","$sch","$i","l1","strictKeywords","18","$valid","$errs","$wasComposite","19","20","21","$passData","$code","$idx","$dataNxt","$nextData","$nonEmptySchema","22","$compile","$inline","$macro","$ruleValidate","$validateCode","$rule","$definition","$rDef","$validateSchema","$parentData","$parentDataProperty","def_callRuleValidate","def_customError","$ruleErrs","$ruleErr","$asyncKeyword","passContext","23","$deps","$schemaDeps","$propertyDeps","$ownProperties","ownProperties","$property","$currentErrorPath","$propertyKey","$useData","$prop","$propertyPath","$missingProperty","_errorDataPathProperty","arr2","i2","l2","24","$vSchema","25","$ruleType","format","$format","$unknownFormats","unknownFormats","$allowUnknown","$isObject","$formatType","warn","indexOf","$formatRef","26","$ifClause","$thenSch","$elseSch","$thenPresent","$elsePresent","27","allOf","contains","enum","if","maxItems","minItems","maxLength","minLength","maxProperties","minProperties","multipleOf","oneOf","pattern","propertyNames","uniqueItems","./_limit","./_limitItems","./_limitLength","./_limitProperties","./allOf","./anyOf","./comment","./const","./contains","./dependencies","./enum","./format","./if","./items","./multipleOf","./not","./oneOf","./pattern","./properties","./propertyNames","./ref","./required","./uniqueItems","./validate","28","$currErrSchemaPath","$additionalItems","additionalItems","29","multipleOfPrecision","30","$allErrorsOption","31","$prevValid","$passingSchemas","32","$regexp","33","$requiredHash","$additionalProperty","$key","$dataProperties","$schemaKeys","filter","notProto","$pProperties","patternProperties","$pPropertyKeys","$aProperties","additionalProperties","$someProperties","$noAdditional","$additionalIsSchema","$removeAdditional","removeAdditional","$checkAdditional","$required","loopRequired","i1","$pProperty","$useDefaults","useDefaults","arr3","i3","l3","$hasDefault","default","arr4","i4","l4","34","$invalidName","35","$refCode","$refVal","$message","missingRefs","__callValidate","36","$propertySch","$loopRequired","37","$itemType","$typeIsArray","38","$refKeywords","$unknownKwd","$keywordsMsg","$top","rootId","strictDefaults","$defaultMsg","$coerceToTypes","$closingBraces1","$closingBraces2","$typeSchema","nullable","extendRefs","coerceTypes","$rulesGroup","$shouldUseGroup","$dataType","$coerced","$type","arr5","i5","l5","$shouldUseRule","impl","$ruleImplementsSomeKeyword","39","definitionSchema","validateKeyword","throwError","_validateKeyword","add","_addRule","ruleGroup","rg","remove","./definition_schema","./dotjs/custom","40","description","41","title","schemaArray","nonNegativeInteger","nonNegativeIntegerDefault0","stringArray","readOnly","examples","exclusiveMinimum","exclusiveMaximum","contentMediaType","contentEncoding","else","42","flags","valueOf","toString","43","cmp","cycles","node","seen","toJSON","isFinite","TypeError","seenIndex","sort","44","cb","_traverse","pre","post","arrayKeywords","propsKeywords","skipKeywords","45","merge","_len","sets","_key","xl","x","subexp","typeOf","shift","toLowerCase","toUpperCase","buildExps","isIRI","ALPHA$$","DIGIT$$","HEXDIG$$","PCT_ENCODED$","SUB_DELIMS$$","RESERVED$$","IPRIVATE$$","UNRESERVED$$","SCHEME$","USERINFO$","DEC_OCTET_RELAXED$","IPV4ADDRESS$","H16$","LS32$","IPV6ADDRESS1$","IPV6ADDRESS2$","IPV6ADDRESS3$","IPV6ADDRESS4$","IPV6ADDRESS5$","IPV6ADDRESS6$","IPV6ADDRESS7$","IPV6ADDRESS8$","IPV6ADDRESS9$","IPV6ADDRESS$","ZONEID$","IPV6ADDRZ_RELAXED$","IPVFUTURE$","IP_LITERAL$","REG_NAME$","HOST$","PORT$","AUTHORITY$","PCHAR$","SEGMENT$","SEGMENT_NZ$","SEGMENT_NZ_NC$","PATH_ABEMPTY$","PATH_ABSOLUTE$","PATH_NOSCHEME$","PATH_ROOTLESS$","PATH_EMPTY$","QUERY$","FRAGMENT$","HIER_PART$","URI$","RELATIVE_PART$","RELATIVE$","NOT_SCHEME","NOT_USERINFO","NOT_HOST","NOT_PATH","NOT_PATH_NOSCHEME","NOT_QUERY","NOT_FRAGMENT","ESCAPE","UNRESERVED","OTHER_CHARS","PCT_ENCODED","IPV4ADDRESS","IPV6ADDRESS","URI_PROTOCOL","IRI_PROTOCOL","slicedToArray","Symbol","iterator","_arr","_n","_d","_e","_s","_i","next","done","err","sliceIterator","maxInt","regexPunycode","regexNonASCII","regexSeparators","overflow","not-basic","invalid-input","floor","stringFromCharCode","String","fromCharCode","error$1","RangeError","mapDomain","string","fn","ucs2decode","output","counter","extra","digitToBasic","digit","flag","adapt","delta","numPoints","firstTime","baseMinusTMin","base","decode","input","inputLength","bias","basic","lastIndexOf","codePoint","oldi","w","baseMinusT","fromCodePoint","encode","_iteratorNormalCompletion","_didIteratorError","_iteratorError","_step","_iterator","_currentValue2","return","basicLength","handledCPCount","m","_iteratorNormalCompletion2","_didIteratorError2","_iteratorError2","_step2","_iterator2","currentValue","handledCPCountPlusOne","_iteratorNormalCompletion3","_didIteratorError3","_iteratorError3","_step3","_iterato
+
+... [206 lines truncated] ...
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me search more specifically for words ending in "ori" in your main application code:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `app`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/SitedoriButtonBar.tsx:9:        <span className="text-sm font-bold text-black mr-4">sitedori</span>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/page.tsx:58:        {/* Sitedori Navigation Links */}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/page.tsx:725:      {/* Sitedori Navigation Links */}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me also check for file names and other patterns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/themes/astra/assets/css/minified/compatibility/site-origin.min.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/themes/astra/assets/css/minified/compatibility/site-origin.min-rtl.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/themes/astra/assets/css/minified/compatibility/site-origin.min.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/themes/astra/assets/css/minified/compatibility/site-origin.min-rtl.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/themes/astra/inc/assets/js/custom-fields-priority.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/themes/astra/inc/assets/js/custom-fields-priority.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/themes/astra/inc/compatibility/class-astra-site-origin.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/themes/astra/inc/compatibility/class-astra-web-stories.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/themes/astra/inc/compatibility/class-astra-web-stories.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/themes/astra/inc/compatibility/class-astra-site-origin.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/themes/twentytwentyfive/patterns/grid-with-categories.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/themes/twentytwentyfive/patterns/grid-with-categories.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/google-sitemap-generator/class-googlesitemapgeneratorindexnow.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/google-sitemap-generator/class-googlesitemapgeneratorindexnow.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor-pro/modules/woocommerce/widgets/categories.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor-pro/modules/display-conditions/conditions/in-categories-condition.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor-pro/modules/woocommerce/widgets/categories.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor-pro/modules/display-conditions/conditions/in-categories-condition.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/image-optimization/modules/connect/rest/authorize.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/image-optimization/classes/image/exceptions/image-restoring-exception.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/image-optimization/modules/connect/rest/authorize.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/image-optimization/classes/image/exceptions/image-restoring-exception.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/image-optimization/trunk/modules/connect/rest/authorize.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/image-optimization/trunk/classes/image/exceptions/image-restoring-exception.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/image-optimization/trunk/modules/connect/rest/authorize.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/image-optimization/trunk/classes/image/exceptions/image-restoring-exception.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor/app/modules/kit-library/data/kits/endpoints/favorites.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor/app/modules/kit-library/data/kits/endpoints/favorites.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-wobble-horizontal.min.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-wobble-horizontal.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-wobble-horizontal.min.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-wobble-horizontal.css
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor/modules/library/user-favorites.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor/modules/favorites/favorites-type.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor/modules/library/user-favorites.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor/modules/favorites/favorites-type.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor/core/common/modules/finder/categories-manager.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor/includes/template-library/sources/admin-menu-items/templates-categories-menu-item.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor/includes/template-library/sources/admin-menu-items/templates-categories-menu-item.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor/core/common/modules/finder/categories-manager.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/elementor/vendor_prefixed/twig/twig/twig/src/NodeVisitor/NodeVisitorInterface.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/elementor/vendor_prefixed/twig/twig/twig/src/NodeVisitor/NodeVisitorInterface.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/seo-by-rank-math/includes/modules/web-stories/class-web-stories.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/seo-by-rank-math/includes/modules/web-stories/class-web-stories.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/seo-by-rank-math/vendor/donatj/phpuseragentparser/examples/object-oriented.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/seo-by-rank-math/vendor/donatj/phpuseragentparser/examples/object-oriented.php
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/mold-removal-stars/wp-content/plugins/media-library-organizer/_modules/dashboard/feather/more-horizontal.svg
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/wordpress-sites/augusta-plumber-net/wp-content/plugins/media-library-organizer/_modules/dashboard/feather/more-horizontal.svg
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/docs/code_concepts_prisomi_horizomi_old.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/pagination/favaPaginationControlsOriginal.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/undici-types/global-origin.d.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/auth/handlers/authorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/auth/handlers/authorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/auth/handlers/authorize.d.ts.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/auth/handlers/authorize.d.ts.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/auth/handlers/authorize.js.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/auth/handlers/authorize.js.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/auth/handlers/authorize.d.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/zephix-mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/auth/handlers/authorize.d.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/logform/colorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/logform/dist/colorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/undici-types/global-origin.d.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/auth/handlers/authorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/logform/dist/uncolorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/logform/uncolorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/@modelcontextprotocol/sdk/dist/esm/server/auth/handlers/authorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/async/priorityQueue.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/auth/handlers/authorize.d.ts.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/@modelcontextprotocol/sdk/dist/esm/server/auth/handlers/authorize.d.ts.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/auth/handlers/authorize.js.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/@modelcontextprotocol/sdk/dist/esm/server/auth/handlers/authorize.js.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/auth/handlers/authorize.d.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/@modelcontextprotocol/sdk/dist/esm/server/auth/handlers/authorize.d.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/caniuse-lite/data/features/css-image-orientation.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/caniuse-lite/data/features/css-text-orientation.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/caniuse-lite/data/features/deviceorientation.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/caniuse-lite/data/features/orientation-sensor.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/caniuse-lite/data/features/screen-orientation.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/jest-worker/build/PriorityQueue.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/jest-watcher/build/lib/colorize.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/agent-rapidlyx/node_modules/jest-util/build/requireOrImportModule.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/@tiptap/extension-horizontal-rule/dist/horizontal-rule.d.ts.map
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/@tiptap/extension-horizontal-rule/dist/horizontal-rule.d.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/@tiptap/extension-horizontal-rule/src/horizontal-rule.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-center-horizontal.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/undici-types/global-origin.d.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-end-horizontal.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-horizontal-distribute-center.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-horizontal-distribute-end.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-horizontal-distribute-start.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-horizontal-justify-center.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-horizontal-justify-end.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-horizontal-justify-start.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-horizontal-space-around.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-horizontal-space-between.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/enhanced-resolve/lib/ModulesInHierachicDirectoriesPlugin.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/enhanced-resolve/lib/ModulesInHierarchicalDirectoriesPlugin.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/align-start-horizontal.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/async/priorityQueue.js
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/node_modules/lucide-react/dist/esm/icons/bar-chart-horizontal-big.js
+(Results are truncated. Consider using a more specific path or pattern.)
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me focus on your main app code specifically:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/pagination/favaPaginationControlsOriginal.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/SitedoriButtonBar.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Based on my search through your system, here are the words ending in "-ori" that I found:
+
+## Words ending in "ori" found in your system:
+
+### In your main application code:
+1. **sitedori** - Found as a navigation component (`SitedoriButtonBar.tsx`) - this appears to be your custom naming convention
+
+### In file names:
+2. **Original** (as in `favaPaginationControlsOriginal.tsx`) - though this is technically "original" not ending in just "ori"
+
+### In external libraries/dependencies:
+3. **horizontal** - Found extensively in CSS classes, animations, and UI components
+4. **priority** - Found in queue management and task handling libraries
+5. **categories** - Found in WordPress and content management contexts
+6. **authorize** - Found in authentication modules
+7. **favorites** - Found in user preference systems
+8. **stories** - Found in WordPress web stories functionality
+9. **colorize/uncolorize** - Found in logging and terminal output libraries
+10. **orientation** - Found in CSS and device orientation handling
+
+### The most relevant ones for your application:
+- **sitedori** - This appears to be part of your custom component naming system, similar to "drenjari" and "menjari"
+
+Your naming pattern seems to follow: `[name]ari` and `[name]ori` for navigation components:
+- drenjari
+- menjari  
+- sitedori
+
+This suggests you have a consistent naming convention for your button bar/navigation components ending in these suffixes.
+

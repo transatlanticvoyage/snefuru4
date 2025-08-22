@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
 import DfsLocationsTable from './components/DfsLocationsTable';
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
@@ -40,8 +41,9 @@ export default function DfslocrPage() {
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex items-center space-x-6">
             <h1 className="text-2xl font-bold text-gray-800">🌍 DataForSEO Locations</h1>
+            <ZhedoriButtonBar />
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-500">Location Database</div>

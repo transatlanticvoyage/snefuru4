@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
 import SerpFetchesTable from './components/SerpFetchesTable';
 
 export default function ZhefetchjarPage() {
@@ -29,8 +30,9 @@ export default function ZhefetchjarPage() {
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex items-center space-x-6">
             <h1 className="text-2xl font-bold text-gray-800">📊 SERP Fetch Logs</h1>
+            <ZhedoriButtonBar />
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-500">Fetch History & Metadata</div>
