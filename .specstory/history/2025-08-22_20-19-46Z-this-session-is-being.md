@@ -3640,3 +3640,1330 @@ _**Agent (claude-sonnet-4-20250514)**_
 
 The custom population range option "75k-325k" has been added to the dropdown, positioned right after "All Records" as requested. The dropdown now includes this specialized range option along with the other existing population filters.
 
+---
+
+_**User**_
+
+pleaes suggest a db table for storing information for when we run our function on this /fabrication page 
+
+it will be called 
+fabrication_launches
+
+it will have fields
+launch_id (serial)
+created_at
+etc
+
+it also needs to store all of the options that the user selected, so we need more fields for this 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Based on the UI form structure and configuration options in the `/fabric` page, here's my suggested database table schema for `fabrication_launches`:
+
+```sql
+CREATE TABLE fabrication_launches (
+  launch_id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE,
+  
+  -- User and session info
+  user_id UUID REFERENCES users(id),
+  
+  -- Configuration options from the form
+  country_selection VARCHAR(100),              -- from row 1: "United States", "Canada", etc.
+  selected_industry_id INTEGER REFERENCES industries(industry_id), -- from row 2
+  city_population_filter VARCHAR(50),          -- from row 3: "all", "75k-325k", "under-25k", etc.
+  kw_style_template TEXT,                      -- from row 4: "deck builder (city_name) (state_code)"
+  selected_kwslot VARCHAR(20),                 -- from row 5: "kwslot1", "kwslot2", etc.
+  rel_dfs_location_code INTEGER,               -- from row 6: 2840 (default)
+  language_code VARCHAR(10) DEFAULT 'en',     -- from row 7: "en"
+  
+  -- Execution tracking
+  status VARCHAR(50) DEFAULT 'pending',        -- 'pending', 'running', 'completed', 'failed'
+  started_at TIMESTAMP WITH TIME ZONE,
+  completed_at TIMESTAMP WITH TIME ZONE,
+  
+  -- Results and statistics
+  total_records_created INTEGER DEFAULT 0,
+  total_keywords_created INTEGER DEFAULT 0,
+  total_errors INTEGER DEFAULT 0,
+  
+  -- Error tracking
+  error_message TEXT,
+  error_details JSONB,
+  
+  -- Additional metadata
+  execution_duration_ms INTEGER,
+  notes TEXT
+);
+
+-- Indexes
+CREATE INDEX idx_fabrication_launches_user_id ON fabrication_launches(user_id);
+CREATE INDEX idx_fabrication_launches_created_at ON fabrication_launches(created_at DESC);
+CREATE INDEX idx_fabrication_launches_status ON fabrication_launches(status);
+CREATE INDEX idx_fabrication_launches_industry ON fabrication_launches(selected_industry_id);
+```
+
+This table captures:
+1. **All user selections** from the 7 form rows
+2. **Execution tracking** (status, timing, duration)
+3. **Results metrics** (records created, errors, etc.)
+4. **Error handling** (messages and detailed error info in JSONB)
+5. **Audit trail** (who ran it, when, what settings)
+
+The field names correspond directly to the UI elements on the `/fabric` page, making it easy to map form data to database records.
+
+---
+
+_**User**_
+
+lets work on the core fields . just show those to me in chat and not all of the other db schema yet
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here are the core fields for the `fabrication_launches` table:
+
+```sql
+-- Core fields
+launch_id SERIAL PRIMARY KEY,
+created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+user_id UUID REFERENCES users(id),
+
+-- Configuration from the UI form
+country_selection VARCHAR(100),              -- Row 1: "United States", "Canada", etc.
+selected_industry_id INTEGER,                -- Row 2: industry dropdown selection  
+city_population_filter VARCHAR(50),          -- Row 3: "all", "75k-325k", "under-25k", etc.
+kw_style_template TEXT,                      -- Row 4: "deck builder (city_name) (state_code)"
+selected_kwslot VARCHAR(20),                 -- Row 5: "kwslot1", "kwslot2", etc.
+rel_dfs_location_code INTEGER,               -- Row 6: 2840 (default)
+language_code VARCHAR(10) DEFAULT 'en',     -- Row 7: "en"
+
+-- Basic execution tracking
+status VARCHAR(50) DEFAULT 'pending'         -- 'pending', 'running', 'completed', 'failed'
+```
+
+These are the essential fields that capture the user's form selections and basic tracking info.
+
+---
+
+_**User**_
+
+change all varchar to text 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here are the core fields for the `fabrication_launches` table with VARCHAR changed to TEXT:
+
+```sql
+-- Core fields
+launch_id SERIAL PRIMARY KEY,
+created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+user_id UUID REFERENCES users(id),
+
+-- Configuration from the UI form
+country_selection TEXT,                      -- Row 1: "United States", "Canada", etc.
+selected_industry_id INTEGER,                -- Row 2: industry dropdown selection  
+city_population_filter TEXT,                 -- Row 3: "all", "75k-325k", "under-25k", etc.
+kw_style_template TEXT,                      -- Row 4: "deck builder (city_name) (state_code)"
+selected_kwslot TEXT,                        -- Row 5: "kwslot1", "kwslot2", etc.
+rel_dfs_location_code INTEGER,               -- Row 6: 2840 (default)
+language_code TEXT DEFAULT 'en',            -- Row 7: "en"
+
+-- Basic execution tracking
+status TEXT DEFAULT 'pending'               -- 'pending', 'running', 'completed', 'failed'
+```
+
+All VARCHAR fields have been changed to TEXT as requested.
+
+---
+
+_**User**_
+
+User provided an image (image/png).
+
+pleaes change the field names to this 
+
+[Image #1]
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here are the core fields for the `fabrication_launches` table with the updated field names:
+
+```sql
+-- Core fields
+launch_id SERIAL PRIMARY KEY,
+created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+user_id UUID REFERENCES users(id),
+
+-- Configuration from the UI form
+opt_country TEXT,                            -- Row 1: "United States", "Canada", etc.
+opt_industry TEXT,                           -- Row 2: industry dropdown selection  
+opt_kw_style TEXT,                           -- Row 4: "deck builder (city_name) (state_code)"
+opt_kw_slot TEXT,                            -- Row 5: "kwslot1", "kwslot2", etc.
+opt_rel_dfs_loc TEXT,                        -- Row 6: 2840 (default)
+opt_language TEXT DEFAULT 'en',             -- Row 7: "en"
+
+-- Basic execution tracking
+status TEXT DEFAULT 'pending'               -- 'pending', 'running', 'completed', 'failed'
+```
+
+I notice the city population filter field isn't in your list - should that be added as well, or are we omitting it for now?
+
+---
+
+_**User**_
+
+please use the exact field names here
+
+launch_id
+created_at
+user_id
+
+opt_country
+opt_industry_id
+opt_city_population_filter
+opt_kw_style
+opt_kw_slot
+opt_rel_dfs_location_code
+opt_language_code
+
+status
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here are the core fields for the `fabrication_launches` table with the exact field names:
+
+```sql
+-- Core fields
+launch_id SERIAL PRIMARY KEY,
+created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+user_id UUID REFERENCES users(id),
+
+-- Configuration from the UI form
+opt_country TEXT,                            -- Row 1: "United States", "Canada", etc.
+opt_industry_id INTEGER,                     -- Row 2: industry dropdown selection  
+opt_city_population_filter TEXT,             -- Row 3: "all", "75k-325k", "under-25k", etc.
+opt_kw_style TEXT,                           -- Row 4: "deck builder (city_name) (state_code)"
+opt_kw_slot TEXT,                            -- Row 5: "kwslot1", "kwslot2", etc.
+opt_rel_dfs_location_code INTEGER,           -- Row 6: 2840 (default)
+opt_language_code TEXT DEFAULT 'en',        -- Row 7: "en"
+
+-- Basic execution tracking
+status TEXT DEFAULT 'pending'               -- 'pending', 'running', 'completed', 'failed'
+```
+
+All field names now match exactly as you specified.
+
+---
+
+_**User**_
+
+ok give me the sql to actually create this in supabase 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here's the SQL to create the `fabrication_launches` table in Supabase:
+
+```sql
+CREATE TABLE fabrication_launches (
+  launch_id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  user_id UUID REFERENCES users(id),
+  
+  opt_country TEXT,
+  opt_industry_id INTEGER,
+  opt_city_population_filter TEXT,
+  opt_kw_style TEXT,
+  opt_kw_slot TEXT,
+  opt_rel_dfs_location_code INTEGER,
+  opt_language_code TEXT DEFAULT 'en',
+  
+  status TEXT DEFAULT 'pending'
+);
+
+-- Create indexes for better performance
+CREATE INDEX idx_fabrication_launches_user_id ON fabrication_launches(user_id);
+CREATE INDEX idx_fabrication_launches_created_at ON fabrication_launches(created_at DESC);
+CREATE INDEX idx_fabrication_launches_status ON fabrication_launches(status);
+```
+
+This creates the table with all the exact field names you specified, plus some basic indexes for common query patterns.
+
+---
+
+_**User**_
+
+ok i ran the sql, now please do the following. on tab 2 on /fabric page, pleaes create a ui table that will list every db column from our new table (use exact db column name in bold and all lowercase in header row of table) 
+
+make header row bg color of gray
+
+there should not be any <td> rows (tbody) showing yet because we haven't actually created the f370 function or ran it yet
+
+but we are just creating the ui table component now 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Create UI table on Tab 2 to display fabrication_launches table columns
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/fabric/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   277→              </div>
+   278→            </div>
+   279→          )}
+   280→
+   281→          {activeTab === 2 && (
+   282→            <div>
+   283→              {/* Fabrication Launches Table */}
+   284→              <table className="border-collapse table-auto">
+   285→                {/* Header row with gray background */}
+   286→                <thead>
+   287→                  <tr className="bg-gray-200">
+   288→                    <th className="border border-gray-300 p-3 font-bold text-left">launch_id</th>
+   289→                    <th className="border border-gray-300 p-3 font-bold text-left">created_at</th>
+   290→                    <th className="border border-gray-300 p-3 font-bold text-left">user_id</th>
+   291→                    <th className="border border-gray-300 p-3 font-bold text-left">opt_country</th>
+   292→                    <th className="border border-gray-300 p-3 font-bold text-left">opt_industry_id</th>
+   293→                    <th className="border border-gray-300 p-3 font-bold text-left">opt_city_population_filter</th>
+   294→                    <th className="border border-gray-300 p-3 font-bold text-left">opt_kw_style</th>
+   295→                    <th className="border border-gray-300 p-3 font-bold text-left">opt_kw_slot</th>
+   296→                    <th className="border border-gray-300 p-3 font-bold text-left">opt_rel_dfs_location_code</th>
+   297→                    <th className="border border-gray-300 p-3 font-bold text-left">opt_language_code</th>
+   298→                    <th className="border border-gray-300 p-3 font-bold text-left">status</th>
+   299→                  </tr>
+   300→                </thead>
+   301→                {/* Empty tbody - no data rows yet */}
+   302→                <tbody>
+   303→                  {/* No rows until f370 function is created and executed */}
+   304→                </tbody>
+   305→              </table>
+   306→            </div>
+   307→          )}
+   308→        </div>
+   309→      </div>
+   310→    </div>
+   311→  );
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Create UI table on Tab 2 to display fabrication_launches table columns
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've created the UI table on Tab 2 of the `/fabric` page with:
+
+1. **Header row** with gray background (`bg-gray-200`)
+2. **All database column names** exactly as they appear in the database (bold and lowercase)
+3. **Empty tbody** - no data rows yet since the f370 function hasn't been created or executed
+4. **Proper table styling** with borders and padding to match the existing table on Tab 1
+
+The table includes all 11 columns from the `fabrication_launches` table:
+- launch_id, created_at, user_id
+- opt_country, opt_industry_id, opt_city_population_filter
+- opt_kw_style, opt_kw_slot, opt_rel_dfs_location_code, opt_language_code  
+- status
+
+The table is ready to display data once the f370 function is implemented and executed.
+
+---
+
+_**User**_
+
+
+please create sql that i can run in supabase to do the following
+
+in db table
+keywordshub_tags
+
+
+create new db column
+fabrication_launch_created_from
+
+foreign key to fabrication_launches.launch_id
+
+integer
+
+———————————————————————
+
+then on page of /kwtagzar, please create new ui column to the immediate right of tag_id ui column
+
+for this new db column
+
+the values that show in the <td> of the ui table on /kwtagzar should be the actual integer values
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here's the SQL to add the new column to the `keywordshub_tags` table:
+
+```sql
+ALTER TABLE keywordshub_tags 
+ADD COLUMN fabrication_launch_created_from INTEGER REFERENCES fabrication_launches(launch_id);
+```
+
+Now let me find and update the `/kwtagzar` page to add the new UI column:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+No files found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+No files found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep**
+
+Result:
+
+```
+Found 8 files
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_12-58-26Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/ZhedoriButtonBar.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwtagzar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_03-33-20Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_00-46-07Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-21_22-07-28Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-21_21-44-39Z-storedb-please-review-my.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/FileGunBasin/09 August-01 StormBasin/190 sddx - nubra tableface - official tenants/190 sddx - nubra tableface - official tenants.txt
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/kwtagzar/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
+     7→import KeywordsTagsTable from './components/KeywordsTagsTable';
+     8→
+     9→export default function KwtagzarPage() {
+    10→  const { user } = useAuth();
+    11→  const router = useRouter();
+    12→
+    13→  useEffect(() => {
+    14→    if (!user) {
+    15→      router.push('/login');
+    16→      return;
+    17→    }
+    18→  }, [user, router]);
+    19→
+    20→
+    21→  if (!user) {
+    22→    return (
+    23→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    24→        <div className="text-gray-500">Loading...</div>
+    25→      </div>
+    26→    );
+    27→  }
+    28→
+    29→  // Set page title
+    30→  useEffect(() => {
+    31→    document.title = '/kwtagzar - Snefuru';
+    32→  }, []);
+    33→
+    34→  return (
+    35→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    36→      {/* Header */}
+    37→      <div className="bg-white border-b px-6 py-4">
+    38→        <div className="flex items-center justify-between">
+    39→          <div className="flex items-center space-x-6">
+    40→            <h1 className="text-2xl font-bold text-gray-800">🏷️ Keywords Tags Manager</h1>
+    41→            <ZhedoriButtonBar />
+    42→          </div>
+    43→          <div className="text-right">
+    44→            <div className="text-sm text-gray-500">Tag Management System</div>
+    45→            <div className="text-xs text-gray-400">Project: Keywords Organization</div>
+    46→          </div>
+    47→        </div>
+    48→      </div>
+    49→
+    50→      {/* Main Content - Full Width KeywordsTagsTable */}
+    51→      <div className="flex-1 overflow-hidden">
+    52→        <KeywordsTagsTable />
+    53→      </div>
+    54→    </div>
+    55→  );
+    56→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/kwtagzar/components/KeywordsTagsTable.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import { useAuth } from '@/app/context/AuthContext';
+     6→import dynamic from 'next/dynamic';
+     7→
+     8→const NubraTablefaceKite = dynamic(
+     9→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    10→  { ssr: false }
+    11→);
+    12→
+    13→interface KeywordTag {
+    14→  tag_id: number;
+    15→  tag_name: string;
+    16→  tag_order: number;
+    17→  created_at: string;
+    18→  updated_at: string;
+    19→  user_id: string;
+    20→}
+    21→
+    22→const columns = [
+    23→  { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
+    24→  { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
+    25→  { key: 'tag_order', label: 'tag_order', type: 'number', width: '120px' },
+    26→  { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
+    27→  { key: 'updated_at', label: 'updated_at', type: 'datetime', width: '180px' },
+    28→  { key: 'user_id', label: 'user_id', type: 'text', width: '200px' }
+    29→];
+    30→
+    31→export default function KeywordsTagsTable() {
+    32→  const { user } = useAuth();
+    33→  const [data, setData] = useState<KeywordTag[]>([]);
+    34→  const [loading, setLoading] = useState(true);
+    35→  const [error, setError] = useState<string | null>(null);
+    36→  const [searchTerm, setSearchTerm] = useState('');
+    37→  const [currentPage, setCurrentPage] = useState(1);
+    38→  const [itemsPerPage, setItemsPerPage] = useState(100);
+    39→  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    40→  const [sortField, setSortField] = useState<keyof KeywordTag>('created_at');
+    41→  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    42→  
+    43→  // Modal states
+    44→  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    45→  
+    46→  // Inline editing states
+    47→  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+    48→  const [editingValue, setEditingValue] = useState<string>('');
+    49→  
+    50→  // Form data for creating
+    51→  const [formData, setFormData] = useState({
+    52→    tag_name: '',
+    53→    tag_order: 0
+    54→  });
+    55→
+    56→  const supabase = createClientComponentClient();
+    57→
+    58→  // Get user ID
+    59→  const [userInternalId, setUserInternalId] = useState<string | null>(null);
+    60→
+    61→  useEffect(() => {
+    62→    const getUserId = async () => {
+    63→      if (user?.id) {
+    64→        const { data: userData } = await supabase
+    65→          .from('users')
+    66→          .select('id')
+    67→          .eq('auth_id', user.id)
+    68→          .single();
+    69→        
+    70→        if (userData) {
+    71→          setUserInternalId(userData.id);
+    72→        }
+    73→      }
+    74→    };
+    75→    getUserId();
+    76→  }, [user, supabase]);
+    77→
+    78→  // Fetch data
+    79→  const fetchData = async () => {
+    80→    try {
+    81→      setLoading(true);
+    82→      
+    83→      if (!userInternalId) return;
+    84→
+    85→      const response = await fetch(`/api/keywordshub_tags?user_internal_id=${userInternalId}`);
+    86→      const result = await response.json();
+    87→
+    88→      if (!response.ok) {
+    89→        throw new Error(result.error || 'Failed to fetch data');
+    90→      }
+    91→      
+    92→      setData(result.tags || []);
+    93→    } catch (err) {
+    94→      console.error('Error fetching tags:', err);
+    95→      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+    96→    } finally {
+    97→      setLoading(false);
+    98→    }
+    99→  };
+   100→
+   101→  useEffect(() => {
+   102→    if (userInternalId) {
+   103→      fetchData();
+   104→    }
+   105→  }, [userInternalId]);
+   106→
+   107→  // Filter and sort data
+   108→  const filteredAndSortedData = useMemo(() => {
+   109→    let filtered = data.filter(item => {
+   110→      if (!searchTerm) return true;
+   111→      return Object.values(item).some(value => 
+   112→        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+   113→      );
+   114→    });
+   115→
+   116→    // Sort data
+   117→    filtered.sort((a, b) => {
+   118→      const aValue = a[sortField];
+   119→      const bValue = b[sortField];
+   120→      
+   121→      if (aValue === null && bValue === null) return 0;
+   122→      if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
+   123→      if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
+   124→      
+   125→      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+   126→      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+   127→      return 0;
+   128→    });
+   129→
+   130→    return filtered;
+   131→  }, [data, searchTerm, sortField, sortOrder]);
+   132→
+   133→  // Pagination
+   134→  const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === 0 ? filteredAndSortedData.length : itemsPerPage));
+   135→  const startIndex = (currentPage - 1) * itemsPerPage;
+   136→  const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+   137→
+   138→  // Handle sort
+   139→  const handleSort = (field: keyof KeywordTag) => {
+   140→    if (sortField === field) {
+   141→      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+   142→    } else {
+   143→      setSortField(field);
+   144→      setSortOrder('asc');
+   145→    }
+   146→  };
+   147→
+   148→  // Handle row selection
+   149→  const handleRowSelect = (id: number) => {
+   150→    const newSelected = new Set(selectedRows);
+   151→    if (newSelected.has(id)) {
+   152→      newSelected.delete(id);
+   153→    } else {
+   154→      newSelected.add(id);
+   155→    }
+   156→    setSelectedRows(newSelected);
+   157→  };
+   158→
+   159→  // Handle select all
+   160→  const handleSelectAll = () => {
+   161→    if (selectedRows.size === paginatedData.length) {
+   162→      setSelectedRows(new Set());
+   163→    } else {
+   164→      setSelectedRows(new Set(paginatedData.map(item => item.tag_id)));
+   165→    }
+   166→  };
+   167→
+   168→  // Inline editing functions
+   169→  const startEditing = (id: number, field: string, currentValue: any) => {
+   170→    setEditingCell({ id, field });
+   171→    setEditingValue(currentValue?.toString() || '');
+   172→  };
+   173→
+   174→  const saveEdit = async () => {
+   175→    if (!editingCell || !userInternalId) return;
+   176→    
+   177→    try {
+   178→      let value: any = editingValue;
+   179→      
+   180→      // Convert value based on field type
+   181→      const column = columns.find(col => col.key === editingCell.field);
+   182→      if (column?.type === 'number') {
+   183→        value = editingValue === '' ? null : Number(editingValue);
+   184→      }
+   185→
+   186→      const response = await fetch('/api/keywordshub_tags', {
+   187→        method: 'PUT',
+   188→        headers: {
+   189→          'Content-Type': 'application/json',
+   190→        },
+   191→        body: JSON.stringify({
+   192→          tag_id: editingCell.id,
+   193→          user_internal_id: userInternalId,
+   194→          [editingCell.field]: value
+   195→        }),
+   196→      });
+   197→
+   198→      const result = await response.json();
+   199→
+   200→      if (!response.ok) {
+   201→        throw new Error(result.error || 'Failed to update');
+   202→      }
+   203→
+   204→      // Update local data
+   205→      setData(prevData => 
+   206→        prevData.map(item => 
+   207→          item.tag_id === editingCell.id 
+   208→            ? { ...item, [editingCell.field]: value, updated_at: new Date().toISOString() }
+   209→            : item
+   210→        )
+   211→      );
+   212→
+   213→      setEditingCell(null);
+   214→      setEditingValue('');
+   215→    } catch (error) {
+   216→      console.error('Error updating field:', error);
+   217→      alert('Failed to update field');
+   218→    }
+   219→  };
+   220→
+   221→  const cancelEdit = () => {
+   222→    setEditingCell(null);
+   223→    setEditingValue('');
+   224→  };
+   225→
+   226→  // Create new inline record
+   227→  const createNewInline = async () => {
+   228→    if (!userInternalId) return;
+   229→
+   230→    try {
+   231→      const newRecord = {
+   232→        tag_name: 'New Tag',
+   233→        tag_order: 0,
+   234→        user_internal_id: userInternalId
+   235→      };
+   236→
+   237→      const response = await fetch('/api/keywordshub_tags', {
+   238→        method: 'POST',
+   239→        headers: {
+   240→          'Content-Type': 'application/json',
+   241→        },
+   242→        body: JSON.stringify(newRecord),
+   243→      });
+   244→
+   245→      const result = await response.json();
+   246→
+   247→      if (!response.ok) {
+   248→        throw new Error(result.error || 'Failed to create');
+   249→      }
+   250→
+   251→      // Add to local data at the beginning
+   252→      setData(prevData => [result.tag, ...prevData]);
+   253→      
+   254→      // Start editing the tag_name field immediately
+   255→      setTimeout(() => {
+   256→        startEditing(result.tag.tag_id, 'tag_name', 'New Tag');
+   257→      }, 100);
+   258→
+   259→    } catch (error) {
+   260→      console.error('Error creating record:', error);
+   261→      alert('Failed to create record');
+   262→    }
+   263→  };
+   264→
+   265→  // Handle popup form creation
+   266→  const handleCreate = async () => {
+   267→    if (!userInternalId) return;
+   268→
+   269→    try {
+   270→      const response = await fetch('/api/keywordshub_tags', {
+   271→        method: 'POST',
+   272→        headers: {
+   273→          'Content-Type': 'application/json',
+   274→        },
+   275→        body: JSON.stringify({
+   276→          ...formData,
+   277→          user_internal_id: userInternalId
+   278→        }),
+   279→      });
+   280→      
+   281→      const result = await response.json();
+   282→
+   283→      if (!response.ok) {
+   284→        throw new Error(result.error || 'Failed to create');
+   285→      }
+   286→      
+   287→      setIsCreateModalOpen(false);
+   288→      resetForm();
+   289→      fetchData();
+   290→    } catch (err) {
+   291→      console.error('Error creating record:', err);
+   292→      alert(`Failed to create record: ${err instanceof Error ? err.message : 'Unknown error'}`);
+   293→    }
+   294→  };
+   295→
+   296→  // Reset form
+   297→  const resetForm = () => {
+   298→    setFormData({
+   299→      tag_name: '',
+   300→      tag_order: 0
+   301→    });
+   302→  };
+   303→
+   304→  // Render cell content
+   305→  const renderCell = (item: KeywordTag, column: typeof columns[0]) => {
+   306→    const value = item[column.key as keyof KeywordTag];
+   307→    const isEditing = editingCell?.id === item.tag_id && editingCell?.field === column.key;
+   308→    const isReadOnly = column.key === 'tag_id' || column.key === 'created_at' || column.key === 'updated_at' || column.key === 'user_id';
+   309→
+   310→    if (isEditing && !isReadOnly) {
+   311→      return (
+   312→        <div className="flex items-center space-x-2">
+   313→          <input
+   314→            type={column.type === 'number' ? 'number' : 'text'}
+   315→            value={editingValue}
+   316→            onChange={(e) => setEditingValue(e.target.value)}
+   317→            onKeyDown={(e) => {
+   318→              if (e.key === 'Enter') saveEdit();
+   319→              if (e.key === 'Escape') cancelEdit();
+   320→            }}
+   321→            className="w-full px-2 py-1 text-xs border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+   322→            autoFocus
+   323→          />
+   324→          <button
+   325→            onClick={saveEdit}
+   326→            className="text-green-600 hover:text-green-800 text-xs"
+   327→          >
+   328→            ✓
+   329→          </button>
+   330→          <button
+   331→            onClick={cancelEdit}
+   332→            className="text-red-600 hover:text-red-800 text-xs"
+   333→          >
+   334→            ✕
+   335→          </button>
+   336→        </div>
+   337→      );
+   338→    }
+   339→
+   340→    const cellClass = "px-2 py-1 cursor-pointer hover:bg-blue-50 text-xs";
+   341→    
+   342→    if (column.type === 'datetime' && value) {
+   343→      return (
+   344→        <div
+   345→          className={cellClass}
+   346→          onClick={() => !isReadOnly && startEditing(item.tag_id, column.key, value)}
+   347→        >
+   348→          {new Date(value as string).toLocaleString()}
+   349→        </div>
+   350→      );
+   351→    }
+   352→
+   353→    if (column.type === 'number' && value !== null) {
+   354→      return (
+   355→        <div
+   356→          className={cellClass}
+   357→          onClick={() => !isReadOnly && startEditing(item.tag_id, column.key, value)}
+   358→        >
+   359→          {typeof value === 'number' ? value.toLocaleString() : value}
+   360→        </div>
+   361→      );
+   362→    }
+   363→
+   364→    return (
+   365→      <div
+   366→        className={cellClass}
+   367→        onClick={() => !isReadOnly && startEditing(item.tag_id, column.key, value)}
+   368→      >
+   369→        {value?.toString() || ''}
+   370→      </div>
+   371→    );
+   372→  };
+   373→
+   374→  // Pagination Controls Component - Matching /filejar style
+   375→  const PaginationControls = () => {
+   376→    // Always show pagination controls
+   377→    
+   378→    return (
+   379→      <div className="flex items-center">
+   380→        <div className="flex items-center">
+   381→          <button
+   382→            onClick={() => {
+   383→              setItemsPerPage(10);
+   384→              setCurrentPage(1);
+   385→            }}
+   386→            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${itemsPerPage === 10 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   387→          >
+   388→            10
+   389→          </button>
+   390→          <button
+   391→            onClick={() => {
+   392→              setItemsPerPage(20);
+   393→              setCurrentPage(1);
+   394→            }}
+   395→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 20 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   396→          >
+   397→            20
+   398→          </button>
+   399→          <button
+   400→            onClick={() => {
+   401→              setItemsPerPage(50);
+   402→              setCurrentPage(1);
+   403→            }}
+   404→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 50 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   405→          >
+   406→            50
+   407→          </button>
+   408→          <button
+   409→            onClick={() => {
+   410→              setItemsPerPage(100);
+   411→              setCurrentPage(1);
+   412→            }}
+   413→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 100 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   414→          >
+   415→            100
+   416→          </button>
+   417→          <button
+   418→            onClick={() => {
+   419→              setItemsPerPage(200);
+   420→              setCurrentPage(1);
+   421→            }}
+   422→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 200 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   423→          >
+   424→            200
+   425→          </button>
+   426→          <button
+   427→            onClick={() => {
+   428→              setItemsPerPage(500);
+   429→              setCurrentPage(1);
+   430→            }}
+   431→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 500 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   432→          >
+   433→            500
+   434→          </button>
+   435→          <button
+   436→            onClick={() => {
+   437→              setItemsPerPage(filteredAndSortedData.length);
+   438→              setCurrentPage(1);
+   439→            }}
+   440→            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${itemsPerPage === filteredAndSortedData.length ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   441→          >
+   442→            All
+   443→          </button>
+   444→        </div>
+   445→        <div className="border-l border-gray-300 pl-2 ml-2">
+   446→          <div className="flex items-center">
+   447→            <button
+   448→              onClick={() => setCurrentPage(1)}
+   449→              disabled={currentPage === 1}
+   450→              className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   451→            >
+   452→              First
+   453→            </button>
+   454→            <button
+   455→              onClick={() => setCurrentPage(currentPage - 1)}
+   456→              disabled={currentPage === 1}
+   457→              className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   458→            >
+   459→              Prev
+   460→            </button>
+   461→            
+   462→            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+   463→              const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+   464→              if (pageNum > totalPages) return null;
+   465→              return (
+   466→                <button
+   467→                  key={pageNum}
+   468→                  onClick={() => setCurrentPage(pageNum)}
+   469→                  className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+   470→                    currentPage === pageNum 
+   471→                      ? 'bg-blue-500 text-white border-blue-500' 
+   472→                      : 'bg-white hover:bg-gray-200'
+   473→                  }`}
+   474→                >
+   475→                  {pageNum}
+   476→                </button>
+   477→              );
+   478→            })}
+   479→            
+   480→            <button
+   481→              onClick={() => setCurrentPage(currentPage + 1)}
+   482→              disabled={currentPage === totalPages}
+   483→              className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   484→            >
+   485→              Next
+   486→            </button>
+   487→            <button
+   488→              onClick={() => setCurrentPage(totalPages)}
+   489→              disabled={currentPage === totalPages}
+   490→              className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   491→            >
+   492→              Last
+   493→            </button>
+   494→          </div>
+   495→        </div>
+   496→      </div>
+   497→    );
+   498→  };
+   499→
+   500→  if (loading) {
+   501→    return (
+   502→      <div className="flex items-center justify-center h-64">
+   503→        <div className="text-gray-500">Loading keywords tags...</div>
+   504→      </div>
+   505→    );
+   506→  }
+   507→
+   508→  if (error) {
+   509→    return (
+   510→      <div className="flex items-center justify-center h-64">
+   511→        <div className="text-red-500">Error: {error}</div>
+   512→      </div>
+   513→    );
+   514→  }
+   515→
+   516→  return (
+   517→    <div className="h-full flex flex-col">
+   518→      {/* Controls */}
+   519→      <div className="flex-none bg-white border-b px-6 py-4">
+   520→        <div className="flex items-center justify-between">
+   521→          <div className="flex items-center space-x-4">
+   522→            <NubraTablefaceKite text="nubra-tableface-kite" />
+   523→            <PaginationControls />
+   524→            <div className="relative">
+   525→              <input
+   526→                type="text"
+   527→                placeholder="Search all fields..."
+   528→                value={searchTerm}
+   529→                onChange={(e) => {
+   530→                  setSearchTerm(e.target.value);
+   531→                  setCurrentPage(1);
+   532→                }}
+   533→                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+   534→              />
+   535→              <button
+   536→                onClick={() => {
+   537→                  setSearchTerm('');
+   538→                  setCurrentPage(1);
+   539→                }}
+   540→                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+   541→              >
+   542→                CL
+   543→              </button>
+   544→            </div>
+   545→          </div>
+   546→          <div className="flex items-center space-x-4">
+   547→            <div className="flex space-x-2">
+   548→              <button
+   549→                onClick={createNewInline}
+   550→                className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+   551→              >
+   552→                Create New (Inline)
+   553→              </button>
+   554→              <button
+   555→                onClick={() => setIsCreateModalOpen(true)}
+   556→                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+   557→              >
+   558→                Create New (Popup)
+   559→              </button>
+   560→            </div>
+   561→          </div>
+   562→        </div>
+   563→      </div>
+   564→
+   565→      {/* Table */}
+   566→      <div className="flex-1 bg-white overflow-hidden">
+   567→        <div className="h-full overflow-auto">
+   568→          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '1000px' }}>
+   569→            <thead className="bg-gray-50 sticky top-0">
+   570→              <tr>
+   571→                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '20px' }}>
+   572→                  <div 
+   573→                    className="w-full h-full flex items-center justify-center cursor-pointer"
+   574→                    style={{ width: '20px', height: '20px' }}
+   575→                    onClick={handleSelectAll}
+   576→                  >
+   577→                    <div
+   578→                      className={`w-full h-full border-2 flex items-center justify-center ${
+   579→                        selectedRows.size === paginatedData.length && paginatedData.length > 0
+   580→                          ? 'bg-blue-500 border-blue-500' 
+   581→                          : 'border-gray-300 bg-white'
+   582→                      }`}
+   583→                      style={{ width: '20px', height: '20px' }}
+   584→                    >
+   585→                      {selectedRows.size === paginatedData.length && paginatedData.length > 0 && (
+   586→                        <span className="text-white text-xs">✓</span>
+   587→                      )}
+   588→                    </div>
+   589→                  </div>
+   590→                </th>
+   591→                {columns.map((column) => (
+   592→                  <th
+   593→                    key={column.key}
+   594→                    className="px-2 py-3 text-left border border-gray-200 cursor-pointer hover:bg-gray-100"
+   595→                    onClick={() => handleSort(column.key as keyof KeywordTag)}
+   596→                    style={{ width: column.width }}
+   597→                  >
+   598→                    <div className="flex items-center space-x-1">
+   599→                      <span className="font-bold text-xs lowercase">{column.label}</span>
+   600→                      {sortField === column.key && (
+   601→                        <span className="text-xs">
+   602→                          {sortOrder === 'asc' ? '↑' : '↓'}
+   603→                        </span>
+   604→                      )}
+   605→                    </div>
+   606→                  </th>
+   607→                ))}
+   608→              </tr>
+   609→            </thead>
+   610→            <tbody className="bg-white">
+   611→              {paginatedData.map((item) => (
+   612→                <tr key={item.tag_id} className="hover:bg-gray-50">
+   613→                  <td className="px-2 py-2 border border-gray-200">
+   614→                    <div 
+   615→                      className="w-full h-full flex items-center justify-center cursor-pointer"
+   616→                      style={{ width: '20px', height: '20px' }}
+   617→                      onClick={() => handleRowSelect(item.tag_id)}
+   618→                    >
+   619→                      <div
+   620→                        className={`w-full h-full border-2 flex items-center justify-center ${
+   621→                          selectedRows.has(item.tag_id) 
+   622→                            ? 'bg-blue-500 border-blue-500' 
+   623→                            : 'border-gray-300 bg-white'
+   624→                        }`}
+   625→                        style={{ width: '20px', height: '20px' }}
+   626→                      >
+   627→                        {selectedRows.has(item.tag_id) && (
+   628→                          <span className="text-white text-xs">✓</span>
+   629→                        )}
+   630→                      </div>
+   631→                    </div>
+   632→                  </td>
+   633→                  {columns.map((column) => (
+   634→                    <td key={column.key} className="border border-gray-200">
+   635→                      {renderCell(item, column)}
+   636→                    </td>
+   637→                  ))}
+   638→                </tr>
+   639→              ))}
+   640→            </tbody>
+   641→          </table>
+   642→        </div>
+   643→      </div>
+   644→
+   645→      {/* Bottom Controls */}
+   646→      <div className="flex-none bg-white border-t px-6 py-4">
+   647→        <div className="flex items-center justify-between">
+   648→          <div className="flex items-center space-x-4">
+   649→            <PaginationControls />
+   650→            <div className="relative">
+   651→              <input
+   652→                type="text"
+   653→                placeholder="Search all fields..."
+   654→                value={searchTerm}
+   655→                onChange={(e) => {
+   656→                  setSearchTerm(e.target.value);
+   657→                  setCurrentPage(1);
+   658→                }}
+   659→                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+   660→              />
+   661→              <button
+   662→                onClick={() => {
+   663→                  setSearchTerm('');
+   664→                  setCurrentPage(1);
+   665→                }}
+   666→                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+   667→              >
+   668→                CL
+   669→              </button>
+   670→            </div>
+   671→          </div>
+   672→          <div></div>
+   673→        </div>
+   674→      </div>
+   675→
+   676→      {/* Create Modal */}
+   677→      {isCreateModalOpen && (
+   678→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+   679→          <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+   680→            <h3 className="text-lg font-semibold mb-4">Create New Keywords Tag</h3>
+   681→            <form onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
+   682→              <div className="grid grid-cols-1 gap-4">
+   683→                <div>
+   684→                  <label className="block text-sm font-medium text-gray-700 mb-1">Tag Name</label>
+   685→                  <input
+   686→                    type="text"
+   687→                    value={formData.tag_name}
+   688→                    onChange={(e) => setFormData({...formData, tag_name: e.target.value})}
+   689→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+   690→                    placeholder="Enter tag name"
+   691→                    required
+   692→                  />
+   693→                </div>
+   694→                <div>
+   695→                  <label className="block text-sm font-medium text-gray-700 mb-1">Tag Order</label>
+   696→                  <input
+   697→                    type="number"
+   698→                    value={formData.tag_order}
+   699→                    onChange={(e) => setFormData({...formData, tag_order: parseInt(e.target.value) || 0})}
+   700→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+   701→                    placeholder="0"
+   702→                  />
+   703→                </div>
+   704→              </div>
+   705→              
+   706→              <div className="flex justify-end space-x-3 mt-6">
+   707→                <button
+   708→                  type="button"
+   709→                  onClick={() => setIsCreateModalOpen(false)}
+   710→                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+   711→                >
+   712→                  Cancel
+   713→                </button>
+   714→                <button
+   715→                  type="submit"
+   716→                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+   717→                >
+   718→                  Create Tag
+   719→                </button>
+   720→              </div>
+   721→            </form>
+   722→          </div>
+   723→        </div>
+   724→      )}
+   725→    </div>
+   726→  );
+   727→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the KeywordsTagsTable component to add the new column. I can see that it needs to be added to the interface, columns array, and the data handling:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwtagzar/components/KeywordsTagsTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     9→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    10→  { ssr: false }
+    11→);
+    12→
+    13→interface KeywordTag {
+    14→  tag_id: number;
+    15→  fabrication_launch_created_from: number | null;
+    16→  tag_name: string;
+    17→  tag_order: number;
+    18→  created_at: string;
+    19→  updated_at: string;
+    20→  user_id: string;
+    21→}
+    22→
+    23→const columns = [
+    24→  { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
+    25→  { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwtagzar/components/KeywordsTagsTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    19→  updated_at: string;
+    20→  user_id: string;
+    21→}
+    22→
+    23→const columns = [
+    24→  { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
+    25→  { key: 'fabrication_launch_created_from', label: 'fabrication_launch_created_from', type: 'number', width: '120px' },
+    26→  { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
+    27→  { key: 'tag_order', label: 'tag_order', type: 'number', width: '120px' },
+    28→  { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
+    29→  { key: 'updated_at', label: 'updated_at', type: 'datetime', width: '180px' },
+    30→  { key: 'user_id', label: 'user_id', type: 'text', width: '200px' }
+    31→];
+    32→
+    33→export default function KeywordsTagsTable() {
+    34→  const { user } = useAuth();
+    35→  const [data, setData] = useState<KeywordTag[]>([]);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwtagzar/components/KeywordsTagsTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   306→  // Render cell content
+   307→  const renderCell = (item: KeywordTag, column: typeof columns[0]) => {
+   308→    const value = item[column.key as keyof KeywordTag];
+   309→    const isEditing = editingCell?.id === item.tag_id && editingCell?.field === column.key;
+   310→    const isReadOnly = column.key === 'tag_id' || column.key === 'fabrication_launch_created_from' || column.key === 'created_at' || column.key === 'updated_at' || column.key === 'user_id';
+   311→
+   312→    if (isEditing && !isReadOnly) {
+   313→      return (
+   314→        <div className="flex items-center space-x-2">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully added the new `fabrication_launch_created_from` column to the `/kwtagzar` page. Here's a summary of what was completed:
+
+## SQL for Supabase:
+```sql
+ALTER TABLE keywordshub_tags 
+ADD COLUMN fabrication_launch_created_from INTEGER REFERENCES fabrication_launches(launch_id);
+```
+
+## UI Changes Made:
+1. **Updated Interface**: Added `fabrication_launch_created_from: number | null` to the `KeywordTag` interface
+2. **Added Column**: Inserted the new column immediately after `tag_id` in the columns array with:
+   - Key: `fabrication_launch_created_from`
+   - Label: `fabrication_launch_created_from` (will display in bold lowercase)
+   - Type: `number` (will show integer values)
+   - Width: `120px`
+3. **Set as Read-Only**: Added the field to the read-only columns list so users can't edit it directly
+4. **Proper Positioning**: The column appears immediately to the right of the `tag_id` column as requested
+
+The new column will display the actual integer foreign key values that reference `fabrication_launches.launch_id`, allowing you to see which fabrication launch process created each tag record.
+

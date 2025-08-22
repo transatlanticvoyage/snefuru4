@@ -280,7 +280,34 @@ tag all kws with a special tag (including ones that did previously exist(if any)
 
           {activeTab === 2 && (
             <div>
-              <p className="text-gray-500">Tab 2 content - blank for now</p>
+              {/* Table title */}
+              <div className="mb-4">
+                <span className="font-bold text-lg">db table: fabrication_launches</span>
+              </div>
+              
+              {/* Fabrication Launches Table */}
+              <table className="border-collapse table-auto">
+                {/* Header row with gray background */}
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="border border-gray-300 p-3 font-bold text-left">launch_id</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">created_at</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">user_id</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">opt_country</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">opt_industry_id</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">opt_city_population_filter</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">opt_kw_style</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">opt_kw_slot</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">opt_rel_dfs_location_code</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">opt_language_code</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">status</th>
+                  </tr>
+                </thead>
+                {/* Empty tbody - no data rows yet */}
+                <tbody>
+                  {/* No rows until f370 function is created and executed */}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

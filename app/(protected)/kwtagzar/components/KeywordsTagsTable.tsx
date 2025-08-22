@@ -12,6 +12,7 @@ const NubraTablefaceKite = dynamic(
 
 interface KeywordTag {
   tag_id: number;
+  fabrication_launch_created_from: number | null;
   tag_name: string;
   tag_order: number;
   created_at: string;
@@ -21,6 +22,7 @@ interface KeywordTag {
 
 const columns = [
   { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
+  { key: 'fabrication_launch_created_from', label: 'fabrication_launch_created_from', type: 'number', width: '120px' },
   { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
   { key: 'tag_order', label: 'tag_order', type: 'number', width: '120px' },
   { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
@@ -305,7 +307,7 @@ export default function KeywordsTagsTable() {
   const renderCell = (item: KeywordTag, column: typeof columns[0]) => {
     const value = item[column.key as keyof KeywordTag];
     const isEditing = editingCell?.id === item.tag_id && editingCell?.field === column.key;
-    const isReadOnly = column.key === 'tag_id' || column.key === 'created_at' || column.key === 'updated_at' || column.key === 'user_id';
+    const isReadOnly = column.key === 'tag_id' || column.key === 'fabrication_launch_created_from' || column.key === 'created_at' || column.key === 'updated_at' || column.key === 'user_id';
 
     if (isEditing && !isReadOnly) {
       return (
