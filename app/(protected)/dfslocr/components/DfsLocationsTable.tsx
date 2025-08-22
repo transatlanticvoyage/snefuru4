@@ -111,7 +111,7 @@ export default function DfsLocationsTable() {
       const { data: locations, error } = await supabase
         .from('dfs_locations')
         .select('*')
-        .limit(300000) // Increase limit to 300k to fetch more records
+        .limit(10000) // Reasonable limit to prevent timeouts
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -265,9 +265,9 @@ export default function DfsLocationsTable() {
   }, [data, searchData, searchTerm, sortField, sortOrder]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === 0 ? filteredAndSortedData.length : itemsPerPage));
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));
+  const startIndex = (currentPage - 1) * (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage);
+  const paginatedData = itemsPerPage === -1 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Handle sort
   const handleSort = (field: keyof DfsLocationRecord) => {
@@ -594,80 +594,95 @@ export default function DfsLocationsTable() {
     );
   };
 
-  // Pagination Controls Component
-  const PaginationControls = () => {
-    if (totalPages <= 1 && itemsPerPage !== 0) return null;
-    
-    return (
+  // Pagination Controls Component (matching cnjar1 style)
+  const PaginationControls = () => (
+    <div className="flex items-center space-x-4">
+      {/* Items per page */}
       <div className="flex items-center">
-        {/* Items per page controls */}
-        <div className="flex items-center">
-          {[10, 20, 50, 100, 200, 500].map((size, index) => (
+        <span className="text-sm text-gray-600 mr-2">Per page:</span>
+        <div className="inline-flex" role="group">
+          {[10, 20, 50, 100, 200, 500, -1].map((value, index) => (
             <button
-              key={size}
+              key={value}
               onClick={() => {
-                setItemsPerPage(size);
+                setItemsPerPage(value === -1 ? filteredAndSortedData.length : value);
                 setCurrentPage(1);
               }}
-              className={`px-2 py-2.5 text-sm border cursor-pointer ${ 
-                index === 0 ? 'rounded-l' : ''
-              } ${
-                index === 5 ? '' : '-mr-px'
-              } ${
-                itemsPerPage === size 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-white hover:bg-gray-200'
-              }`}
+              className={`
+                px-3 py-2 text-sm font-medium border border-gray-300
+                ${itemsPerPage === (value === -1 ? filteredAndSortedData.length : value) ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 hover:bg-gray-100'}
+                ${index === 0 ? 'rounded-l-md' : ''}
+                ${index === 6 ? 'rounded-r-md' : ''}
+                ${index > 0 ? 'border-l-0' : ''}
+                transition-colors duration-150 cursor-pointer
+              `}
               style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
             >
-              {size}
+              {value === -1 ? 'All' : value}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Page navigation */}
+      <div className="flex items-center">
+        <span className="text-sm text-gray-600 mr-2">Page:</span>
+        <div className="inline-flex" role="group">
           <button
-            onClick={() => {
-              setItemsPerPage(0);
-              setCurrentPage(1);
-            }}
-            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${
-              itemsPerPage === 0 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-white hover:bg-gray-200'
-            }`}
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            className={`
+              px-3 py-2 text-sm font-medium border border-gray-300 rounded-l-md
+              ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100 cursor-pointer'}
+              transition-colors duration-150
+            `}
             style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
           >
-            All
+            ←
+          </button>
+          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+            let pageNum;
+            if (totalPages <= 5) {
+              pageNum = i + 1;
+            } else if (currentPage <= 3) {
+              pageNum = i + 1;
+            } else if (currentPage >= totalPages - 2) {
+              pageNum = totalPages - 4 + i;
+            } else {
+              pageNum = currentPage - 2 + i;
+            }
+            
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`
+                  px-3 py-2 text-sm font-medium border border-gray-300 border-l-0
+                  ${currentPage === pageNum ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 hover:bg-gray-100'}
+                  transition-colors duration-150 cursor-pointer
+                `}
+                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            className={`
+              px-3 py-2 text-sm font-medium border border-gray-300 border-l-0 rounded-r-md
+              ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100 cursor-pointer'}
+              transition-colors duration-150
+            `}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            →
           </button>
         </div>
-
-        {/* Page navigation controls */}
-        {itemsPerPage !== 0 && totalPages > 1 && (
-          <div className="flex items-center ml-4">
-            {Array.from({ length: Math.min(10, totalPages) }, (_, i) => {
-              const pageNum = Math.max(1, Math.min(currentPage - 5 + i, totalPages - 9 + i));
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`px-2 py-2.5 text-sm border cursor-pointer ${
-                    i === 0 ? 'rounded-l' : ''
-                  } ${
-                    i === Math.min(9, totalPages - 1) ? 'rounded-r' : '-mr-px'
-                  } ${
-                    currentPage === pageNum 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-white hover:bg-gray-200'
-                  }`}
-                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-          </div>
-        )}
       </div>
-    );
-  };
+    </div>
+  );
 
   if (loading) {
     return (
@@ -697,6 +712,10 @@ export default function DfsLocationsTable() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <NubraTablefaceKite text="nubra-tableface-kite" />
+            <div className="text-sm text-gray-600">
+              {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
+              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+            </div>
             <PaginationControls />
             <div className="relative">
               <input
@@ -827,6 +846,10 @@ export default function DfsLocationsTable() {
       <div className="flex-none bg-white border-t px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
+            <div className="text-sm text-gray-600">
+              {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
+              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+            </div>
             <PaginationControls />
             <div className="relative">
               <input

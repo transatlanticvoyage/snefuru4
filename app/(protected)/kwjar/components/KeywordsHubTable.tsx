@@ -16,6 +16,7 @@ interface KeywordRecord {
   search_volume: number | null;
   cpc: number | null;
   location_code: number | null;
+  rel_dfs_location_code: number | null;
   location_display_name: string | null;
   location_coordinate: string | null;
   language_code: string | null;
@@ -37,6 +38,7 @@ const columns = [
   { key: 'search_volume', label: 'search_volume', type: 'number' },
   { key: 'cpc', label: 'cpc', type: 'number' },
   { key: 'location_code', label: 'location_code', type: 'number' },
+  { key: 'rel_dfs_location_code', label: 'rel_dfs_location_code', type: 'number' },
   { key: 'location_display_name', label: 'location_display_name', type: 'text' },
   { key: 'location_coordinate', label: 'location_coordinate', type: 'text' },
   { key: 'language_code', label: 'language_code', type: 'text' },
