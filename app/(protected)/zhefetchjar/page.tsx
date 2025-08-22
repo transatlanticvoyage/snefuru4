@@ -17,6 +17,7 @@ export default function ZhefetchjarPage() {
     }
   }, [user, router]);
 
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -24,6 +25,11 @@ export default function ZhefetchjarPage() {
       </div>
     );
   }
+
+  // Set page title
+  useEffect(() => {
+    document.title = '/zhefetchjar - Snefuru';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

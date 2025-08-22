@@ -17,6 +17,7 @@ export default function KwtagzarPage() {
     }
   }, [user, router]);
 
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -24,6 +25,11 @@ export default function KwtagzarPage() {
       </div>
     );
   }
+
+  // Set page title
+  useEffect(() => {
+    document.title = '/kwtagzar - Snefuru';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

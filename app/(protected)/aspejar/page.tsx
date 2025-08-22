@@ -22,6 +22,7 @@ export default function AspejarPage() {
     }
   }, [user, router]);
 
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -29,6 +30,11 @@ export default function AspejarPage() {
       </div>
     );
   }
+
+  // Set page title
+  useEffect(() => {
+    document.title = '/aspejar - Snefuru';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

@@ -21,6 +21,7 @@ export default function Skojar1Page() {
     }
   }, [user, router]);
 
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -28,6 +29,11 @@ export default function Skojar1Page() {
       </div>
     );
   }
+
+  // Set page title
+  useEffect(() => {
+    document.title = '/skojar1 - Snefuru';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

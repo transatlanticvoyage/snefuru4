@@ -17,6 +17,7 @@ export default function SerpjarPage() {
     }
   }, [user, router]);
 
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -24,6 +25,11 @@ export default function SerpjarPage() {
       </div>
     );
   }
+
+  // Set page title
+  useEffect(() => {
+    document.title = '/serpjar - Snefuru';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

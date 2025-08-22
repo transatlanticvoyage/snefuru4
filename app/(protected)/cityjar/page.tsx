@@ -22,6 +22,7 @@ export default function CityjarPage() {
     }
   }, [user, router]);
 
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -29,6 +30,11 @@ export default function CityjarPage() {
       </div>
     );
   }
+
+  // Set page title immediately
+  useEffect(() => {
+    document.title = '/cityjar - Snefuru';
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
