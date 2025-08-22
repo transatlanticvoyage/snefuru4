@@ -23,6 +23,7 @@ interface City {
   latitude: number | null;
   longitude: number | null;
   rel_metro_id: number | null;
+  fk_dfs_location_code: number | null;
   population_last_updated: string | null;
   created_at: string;
   updated_at: string | null;
@@ -80,6 +81,7 @@ export default function CityjarTable() {
     { key: 'latitude' as keyof City, label: 'latitude', type: 'number' },
     { key: 'longitude' as keyof City, label: 'longitude', type: 'number' },
     { key: 'rel_metro_id' as keyof City, label: 'rel_metro_id', type: 'number' },
+    { key: 'fk_dfs_location_code' as keyof City, label: 'fk_dfs_location_code', type: 'number' },
     { key: 'population_last_updated' as keyof City, label: 'population_last_updated', type: 'datetime' },
     { key: 'created_at' as keyof City, label: 'created_at', type: 'datetime', readOnly: true },
     { key: 'updated_at' as keyof City, label: 'updated_at', type: 'datetime', readOnly: true }

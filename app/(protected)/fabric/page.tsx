@@ -117,16 +117,18 @@ export default function FabricPage() {
                     <th className="border border-gray-300 p-3 font-normal">1</th>
                     <th className="border border-gray-300 p-3 font-normal">2</th>
                     <th className="border border-gray-300 p-3 font-normal">3</th>
+                    <th className="border border-gray-300 p-3 font-normal">4</th>
+                    <th className="border border-gray-300 p-3 font-normal">5</th>
                   </tr>
                 </thead>
                 <tbody>
                   {/* Row 1 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200">1</td>
-                    <td className="border border-gray-300 p-3">
-                      <span className="font-bold">select cncglub rows to populate</span>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">1</td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
+                      <span className="font-bold">cncglub option - select country</span>
                     </td>
-                    <td className="border border-gray-300 p-3">
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
                       <select className="w-full px-2 py-1 border border-gray-300 rounded" defaultValue="United States">
                         <option value="Australia">Australia</option>
                         <option value="Canada">Canada</option>
@@ -136,7 +138,9 @@ export default function FabricPage() {
                         <option value="South Africa">South Africa</option>
                       </select>
                     </td>
-                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
                   </tr>
                   {/* Row 2 */}
                   <tr>
@@ -154,6 +158,8 @@ export default function FabricPage() {
                         ))}
                       </select>
                     </td>
+                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3"></td>
                     <td className="border border-gray-300 p-3"></td>
                   </tr>
                   {/* Row 3 */}
@@ -174,29 +180,16 @@ export default function FabricPage() {
                       </select>
                     </td>
                     <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3"></td>
                   </tr>
                   {/* Row 4 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200">4</td>
-                    <td className="border border-gray-300 p-3">
-                      <span className="font-bold">kw style</span>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">4</td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
+                      <span className="font-bold">kwslot option - kwslot to populate</span>
                     </td>
-                    <td className="border border-gray-300 p-3 min-w-80">
-                      <input 
-                        type="text" 
-                        placeholder="deck builder (city_name) (state_code)"
-                        className="w-full px-2 py-1 border border-gray-300 rounded min-w-72"
-                      />
-                    </td>
-                    <td className="border border-gray-300 p-3"></td>
-                  </tr>
-                  {/* Row 5 */}
-                  <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200">5</td>
-                    <td className="border border-gray-300 p-3">
-                      <span className="font-bold">Select kwslot to populate</span>
-                    </td>
-                    <td className="border border-gray-300 p-3">
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
                       <select className="w-full px-2 py-1 border border-gray-300 rounded">
                         <option value="">Select kwslot...</option>
                         <option value="kwslot1">kwslot1</option>
@@ -211,13 +204,32 @@ export default function FabricPage() {
                         <option value="kwslot10">kwslot10</option>
                       </select>
                     </td>
-                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">cncglub.kwslot*</td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
+                  </tr>
+                  {/* Row 5 */}
+                  <tr>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">5</td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
+                      <span className="font-bold">kwhub option - kw rubric</span>
+                    </td>
+                    <td className="border border-gray-300 p-3 min-w-80 border-t-black border-t-[4px]">
+                      <input 
+                        type="text" 
+                        placeholder="deck builder (city_name) (state_code)"
+                        className="w-full px-2 py-1 border border-gray-300 rounded min-w-72"
+                      />
+                    </td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">keywordshub.keyword_datum</td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
+                    <td className="border border-gray-300 p-3 border-t-black border-t-[4px]"></td>
                   </tr>
                   {/* Row 6 */}
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200">6</td>
                     <td className="border border-gray-300 p-3">
-                      <span className="font-bold">rel_dfs_location_code</span>
+                      <span className="font-bold">kwhub option - rel_dfs_location_code</span>
                     </td>
                     <td className="border border-gray-300 p-3">
                       <input 
@@ -226,22 +238,43 @@ export default function FabricPage() {
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                       />
                     </td>
+                    <td className="border border-gray-300 p-3">keywordshub.rel_dfs_location_code</td>
+                    <td className="border border-gray-300 p-3"></td>
                     <td className="border border-gray-300 p-3"></td>
                   </tr>
                   {/* Row 7 */}
                   <tr>
-                    <td className="border border-gray-300 p-3 bg-gray-200">7</td>
-                    <td className="border border-gray-300 p-3">
-                      <span className="font-bold">language_code</span>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">7</td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
+                      <span className="font-bold">kwhub option - language_code</span>
                     </td>
-                    <td className="border border-gray-300 p-3">
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
                       <input 
                         type="text" 
                         defaultValue="en"
                         className="w-full px-2 py-1 border border-gray-300 rounded"
                       />
                     </td>
-                    <td className="border border-gray-300 p-3"></td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">keywordshub.language_code</td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
+                  </tr>
+                  {/* Row 8 */}
+                  <tr>
+                    <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">8</td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
+                      <span className="font-bold">tag option - keywordshub_tags.tag_name</span>
+                    </td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
+                      <input 
+                        type="text" 
+                        placeholder="deck cncs 1"
+                        className="w-full px-2 py-1 border border-gray-300 rounded placeholder-gray-400"
+                      />
+                    </td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
+                    <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
                   </tr>
                 </tbody>
               </table>
@@ -270,7 +303,7 @@ this process will:
 
 create new keywords in db table keywordshub (if they do not exist)
 
-create kw style by referring to relationship of cncglub -> cncglub.rel_city_id -> cities.city_name / cities.state_code
+NOTE: if (city_name) and/or (state_code) are submitted by user in kw rubric box, do the following: for each row in cncglub, create kw rubric by referring to relationship of cncglub -> cncglub.rel_city_id -> cities.city_name / cities.state_code (to dynamically pull that info)
 
 tag all kws with a special tag (including ones that did previously exist(if any) that match the criteria set here)
 ———————————————————————`}

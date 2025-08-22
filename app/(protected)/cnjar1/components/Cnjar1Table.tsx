@@ -124,7 +124,7 @@ export default function Cnjar1Table() {
 
   // City columns from cityjar
   const cityColumns = [
-    { key: 'cities.rel_dfs_location_code', label: 'rel_dfs_location_code', type: 'number', readOnly: true, isJoined: true },
+    { key: 'cities.fk_dfs_location_code', label: 'fk_dfs_location_code', type: 'number', readOnly: true, isJoined: true },
     { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
     { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
     { key: 'cities.state_full', label: 'state_full', type: 'text', readOnly: true, isJoined: true },
@@ -167,7 +167,7 @@ export default function Cnjar1Table() {
           cities!rel_city_id (
             city_name, state_code, state_full, country, rank_in_pop, 
             gmaps_link, is_suburb, city_and_state_code, city_population, 
-            latitude, longitude, rel_metro_id, population_last_updated, rel_dfs_location_code
+            latitude, longitude, rel_metro_id, population_last_updated, fk_dfs_location_code
           ),
           industries!rel_industry_id (
             industry_name, industry_description
