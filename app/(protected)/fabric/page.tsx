@@ -11,6 +11,17 @@ export default function FabricPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState(1);
   const [industries, setIndustries] = useState<{industry_id: number, industry_name: string}[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [formData, setFormData] = useState({
+    country: 'United States',
+    industry_id: '',
+    city_population_filter: 'all',
+    kwslot: 'kwslot1',
+    kw_rubric: 'deck builder (city_name) (state_code)',
+    rel_dfs_location_code: '2840',
+    language_code: 'en',
+    tag_name: 'deck cncs 1'
+  });
 
   useEffect(() => {
     if (!user) {
@@ -46,6 +57,63 @@ export default function FabricPage() {
 
     fetchIndustries();
   }, [user]);
+
+  const handleF370Process = async () => {
+    // Double confirmation popup
+    const firstConfirm = window.confirm(
+      "⚠️ WARNING: You are about to run the F370 function which will create keywords and modify database records. This is a significant process that cannot be easily undone.\n\nAre you sure you want to continue?"
+    );
+
+    if (!firstConfirm) return;
+
+    const secondConfirm = window.confirm(
+      "⚠️ FINAL WARNING: This will:\n" +
+      "• Filter cncglub records based on your criteria\n" +
+      "• Create new keywords in keywordshub table\n" +
+      "• Create a new tag and assign it to keywords\n" +
+      "• Update cncglub kwslot fields\n" +
+      "• Create a fabrication_launches record\n\n" +
+      "This process will affect multiple database tables. Are you absolutely certain you want to proceed?"
+    );
+
+    if (!secondConfirm) return;
+
+    setIsProcessing(true);
+
+    try {
+      const response = await fetch('/api/f370', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(`✅ F370 Process Completed Successfully!\n\n` +
+              `• Processed ${result.keywords_processed} keywords\n` +
+              `• Updated ${result.cncglub_rows_processed} cncglub rows\n` +
+              `• Created tag: ${result.tag_name} (ID: ${result.tag_id})\n` +
+              `• Launch ID: ${result.launch_id}`);
+      } else {
+        alert(`❌ Error: ${result.error || 'Unknown error occurred'}`);
+      }
+    } catch (error) {
+      console.error('F370 process error:', error);
+      alert('❌ Network error occurred while running F370 process');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   if (!user) {
     return (
@@ -126,10 +194,23 @@ export default function FabricPage() {
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">1</td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
-                      <span className="font-bold">cncglub option - select country</span>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('cncglub option - select country')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">cncglub option - select country</span>
+                      </div>
                     </td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
-                      <select className="w-full px-2 py-1 border border-gray-300 rounded" defaultValue="United States">
+                      <select 
+                        className="w-full px-2 py-1 border border-gray-300 rounded" 
+                        value={formData.country}
+                        onChange={(e) => handleInputChange('country', e.target.value)}
+                      >
                         <option value="Australia">Australia</option>
                         <option value="Canada">Canada</option>
                         <option value="United Kingdom">United Kingdom</option>
@@ -146,10 +227,23 @@ export default function FabricPage() {
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200">2</td>
                     <td className="border border-gray-300 p-3">
-                      <span className="font-bold">cncglub option - select industry</span>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('cncglub option - select industry')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">cncglub option - select industry</span>
+                      </div>
                     </td>
                     <td className="border border-gray-300 p-3">
-                      <select className="w-full px-2 py-1 border border-gray-300 rounded">
+                      <select 
+                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                        value={formData.industry_id}
+                        onChange={(e) => handleInputChange('industry_id', e.target.value)}
+                      >
                         <option value="">Select industry...</option>
                         {industries.map((industry) => (
                           <option key={industry.industry_id} value={industry.industry_id}>
@@ -166,10 +260,23 @@ export default function FabricPage() {
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200">3</td>
                     <td className="border border-gray-300 p-3">
-                      <span className="font-bold">cncglub option - select cities</span>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('cncglub option - select cities')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">cncglub option - select cities</span>
+                      </div>
                     </td>
                     <td className="border border-gray-300 p-3">
-                      <select className="w-full px-2 py-1 border border-gray-300 rounded">
+                      <select 
+                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                        value={formData.city_population_filter}
+                        onChange={(e) => handleInputChange('city_population_filter', e.target.value)}
+                      >
                         <option value="all">All Records</option>
                         <option value="75k-325k">75k-325k</option>
                         <option value="under-25k">Under 25k</option>
@@ -187,10 +294,23 @@ export default function FabricPage() {
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">4</td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
-                      <span className="font-bold">kwslot option - kwslot to populate</span>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('kwslot option - kwslot to populate')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">kwslot option - kwslot to populate</span>
+                      </div>
                     </td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
-                      <select className="w-full px-2 py-1 border border-gray-300 rounded">
+                      <select 
+                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                        value={formData.kwslot}
+                        onChange={(e) => handleInputChange('kwslot', e.target.value)}
+                      >
                         <option value="">Select kwslot...</option>
                         <option value="kwslot1">kwslot1</option>
                         <option value="kwslot2">kwslot2</option>
@@ -212,13 +332,24 @@ export default function FabricPage() {
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200 border-t-black border-t-[4px]">5</td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">
-                      <span className="font-bold">kwhub option - kw rubric</span>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('kwhub option - kw rubric')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">kwhub option - kw rubric</span>
+                      </div>
                     </td>
                     <td className="border border-gray-300 p-3 min-w-80 border-t-black border-t-[4px]">
                       <input 
                         type="text" 
                         placeholder="deck builder (city_name) (state_code)"
                         className="w-full px-2 py-1 border border-gray-300 rounded min-w-72"
+                        value={formData.kw_rubric}
+                        onChange={(e) => handleInputChange('kw_rubric', e.target.value)}
                       />
                     </td>
                     <td className="border border-gray-300 p-3 border-t-black border-t-[4px]">keywordshub.keyword_datum</td>
@@ -229,13 +360,23 @@ export default function FabricPage() {
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200">6</td>
                     <td className="border border-gray-300 p-3">
-                      <span className="font-bold">kwhub option - rel_dfs_location_code</span>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('kwhub option - rel_dfs_location_code')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">kwhub option - rel_dfs_location_code</span>
+                      </div>
                     </td>
                     <td className="border border-gray-300 p-3">
                       <input 
                         type="text" 
-                        defaultValue="2840"
                         className="w-full px-2 py-1 border border-gray-300 rounded"
+                        value={formData.rel_dfs_location_code}
+                        onChange={(e) => handleInputChange('rel_dfs_location_code', e.target.value)}
                       />
                     </td>
                     <td className="border border-gray-300 p-3">keywordshub.rel_dfs_location_code</td>
@@ -246,13 +387,23 @@ export default function FabricPage() {
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">7</td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
-                      <span className="font-bold">kwhub option - language_code</span>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('kwhub option - language_code')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">kwhub option - language_code</span>
+                      </div>
                     </td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
                       <input 
                         type="text" 
-                        defaultValue="en"
                         className="w-full px-2 py-1 border border-gray-300 rounded"
+                        value={formData.language_code}
+                        onChange={(e) => handleInputChange('language_code', e.target.value)}
                       />
                     </td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">keywordshub.language_code</td>
@@ -263,13 +414,24 @@ export default function FabricPage() {
                   <tr>
                     <td className="border border-gray-300 p-3 bg-gray-200 border-b-black border-b-[4px]">8</td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
-                      <span className="font-bold">tag option - keywordshub_tags.tag_name</span>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="w-5 h-5 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded-sm flex items-center justify-center text-xs"
+                          onClick={() => navigator.clipboard.writeText('tag option - keywordshub_tags.tag_name')}
+                          title="Copy to clipboard"
+                        >
+                          ⧉
+                        </button>
+                        <span className="font-bold">tag option - keywordshub_tags.tag_name</span>
+                      </div>
                     </td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]">
                       <input 
                         type="text" 
                         placeholder="deck cncs 1"
                         className="w-full px-2 py-1 border border-gray-300 rounded placeholder-gray-400"
+                        value={formData.tag_name}
+                        onChange={(e) => handleInputChange('tag_name', e.target.value)}
                       />
                     </td>
                     <td className="border border-gray-300 p-3 border-b-black border-b-[4px]"></td>
@@ -281,8 +443,16 @@ export default function FabricPage() {
               
               {/* Red button below table */}
               <div className="mt-6">
-                <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-                  Run f370 populate kwslot* in cncglub
+                <button 
+                  className={`px-4 py-2 rounded text-white font-medium ${
+                    isProcessing 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-red-600 hover:bg-red-700'
+                  }`}
+                  onClick={handleF370Process}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? 'Processing F370...' : 'Run f370 populate kwslot* in cncglub'}
                 </button>
               </div>
 
@@ -298,14 +468,53 @@ export default function FabricPage() {
                 {/* Code content */}
                 <div className="p-4 bg-gray-50 font-mono text-sm whitespace-pre-line">
 {`———————————————————————
+
+
+summary of how the f370 function should work
+
+user will "run" this function by pressing button on /fabric page
+
+it must show user a double warning popup that this is a signficant process and they must confirm 2 times
 ———————————————————————
-this process will:
+———————————————————————
 
-create new keywords in db table keywordshub (if they do not exist)
+the gist of what will happen:
 
-NOTE: if (city_name) and/or (state_code) are submitted by user in kw rubric box, do the following: for each row in cncglub, create kw rubric by referring to relationship of cncglub -> cncglub.rel_city_id -> cities.city_name / cities.state_code (to dynamically pull that info)
+———————————————————————
+• identify all db rows in db table cncglub that match the criteria in these options
 
-tag all kws with a special tag (including ones that did previously exist(if any) that match the criteria set here)
+cncglub option - select country
+cncglub option - select industry
+cncglub option - select cities
+
+please note that country and cities options here are related to db columns that exist in db table cities
+
+these must be filtered through a relationship field in cncglub that connects the foreign key to the cities db table
+
+and the same for the industry option (which corresponds to industries db table - which also has foreign key relationship field in cncglub db table)
+
+
+———————————————————————
+• for all cncglub rows that match the criteria above, create new keywords in db table keywordshub (if they do not exist)
+
+• if user has entered these dynamic shortcodes like (city_name) and/or (state_code), the system must pull the value from the associated db row and db columns in the cities db table and insert it into the keyword_datum entry that we're creating as plain text (not shortcode - shortcode is being "rendered" at this stage that I'm describing)
+———————————————————————
+• create a new tag in keywordshub_tags db table
+
+———————————————————————
+• tag all kws with a special tag (including ones that did previously exist(if any)  and didn't have to be created because they match the criteria set here)
+
+the criteria I'm referring to is a match to the options of:
+
+kwhub option - kw rubric (the end output after dynamic short codes are rendered into end-text)
+kwhub option - rel_dfs_location_code
+kwhub option - language_code
+
+———————————————————————
+
+next, populate the field cncglub.kwslot* (the asterisk corresponds to "kwslot option - kwslot to populate") with the keyword_id number for the keyword that was created related to that specific cncglub row 
+
+
 ———————————————————————`}
                 </div>
               </div>
