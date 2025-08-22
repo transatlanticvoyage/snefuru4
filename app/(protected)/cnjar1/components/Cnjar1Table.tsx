@@ -213,31 +213,38 @@ export default function Cnjar1Table() {
   const matchesCitySizeFilter = (item: Cncglub) => {
     const cityPopulation = item.cities?.city_population;
     
-    // Debug logging (can be removed once working)
-    console.log('Debug matchesCitySizeFilter - cncg_id:', item.cncg_id, 'rel_city_id:', item.rel_city_id, 'cityPopulation:', cityPopulation, 'citySizeFilter:', citySizeFilter);
-    
     // If city size filter is 'all', show all records
     if (citySizeFilter === 'all') {
       return true;
     }
     
     // If no population data, exclude from specific size filters
-    if (cityPopulation === null || cityPopulation === undefined) {
+    if (!cityPopulation) {
       return false;
     }
     
-    // Apply specific city size filters based on city_population from cities table
+    // CONVERT TO NUMBER FIRST to handle string values from database
+    const population = Number(cityPopulation);
+    if (isNaN(population)) {
+      console.log('Invalid population data for cncg_id:', item.cncg_id, 'cityPopulation:', cityPopulation);
+      return false;
+    }
+    
+    // Debug logging (can be removed once working)
+    console.log('Debug matchesCitySizeFilter - cncg_id:', item.cncg_id, 'rel_city_id:', item.rel_city_id, 'originalPopulation:', cityPopulation, 'convertedPopulation:', population, 'citySizeFilter:', citySizeFilter);
+    
+    // Apply specific city size filters based on converted population number
     switch (citySizeFilter) {
       case 'under-25k':
-        return cityPopulation < 25000;
+        return population < 25000;
       case '25k-50k':
-        return cityPopulation >= 25000 && cityPopulation < 50000;
+        return population >= 25000 && population < 50000;
       case '50k-100k':
-        return cityPopulation >= 50000 && cityPopulation < 100000;
+        return population >= 50000 && population < 100000;
       case '100k-500k':
-        return cityPopulation >= 100000 && cityPopulation < 500000;
+        return population >= 100000 && population < 500000;
       case '500k-plus':
-        return cityPopulation >= 500000;
+        return population >= 500000;
       default:
         return true;
     }
