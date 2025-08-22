@@ -300,51 +300,8 @@ export default function KeywordsHubTable() {
     }
   };
 
-  // Bulk refresh functions (Task-based)
-  const bulkRefreshVolume = async () => {
-    setBulkRefreshing(true);
-    
-    try {
-      // Get selected keywords
-      const selectedKeywordIds = Array.from(selectedRows);
-      if (selectedKeywordIds.length === 0) {
-        alert('Please select keywords to refresh');
-        return;
-      }
-
-      const response = await fetch('/api/dataforseo-refresh-bulk', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          keyword_ids: selectedKeywordIds,
-          field: 'search_volume'
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to start bulk refresh');
-      }
-
-      alert(`Bulk refresh started for ${selectedKeywordIds.length} keywords. Results will be available shortly.`);
-      
-      // Refresh the table data after a delay
-      setTimeout(() => {
-        fetchData();
-      }, 5000);
-
-    } catch (error) {
-      console.error('❌ Failed to start bulk refresh:', error);
-      alert(`Failed to start bulk refresh: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setBulkRefreshing(false);
-    }
-  };
-
-  const bulkRefreshCPC = async () => {
+  // Bulk refresh function
+  const bulkRefreshMetrics = async () => {
     setBulkRefreshing(true);
     
     try {
@@ -813,9 +770,9 @@ export default function KeywordsHubTable() {
                 </div>
               </div>
               
-              {/* Refresh Volume Button */}
+              {/* Refresh Metrics Button */}
               <button
-                onClick={bulkRefreshVolume}
+                onClick={bulkRefreshMetrics}
                 disabled={bulkRefreshing || selectedRows.size === 0}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                   bulkRefreshing || selectedRows.size === 0
@@ -823,20 +780,7 @@ export default function KeywordsHubTable() {
                     : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
-                {bulkRefreshing ? 'Processing...' : 'Refresh Volume'}
-              </button>
-              
-              {/* Refresh CPC Button */}
-              <button
-                onClick={bulkRefreshCPC}
-                disabled={bulkRefreshing || selectedRows.size === 0}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  bulkRefreshing || selectedRows.size === 0
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
-              >
-                {bulkRefreshing ? 'Processing...' : 'Refresh CPC'}
+                {bulkRefreshing ? 'Processing...' : 'Refresh Metrics'}
               </button>
               
             </div>
