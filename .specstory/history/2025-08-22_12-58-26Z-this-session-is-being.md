@@ -5762,3 +5762,14 @@ Perfect! Now I've successfully:
 
 The /kwjar page now has a single "Refresh Metrics" button for bulk refresh, which is more intuitive and cost-efficient since each API call returns all the metric data anyway.
 
+---
+
+_**User**_
+
+please make this the default value when user "creates new" on page at /kwjar for db column rel_dfs_location_code
+2840
+
+this is the code for United States 
+
+
+
