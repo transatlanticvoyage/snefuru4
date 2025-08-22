@@ -18,6 +18,7 @@ interface Cncglub {
   is_sko: boolean;
   created_at: string;
   updated_at: string | null;
+  kwslot1: number | null;
   // Joined city data
   cities?: {
     city_name: string | null;
@@ -103,7 +104,8 @@ export default function Cnjar1Table() {
     { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
     { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
     { key: 'created_at' as keyof Cncglub, label: 'created_at', type: 'datetime', readOnly: true },
-    { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true, separator: 'black-3px' }
+    { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true },
+    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', separator: 'black-3px' }
   ];
 
   // City columns from cityjar
