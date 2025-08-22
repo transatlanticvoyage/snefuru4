@@ -12,7 +12,7 @@ const NubraTablefaceKite = dynamic(
 
 interface KeywordTag {
   tag_id: number;
-  fabrication_launch_created_from: number | null;
+  fabrication_launch_created_from: number | null; // UI only - no DB field
   tag_name: string;
   tag_order: number;
   created_at: string;

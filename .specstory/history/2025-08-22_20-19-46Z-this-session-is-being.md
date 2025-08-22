@@ -4967,3 +4967,46 @@ ADD COLUMN fabrication_launch_created_from INTEGER REFERENCES fabrication_launch
 
 The new column will display the actual integer foreign key values that reference `fabrication_launches.launch_id`, allowing you to see which fabrication launch process created each tag record.
 
+---
+
+_**User**_
+
+on page /fabric, pleaes create bold text above ui table on tab 2 that says:
+
+db table: fabrication_launches
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/fabric/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   277→              </div>
+   278→            </div>
+   279→          )}
+   280→
+   281→          {activeTab === 2 && (
+   282→            <div>
+   283→              {/* Table title */}
+   284→              <div className="mb-4">
+   285→                <span className="font-bold text-lg">db table: fabrication_launches</span>
+   286→              </div>
+   287→              
+   288→              {/* Fabrication Launches Table */}
+   289→              <table className="border-collapse table-auto">
+   290→                {/* Header row with gray background */}
+   291→                <thead>
+   292→                  <tr className="bg-gray-200">
+   293→                    <th className="border border-gray-300 p-3 font-bold text-left">launch_id</th>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've added bold text above the UI table on Tab 2 that says "db table: fabrication_launches". The text is positioned with proper spacing (mb-4 margin) above the table and uses the same styling as the existing table title on Tab 1.
+

@@ -291,6 +291,7 @@ tag all kws with a special tag (including ones that did previously exist(if any)
                 <thead>
                   <tr className="bg-gray-200">
                     <th className="border border-gray-300 p-3 font-bold text-left">launch_id</th>
+                    <th className="border border-gray-300 p-3 font-bold text-left">rel_keywordshub_tag_id</th>
                     <th className="border border-gray-300 p-3 font-bold text-left">created_at</th>
                     <th className="border border-gray-300 p-3 font-bold text-left">user_id</th>
                     <th className="border border-gray-300 p-3 font-bold text-left">opt_country</th>
