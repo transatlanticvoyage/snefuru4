@@ -9,9 +9,17 @@ import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
 export default function FabricPage() {
   const { user } = useAuth();
   const router = useRouter();
+  
+  // Force refresh to clear any cache issues
+  console.log('Fabric page loaded');
   const [activeTab, setActiveTab] = useState(1);
   const [industries, setIndustries] = useState<{industry_id: number, industry_name: string}[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showFirstConfirm, setShowFirstConfirm] = useState(false);
+  const [showSecondConfirm, setShowSecondConfirm] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultMessage, setResultMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
     country: 'United States',
     industry_id: '',
@@ -58,26 +66,17 @@ export default function FabricPage() {
     fetchIndustries();
   }, [user]);
 
-  const handleF370Process = async () => {
-    // Double confirmation popup
-    const firstConfirm = window.confirm(
-      "⚠️ WARNING: You are about to run the F370 function which will create keywords and modify database records. This is a significant process that cannot be easily undone.\n\nAre you sure you want to continue?"
-    );
+  const handleF370Process = () => {
+    setShowFirstConfirm(true);
+  };
 
-    if (!firstConfirm) return;
+  const handleFirstConfirm = () => {
+    setShowFirstConfirm(false);
+    setShowSecondConfirm(true);
+  };
 
-    const secondConfirm = window.confirm(
-      "⚠️ FINAL WARNING: This will:\n" +
-      "• Filter cncglub records based on your criteria\n" +
-      "• Create new keywords in keywordshub table\n" +
-      "• Create a new tag and assign it to keywords\n" +
-      "• Update cncglub kwslot fields\n" +
-      "• Create a fabrication_launches record\n\n" +
-      "This process will affect multiple database tables. Are you absolutely certain you want to proceed?"
-    );
-
-    if (!secondConfirm) return;
-
+  const handleSecondConfirm = async () => {
+    setShowSecondConfirm(false);
     setIsProcessing(true);
 
     try {
@@ -92,20 +91,33 @@ export default function FabricPage() {
       const result = await response.json();
 
       if (response.ok) {
-        alert(`✅ F370 Process Completed Successfully!\n\n` +
-              `• Processed ${result.keywords_processed} keywords\n` +
-              `• Updated ${result.cncglub_rows_processed} cncglub rows\n` +
-              `• Created tag: ${result.tag_name} (ID: ${result.tag_id})\n` +
-              `• Launch ID: ${result.launch_id}`);
+        setIsSuccess(true);
+        setResultMessage(
+          `✅ F370 Process Completed Successfully!\n\n` +
+          `• Processed ${result.keywords_processed} keywords\n` +
+          `• Updated ${result.cncglub_rows_processed} cncglub rows\n` +
+          `• Created tag: ${result.tag_name} (ID: ${result.tag_id})\n` +
+          `• Launch ID: ${result.launch_id}\n\n` +
+          `Process completed at: ${new Date().toLocaleString()}`
+        );
       } else {
-        alert(`❌ Error: ${result.error || 'Unknown error occurred'}`);
+        setIsSuccess(false);
+        setResultMessage(`❌ Error: ${result.error || 'Unknown error occurred'}`);
       }
     } catch (error) {
       console.error('F370 process error:', error);
-      alert('❌ Network error occurred while running F370 process');
+      setIsSuccess(false);
+      setResultMessage('❌ Network error occurred while running F370 process');
     } finally {
       setIsProcessing(false);
+      setShowResultModal(true);
     }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Message copied to clipboard!');
+    });
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -556,6 +568,174 @@ next, populate the field cncglub.kwslot* (the asterisk corresponds to "kwslot op
           )}
         </div>
       </div>
+
+      {/* First Confirmation Modal */}
+      {showFirstConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-red-600 text-lg">⚠️</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Warning - Significant Process</h3>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700 leading-relaxed">
+                You are about to run the <strong>F370 function</strong> which will create keywords and modify database records. 
+                This is a significant process that cannot be easily undone.
+              </p>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+              <p className="text-yellow-800 text-sm">
+                <strong>Important:</strong> This operation will make permanent changes to your database. 
+                Please ensure you have reviewed all settings carefully.
+              </p>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowFirstConfirm(false)}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleFirstConfirm}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Second Confirmation Modal */}
+      {showSecondConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-red-600 text-lg">⚠️</span>
+              </div>
+              <h3 className="text-lg font-semibold text-red-700">FINAL WARNING</h3>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700 mb-4">This process will perform the following operations:</p>
+              
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2">•</span>
+                  Filter cncglub records based on your criteria
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2">•</span>
+                  Create new keywords in keywordshub table
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2">•</span>
+                  Create a new tag and assign it to keywords
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2">•</span>
+                  Update cncglub kwslot fields
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2">•</span>
+                  Create a fabrication_launches record
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-800 text-sm font-medium">
+                This process will affect multiple database tables and cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowSecondConfirm(false)}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSecondConfirm}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+              >
+                Yes, Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Result Modal */}
+      {showResultModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+            <div className="flex items-center mb-4">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                isSuccess ? 'bg-green-100' : 'bg-red-100'
+              }`}>
+                <span className={`text-lg ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
+                  {isSuccess ? '✅' : '❌'}
+                </span>
+              </div>
+              <h3 className={`text-lg font-semibold ${
+                isSuccess ? 'text-green-700' : 'text-red-700'
+              }`}>
+                {isSuccess ? 'Process Completed' : 'Process Failed'}
+              </h3>
+            </div>
+            
+            <div className="mb-6">
+              <div className={`rounded-lg p-4 ${
+                isSuccess ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+              }`}>
+                <pre className={`text-sm whitespace-pre-wrap ${
+                  isSuccess ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {resultMessage}
+                </pre>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => copyToClipboard(resultMessage)}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center"
+              >
+                <span className="mr-2">📋</span>
+                Copy Message
+              </button>
+              <button
+                onClick={() => setShowResultModal(false)}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Processing Overlay */}
+      {isProcessing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full mx-4">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Processing F370...</h3>
+              <p className="text-gray-600 text-sm">Please wait while we process your request. This may take a few moments.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
