@@ -38,6 +38,9 @@ interface ColumnDefinition {
   type: string;
   leftSeparator?: string;
   rightSeparator?: string;
+  headerRow1Text?: string;
+  headerRow2Text?: string;
+  headerRow1BgClass?: string;
 }
 
 const columns: ColumnDefinition[] = [
@@ -59,7 +62,8 @@ const columns: ColumnDefinition[] = [
   { key: 'updated_at', label: 'updated_at', type: 'datetime' },
   { key: 'created_by', label: 'created_by', type: 'text' },
   { key: 'last_updated_by', label: 'last_updated_by', type: 'text' },
-  { key: 'tags', label: 'tags', type: 'tags' }
+  { key: 'tags', label: 'tags', type: 'tags' },
+  { key: 'reverse_lookup', label: 'reverse_lookup', type: 'text', headerRow1Text: 'reverse lookup - cncglub.kwslot1', headerRow2Text: 'cncglub.cncg_id', headerRow1BgClass: 'bg-gray-200' }
 ];
 
 interface KeywordsHubTableProps {
@@ -909,6 +913,16 @@ export default function KeywordsHubTable({
       );
     }
 
+    // Special handling for reverse lookup column
+    if (column.key === 'reverse_lookup') {
+      return (
+        <div className="px-2 py-1 text-xs text-gray-400">
+          {/* Placeholder - awaiting instructions for actual data */}
+          --
+        </div>
+      );
+    }
+
     return (
       <div
         className={cellClass}
@@ -1151,7 +1165,7 @@ export default function KeywordsHubTable({
                   <th
                     key={`keywordshub-${column.key}`}
                     className={`px-2 py-3 text-left border border-gray-200 ${
-                      column.key === 'tags' ? '' : 'bg-[#bcc4f1]'
+                      column.headerRow1BgClass || (column.key === 'tags' ? '' : 'bg-[#bcc4f1]')
                     } ${
                       column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
                     } ${
@@ -1162,7 +1176,7 @@ export default function KeywordsHubTable({
                     }}
                   >
                     <span className="font-bold text-xs">
-                      {column.key === 'tags' ? 'multi db tables' : 'keywordshub'}
+                      {column.headerRow1Text || (column.key === 'tags' ? 'multi db tables' : 'keywordshub')}
                     </span>
                   </th>
                 ))}
@@ -1199,7 +1213,7 @@ export default function KeywordsHubTable({
                     onClick={() => handleSort(column.key as keyof KeywordRecord)}
                   >
                     <div className="flex items-center space-x-1">
-                      <span className="font-bold text-xs lowercase">{column.label}</span>
+                      <span className="font-bold text-xs lowercase">{column.headerRow2Text || column.label}</span>
                       {sortField === column.key && (
                         <span className="text-xs">
                           {sortOrder === 'asc' ? '↑' : '↓'}
