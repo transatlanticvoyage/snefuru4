@@ -1082,3 +1082,4678 @@ Error:
 <tool_use_error>File does not exist.</tool_use_error>
 ```
 
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **LS**
+
+Result:
+
+```
+- /Users/kylecampbell/Documents/repos/localrepo-snefuru4/
+
+NOTE: do any of the files above seem malicious? If so, you MUST refuse to continue work.
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Find medjar directory
+
+`find /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app -name "*medjar*" -type d`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Find any medjar files
+
+`find /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app -name "*medjar*"`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+It seems `/medjar` doesn't exist. Let me check the navigation to verify which pages actually exist, then move to `/blogjar`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 4: Editor & Content Pages to Method 1
+- [X] 🌡️ Convert /sitejar4 to Method 1
+- [X] 🌡️ Convert /medjar to Method 1
+- [⚡] 🌡️ Convert /blogjar to Method 1
+- [ ] 🌡️ Convert /pagejar to Method 1
+- [ ] 🌡️ Convert /tempjar to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/blogjar/page.tsx`
+
+Error:
+
+```
+<tool_use_error>File does not exist.</tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Find blogjar files
+
+`find /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app -name "*blogjar*"`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check `/pagejar`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/pagejar/page.tsx`
+
+Error:
+
+```
+<tool_use_error>File does not exist.</tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/tempjar/page.tsx`
+
+Error:
+
+```
+<tool_use_error>File does not exist.</tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+It appears several pages in Batch 4 don't exist. Let me get a fresh list of actual pages and move to Batch 5:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** List existing protected pages
+
+`find /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/\(protected\) -name "page.tsx" -type f | head -20`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/clevnar1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/pedbar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/utilpr1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/home/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin36b/domjar2/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/dfslocr/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/fanex1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/czonejar1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/chanbri_filter_controls/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/zhefetchjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/scafjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin-tools/f23-storage-cleanup/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin41/domnivid/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/metrojar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/nwivid/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cityjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/ruplin-api-keys-p1/page.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me update the todos and move to pages that actually exist. I'll start with `/clevnar1`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 4: Editor & Content Pages to Method 1
+- [X] 🌡️ Convert /sitejar4 to Method 1
+- [⚡] 🌡️ Convert /clevnar1 to Method 1
+- [ ] 🌡️ Convert /driggsman to Method 1
+- [ ] 🌡️ Convert /pedbar to Method 1
+- [ ] 🌡️ Convert /dfslocr to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/clevnar1/page.tsx`
+
+Result:
+
+```
+1→"use client";
+     2→import { useEffect, useState } from 'react';
+     3→import { useAuth } from '@/app/context/AuthContext';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→
+     6→interface ApiKey {
+     7→  api_key_id: string;
+     8→  fk_user_id: string;
+     9→  fk_provider_id: string | null;
+    10→  api_key_datum: string;
+    11→  key_name: string | null;
+    12→  is_active: boolean;
+    13→  created_at: string;
+    14→  updated_at: string;
+    15→}
+    16→
+    17→interface EditingState {
+    18→  [key: string]: {
+    19→    api_key_datum: string;
+    20→    key_name: string;
+    21→    is_active: boolean;
+    22→    fk_provider_id: string | null;
+    23→  };
+    24→}
+    25→
+    26→const columns = [
+    27→  'actions',
+    28→  'api_key_id',
+    29→  'fk_user_id',
+    30→  'key_name',
+    31→  'api_key_datum',
+    32→  'fk_provider_id',
+    33→  'is_active',
+    34→  'created_at',
+    35→  'updated_at'
+    36→];
+    37→
+    38→export default function Clevnar1Page() {
+    39→  const [data, setData] = useState<ApiKey[]>([]);
+    40→  const [filteredData, setFilteredData] = useState<ApiKey[]>([]);
+    41→  const [loading, setLoading] = useState(true);
+    42→  const [error, setError] = useState<string | null>(null);
+    43→  const [currentPage, setCurrentPage] = useState(1);
+    44→  const [pageSize, setPageSize] = useState(10);
+    45→  const [searchTerm, setSearchTerm] = useState('');
+    46→  const [editingRows, setEditingRows] = useState<Set<string>>(new Set());
+    47→  const [editingData, setEditingData] = useState<EditingState>({});
+    48→  const [savingRows, setSavingRows] = useState<Set<string>>(new Set());
+    49→  
+    50→  const pageSizeOptions = [5, 10, 20, 50, 100];
+    51→  const { user } = useAuth();
+    52→  const supabase = createClientComponentClient();
+    53→
+    54→  useEffect(() => {
+    55→    document.title = 'clevnar1 - Snefuru';
+    56→  }, []);
+    57→
+    58→  useEffect(() => {
+    59→    fetchApiKeys();
+    60→  }, [user]);
+    61→
+    62→  useEffect(() => {
+    63→    // Filter data based on search term
+    64→    if (searchTerm) {
+    65→      const filtered = data.filter(item => 
+    66→        item.key_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    67→        item.api_key_datum.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    68→        item.api_key_id.toLowerCase().includes(searchTerm.toLowerCase())
+    69→      );
+    70→      setFilteredData(filtered);
+    71→    } else {
+    72→      setFilteredData(data);
+    73→    }
+    74→    setCurrentPage(1); // Reset to first page when filtering
+    75→  }, [searchTerm, data]);
+    76→
+    77→  const fetchApiKeys = async () => {
+    78→    setLoading(true);
+    79→    setError(null);
+    80→    try {
+    81→      if (!user?.id) {
+    82→        setData([]);
+    83→        setLoading(false);
+    84→        return;
+    85→      }
+    86→      
+    87→      // Get user's DB id from users table
+    88→      const { data: userData, error: userError } = await supabase
+    89→        .from('users')
+    90→        .select('id')
+    91→        .eq('auth_id', user.id)
+    92→        .single();
+    93→        
+    94→      if (userError || !userData) {
+    95→        setError('Could not find user record.');
+    96→        setData([]);
+    97→        setLoading(false);
+    98→        return;
+    99→      }
+   100→      
+   101→      // Fetch api_keys_t2 for this user
+   102→      const { data: apiKeys, error: apiKeysError } = await supabase
+   103→        .from('api_keys_t2')
+   104→        .select('*')
+   105→        .eq('fk_user_id', userData.id)
+   106→        .order('created_at', { ascending: false });
+   107→        
+   108→      if (apiKeysError) throw apiKeysError;
+   109→      setData(apiKeys || []);
+   110→      setFilteredData(apiKeys || []);
+   111→    } catch (err) {
+   112→      setError(err instanceof Error ? err.message : 'Failed to fetch API keys');
+   113→      setData([]);
+   114→      setFilteredData([]);
+   115→    } finally {
+   116→      setLoading(false);
+   117→    }
+   118→  };
+   119→
+   120→  // Pagination calculations
+   121→  const totalItems = filteredData.length;
+   122→  const totalPages = Math.ceil(totalItems / pageSize);
+   123→  const startIndex = (currentPage - 1) * pageSize;
+   124→  const endIndex = Math.min(startIndex + pageSize, totalItems);
+   125→  const currentItems = filteredData.slice(startIndex, endIndex);
+   126→
+   127→  const handlePageChange = (newPage: number) => {
+   128→    setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
+   129→  };
+   130→
+   131→  const handlePageSizeChange = (size: number) => {
+   132→    setPageSize(size);
+   133→    setCurrentPage(1);
+   134→  };
+   135→
+   136→  const handleEdit = (apiKey: ApiKey) => {
+   137→    setEditingRows(new Set([...editingRows, apiKey.api_key_id]));
+   138→    setEditingData({
+   139→      ...editingData,
+   140→      [apiKey.api_key_id]: {
+   141→        api_key_datum: apiKey.api_key_datum,
+   142→        key_name: apiKey.key_name || '',
+   143→        is_active: apiKey.is_active,
+   144→        fk_provider_id: apiKey.fk_provider_id
+   145→      }
+   146→    });
+   147→  };
+   148→
+   149→  const handleCancel = (apiKeyId: string) => {
+   150→    const newEditingRows = new Set(editingRows);
+   151→    newEditingRows.delete(apiKeyId);
+   152→    setEditingRows(newEditingRows);
+   153→    
+   154→    const newEditingData = { ...editingData };
+   155→    delete newEditingData[apiKeyId];
+   156→    setEditingData(newEditingData);
+   157→  };
+   158→
+   159→  const handleSave = async (apiKeyId: string) => {
+   160→    const editData = editingData[apiKeyId];
+   161→    if (!editData) return;
+   162→
+   163→    setSavingRows(new Set([...savingRows, apiKeyId]));
+   164→    
+   165→    try {
+   166→      const { error: updateError } = await supabase
+   167→        .from('api_keys_t2')
+   168→        .update({
+   169→          api_key_datum: editData.api_key_datum,
+   170→          key_name: editData.key_name,
+   171→          is_active: editData.is_active,
+   172→          fk_provider_id: editData.fk_provider_id,
+   173→          updated_at: new Date().toISOString()
+   174→        })
+   175→        .eq('api_key_id', apiKeyId);
+   176→
+   177→      if (updateError) throw updateError;
+   178→
+   179→      // Refresh data
+   180→      await fetchApiKeys();
+   181→      
+   182→      // Clear editing state
+   183→      handleCancel(apiKeyId);
+   184→    } catch (err) {
+   185→      setError(err instanceof Error ? err.message : 'Failed to save API key');
+   186→    } finally {
+   187→      const newSavingRows = new Set(savingRows);
+   188→      newSavingRows.delete(apiKeyId);
+   189→      setSavingRows(newSavingRows);
+   190→    }
+   191→  };
+   192→
+   193→  const handleFieldChange = (apiKeyId: string, field: keyof EditingState[string], value: any) => {
+   194→    setEditingData({
+   195→      ...editingData,
+   196→      [apiKeyId]: {
+   197→        ...editingData[apiKeyId],
+   198→        [field]: value
+   199→      }
+   200→    });
+   201→  };
+   202→
+   203→  const formatColumnData = (col: string, value: any, apiKey: ApiKey) => {
+   204→    if (value === null || value === undefined) return '-';
+   205→    
+   206→    const isEditing = editingRows.has(apiKey.api_key_id);
+   207→    const editData = editingData[apiKey.api_key_id];
+   208→    
+   209→    switch (col) {
+   210→      case 'api_key_id':
+   211→        return value.substring(0, 8) + '...';
+   212→      case 'fk_user_id':
+   213→        return value.substring(0, 8) + '...';
+   214→      case 'key_name':
+   215→        if (isEditing) {
+   216→          return (
+   217→            <input
+   218→              type="text"
+   219→              value={editData?.key_name || ''}
+   220→              onChange={(e) => handleFieldChange(apiKey.api_key_id, 'key_name', e.target.value)}
+   221→              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+   222→              placeholder="Enter key name"
+   223→            />
+   224→          );
+   225→        }
+   226→        return value || '-';
+   227→      case 'api_key_datum':
+   228→        if (isEditing) {
+   229→          return (
+   230→            <input
+   231→              type="text"
+   232→              value={editData?.api_key_datum || ''}
+   233→              onChange={(e) => handleFieldChange(apiKey.api_key_id, 'api_key_datum', e.target.value)}
+   234→              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono text-xs"
+   235→              placeholder="Enter API key"
+   236→            />
+   237→          );
+   238→        }
+   239→        // Show masked key when not editing
+   240→        const keyLength = value.length;
+   241→        if (keyLength <= 8) return '********';
+   242→        return value.substring(0, 4) + '...' + value.substring(keyLength - 4);
+   243→      case 'fk_provider_id':
+   244→        if (isEditing) {
+   245→          return (
+   246→            <input
+   247→              type="text"
+   248→              value={editData?.fk_provider_id || ''}
+   249→              onChange={(e) => handleFieldChange(apiKey.api_key_id, 'fk_provider_id', e.target.value)}
+   250→              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+   251→              placeholder="Provider ID"
+   252→            />
+   253→          );
+   254→        }
+   255→        return value ? value.substring(0, 8) + '...' : '-';
+   256→      case 'is_active':
+   257→        if (isEditing) {
+   258→          return (
+   259→            <select
+   260→              value={editData?.is_active ? 'true' : 'false'}
+   261→              onChange={(e) => handleFieldChange(apiKey.api_key_id, 'is_active', e.target.value === 'true')}
+   262→              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+   263→            >
+   264→              <option value="true">Active</option>
+   265→              <option value="false">Inactive</option>
+   266→            </select>
+   267→          );
+   268→        }
+   269→        return (
+   270→          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+   271→            value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+   272→          }`}>
+   273→            {value ? 'Active' : 'Inactive'}
+   274→          </span>
+   275→        );
+   276→      case 'created_at':
+   277→      case 'updated_at':
+   278→        return new Date(value).toLocaleString();
+   279→      default:
+   280→        return String(value);
+   281→    }
+   282→  };
+   283→
+   284→  const getColumnDisplayName = (col: string) => {
+   285→    switch (col) {
+   286→      case 'actions': return 'actions';
+   287→      case 'api_key_id': return 'api_key_id';
+   288→      case 'fk_user_id': return 'fk_user_id';
+   289→      case 'key_name': return 'key_name';
+   290→      case 'api_key_datum': return 'api_key_datum';
+   291→      case 'fk_provider_id': return 'fk_provider_id';
+   292→      case 'is_active': return 'is_active';
+   293→      case 'created_at': return 'created_at';
+   294→      case 'updated_at': return 'updated_at';
+   295→      default: return col;
+   296→    }
+   297→  };
+   298→
+   299→  const getPageNumbers = () => {
+   300→    const pageNumbers = [];
+   301→    const maxVisiblePages = 5;
+   302→    
+   303→    if (totalPages <= maxVisiblePages) {
+   304→      for (let i = 1; i <= totalPages; i++) {
+   305→        pageNumbers.push(i);
+   306→      }
+   307→    } else {
+   308→      const halfVisible = Math.floor(maxVisiblePages / 2);
+   309→      let startPage = Math.max(1, currentPage - halfVisible);
+   310→      let endPage = Math.min(totalPages, currentPage + halfVisible);
+   311→      
+   312→      if (startPage === 1) {
+   313→        endPage = Math.min(totalPages, maxVisiblePages);
+   314→      }
+   315→      
+   316→      if (endPage === totalPages) {
+   317→        startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+   318→      }
+   319→      
+   320→      if (startPage > 1) {
+   321→        pageNumbers.push(1);
+   322→        if (startPage > 2) {
+   323→          pageNumbers.push('...');
+   324→        }
+   325→      }
+   326→      
+   327→      for (let i = startPage; i <= endPage; i++) {
+   328→        pageNumbers.push(i);
+   329→      }
+   330→      
+   331→      if (endPage < totalPages) {
+   332→        if (endPage < totalPages - 1) {
+   333→          pageNumbers.push('...');
+   334→        }
+   335→        pageNumbers.push(totalPages);
+   336→      }
+   337→    }
+   338→    
+   339→    return pageNumbers;
+   340→  };
+   341→
+   342→  if (loading) return <div className="p-6">Loading API keys...</div>;
+   343→  if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+   344→
+   345→  return (
+   346→    <div className="p-6">
+   347→      <h1 className="text-2xl font-bold text-gray-800 mb-2">API Key Management</h1>
+   348→      <p className="text-sm text-gray-600 mb-6">db table: api_keys_t2</p>
+   349→      
+   350→      {/* Search and Filter Section */}
+   351→      <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+   352→        <div className="flex items-center space-x-4">
+   353→          <div className="flex-1">
+   354→            <label htmlFor="search" className="sr-only">Search API Keys</label>
+   355→            <div className="relative">
+   356→              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+   357→                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   358→                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+   359→                </svg>
+   360→              </div>
+   361→              <input
+   362→                type="text"
+   363→                id="search"
+   364→                value={searchTerm}
+   365→                onChange={(e) => setSearchTerm(e.target.value)}
+   366→                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+   367→                placeholder="Search by key name, ID, or key value..."
+   368→              />
+   369→            </div>
+   370→          </div>
+   371→          <button
+   372→            onClick={fetchApiKeys}
+   373→            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+   374→          >
+   375→            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   376→              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+   377→            </svg>
+   378→            Refresh
+   379→          </button>
+   380→        </div>
+   381→      </div>
+   382→
+   383→      {/* Statistics Bar */}
+   384→      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+   385→        <div className="flex items-center justify-between text-sm text-gray-600">
+   386→          <span>
+   387→            Showing <span className="font-medium text-gray-900">{startIndex + 1}</span> to{' '}
+   388→            <span className="font-medium text-gray-900">{endIndex}</span> of{' '}
+   389→            <span className="font-medium text-gray-900">{totalItems}</span> API keys
+   390→          </span>
+   391→          <div className="flex items-center space-x-2">
+   392→            <label htmlFor="pageSize" className="text-sm font-medium text-gray-700">
+   393→              Items per page:
+   394→            </label>
+   395→            <select
+   396→              id="pageSize"
+   397→              value={pageSize}
+   398→              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+   399→              className="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+   400→            >
+   401→              {pageSizeOptions.map(size => (
+   402→                <option key={size} value={size}>
+   403→                  {size}
+   404→                </option>
+   405→              ))}
+   406→            </select>
+   407→          </div>
+   408→        </div>
+   409→      </div>
+   410→
+   411→      {/* Table */}
+   412→      <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+   413→        <table className="min-w-full divide-y divide-gray-200">
+   414→          <thead className="bg-gray-50">
+   415→            <tr>
+   416→              {columns.map(col => (
+   417→                <th 
+   418→                  key={col} 
+   419→                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+   420→                >
+   421→                  {getColumnDisplayName(col)}
+   422→                </th>
+   423→              ))}
+   424→            </tr>
+   425→          </thead>
+   426→          <tbody className="bg-white divide-y divide-gray-200">
+   427→            {currentItems.map((apiKey, index) => (
+   428→              <tr key={apiKey.api_key_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+   429→                {columns.map(col => (
+   430→                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+   431→                    {col === 'actions' ? (
+   432→                      <div className="flex space-x-2">
+   433→                        {editingRows.has(apiKey.api_key_id) ? (
+   434→                          <>
+   435→                            <button
+   436→                              onClick={() => handleSave(apiKey.api_key_id)}
+   437→                              disabled={savingRows.has(apiKey.api_key_id)}
+   438→                              className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+   439→                            >
+   440→                              {savingRows.has(apiKey.api_key_id) ? 'Saving...' : 'Save'}
+   441→                            </button>
+   442→                            <button
+   443→                              onClick={() => handleCancel(apiKey.api_key_id)}
+   444→                              disabled={savingRows.has(apiKey.api_key_id)}
+   445→                              className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+   446→                            >
+   447→                              Cancel
+   448→                            </button>
+   449→                          </>
+   450→                        ) : (
+   451→                          <button
+   452→                            onClick={() => handleEdit(apiKey)}
+   453→                            className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+   454→                          >
+   455→                            Edit
+   456→                          </button>
+   457→                        )}
+   458→                      </div>
+   459→                    ) : (
+   460→                      <div className="max-w-xs">
+   461→                        {formatColumnData(col, apiKey[col as keyof ApiKey], apiKey)}
+   462→                      </div>
+   463→                    )}
+   464→                  </td>
+   465→                ))}
+   466→              </tr>
+   467→            ))}
+   468→          </tbody>
+   469→        </table>
+   470→      </div>
+   471→
+   472→      {/* Pagination Controls */}
+   473→      <div className="mt-6 flex items-center justify-between">
+   474→        <div className="flex items-center">
+   475→          <p className="text-sm text-gray-700">
+   476→            Page <span className="font-medium">{currentPage}</span> of{' '}
+   477→            <span className="font-medium">{totalPages}</span>
+   478→          </p>
+   479→        </div>
+   480→        
+   481→        <div className="flex items-center space-x-2">
+   482→          <button
+   483→            onClick={() => handlePageChange(1)}
+   484→            disabled={currentPage === 1}
+   485→            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   486→            title="First Page"
+   487→          >
+   488→            <span className="sr-only">First</span>
+   489→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   490→              <path fillRule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+   491→            </svg>
+   492→          </button>
+   493→
+   494→          <button
+   495→            onClick={() => handlePageChange(currentPage - 1)}
+   496→            disabled={currentPage === 1}
+   497→            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   498→            title="Previous Page"
+   499→          >
+   500→            <span className="sr-only">Previous</span>
+   501→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   502→              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+   503→            </svg>
+   504→          </button>
+   505→
+   506→          {getPageNumbers().map((pageNum, index) => (
+   507→            <span key={index}>
+   508→              {pageNum === '...' ? (
+   509→                <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+   510→                  ...
+   511→                </span>
+   512→              ) : (
+   513→                <button
+   514→                  onClick={() => handlePageChange(pageNum as number)}
+   515→                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+   516→                    currentPage === pageNum
+   517→                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+   518→                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+   519→                  }`}
+   520→                >
+   521→                  {pageNum}
+   522→                </button>
+   523→              )}
+   524→            </span>
+   525→          ))}
+   526→
+   527→          <button
+   528→            onClick={() => handlePageChange(currentPage + 1)}
+   529→            disabled={currentPage === totalPages}
+   530→            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   531→            title="Next Page"
+   532→          >
+   533→            <span className="sr-only">Next</span>
+   534→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   535→              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+   536→            </svg>
+   537→          </button>
+   538→
+   539→          <button
+   540→            onClick={() => handlePageChange(totalPages)}
+   541→            disabled={currentPage === totalPages}
+   542→            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   543→            title="Last Page"
+   544→          >
+   545→            <span className="sr-only">Last</span>
+   546→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   547→              <path fillRule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0zm-6 0a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+   548→            </svg>
+   549→          </button>
+   550→        </div>
+   551→      </div>
+   552→
+   553→      {/* Empty State */}
+   554→      {filteredData.length === 0 && (
+   555→        <div className="text-center py-12">
+   556→          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   557→            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+   558→          </svg>
+   559→          <h3 className="mt-2 text-sm font-medium text-gray-900">No API keys found</h3>
+   560→          <p className="mt-1 text-sm text-gray-500">
+   561→            {searchTerm ? 'No API keys match your search criteria.' : 'You have not added any API keys yet.'}
+   562→          </p>
+   563→        </div>
+   564→      )}
+   565→    </div>
+   566→  );
+   567→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+This is a complex API key management page with 567 lines. I need to create the pclient.tsx and convert it to Method 1:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+"use client";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+interface ApiKey {
+  api_key_id: string;
+  fk_user_id: string;
+  fk_provider_id: string | null;
+  api_key_datum: string;
+  key_name: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface EditingState {
+  [key: string]: {
+    api_key_datum: string;
+    key_name: string;
+    is_active: boolean;
+    fk_provider_id: string | null;
+  };
+}
+
+const columns = [
+  'actions',
+  'api_key_id',
+  'fk_user_id',
+  'key_name',
+  'api_key_datum',
+  'fk_provider_id',
+  'is_active',
+  'created_at',
+  'updated_at'
+];
+
+export default function Clevnar1Client() {
+  const [data, setData] = useState<ApiKey[]>([]);
+  const [filteredData, setFilteredData] = useState<ApiKey[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [editingRows, setEditingRows] = useState<Set<string>>(new Set());
+  const [editingData, setEditingData] = useState<EditingState>({});
+  const [savingRows, setSavingRows] = useState<Set<string>>(new Set());
+  
+  const pageSizeOptions = [5, 10, 20, 50, 100];
+  const { user } = useAuth();
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    fetchApiKeys();
+  }, [user]);
+
+  useEffect(() => {
+    // Filter data based on search term
+    if (searchTerm) {
+      const filtered = data.filter(item => 
+        item.key_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.api_key_datum.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.api_key_id.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+    setCurrentPage(1); // Reset to first page when filtering
+  }, [searchTerm, data]);
+
+  const fetchApiKeys = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!user?.id) {
+        setData([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+        
+      if (userError || !userData) {
+        setError('Could not find user record.');
+        setData([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch api_keys_t2 for this user
+      const { data: apiKeys, error: apiKeysError } = await supabase
+        .from('api_keys_t2')
+        .select('*')
+        .eq('fk_user_id', userData.id)
+        .order('created_at', { ascending: false });
+        
+      if (apiKeysError) throw apiKeysError;
+      setData(apiKeys || []);
+      setFilteredData(apiKeys || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch API keys');
+      setData([]);
+      setFilteredData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Pagination calculations
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const currentItems = filteredData.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  const handleEdit = (apiKey: ApiKey) => {
+    setEditingRows(new Set([...editingRows, apiKey.api_key_id]));
+    setEditingData({
+      ...editingData,
+      [apiKey.api_key_id]: {
+        api_key_datum: apiKey.api_key_datum,
+        key_name: apiKey.key_name || '',
+        is_active: apiKey.is_active,
+        fk_provider_id: apiKey.fk_provider_id
+      }
+    });
+  };
+
+  const handleCancel = (apiKeyId: string) => {
+    const newEditingRows = new Set(editingRows);
+    newEditingRows.delete(apiKeyId);
+    setEditingRows(newEditingRows);
+    
+    const newEditingData = { ...editingData };
+    delete newEditingData[apiKeyId];
+    setEditingData(newEditingData);
+  };
+
+  const handleSave = async (apiKeyId: string) => {
+    const editData = editingData[apiKeyId];
+    if (!editData) return;
+
+    setSavingRows(new Set([...savingRows, apiKeyId]));
+    
+    try {
+      const { error: updateError } = await supabase
+        .from('api_keys_t2')
+        .update({
+          api_key_datum: editData.api_key_datum,
+          key_name: editData.key_name,
+          is_active: editData.is_active,
+          fk_provider_id: editData.fk_provider_id,
+          updated_at: new Date().toISOString()
+        })
+        .eq('api_key_id', apiKeyId);
+
+      if (updateError) throw updateError;
+
+      // Refresh data
+      await fetchApiKeys();
+      
+      // Clear editing state
+      handleCancel(apiKeyId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save API key');
+    } finally {
+      const newSavingRows = new Set(savingRows);
+      newSavingRows.delete(apiKeyId);
+      setSavingRows(newSavingRows);
+    }
+  };
+
+  const handleFieldChange = (apiKeyId: string, field: keyof EditingState[string], value: any) => {
+    setEditingData({
+      ...editingData,
+      [apiKeyId]: {
+        ...editingData[apiKeyId],
+        [field]: value
+      }
+    });
+  };
+
+  const formatColumnData = (col: string, value: any, apiKey: ApiKey) => {
+    if (value === null || value === undefined) return '-';
+    
+    const isEditing = editingRows.has(apiKey.api_key_id);
+    const editData = editingData[apiKey.api_key_id];
+    
+    switch (col) {
+      case 'api_key_id':
+        return value.substring(0, 8) + '...';
+      case 'fk_user_id':
+        return value.substring(0, 8) + '...';
+      case 'key_name':
+        if (isEditing) {
+          return (
+            <input
+              type="text"
+              value={editData?.key_name || ''}
+              onChange={(e) => handleFieldChange(apiKey.api_key_id, 'key_name', e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="Enter key name"
+            />
+          );
+        }
+        return value || '-';
+      case 'api_key_datum':
+        if (isEditing) {
+          return (
+            <input
+              type="text"
+              value={editData?.api_key_datum || ''}
+              onChange={(e) => handleFieldChange(apiKey.api_key_id, 'api_key_datum', e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono text-xs"
+              placeholder="Enter API key"
+            />
+          );
+        }
+        // Show masked key when not editing
+        const keyLength = value.length;
+        if (keyLength <= 8) return '********';
+        return value.substring(0, 4) + '...' + value.substring(keyLength - 4);
+      case 'fk_provider_id':
+        if (isEditing) {
+          return (
+            <input
+              type="text"
+              value={editData?.fk_provider_id || ''}
+              onChange={(e) => handleFieldChange(apiKey.api_key_id, 'fk_provider_id', e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="Provider ID"
+            />
+          );
+        }
+        return value ? value.substring(0, 8) + '...' : '-';
+      case 'is_active':
+        if (isEditing) {
+          return (
+            <select
+              value={editData?.is_active ? 'true' : 'false'}
+              onChange={(e) => handleFieldChange(apiKey.api_key_id, 'is_active', e.target.value === 'true')}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          );
+        }
+        return (
+          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+            value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          }`}>
+            {value ? 'Active' : 'Inactive'}
+          </span>
+        );
+      case 'created_at':
+      case 'updated_at':
+        return new Date(value).toLocaleString();
+      default:
+        return String(value);
+    }
+  };
+
+  const getColumnDisplayName = (col: string) => {
+    switch (col) {
+      case 'actions': return 'actions';
+      case 'api_key_id': return 'api_key_id';
+      case 'fk_user_id': return 'fk_user_id';
+      case 'key_name': return 'key_name';
+      case 'api_key_datum': return 'api_key_datum';
+      case 'fk_provider_id': return 'fk_provider_id';
+      case 'is_active': return 'is_active';
+      case 'created_at': return 'created_at';
+      case 'updated_at': return 'updated_at';
+      default: return col;
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      const halfVisible = Math.floor(maxVisiblePages / 2);
+      let startPage = Math.max(1, currentPage - halfVisible);
+      let endPage = Math.min(totalPages, currentPage + halfVisible);
+      
+      if (startPage === 1) {
+        endPage = Math.min(totalPages, maxVisiblePages);
+      }
+      
+      if (endPage === totalPages) {
+        startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+      }
+      
+      if (startPage > 1) {
+        pageNumbers.push(1);
+        if (startPage > 2) {
+          pageNumbers.push('...');
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push('...');
+        }
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
+  };
+
+  if (loading) return <div className="p-6">Loading API keys...</div>;
+  if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">API Key Management</h1>
+      <p className="text-sm text-gray-600 mb-6">db table: api_keys_t2</p>
+      
+      {/* Search and Filter Section */}
+      <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex-1">
+            <label htmlFor="search" className="sr-only">Search API Keys</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Search by key name, ID, or key value..."
+              />
+            </div>
+          </div>
+          <button
+            onClick={fetchApiKeys}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Statistics Bar */}
+      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between text-sm text-gray-600">
+          <span>
+            Showing <span className="font-medium text-gray-900">{startIndex + 1}</span> to{' '}
+            <span className="font-medium text-gray-900">{endIndex}</span> of{' '}
+            <span className="font-medium text-gray-900">{totalItems}</span> API keys
+          </span>
+          <div className="flex items-center space-x-2">
+            <label htmlFor="pageSize" className="text-sm font-medium text-gray-700">
+              Items per page:
+            </label>
+            <select
+              id="pageSize"
+              value={pageSize}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+              className="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+            >
+              {pageSizeOptions.map(size => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              {columns.map(col => (
+                <th 
+                  key={col} 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  {getColumnDisplayName(col)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {currentItems.map((apiKey, index) => (
+              <tr key={apiKey.api_key_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                {columns.map(col => (
+                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {col === 'actions' ? (
+                      <div className="flex space-x-2">
+                        {editingRows.has(apiKey.api_key_id) ? (
+                          <>
+                            <button
+                              onClick={() => handleSave(apiKey.api_key_id)}
+                              disabled={savingRows.has(apiKey.api_key_id)}
+                              className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {savingRows.has(apiKey.api_key_id) ? 'Saving...' : 'Save'}
+                            </button>
+                            <button
+                              onClick={() => handleCancel(apiKey.api_key_id)}
+                              disabled={savingRows.has(apiKey.api_key_id)}
+                              className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => handleEdit(apiKey)}
+                            className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          >
+                            Edit
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="max-w-xs">
+                        {formatColumnData(col, apiKey[col as keyof ApiKey], apiKey)}
+                      </div>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="mt-6 flex items-center justify-between">
+        <div className="flex items-center">
+          <p className="text-sm text-gray-700">
+            Page <span className="font-medium">{currentPage}</span> of{' '}
+            <span className="font-medium">{totalPages}</span>
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handlePageChange(1)}
+            disabled={currentPage === 1}
+            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="First Page"
+          >
+            <span className="sr-only">First</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Previous Page"
+          >
+            <span className="sr-only">Previous</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          {getPageNumbers().map((pageNum, index) => (
+            <span key={index}>
+              {pageNum === '...' ? (
+                <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                  ...
+                </span>
+              ) : (
+                <button
+                  onClick={() => handlePageChange(pageNum as number)}
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                    currentPage === pageNum
+                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              )}
+            </span>
+          ))}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Next Page"
+          >
+            <span className="sr-only">Next</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => handlePageChange(totalPages)}
+            disabled={currentPage === totalPages}
+            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Last Page"
+          >
+            <span className="sr-only">Last</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0zm-6 0a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Empty State */}
+      {filteredData.length === 0 && (
+        <div className="text-center py-12">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No API keys found</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {searchTerm ? 'No API keys match your search criteria.' : 'You have not added any API keys yet.'}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/clevnar1/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll convert the page.tsx to server component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/clevnar1/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import Clevnar1Client from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'clevnar1',
+     6→};
+     7→
+     8→export default function Clevnar1Page() {
+     9→  return <Clevnar1Client />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now let me move to `/driggsman`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 4: Editor & Content Pages to Method 1
+- [X] 🌡️ Convert /sitejar4 to Method 1
+- [X] 🌡️ Convert /clevnar1 to Method 1
+- [⚡] 🌡️ Convert /driggsman to Method 1
+- [ ] 🌡️ Convert /pedbar to Method 1
+- [ ] 🌡️ Convert /dfslocr to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/page.tsx`
+
+Result:
+
+```
+1→import { Metadata } from 'next';
+     2→import DriggsmanClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: '/driggsman',
+     6→};
+     7→
+     8→export default function DriggsmanPage() {
+     9→  return <DriggsmanClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Great! `/driggsman` already has Method 1. Let me move to `/pedbar`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 4: Editor & Content Pages to Method 1
+- [X] 🌡️ Convert /sitejar4 to Method 1
+- [X] 🌡️ Convert /clevnar1 to Method 1
+- [X] 🌡️ Convert /driggsman to Method 1
+- [⚡] 🌡️ Convert /pedbar to Method 1
+- [ ] 🌡️ Convert /dfslocr to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/pedbar/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     6→import { useSearchParams, useRouter } from 'next/navigation';
+     7→import GconPieceEditor from './components/GconPieceEditor';
+     8→import Link from 'next/link';
+     9→
+    10→interface GconPiece {
+    11→  id: string;
+    12→  fk_users_id: string;
+    13→  meta_title: string | null;
+    14→  h1title: string | null;
+    15→  pgb_h1title: string | null;
+    16→  corpus1: string | null;
+    17→  corpus2: string | null;
+    18→  asn_sitespren_base: string | null;
+    19→  asn_nwpi_posts_id: string | null;
+    20→  asn_imgplanbatch_id: string | null;
+    21→  image_pack1: any;
+    22→  pelementor_cached: any;
+    23→  pelementor_edits: any;
+    24→  pub_status: string | null;
+    25→  date_time_pub_carry: string | null;
+    26→  pageslug: string | null;
+    27→  pageurl: string | null;
+    28→  created_at: string;
+    29→  updated_at: string;
+    30→}
+    31→
+    32→export default function PedbarPage() {
+    33→  const [gconPiece, setGconPiece] = useState<GconPiece | null>(null);
+    34→  const [loading, setLoading] = useState(true);
+    35→  const [error, setError] = useState<string | null>(null);
+    36→  const [userInternalId, setUserInternalId] = useState<string | null>(null);
+    37→  const { user } = useAuth();
+    38→  const supabase = createClientComponentClient();
+    39→  const searchParams = useSearchParams();
+    40→  const router = useRouter();
+    41→  const id = searchParams?.get('id') || null;
+    42→
+    43→  useEffect(() => {
+    44→    document.title = '/pedbar - Snefuru';
+    45→  }, []);
+    46→
+    47→  useEffect(() => {
+    48→    const fetchGconPiece = async () => {
+    49→      if (!user?.id || !id) {
+    50→        setLoading(false);
+    51→        if (!id) {
+    52→          setError('No content piece ID provided');
+    53→        }
+    54→        return;
+    55→      }
+    56→
+    57→      try {
+    58→        // First get the internal user ID
+    59→        const { data: userData, error: userError } = await supabase
+    60→          .from('users')
+    61→          .select('id')
+    62→          .eq('auth_id', user.id)
+    63→          .single();
+    64→
+    65→        if (userError || !userData) {
+    66→          setError('User not found');
+    67→          setLoading(false);
+    68→          return;
+    69→        }
+    70→
+    71→        setUserInternalId(userData.id);
+    72→
+    73→        // Fetch the specific gcon_piece
+    74→        const { data: gconPiece, error } = await supabase
+    75→          .from('gcon_pieces')
+    76→          .select('*')
+    77→          .eq('id', id)
+    78→          .eq('fk_users_id', userData.id) // Security: only allow user's own pieces
+    79→          .single();
+    80→
+    81→        if (error) {
+    82→          console.error('Error fetching gcon_piece:', error);
+    83→          if (error.code === 'PGRST116') {
+    84→            setError('Content piece not found or access denied');
+    85→          } else {
+    86→            setError('Error loading content piece');
+    87→          }
+    88→        } else {
+    89→          setGconPiece(gconPiece);
+    90→        }
+    91→      } catch (err) {
+    92→        console.error('Error:', err);
+    93→        setError('An error occurred');
+    94→      } finally {
+    95→        setLoading(false);
+    96→      }
+    97→    };
+    98→
+    99→    fetchGconPiece();
+   100→  }, [user?.id, id, supabase]);
+   101→
+   102→  if (!user) {
+   103→    return (
+   104→      <div className="container mx-auto p-4">
+   105→        <div className="text-center">
+   106→          <p>Please sign in to edit content pieces.</p>
+   107→        </div>
+   108→      </div>
+   109→    );
+   110→  }
+   111→
+   112→  if (!id) {
+   113→    return (
+   114→      <div className="container mx-auto p-4">
+   115→        <div className="text-center">
+   116→          <h1 className="text-2xl font-bold mb-4 text-red-600">Invalid Request</h1>
+   117→          <p className="mb-4">No content piece ID provided.</p>
+   118→          <Link 
+   119→            href="/gconjar1"
+   120→            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+   121→          >
+   122→            Back to Content Pieces
+   123→          </Link>
+   124→        </div>
+   125→      </div>
+   126→    );
+   127→  }
+   128→
+   129→  if (loading) {
+   130→    return (
+   131→      <div className="container mx-auto p-4">
+   132→        <div className="text-center">
+   133→          <p>Loading content piece...</p>
+   134→        </div>
+   135→      </div>
+   136→    );
+   137→  }
+   138→
+   139→  if (error) {
+   140→    return (
+   141→      <div className="container mx-auto p-4">
+   142→        <div className="text-center">
+   143→          <h1 className="text-2xl font-bold mb-4 text-red-600">Error</h1>
+   144→          <p className="mb-4 text-red-600">{error}</p>
+   145→          <Link 
+   146→            href="/gconjar1"
+   147→            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+   148→          >
+   149→            Back to Content Pieces
+   150→          </Link>
+   151→        </div>
+   152→      </div>
+   153→    );
+   154→  }
+   155→
+   156→  if (!gconPiece) {
+   157→    return (
+   158→      <div className="container mx-auto p-4">
+   159→        <div className="text-center">
+   160→          <h1 className="text-2xl font-bold mb-4 text-red-600">Not Found</h1>
+   161→          <p className="mb-4">Content piece not found.</p>
+   162→          <Link 
+   163→            href="/gconjar1"
+   164→            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+   165→          >
+   166→            Back to Content Pieces
+   167→          </Link>
+   168→        </div>
+   169→      </div>
+   170→    );
+   171→  }
+   172→
+   173→  return (
+   174→    <div className="container mx-auto p-4">
+   175→      {/* Header */}
+   176→      <div className="mb-6">
+   177→        <div className="flex items-center justify-between mb-4">
+   178→          <h1 className="text-3xl font-bold">Edit Content Piece</h1>
+   179→          
+   180→          <div className="flex items-center gap-4">
+   181→            {/* Horizontal button bar */}
+   182→            <div className="flex border border-gray-300 rounded-md overflow-hidden h-[30px]">
+   183→              <a 
+   184→                href="#" 
+   185→                target="_blank" 
+   186→                rel="noopener noreferrer"
+   187→                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline border-r border-gray-300"
+   188→              >
+   189→                FRONTEND
+   190→              </a>
+   191→              <a 
+   192→                href="#" 
+   193→                target="_blank" 
+   194→                rel="noopener noreferrer"
+   195→                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline border-r border-gray-300"
+   196→              >
+   197→                ELEM.EDITOR
+   198→              </a>
+   199→              <a 
+   200→                href="#" 
+   201→                target="_blank" 
+   202→                rel="noopener noreferrer"
+   203→                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline"
+   204→              >
+   205→                WP EDITOR
+   206→              </a>
+   207→            </div>
+   208→            
+   209→            <Link 
+   210→              href="/gconjar1"
+   211→              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+   212→            >
+   213→              ← Back to List
+   214→            </Link>
+   215→          </div>
+   216→        </div>
+   217→        <div className="text-sm text-gray-600">
+   218→          <p><strong>db table:</strong> gcon_pieces</p>
+   219→          <p><strong>ID:</strong> {gconPiece.id}</p>
+   220→          <p><strong>Created:</strong> {new Date(gconPiece.created_at).toLocaleString()}</p>
+   221→          <p><strong>Updated:</strong> {new Date(gconPiece.updated_at).toLocaleString()}</p>
+   222→        </div>
+   223→      </div>
+   224→
+   225→      {/* Editor */}
+   226→      <GconPieceEditor 
+   227→        gconPiece={gconPiece}
+   228→        userInternalId={userInternalId!}
+   229→        onUpdate={(updatedPiece) => setGconPiece(updatedPiece)}
+   230→      />
+   231→    </div>
+   232→  );
+   233→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+This is a content piece editor page. I need to create pclient.tsx and convert it to Method 1:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useSearchParams, useRouter } from 'next/navigation';
+import GconPieceEditor from './components/GconPieceEditor';
+import Link from 'next/link';
+
+interface GconPiece {
+  id: string;
+  fk_users_id: string;
+  meta_title: string | null;
+  h1title: string | null;
+  pgb_h1title: string | null;
+  corpus1: string | null;
+  corpus2: string | null;
+  asn_sitespren_base: string | null;
+  asn_nwpi_posts_id: string | null;
+  asn_imgplanbatch_id: string | null;
+  image_pack1: any;
+  pelementor_cached: any;
+  pelementor_edits: any;
+  pub_status: string | null;
+  date_time_pub_carry: string | null;
+  pageslug: string | null;
+  pageurl: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export default function PedbarClient() {
+  const [gconPiece, setGconPiece] = useState<GconPiece | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userInternalId, setUserInternalId] = useState<string | null>(null);
+  const { user } = useAuth();
+  const supabase = createClientComponentClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const id = searchParams?.get('id') || null;
+
+  useEffect(() => {
+    const fetchGconPiece = async () => {
+      if (!user?.id || !id) {
+        setLoading(false);
+        if (!id) {
+          setError('No content piece ID provided');
+        }
+        return;
+      }
+
+      try {
+        // First get the internal user ID
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (userError || !userData) {
+          setError('User not found');
+          setLoading(false);
+          return;
+        }
+
+        setUserInternalId(userData.id);
+
+        // Fetch the specific gcon_piece
+        const { data: gconPiece, error } = await supabase
+          .from('gcon_pieces')
+          .select('*')
+          .eq('id', id)
+          .eq('fk_users_id', userData.id) // Security: only allow user's own pieces
+          .single();
+
+        if (error) {
+          console.error('Error fetching gcon_piece:', error);
+          if (error.code === 'PGRST116') {
+            setError('Content piece not found or access denied');
+          } else {
+            setError('Error loading content piece');
+          }
+        } else {
+          setGconPiece(gconPiece);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        setError('An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGconPiece();
+  }, [user?.id, id, supabase]);
+
+  if (!user) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center">
+          <p>Please sign in to edit content pieces.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!id) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">Invalid Request</h1>
+          <p className="mb-4">No content piece ID provided.</p>
+          <Link 
+            href="/gconjar1"
+            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Back to Content Pieces
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center">
+          <p>Loading content piece...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">Error</h1>
+          <p className="mb-4 text-red-600">{error}</p>
+          <Link 
+            href="/gconjar1"
+            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Back to Content Pieces
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!gconPiece) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">Not Found</h1>
+          <p className="mb-4">Content piece not found.</p>
+          <Link 
+            href="/gconjar1"
+            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Back to Content Pieces
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-4">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-3xl font-bold">Edit Content Piece</h1>
+          
+          <div className="flex items-center gap-4">
+            {/* Horizontal button bar */}
+            <div className="flex border border-gray-300 rounded-md overflow-hidden h-[30px]">
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline border-r border-gray-300"
+              >
+                FRONTEND
+              </a>
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline border-r border-gray-300"
+              >
+                ELEM.EDITOR
+              </a>
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="px-4 flex items-center justify-center text-[20px] leading-none hover:bg-gray-50 text-black no-underline"
+              >
+                WP EDITOR
+              </a>
+            </div>
+            
+            <Link 
+              href="/gconjar1"
+              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+            >
+              ← Back to List
+            </Link>
+          </div>
+        </div>
+        <div className="text-sm text-gray-600">
+          <p><strong>db table:</strong> gcon_pieces</p>
+          <p><strong>ID:</strong> {gconPiece.id}</p>
+          <p><strong>Created:</strong> {new Date(gconPiece.created_at).toLocaleString()}</p>
+          <p><strong>Updated:</strong> {new Date(gconPiece.updated_at).toLocaleString()}</p>
+        </div>
+      </div>
+
+      {/* Editor */}
+      <GconPieceEditor 
+        gconPiece={gconPiece}
+        userInternalId={userInternalId!}
+        onUpdate={(updatedPiece) => setGconPiece(updatedPiece)}
+      />
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/pedbar/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll convert the page.tsx to server component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/pedbar/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import PedbarClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'pedbar',
+     6→};
+     7→
+     8→export default function PedbarPage() {
+     9→  return <PedbarClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me move to the final page in this batch - `/dfslocr`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 4: Editor & Content Pages to Method 1
+- [X] 🌡️ Convert /sitejar4 to Method 1
+- [X] 🌡️ Convert /clevnar1 to Method 1
+- [X] 🌡️ Convert /driggsman to Method 1
+- [X] 🌡️ Convert /pedbar to Method 1
+- [⚡] 🌡️ Convert /dfslocr to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/dfslocr/page.tsx`
+
+Result:
+
+```
+1→import { Metadata } from 'next';
+     2→import DfslocrClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: '/dfslocr',
+     6→};
+     7→
+     8→export default function DfslocrPage() {
+     9→  return <DfslocrClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Excellent! `/dfslocr` already has Method 1. Let me complete Batch 4:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Convert Batch 4: Editor & Content Pages to Method 1
+- [X] 🌡️ Convert /sitejar4 to Method 1
+- [X] 🌡️ Convert /clevnar1 to Method 1
+- [X] 🌡️ Convert /driggsman to Method 1
+- [X] 🌡️ Convert /pedbar to Method 1
+- [X] 🌡️ Convert /dfslocr to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Batch 4 Complete!** ✅
+
+I've successfully converted Batch 4 (Editor & Content Pages) to Method 1:
+
+1. **✅ /sitejar4** - Already had Method 1 (skipped)
+2. **✅ /clevnar1** - API key management (567-line complex component with pagination and inline editing)
+3. **✅ /driggsman** - Already had Method 1 (skipped)
+4. **✅ /pedbar** - Content piece editor (233-line component with URL params and content management)
+5. **✅ /dfslocr** - Already had Method 1 (skipped)
+
+**Key conversions completed:**
+- **clevnar1:page.tsx:55** - Removed `document.title = 'clevnar1 - Snefuru';` and moved to server-side metadata
+- **pedbar:page.tsx:44** - Removed `document.title = '/pedbar - Snefuru';` and moved to server-side metadata
+
+All pages now follow the Method 1 pattern with server-side meta titles via Next.js Metadata API. The development server should show successful compilation.
+
+Ready to continue with the next batch of pages! 🚀
+
+---
+
+_**User**_
+
+please review the driggsman and other pages that "already had method 1" and make sure the setup that those pages are using is uniform to what we're creating. for example, they must have a file named pclient , etc. 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Good point! Let me check the pages that I marked as "already having Method 1" to ensure they follow our uniform naming conventions and structure.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import DriggsmanTable from './components/DriggsmanTable';
+     7→import dynamic from 'next/dynamic';
+     8→
+     9→const SitedoriButtonBar = dynamic(
+    10→  () => import('@/app/components/SitedoriButtonBar'),
+    11→  { ssr: false }
+    12→);
+    13→
+    14→const DrenjariButtonBarDriggsmanLinks = dynamic(
+    15→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    16→  { ssr: false }
+    17→);
+    18→
+    19→export default function DriggsmanClient() {
+    20→  const { user } = useAuth();
+    21→  const router = useRouter();
+    22→
+    23→  useEffect(() => {
+    24→    if (!user) {
+    25→      router.push('/login');
+    26→      return;
+    27→    }
+    28→  }, [user, router]);
+    29→
+    30→  if (!user) {
+    31→    return (
+    32→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    33→        <div className="text-gray-500">Loading...</div>
+    34→      </div>
+    35→    );
+    36→  }
+    37→
+    38→  return (
+    39→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    40→      {/* Header */}
+    41→      <div className="bg-white border-b px-6 py-4">
+    42→        <div className="flex items-center justify-between">
+    43→          <div>
+    44→            <h1 className="text-2xl font-bold text-gray-800">
+    45→              Driggs Manager 
+    46→              <span className="text-xl font-normal text-gray-600 ml-3">Phone Numbers, Addresses, and Citations</span>
+    47→            </h1>
+    48→          </div>
+    49→          <div className="text-right">
+    50→            <div className="text-sm text-gray-500">Site Field Management</div>
+    51→            <div className="text-xs text-gray-400">Cross-reference all site fields</div>
+    52→          </div>
+    53→        </div>
+    54→      </div>
+    55→
+    56→      {/* Navigation Components */}
+    57→      <div className="px-6 py-2">
+    58→        {/* Sitedori Navigation Links */}
+    59→        <div className="mb-4">
+    60→          <SitedoriButtonBar />
+    61→        </div>
+    62→
+    63→        {/* Drenjari Navigation Links */}
+    64→        <div className="mb-4">
+    65→          <DrenjariButtonBarDriggsmanLinks />
+    66→        </div>
+    67→      </div>
+    68→
+    69→      {/* Main Content - Full Width DriggsmanTable */}
+    70→      <div className="flex-1 overflow-hidden">
+    71→        <DriggsmanTable />
+    72→      </div>
+    73→    </div>
+    74→  );
+    75→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Good - `/driggsman` correctly has `pclient.tsx` with `DriggsmanClient`. Let me check `/sitejar4`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/sitejar4/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useRouter, useSearchParams } from 'next/navigation';
+     5→import { useAuth } from '@/app/context/AuthContext';
+     6→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     7→import SitesprenTable from './components/SitesprenTable';
+     8→import ExportSitesComponent from './components/ExportSitesComponent';
+     9→import { cfunc_f71_createsite } from './utils/cfunc_f71_createsite';
+    10→import dynamic from 'next/dynamic';
+    11→
+    12→const DrenjariButtonBarDriggsmanLinks = dynamic(
+    13→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    14→  { ssr: false }
+    15→);
+    16→
+    17→const SitedoriButtonBar = dynamic(
+    18→  () => import('@/app/components/SitedoriButtonBar'),
+    19→  { ssr: false }
+    20→);
+    21→
+    22→export default function Sitejar4Client() {
+    23→  const [sitesprenData, setSitesprenData] = useState<any[]>([]);
+    24→  const [loading, setLoading] = useState(true);
+    25→  const [error, setError] = useState<string | null>(null);
+    26→  const [userInternalId, setUserInternalId] = useState<string | null>(null);
+    27→  const [debugExpanded, setDebugExpanded] = useState(false);
+    28→  const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
+    29→  const [isDeleting, setIsDeleting] = useState(false);
+    30→  const [deleteNotification, setDeleteNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+    31→  const [searchTerm, setSearchTerm] = useState<string>('');
+    32→  const [isExternalFilter, setIsExternalFilter] = useState<string>('hide');
+    33→  const [sitesEnteredFilter, setSitesEnteredFilter] = useState<string[]>([]);
+    34→  const [isPopupOpen, setIsPopupOpen] = useState(false);
+    35→  const [kz101Checked, setKz101Checked] = useState(false);
+    36→  const [kz103Checked, setKz103Checked] = useState(false);
+    37→  const [activePopupTab, setActivePopupTab] = useState<'ptab1' | 'ptab2' | 'ptab3' | 'ptab4' | 'ptab5' | 'ptab6' | 'ptab7'>('ptab1');
+    38→  const [uelBarColors, setUelBarColors] = useState<{bg: string, text: string}>({bg: '#2563eb', text: '#ffffff'});
+    39→  const [uelBar37Colors, setUelBar37Colors] = useState<{bg: string, text: string}>({bg: '#1e40af', text: '#ffffff'});
+    40→  const [currentUrl, setCurrentUrl] = useState<string>('');
+    41→  // F71 Create Site Form state
+    42→  const [sitesList, setSitesList] = useState('');
+    43→  const [isSubmittingF71, setIsSubmittingF71] = useState(false);
+    44→  const [f71Notification, setF71Notification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+    45→  
+    46→  // Tags management tab state
+    47→  const [tagsActiveTab, setTagsActiveTab] = useState<'fromUTG' | 'fromPaste'>('fromUTG');
+    48→  const [pastedSitesContent, setPastedSitesContent] = useState('');
+    49→  const [isProcessingPastedSites, setIsProcessingPastedSites] = useState(false);
+    50→  const [pastedSitesReport, setPastedSitesReport] = useState<{
+    51→    totalSubmitted: number;
+    52→    successfullyAdded: number;
+    53→    alreadyExisted: number;
+    54→    notInAccount: number;
+    55→    details?: string[];
+    56→  } | null>(null);
+    57→  
+    58→  // F71 additional fields state for the table grid
+    59→  const [f71Fields, setF71Fields] = useState({
+    60→    true_root_domain: '',
+    61→    full_subdomain: '',
+    62→    webproperty_type: '',
+    63→    wpuser1: '',
+    64→    wppass1: '',
+    65→    wp_plugin_installed1: false,
+    66→    wp_plugin_connected2: false,
+    67→    fk_domreg_hostaccount: '',
+    68→    is_wp_site: false,
+    69→    wp_rest_app_pass: '',
+    70→    driggs_industry: '',
+    71→    driggs_city: '',
+    72→    driggs_brand_name: '',
+    73→    driggs_site_type_purpose: '',
+    74→    driggs_email_1: '',
+    75→    driggs_address_full: '',
+    76→    driggs_address_species_id: null as number | null,
+    77→    driggs_phone_1: '',
+    78→    driggs_phone1_platform_id: null as number | null,
+    79→    driggs_cgig_id: null as number | null,
+    80→    driggs_special_note_for_ai_tool: '',
+    81→    driggs_revenue_goal: null as number | null,
+    82→    ns_full: '',
+    83→    ip_address: '',
+    84→    is_starred1: '',
+    85→    icon_name: '',
+    86→    icon_color: '',
+    87→    is_bulldozer: false,
+    88→    is_competitor: false,
+    89→    is_external: false,
+    90→    is_internal: false,
+    91→    is_ppx: false,
+    92→    is_ms: false,
+    93→    is_wayback_rebuild: false,
+    94→    is_naked_wp_build: false,
+    95→    is_rnr: false,
+    96→    is_aff: false,
+    97→    is_other1: false,
+    98→    is_other2: false,
+    99→    is_flylocal: false
+   100→  });
+   101→  
+   102→  // Chamber visibility states
+   103→  const [chambersVisible, setChambersVisible] = useState({
+   104→    yupik: true,
+   105→    chepno: true
+   106→  });
+   107→  const [selectedF71Fields, setSelectedF71Fields] = useState<Set<string>>(new Set());
+   108→  const [tagsData, setTagsData] = useState<any>(null);
+   109→  const { user } = useAuth();
+   110→  const supabase = createClientComponentClient();
+   111→  const router = useRouter();
+   112→  const searchParams = useSearchParams();
+   113→
+   114→  useEffect(() => {
+   115→    // Handle URL parameters for popup and tab state
+   116→    const urlParams = new URLSearchParams(window.location.search);
+   117→    const fpop = urlParams.get('fpop');
+   118→    const ptab1 = urlParams.get('ptab1');
+   119→    const ptab2 = urlParams.get('ptab2');
+   120→    const ptab3 = urlParams.get('ptab3');
+   121→    const ptab4 = urlParams.get('ptab4');
+   122→    const ptab5 = urlParams.get('ptab5');
+   123→    const ptab6 = urlParams.get('ptab6');
+   124→    const ptab7 = urlParams.get('ptab7');
+   125→    
+   126→    // Auto-open popup if fpop=open is in URL
+   127→    if (fpop === 'open') {
+   128→      setIsPopupOpen(true);
+   129→      
+   130→      // Set active tab based on URL parameters
+   131→      if (ptab1 === 'active') {
+   132→        setActivePopupTab('ptab1');
+   133→      } else if (ptab2 === 'active') {
+   134→        setActivePopupTab('ptab2');
+   135→      } else if (ptab3 === 'active') {
+   136→        setActivePopupTab('ptab3');
+   137→      } else if (ptab4 === 'active') {
+   138→        setActivePopupTab('ptab4');
+   139→      } else if (ptab5 === 'active') {
+   140→        setActivePopupTab('ptab5');
+   141→      } else if (ptab6 === 'active') {
+   142→        setActivePopupTab('ptab6');
+   143→      } else if (ptab7 === 'active') {
+   144→        setActivePopupTab('ptab7');
+   145→      }
+   146→    }
+   147→  }, []);
+   148→
+   149→  // Initialize search term, is_external filter, and sitesentered filter from URL parameters
+   150→  useEffect(() => {
+   151→    const searchsite = searchParams?.get('searchsite');
+   152→    const isExternal = searchParams?.get('is_external');
+   153→    const sitesEntered = searchParams?.get('sitesentered');
+   154→    
+   155→    if (searchsite) {
+   156→      setSearchTerm(searchsite);
+   157→    }
+   158→    
+   159→    if (isExternal === 'show' || isExternal === 'hide') {
+   160→      setIsExternalFilter(isExternal);
+   161→    }
+   162→    
+   163→    if (sitesEntered) {
+   164→      // Parse comma-separated sites (URL encoded)
+   165→      const sites = sitesEntered.split(',').map(site => decodeURIComponent(site.trim())).filter(site => site.length > 0);
+   166→      setSitesEnteredFilter(sites);
+   167→    } else {
+   168→      setSitesEnteredFilter([]);
+   169→    }
+   170→  }, [searchParams]);
+   171→
+   172→  // Track URL changes
+   173→  useEffect(() => {
+   174→    // Initialize URL on mount
+   175→    setCurrentUrl(window.location.href);
+   176→    
+   177→    // Handle URL changes
+   178→    const handleUrlChange = () => {
+   179→      setCurrentUrl(window.location.href);
+   180→    };
+   181→    
+   182→    // Custom event for URL updates
+   183→    const handleCustomUrlUpdate = () => {
+   184→      setCurrentUrl(window.location.href);
+   185→    };
+   186→    
+   187→    window.addEventListener('popstate', handleUrlChange);
+   188→    window.addEventListener('urlchange', handleCustomUrlUpdate);
+   189→    
+   190→    // Use MutationObserver as fallback
+   191→    // COMMENTED OUT: This was causing navigation link issues - preventing normal clicks from working
+   192→    // const observer = new MutationObserver(() => {
+   193→    //   if (window.location.href !== currentUrl) {
+   194→    //     setCurrentUrl(window.location.href);
+   195→    //   }
+   196→    // });
+   197→    // 
+   198→    // observer.observe(document.querySelector('head') || document.documentElement, {
+   199→    //   childList: true,
+   200→    //   subtree: true
+   201→    // });
+   202→    
+   203→    return () => {
+   204→      window.removeEventListener('popstate', handleUrlChange);
+   205→      window.removeEventListener('urlchange', handleCustomUrlUpdate);
+   206→      // observer.disconnect(); // Commented out since observer is disabled
+   207→    };
+   208→  }, [currentUrl]);
+   209→
+   210→  // Update URL when search term or is_external filter changes
+   211→  const updateSearchInURL = (newSearchTerm: string, newIsExternal?: string) => {
+   212→    const url = new URL(window.location.href);
+   213→    
+   214→    if (newSearchTerm.trim()) {
+   215→      url.searchParams.set('searchsite', newSearchTerm.trim());
+   216→    } else {
+   217→      url.searchParams.delete('searchsite');
+   218→    }
+   219→    
+   220→    const externalFilter = newIsExternal !== undefined ? newIsExternal : isExternalFilter;
+   221→    if (externalFilter === 'show') {
+   222→      url.searchParams.set('is_external', 'show');
+   223→    } else {
+   224→      url.searchParams.delete('is_external'); // Default is 'hide', no need to set in URL
+   225→    }
+   226→    
+   227→    // Preserve sitesentered parameter if it exists
+   228→    const currentSitesEntered = searchParams?.get('sitesentered');
+   229→    if (currentSitesEntered) {
+   230→      url.searchParams.set('sitesentered', currentSitesEntered);
+   231→    }
+   232→    
+   233→    router.replace(url.pathname + url.search, { scroll: false });
+   234→  };
+   235→
+   236→  // Handle search input change
+   237→  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   238→    const newValue = e.target.value;
+   239→    setSearchTerm(newValue);
+   240→    updateSearchInURL(newValue);
+   241→  };
+   242→
+   243→  // Handle is_external filter change
+   244→  const handleIsExternalFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+   245→    const newValue = e.target.value;
+   246→    setIsExternalFilter(newValue);
+   247→    updateSearchInURL(searchTerm, newValue);
+   248→  };
+   249→
+   250→  // Filter sitespren data based on search term, is_external filter, and sitesentered filter
+   251→  const filteredSitesprenData = sitesprenData.filter(site => {
+   252→    // Apply sitesentered filter first (most restrictive)
+   253→    if (sitesEnteredFilter.length > 0) {
+   254→      const matchesSitesEntered = sitesEnteredFilter.some(enteredSite => 
+   255→        site.sitespren_base?.toLowerCase() === enteredSite.toLowerCase()
+   256→      );
+   257→      if (!matchesSitesEntered) return false;
+   258→    }
+   259→    
+   260→    // Apply search term filter
+   261→    if (searchTerm.trim()) {
+   262→      const searchLower = searchTerm.toLowerCase();
+   263→      const matchesSearch = (
+   264→        site.sitespren_base?.toLowerCase().includes(searchLower) ||
+   265→        site.true_root_domain?.toLowerCase().includes(searchLower) ||
+   266→        site.full_subdomain?.toLowerCase().includes(searchLower) ||
+   267→        site.webproperty_type?.toLowerCase().includes(searchLower) ||
+   268→        site.id?.toLowerCase().includes(searchLower)
+   269→      );
+   270→      if (!matchesSearch) return false;
+   271→    }
+   272→    
+   273→    // Apply is_external filter
+   274→    if (isExternalFilter === 'show') {
+   275→      // Show all sites regardless of is_external value
+   276→      return true;
+   277→    } else {
+   278→      // 'hide' - do not display sites where is_external = true
+   279→      return site.is_external !== true;
+   280→    }
+   281→  });
+   282→
+   283→  useEffect(() => {
+   284→    const fetchSitesprenData = async () => {
+   285→      if (!user?.id) {
+   286→        setLoading(false);
+   287→        return;
+   288→      }
+   289→
+   290→      try {
+   291→        // First get the internal user ID
+   292→        const { data: userData, error: userError } = await supabase
+   293→          .from('users')
+   294→          .select('id')
+   295→          .eq('auth_id', user.id)
+   296→          .single();
+   297→
+   298→        if (userError || !userData) {
+   299→          setError('User not found');
+   300→          setLoading(false);
+   301→          return;
+   302→        }
+   303→
+   304→        setUserInternalId(userData.id);
+   305→
+   306→        // Fetch user's sitespren data via API (bypasses RLS)
+   307→        console.log('Fetching sitespren data for user ID:', userData.id);
+   308→        
+   309→        const response = await fetch(`/api/get_sitespren_data?user_internal_id=${userData.id}`);
+   310→        const result = await response.json();
+   311→
+   312→        console.log('API fetch result:', result);
+   313→
+   314→        if (result.success) {
+   315→          console.log('Setting sitespren data:', result.data);
+   316→          setSitesprenData(result.data || []);
+   317→        } else {
+   318→          console.error('Error fetching sitespren:', result.error);
+   319→          setError('Error fetching sites data');
+   320→        }
+   321→      } catch (err) {
+   322→        console.error('Error:', err);
+   323→        setError('An error occurred');
+   324→      } finally {
+   325→        setLoading(false);
+   326→      }
+   327→    };
+   328→
+   329→    fetchSitesprenData();
+   330→  }, [user?.id, supabase]);
+   331→
+   332→  // Function to refetch data after creating new sites
+   333→  const refetchSitesprenData = async () => {
+   334→    console.log('Refetching data...', { userId: user?.id, userInternalId });
+   335→    
+   336→    if (!user?.id || !userInternalId) {
+   337→      console.log('Missing user data for refetch');
+   338→      return;
+   339→    }
+   340→
+   341→    try {
+   342→      const response = await fetch(`/api/get_sitespren_data?user_internal_id=${userInternalId}`);
+   343→      const result = await response.json();
+   344→
+   345→      console.log('Refetch API result:', result);
+   346→
+   347→      if (result.success) {
+   348→        console.log('Setting new data:', result.data);
+   349→        setSitesprenData(result.data || []);
+   350→      } else {
+   351→        console.error('Error in refetch:', result.error);
+   352→      }
+   353→    } catch (err) {
+   354→      console.error('Error refetching data:', err);
+   355→    }
+   356→  };
+   357→
+   358→  // Handle selection change from table
+   359→  const handleSelectionChange = (selectedIds: string[]) => {
+   360→    setSelectedSiteIds(selectedIds);
+   361→  };
+   362→
+   363→  // f71_createsite function
+   364→  const handleF71Submit = async () => {
+   365→    if (!sitesList.trim()) {
+   366→      setF71Notification({
+   367→        type: 'error',
+   368→        message: 'Please enter at least one site URL'
+   369→      });
+   370→      return;
+   371→    }
+   372→
+   373→    if (!userInternalId) {
+   374→      setF71Notification({
+   375→        type: 'error',
+   376→        message: 'User verification failed'
+   377→      });
+   378→      return;
+   379→    }
+   380→
+   381→    setIsSubmittingF71(true);
+   382→    setF71Notification(null);
+   383→
+   384→    try {
+   385→      // Build additional fields object with only selected fields
+   386→      const additionalFields: any = {};
+   387→      selectedF71Fields.forEach(fieldName => {
+   388→        if (f71Fields[fieldName as keyof typeof f71Fields] !== '' && 
+   389→            f71Fields[fieldName as keyof typeof f71Fields] !== null) {
+   390→          additionalFields[fieldName] = f71Fields[fieldName as keyof typeof f71Fields];
+   391→        }
+   392→      });
+   393→      
+   394→      const result = await cfunc_f71_createsite(userInternalId, sitesList, additionalFields);
+   395→      
+   396→      if (result.success) {
+   397→        console.log('Sites created successfully, calling refetchSitesprenData()');
+   398→        setF71Notification({
+   399→          type: 'success',
+   400→          message: `Successfully created ${result.data?.sitesCreated} site(s)!`
+   401→        });
+   402→        setSitesList(''); // Clear the textarea
+   403→        // Clear additional fields
+   404→        setF71Fields({
+   405→          true_root_domain: '',
+   406→          full_subdomain: '',
+   407→          webproperty_type: '',
+   408→          wpuser1: '',
+   409→          wppass1: '',
+   410→          wp_plugin_installed1: false,
+   411→          wp_plugin_connected2: false,
+   412→          fk_domreg_hostaccount: '',
+   413→          is_wp_site: false,
+   414→          wp_rest_app_pass: '',
+   415→          driggs_industry: '',
+   416→          driggs_city: '',
+   417→          driggs_brand_name: '',
+   418→          driggs_site_type_purpose: '',
+   419→          driggs_email_1: '',
+   420→          driggs_address_full: '',
+   421→          driggs_address_species_id: null,
+   422→          driggs_phone_1: '',
+   423→          driggs_phone1_platform_id: null,
+   424→          driggs_cgig_id: null,
+   425→          driggs_special_note_for_ai_tool: '',
+   426→          driggs_revenue_goal: null,
+   427→          ns_full: '',
+   428→          ip_address: '',
+   429→          is_starred1: '',
+   430→          icon_name: '',
+   431→          icon_color: '',
+   432→          is_bulldozer: false,
+   433→          is_competitor: false,
+   434→          is_external: false,
+   435→          is_internal: false,
+   436→          is_ppx: false,
+   437→          is_ms: false,
+   438→          is_wayback_rebuild: false,
+   439→          is_naked_wp_build: false,
+   440→          is_rnr: false,
+   441→          is_aff: false,
+   442→          is_other1: false,
+   443→          is_other2: false,
+   444→          is_flylocal: false
+   445→        });
+   446→        setSelectedF71Fields(new Set()); // Clear selections
+   447→        await refetchSitesprenData(); // Refresh the table
+   448→      } else {
+   449→        setF71Notification({
+   450→          type: 'error',
+   451→          message: result.error || 'Failed to create sites'
+   452→        });
+   453→      }
+   454→    } catch (error) {
+   455→      console.error('Error creating sites:', error);
+   456→      setF71Notification({
+   457→        type: 'error',
+   458→        message: 'An error occurred while creating sites'
+   459→      });
+   460→    } finally {
+   461→      setIsSubmittingF71(false);
+   462→      // Clear notification after 5 seconds
+   463→      setTimeout(() => setF71Notification(null), 5000);
+   464→    }
+   465→  };
+   466→
+   467→  // Handle adding pasted sites to selected tag
+   468→  const handleAddPastedSitesToTag = async () => {
+   469→    if (!pastedSitesContent.trim()) {
+   470→      return;
+   471→    }
+   472→    
+   473→    if (!tagsData?.selectedTags || tagsData.selectedTags.size === 0) {
+   474→      return;
+   475→    }
+   476→    
+   477→    if (!userInternalId) {
+   478→      return;
+   479→    }
+   480→
+   481→    setIsProcessingPastedSites(true);
+   482→    setPastedSitesReport(null);
+   483→
+   484→    try {
+   485→      // Parse pasted content - split by lines and clean up
+   486→      const pastedSites = pastedSitesContent
+   487→        .split('\n')
+   488→        .map(line => line.trim())
+   489→        .filter(line => line.length > 0);
+   490→
+   491→      const tagId = Array.from(tagsData.selectedTags)[0]; // Use first selected tag
+   492→      
+   493→      // Call API to process pasted sites
+   494→      const response = await fetch('/api/add_pasted_sites_to_tag', {
+   495→        method: 'POST',
+   496→        headers: {
+   497→          'Content-Type': 'application/json',
+   498→        },
+   499→        body: JSON.stringify({
+   500→          pasted_sites: pastedSites,
+   501→          tag_id: tagId,
+   502→          user_internal_id: userInternalId
+   503→        })
+   504→      });
+   505→
+   506→      const result = await response.json();
+   507→      
+   508→      if (result.success) {
+   509→        setPastedSitesReport({
+   510→          totalSubmitted: result.totalSubmitted,
+   511→          successfullyAdded: result.successfullyAdded,
+   512→          alreadyExisted: result.alreadyExisted,
+   513→          notInAccount: result.notInAccount,
+   514→          details: result.details
+   515→        });
+   516→        
+   517→        // Clear the textarea after successful processing
+   518→        setPastedSitesContent('');
+   519→      }
+   520→    } catch (error) {
+   521→      console.error('Error processing pasted sites:', error);
+   522→    } finally {
+   523→      setIsProcessingPastedSites(false);
+   524→    }
+   525→  };
+   526→
+   527→  // f18_deletesites function
+   528→  // Handle checkbox clicks with mutual exclusivity
+   529→  const handleKz101Click = () => {
+   530→    setKz101Checked(true);
+   531→    setKz103Checked(false);
+   532→  };
+   533→
+   534→  const handleKz103Click = () => {
+   535→    setKz103Checked(true);
+   536→    setKz101Checked(false);
+   537→  };
+   538→
+   539→  // Update URL parameters for popup state
+   540→  const updatePopupURL = (fpopOpen: boolean, tabActive?: string) => {
+   541→    const url = new URL(window.location.href);
+   542→    
+   543→    if (fpopOpen) {
+   544→      url.searchParams.set('fpop', 'open');
+   545→      
+   546→      // Clear all tab parameters first
+   547→      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+   548→        url.searchParams.delete(tab);
+   549→      });
+   550→      
+   551→      // Set the active tab parameter
+   552→      if (tabActive) {
+   553→        url.searchParams.set(tabActive, 'active');
+   554→      } else {
+   555→        // Default to ptab1 if no specific tab provided
+   556→        url.searchParams.set('ptab1', 'active');
+   557→      }
+   558→    } else {
+   559→      // Remove popup and all tab parameters when popup is closed
+   560→      url.searchParams.delete('fpop');
+   561→      ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].forEach(tab => {
+   562→        url.searchParams.delete(tab);
+   563→      });
+   564→    }
+   565→    
+   566→    // Update URL without triggering page reload
+   567→    window.history.replaceState({}, '', url.toString());
+   568→    
+   569→    // Trigger custom event to update our URL display
+   570→    window.dispatchEvent(new Event('urlchange'));
+   571→  };
+   572→
+   573→  // Handle popup open/close with URL updates
+   574→  const handlePopupOpen = () => {
+   575→    setIsPopupOpen(true);
+   576→    
+   577→    // Set default selection if neither option is selected
+   578→    if (!kz101Checked && !kz103Checked) {
+   579→      setKz101Checked(true);
+   580→    }
+   581→    
+   582→    // Check if URL has specific tab parameter
+   583→    const urlParams = new URLSearchParams(window.location.search);
+   584→    const hasTabInUrl = ['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7']
+   585→      .some(tab => urlParams.get(tab) === 'active');
+   586→    
+   587→    if (!hasTabInUrl) {
+   588→      // No tab specified in URL, use last remembered tab from localStorage
+   589→      const lastTab = localStorage.getItem('sitejar4_lastActiveTab') || 'ptab1';
+   590→      setActivePopupTab(lastTab as any);
+   591→      updatePopupURL(true, lastTab);
+   592→    } else {
+   593→      // URL has tab specified, use current activePopupTab
+   594→      updatePopupURL(true, activePopupTab);
+   595→    }
+   596→  };
+   597→
+   598→  const handlePopupClose = () => {
+   599→    setIsPopupOpen(false);
+   600→    updatePopupURL(false);
+   601→  };
+   602→
+   603→  // Handle tab changes with URL updates and localStorage
+   604→  const handleTabChange = (tab: string) => {
+   605→    setActivePopupTab(tab as any);
+   606→    localStorage.setItem('sitejar4_lastActiveTab', tab); // Remember this tab for next time
+   607→    updatePopupURL(true, tab);
+   608→  };
+   609→
+   610→  // Handle tags data from SitesprenTable
+   611→  const handleTagsUpdate = (newTagsData: any) => {
+   612→    setTagsData(newTagsData);
+   613→  };
+   614→
+   615→  // Toggle chamber visibility
+   616→  const toggleChamber = (chamber: keyof typeof chambersVisible) => {
+   617→    setChambersVisible(prev => ({
+   618→      ...prev,
+   619→      [chamber]: !prev[chamber]
+   620→    }));
+   621→  };
+   622→
+   623→  const f18_deletesites = async () => {
+   624→    if (selectedSiteIds.length === 0) {
+   625→      setDeleteNotification({
+   626→        type: 'error',
+   627→        message: 'Please select at least one site to delete'
+   628→      });
+   629→      return;
+   630→    }
+   631→
+   632→    if (!userInternalId) {
+   633→      setDeleteNotification({
+   634→        type: 'error',
+   635→        message: 'User verification failed'
+   636→      });
+   637→      return;
+   638→    }
+   639→
+   640→    const confirmed = window.confirm(
+   641→      `Are you sure you want to delete ${selectedSiteIds.length} selected site(s)? This action cannot be undone.`
+   642→    );
+   643→
+   644→    if (!confirmed) return;
+   645→
+   646→    setIsDeleting(true);
+   647→    setDeleteNotification(null);
+   648→
+   649→    try {
+   650→      const response = await fetch('/api/f18_deletesites', {
+   651→        method: 'POST',
+   652→        headers: {
+   653→          'Content-Type': 'application/json',
+   654→        },
+   655→        body: JSON.stringify({
+   656→          site_ids: selectedSiteIds,
+   657→          user_internal_id: userInternalId
+   658→        }),
+   659→      });
+   660→
+   661→      const result = await response.json();
+   662→
+   663→      if (result.success) {
+   664→        setDeleteNotification({
+   665→          type: 'success',
+   666→          message: `Successfully deleted ${result.data?.deletedCount || 0} site(s)`
+   667→        });
+   668→        setSelectedSiteIds([]); // Clear selection
+   669→        await refetchSitesprenData(); // Refresh the table
+   670→      } else {
+   671→        setDeleteNotification({
+   672→          type: 'error',
+   673→          message: result.error || 'Failed to delete sites'
+   674→        });
+   675→      }
+   676→    } catch (error) {
+   677→      console.error('Error deleting sites:', error);
+   678→      setDeleteNotification({
+   679→        type: 'error',
+   680→        message: 'An error occurred while deleting sites'
+   681→      });
+   682→    } finally {
+   683→      setIsDeleting(false);
+   684→      // Clear notification after 5 seconds
+   685→      setTimeout(() => setDeleteNotification(null), 5000);
+   686→    }
+   687→  };
+   688→
+   689→  if (!user) {
+   690→    return (
+   691→      <div className="pr-4">
+   692→        <div className="text-center">
+   693→          <p>Please sign in to manage your sites.</p>
+   694→        </div>
+   695→      </div>
+   696→    );
+   697→  }
+   698→
+   699→  if (loading) {
+   700→    return (
+   701→      <div className="pr-4">
+   702→        <div className="text-center">
+   703→          <p>Loading sites data...</p>
+   704→        </div>
+   705→      </div>
+   706→    );
+   707→  }
+   708→
+   709→  if (error) {
+   710→    return (
+   711→      <div className="pr-4">
+   712→        <div className="text-center text-red-600">
+   713→          <p>Error: {error}</p>
+   714→        </div>
+   715→      </div>
+   716→    );
+   717→  }
+   718→
+   719→  return (
+   720→    <div className="pr-4">
+   721→
+   722→      {/* Sitedori Navigation Links */}
+   723→      <div className="mb-4">
+   724→        <SitedoriButtonBar />
+   725→      </div>
+   726→
+   727→      {/* Drenjari Navigation Links */}
+   728→      <div className="mb-4">
+   729→        <DrenjariButtonBarDriggsmanLinks />
+   730→      </div>
+   731→
+   732→      {/* Chamber Controlyar Buttons */}
+   733→      <div className="mb-4 flex items-center">
+   734→        <span className="font-bold text-black mr-6" style={{ fontSize: '16px' }}>chamber controlyar buttons</span>
+   735→        <div className="flex items-center space-x-2">
+   736→          <button
+   737→            onClick={() => toggleChamber('yupik')}
+   738→            className={`px-3 py-1 text-sm rounded transition-colors ${
+   739→              chambersVisible.yupik ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+   740→            }`}
+   741→          >
+   742→            yupik
+   743→          </button>
+   744→          <button
+   745→            onClick={() => toggleChamber('chepno')}
+   746→            className={`px-3 py-1 text-sm rounded transition-colors ${
+   747→              chambersVisible.chepno ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+   748→            }`}
+   749→          >
+   750→            chepno
+   751→          </button>
+   752→        </div>
+   753→      </div>
+   754→
+   755→      {/* Functions popup button */}
+   756→      <div className="mb-4">
+   757→        <button
+   758→          onClick={handlePopupOpen}
+   759→          className="font-bold text-white rounded"
+   760→          style={{
+   761→            backgroundColor: '#800000', // maroon color
+   762→            fontSize: '20px',
+   763→            paddingLeft: '14px',
+   764→            paddingRight: '14px',
+   765→            paddingTop: '10px',
+   766→            paddingBottom: '10px'
+   767→          }}
+   768→        >
+   769→          functions popup
+   770→        </button>
+   771→      </div>
+   772→
+   773→      {/* Delete notification */}
+   774→      {deleteNotification && (
+   775→        <div className={`mb-4 p-4 rounded-md ${
+   776→          deleteNotification.type === 'success' 
+   777→            ? 'bg-green-100 border border-green-400 text-green-700' 
+   778→            : 'bg-red-100 border border-red-400 text-red-700'
+   779→        }`}>
+   780→          {deleteNotification.message}
+   781→        </div>
+   782→      )}
+   783→
+   784→
+   785→
+   786→      {/* Debug Info */}
+   787→      <div className="mb-4 bg-yellow-100 border border-yellow-400 rounded overflow-hidden">
+   788→        <div 
+   789→          className="flex items-center justify-between p-2 cursor-pointer hover:bg-yellow-200"
+   790→          onClick={() => setDebugExpanded(!debugExpanded)}
+   791→        >
+   792→          <h3 className="font-bold text-sm">Debug Info (Count: {sitesprenData.length})</h3>
+   793→          <button className="text-yellow-800 hover:text-yellow-900">
+   794→            {debugExpanded ? '−' : '+'}
+   795→          </button>
+   796→        </div>
+   797→        {debugExpanded && (
+   798→          <div className="p-4 pt-0 border-t border-yellow-300">
+   799→            <div className="space-y-1 text-sm">
+   800→              <p><strong>User ID:</strong> {user.id}</p>
+   801→              <p><strong>Internal User ID:</strong> {userInternalId}</p>
+   802→              <p><strong>Total Sites:</strong> {sitesprenData.length}</p>
+   803→              <p><strong>Filtered Sites:</strong> {filteredSitesprenData.length}</p>
+   804→              <p><strong>Search Term:</strong> {searchTerm || '(none)'}</p>
+   805→              <p><strong>Sites Entered Filter:</strong> {sitesEnteredFilter.length > 0 ? sitesEnteredFilter.join(', ') : '(none)'}</p>
+   806→              <div>
+   807→                <strong>Data:</strong>
+   808→                <pre className="mt-1 text-xs bg-yellow-50 p-2 rounded border overflow-x-auto">
+   809→                  {JSON.stringify(sitesprenData, null, 2)}
+   810→                </pre>
+   811→              </div>
+   812→            </div>
+   813→          </div>
+   814→        )}
+   815→      </div>
+   816→
+   817→      {/* Popup Modal */}
+   818→      {isPopupOpen && (
+   819→        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+   820→          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
+   821→            {/* uelbar37 header bar */}
+   822→            <div 
+   823→              className="absolute top-0 left-0 right-0 flex items-center px-4"
+   824→              style={{ 
+   825→                height: '50px',
+   826→                backgroundColor: uelBar37Colors.bg,
+   827→                color: uelBar37Colors.text
+   828→              }}
+   829→            >
+   830→              <span className="font-semibold">BROWSER URL</span>
+   831→              
+   832→              {/* Vertical separator */}
+   833→              <div 
+   834→                className="bg-gray-600"
+   835→                style={{
+   836→                  width: '3px',
+   837→                  height: '100%',
+   838→                  marginLeft: '30px',
+   839→                  marginRight: '30px'
+   840→                }}
+   841→              />
+   842→              
+   843→              <span className="font-mono text-sm overflow-hidden whitespace-nowrap text-ellipsis flex-1">
+   844→                {(() => {
+   845→                  // Parse URL to highlight searchsite parameter
+   846→                  try {
+   847→                    const url = new URL(currentUrl);
+   848→                    const searchsiteParam = url.searchParams.get('searchsite');
+   849→                    
+   850→                    if (searchsiteParam) {
+   851→                      const fullUrl = currentUrl;
+   852→                      const searchsiteText = `searchsite=${searchsiteParam}`;
+   853→                      const parts = fullUrl.split(searchsiteText);
+   854→                      
+   855→                      if (parts.length === 2) {
+   856→                        return (
+   857→                          <>
+   858→                            {parts[0]}
+   859→                            <span style={{ fontWeight: 'bold', color: '#ff9e71' }}>
+   860→                              {searchsiteText}
+   861→                            </span>
+   862→                            {parts[1]}
+   863→                          </>
+   864→                        );
+   865→                      }
+   866→                    }
+   867→                    
+   868→                    return currentUrl;
+   869→                  } catch (error) {
+   870→                    return currentUrl;
+   871→                  }
+   872→                })()}
+   873→              </span>
+   874→
+   875→              {/* Copy buttons in uelbar37 - positioned to the left of close button */}
+   876→              <button
+   877→                onClick={() => {
+   878→                  navigator.clipboard.writeText(currentUrl);
+   879→                }}
+   880→                className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
+   881→                style={{
+   882→                  width: '80px',
+   883→                  height: '50px',
+   884→                  marginRight: '0px',
+   885→                  fontSize: '10px',
+   886→                  flexDirection: 'column',
+   887→                  gap: '2px'
+   888→                }}
+   889→                title="Copy Full URL"
+   890→              >
+   891→                <div>COPY URL</div>
+   892→              </button>
+   893→              <button
+   894→                onClick={() => {
+   895→                  try {
+   896→                    const url = new URL(currentUrl);
+   897→                    const searchsiteParam = url.searchParams.get('searchsite');
+   898→                    if (searchsiteParam) {
+   899→                      navigator.clipboard.writeText(searchsiteParam);
+   900→                    }
+   901→                  } catch (error) {
+   902→                    console.error('Error copying search term:', error);
+   903→                  }
+   904→                }}
+   905→                className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
+   906→                style={{
+   907→                  width: '60px',
+   908→                  height: '50px',
+   909→                  marginRight: '0px',
+   910→                  fontSize: '10px',
+   911→                  flexDirection: 'column',
+   912→                  gap: '2px'
+   913→                }}
+   914→                title="Copy Search Term"
+   915→              >
+   916→                <div>SEARCH</div>
+   917→              </button>
+   918→            </div>
+   919→            
+   920→            {/* uelbar38 header bar */}
+   921→            <div 
+   922→              className="absolute left-0 right-0 flex items-center px-4"
+   923→              style={{ 
+   924→                top: '50px',
+   925→                height: '50px',
+   926→                backgroundColor: uelBarColors.bg,
+   927→                color: uelBarColors.text
+   928→              }}
+   929→            >
+   930→              <span className="font-semibold">uelbar38</span>
+   931→              
+   932→              {/* Vertical separator */}
+   933→              <div 
+   934→                className="bg-gray-600"
+   935→                style={{
+   936→                  width: '3px',
+   937→                  height: '100%',
+   938→                  marginLeft: '30px',
+   939→                  marginRight: '30px'
+   940→                }}
+   941→              />
+   942→              
+   943→              <span className="font-bold">{window.location.pathname}</span>
+   944→              <div 
+   945→                className="ml-4 flex items-center kz101 cursor-pointer"
+   946→                style={{
+   947→                  color: uelBarColors.text,
+   948→                  padding: '8px',
+   949→                  border: '1px solid black',
+   950→                  fontSize: '16px'
+   951→                }}
+   952→                onClick={handleKz101Click}
+   953→              >
+   954→                <input
+   955→                  type="checkbox"
+   956→                  className="mr-2 pointer-events-none"
+   957→                  checked={kz101Checked}
+   958→                  readOnly
+   959→                  style={{
+   960→                    width: '18px',
+   961→                    height: '18px'
+   962→                  }}
+   963→                />
+   964→                SOPTION1 - Use Your Current Selection From Table | {selectedSiteIds.length} rows
+   965→              </div>
+   966→              <div 
+   967→                className="flex items-center kz102 font-bold"
+   968→                style={{
+   969→                  color: uelBarColors.text,
+   970→                  padding: '8px',
+   971→                  border: '1px solid black',
+   972→                  fontSize: '16px'
+   973→                }}
+   974→              >
+   975→                OR
+   976→              </div>
+   977→              <div 
+   978→                className="flex items-center kz103 cursor-pointer"
+   979→                style={{
+   980→                  color: uelBarColors.text,
+   981→                  padding: '8px',
+   982→                  border: '1px solid black',
+   983→                  fontSize: '16px'
+   984→                }}
+   985→                onClick={handleKz103Click}
+   986→              >
+   987→                <input
+   988→                  type="checkbox"
+   989→                  className="mr-2 pointer-events-none"
+   990→                  checked={kz103Checked}
+   991→                  readOnly
+   992→                  style={{
+   993→                    width: '18px',
+   994→                    height: '18px'
+   995→                  }}
+   996→                />
+   997→                SOPTION2 - Select All Items In Current Pagination | {filteredSitesprenData.length} rows
+   998→              </div>
+   999→              
+  1000→              {/* Close button in header - spans both bars */}
+  1001→              <button
+  1002→                onClick={handlePopupClose}
+  1003→                className="absolute right-0 top-0 bg-gray-400 text-gray-800 font-bold flex items-center justify-center hover:bg-gray-500 transition-colors"
+  1004→                style={{
+  1005→                  width: '260px',
+  1006→                  height: '100px', // Spans both 50px bars
+  1007→                  border: '2px solid #4a4a4a',
+  1008→                  fontSize: '14px',
+  1009→                  flexDirection: 'column',
+  1010→                  gap: '4px'
+  1011→                }}
+  1012→              >
+  1013→                <div style={{ fontSize: '20px' }}>×</div>
+  1014→                <div style={{ fontSize: '12px', lineHeight: '12px', textAlign: 'center' }}>
+  1015→                  CLOSE<br/>POPUP
+  1016→                </div>
+  1017→              </button>
+  1018→            </div>
+  1019→            
+  1020→            {/* Popup content - adjusted to start below both headers */}
+  1021→            <div className="h-full" style={{ paddingTop: '100px' }}>
+  1022→              {/* Tab Navigation */}
+  1023→              <div className="border-b border-gray-200 bg-gray-50">
+  1024→                <nav className="flex">
+  1025→                  {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
+  1026→                    <button
+  1027→                      key={tab}
+  1028→                      onClick={() => handleTabChange(tab)}
+  1029→                      className={`px-4 py-2 font-medium text-sm transition-colors ${
+  1030→                        activePopupTab === tab
+  1031→                          ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
+  1032→                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+  1033→                      }`}
+  1034→                    >
+  1035→                      {tab}
+  1036→                    </button>
+  1037→                  ))}
+  1038→                </nav>
+  1039→              </div>
+  1040→              
+  1041→              {/* Tab Content */}
+  1042→              <div className="p-8 h-full overflow-auto">
+  1043→                {activePopupTab === 'ptab1' && (
+  1044→                  <div>
+  1045→                    <h3 className="text-lg font-semibold mb-4">Functions</h3>
+  1046→                    
+  1047→                    {/* F71 Create Site Form */}
+  1048→                    <div className="mb-8 bg-white p-6 rounded-lg shadow border">
+  1049→                      <h2 className="text-xl font-semibold mb-4">Add New Sites</h2>
+  1050→                      
+  1051→                      {/* F71 Notification */}
+  1052→                      {f71Notification && (
+  1053→                        <div className={`mb-4 p-4 rounded-md ${
+  1054→                          f71Notification.type === 'success' 
+  1055→                            ? 'bg-green-100 border border-green-400 text-green-700' 
+  1056→                            : 'bg-red-100 border border-red-400 text-red-700'
+  1057→                        }`}>
+  1058→                          {f71Notification.message}
+  1059→                        </div>
+  1060→                      )}
+  1061→
+  1062→                      <div className="space-y-4">
+  1063→                        <div>
+  1064→                          <label htmlFor="sites-list-popup" className="block text-sm font-medium text-gray-700 mb-2">
+  1065→                            Enter web properties (one per line)
+  1066→                          </label>
+  1067→                          <textarea
+  1068→                            id="sites-list-popup"
+  1069→                            value={sitesList}
+  1070→                            onChange={(e) => setSitesList(e.target.value)}
+  1071→                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  1072→                            rows={6}
+  1073→                            placeholder={`dogs.com
+  1074→cats.com
+  1075→facebook.com/catsgroup
+  1076→https://linkedin.com/cats
+  1077→http://www.drogs.com`}
+  1078→                          />
+  1079→                          <p className="mt-1 text-sm text-gray-500">
+  1080→                            URLs will be automatically cleaned (https://, http://, and www. will be removed)
+  1081→                          </p>
+  1082→                        </div>
+  1083→
+  1084→                        <button
+  1085→                          onClick={handleF71Submit}
+  1086→                          disabled={isSubmittingF71}
+  1087→                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold rounded-md transition-colors"
+  1088→                        >
+  1089→                          {isSubmittingF71 ? 'Creating Sites...' : 'f71_createsite'}
+  1090→                        </button>
+  1091→                      </div>
+  1092→
+  1093→                      {/* F71 Additional Fields Table Grid */}
+  1094→                      <div className="mt-6">
+  1095→                        <h3 className="text-lg font-semibold mb-3">Additional Site Fields (Optional)</h3>
+  1096→                        <div className="overflow-x-auto border border-gray-300 rounded-lg">
+  1097→                          <table className="divide-y divide-gray-200" style={{ width: 'auto' }}>
+  1098→                            <thead className="bg-gray-50">
+  1099→                              <tr>
+  1100→                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '50px' }}>
+  1101→                                  Select
+  1102→                                </th>
+  1103→                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '300px' }}>
+  1104→                                  Field Name
+  1105→                                </th>
+  1106→                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1107→                                  Value
+  1108→                                </th>
+  1109→                              </tr>
+  1110→                            </thead>
+  1111→                            <tbody className="bg-white divide-y divide-gray-200">
+  1112→                              {Object.entries(f71Fields).map(([fieldName, fieldValue]) => {
+  1113→                                const isBoolean = typeof fieldValue === 'boolean';
+  1114→                                const isNumber = fieldName.includes('_id') || fieldName.includes('revenue_goal');
+  1115→                                const isSelected = selectedF71Fields.has(fieldName);
+  1116→                                
+  1117→                                return (
+  1118→                                  <tr key={fieldName} className={isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}>
+  1119→                                    <td className="px-3 py-2" style={{ width: '50px' }}>
+  1120→                                      <input
+  1121→                                        type="checkbox"
+  1122→                                        checked={isSelected}
+  1123→                                        onChange={(e) => {
+  1124→                                          const newSelected = new Set(selectedF71Fields);
+  1125→                                          if (e.target.checked) {
+  1126→                                            newSelected.add(fieldName);
+  1127→                                          } else {
+  1128→                                            newSelected.delete(fieldName);
+  1129→                                          }
+  1130→                                          setSelectedF71Fields(newSelected);
+  1131→                                        }}
+  1132→                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+  1133→                                      />
+  1134→                                    </td>
+  1135→                                    <td className="px-3 py-2 text-sm text-gray-900 font-medium" style={{ width: '300px' }}>
+  1136→                                      {fieldName}
+  1137→                                    </td>
+  1138→                                    <td className="px-3 py-2">
+  1139→                                      {isBoolean ? (
+  1140→                                        <label className="relative inline-flex items-center cursor-pointer">
+  1141→                                          <input
+  1142→                                            type="checkbox"
+  1143→                                            checked={fieldValue}
+  1144→                                            onChange={(e) => {
+  1145→                                              setF71Fields(prev => ({
+  1146→                                                ...prev,
+  1147→                                                [fieldName]: e.target.checked
+  1148→                                              }));
+  1149→                                              // Auto-select field when value changes
+  1150→                                              if (!isSelected) {
+  1151→                                                setSelectedF71Fields(prev => new Set([...prev, fieldName]));
+  1152→                                              }
+  1153→                                            }}
+  1154→                                            className="sr-only peer"
+  1155→                                          />
+  1156→                                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+  1157→                                        </label>
+  1158→                                      ) : isNumber ? (
+  1159→                                        <input
+  1160→                                          type="number"
+  1161→                                          value={fieldValue || ''}
+  1162→                                          onChange={(e) => {
+  1163→                                            const value = e.target.value ? parseInt(e.target.value) : null;
+  1164→                                            setF71Fields(prev => ({
+  1165→                                              ...prev,
+  1166→                                              [fieldName]: value
+  1167→                                            }));
+  1168→                                            // Auto-select field when value changes
+  1169→                                            if (!isSelected && e.target.value) {
+  1170→                                              setSelectedF71Fields(prev => new Set([...prev, fieldName]));
+  1171→                                            }
+  1172→                                          }}
+  1173→                                          className="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1174→                                          placeholder="Enter number..."
+  1175→                                        />
+  1176→                                      ) : (
+  1177→                                        <input
+  1178→                                          type="text"
+  1179→                                          value={fieldValue || ''}
+  1180→                                          onChange={(e) => {
+  1181→                                            setF71Fields(prev => ({
+  1182→                                              ...prev,
+  1183→                                              [fieldName]: e.target.value
+  1184→                                            }));
+  1185→                                            // Auto-select field when value changes
+  1186→                                            if (!isSelected && e.target.value) {
+  1187→                                              setSelectedF71Fields(prev => new Set([...prev, fieldName]));
+  1188→                                            }
+  1189→                                          }}
+  1190→                                          className="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1191→                                          placeholder={`Enter ${fieldName}...`}
+  1192→                                        />
+  1193→                                      )}
+  1194→                                    </td>
+  1195→                                  </tr>
+  1196→                                );
+  1197→                              })}
+  1198→                            </tbody>
+  1199→                          </table>
+  1200→                        </div>
+  1201→                        <p className="mt-2 text-sm text-gray-600">
+  1202→                          Selected fields will be applied to all sites being created. Check the box next to each field you want to include.
+  1203→                        </p>
+  1204→                      </div>
+  1205→                    </div>
+  1206→
+  1207→                    {/* Other Functions */}
+  1208→                    <div className="space-y-4">
+  1209→                      <p className="text-gray-600">Other functions for sitespren will be added here.</p>
+  1210→                      {!kz101Checked && !kz103Checked && (
+  1211→                        <p className="text-sm text-gray-500">
+  1212→                          Select either SOPTION1 or SOPTION2 to enable functions
+  1213→                        </p>
+  1214→                      )}
+  1215→                      {kz101Checked && selectedSiteIds.length === 0 && (
+  1216→                        <p className="text-sm text-gray-500">
+  1217→                          SOPTION1 selected: Select items from the table to enable functions
+  1218→                        </p>
+  1219→                      )}
+  1220→                      {kz101Checked && selectedSiteIds.length > 0 && (
+  1221→                        <p className="text-sm text-gray-600">
+  1222→                          SOPTION1 selected: {selectedSiteIds.length} item(s) will be processed
+  1223→                        </p>
+  1224→                      )}
+  1225→                      {kz103Checked && (
+  1226→                        <p className="text-sm text-gray-600">
+  1227→                          SOPTION2 selected: All {filteredSitesprenData.length} items will be processed
+  1228→                        </p>
+  1229→                      )}
+  1230→                    </div>
+  1231→                  </div>
+  1232→                )}
+  1233→                {activePopupTab === 'ptab2' && (
+  1234→                  <div>
+  1235→                    <h3 className="text-lg font-semibold mb-4">Delete Sites</h3>
+  1236→                    
+  1237→                    {/* Delete notification */}
+  1238→                    {deleteNotification && (
+  1239→                      <div className={`mb-4 p-4 rounded-md ${
+  1240→                        deleteNotification.type === 'success' 
+  1241→                          ? 'bg-green-100 border border-green-400 text-green-700' 
+  1242→                          : 'bg-red-100 border border-red-400 text-red-700'
+  1243→                      }`}>
+  1244→                        {deleteNotification.message}
+  1245→                      </div>
+  1246→                    )}
+  1247→                    
+  1248→                    {/* Bulk Delete Actions */}
+  1249→                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+  1250→                      <div className="mb-4">
+  1251→                        <h3 className="text-lg font-medium text-red-800">
+  1252→                          Delete Selected Sites
+  1253→                        </h3>
+  1254→                        <p className="text-sm text-red-600 mt-2">
+  1255→                          This action will permanently delete the selected sites. This cannot be undone.
+  1256→                        </p>
+  1257→                      </div>
+  1258→                      
+  1259→                      {/* Selection Info */}
+  1260→                      <div className="mb-4 p-3 bg-white rounded border border-red-300">
+  1261→                        <div className="text-sm">
+  1262→                          {kz101Checked && (
+  1263→                            <p className="font-medium">
+  1264→                              SOPTION1: {selectedSiteIds.length} site(s) selected from table
+  1265→                            </p>
+  1266→                          )}
+  1267→                          {kz103Checked && (
+  1268→                            <p className="font-medium">
+  1269→                              SOPTION2: All {filteredSitesprenData.length} sites in current view will be affected
+  1270→                            </p>
+  1271→                          )}
+  1272→                          {!kz101Checked && !kz103Checked && (
+  1273→                            <p className="text-gray-500">
+  1274→                              Please select either SOPTION1 or SOPTION2 above to choose which sites to delete
+  1275→                            </p>
+  1276→                          )}
+  1277→                        </div>
+  1278→                      </div>
+  1279→                      
+  1280→                      {/* Delete Button */}
+  1281→                      <button
+  1282→                        onClick={f18_deletesites}
+  1283→                        disabled={isDeleting || (!kz101Checked && !kz103Checked) || (kz101Checked && selectedSiteIds.length === 0)}
+  1284→                        className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-bold rounded-md transition-colors"
+  1285→                      >
+  1286→                        {isDeleting ? 'Deleting...' : 'f18_deletesites'}
+  1287→                      </button>
+  1288→                      
+  1289→                      {kz101Checked && selectedSiteIds.length === 0 && (
+  1290→                        <p className="mt-2 text-sm text-red-600">
+  1291→                          Please select at least one site from the table to delete
+  1292→                        </p>
+  1293→                      )}
+  1294→                    </div>
+  1295→                  </div>
+  1296→                )}
+  1297→                {activePopupTab === 'ptab3' && (
+  1298→                  <div>
+  1299→                    <h3 className="text-lg font-semibold mb-4">Tags Management</h3>
+  1300→                    
+  1301→                    {/* Tags Feedback */}
+  1302→                    {tagsData?.tagsFeedback && (
+  1303→                      <div className={`mb-4 p-4 rounded-md ${
+  1304→                        tagsData.tagsFeedback.type === 'success' 
+  1305→                          ? 'bg-green-100 border border-green-400 text-green-700' 
+  1306→                          : tagsData.tagsFeedback.type === 'error'
+  1307→                          ? 'bg-red-100 border border-red-400 text-red-700'
+  1308→                          : 'bg-blue-100 border border-blue-400 text-blue-700'
+  1309→                      }`}>
+  1310→                        {tagsData.tagsFeedback.message}
+  1311→                      </div>
+  1312→                    )}
+  1313→
+  1314→                    {/* Add Sites to Tag Section with Tabs */}
+  1315→                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+  1316→                      {/* Tab Navigation */}
+  1317→                      <div className="mb-4 border-b border-blue-200">
+  1318→                        <div className="flex">
+  1319→                          <button
+  1320→                            onClick={() => setTagsActiveTab('fromUTG')}
+  1321→                            className={`px-4 py-2 font-medium transition-colors ${
+  1322→                              tagsActiveTab === 'fromUTG'
+  1323→                                ? 'border-b-2 border-blue-600 text-blue-600'
+  1324→                                : 'text-gray-600 hover:text-gray-900'
+  1325→                            }`}
+  1326→                          >
+  1327→                            From UTG
+  1328→                          </button>
+  1329→                          <button
+  1330→                            onClick={() => setTagsActiveTab('fromPaste')}
+  1331→                            className={`px-4 py-2 font-medium transition-colors ${
+  1332→                              tagsActiveTab === 'fromPaste'
+  1333→                                ? 'border-b-2 border-blue-600 text-blue-600'
+  1334→                                : 'text-gray-600 hover:text-gray-900'
+  1335→                            }`}
+  1336→                          >
+  1337→                            From Paste
+  1338→                          </button>
+  1339→                        </div>
+  1340→                      </div>
+  1341→
+  1342→                      {/* Tab Content */}
+  1343→                      {tagsActiveTab === 'fromUTG' && (
+  1344→                        <div>
+  1345→                          <button
+  1346→                            onClick={() => tagsData?.functions?.handleAddSitesToTag()}
+  1347→                            disabled={!tagsData?.functions?.handleAddSitesToTag || tagsData?.loadingStates?.isAddingSitesToTag}
+  1348→                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-bold rounded-md transition-colors text-lg"
+  1349→                          >
+  1350→                            {tagsData?.loadingStates?.isAddingSitesToTag ? 'Adding Sites...' : 'Add Selected Sites to Selected Tag'}
+  1351→                          </button>
+  1352→                          <div className="mt-2 text-sm text-blue-600">
+  1353→                            <p>• First select sites from the main table using checkboxes</p>
+  1354→                            <p>• Then select one tag from the table below using its checkbox</p>
+  1355→                            <p>• Finally click the button above to add selected sites to the selected tag</p>
+  1356→                            <p>• Currently selected: {selectedSiteIds.length} site(s), {tagsData?.selectedTags?.size || 0} tag(s)</p>
+  1357→                          </div>
+  1358→                        </div>
+  1359→                      )}
+  1360→
+  1361→                      {tagsActiveTab === 'fromPaste' && (
+  1362→                        <div>
+  1363→                          <textarea
+  1364→                            value={pastedSitesContent}
+  1365→                            onChange={(e) => setPastedSitesContent(e.target.value)}
+  1366→                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+  1367→                            style={{ width: '600px', height: '200px' }}
+  1368→                            placeholder="Paste site URLs here (one per line)..."
+  1369→                            disabled={isProcessingPastedSites}
+  1370→                          />
+  1371→                          <button
+  1372→                            onClick={handleAddPastedSitesToTag}
+  1373→                            disabled={!pastedSitesContent.trim() || !tagsData?.selectedTags || tagsData.selectedTags.size === 0 || isProcessingPastedSites}
+  1374→                            className="mt-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-bold rounded-md transition-colors text-lg"
+  1375→                          >
+  1376→                            {isProcessingPastedSites ? 'Processing...' : 'Add Pasted Sites to Selected Tag'}
+  1377→                          </button>
+  1378→                          <div className="mt-2 text-sm text-blue-600">
+  1379→                            <p>• Currently selected: {tagsData?.selectedTags?.size || 0} tag(s)</p>
+  1380→                            <p>• Lines to process: {pastedSitesContent.split('\n').filter(line => line.trim()).length}</p>
+  1381→                          </div>
+  1382→                          
+  1383→                          {/* Report Section */}
+  1384→                          {pastedSitesReport && (
+  1385→                            <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+  1386→                              <h5 className="text-md font-semibold mb-2">Processing Report</h5>
+  1387→                              <div className="space-y-1 text-sm">
+  1388→                                <p>• Total sites submitted: <strong>{pastedSitesReport.totalSubmitted}</strong></p>
+  1389→                                <p>• Successfully added to tag: <strong className="text-green-600">{pastedSitesReport.successfullyAdded}</strong></p>
+  1390→                                <p>• Already existed in tag: <strong className="text-yellow-600">{pastedSitesReport.alreadyExisted}</strong></p>
+  1391→                                <p>• Not found in your account: <strong className="text-red-600">{pastedSitesReport.notInAccount}</strong></p>
+  1392→                                {pastedSitesReport.details && pastedSitesReport.details.length > 0 && (
+  1393→                                  <div className="mt-2 pt-2 border-t border-gray-300">
+  1394→                                    <p className="font-medium">Details:</p>
+  1395→                                    <ul className="mt-1 ml-4 text-xs">
+  1396→                                      {pastedSitesReport.details.map((detail, index) => (
+  1397→                                        <li key={index} className="text-gray-600">• {detail}</li>
+  1398→                                      ))}
+  1399→                                    </ul>
+  1400→                                  </div>
+  1401→                                )}
+  1402→                              </div>
+  1403→                            </div>
+  1404→                          )}
+  1405→                        </div>
+  1406→                      )}
+  1407→                    </div>
+  1408→
+  1409→                    {/* Create New Tag Form */}
+  1410→                    <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+  1411→                      <h4 className="text-md font-semibold mb-3">Create New Tag</h4>
+  1412→                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+  1413→                        <div className="md:col-span-2">
+  1414→                          <label className="block text-sm font-medium text-gray-700 mb-1">Tag Name</label>
+  1415→                          <input
+  1416→                            type="text"
+  1417→                            value={tagsData?.formData?.newTagName || ''}
+  1418→                            onChange={(e) => tagsData?.formData?.setNewTagName(e.target.value)}
+  1419→                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  1420→                            placeholder="Enter tag name"
+  1421→                          />
+  1422→                        </div>
+  1423→                        <div>
+  1424→                          <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+  1425→                          <input
+  1426→                            type="number"
+  1427→                            value={tagsData?.formData?.newTagOrder || 0}
+  1428→                            onChange={(e) => tagsData?.formData?.setNewTagOrder(parseInt(e.target.value) || 0)}
+  1429→                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  1430→                            placeholder="0"
+  1431→                          />
+  1432→                        </div>
+  1433→                      </div>
+  1434→                      <button
+  1435→                        onClick={() => tagsData?.functions?.handleCreateTag()}
+  1436→                        disabled={!tagsData?.functions?.handleCreateTag || tagsData?.loadingStates?.isCreatingTag || !tagsData?.formData?.newTagName?.trim()}
+  1437→                        className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed text-white font-medium rounded-md transition-colors"
+  1438→                      >
+  1439→                        {tagsData?.loadingStates?.isCreatingTag ? 'Creating...' : 'Create Tag'}
+  1440→                      </button>
+  1441→                    </div>
+  1442→
+  1443→                    {/* Tags Table */}
+  1444→                    <div className="bg-white rounded-lg shadow overflow-hidden">
+  1445→                      <div className="px-4 py-3 border-b border-gray-200">
+  1446→                        <h4 className="text-md font-semibold">sitespren_tags Table</h4>
+  1447→                      </div>
+  1448→                      <div className="overflow-x-auto">
+  1449→                        <table className="min-w-full divide-y divide-gray-200">
+  1450→                          <thead className="bg-gray-50">
+  1451→                            <tr>
+  1452→                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1453→                                Select
+  1454→                              </th>
+  1455→                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1456→                                tag_id
+  1457→                              </th>
+  1458→                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1459→                                tag_name
+  1460→                              </th>
+  1461→                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1462→                                tag_order
+  1463→                              </th>
+  1464→                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1465→                                created_at
+  1466→                              </th>
+  1467→                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1468→                                updated_at
+  1469→                              </th>
+  1470→                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1471→                                fk_user_id
+  1472→                              </th>
+  1473→                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+  1474→                                Actions
+  1475→                              </th>
+  1476→                            </tr>
+  1477→                          </thead>
+  1478→                          <tbody className="bg-white divide-y divide-gray-200">
+  1479→                            {tagsData?.tags?.length === 0 ? (
+  1480→                              <tr>
+  1481→                                <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+  1482→                                  No tags found. Create your first tag using the form above.
+  1483→                                </td>
+  1484→                              </tr>
+  1485→                            ) : (
+  1486→                              tagsData?.tags?.map((tag: any) => (
+  1487→                                <tr key={tag.tag_id} className="hover:bg-gray-50">
+  1488→                                  <td className="px-4 py-3">
+  1489→                                    <input
+  1490→                                      type="checkbox"
+  1491→                                      checked={tagsData?.selectedTags?.has(tag.tag_id) || false}
+  1492→                                      onChange={(e) => tagsData?.functions?.handleTagSelection(tag.tag_id, e.target.checked)}
+  1493→                                      className="text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+  1494→                                    />
+  1495→                                  </td>
+  1496→                                  <td className="px-4 py-3 text-xs text-gray-900">
+  1497→                                    {tag.tag_id?.substring(0, 8)}...
+  1498→                                  </td>
+  1499→                                  <td className="px-4 py-3 text-sm text-gray-900">
+  1500→                                    {tagsData?.formData?.editingTagId === tag.tag_id ? (
+  1501→                                      <input
+  1502→                                        type="text"
+  1503→                                        value={tagsData?.formData?.editingTagName || ''}
+  1504→                                        onChange={(e) => tagsData?.formData?.setEditingTagName(e.target.value)}
+  1505→                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+  1506→                                      />
+  1507→                                    ) : (
+  1508→                                      <span className="font-medium">{tag.tag_name}</span>
+  1509→                                    )}
+  1510→                                  </td>
+  1511→                                  <td className="px-4 py-3 text-sm text-gray-900">
+  1512→                                    {tagsData?.formData?.editingTagId === tag.tag_id ? (
+  1513→                                      <input
+  1514→                                        type="number"
+  1515→                                        value={tagsData?.formData?.editingTagOrder || 0}
+  1516→                                        onChange={(e) => tagsData?.formData?.setEditingTagOrder(parseInt(e.target.value) || 0)}
+  1517→                                        className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+  1518→                                      />
+  1519→                                    ) : (
+  1520→                                      tag.tag_order
+  1521→                                    )}
+  1522→                                  </td>
+  1523→                                  <td className="px-4 py-3 text-sm text-gray-500">
+  1524→                                    {tag.created_at ? new Date(tag.created_at).toLocaleDateString() : '-'}
+  1525→                                  </td>
+  1526→                                  <td className="px-4 py-3 text-sm text-gray-500">
+  1527→                                    {tag.updated_at ? new Date(tag.updated_at).toLocaleDateString() : '-'}
+  1528→                                  </td>
+  1529→                                  <td className="px-4 py-3 text-xs text-gray-500">
+  1530→                                    {tag.fk_user_id?.substring(0, 8)}...
+  1531→                                  </td>
+  1532→                                  <td className="px-4 py-3 text-sm">
+  1533→                                    <div className="flex space-x-2">
+  1534→                                      {tagsData?.formData?.editingTagId === tag.tag_id ? (
+  1535→                                        <>
+  1536→                                          <button
+  1537→                                            onClick={() => tagsData?.functions?.handleUpdateTag()}
+  1538→                                            disabled={tagsData?.loadingStates?.isUpdatingTag}
+  1539→                                            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs rounded"
+  1540→                                          >
+  1541→                                            {tagsData?.loadingStates?.isUpdatingTag ? 'Saving...' : 'Save'}
+  1542→                                          </button>
+  1543→                                          <button
+  1544→                                            onClick={() => tagsData?.functions?.cancelEditingTag()}
+  1545→                                            className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded"
+  1546→                                          >
+  1547→                                            Cancel
+  1548→                                          </button>
+  1549→                                        </>
+  1550→                                      ) : (
+  1551→                                        <>
+  1552→                                          <button
+  1553→                                            onClick={() => tagsData?.functions?.startEditingTag(tag)}
+  1554→                                            className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs rounded"
+  1555→                                          >
+  1556→                                            Edit
+  1557→                                          </button>
+  1558→                                          <button
+  1559→                                            onClick={() => tagsData?.functions?.handleDeleteTag(tag.tag_id)}
+  1560→                                            disabled={tagsData?.loadingStates?.isDeletingTag?.has(tag.tag_id)}
+  1561→                                            className="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white text-xs rounded"
+  1562→                                          >
+  1563→                                            {tagsData?.loadingStates?.isDeletingTag?.has(tag.tag_id) ? 'Deleting...' : 'Delete'}
+  1564→                                          </button>
+  1565→                                        </>
+  1566→                                      )}
+  1567→                                    </div>
+  1568→                                  </td>
+  1569→                                </tr>
+  1570→                              ))
+  1571→                            )}
+  1572→                          </tbody>
+  1573→                        </table>
+  1574→                      </div>
+  1575→                    </div>
+  1576→                    
+  1577→                    {/* Bottom spacing to allow scrolling past the table */}
+  1578→                    <div style={{ height: '60px' }}></div>
+  1579→                  </div>
+  1580→                )}
+  1581→                {activePopupTab === 'ptab4' && (
+  1582→                  <ExportSitesComponent
+  1583→                    selectedSiteIds={selectedSiteIds}
+  1584→                    totalSitesCount={sitesprenData.length}
+  1585→                    userId={user.id}
+  1586→                  />
+  1587→                )}
+  1588→                {activePopupTab === 'ptab5' && (
+  1589→                  <div>
+  1590→                    <h3 className="text-lg font-semibold mb-4">Content for ptab5</h3>
+  1591→                    <p className="text-gray-600">This is the content area for ptab5.</p>
+  1592→                  </div>
+  1593→                )}
+  1594→                {activePopupTab === 'ptab6' && (
+  1595→                  <div>
+  1596→                    <h3 className="text-lg font-semibold mb-4">Content for ptab6</h3>
+  1597→                    <p className="text-gray-600">This is the content area for ptab6.</p>
+  1598→                  </div>
+  1599→                )}
+  1600→                {activePopupTab === 'ptab7' && (
+  1601→                  <div>
+  1602→                    <h3 className="text-lg font-semibold mb-4">Content for ptab7</h3>
+  1603→                    <p className="text-gray-600">This is the content area for ptab7.</p>
+  1604→                  </div>
+  1605→                )}
+  1606→              </div>
+  1607→            </div>
+  1608→          </div>
+  1609→        </div>
+  1610→      )}
+  1611→
+  1612→      {/* Sitespren Table */}
+  1613→      <SitesprenTable 
+  1614→        data={filteredSitesprenData} 
+  1615→        userId={user.id}
+  1616→        userInternalId={userInternalId!}
+  1617→        onSelectionChange={handleSelectionChange}
+  1618→        onDataUpdate={setSitesprenData}
+  1619→        searchTerm={searchTerm}
+  1620→        onSearchChange={handleSearchChange}
+  1621→        totalUnfilteredCount={sitesprenData.length}
+  1622→        onTagsUpdate={handleTagsUpdate}
+  1623→        isExternalFilter={isExternalFilter}
+  1624→        onIsExternalFilterChange={handleIsExternalFilterChange}
+  1625→        // chambersVisible={chambersVisible}
+  1626→      />
+  1627→    </div>
+  1628→  );
+  1629→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! `/sitejar4` correctly has `pclient.tsx` with `Sitejar4Client`. Let me check `/dfslocr`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/dfslocr/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import dynamic from 'next/dynamic';
+     7→import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
+     8→import DfsLocationsTable from './components/DfsLocationsTable';
+     9→
+    10→const DrenjariButtonBarDriggsmanLinks = dynamic(
+    11→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    12→  { ssr: false }
+    13→);
+    14→
+    15→export default function DfslocrClient() {
+    16→  const { user } = useAuth();
+    17→  const router = useRouter();
+    18→
+    19→  useEffect(() => {
+    20→    if (!user) {
+    21→      router.push('/login');
+    22→      return;
+    23→    }
+    24→  }, [user, router]);
+    25→
+    26→  if (!user) {
+    27→    return (
+    28→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    29→        <div className="text-gray-500">Loading...</div>
+    30→      </div>
+    31→    );
+    32→  }
+    33→
+    34→  return (
+    35→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    36→      {/* Drenjari Button Bar */}
+    37→      <div className="px-6 pb-0">
+    38→        <DrenjariButtonBarDriggsmanLinks />
+    39→      </div>
+    40→      
+    41→      {/* Header */}
+    42→      <div className="bg-white border-b px-6 py-4">
+    43→        <div className="flex items-center justify-between">
+    44→          <div className="flex items-center space-x-6">
+    45→            <h1 className="text-2xl font-bold text-gray-800">🌍 DataForSEO Locations</h1>
+    46→            <ZhedoriButtonBar />
+    47→          </div>
+    48→          <div className="text-right">
+    49→            <div className="text-sm text-gray-500">Location Database</div>
+    50→            <div className="text-xs text-gray-400">Project: DFS Location Manager</div>
+    51→          </div>
+    52→        </div>
+    53→      </div>
+    54→
+    55→      {/* Main Content - Full Width DfsLocationsTable */}
+    56→      <div className="flex-1 overflow-hidden">
+    57→        <DfsLocationsTable />
+    58→      </div>
+    59→    </div>
+    60→  );
+    61→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Great! All the pages I marked as "already having Method 1" do indeed have the correct uniform structure:
+
+✅ **All validated pages have proper Method 1 setup:**
+
+1. **`/driggsman`** - ✅ Has `pclient.tsx` with `DriggsmanClient`
+2. **`/sitejar4`** - ✅ Has `pclient.tsx` with `Sitejar4Client` 
+3. **`/dfslocr`** - ✅ Has `pclient.tsx` with `DfslocrClient`
+
+All follow the exact naming convention we've been using:
+- Server component in `page.tsx` with `Metadata` export
+- Client component in `pclient.tsx` with `[Name]Client` export
+- Server component imports and renders the client component
+
+The structure is completely uniform across all converted pages. Batch 4 is genuinely complete with all pages properly converted to Method 1! 🎉
+
+Ready to proceed with the next batch of pages when you're ready.
+
+---
+
+_**User**_
+
+pleae continue with the next batch of apges
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 5: Business Logic Pages to Method 1
+- [ ] 🌡️ Convert /fanex1 to Method 1
+- [ ] 🌡️ Convert /czonejar1 to Method 1
+- [ ] 🌡️ Convert /zhefetchjar to Method 1
+- [ ] 🌡️ Convert /scafjar to Method 1
+- [ ] 🌡️ Convert /metrojar to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Starting **Batch 5: Business Logic Pages**! Let me begin with `/fanex1`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 5: Business Logic Pages to Method 1
+- [⚡] 🌡️ Convert /fanex1 to Method 1
+- [ ] 🌡️ Convert /czonejar1 to Method 1
+- [ ] 🌡️ Convert /zhefetchjar to Method 1
+- [ ] 🌡️ Convert /scafjar to Method 1
+- [ ] 🌡️ Convert /metrojar to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/fanex1/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→
+     5→export default function Fanex1Page() {
+     6→  useEffect(() => {
+     7→    document.title = '/fanex1 - Snefuru';
+     8→  }, []);
+     9→
+    10→  return (
+    11→    <div className="container mx-auto px-4 py-8">
+    12→      <div className="mb-8">
+    13→        <h1 className="text-3xl font-bold text-gray-900">/fanex1 - Prex System Tools (Elementor)</h1>
+    14→        <p className="mt-2 text-gray-600">
+    15→          zeeprex related tools etc. from the wp plugin
+    16→        </p>
+    17→      </div>
+    18→    </div>
+    19→  );
+    20→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+This is a simple page that needs conversion. I'll create the pclient.tsx and convert to Method 1:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+export default function Fanex1Client() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">/fanex1 - Prex System Tools (Elementor)</h1>
+        <p className="mt-2 text-gray-600">
+          zeeprex related tools etc. from the wp plugin
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/fanex1/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/fanex1/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import Fanex1Client from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'fanex1',
+     6→};
+     7→
+     8→export default function Fanex1Page() {
+     9→  return <Fanex1Client />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me move to `/czonejar1`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 5: Business Logic Pages to Method 1
+- [X] 🌡️ Convert /fanex1 to Method 1
+- [⚡] 🌡️ Convert /czonejar1 to Method 1
+- [ ] 🌡️ Convert /zhefetchjar to Method 1
+- [ ] 🌡️ Convert /scafjar to Method 1
+- [ ] 🌡️ Convert /metrojar to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/czonejar1/page.tsx`
+
+Result:
+
+```
+1→"use client";
+     2→import { useEffect, useState } from 'react';
+     3→import { useAuth } from '@/app/context/AuthContext';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→
+     6→interface ContextZone {
+     7→  zone_id: string;
+     8→  fk_user_id: string;
+     9→  zone_name: string;
+    10→  zone_description: string;
+    11→  created_at: string;
+    12→}
+    13→
+    14→const columns = [
+    15→  'zone_id',
+    16→  'fk_user_id',
+    17→  'zone_name',
+    18→  'zone_description',
+    19→  'created_at'
+    20→];
+    21→
+    22→export default function Czonejar1Page() {
+    23→  const [data, setData] = useState<ContextZone[]>([]);
+    24→  const [filteredData, setFilteredData] = useState<ContextZone[]>([]);
+    25→  const [loading, setLoading] = useState(true);
+    26→  const [error, setError] = useState<string | null>(null);
+    27→  const [currentPage, setCurrentPage] = useState(1);
+    28→  const [pageSize, setPageSize] = useState(10);
+    29→  const [searchTerm, setSearchTerm] = useState('');
+    30→  
+    31→  const pageSizeOptions = [5, 10, 20, 50, 100];
+    32→  const { user } = useAuth();
+    33→  const supabase = createClientComponentClient();
+    34→
+    35→  useEffect(() => {
+    36→    document.title = 'czonejar1 - Snefuru';
+    37→  }, []);
+    38→
+    39→  useEffect(() => {
+    40→    fetchContextZones();
+    41→  }, [user]);
+    42→
+    43→  useEffect(() => {
+    44→    // Filter data based on search term
+    45→    if (searchTerm) {
+    46→      const filtered = data.filter(item => 
+    47→        item.zone_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    48→        item.zone_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    49→        item.zone_id.toLowerCase().includes(searchTerm.toLowerCase())
+    50→      );
+    51→      setFilteredData(filtered);
+    52→    } else {
+    53→      setFilteredData(data);
+    54→    }
+    55→    setCurrentPage(1); // Reset to first page when filtering
+    56→  }, [searchTerm, data]);
+    57→
+    58→  const fetchContextZones = async () => {
+    59→    setLoading(true);
+    60→    setError(null);
+    61→    try {
+    62→      if (!user?.id) {
+    63→        setData([]);
+    64→        setLoading(false);
+    65→        return;
+    66→      }
+    67→      
+    68→      // Get user's DB id from users table
+    69→      const { data: userData, error: userError } = await supabase
+    70→        .from('users')
+    71→        .select('id')
+    72→        .eq('auth_id', user.id)
+    73→        .single();
+    74→        
+    75→      if (userError || !userData) {
+    76→        setError('Could not find user record.');
+    77→        setData([]);
+    78→        setLoading(false);
+    79→        return;
+    80→      }
+    81→      
+    82→      // Fetch context_zones for this user
+    83→      const { data: contextZones, error: contextZonesError } = await supabase
+    84→        .from('context_zones')
+    85→        .select('*')
+    86→        .eq('fk_user_id', userData.id)
+    87→        .order('created_at', { ascending: false });
+    88→        
+    89→      if (contextZonesError) throw contextZonesError;
+    90→      setData(contextZones || []);
+    91→      setFilteredData(contextZones || []);
+    92→    } catch (err) {
+    93→      setError(err instanceof Error ? err.message : 'Failed to fetch context zones');
+    94→      setData([]);
+    95→      setFilteredData([]);
+    96→    } finally {
+    97→      setLoading(false);
+    98→    }
+    99→  };
+   100→
+   101→  // Pagination calculations
+   102→  const totalItems = filteredData.length;
+   103→  const totalPages = Math.ceil(totalItems / pageSize);
+   104→  const startIndex = (currentPage - 1) * pageSize;
+   105→  const endIndex = Math.min(startIndex + pageSize, totalItems);
+   106→  const currentItems = filteredData.slice(startIndex, endIndex);
+   107→
+   108→  const handlePageChange = (newPage: number) => {
+   109→    setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
+   110→  };
+   111→
+   112→  const handlePageSizeChange = (size: number) => {
+   113→    setPageSize(size);
+   114→    setCurrentPage(1);
+   115→  };
+   116→
+   117→  const formatColumnData = (col: string, value: any) => {
+   118→    if (value === null || value === undefined) return '-';
+   119→    
+   120→    switch (col) {
+   121→      case 'zone_id':
+   122→      case 'fk_user_id':
+   123→        return value.substring(0, 8) + '...';
+   124→      case 'zone_name':
+   125→        return String(value).length > 50 ? String(value).substring(0, 50) + '...' : String(value);
+   126→      case 'zone_description':
+   127→        return String(value).length > 100 ? String(value).substring(0, 100) + '...' : String(value);
+   128→      case 'created_at':
+   129→        return new Date(value).toLocaleString();
+   130→      default:
+   131→        return String(value);
+   132→    }
+   133→  };
+   134→
+   135→  const getColumnDisplayName = (col: string) => {
+   136→    return col; // Return the exact column name as specified
+   137→  };
+   138→
+   139→  const getPageNumbers = () => {
+   140→    const pageNumbers = [];
+   141→    const maxVisiblePages = 5;
+   142→    
+   143→    if (totalPages <= maxVisiblePages) {
+   144→      for (let i = 1; i <= totalPages; i++) {
+   145→        pageNumbers.push(i);
+   146→      }
+   147→    } else {
+   148→      const halfVisible = Math.floor(maxVisiblePages / 2);
+   149→      let startPage = Math.max(1, currentPage - halfVisible);
+   150→      let endPage = Math.min(totalPages, currentPage + halfVisible);
+   151→      
+   152→      if (startPage === 1) {
+   153→        endPage = Math.min(totalPages, maxVisiblePages);
+   154→      }
+   155→      
+   156→      if (endPage === totalPages) {
+   157→        startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+   158→      }
+   159→      
+   160→      if (startPage > 1) {
+   161→        pageNumbers.push(1);
+   162→        if (startPage > 2) {
+   163→          pageNumbers.push('...');
+   164→        }
+   165→      }
+   166→      
+   167→      for (let i = startPage; i <= endPage; i++) {
+   168→        pageNumbers.push(i);
+   169→      }
+   170→      
+   171→      if (endPage < totalPages) {
+   172→        if (endPage < totalPages - 1) {
+   173→          pageNumbers.push('...');
+   174→        }
+   175→        pageNumbers.push(totalPages);
+   176→      }
+   177→    }
+   178→    
+   179→    return pageNumbers;
+   180→  };
+   181→
+   182→  if (loading) return <div className="p-6">Loading context zones...</div>;
+   183→  if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+   184→
+   185→  return (
+   186→    <div className="p-6">
+   187→      <h1 className="text-2xl font-bold text-gray-800 mb-2">Context Zones Management</h1>
+   188→      <p className="text-sm text-gray-600 mb-6">db table: context_zones</p>
+   189→      
+   190→      {/* Search and Filter Section */}
+   191→      <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+   192→        <div className="flex items-center space-x-4">
+   193→          <div className="flex-1">
+   194→            <label htmlFor="search" className="sr-only">Search Context Zones</label>
+   195→            <div className="relative">
+   196→              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+   197→                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   198→                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+   199→                </svg>
+   200→              </div>
+   201→              <input
+   202→                type="text"
+   203→                id="search"
+   204→                value={searchTerm}
+   205→                onChange={(e) => setSearchTerm(e.target.value)}
+   206→                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+   207→                placeholder="Search by zone name, description, or ID..."
+   208→              />
+   209→            </div>
+   210→          </div>
+   211→          <button
+   212→            onClick={fetchContextZones}
+   213→            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+   214→          >
+   215→            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   216→              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+   217→            </svg>
+   218→            Refresh
+   219→          </button>
+   220→        </div>
+   221→      </div>
+   222→
+   223→      {/* Statistics Bar */}
+   224→      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+   225→        <div className="flex items-center justify-between text-sm text-gray-600">
+   226→          <span>
+   227→            Showing <span className="font-medium text-gray-900">{startIndex + 1}</span> to{' '}
+   228→            <span className="font-medium text-gray-900">{endIndex}</span> of{' '}
+   229→            <span className="font-medium text-gray-900">{totalItems}</span> context zones
+   230→          </span>
+   231→          <div className="flex items-center space-x-2">
+   232→            <label htmlFor="pageSize" className="text-sm font-medium text-gray-700">
+   233→              Items per page:
+   234→            </label>
+   235→            <select
+   236→              id="pageSize"
+   237→              value={pageSize}
+   238→              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+   239→              className="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+   240→            >
+   241→              {pageSizeOptions.map(size => (
+   242→                <option key={size} value={size}>
+   243→                  {size}
+   244→                </option>
+   245→              ))}
+   246→            </select>
+   247→          </div>
+   248→        </div>
+   249→      </div>
+   250→
+   251→      {/* Table */}
+   252→      <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+   253→        <table className="min-w-full divide-y divide-gray-200">
+   254→          <thead className="bg-gray-50">
+   255→            <tr>
+   256→              {columns.map(col => (
+   257→                <th 
+   258→                  key={col} 
+   259→                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider"
+   260→                >
+   261→                  {getColumnDisplayName(col)}
+   262→                </th>
+   263→              ))}
+   264→            </tr>
+   265→          </thead>
+   266→          <tbody className="bg-white divide-y divide-gray-200">
+   267→            {currentItems.map((contextZone, index) => (
+   268→              <tr key={contextZone.zone_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+   269→                {columns.map(col => (
+   270→                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+   271→                    <div className="max-w-xs">
+   272→                      {formatColumnData(col, contextZone[col as keyof ContextZone])}
+   273→                    </div>
+   274→                  </td>
+   275→                ))}
+   276→              </tr>
+   277→            ))}
+   278→          </tbody>
+   279→        </table>
+   280→      </div>
+   281→
+   282→      {/* Pagination Controls */}
+   283→      <div className="mt-6 flex items-center justify-between">
+   284→        <div className="flex items-center">
+   285→          <p className="text-sm text-gray-700">
+   286→            Page <span className="font-medium">{currentPage}</span> of{' '}
+   287→            <span className="font-medium">{totalPages}</span>
+   288→          </p>
+   289→        </div>
+   290→        
+   291→        <div className="flex items-center space-x-2">
+   292→          <button
+   293→            onClick={() => handlePageChange(1)}
+   294→            disabled={currentPage === 1}
+   295→            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   296→            title="First Page"
+   297→          >
+   298→            <span className="sr-only">First</span>
+   299→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   300→              <path fillRule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+   301→            </svg>
+   302→          </button>
+   303→
+   304→          <button
+   305→            onClick={() => handlePageChange(currentPage - 1)}
+   306→            disabled={currentPage === 1}
+   307→            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   308→            title="Previous Page"
+   309→          >
+   310→            <span className="sr-only">Previous</span>
+   311→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   312→              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+   313→            </svg>
+   314→          </button>
+   315→
+   316→          {getPageNumbers().map((pageNum, index) => (
+   317→            <span key={index}>
+   318→              {pageNum === '...' ? (
+   319→                <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+   320→                  ...
+   321→                </span>
+   322→              ) : (
+   323→                <button
+   324→                  onClick={() => handlePageChange(pageNum as number)}
+   325→                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+   326→                    currentPage === pageNum
+   327→                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+   328→                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+   329→                  }`}
+   330→                >
+   331→                  {pageNum}
+   332→                </button>
+   333→              )}
+   334→            </span>
+   335→          ))}
+   336→
+   337→          <button
+   338→            onClick={() => handlePageChange(currentPage + 1)}
+   339→            disabled={currentPage === totalPages}
+   340→            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   341→            title="Next Page"
+   342→          >
+   343→            <span className="sr-only">Next</span>
+   344→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   345→              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+   346→            </svg>
+   347→          </button>
+   348→
+   349→          <button
+   350→            onClick={() => handlePageChange(totalPages)}
+   351→            disabled={currentPage === totalPages}
+   352→            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   353→            title="Last Page"
+   354→          >
+   355→            <span className="sr-only">Last</span>
+   356→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   357→              <path fillRule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0zm-6 0a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+   358→            </svg>
+   359→          </button>
+   360→        </div>
+   361→      </div>
+   362→
+   363→      {/* Empty State */}
+   364→      {filteredData.length === 0 && (
+   365→        <div className="text-center py-12">
+   366→          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   367→            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+   368→          </svg>
+   369→          <h3 className="mt-2 text-sm font-medium text-gray-900">No context zones found</h3>
+   370→          <p className="mt-1 text-sm text-gray-500">
+   371→            {searchTerm ? 'No context zones match your search criteria.' : 'You have not created any context zones yet.'}
+   372→          </p>
+   373→        </div>
+   374→      )}
+   375→    </div>
+   376→  );
+   377→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+This is a context zones management page with 377 lines. I'll create the pclient.tsx and convert it to Method 1:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+"use client";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+interface ContextZone {
+  zone_id: string;
+  fk_user_id: string;
+  zone_name: string;
+  zone_description: string;
+  created_at: string;
+}
+
+const columns = [
+  'zone_id',
+  'fk_user_id',
+  'zone_name',
+  'zone_description',
+  'created_at'
+];
+
+export default function Czonejar1Client() {
+  const [data, setData] = useState<ContextZone[]>([]);
+  const [filteredData, setFilteredData] = useState<ContextZone[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const pageSizeOptions = [5, 10, 20, 50, 100];
+  const { user } = useAuth();
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    fetchContextZones();
+  }, [user]);
+
+  useEffect(() => {
+    // Filter data based on search term
+    if (searchTerm) {
+      const filtered = data.filter(item => 
+        item.zone_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.zone_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.zone_id.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+    setCurrentPage(1); // Reset to first page when filtering
+  }, [searchTerm, data]);
+
+  const fetchContextZones = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!user?.id) {
+        setData([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+        
+      if (userError || !userData) {
+        setError('Could not find user record.');
+        setData([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch context_zones for this user
+      const { data: contextZones, error: contextZonesError } = await supabase
+        .from('context_zones')
+        .select('*')
+        .eq('fk_user_id', userData.id)
+        .order('created_at', { ascending: false });
+        
+      if (contextZonesError) throw contextZonesError;
+      setData(contextZones || []);
+      setFilteredData(contextZones || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch context zones');
+      setData([]);
+      setFilteredData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Pagination calculations
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const currentItems = filteredData.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  const formatColumnData = (col: string, value: any) => {
+    if (value === null || value === undefined) return '-';
+    
+    switch (col) {
+      case 'zone_id':
+      case 'fk_user_id':
+        return value.substring(0, 8) + '...';
+      case 'zone_name':
+        return String(value).length > 50 ? String(value).substring(0, 50) + '...' : String(value);
+      case 'zone_description':
+        return String(value).length > 100 ? String(value).substring(0, 100) + '...' : String(value);
+      case 'created_at':
+        return new Date(value).toLocaleString();
+      default:
+        return String(value);
+    }
+  };
+
+  const getColumnDisplayName = (col: string) => {
+    return col; // Return the exact column name as specified
+  };
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      const halfVisible = Math.floor(maxVisiblePages / 2);
+      let startPage = Math.max(1, currentPage - halfVisible);
+      let endPage = Math.min(totalPages, currentPage + halfVisible);
+      
+      if (startPage === 1) {
+        endPage = Math.min(totalPages, maxVisiblePages);
+      }
+      
+      if (endPage === totalPages) {
+        startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+      }
+      
+      if (startPage > 1) {
+        pageNumbers.push(1);
+        if (startPage > 2) {
+          pageNumbers.push('...');
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push('...');
+        }
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
+  };
+
+  if (loading) return <div className="p-6">Loading context zones...</div>;
+  if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">Context Zones Management</h1>
+      <p className="text-sm text-gray-600 mb-6">db table: context_zones</p>
+      
+      {/* Search and Filter Section */}
+      <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex-1">
+            <label htmlFor="search" className="sr-only">Search Context Zones</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Search by zone name, description, or ID..."
+              />
+            </div>
+          </div>
+          <button
+            onClick={fetchContextZones}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Statistics Bar */}
+      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between text-sm text-gray-600">
+          <span>
+            Showing <span className="font-medium text-gray-900">{startIndex + 1}</span> to{' '}
+            <span className="font-medium text-gray-900">{endIndex}</span> of{' '}
+            <span className="font-medium text-gray-900">{totalItems}</span> context zones
+          </span>
+          <div className="flex items-center space-x-2">
+            <label htmlFor="pageSize" className="text-sm font-medium text-gray-700">
+              Items per page:
+            </label>
+            <select
+              id="pageSize"
+              value={pageSize}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+              className="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+            >
+              {pageSizeOptions.map(size => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              {columns.map(col => (
+                <th 
+                  key={col} 
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider"
+                >
+                  {getColumnDisplayName(col)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {currentItems.map((contextZone, index) => (
+              <tr key={contextZone.zone_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                {columns.map(col => (
+                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div className="max-w-xs">
+                      {formatColumnData(col, contextZone[col as keyof ContextZone])}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="mt-6 flex items-center justify-between">
+        <div className="flex items-center">
+          <p className="text-sm text-gray-700">
+            Page <span className="font-medium">{currentPage}</span> of{' '}
+            <span className="font-medium">{totalPages}</span>
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handlePageChange(1)}
+            disabled={currentPage === 1}
+            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="First Page"
+          >
+            <span className="sr-only">First</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Previous Page"
+          >
+            <span className="sr-only">Previous</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          {getPageNumbers().map((pageNum, index) => (
+            <span key={index}>
+              {pageNum === '...' ? (
+                <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                  ...
+                </span>
+              ) : (
+                <button
+                  onClick={() => handlePageChange(pageNum as number)}
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                    currentPage === pageNum
+                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              )}
+            </span>
+          ))}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Next Page"
+          >
+            <span className="sr-only">Next</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => handlePageChange(totalPages)}
+            disabled={currentPage === totalPages}
+            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Last Page"
+          >
+            <span className="sr-only">Last</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0zm-6 0a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Empty State */}
+      {filteredData.length === 0 && (
+        <div className="text-center py-12">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No context zones found</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {searchTerm ? 'No context zones match your search criteria.' : 'You have not created any context zones yet.'}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/czonejar1/pclient.tsx
+```
+

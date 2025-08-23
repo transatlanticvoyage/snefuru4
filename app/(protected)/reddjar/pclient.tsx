@@ -47,10 +47,10 @@ export default function ReddjarClient() {
       const successful = result.results.filter((r: any) => r.success).length;
       const totalLinks = result.results.reduce((sum: number, r: any) => sum + r.links_found, 0);
       
-      alert(`Scraping completed!\n\nSuccessful: ${successful}/${result.results.length} URLs\nTotal links found: ${totalLinks}`);
+      alert(`Scraping completed!\n\nSuccessful: ${successful}/${result.results.length} URLs\nTotal links found: ${totalLinks}\n\nNote: Check browser console for detailed debug output.\nRefresh page manually to see updated table data.`);
       
-      // Optionally refresh the table data to show updated counts
-      window.location.reload();
+      // Don't auto-refresh so user can see console debug output
+      // window.location.reload();
       
     } catch (error) {
       console.error('Error scraping links:', error);
@@ -68,8 +68,9 @@ export default function ReddjarClient() {
 
     setIsScrapingCommentable(true);
     try {
-      console.log('Checking commentability for selected rows:', Array.from(selectedRows));
+      console.log('🚀 CLIENT: Checking commentability for selected rows:', Array.from(selectedRows));
       
+      console.log('📡 CLIENT: Making API call to /api/reddit-commentable-scraper');
       const response = await fetch('/api/reddit-commentable-scraper', {
         method: 'POST',
         headers: {
@@ -80,21 +81,33 @@ export default function ReddjarClient() {
         }),
       });
 
+      console.log('📨 CLIENT: API response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        url: response.url
+      });
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error('❌ CLIENT: API response not ok:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('❌ CLIENT: Error response body:', errorText);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
+      console.log('🔄 CLIENT: Parsing JSON response...');
       const result = await response.json();
+      console.log('📊 CLIENT: Parsed API result:', result);
       
       // Show results summary
       const successful = result.results.filter((r: any) => r.success).length;
       const openThreads = result.results.filter((r: any) => r.success && r.is_commentable === true).length;
       const closedThreads = result.results.filter((r: any) => r.success && r.is_commentable === false).length;
       
-      alert(`Commentability check completed!\n\nSuccessful: ${successful}/${result.results.length} URLs\nOpen for comments: ${openThreads}\nClosed: ${closedThreads}`);
+      alert(`Commentability check completed!\n\nSuccessful: ${successful}/${result.results.length} URLs\nOpen for comments: ${openThreads}\nClosed: ${closedThreads}\n\nNote: Check browser console for detailed debug output.\nRefresh page manually to see updated table data.`);
       
-      // Optionally refresh the table data to show updated status
-      window.location.reload();
+      // Don't auto-refresh so user can see console debug output
+      // window.location.reload();
       
     } catch (error) {
       console.error('Error checking commentability:', error);

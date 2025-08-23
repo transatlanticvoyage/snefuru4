@@ -81,31 +81,45 @@ async function fetchRedditThreadCommentability(redditUrl: string): Promise<Reddi
   }
 }
 
+export async function GET(request: NextRequest) {
+  console.log('🔧 TEST: reddit-commentable-scraper GET endpoint called');
+  return NextResponse.json({ message: 'reddit-commentable-scraper API is working', timestamp: new Date().toISOString() });
+}
+
 export async function POST(request: NextRequest) {
+  console.log('🚀 REDDIT COMMENTABLE SCRAPER API CALLED');
   try {
     const { selectedUrlIds } = await request.json();
+    console.log('📋 Received selectedUrlIds:', selectedUrlIds);
     
     if (!Array.isArray(selectedUrlIds) || selectedUrlIds.length === 0) {
+      console.log('❌ ERROR: No URLs provided or invalid format');
       return NextResponse.json({ error: 'No URLs provided' }, { status: 400 });
     }
     
+    console.log(`✅ Processing ${selectedUrlIds.length} URL IDs`);
     const supabase = createServerComponentClient({ cookies });
     
     // Fetch the selected Reddit URLs from the database
+    console.log('🗄️ Fetching URLs from database...');
     const { data: redditUrls, error: fetchError } = await supabase
       .from('redditurlsvat')
       .select('url_id, url_datum')
       .in('url_id', selectedUrlIds);
     
     if (fetchError) {
+      console.log('❌ DATABASE FETCH ERROR:', fetchError);
       return NextResponse.json({ error: 'Failed to fetch Reddit URLs' }, { status: 500 });
     }
+    
+    console.log(`📊 Found ${redditUrls?.length || 0} URLs in database:`, redditUrls?.map(u => `${u.url_id}: ${u.url_datum}`));
     
     const results = [];
     
     for (const redditUrl of redditUrls) {
+      console.log(`\n🔄 PROCESSING URL ${redditUrls.indexOf(redditUrl) + 1}/${redditUrls.length}`);
       try {
-        console.log(`Checking commentability for Reddit URL: ${redditUrl.url_datum}`);
+        console.log(`🌐 Checking commentability for Reddit URL: ${redditUrl.url_datum}`);
         
         // Fetch Reddit thread data (commentability only)
         const submission = await fetchRedditThreadCommentability(redditUrl.url_datum);
@@ -156,7 +170,8 @@ export async function POST(request: NextRequest) {
         await new Promise(resolve => setTimeout(resolve, 200));
         
       } catch (error) {
-        console.error(`Error processing ${redditUrl.url_datum}:`, error);
+        console.error(`💥 ERROR processing ${redditUrl.url_datum}:`, error);
+        console.error('💥 Error stack:', error instanceof Error ? error.stack : 'No stack trace');
         results.push({
           url_id: redditUrl.url_id,
           url: redditUrl.url_datum,
@@ -167,13 +182,19 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    console.log(`\n🎯 FINAL RESULTS SUMMARY:`);
+    console.log(`   Total processed: ${results.length}`);
+    console.log(`   Successful: ${results.filter(r => r.success).length}`);
+    console.log(`   Failed: ${results.filter(r => !r.success).length}`);
+    
     return NextResponse.json({
       message: 'Commentability check completed',
       results
     });
     
   } catch (error) {
-    console.error('Reddit commentability scraper error:', error);
+    console.error('💥 REDDIT COMMENTABILITY SCRAPER FATAL ERROR:', error);
+    console.error('💥 Fatal error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
