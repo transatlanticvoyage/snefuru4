@@ -21,6 +21,8 @@ export default function FabricPage() {
   const [resultMessage, setResultMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [fabricationLaunches, setFabricationLaunches] = useState<any[]>([]);
+  const [cncglubRowCount, setCncglubRowCount] = useState<number | null>(null);
+  const [isLoadingCount, setIsLoadingCount] = useState(false);
   const [formData, setFormData] = useState({
     country: 'United States',
     industry_id: '',
@@ -138,11 +140,13 @@ export default function FabricPage() {
       if (response.ok) {
         setIsSuccess(true);
         setResultMessage(
-          `✅ F370 Process Completed Successfully!\n\n` +
+          `✅ F370 Process Completed Successfully!\n\n\n` +
+          `• Identified ${result.cncglub_rows_identified} cncglub rows matching the criteria\n` +
           `• Created ${result.keywords_created} new keywords\n` +
-          `• Total keywords managed: ${result.keywords_total}\n` +
-          `• Updated ${result.cncglub_rows_processed} cncglub rows\n` +
-          `• Created tag: ${result.tag_name} (ID: ${result.tag_id})\n` +
+          `• Found ${result.keywords_existing} keywords that already existed\n` +
+          `• Created tag in keywordshub_tags db table: ${result.tag_name} (ID: ${result.tag_id})\n` +
+          `• Made sure all ${result.keywords_total} keywords were added to it\n` +
+          `• Updated ${result.cncglub_rows_updated} cncglub rows at ${formData.kwslot} to reference all ${result.keywords_total} keywords in keywordshub db table\n` +
           `• Launch ID: ${result.launch_id}\n\n` +
           `Process completed at: ${new Date().toLocaleString()}`
         );
@@ -169,11 +173,96 @@ export default function FabricPage() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
+    const newFormData = {
+      ...formData,
       [field]: value
-    }));
+    };
+    
+    setFormData(newFormData);
+    
+    // Only trigger count update for filter fields (first 3 rows)
+    if (['country', 'industry_id', 'city_population_filter'].includes(field)) {
+      getCncglubRowCountWithData(newFormData);
+    }
   };
+
+  // Function to get cncglub row count based on provided form data
+  const getCncglubRowCountWithData = async (data: typeof formData) => {
+    if (!user) return;
+    
+    setIsLoadingCount(true);
+    
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      let cncglubQuery = supabase
+        .from('cncglub')
+        .select('cncg_id, cities!rel_city_id(country, city_population)', { count: 'exact', head: true });
+
+      // Apply country filter
+      if (data.country && data.country !== '') {
+        cncglubQuery = cncglubQuery.eq('cities.country', data.country);
+      }
+
+      // Apply industry filter
+      if (data.industry_id && data.industry_id !== '') {
+        cncglubQuery = cncglubQuery.eq('rel_industry_id', parseInt(data.industry_id));
+      }
+
+      // Apply city population filter
+      if (data.city_population_filter && data.city_population_filter !== 'all') {
+        switch (data.city_population_filter) {
+          case 'under-25k':
+            cncglubQuery = cncglubQuery.lt('cities.city_population', 25000);
+            break;
+          case '25k-50k':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 25000).lt('cities.city_population', 50000);
+            break;
+          case '50k-100k':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 50000).lt('cities.city_population', 100000);
+            break;
+          case '75k-325k':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 75000).lt('cities.city_population', 325000);
+            break;
+          case '100k-500k':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 100000).lt('cities.city_population', 500000);
+            break;
+          case '500k-plus':
+            cncglubQuery = cncglubQuery.gte('cities.city_population', 500000);
+            break;
+        }
+      }
+
+      const { count, error } = await cncglubQuery;
+
+      if (!error) {
+        setCncglubRowCount(count || 0);
+      } else {
+        console.error('Error getting cncglub count:', error);
+        setCncglubRowCount(null);
+      }
+    } catch (error) {
+      console.error('Error getting cncglub count:', error);
+      setCncglubRowCount(null);
+    } finally {
+      setIsLoadingCount(false);
+    }
+  };
+
+  // Function to get cncglub row count based on current filters
+  const getCncglubRowCount = async () => {
+    return getCncglubRowCountWithData(formData);
+  };
+
+  // Get initial count when component loads
+  useEffect(() => {
+    if (user) {
+      getCncglubRowCount();
+    }
+  }, [user]);
 
   if (!user) {
     return (
@@ -501,8 +590,37 @@ export default function FabricPage() {
                 </tbody>
               </table>
               
-              {/* Red button below table */}
+              {/* Row Count Display Box */}
               <div className="mt-6">
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                      <span className="text-blue-800 font-semibold">
+                        Rows matching current criteria:
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      {isLoadingCount ? (
+                        <div className="flex items-center">
+                          <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full mr-2"></div>
+                          <span className="text-blue-600 text-sm">Counting...</span>
+                        </div>
+                      ) : (
+                        <span className="text-blue-900 text-2xl font-bold">
+                          {cncglubRowCount !== null ? cncglubRowCount.toLocaleString() : '—'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-2 text-blue-700 text-sm">
+                    This is how many cncglub rows will be processed when F370 runs
+                  </div>
+                </div>
+              </div>
+
+              {/* Red button below table */}
+              <div className="mt-2">
                 <button 
                   className={`px-4 py-2 rounded text-white font-medium ${
                     isProcessing 

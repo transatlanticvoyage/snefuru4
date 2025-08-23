@@ -21,13 +21,24 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Step 1: Filter cncglub rows based on criteria
+    console.log('F370 Filters applied:', {
+      country,
+      industry_id,
+      city_population_filter,
+      kwslot,
+      kw_rubric,
+      rel_dfs_location_code,
+      language_code,
+      tag_name
+    });
+
     let cncglubQuery = supabase
       .from('cncglub')
       .select(`
         cncg_id,
         rel_city_id,
         rel_industry_id,
-        cities!rel_city_id (
+        cities:rel_city_id (
           city_id,
           city_name,
           state_code,
@@ -35,51 +46,70 @@ export async function POST(request: NextRequest) {
           country,
           city_population
         ),
-        industries!rel_industry_id (
+        industries:rel_industry_id (
           industry_id,
           industry_name
         )
-      `);
+      `)
+      .limit(50000);
+
+    console.log('Base query set up, applying filters...');
 
     // Apply country filter
     if (country && country !== '') {
-      cncglubQuery = cncglubQuery.eq('cities.country', country);
+      console.log(`Applying country filter: ${country}`);
+      cncglubQuery = cncglubQuery.ilike('cities.country', country);
     }
 
     // Apply industry filter
     if (industry_id && industry_id !== '') {
+      console.log(`Applying industry filter: ${industry_id}`);
       cncglubQuery = cncglubQuery.eq('rel_industry_id', parseInt(industry_id));
     }
 
     // Apply city population filter
     if (city_population_filter && city_population_filter !== 'all') {
+      console.log(`Applying city population filter: ${city_population_filter}`);
       switch (city_population_filter) {
         case 'under-25k':
-          cncglubQuery = cncglubQuery.lt('cities.city_population', 25000);
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).lt('cities.city_population', 25000);
           break;
         case '25k-50k':
-          cncglubQuery = cncglubQuery.gte('cities.city_population', 25000).lt('cities.city_population', 50000);
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 25000).lt('cities.city_population', 50000);
           break;
         case '50k-100k':
-          cncglubQuery = cncglubQuery.gte('cities.city_population', 50000).lt('cities.city_population', 100000);
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 50000).lt('cities.city_population', 100000);
           break;
         case '75k-325k':
-          cncglubQuery = cncglubQuery.gte('cities.city_population', 75000).lt('cities.city_population', 325000);
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 75000).lt('cities.city_population', 325000);
           break;
         case '100k-500k':
-          cncglubQuery = cncglubQuery.gte('cities.city_population', 100000).lt('cities.city_population', 500000);
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 100000).lt('cities.city_population', 500000);
           break;
         case '500k-plus':
-          cncglubQuery = cncglubQuery.gte('cities.city_population', 500000);
+          cncglubQuery = cncglubQuery.not('cities.city_population', 'is', null).gte('cities.city_population', 500000);
           break;
       }
     }
 
+    console.log('Executing cncglub query...');
     const { data: cncglubRows, error: cncglubError } = await cncglubQuery;
 
     if (cncglubError) {
       console.error('Error fetching cncglub rows:', cncglubError);
       return NextResponse.json({ error: 'Failed to fetch cncglub data' }, { status: 500 });
+    }
+
+    console.log(`Query returned ${cncglubRows.length} rows`);
+    if (cncglubRows.length > 0) {
+      console.log('Sample row:', {
+        cncg_id: cncglubRows[0].cncg_id,
+        rel_city_id: cncglubRows[0].rel_city_id,
+        city_name: cncglubRows[0].cities?.city_name,
+        country: cncglubRows[0].cities?.country,
+        population: cncglubRows[0].cities?.city_population,
+        industry_id: cncglubRows[0].rel_industry_id
+      });
     }
 
     // Step 2: Create new tag in keywordshub_tags
@@ -100,6 +130,7 @@ export async function POST(request: NextRequest) {
     const createdKeywords = [];
     const cncglubUpdates = [];
     let keywordsCreatedCount = 0;
+    let existingKeywordsCount = 0;
 
     console.log(`Processing ${cncglubRows.length} cncglub rows...`);
 
@@ -126,7 +157,7 @@ export async function POST(request: NextRequest) {
         .from('keywordshub')
         .select('keyword_id')
         .eq('keyword_datum', renderedKeyword)
-        .eq('location_code', rel_dfs_location_code)
+        .eq('rel_dfs_location_code', parseInt(rel_dfs_location_code))
         .eq('language_code', language_code)
         .maybeSingle();
 
@@ -136,6 +167,7 @@ export async function POST(request: NextRequest) {
       if (existingKeyword) {
         // Keyword exists, use existing ID
         keywordId = existingKeyword.keyword_id;
+        existingKeywordsCount++;
         console.log(`Using existing keyword ID: ${keywordId}`);
       } else {
         // Create new keyword
@@ -143,7 +175,7 @@ export async function POST(request: NextRequest) {
           .from('keywordshub')
           .insert({
             keyword_datum: renderedKeyword,
-            location_code: rel_dfs_location_code,
+            rel_dfs_location_code: parseInt(rel_dfs_location_code),
             location_display_name: city.city_name + ', ' + city.state_code,
             language_code: language_code,
             language_name: 'English'
@@ -214,7 +246,7 @@ export async function POST(request: NextRequest) {
       .from('fabrication_launches')
       .insert({
         rel_keywordshub_tag_id: tagId,
-        user_id: 'system', // You may want to get actual user ID from session
+        user_id: null, // Set to null instead of invalid UUID
         opt_country: country,
         opt_industry_id: industry_id ? parseInt(industry_id) : null,
         opt_city_population_filter: city_population_filter,
@@ -231,16 +263,18 @@ export async function POST(request: NextRequest) {
       console.error('Error creating fabrication launch:', launchError);
     }
 
-    console.log(`Final results: Created ${keywordsCreatedCount} new keywords, processed ${createdKeywords.length} total`);
+    console.log(`Final results: Created ${keywordsCreatedCount} new keywords, found ${existingKeywordsCount} existing, processed ${createdKeywords.length} total`);
 
     return NextResponse.json({
       success: true,
-      message: `Created ${keywordsCreatedCount} keywords from ${cncglubRows.length} cncglub rows`,
+      message: `Processed ${cncglubRows.length} cncglub rows successfully`,
       tag_id: tagId,
       tag_name: tag_name,
+      cncglub_rows_identified: cncglubRows.length,
       keywords_created: keywordsCreatedCount,
+      keywords_existing: existingKeywordsCount,
       keywords_total: createdKeywords.length,
-      cncglub_rows_processed: cncglubRows.length,
+      cncglub_rows_updated: cncglubUpdates.length,
       launch_id: launchData?.launch_id || 'N/A'
     });
 
