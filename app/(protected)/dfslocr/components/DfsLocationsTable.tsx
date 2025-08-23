@@ -59,6 +59,10 @@ export default function DfsLocationsTable() {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortField, setSortField] = useState<keyof DfsLocationRecord>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [regionFilter, setRegionFilter] = useState<'us' | 'worldwide'>('us'); // Default to US Only
+  const [locationTypeFilter, setLocationTypeFilter] = useState<string>('all'); // Default to All
+  const [locationTypes, setLocationTypes] = useState<string[]>([]); // Available location types
+  const [searchOnlyBeforeComma, setSearchOnlyBeforeComma] = useState<boolean>(true); // Default to On
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -103,6 +107,37 @@ export default function DfsLocationsTable() {
     getUserId();
   }, [user, supabase]);
 
+  // Fetch location types for filter
+  const fetchLocationTypes = async () => {
+    try {
+      const { data: types, error } = await supabase
+        .from('dfs_locations')
+        .select('location_type')
+        .not('location_type', 'is', null);
+      
+      if (error) throw error;
+      
+      // Get unique types and count occurrences
+      const typeCounts: Record<string, number> = {};
+      types.forEach(record => {
+        const type = record.location_type;
+        if (type) {
+          typeCounts[type] = (typeCounts[type] || 0) + 1;
+        }
+      });
+      
+      // Sort by count descending and take top types
+      const sortedTypes = Object.entries(typeCounts)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 12) // Top 12 types to fit in button bar
+        .map(([type]) => type);
+      
+      setLocationTypes(sortedTypes);
+    } catch (err) {
+      console.error('Error fetching location types:', err);
+    }
+  };
+
   // Fetch data
   const fetchData = async () => {
     try {
@@ -128,6 +163,7 @@ export default function DfsLocationsTable() {
 
   useEffect(() => {
     fetchData();
+    fetchLocationTypes();
   }, []);
 
   // Server-side search function with improved relevance ordering
@@ -146,11 +182,31 @@ export default function DfsLocationsTable() {
       // Handle multi-word searches by replacing spaces with wildcards
       const searchPattern = term.replace(/\s+/g, '%');
       
-      const { data: results, error } = await supabase
+      // For "before comma" searches, we'll fetch results and filter client-side
+      // For normal searches, use server-side filtering
+      let query = supabase
         .from('dfs_locations')
-        .select('*')
-        .or(`location_name.ilike.%${searchPattern}%,location_code.eq.${parseInt(term) || 0},country_iso_code.ilike.%${searchPattern}%,location_type.ilike.%${searchPattern}%`)
-        .limit(10000); // Limit search results to prevent performance issues
+        .select('*');
+      
+      if (searchOnlyBeforeComma) {
+        // Search broadly in location_name and filter client-side later
+        query = query.or(`location_name.ilike.%${searchPattern}%,location_code.eq.${parseInt(term) || 0}`);
+      } else {
+        // Original search across all fields
+        query = query.or(`location_name.ilike.%${searchPattern}%,location_code.eq.${parseInt(term) || 0},country_iso_code.ilike.%${searchPattern}%,location_type.ilike.%${searchPattern}%`);
+      }
+      
+      // Apply region filter
+      if (regionFilter === 'us') {
+        query = query.eq('country_iso_code', 'US');
+      }
+      
+      // Apply location type filter
+      if (locationTypeFilter !== 'all') {
+        query = query.eq('location_type', locationTypeFilter);
+      }
+      
+      const { data: results, error } = await query.limit(10000); // Limit search results to prevent performance issues
 
       console.log(`📊 Raw search results for "${term}":`, results?.length || 0);
       
@@ -159,8 +215,19 @@ export default function DfsLocationsTable() {
         throw error;
       }
       
+      // Apply client-side filtering for "before comma" searches
+      let filteredResults = results || [];
+      if (searchOnlyBeforeComma) {
+        filteredResults = (results || []).filter(location => {
+          const locationName = location.location_name || '';
+          const beforeComma = locationName.split(',')[0].trim();
+          return beforeComma.toLowerCase().includes(term.toLowerCase());
+        });
+        console.log(`🔍 Before comma filter: ${results?.length || 0} → ${filteredResults.length}`);
+      }
+      
       // Sort results by relevance (client-side sorting for better relevance)
-      const sortedResults = (results || []).sort((a, b) => {
+      const sortedResults = filteredResults.sort((a, b) => {
         const termLower = term.toLowerCase();
         const aName = (a.location_name || '').toLowerCase();
         const bName = (b.location_name || '').toLowerCase();
@@ -237,7 +304,7 @@ export default function DfsLocationsTable() {
     }, 300); // 300ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, sortField, sortOrder]);
+  }, [searchTerm, sortField, sortOrder, regionFilter, locationTypeFilter, searchOnlyBeforeComma]);
 
   // Filter and sort data - now with server-side search when search term is provided
   const filteredAndSortedData = useMemo(() => {
@@ -717,6 +784,81 @@ export default function DfsLocationsTable() {
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
             </div>
             <PaginationControls />
+            {/* Region Filter Toggle */}
+            <div className="flex items-center">
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <button
+                  onClick={() => setRegionFilter('us')}
+                  className={`
+                    px-4 py-2 text-sm font-medium border rounded-l-md transition-colors
+                    ${regionFilter === 'us' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  US Only
+                </button>
+                <button
+                  onClick={() => setRegionFilter('worldwide')}
+                  className={`
+                    px-4 py-2 text-sm font-medium border border-l-0 rounded-r-md transition-colors
+                    ${regionFilter === 'worldwide' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  Worldwide
+                </button>
+              </div>
+            </div>
+            {/* Location Type Filter */}
+            <div className="flex items-center">
+              <div className="flex flex-wrap gap-1" role="group">
+                <button
+                  onClick={() => setLocationTypeFilter('all')}
+                  className={`
+                    px-3 py-1 text-xs font-medium border rounded transition-colors
+                    ${locationTypeFilter === 'all' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  All
+                </button>
+                {locationTypes.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setLocationTypeFilter(type)}
+                    className={`
+                      px-3 py-1 text-xs font-medium border rounded transition-colors
+                      ${locationTypeFilter === type ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                    `}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Search Only Before First Comma Toggle */}
+            <div className="flex items-center">
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <div className="px-3 py-2 text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300 rounded-l-md">
+                  Search Only Before First Comma
+                </div>
+                <button
+                  onClick={() => setSearchOnlyBeforeComma(true)}
+                  className={`
+                    px-3 py-2 text-sm font-medium border border-l-0 transition-colors
+                    ${searchOnlyBeforeComma ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  On
+                </button>
+                <button
+                  onClick={() => setSearchOnlyBeforeComma(false)}
+                  className={`
+                    px-3 py-2 text-sm font-medium border border-l-0 rounded-r-md transition-colors
+                    ${!searchOnlyBeforeComma ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  Off
+                </button>
+              </div>
+            </div>
             <div className="relative">
               <input
                 type="text"
@@ -851,6 +993,81 @@ export default function DfsLocationsTable() {
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
             </div>
             <PaginationControls />
+            {/* Region Filter Toggle */}
+            <div className="flex items-center">
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <button
+                  onClick={() => setRegionFilter('us')}
+                  className={`
+                    px-4 py-2 text-sm font-medium border rounded-l-md transition-colors
+                    ${regionFilter === 'us' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  US Only
+                </button>
+                <button
+                  onClick={() => setRegionFilter('worldwide')}
+                  className={`
+                    px-4 py-2 text-sm font-medium border border-l-0 rounded-r-md transition-colors
+                    ${regionFilter === 'worldwide' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  Worldwide
+                </button>
+              </div>
+            </div>
+            {/* Location Type Filter */}
+            <div className="flex items-center">
+              <div className="flex flex-wrap gap-1" role="group">
+                <button
+                  onClick={() => setLocationTypeFilter('all')}
+                  className={`
+                    px-3 py-1 text-xs font-medium border rounded transition-colors
+                    ${locationTypeFilter === 'all' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  All
+                </button>
+                {locationTypes.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setLocationTypeFilter(type)}
+                    className={`
+                      px-3 py-1 text-xs font-medium border rounded transition-colors
+                      ${locationTypeFilter === type ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                    `}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Search Only Before First Comma Toggle */}
+            <div className="flex items-center">
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <div className="px-3 py-2 text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300 rounded-l-md">
+                  Search Only Before First Comma
+                </div>
+                <button
+                  onClick={() => setSearchOnlyBeforeComma(true)}
+                  className={`
+                    px-3 py-2 text-sm font-medium border border-l-0 transition-colors
+                    ${searchOnlyBeforeComma ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  On
+                </button>
+                <button
+                  onClick={() => setSearchOnlyBeforeComma(false)}
+                  className={`
+                    px-3 py-2 text-sm font-medium border border-l-0 rounded-r-md transition-colors
+                    ${!searchOnlyBeforeComma ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  `}
+                >
+                  Off
+                </button>
+              </div>
+            </div>
             <div className="relative">
               <input
                 type="text"

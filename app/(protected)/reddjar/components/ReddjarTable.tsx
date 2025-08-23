@@ -36,6 +36,22 @@ interface RedditUrl {
   updated_at: string;
 }
 
+interface OutboundLink {
+  link_id: number;
+  source_url_id: number;
+  comment_id: string | null;
+  source_type: string | null;
+  raw_url: string | null;
+  resolved_url: string | null;
+  domain: string | null;
+  anchor_text: string | null;
+  http_status: number | null;
+  first_seen: string;
+  last_seen: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface ReddjarTableProps {
   onColumnPaginationRender?: (controls: {
     ColumnPaginationBar1: () => JSX.Element | null;
@@ -60,7 +76,7 @@ export default function ReddjarTable({
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Column pagination states
-  const [columnsPerPage] = useState(8); // Show 8 columns at a time
+  const [columnsPerPage, setColumnsPerPage] = useState(8); // Show 8 columns at a time
   const [currentColumnPage, setCurrentColumnPage] = useState(1);
   
   // Modal states
@@ -69,6 +85,11 @@ export default function ReddjarTable({
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
+  
+  // Expandable row states
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [outboundLinks, setOutboundLinks] = useState<Record<number, OutboundLink[]>>({});
+  const [loadingLinks, setLoadingLinks] = useState<Set<number>>(new Set());
   
   // Form data for creating/editing
   const [formData, setFormData] = useState({
@@ -138,12 +159,110 @@ export default function ReddjarTable({
   const visibleColumns = columns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
   
   // Column Pagination Components - Define before use
+  // Bar 1: Columns per page quantity selector
   const ColumnPaginationBar1 = () => {
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Cols/page:</span>
+          <button
+            onClick={() => {
+              setColumnsPerPage(4);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${
+              columnsPerPage === 4 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 4 ? '#f8f782' : undefined
+            }}
+          >
+            4
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(6);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 6 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 6 ? '#f8f782' : undefined
+            }}
+          >
+            6
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(8);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 8 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 8 ? '#f8f782' : undefined
+            }}
+          >
+            8
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(10);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 10 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 10 ? '#f8f782' : undefined
+            }}
+          >
+            10
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(12);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${
+              columnsPerPage === 12 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 12 ? '#f8f782' : undefined
+            }}
+          >
+            12
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Bar 2: Current column page selector
+  const ColumnPaginationBar2 = () => {
     if (totalColumnPages <= 1) return null;
     
     return (
       <div className="flex items-center">
         <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Col page:</span>
           <button
             onClick={() => setCurrentColumnPage(1)}
             disabled={currentColumnPage === 1}
@@ -170,10 +289,15 @@ export default function ReddjarTable({
                 onClick={() => setCurrentColumnPage(pageNum)}
                 className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
                   currentColumnPage === pageNum 
-                    ? 'bg-blue-500 text-white border-blue-500' 
+                    ? 'text-black border-black' 
                     : 'bg-white hover:bg-gray-200'
                 }`}
-                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+                style={{ 
+                  fontSize: '14px', 
+                  paddingTop: '10px', 
+                  paddingBottom: '10px',
+                  backgroundColor: currentColumnPage === pageNum ? '#f8f782' : undefined
+                }}
               >
                 {pageNum}
               </button>
@@ -195,45 +319,6 @@ export default function ReddjarTable({
             style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
           >
             Last
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  const ColumnPaginationBar2 = () => {
-    if (totalColumnPages <= 1) return null;
-    
-    return (
-      <div className="flex items-center">
-        <div className="flex items-center">
-          <button
-            onClick={() => setCurrentColumnPage(1)}
-            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${currentColumnPage === 1 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
-          >
-            1
-          </button>
-          <button
-            onClick={() => setCurrentColumnPage(2)}
-            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${currentColumnPage === 2 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
-          >
-            2
-          </button>
-          <button
-            onClick={() => setCurrentColumnPage(3)}
-            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${currentColumnPage === 3 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
-          >
-            3
-          </button>
-          <button
-            onClick={() => setCurrentColumnPage(totalColumnPages)}
-            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${currentColumnPage === totalColumnPages ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
-          >
-            All
           </button>
         </div>
       </div>
@@ -596,6 +681,54 @@ export default function ReddjarTable({
     });
   };
 
+  // Fetch outbound links for a specific URL
+  const fetchOutboundLinks = async (urlId: number) => {
+    if (outboundLinks[urlId]) {
+      return; // Already fetched
+    }
+
+    setLoadingLinks(prev => new Set(prev).add(urlId));
+    
+    try {
+      const { data, error } = await supabase
+        .from('redditoblinks')
+        .select('*')
+        .eq('source_url_id', urlId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching outbound links:', error);
+        return;
+      }
+
+      setOutboundLinks(prev => ({
+        ...prev,
+        [urlId]: data || []
+      }));
+    } catch (error) {
+      console.error('Error fetching outbound links:', error);
+    } finally {
+      setLoadingLinks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(urlId);
+        return newSet;
+      });
+    }
+  };
+
+  // Toggle expanded row
+  const toggleRowExpansion = (urlId: number) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(urlId)) {
+      newExpanded.delete(urlId);
+    } else {
+      newExpanded.add(urlId);
+      // Fetch outbound links when expanding
+      fetchOutboundLinks(urlId);
+    }
+    setExpandedRows(newExpanded);
+  };
+
   // Render cell content
   const renderCell = (item: RedditUrl, column: typeof columns[0]) => {
     const value = item[column.key];
@@ -654,13 +787,87 @@ export default function ReddjarTable({
       displayValue = value?.toString() || '';
     }
 
+    // Special handling for count_obls column to show EXP button
+    if (column.key === 'count_obls') {
+      return (
+        <div className="flex items-center gap-1">
+          <div
+            onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
+            className={`min-h-[1.25rem] px-1 py-0.5 rounded ${
+              !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+            } ${isReadOnly ? 'text-gray-500' : ''}`}
+            style={{ whiteSpace: 'nowrap' }}
+            title={isReadOnly ? displayValue : `${displayValue} (Click to edit)`}
+          >
+            {displayValue}
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleRowExpansion(item.url_id);
+            }}
+            className="w-8 h-7 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded transition-colors flex items-center justify-center"
+            style={{ fontSize: '10px' }}
+            title={expandedRows.has(item.url_id) ? 'Collapse outbound links' : 'Expand outbound links'}
+          >
+            EXP
+          </button>
+        </div>
+      );
+    }
+
+    // Special handling for url_datum column to show copy and open URL buttons
+    if (column.key === 'url_datum') {
+      return (
+        <div className="flex items-center gap-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (displayValue) {
+                navigator.clipboard.writeText(displayValue);
+              }
+            }}
+            className="w-5 h-5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded transition-colors flex items-center justify-center"
+            style={{ fontSize: '10px' }}
+            title="Copy URL to clipboard"
+          >
+            C
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (displayValue) {
+                window.open(displayValue, '_blank', 'noopener,noreferrer');
+              }
+            }}
+            className="w-5 h-5 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded transition-colors flex items-center justify-center"
+            title="Open URL in new tab"
+          >
+            →
+          </button>
+          <div
+            onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
+            className={`min-h-[1.25rem] px-1 py-0.5 rounded ${
+              !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+            } ${isReadOnly ? 'text-gray-500' : ''}`}
+            style={{ whiteSpace: 'nowrap' }}
+            title={isReadOnly ? displayValue : `${displayValue} (Click to edit)`}
+          >
+            {displayValue}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
-        className={`min-w-[30px] min-h-[1.25rem] px-1 py-0.5 rounded break-words ${
+        className={`min-h-[1.25rem] px-1 py-0.5 rounded ${
           !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
         } ${isReadOnly ? 'text-gray-500' : ''}`}
-        style={{ maxWidth: '200px', wordWrap: 'break-word', overflowWrap: 'break-word' }}
+        style={{ 
+          whiteSpace: 'nowrap'
+        }}
         title={isReadOnly ? displayValue : `${displayValue} (Click to edit)`}
       >
         {displayValue}
@@ -696,8 +903,8 @@ export default function ReddjarTable({
               setItemsPerPage(10);
               setCurrentPage(1);
             }}
-            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${itemsPerPage === 10 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${itemsPerPage === 10 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 10 ? '#f8f782' : undefined }}
           >
             10
           </button>
@@ -706,8 +913,8 @@ export default function ReddjarTable({
               setItemsPerPage(20);
               setCurrentPage(1);
             }}
-            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 20 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 20 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 20 ? '#f8f782' : undefined }}
           >
             20
           </button>
@@ -716,8 +923,8 @@ export default function ReddjarTable({
               setItemsPerPage(50);
               setCurrentPage(1);
             }}
-            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 50 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 50 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 50 ? '#f8f782' : undefined }}
           >
             50
           </button>
@@ -726,8 +933,8 @@ export default function ReddjarTable({
               setItemsPerPage(100);
               setCurrentPage(1);
             }}
-            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 100 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 100 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 100 ? '#f8f782' : undefined }}
           >
             100
           </button>
@@ -736,8 +943,8 @@ export default function ReddjarTable({
               setItemsPerPage(200);
               setCurrentPage(1);
             }}
-            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 200 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 200 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 200 ? '#f8f782' : undefined }}
           >
             200
           </button>
@@ -746,8 +953,8 @@ export default function ReddjarTable({
               setItemsPerPage(500);
               setCurrentPage(1);
             }}
-            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 500 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 500 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 500 ? '#f8f782' : undefined }}
           >
             500
           </button>
@@ -756,8 +963,8 @@ export default function ReddjarTable({
               setItemsPerPage(filteredAndSortedData.length);
               setCurrentPage(1);
             }}
-            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${itemsPerPage === filteredAndSortedData.length ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
-            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${itemsPerPage === filteredAndSortedData.length ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === filteredAndSortedData.length ? '#f8f782' : undefined }}
           >
             All
           </button>
@@ -878,10 +1085,10 @@ export default function ReddjarTable({
       {/* Table */}
       <div className="bg-white overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '3000px', tableLayout: 'fixed' }}>
+          <table className="border-collapse border border-gray-200" style={{ tableLayout: 'auto' }}>
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '40px' }}>
+                <th className="px-2 py-3 text-left border border-gray-200">
                   <div 
                     className="w-full h-full cursor-pointer flex items-center justify-center"
                     onClick={(e) => {
@@ -920,10 +1127,8 @@ export default function ReddjarTable({
                         hasRightSeparator ? 'border-r-4 border-r-black' : ''
                       }`}
                       style={{ 
-                        width: column.width,
-                        minWidth: column.width,
-                        maxWidth: column.width,
-                        backgroundColor: column.key === 'count_obls' ? '#dbeafe' : undefined
+                        backgroundColor: column.key === 'count_obls' ? '#dbeafe' : undefined,
+                        whiteSpace: 'nowrap'
                       }}
                       onClick={() => handleSort(column.key)}
                     >
@@ -961,57 +1166,129 @@ export default function ReddjarTable({
             </thead>
             <tbody className="divide-y divide-gray-200">
               {paginatedData.map((item) => (
-                <tr key={item.url_id} className="hover:bg-gray-50">
-                  <td className="px-2 py-3 border border-gray-200">
-                    <div 
-                      className="w-full h-full cursor-pointer flex items-center justify-center"
-                      onClick={(e) => {
-                        const target = e.target as HTMLElement;
-                        const checkbox = target.closest('td')?.querySelector('input[type="checkbox"]') as HTMLInputElement;
-                        if (checkbox && target !== checkbox) {
-                          checkbox.checked = !checkbox.checked;
-                          checkbox.dispatchEvent(new Event('change'));
-                        }
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        style={{ width: '20px', height: '20px' }}
-                        checked={selectedRows.has(item.url_id)}
-                        onChange={(e) => {
-                          if (onSelectionChange) {
-                            const newSelected = new Set(selectedRows);
-                            if (e.target.checked) {
-                              newSelected.add(item.url_id);
-                            } else {
-                              newSelected.delete(item.url_id);
-                            }
-                            onSelectionChange(newSelected);
+                <>
+                  <tr key={item.url_id} className="hover:bg-gray-50">
+                    <td className="px-2 py-3 border border-gray-200">
+                      <div 
+                        className="w-full h-full cursor-pointer flex items-center justify-center"
+                        onClick={(e) => {
+                          const target = e.target as HTMLElement;
+                          const checkbox = target.closest('td')?.querySelector('input[type="checkbox"]') as HTMLInputElement;
+                          if (checkbox && target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change'));
                           }
                         }}
-                      />
-                    </div>
-                  </td>
-                  {visibleColumns.map((column, index) => {
-                    const hasRightSeparator = column.separator === 'right';
-                    
-                    return (
-                      <td
-                        key={column.key}
-                        className={`text-sm border border-gray-200 px-2 py-1 ${
-                          hasRightSeparator ? 'border-r-4 border-r-black' : ''
-                        }`}
-                        style={{ 
-                          width: column.width,
-                          minWidth: column.width,
-                          maxWidth: column.width
-                        }}
                       >
-                        {renderCell(item, column)}
+                        <input
+                          type="checkbox"
+                          style={{ width: '20px', height: '20px' }}
+                          checked={selectedRows.has(item.url_id)}
+                          onChange={(e) => {
+                            if (onSelectionChange) {
+                              const newSelected = new Set(selectedRows);
+                              if (e.target.checked) {
+                                newSelected.add(item.url_id);
+                              } else {
+                                newSelected.delete(item.url_id);
+                              }
+                              onSelectionChange(newSelected);
+                            }
+                          }}
+                        />
+                      </div>
+                    </td>
+                    {visibleColumns.map((column, index) => {
+                      const hasRightSeparator = column.separator === 'right';
+                      
+                      return (
+                        <td
+                          key={column.key}
+                          className={`text-sm border border-gray-200 px-2 py-1 ${
+                            hasRightSeparator ? 'border-r-4 border-r-black' : ''
+                          }`}
+                          style={{ 
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {renderCell(item, column)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                  
+                  {/* Expanded row for outbound links */}
+                  {expandedRows.has(item.url_id) && (
+                    <tr key={`expanded-${item.url_id}`} className="bg-gray-50">
+                      <td colSpan={visibleColumns.length + 1} className="px-4 py-4 border border-gray-200">
+                        <div className="space-y-3">
+                          <h3 className="font-bold text-base text-gray-800">
+                            Outbound Links
+                          </h3>
+                          
+                          {loadingLinks.has(item.url_id) ? (
+                            <div className="text-gray-500 text-sm">Loading outbound links...</div>
+                          ) : outboundLinks[item.url_id]?.length > 0 ? (
+                            <div className="overflow-x-auto">
+                              <table className="min-w-full bg-white border border-gray-300 rounded-md">
+                                <thead className="bg-gray-100">
+                                  <tr>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">link_id</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">source_url_id</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">comment_id</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">source_type</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">raw_url</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">resolved_url</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">domain</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">anchor_text</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">http_status</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">first_seen</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">last_seen</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">created_at</th>
+                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">updated_at</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {outboundLinks[item.url_id].map((link) => (
+                                    <tr key={link.link_id} className="hover:bg-gray-50">
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.link_id}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.source_url_id}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.comment_id || '-'}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.source_type || '-'}</td>
+                                      <td className="px-3 py-2 text-sm text-blue-600 border-b border-gray-200 max-w-xs truncate" title={link.raw_url || ''}>
+                                        {link.raw_url ? (
+                                          <a href={link.raw_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                            {link.raw_url}
+                                          </a>
+                                        ) : '-'}
+                                      </td>
+                                      <td className="px-3 py-2 text-sm text-blue-600 border-b border-gray-200 max-w-xs truncate" title={link.resolved_url || ''}>
+                                        {link.resolved_url ? (
+                                          <a href={link.resolved_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                            {link.resolved_url}
+                                          </a>
+                                        ) : '-'}
+                                      </td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.domain || '-'}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200 max-w-xs truncate" title={link.anchor_text || ''}>{link.anchor_text || '-'}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.http_status || '-'}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.first_seen ? new Date(link.first_seen).toLocaleDateString() : '-'}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.last_seen ? new Date(link.last_seen).toLocaleDateString() : '-'}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{new Date(link.created_at).toLocaleDateString()}</td>
+                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{new Date(link.updated_at).toLocaleDateString()}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <div className="text-gray-500 text-sm">No outbound links found for this URL.</div>
+                          )}
+                        </div>
                       </td>
-                    );
-                  })}
-                </tr>
+                    </tr>
+                  )}
+                </>
               ))}
             </tbody>
           </table>

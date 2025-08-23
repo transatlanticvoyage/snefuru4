@@ -63,7 +63,6 @@ export async function POST(request: NextRequest) {
           industry_name
         )
       `)
-      .not('rel_city_id', 'is', null)
       .limit(50000);
 
     console.log('Base query set up, applying filters...');

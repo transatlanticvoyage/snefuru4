@@ -3042,3 +3042,11 @@ The solution ensures:
 
 The reddjar page should now load properly and display the count_obls column with a light blue background header positioned right after the url_datum column.
 
+---
+
+_**User**_
+
+i tried to run the scrape on 1 url and it said: failed to fetch. error
+
+or somethign liek that. i couldnt find any errors in the console
+
