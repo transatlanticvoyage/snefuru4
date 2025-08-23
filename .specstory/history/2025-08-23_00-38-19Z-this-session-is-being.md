@@ -7991,3 +7991,987 @@ The F370 function is now **functional** but not **fully optimized**. The main fu
 
 The F370 function is now operational and creating keywords successfully. The remaining errors in the logs appear to be from attempts to create duplicate keywords or other edge cases, but the core functionality is working as evidenced by the successful creation of 38 keywords.
 
+---
+
+_**User**_
+
+please analyze the kwtagzar page and figure out why i can only see 1 tag in the table . perhaps it is because this is a tag that i created using the buttons present on this page. i see in supabase db, all the tags that are created from the process run on the /fabric page. but these tags are not appearing here on kwtagzar for some reason
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll analyze the kwtagzar page to understand why only 1 tag is showing in the table when there are more tags in the database. Let me first check the current page structure and then investigate the data fetching logic.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/kwtagzar/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
+     7→import KeywordsTagsTable from './components/KeywordsTagsTable';
+     8→
+     9→export default function KwtagzarPage() {
+    10→  const { user } = useAuth();
+    11→  const router = useRouter();
+    12→
+    13→  useEffect(() => {
+    14→    if (!user) {
+    15→      router.push('/login');
+    16→      return;
+    17→    }
+    18→  }, [user, router]);
+    19→
+    20→
+    21→  if (!user) {
+    22→    return (
+    23→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    24→        <div className="text-gray-500">Loading...</div>
+    25→      </div>
+    26→    );
+    27→  }
+    28→
+    29→  // Set page title
+    30→  useEffect(() => {
+    31→    document.title = '/kwtagzar - Snefuru';
+    32→  }, []);
+    33→
+    34→  return (
+    35→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    36→      {/* Header */}
+    37→      <div className="bg-white border-b px-6 py-4">
+    38→        <div className="flex items-center justify-between">
+    39→          <div className="flex items-center space-x-6">
+    40→            <h1 className="text-2xl font-bold text-gray-800">🏷️ Keywords Tags Manager</h1>
+    41→            <ZhedoriButtonBar />
+    42→          </div>
+    43→          <div className="text-right">
+    44→            <div className="text-sm text-gray-500">Tag Management System</div>
+    45→            <div className="text-xs text-gray-400">Project: Keywords Organization</div>
+    46→          </div>
+    47→        </div>
+    48→      </div>
+    49→
+    50→      {/* Main Content - Full Width KeywordsTagsTable */}
+    51→      <div className="flex-1 overflow-hidden">
+    52→        <KeywordsTagsTable />
+    53→      </div>
+    54→    </div>
+    55→  );
+    56→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check the KeywordsTagsTable component where the data fetching and display logic is:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/kwtagzar/components/KeywordsTagsTable.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import { useAuth } from '@/app/context/AuthContext';
+     6→import dynamic from 'next/dynamic';
+     7→
+     8→const NubraTablefaceKite = dynamic(
+     9→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    10→  { ssr: false }
+    11→);
+    12→
+    13→interface KeywordTag {
+    14→  tag_id: number;
+    15→  fabrication_launch_created_from: number | null; // UI only - no DB field
+    16→  tag_name: string;
+    17→  tag_order: number;
+    18→  created_at: string;
+    19→  updated_at: string;
+    20→  user_id: string;
+    21→}
+    22→
+    23→const columns = [
+    24→  { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
+    25→  { 
+    26→    key: 'fabrication_launch_created_from', 
+    27→    label: 'fabrication_launch_created_from', 
+    28→    labelLines: [
+    29→      'fabrication_launch_created_from',
+    30→      '(reverse lookup)',
+    31→      'fabrication_launches.rel_keywordshub_tag_id'
+    32→    ],
+    33→    type: 'number', 
+    34→    width: '180px' 
+    35→  },
+    36→  { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
+    37→  { key: 'tag_order', label: 'tag_order', type: 'number', width: '120px' },
+    38→  { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
+    39→  { key: 'updated_at', label: 'updated_at', type: 'datetime', width: '180px' },
+    40→  { key: 'user_id', label: 'user_id', type: 'text', width: '200px' }
+    41→];
+    42→
+    43→export default function KeywordsTagsTable() {
+    44→  const { user } = useAuth();
+    45→  const [data, setData] = useState<KeywordTag[]>([]);
+    46→  const [loading, setLoading] = useState(true);
+    47→  const [error, setError] = useState<string | null>(null);
+    48→  const [searchTerm, setSearchTerm] = useState('');
+    49→  const [currentPage, setCurrentPage] = useState(1);
+    50→  const [itemsPerPage, setItemsPerPage] = useState(100);
+    51→  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    52→  const [sortField, setSortField] = useState<keyof KeywordTag>('created_at');
+    53→  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    54→  
+    55→  // Modal states
+    56→  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    57→  
+    58→  // Inline editing states
+    59→  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+    60→  const [editingValue, setEditingValue] = useState<string>('');
+    61→  
+    62→  // Form data for creating
+    63→  const [formData, setFormData] = useState({
+    64→    tag_name: '',
+    65→    tag_order: 0
+    66→  });
+    67→
+    68→  const supabase = createClientComponentClient();
+    69→
+    70→  // Get user ID
+    71→  const [userInternalId, setUserInternalId] = useState<string | null>(null);
+    72→
+    73→  useEffect(() => {
+    74→    const getUserId = async () => {
+    75→      if (user?.id) {
+    76→        const { data: userData } = await supabase
+    77→          .from('users')
+    78→          .select('id')
+    79→          .eq('auth_id', user.id)
+    80→          .single();
+    81→        
+    82→        if (userData) {
+    83→          setUserInternalId(userData.id);
+    84→        }
+    85→      }
+    86→    };
+    87→    getUserId();
+    88→  }, [user, supabase]);
+    89→
+    90→  // Fetch data
+    91→  const fetchData = async () => {
+    92→    try {
+    93→      setLoading(true);
+    94→      
+    95→      if (!userInternalId) return;
+    96→
+    97→      const response = await fetch(`/api/keywordshub_tags?user_internal_id=${userInternalId}`);
+    98→      const result = await response.json();
+    99→
+   100→      if (!response.ok) {
+   101→        throw new Error(result.error || 'Failed to fetch data');
+   102→      }
+   103→      
+   104→      setData(result.tags || []);
+   105→    } catch (err) {
+   106→      console.error('Error fetching tags:', err);
+   107→      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+   108→    } finally {
+   109→      setLoading(false);
+   110→    }
+   111→  };
+   112→
+   113→  useEffect(() => {
+   114→    if (userInternalId) {
+   115→      fetchData();
+   116→    }
+   117→  }, [userInternalId]);
+   118→
+   119→  // Filter and sort data
+   120→  const filteredAndSortedData = useMemo(() => {
+   121→    let filtered = data.filter(item => {
+   122→      if (!searchTerm) return true;
+   123→      return Object.values(item).some(value => 
+   124→        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+   125→      );
+   126→    });
+   127→
+   128→    // Sort data
+   129→    filtered.sort((a, b) => {
+   130→      const aValue = a[sortField];
+   131→      const bValue = b[sortField];
+   132→      
+   133→      if (aValue === null && bValue === null) return 0;
+   134→      if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
+   135→      if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
+   136→      
+   137→      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+   138→      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+   139→      return 0;
+   140→    });
+   141→
+   142→    return filtered;
+   143→  }, [data, searchTerm, sortField, sortOrder]);
+   144→
+   145→  // Pagination
+   146→  const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === 0 ? filteredAndSortedData.length : itemsPerPage));
+   147→  const startIndex = (currentPage - 1) * itemsPerPage;
+   148→  const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+   149→
+   150→  // Handle sort
+   151→  const handleSort = (field: keyof KeywordTag) => {
+   152→    if (sortField === field) {
+   153→      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+   154→    } else {
+   155→      setSortField(field);
+   156→      setSortOrder('asc');
+   157→    }
+   158→  };
+   159→
+   160→  // Handle row selection
+   161→  const handleRowSelect = (id: number) => {
+   162→    const newSelected = new Set(selectedRows);
+   163→    if (newSelected.has(id)) {
+   164→      newSelected.delete(id);
+   165→    } else {
+   166→      newSelected.add(id);
+   167→    }
+   168→    setSelectedRows(newSelected);
+   169→  };
+   170→
+   171→  // Handle select all
+   172→  const handleSelectAll = () => {
+   173→    if (selectedRows.size === paginatedData.length) {
+   174→      setSelectedRows(new Set());
+   175→    } else {
+   176→      setSelectedRows(new Set(paginatedData.map(item => item.tag_id)));
+   177→    }
+   178→  };
+   179→
+   180→  // Inline editing functions
+   181→  const startEditing = (id: number, field: string, currentValue: any) => {
+   182→    setEditingCell({ id, field });
+   183→    setEditingValue(currentValue?.toString() || '');
+   184→  };
+   185→
+   186→  const saveEdit = async () => {
+   187→    if (!editingCell || !userInternalId) return;
+   188→    
+   189→    try {
+   190→      let value: any = editingValue;
+   191→      
+   192→      // Convert value based on field type
+   193→      const column = columns.find(col => col.key === editingCell.field);
+   194→      if (column?.type === 'number') {
+   195→        value = editingValue === '' ? null : Number(editingValue);
+   196→      }
+   197→
+   198→      const response = await fetch('/api/keywordshub_tags', {
+   199→        method: 'PUT',
+   200→        headers: {
+   201→          'Content-Type': 'application/json',
+   202→        },
+   203→        body: JSON.stringify({
+   204→          tag_id: editingCell.id,
+   205→          user_internal_id: userInternalId,
+   206→          [editingCell.field]: value
+   207→        }),
+   208→      });
+   209→
+   210→      const result = await response.json();
+   211→
+   212→      if (!response.ok) {
+   213→        throw new Error(result.error || 'Failed to update');
+   214→      }
+   215→
+   216→      // Update local data
+   217→      setData(prevData => 
+   218→        prevData.map(item => 
+   219→          item.tag_id === editingCell.id 
+   220→            ? { ...item, [editingCell.field]: value, updated_at: new Date().toISOString() }
+   221→            : item
+   222→        )
+   223→      );
+   224→
+   225→      setEditingCell(null);
+   226→      setEditingValue('');
+   227→    } catch (error) {
+   228→      console.error('Error updating field:', error);
+   229→      alert('Failed to update field');
+   230→    }
+   231→  };
+   232→
+   233→  const cancelEdit = () => {
+   234→    setEditingCell(null);
+   235→    setEditingValue('');
+   236→  };
+   237→
+   238→  // Create new inline record
+   239→  const createNewInline = async () => {
+   240→    if (!userInternalId) return;
+   241→
+   242→    try {
+   243→      const newRecord = {
+   244→        tag_name: 'New Tag',
+   245→        tag_order: 0,
+   246→        user_internal_id: userInternalId
+   247→      };
+   248→
+   249→      const response = await fetch('/api/keywordshub_tags', {
+   250→        method: 'POST',
+   251→        headers: {
+   252→          'Content-Type': 'application/json',
+   253→        },
+   254→        body: JSON.stringify(newRecord),
+   255→      });
+   256→
+   257→      const result = await response.json();
+   258→
+   259→      if (!response.ok) {
+   260→        throw new Error(result.error || 'Failed to create');
+   261→      }
+   262→
+   263→      // Add to local data at the beginning
+   264→      setData(prevData => [result.tag, ...prevData]);
+   265→      
+   266→      // Start editing the tag_name field immediately
+   267→      setTimeout(() => {
+   268→        startEditing(result.tag.tag_id, 'tag_name', 'New Tag');
+   269→      }, 100);
+   270→
+   271→    } catch (error) {
+   272→      console.error('Error creating record:', error);
+   273→      alert('Failed to create record');
+   274→    }
+   275→  };
+   276→
+   277→  // Handle popup form creation
+   278→  const handleCreate = async () => {
+   279→    if (!userInternalId) return;
+   280→
+   281→    try {
+   282→      const response = await fetch('/api/keywordshub_tags', {
+   283→        method: 'POST',
+   284→        headers: {
+   285→          'Content-Type': 'application/json',
+   286→        },
+   287→        body: JSON.stringify({
+   288→          ...formData,
+   289→          user_internal_id: userInternalId
+   290→        }),
+   291→      });
+   292→      
+   293→      const result = await response.json();
+   294→
+   295→      if (!response.ok) {
+   296→        throw new Error(result.error || 'Failed to create');
+   297→      }
+   298→      
+   299→      setIsCreateModalOpen(false);
+   300→      resetForm();
+   301→      fetchData();
+   302→    } catch (err) {
+   303→      console.error('Error creating record:', err);
+   304→      alert(`Failed to create record: ${err instanceof Error ? err.message : 'Unknown error'}`);
+   305→    }
+   306→  };
+   307→
+   308→  // Reset form
+   309→  const resetForm = () => {
+   310→    setFormData({
+   311→      tag_name: '',
+   312→      tag_order: 0
+   313→    });
+   314→  };
+   315→
+   316→  // Render cell content
+   317→  const renderCell = (item: KeywordTag, column: typeof columns[0]) => {
+   318→    const value = item[column.key as keyof KeywordTag];
+   319→    const isEditing = editingCell?.id === item.tag_id && editingCell?.field === column.key;
+   320→    const isReadOnly = column.key === 'tag_id' || column.key === 'fabrication_launch_created_from' || column.key === 'created_at' || column.key === 'updated_at' || column.key === 'user_id';
+   321→
+   322→    if (isEditing && !isReadOnly) {
+   323→      return (
+   324→        <div className="flex items-center space-x-2">
+   325→          <input
+   326→            type={column.type === 'number' ? 'number' : 'text'}
+   327→            value={editingValue}
+   328→            onChange={(e) => setEditingValue(e.target.value)}
+   329→            onKeyDown={(e) => {
+   330→              if (e.key === 'Enter') saveEdit();
+   331→              if (e.key === 'Escape') cancelEdit();
+   332→            }}
+   333→            className="w-full px-2 py-1 text-xs border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+   334→            autoFocus
+   335→          />
+   336→          <button
+   337→            onClick={saveEdit}
+   338→            className="text-green-600 hover:text-green-800 text-xs"
+   339→          >
+   340→            ✓
+   341→          </button>
+   342→          <button
+   343→            onClick={cancelEdit}
+   344→            className="text-red-600 hover:text-red-800 text-xs"
+   345→          >
+   346→            ✕
+   347→          </button>
+   348→        </div>
+   349→      );
+   350→    }
+   351→
+   352→    const cellClass = "px-2 py-1 cursor-pointer hover:bg-blue-50 text-xs";
+   353→    
+   354→    if (column.type === 'datetime' && value) {
+   355→      return (
+   356→        <div
+   357→          className={cellClass}
+   358→          onClick={() => !isReadOnly && startEditing(item.tag_id, column.key, value)}
+   359→        >
+   360→          {new Date(value as string).toLocaleString()}
+   361→        </div>
+   362→      );
+   363→    }
+   364→
+   365→    if (column.type === 'number' && value !== null) {
+   366→      return (
+   367→        <div
+   368→          className={cellClass}
+   369→          onClick={() => !isReadOnly && startEditing(item.tag_id, column.key, value)}
+   370→        >
+   371→          {typeof value === 'number' ? value.toLocaleString() : value}
+   372→        </div>
+   373→      );
+   374→    }
+   375→
+   376→    return (
+   377→      <div
+   378→        className={cellClass}
+   379→        onClick={() => !isReadOnly && startEditing(item.tag_id, column.key, value)}
+   380→      >
+   381→        {value?.toString() || ''}
+   382→      </div>
+   383→    );
+   384→  };
+   385→
+   386→  // Pagination Controls Component - Matching /filejar style
+   387→  const PaginationControls = () => {
+   388→    // Always show pagination controls
+   389→    
+   390→    return (
+   391→      <div className="flex items-center">
+   392→        <div className="flex items-center">
+   393→          <button
+   394→            onClick={() => {
+   395→              setItemsPerPage(10);
+   396→              setCurrentPage(1);
+   397→            }}
+   398→            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${itemsPerPage === 10 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   399→          >
+   400→            10
+   401→          </button>
+   402→          <button
+   403→            onClick={() => {
+   404→              setItemsPerPage(20);
+   405→              setCurrentPage(1);
+   406→            }}
+   407→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 20 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   408→          >
+   409→            20
+   410→          </button>
+   411→          <button
+   412→            onClick={() => {
+   413→              setItemsPerPage(50);
+   414→              setCurrentPage(1);
+   415→            }}
+   416→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 50 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   417→          >
+   418→            50
+   419→          </button>
+   420→          <button
+   421→            onClick={() => {
+   422→              setItemsPerPage(100);
+   423→              setCurrentPage(1);
+   424→            }}
+   425→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 100 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   426→          >
+   427→            100
+   428→          </button>
+   429→          <button
+   430→            onClick={() => {
+   431→              setItemsPerPage(200);
+   432→              setCurrentPage(1);
+   433→            }}
+   434→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 200 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   435→          >
+   436→            200
+   437→          </button>
+   438→          <button
+   439→            onClick={() => {
+   440→              setItemsPerPage(500);
+   441→              setCurrentPage(1);
+   442→            }}
+   443→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 500 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   444→          >
+   445→            500
+   446→          </button>
+   447→          <button
+   448→            onClick={() => {
+   449→              setItemsPerPage(filteredAndSortedData.length);
+   450→              setCurrentPage(1);
+   451→            }}
+   452→            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${itemsPerPage === filteredAndSortedData.length ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+   453→          >
+   454→            All
+   455→          </button>
+   456→        </div>
+   457→        <div className="border-l border-gray-300 pl-2 ml-2">
+   458→          <div className="flex items-center">
+   459→            <button
+   460→              onClick={() => setCurrentPage(1)}
+   461→              disabled={currentPage === 1}
+   462→              className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   463→            >
+   464→              First
+   465→            </button>
+   466→            <button
+   467→              onClick={() => setCurrentPage(currentPage - 1)}
+   468→              disabled={currentPage === 1}
+   469→              className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   470→            >
+   471→              Prev
+   472→            </button>
+   473→            
+   474→            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+   475→              const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+   476→              if (pageNum > totalPages) return null;
+   477→              return (
+   478→                <button
+   479→                  key={pageNum}
+   480→                  onClick={() => setCurrentPage(pageNum)}
+   481→                  className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+   482→                    currentPage === pageNum 
+   483→                      ? 'bg-blue-500 text-white border-blue-500' 
+   484→                      : 'bg-white hover:bg-gray-200'
+   485→                  }`}
+   486→                >
+   487→                  {pageNum}
+   488→                </button>
+   489→              );
+   490→            })}
+   491→            
+   492→            <button
+   493→              onClick={() => setCurrentPage(currentPage + 1)}
+   494→              disabled={currentPage === totalPages}
+   495→              className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   496→            >
+   497→              Next
+   498→            </button>
+   499→            <button
+   500→              onClick={() => setCurrentPage(totalPages)}
+   501→              disabled={currentPage === totalPages}
+   502→              className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   503→            >
+   504→              Last
+   505→            </button>
+   506→          </div>
+   507→        </div>
+   508→      </div>
+   509→    );
+   510→  };
+   511→
+   512→  if (loading) {
+   513→    return (
+   514→      <div className="flex items-center justify-center h-64">
+   515→        <div className="text-gray-500">Loading keywords tags...</div>
+   516→      </div>
+   517→    );
+   518→  }
+   519→
+   520→  if (error) {
+   521→    return (
+   522→      <div className="flex items-center justify-center h-64">
+   523→        <div className="text-red-500">Error: {error}</div>
+   524→      </div>
+   525→    );
+   526→  }
+   527→
+   528→  return (
+   529→    <div className="h-full flex flex-col">
+   530→      {/* Controls */}
+   531→      <div className="flex-none bg-white border-b px-6 py-4">
+   532→        <div className="flex items-center justify-between">
+   533→          <div className="flex items-center space-x-4">
+   534→            <NubraTablefaceKite text="nubra-tableface-kite" />
+   535→            <PaginationControls />
+   536→            <div className="relative">
+   537→              <input
+   538→                type="text"
+   539→                placeholder="Search all fields..."
+   540→                value={searchTerm}
+   541→                onChange={(e) => {
+   542→                  setSearchTerm(e.target.value);
+   543→                  setCurrentPage(1);
+   544→                }}
+   545→                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+   546→              />
+   547→              <button
+   548→                onClick={() => {
+   549→                  setSearchTerm('');
+   550→                  setCurrentPage(1);
+   551→                }}
+   552→                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+   553→              >
+   554→                CL
+   555→              </button>
+   556→            </div>
+   557→          </div>
+   558→          <div className="flex items-center space-x-4">
+   559→            <div className="flex space-x-2">
+   560→              <button
+   561→                onClick={createNewInline}
+   562→                className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+   563→              >
+   564→                Create New (Inline)
+   565→              </button>
+   566→              <button
+   567→                onClick={() => setIsCreateModalOpen(true)}
+   568→                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+   569→              >
+   570→                Create New (Popup)
+   571→              </button>
+   572→            </div>
+   573→          </div>
+   574→        </div>
+   575→      </div>
+   576→
+   577→      {/* Table */}
+   578→      <div className="flex-1 bg-white overflow-hidden">
+   579→        <div className="h-full overflow-auto">
+   580→          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '1000px' }}>
+   581→            <thead className="bg-gray-50 sticky top-0">
+   582→              <tr>
+   583→                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '20px' }}>
+   584→                  <div 
+   585→                    className="w-full h-full flex items-center justify-center cursor-pointer"
+   586→                    style={{ width: '20px', height: '20px' }}
+   587→                    onClick={handleSelectAll}
+   588→                  >
+   589→                    <div
+   590→                      className={`w-full h-full border-2 flex items-center justify-center ${
+   591→                        selectedRows.size === paginatedData.length && paginatedData.length > 0
+   592→                          ? 'bg-blue-500 border-blue-500' 
+   593→                          : 'border-gray-300 bg-white'
+   594→                      }`}
+   595→                      style={{ width: '20px', height: '20px' }}
+   596→                    >
+   597→                      {selectedRows.size === paginatedData.length && paginatedData.length > 0 && (
+   598→                        <span className="text-white text-xs">✓</span>
+   599→                      )}
+   600→                    </div>
+   601→                  </div>
+   602→                </th>
+   603→                {columns.map((column: any) => (
+   604→                  <th
+   605→                    key={column.key}
+   606→                    className="px-2 py-3 text-left border border-gray-200 cursor-pointer hover:bg-gray-100"
+   607→                    onClick={() => handleSort(column.key as keyof KeywordTag)}
+   608→                    style={{ width: column.width }}
+   609→                  >
+   610→                    <div className="flex items-center space-x-1">
+   611→                      {column.labelLines ? (
+   612→                        <div className="flex flex-col">
+   613→                          {column.labelLines.map((line: string, index: number) => (
+   614→                            <span key={index} className="font-bold text-xs lowercase">
+   615→                              {line}
+   616→                            </span>
+   617→                          ))}
+   618→                        </div>
+   619→                      ) : (
+   620→                        <span className="font-bold text-xs lowercase">{column.label}</span>
+   621→                      )}
+   622→                      {sortField === column.key && (
+   623→                        <span className="text-xs">
+   624→                          {sortOrder === 'asc' ? '↑' : '↓'}
+   625→                        </span>
+   626→                      )}
+   627→                    </div>
+   628→                  </th>
+   629→                ))}
+   630→              </tr>
+   631→            </thead>
+   632→            <tbody className="bg-white">
+   633→              {paginatedData.map((item) => (
+   634→                <tr key={item.tag_id} className="hover:bg-gray-50">
+   635→                  <td className="px-2 py-2 border border-gray-200">
+   636→                    <div 
+   637→                      className="w-full h-full flex items-center justify-center cursor-pointer"
+   638→                      style={{ width: '20px', height: '20px' }}
+   639→                      onClick={() => handleRowSelect(item.tag_id)}
+   640→                    >
+   641→                      <div
+   642→                        className={`w-full h-full border-2 flex items-center justify-center ${
+   643→                          selectedRows.has(item.tag_id) 
+   644→                            ? 'bg-blue-500 border-blue-500' 
+   645→                            : 'border-gray-300 bg-white'
+   646→                        }`}
+   647→                        style={{ width: '20px', height: '20px' }}
+   648→                      >
+   649→                        {selectedRows.has(item.tag_id) && (
+   650→                          <span className="text-white text-xs">✓</span>
+   651→                        )}
+   652→                      </div>
+   653→                    </div>
+   654→                  </td>
+   655→                  {columns.map((column) => (
+   656→                    <td key={column.key} className="border border-gray-200">
+   657→                      {renderCell(item, column)}
+   658→                    </td>
+   659→                  ))}
+   660→                </tr>
+   661→              ))}
+   662→            </tbody>
+   663→          </table>
+   664→        </div>
+   665→      </div>
+   666→
+   667→      {/* Bottom Controls */}
+   668→      <div className="flex-none bg-white border-t px-6 py-4">
+   669→        <div className="flex items-center justify-between">
+   670→          <div className="flex items-center space-x-4">
+   671→            <PaginationControls />
+   672→            <div className="relative">
+   673→              <input
+   674→                type="text"
+   675→                placeholder="Search all fields..."
+   676→                value={searchTerm}
+   677→                onChange={(e) => {
+   678→                  setSearchTerm(e.target.value);
+   679→                  setCurrentPage(1);
+   680→                }}
+   681→                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+   682→              />
+   683→              <button
+   684→                onClick={() => {
+   685→                  setSearchTerm('');
+   686→                  setCurrentPage(1);
+   687→                }}
+   688→                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+   689→              >
+   690→                CL
+   691→              </button>
+   692→            </div>
+   693→          </div>
+   694→          <div></div>
+   695→        </div>
+   696→      </div>
+   697→
+   698→      {/* Create Modal */}
+   699→      {isCreateModalOpen && (
+   700→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+   701→          <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+   702→            <h3 className="text-lg font-semibold mb-4">Create New Keywords Tag</h3>
+   703→            <form onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
+   704→              <div className="grid grid-cols-1 gap-4">
+   705→                <div>
+   706→                  <label className="block text-sm font-medium text-gray-700 mb-1">Tag Name</label>
+   707→                  <input
+   708→                    type="text"
+   709→                    value={formData.tag_name}
+   710→                    onChange={(e) => setFormData({...formData, tag_name: e.target.value})}
+   711→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+   712→                    placeholder="Enter tag name"
+   713→                    required
+   714→                  />
+   715→                </div>
+   716→                <div>
+   717→                  <label className="block text-sm font-medium text-gray-700 mb-1">Tag Order</label>
+   718→                  <input
+   719→                    type="number"
+   720→                    value={formData.tag_order}
+   721→                    onChange={(e) => setFormData({...formData, tag_order: parseInt(e.target.value) || 0})}
+   722→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+   723→                    placeholder="0"
+   724→                  />
+   725→                </div>
+   726→              </div>
+   727→              
+   728→              <div className="flex justify-end space-x-3 mt-6">
+   729→                <button
+   730→                  type="button"
+   731→                  onClick={() => setIsCreateModalOpen(false)}
+   732→                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+   733→                >
+   734→                  Cancel
+   735→                </button>
+   736→                <button
+   737→                  type="submit"
+   738→                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+   739→                >
+   740→                  Create Tag
+   741→                </button>
+   742→              </div>
+   743→            </form>
+   744→          </div>
+   745→        </div>
+   746→      )}
+   747→    </div>
+   748→  );
+   749→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check the API endpoint that the kwtagzar page is calling to fetch the data:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/api/keywordshub_tags/route.ts`
+
+Result:
+
+```
+1→import { NextRequest, NextResponse } from 'next/server';
+     2→import { supabaseAdmin } from '@/lib/supabase-admin';
+     3→
+     4→export async function GET(request: NextRequest) {
+     5→  try {
+     6→    const { searchParams } = new URL(request.url);
+     7→    const userInternalId = searchParams.get('user_internal_id');
+     8→
+     9→    if (!userInternalId) {
+    10→      return NextResponse.json({ error: 'User internal ID is required' }, { status: 400 });
+    11→    }
+    12→
+    13→    const supabase = supabaseAdmin;
+    14→
+    15→    // Fetch keywordshub_tags for the user
+    16→    const { data: tags, error } = await supabase
+    17→      .from('keywordshub_tags')
+    18→      .select('*')
+    19→      .eq('user_id', userInternalId)
+    20→      .order('created_at', { ascending: false });
+    21→
+    22→    if (error) {
+    23→      console.error('Error fetching keywordshub_tags:', error);
+    24→      return NextResponse.json({ error: 'Failed to fetch tags' }, { status: 500 });
+    25→    }
+    26→
+    27→    return NextResponse.json({ tags });
+    28→
+    29→  } catch (error) {
+    30→    console.error('API Error:', error);
+    31→    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    32→  }
+    33→}
+    34→
+    35→export async function POST(request: NextRequest) {
+    36→  try {
+    37→    const body = await request.json();
+    38→    const { user_internal_id, ...tagData } = body;
+    39→
+    40→    if (!user_internal_id) {
+    41→      return NextResponse.json({ error: 'User internal ID is required' }, { status: 400 });
+    42→    }
+    43→
+    44→    const supabase = supabaseAdmin;
+    45→
+    46→    // Create new tag
+    47→    const { data: newTag, error } = await supabase
+    48→      .from('keywordshub_tags')
+    49→      .insert([{
+    50→        ...tagData,
+    51→        user_id: user_internal_id
+    52→      }])
+    53→      .select()
+    54→      .single();
+    55→
+    56→    if (error) {
+    57→      console.error('Error creating keywordshub_tag:', error);
+    58→      return NextResponse.json({ error: 'Failed to create tag' }, { status: 500 });
+    59→    }
+    60→
+    61→    return NextResponse.json({ tag: newTag });
+    62→
+    63→  } catch (error) {
+    64→    console.error('API Error:', error);
+    65→    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    66→  }
+    67→}
+    68→
+    69→export async function PUT(request: NextRequest) {
+    70→  try {
+    71→    const body = await request.json();
+    72→    const { tag_id, user_internal_id, ...updateData } = body;
+    73→
+    74→    if (!tag_id || !user_internal_id) {
+    75→      return NextResponse.json({ error: 'Tag ID and User internal ID are required' }, { status: 400 });
+    76→    }
+    77→
+    78→    const supabase = supabaseAdmin;
+    79→
+    80→    // Update the tag (ensure it belongs to the user)
+    81→    const { data: updatedTag, error } = await supabase
+    82→      .from('keywordshub_tags')
+    83→      .update(updateData)
+    84→      .eq('tag_id', tag_id)
+    85→      .eq('user_id', user_internal_id)
+    86→      .select()
+    87→      .single();
+    88→
+    89→    if (error) {
+    90→      console.error('Error updating keywordshub_tag:', error);
+    91→      return NextResponse.json({ error: 'Failed to update tag' }, { status: 500 });
+    92→    }
+    93→
+    94→    return NextResponse.json({ tag: updatedTag });
+    95→
+    96→  } catch (error) {
+    97→    console.error('API Error:', error);
+    98→    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    99→  }
+   100→}
+   101→
+   102→export async function DELETE(request: NextRequest) {
+   103→  try {
+   104→    const { searchParams } = new URL(request.url);
+   105→    const tagId = searchParams.get('tag_id');
+   106→    const userInternalId = searchParams.get('user_internal_id');
+   107→
+   108→    if (!tagId || !userInternalId) {
+   109→      return NextResponse.json({ error: 'Tag ID and User internal ID are required' }, { status: 400 });
+   110→    }
+   111→
+   112→    const supabase = supabaseAdmin;
+   113→
+   114→    // Delete the tag (ensure it belongs to the user)
+   115→    const { error } = await supabase
+   116→      .from('keywordshub_tags')
+   117→      .delete()
+   118→      .eq('tag_id', tagId)
+   119→      .eq('user_id', userInternalId);
+   120→
+   121→    if (error) {
+   122→      console.error('Error deleting keywordshub_tag:', error);
+   123→      return NextResponse.json({ error: 'Failed to delete tag' }, { status: 500 });
+   124→    }
+   125→
+   126→    return NextResponse.json({ success: true });
+   127→
+   128→  } catch (error) {
+   129→    console.error('API Error:', error);
+   130→    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+   131→  }
+   132→}
+```
+

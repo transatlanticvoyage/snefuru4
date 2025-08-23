@@ -17,10 +17,15 @@ export async function POST(request: NextRequest) {
       kw_rubric,
       rel_dfs_location_code,
       language_code,
-      tag_name
+      tag_name,
+      user_internal_id
     } = body;
 
     // Step 1: Filter cncglub rows based on criteria
+    if (!user_internal_id) {
+      return NextResponse.json({ error: 'User internal ID is required' }, { status: 400 });
+    }
+
     console.log('F370 Filters applied:', {
       country,
       industry_id,
@@ -29,7 +34,8 @@ export async function POST(request: NextRequest) {
       kw_rubric,
       rel_dfs_location_code,
       language_code,
-      tag_name
+      tag_name,
+      user_internal_id
     });
 
     let cncglubQuery = supabase
@@ -51,6 +57,7 @@ export async function POST(request: NextRequest) {
           industry_name
         )
       `)
+      .not('rel_city_id', 'is', null)
       .limit(50000);
 
     console.log('Base query set up, applying filters...');
@@ -115,7 +122,10 @@ export async function POST(request: NextRequest) {
     // Step 2: Create new tag in keywordshub_tags
     const { data: tagData, error: tagError } = await supabase
       .from('keywordshub_tags')
-      .insert({ tag_name })
+      .insert({ 
+        tag_name,
+        user_id: user_internal_id 
+      })
       .select('tag_id')
       .single();
 
@@ -246,7 +256,7 @@ export async function POST(request: NextRequest) {
       .from('fabrication_launches')
       .insert({
         rel_keywordshub_tag_id: tagId,
-        user_id: null, // Set to null instead of invalid UUID
+        user_id: user_internal_id,
         opt_country: country,
         opt_industry_id: industry_id ? parseInt(industry_id) : null,
         opt_city_population_filter: city_population_filter,

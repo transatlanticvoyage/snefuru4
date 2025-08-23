@@ -23,6 +23,7 @@ export default function FabricPage() {
   const [fabricationLaunches, setFabricationLaunches] = useState<any[]>([]);
   const [cncglubRowCount, setCncglubRowCount] = useState<number | null>(null);
   const [isLoadingCount, setIsLoadingCount] = useState(false);
+  const [userInternalId, setUserInternalId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     country: 'United States',
     industry_id: '',
@@ -40,6 +41,30 @@ export default function FabricPage() {
       return;
     }
   }, [user, router]);
+
+  // Get user internal ID
+  useEffect(() => {
+    const getUserInternalId = async () => {
+      if (!user) return;
+      
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (!error && userData) {
+        setUserInternalId(userData.id);
+      }
+    };
+
+    getUserInternalId();
+  }, [user]);
 
   // Set page title
   useEffect(() => {
@@ -126,13 +151,24 @@ export default function FabricPage() {
     setShowSecondConfirm(false);
     setIsProcessing(true);
 
+    if (!userInternalId) {
+      setIsSuccess(false);
+      setResultMessage('❌ Error: User internal ID not found');
+      setIsProcessing(false);
+      setShowResultModal(true);
+      return;
+    }
+
     try {
       const response = await fetch('/api/f370', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          user_internal_id: userInternalId
+        }),
       });
 
       const result = await response.json();
@@ -200,7 +236,8 @@ export default function FabricPage() {
 
       let cncglubQuery = supabase
         .from('cncglub')
-        .select('cncg_id, cities!rel_city_id(country, city_population)', { count: 'exact', head: true });
+        .select('cncg_id, cities!rel_city_id(country, city_population)', { count: 'exact', head: true })
+        .not('rel_city_id', 'is', null);
 
       // Apply country filter
       if (data.country && data.country !== '') {
