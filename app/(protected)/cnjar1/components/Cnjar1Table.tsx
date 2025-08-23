@@ -268,6 +268,8 @@ export default function Cnjar1Table() {
         return population >= 25000 && population < 50000;
       case '50k-100k':
         return population >= 50000 && population < 100000;
+      case '75k-325k':
+        return population >= 75000 && population < 325000;
       case '100k-500k':
         return population >= 100000 && population < 500000;
       case '500k-plus':
@@ -1016,6 +1018,7 @@ export default function Cnjar1Table() {
               className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               <option value="all">All Records</option>
+              <option value="75k-325k">75k-325k</option>
               <option value="under-25k">Under 25k</option>
               <option value="25k-50k">25k - 50k</option>
               <option value="50k-100k">50k - 100k</option>

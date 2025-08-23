@@ -1590,3 +1590,2039 @@ Perfect! Now the fix is complete. Here's what I changed:
 
 This ensures data integrity and eliminates the confusion between identified vs processed rows. The function will now only count and process rows that can actually be completed successfully.
 
+---
+
+_**User**_
+
+on our page at /cnjar1 , please update the filter by city population dropdown to have this option:
+75k-325k
+
+place it as the first option below "All Records" option 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll help you add the "75k-325k" option to the city population filter dropdown on the /cnjar1 page. Let me first find and examine that page.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/utils/f355-populate-cncglub.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/utils/f360-delete-all-cncglub.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect, useState } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import dynamic from 'next/dynamic';
+     7→
+     8→const DrenjariButtonBarDriggsmanLinks = dynamic(
+     9→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    10→  { ssr: false }
+    11→);
+    12→
+    13→const Cnjar1Table = dynamic(
+    14→  () => import('./components/Cnjar1Table'),
+    15→  { ssr: false }
+    16→);
+    17→
+    18→export default function Cnjar1Page() {
+    19→  const { user } = useAuth();
+    20→  const router = useRouter();
+    21→  const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(() => {
+    22→    // Initialize from localStorage
+    23→    if (typeof window !== 'undefined') {
+    24→      const saved = localStorage.getItem('cnjar1-header-visible');
+    25→      return saved === null ? true : saved === 'true';
+    26→    }
+    27→    return true;
+    28→  });
+    29→
+    30→  useEffect(() => {
+    31→    if (!user) {
+    32→      router.push('/login');
+    33→      return;
+    34→    }
+    35→  }, [user, router]);
+    36→
+    37→
+    38→  // Save header visibility state to localStorage and update body class
+    39→  useEffect(() => {
+    40→    localStorage.setItem('cnjar1-header-visible', isHeaderVisible.toString());
+    41→    
+    42→    // Add/remove class on body to hide main header
+    43→    if (isHeaderVisible) {
+    44→      document.body.classList.remove('cnjar1-hide-main-header');
+    45→    } else {
+    46→      document.body.classList.add('cnjar1-hide-main-header');
+    47→    }
+    48→    
+    49→    // Cleanup on unmount
+    50→    return () => {
+    51→      document.body.classList.remove('cnjar1-hide-main-header');
+    52→    };
+    53→  }, [isHeaderVisible]);
+    54→
+    55→  if (!user) {
+    56→    return (
+    57→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    58→        <div className="text-gray-500">Loading...</div>
+    59→      </div>
+    60→    );
+    61→  }
+    62→
+    63→  // Set page title
+    64→  useEffect(() => {
+    65→    document.title = '/cnjar1 - Snefuru';
+    66→  }, []);
+    67→
+    68→  return (
+    69→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    70→      {/* Header */}
+    71→      <div className="bg-white border-b px-6 py-4">
+    72→        <div className="flex items-center justify-between">
+    73→          <div>
+    74→            <h1 className="text-2xl font-bold text-gray-800">
+    75→              CNJar1 Manager
+    76→            </h1>
+    77→          </div>
+    78→          <div className="flex items-center space-x-4">
+    79→            <DrenjariButtonBarDriggsmanLinks />
+    80→            <div className="text-right">
+    81→              <div className="text-sm text-gray-500">City-Industry Combinations</div>
+    82→              <div className="text-xs text-gray-400">Manage cncglub table</div>
+    83→            </div>
+    84→          </div>
+    85→        </div>
+    86→      </div>
+    87→
+    88→      {/* Hide/Show Header Button */}
+    89→      <div className="px-6 py-2 bg-gray-50">
+    90→        <button
+    91→          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+    92→          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+    93→        >
+    94→          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+    95→        </button>
+    96→      </div>
+    97→
+    98→      {/* Drenjari Links at Top */}
+    99→      <div className="px-6 py-4">
+   100→        <DrenjariButtonBarDriggsmanLinks />
+   101→      </div>
+   102→
+   103→      {/* Main Content */}
+   104→      <div className="flex-1 overflow-hidden">
+   105→        <Cnjar1Table />
+   106→      </div>
+   107→    </div>
+   108→  );
+   109→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check the Cnjar1Table component where the filter dropdown is likely located:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import dynamic from 'next/dynamic';
+     6→import { f355PopulateCncglub } from '../utils/f355-populate-cncglub';
+     7→import { f360DeleteAllCncglub } from '../utils/f360-delete-all-cncglub';
+     8→
+     9→const NubraTablefaceKite = dynamic(
+    10→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    11→  { ssr: false }
+    12→);
+    13→
+    14→interface Cncglub {
+    15→  cncg_id: number;
+    16→  rel_city_id: number;
+    17→  rel_industry_id: number;
+    18→  is_sko: boolean;
+    19→  created_at: string;
+    20→  updated_at: string | null;
+    21→  kwslot1: number | null;
+    22→  // Joined keyword data for kwslot1
+    23→  kwslot1_keyword?: {
+    24→    keyword_datum: string | null;
+    25→    search_volume: number | null;
+    26→    cpc: number | null;
+    27→  } | null;
+    28→  // Joined city data
+    29→  cities?: {
+    30→    city_name: string | null;
+    31→    state_code: string | null;
+    32→    state_full: string | null;
+    33→    country: string | null;
+    34→    rank_in_pop: number | null;
+    35→    gmaps_link: string | null;
+    36→    is_suburb: boolean | null;
+    37→    city_and_state_code: string | null;
+    38→    city_population: number | null;
+    39→    latitude: number | null;
+    40→    longitude: number | null;
+    41→    rel_metro_id: number | null;
+    42→    population_last_updated: string | null;
+    43→    rel_dfs_location_code: number | null;
+    44→  } | null;
+    45→  // Joined industry data
+    46→  industries?: {
+    47→    industry_name: string | null;
+    48→    industry_description: string | null;
+    49→  } | null;
+    50→}
+    51→
+    52→interface City {
+    53→  city_id: number;
+    54→  city_name: string | null;
+    55→  state_code: string | null;
+    56→}
+    57→
+    58→interface Industry {
+    59→  industry_id: number;
+    60→  industry_name: string | null;
+    61→}
+    62→
+    63→export default function Cnjar1Table() {
+    64→  const [data, setData] = useState<Cncglub[]>([]);
+    65→  const [cities, setCities] = useState<City[]>([]);
+    66→  const [industries, setIndustries] = useState<Industry[]>([]);
+    67→  const [loading, setLoading] = useState(true);
+    68→  const [error, setError] = useState<string | null>(null);
+    69→  const [searchTerm, setSearchTerm] = useState('');
+    70→  const [currentPage, setCurrentPage] = useState(1);
+    71→  const [itemsPerPage, setItemsPerPage] = useState(100);
+    72→  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    73→  const [sortField, setSortField] = useState<keyof Cncglub | string>('created_at');
+    74→  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    75→  
+    76→  // Modal states
+    77→  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    78→  const [isF355ConfirmOpen, setIsF355ConfirmOpen] = useState(false);
+    79→  const [f355ConfirmStep, setF355ConfirmStep] = useState(1);
+    80→  const [isF355Running, setIsF355Running] = useState(false);
+    81→  const [f355Message, setF355Message] = useState('');
+    82→  
+    83→  // F360 Delete states
+    84→  const [isF360ConfirmOpen, setIsF360ConfirmOpen] = useState(false);
+    85→  const [f360ConfirmStep, setF360ConfirmStep] = useState(1);
+    86→  const [isF360Running, setIsF360Running] = useState(false);
+    87→  const [f360Message, setF360Message] = useState('');
+    88→  const [f360UserInput, setF360UserInput] = useState('');
+    89→  
+    90→  // Filter states
+    91→  const [citySizeFilter, setCitySizeFilter] = useState('all');
+    92→  const [stateFilter, setStateFilter] = useState('all');
+    93→  const [industryFilter, setIndustryFilter] = useState('all');
+    94→  
+    95→  // Inline editing states
+    96→  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+    97→  const [editingValue, setEditingValue] = useState<string>('');
+    98→  
+    99→  // Form data for creating
+   100→  const [formData, setFormData] = useState({
+   101→    rel_city_id: 0,
+   102→    rel_industry_id: 0
+   103→  });
+   104→
+   105→  const supabase = createClientComponentClient();
+   106→
+   107→  // Define columns
+   108→  const columns = [
+   109→    { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
+   110→    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
+   111→    { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+   112→    { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
+   113→    { key: 'created_at' as keyof Cncglub, label: 'created_at', type: 'datetime', readOnly: true },
+   114→    { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true },
+   115→    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', leftSeparator: 'black-3px' }
+   116→  ];
+   117→
+   118→  // Keyword columns (new section with different background)
+   119→  const keywordColumns = [
+   120→    { key: 'kwslot1_keyword.keyword_datum', label: 'keyword_datum', type: 'text', readOnly: true, isJoined: true, isKeyword: true },
+   121→    { key: 'kwslot1_keyword.search_volume', label: 'search_volume', type: 'number', readOnly: true, isJoined: true, isKeyword: true },
+   122→    { key: 'kwslot1_keyword.cpc', label: 'cpc', type: 'number', readOnly: true, isJoined: true, isKeyword: true, separator: 'black-3px' }
+   123→  ];
+   124→
+   125→  // City columns from cityjar
+   126→  const cityColumns = [
+   127→    { key: 'cities.fk_dfs_location_code', label: 'fk_dfs_location_code', type: 'number', readOnly: true, isJoined: true },
+   128→    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+   129→    { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
+   130→    { key: 'cities.state_full', label: 'state_full', type: 'text', readOnly: true, isJoined: true },
+   131→    { key: 'cities.country', label: 'country', type: 'text', readOnly: true, isJoined: true },
+   132→    { key: 'cities.rank_in_pop', label: 'rank_in_pop', type: 'number', readOnly: true, isJoined: true },
+   133→    { key: 'cities.gmaps_link', label: 'gmaps_link', type: 'text', readOnly: true, isJoined: true, width: '100px' },
+   134→    { key: 'cities.is_suburb', label: 'is_suburb', type: 'boolean', readOnly: true, isJoined: true },
+   135→    { key: 'cities.city_and_state_code', label: 'city_and_state_code', type: 'text', readOnly: true, isJoined: true },
+   136→    { key: 'cities.city_population', label: 'city_population', type: 'number', readOnly: true, isJoined: true, sortable: true },
+   137→    { key: 'cities.latitude', label: 'latitude', type: 'number', readOnly: true, isJoined: true },
+   138→    { key: 'cities.longitude', label: 'longitude', type: 'number', readOnly: true, isJoined: true },
+   139→    { key: 'cities.rel_metro_id', label: 'rel_metro_id', type: 'number', readOnly: true, isJoined: true },
+   140→    { key: 'cities.population_last_updated', label: 'population_last_updated', type: 'datetime', readOnly: true, isJoined: true, separator: 'black-3px' }
+   141→  ];
+   142→
+   143→  // Industry columns from indusjar
+   144→  const industryColumns = [
+   145→    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
+   146→    { key: 'industries.industry_description', label: 'industry_description', type: 'text', readOnly: true, isJoined: true }
+   147→  ];
+   148→
+   149→  // Combine all columns
+   150→  const allColumns = [...columns, ...keywordColumns, ...cityColumns, ...industryColumns];
+   151→
+   152→  // Fetch data from Supabase
+   153→  const fetchData = async () => {
+   154→    try {
+   155→      setLoading(true);
+   156→      
+   157→      // Fetch main data with joins
+   158→      const { data: cncglubData, error: cncglubError } = await supabase
+   159→        .from('cncglub')
+   160→        .select(`
+   161→          *,
+   162→          kwslot1_keyword:keywordshub!kwslot1 (
+   163→            keyword_datum,
+   164→            search_volume,
+   165→            cpc
+   166→          ),
+   167→          cities!rel_city_id (
+   168→            city_name, state_code, state_full, country, rank_in_pop, 
+   169→            gmaps_link, is_suburb, city_and_state_code, city_population, 
+   170→            latitude, longitude, rel_metro_id, population_last_updated, fk_dfs_location_code
+   171→          ),
+   172→          industries!rel_industry_id (
+   173→            industry_name, industry_description
+   174→          )
+   175→        `)
+   176→        .order('created_at', { ascending: false })
+   177→        .limit(50000); // Set explicit limit to handle up to 50k records
+   178→
+   179→      if (cncglubError) throw cncglubError;
+   180→      
+   181→      // Fetch cities for reference (still needed for dropdowns)
+   182→      const { data: citiesData, error: citiesError } = await supabase
+   183→        .from('cities')
+   184→        .select('city_id, city_name, state_code')
+   185→        .order('city_name');
+   186→        
+   187→      if (citiesError) throw citiesError;
+   188→      
+   189→      // Fetch industries for reference (still needed for dropdowns)
+   190→      const { data: industriesData, error: industriesError } = await supabase
+   191→        .from('industries')
+   192→        .select('industry_id, industry_name')
+   193→        .order('industry_name');
+   194→        
+   195→      if (industriesError) throw industriesError;
+   196→      
+   197→      setData(cncglubData || []);
+   198→      setCities(citiesData || []);
+   199→      setIndustries(industriesData || []);
+   200→    } catch (err) {
+   201→      console.error('Error fetching data:', err);
+   202→      setError(err instanceof Error ? err.message : 'Unknown error');
+   203→    } finally {
+   204→      setLoading(false);
+   205→    }
+   206→  };
+   207→
+   208→  useEffect(() => {
+   209→    fetchData();
+   210→  }, []);
+   211→
+   212→  // Helper function to get city display name
+   213→  const getCityDisplay = (cityId: number) => {
+   214→    const city = cities.find(c => c.city_id === cityId);
+   215→    return city ? `${city.city_name}, ${city.state_code}` : `City ID: ${cityId}`;
+   216→  };
+   217→
+   218→  // Helper function to get industry display name
+   219→  const getIndustryDisplay = (industryId: number) => {
+   220→    const industry = industries.find(i => i.industry_id === industryId);
+   221→    return industry ? industry.industry_name : `Industry ID: ${industryId}`;
+   222→  };
+   223→
+   224→  // Helper function to get joined column value
+   225→  const getJoinedValue = (item: Cncglub, columnKey: string) => {
+   226→    const [table, field] = columnKey.split('.');
+   227→    if (table === 'cities' && item.cities) {
+   228→      return (item.cities as any)[field];
+   229→    }
+   230→    if (table === 'industries' && item.industries) {
+   231→      return (item.industries as any)[field];
+   232→    }
+   233→    if (table === 'kwslot1_keyword' && item.kwslot1_keyword) {
+   234→      return (item.kwslot1_keyword as any)[field];
+   235→    }
+   236→    return null;
+   237→  };
+   238→
+   239→  // Helper function to check if cncglub record's related city population matches filter
+   240→  const matchesCitySizeFilter = (item: Cncglub) => {
+   241→    const cityPopulation = item.cities?.city_population;
+   242→    
+   243→    // If city size filter is 'all', show all records
+   244→    if (citySizeFilter === 'all') {
+   245→      return true;
+   246→    }
+   247→    
+   248→    // If no population data, exclude from specific size filters
+   249→    if (!cityPopulation) {
+   250→      return false;
+   251→    }
+   252→    
+   253→    // CONVERT TO NUMBER FIRST to handle string values from database
+   254→    const population = Number(cityPopulation);
+   255→    if (isNaN(population)) {
+   256→      console.log('Invalid population data for cncg_id:', item.cncg_id, 'cityPopulation:', cityPopulation);
+   257→      return false;
+   258→    }
+   259→    
+   260→    // Debug logging (can be removed once working)
+   261→    console.log('Debug matchesCitySizeFilter - cncg_id:', item.cncg_id, 'rel_city_id:', item.rel_city_id, 'originalPopulation:', cityPopulation, 'convertedPopulation:', population, 'citySizeFilter:', citySizeFilter);
+   262→    
+   263→    // Apply specific city size filters based on converted population number
+   264→    switch (citySizeFilter) {
+   265→      case 'under-25k':
+   266→        return population < 25000;
+   267→      case '25k-50k':
+   268→        return population >= 25000 && population < 50000;
+   269→      case '50k-100k':
+   270→        return population >= 50000 && population < 100000;
+   271→      case '100k-500k':
+   272→        return population >= 100000 && population < 500000;
+   273→      case '500k-plus':
+   274→        return population >= 500000;
+   275→      default:
+   276→        return true;
+   277→    }
+   278→  };
+   279→
+   280→  // Helper function to check if cncglub record's related city state matches filter
+   281→  const matchesStateFilter = (item: Cncglub) => {
+   282→    if (stateFilter === 'all') {
+   283→      return true;
+   284→    }
+   285→    
+   286→    const stateCode = item.cities?.state_code;
+   287→    if (!stateCode) {
+   288→      return false;
+   289→    }
+   290→    
+   291→    return stateCode.toLowerCase() === stateFilter.toLowerCase();
+   292→  };
+   293→
+   294→  // Helper function to check if cncglub record's related industry matches filter
+   295→  const matchesIndustryFilter = (item: Cncglub) => {
+   296→    if (industryFilter === 'all') {
+   297→      return true;
+   298→    }
+   299→    
+   300→    const industryName = item.industries?.industry_name;
+   301→    if (!industryName) {
+   302→      return false;
+   303→    }
+   304→    
+   305→    return industryName === industryFilter;
+   306→  };
+   307→
+   308→  // US States list with codes and full names, ordered alphabetically by full name
+   309→  const usStates = [
+   310→    { code: 'AL', name: 'Alabama' },
+   311→    { code: 'AK', name: 'Alaska' },
+   312→    { code: 'AZ', name: 'Arizona' },
+   313→    { code: 'AR', name: 'Arkansas' },
+   314→    { code: 'CA', name: 'California' },
+   315→    { code: 'CO', name: 'Colorado' },
+   316→    { code: 'CT', name: 'Connecticut' },
+   317→    { code: 'DE', name: 'Delaware' },
+   318→    { code: 'FL', name: 'Florida' },
+   319→    { code: 'GA', name: 'Georgia' },
+   320→    { code: 'HI', name: 'Hawaii' },
+   321→    { code: 'ID', name: 'Idaho' },
+   322→    { code: 'IL', name: 'Illinois' },
+   323→    { code: 'IN', name: 'Indiana' },
+   324→    { code: 'IA', name: 'Iowa' },
+   325→    { code: 'KS', name: 'Kansas' },
+   326→    { code: 'KY', name: 'Kentucky' },
+   327→    { code: 'LA', name: 'Louisiana' },
+   328→    { code: 'ME', name: 'Maine' },
+   329→    { code: 'MD', name: 'Maryland' },
+   330→    { code: 'MA', name: 'Massachusetts' },
+   331→    { code: 'MI', name: 'Michigan' },
+   332→    { code: 'MN', name: 'Minnesota' },
+   333→    { code: 'MS', name: 'Mississippi' },
+   334→    { code: 'MO', name: 'Missouri' },
+   335→    { code: 'MT', name: 'Montana' },
+   336→    { code: 'NE', name: 'Nebraska' },
+   337→    { code: 'NV', name: 'Nevada' },
+   338→    { code: 'NH', name: 'New Hampshire' },
+   339→    { code: 'NJ', name: 'New Jersey' },
+   340→    { code: 'NM', name: 'New Mexico' },
+   341→    { code: 'NY', name: 'New York' },
+   342→    { code: 'NC', name: 'North Carolina' },
+   343→    { code: 'ND', name: 'North Dakota' },
+   344→    { code: 'OH', name: 'Ohio' },
+   345→    { code: 'OK', name: 'Oklahoma' },
+   346→    { code: 'OR', name: 'Oregon' },
+   347→    { code: 'PA', name: 'Pennsylvania' },
+   348→    { code: 'RI', name: 'Rhode Island' },
+   349→    { code: 'SC', name: 'South Carolina' },
+   350→    { code: 'SD', name: 'South Dakota' },
+   351→    { code: 'TN', name: 'Tennessee' },
+   352→    { code: 'TX', name: 'Texas' },
+   353→    { code: 'UT', name: 'Utah' },
+   354→    { code: 'VT', name: 'Vermont' },
+   355→    { code: 'VA', name: 'Virginia' },
+   356→    { code: 'WA', name: 'Washington' },
+   357→    { code: 'WV', name: 'West Virginia' },
+   358→    { code: 'WI', name: 'Wisconsin' },
+   359→    { code: 'WY', name: 'Wyoming' },
+   360→    { code: 'DC', name: 'Washington DC' }
+   361→  ];
+   362→
+   363→  // Filter and sort data
+   364→  const filteredAndSortedData = useMemo(() => {
+   365→    let filtered = data;
+   366→    
+   367→    console.log('Filter applied - citySizeFilter:', citySizeFilter);
+   368→    console.log('Original data length:', data.length);
+   369→    console.log('First few items structure:', data.slice(0, 3).map(item => ({
+   370→      cncg_id: item.cncg_id,
+   371→      rel_city_id: item.rel_city_id,
+   372→      cities: item.cities,
+   373→      city_population: item.cities?.city_population
+   374→    })));
+   375→    
+   376→    // Debug: Show population range
+   377→    const populations = data.map(item => item.cities?.city_population).filter(pop => pop !== null && pop !== undefined);
+   378→    const minPop = Math.min(...populations);
+   379→    const maxPop = Math.max(...populations);
+   380→    console.log('Population range:', { minPop, maxPop, totalCities: populations.length });
+   381→    
+   382→    // Apply city size filtering only if not 'all'
+   383→    if (citySizeFilter !== 'all') {
+   384→      console.log('Applying city size filter...');
+   385→      filtered = filtered.filter(item => matchesCitySizeFilter(item));
+   386→      console.log('Filtered data length after city size filter:', filtered.length);
+   387→    }
+   388→    
+   389→    // Apply state filtering only if not 'all'
+   390→    if (stateFilter !== 'all') {
+   391→      console.log('Applying state filter...');
+   392→      filtered = filtered.filter(item => matchesStateFilter(item));
+   393→      console.log('Filtered data length after state filter:', filtered.length);
+   394→    }
+   395→    
+   396→    // Apply industry filtering only if not 'all'
+   397→    if (industryFilter !== 'all') {
+   398→      console.log('Applying industry filter...');
+   399→      filtered = filtered.filter(item => matchesIndustryFilter(item));
+   400→      console.log('Filtered data length after industry filter:', filtered.length);
+   401→    }
+   402→    
+   403→    if (searchTerm) {
+   404→      filtered = filtered.filter(item => {
+   405→        const searchLower = searchTerm.toLowerCase();
+   406→        // Search in city and industry names
+   407→        const cityName = getCityDisplay(item.rel_city_id).toLowerCase();
+   408→        const industryName = getIndustryDisplay(item.rel_industry_id).toLowerCase();
+   409→        
+   410→        return (
+   411→          cityName.includes(searchLower) ||
+   412→          industryName.includes(searchLower) ||
+   413→          Object.values(item).some(value => 
+   414→            value && value.toString().toLowerCase().includes(searchLower)
+   415→          )
+   416→        );
+   417→      });
+   418→    }
+   419→
+   420→    return filtered.sort((a, b) => {
+   421→      let aValue, bValue;
+   422→      
+   423→      // Handle joined column sorting
+   424→      if (typeof sortField === 'string' && sortField.includes('.')) {
+   425→        aValue = getJoinedValue(a, sortField);
+   426→        bValue = getJoinedValue(b, sortField);
+   427→        
+   428→        // Special handling for city_population - convert to numbers for proper sorting
+   429→        if (sortField === 'cities.city_population') {
+   430→          aValue = aValue ? Number(aValue) : null;
+   431→          bValue = bValue ? Number(bValue) : null;
+   432→        }
+   433→      } else {
+   434→        aValue = a[sortField as keyof Cncglub];
+   435→        bValue = b[sortField as keyof Cncglub];
+   436→      }
+   437→      
+   438→      if (aValue === null && bValue === null) return 0;
+   439→      if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
+   440→      if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
+   441→      
+   442→      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+   443→      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+   444→      return 0;
+   445→    });
+   446→  }, [data, searchTerm, sortField, sortOrder, cities, industries, citySizeFilter, stateFilter, industryFilter]);
+   447→
+   448→  // Pagination
+   449→  const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));
+   450→  const startIndex = (currentPage - 1) * (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage);
+   451→  const paginatedData = itemsPerPage === -1 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+   452→
+   453→  // Handle sorting
+   454→  const handleSort = (field: keyof Cncglub | string) => {
+   455→    if (sortField === field) {
+   456→      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+   457→    } else {
+   458→      setSortField(field);
+   459→      setSortOrder('asc');
+   460→    }
+   461→  };
+   462→
+   463→  // Handle cell editing
+   464→  const handleCellClick = (id: number, field: string, value: any) => {
+   465→    const column = columns.find(col => col.key === field);
+   466→    if (column?.readOnly) return;
+   467→    
+   468→    // Handle boolean columns specially
+   469→    if (column?.type === 'boolean') {
+   470→      handleBooleanToggle(id, field, value);
+   471→      return;
+   472→    }
+   473→    
+   474→    setEditingCell({ id, field });
+   475→    setEditingValue(value?.toString() || '');
+   476→  };
+   477→
+   478→  // Handle boolean toggle
+   479→  const handleBooleanToggle = async (id: number, field: string, currentValue: boolean) => {
+   480→    try {
+   481→      const newValue = !currentValue;
+   482→      
+   483→      const { error } = await supabase
+   484→        .from('cncglub')
+   485→        .update({ [field]: newValue })
+   486→        .eq('cncg_id', id);
+   487→
+   488→      if (error) throw error;
+   489→
+   490→      // Update local data
+   491→      setData(data.map(item => 
+   492→        item.cncg_id === id 
+   493→          ? { ...item, [field]: newValue }
+   494→          : item
+   495→      ));
+   496→    } catch (err) {
+   497→      console.error('Error updating boolean field:', err);
+   498→      alert('Failed to update field');
+   499→    }
+   500→  };
+   501→
+   502→  const handleCellSave = async () => {
+   503→    if (!editingCell) return;
+   504→
+   505→    try {
+   506→      let processedValue: any = editingValue;
+   507→
+   508→      // Process value based on type
+   509→      const column = columns.find(col => col.key === editingCell.field);
+   510→      if (column?.type === 'number') {
+   511→        processedValue = editingValue === '' ? null : Number(editingValue);
+   512→      } else if (column?.type === 'datetime') {
+   513→        processedValue = editingValue === '' ? null : editingValue;
+   514→      } else {
+   515→        processedValue = editingValue === '' ? null : editingValue;
+   516→      }
+   517→
+   518→      const { error } = await supabase
+   519→        .from('cncglub')
+   520→        .update({ [editingCell.field]: processedValue })
+   521→        .eq('cncg_id', editingCell.id);
+   522→
+   523→      if (error) throw error;
+   524→
+   525→      // Update local data
+   526→      setData(data.map(item => 
+   527→        item.cncg_id === editingCell.id 
+   528→          ? { ...item, [editingCell.field]: processedValue }
+   529→          : item
+   530→      ));
+   531→
+   532→      setEditingCell(null);
+   533→      setEditingValue('');
+   534→    } catch (err) {
+   535→      console.error('Error updating cell:', err);
+   536→      alert('Failed to update cell');
+   537→    }
+   538→  };
+   539→
+   540→  const handleCellCancel = () => {
+   541→    setEditingCell(null);
+   542→    setEditingValue('');
+   543→  };
+   544→
+   545→  // Create new record inline
+   546→  const createNewRecordInline = async () => {
+   547→    try {
+   548→      // Get first city and industry as defaults
+   549→      const defaultCity = cities[0]?.city_id || 1;
+   550→      const defaultIndustry = industries[0]?.industry_id || 1;
+   551→      
+   552→      const newRecord = {
+   553→        rel_city_id: defaultCity,
+   554→        rel_industry_id: defaultIndustry
+   555→      };
+   556→
+   557→      const { data: insertedData, error } = await supabase
+   558→        .from('cncglub')
+   559→        .insert([newRecord])
+   560→        .select()
+   561→        .single();
+   562→
+   563→      if (error) throw error;
+   564→
+   565→      // Add to local data at the beginning
+   566→      setData([insertedData, ...data]);
+   567→      
+   568→      // Set first editable cell to editing mode
+   569→      setEditingCell({ id: insertedData.cncg_id, field: 'rel_city_id' });
+   570→      setEditingValue(defaultCity.toString());
+   571→    } catch (err) {
+   572→      console.error('Error creating record:', err);
+   573→      alert('Failed to create record');
+   574→    }
+   575→  };
+   576→
+   577→  // Handle popup form submission
+   578→  const handleCreateSubmit = async () => {
+   579→    try {
+   580→      const insertData = {
+   581→        rel_city_id: formData.rel_city_id || null,
+   582→        rel_industry_id: formData.rel_industry_id || null
+   583→      };
+   584→      
+   585→      const { data: insertedData, error } = await supabase
+   586→        .from('cncglub')
+   587→        .insert([insertData])
+   588→        .select()
+   589→        .single();
+   590→        
+   591→      if (error) throw error;
+   592→      
+   593→      setIsCreateModalOpen(false);
+   594→      resetForm();
+   595→      setData([insertedData, ...data]);
+   596→    } catch (err) {
+   597→      console.error('Error creating record:', err);
+   598→      alert(`Failed to create record: ${err instanceof Error ? err.message : 'Unknown error'}`);
+   599→    }
+   600→  };
+   601→
+   602→  // Reset form
+   603→  const resetForm = () => {
+   604→    setFormData({
+   605→      rel_city_id: 0,
+   606→      rel_industry_id: 0
+   607→    });
+   608→  };
+   609→
+   610→  // F355 Populate function handlers
+   611→  const handleF355PopulateClick = () => {
+   612→    setIsF355ConfirmOpen(true);
+   613→    setF355ConfirmStep(1);
+   614→    setF355Message('');
+   615→  };
+   616→
+   617→  const handleF355Confirm = async () => {
+   618→    if (f355ConfirmStep === 1) {
+   619→      setF355ConfirmStep(2);
+   620→      return;
+   621→    }
+   622→    
+   623→    // Step 2 confirmed, run the function
+   624→    setIsF355Running(true);
+   625→    setF355Message('');
+   626→    
+   627→    try {
+   628→      const result = await f355PopulateCncglub();
+   629→      
+   630→      if (result.success) {
+   631→        setF355Message(result.message);
+   632→        if (result.stats && result.stats.newCombos > 0) {
+   633→          // Refresh the data to show new records
+   634→          fetchData();
+   635→        }
+   636→      } else {
+   637→        setF355Message(`Error: ${result.message}`);
+   638→      }
+   639→    } catch (error) {
+   640→      setF355Message(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+   641→    } finally {
+   642→      setIsF355Running(false);
+   643→    }
+   644→  };
+   645→
+   646→  const handleF355Cancel = () => {
+   647→    setIsF355ConfirmOpen(false);
+   648→    setF355ConfirmStep(1);
+   649→    setF355Message('');
+   650→  };
+   651→
+   652→  // F360 Delete function handlers
+   653→  const handleF360DeleteClick = () => {
+   654→    setIsF360ConfirmOpen(true);
+   655→    setF360ConfirmStep(1);
+   656→    setF360Message('');
+   657→    setF360UserInput('');
+   658→  };
+   659→
+   660→  const handleF360Confirm = async () => {
+   661→    if (f360ConfirmStep === 1) {
+   662→      setF360ConfirmStep(2);
+   663→      return;
+   664→    }
+   665→    
+   666→    if (f360ConfirmStep === 2) {
+   667→      setF360ConfirmStep(3);
+   668→      return;
+   669→    }
+   670→    
+   671→    // Step 3 - check user input
+   672→    if (f360ConfirmStep === 3) {
+   673→      if (f360UserInput !== 'i confirm totally') {
+   674→        setF360Message('Incorrect confirmation text. Please type exactly: i confirm totally');
+   675→        return;
+   676→      }
+   677→      
+   678→      // Run the delete function
+   679→      setIsF360Running(true);
+   680→      setF360Message('');
+   681→      
+   682→      try {
+   683→        const result = await f360DeleteAllCncglub();
+   684→        
+   685→        if (result.success) {
+   686→          setF360Message(result.message);
+   687→          // Refresh the data to show empty table
+   688→          fetchData();
+   689→        } else {
+   690→          setF360Message(`Error: ${result.message}`);
+   691→        }
+   692→      } catch (error) {
+   693→        setF360Message(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+   694→      } finally {
+   695→        setIsF360Running(false);
+   696→      }
+   697→    }
+   698→  };
+   699→
+   700→  const handleF360Cancel = () => {
+   701→    setIsF360ConfirmOpen(false);
+   702→    setF360ConfirmStep(1);
+   703→    setF360Message('');
+   704→    setF360UserInput('');
+   705→  };
+   706→
+   707→  // Render cell content with special handling for foreign keys
+   708→  const renderCell = (item: Cncglub, column: any) => {
+   709→    let value: any;
+   710→    
+   711→    // Handle joined columns
+   712→    if (column.isJoined) {
+   713→      value = getJoinedValue(item, column.key);
+   714→    } else {
+   715→      value = item[column.key as keyof Cncglub];
+   716→    }
+   717→    
+   718→    const isEditing = editingCell?.id === item.cncg_id && editingCell?.field === column.key;
+   719→    const isReadOnly = column.readOnly;
+   720→
+   721→    if (isEditing && !column.isJoined) {
+   722→      return (
+   723→        <div className="flex items-center space-x-2">
+   724→          {column.key === 'rel_city_id' ? (
+   725→            <select
+   726→              value={editingValue}
+   727→              onChange={(e) => setEditingValue(e.target.value)}
+   728→              onBlur={handleCellSave}
+   729→              onKeyPress={(e) => {
+   730→                if (e.key === 'Enter') handleCellSave();
+   731→                if (e.key === 'Escape') handleCellCancel();
+   732→              }}
+   733→              className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none"
+   734→              autoFocus
+   735→            >
+   736→              {cities.map(city => (
+   737→                <option key={city.city_id} value={city.city_id}>
+   738→                  {city.city_name}, {city.state_code}
+   739→                </option>
+   740→              ))}
+   741→            </select>
+   742→          ) : column.key === 'rel_industry_id' ? (
+   743→            <select
+   744→              value={editingValue}
+   745→              onChange={(e) => setEditingValue(e.target.value)}
+   746→              onBlur={handleCellSave}
+   747→              onKeyPress={(e) => {
+   748→                if (e.key === 'Enter') handleCellSave();
+   749→                if (e.key === 'Escape') handleCellCancel();
+   750→              }}
+   751→              className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none"
+   752→              autoFocus
+   753→            >
+   754→              {industries.map(industry => (
+   755→                <option key={industry.industry_id} value={industry.industry_id}>
+   756→                  {industry.industry_name}
+   757→                </option>
+   758→              ))}
+   759→            </select>
+   760→          ) : (
+   761→            <input
+   762→              type={column.type === 'number' ? 'number' : 'text'}
+   763→              value={editingValue}
+   764→              onChange={(e) => setEditingValue(e.target.value)}
+   765→              onKeyPress={(e) => {
+   766→                if (e.key === 'Enter') handleCellSave();
+   767→                if (e.key === 'Escape') handleCellCancel();
+   768→              }}
+   769→              className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none"
+   770→              autoFocus
+   771→            />
+   772→          )}
+   773→          <button onClick={handleCellSave} className="text-green-600 hover:text-green-800">
+   774→            ✓
+   775→          </button>
+   776→          <button onClick={handleCellCancel} className="text-red-600 hover:text-red-800">
+   777→            ✗
+   778→          </button>
+   779→        </div>
+   780→      );
+   781→    }
+   782→
+   783→    // Special display for foreign keys
+   784→    if (column.key === 'rel_city_id') {
+   785→      return (
+   786→        <div
+   787→          onClick={() => !isReadOnly && handleCellClick(item.cncg_id, column.key, value)}
+   788→          className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'}`}
+   789→        >
+   790→          {getCityDisplay(value as number)}
+   791→        </div>
+   792→      );
+   793→    }
+   794→
+   795→    if (column.key === 'rel_industry_id') {
+   796→      return (
+   797→        <div
+   798→          onClick={() => !isReadOnly && handleCellClick(item.cncg_id, column.key, value)}
+   799→          className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'}`}
+   800→        >
+   801→          {getIndustryDisplay(value as number)}
+   802→        </div>
+   803→      );
+   804→    }
+   805→
+   806→    // Special handling for joined gmaps_link column
+   807→    if (column.key === 'cities.gmaps_link' && value) {
+   808→      return (
+   809→        <div className="flex items-center space-x-1" style={{ width: '100px', maxWidth: '100px', minWidth: '100px' }}>
+   810→          <button onClick={async (e) => {
+   811→            e.stopPropagation();
+   812→            if (value) {
+   813→              try {
+   814→                await navigator.clipboard.writeText(value.toString());
+   815→              } catch (err) {
+   816→                console.error('Failed to copy to clipboard:', err);
+   817→              }
+   818→            }
+   819→          }}
+   820→          className="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-bold flex items-center justify-center"
+   821→          title="Copy to clipboard">
+   822→            📋
+   823→          </button>
+   824→          <button onClick={(e) => {
+   825→            e.stopPropagation();
+   826→            if (value) {
+   827→              window.open(value.toString(), '_blank');
+   828→            }
+   829→          }}
+   830→          className="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold flex items-center justify-center"
+   831→          title="Open in new tab">
+   832→            OP
+   833→          </button>
+   834→          <div className="flex-1 overflow-hidden">
+   835→            <textarea
+   836→              value={value?.toString() || ''}
+   837→              readOnly
+   838→              className="w-full text-xs border-none resize-none bg-transparent overflow-hidden"
+   839→              style={{ height: '20px', width: '46px' }}
+   840→            />
+   841→          </div>
+   842→        </div>
+   843→      );
+   844→    }
+   845→
+   846→    // Special formatting for city_population column
+   847→    if (column.key === 'cities.city_population' && value) {
+   848→      return (
+   849→        <div className="px-2 py-1 cursor-default">
+   850→          {Number(value).toLocaleString()}
+   851→        </div>
+   852→      );
+   853→    }
+   854→
+   855→    // Special formatting for keyword_datum column
+   856→    if (column.key === 'kwslot1_keyword.keyword_datum') {
+   857→      return (
+   858→        <div className="px-2 py-1 cursor-default text-xs">
+   859→          {value || '-'}
+   860→        </div>
+   861→      );
+   862→    }
+   863→
+   864→    // Special formatting for search_volume column
+   865→    if (column.key === 'kwslot1_keyword.search_volume') {
+   866→      return (
+   867→        <div className="px-2 py-1 cursor-default text-xs">
+   868→          {value !== null && value !== undefined ? Number(value).toLocaleString() : '-'}
+   869→        </div>
+   870→      );
+   871→    }
+   872→
+   873→    // Special formatting for cpc column
+   874→    if (column.key === 'kwslot1_keyword.cpc') {
+   875→      return (
+   876→        <div className="px-2 py-1 cursor-default text-xs">
+   877→          {value !== null && value !== undefined ? `$${Number(value).toFixed(2)}` : '-'}
+   878→        </div>
+   879→      );
+   880→    }
+   881→
+   882→    return (
+   883→      <div
+   884→        onClick={() => !isReadOnly && !column.isJoined && handleCellClick(item.cncg_id, column.key, value)}
+   885→        className={`px-2 py-1 ${!isReadOnly && !column.isJoined ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'} ${column.type === 'boolean' ? 'cursor-pointer' : 'cursor-text'}`}
+   886→      >
+   887→        {column.type === 'boolean' ? 
+   888→          (value ? '✓' : '✗') :
+   889→          column.type === 'datetime' && value ? 
+   890→            new Date(value).toLocaleString() : 
+   891→            value?.toString() || ''
+   892→        }
+   893→      </div>
+   894→    );
+   895→  };
+   896→
+   897→  // Pagination Controls Component
+   898→  const PaginationControls = () => (
+   899→    <div className="flex items-center space-x-4">
+   900→      {/* Items per page */}
+   901→      <div className="flex items-center">
+   902→        <span className="text-sm text-gray-600 mr-2">Per page:</span>
+   903→        <div className="inline-flex" role="group">
+   904→          {[10, 20, 50, 100, 200, 500, -1].map((value, index) => (
+   905→            <button
+   906→              key={value}
+   907→              onClick={() => {
+   908→                setItemsPerPage(value === -1 ? filteredAndSortedData.length : value);
+   909→                setCurrentPage(1);
+   910→              }}
+   911→              className={`
+   912→                px-3 py-2 text-sm font-medium border border-gray-300
+   913→                ${itemsPerPage === (value === -1 ? filteredAndSortedData.length : value) ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 hover:bg-gray-100'}
+   914→                ${index === 0 ? 'rounded-l-md' : ''}
+   915→                ${index === 6 ? 'rounded-r-md' : ''}
+   916→                ${index > 0 ? 'border-l-0' : ''}
+   917→                transition-colors duration-150 cursor-pointer
+   918→              `}
+   919→              style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+   920→            >
+   921→              {value === -1 ? 'All' : value}
+   922→            </button>
+   923→          ))}
+   924→        </div>
+   925→      </div>
+   926→
+   927→      {/* Page navigation */}
+   928→      <div className="flex items-center">
+   929→        <span className="text-sm text-gray-600 mr-2">Page:</span>
+   930→        <div className="inline-flex" role="group">
+   931→          <button
+   932→            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+   933→            disabled={currentPage === 1}
+   934→            className={`
+   935→              px-3 py-2 text-sm font-medium border border-gray-300 rounded-l-md
+   936→              ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100 cursor-pointer'}
+   937→              transition-colors duration-150
+   938→            `}
+   939→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+   940→          >
+   941→            ←
+   942→          </button>
+   943→          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+   944→            let pageNum;
+   945→            if (totalPages <= 5) {
+   946→              pageNum = i + 1;
+   947→            } else if (currentPage <= 3) {
+   948→              pageNum = i + 1;
+   949→            } else if (currentPage >= totalPages - 2) {
+   950→              pageNum = totalPages - 4 + i;
+   951→            } else {
+   952→              pageNum = currentPage - 2 + i;
+   953→            }
+   954→            
+   955→            return (
+   956→              <button
+   957→                key={pageNum}
+   958→                onClick={() => setCurrentPage(pageNum)}
+   959→                className={`
+   960→                  px-3 py-2 text-sm font-medium border border-gray-300 border-l-0
+   961→                  ${currentPage === pageNum ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 hover:bg-gray-100'}
+   962→                  transition-colors duration-150 cursor-pointer
+   963→                `}
+   964→                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+   965→              >
+   966→                {pageNum}
+   967→              </button>
+   968→            );
+   969→          })}
+   970→          <button
+   971→            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+   972→            disabled={currentPage === totalPages}
+   973→            className={`
+   974→              px-3 py-2 text-sm font-medium border border-gray-300 border-l-0 rounded-r-md
+   975→              ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100 cursor-pointer'}
+   976→              transition-colors duration-150
+   977→            `}
+   978→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+   979→          >
+   980→            →
+   981→          </button>
+   982→        </div>
+   983→      </div>
+   984→    </div>
+   985→  );
+   986→
+   987→  if (loading) {
+   988→    return (
+   989→      <div className="flex items-center justify-center h-64">
+   990→        <div className="text-gray-500">Loading city-industry combinations...</div>
+   991→      </div>
+   992→    );
+   993→  }
+   994→
+   995→  if (error) {
+   996→    return (
+   997→      <div className="flex items-center justify-center h-64">
+   998→        <div className="text-red-500">{error}</div>
+   999→      </div>
+  1000→    );
+  1001→  }
+  1002→
+  1003→  return (
+  1004→    <div className="w-full">
+  1005→      {/* City Size Filter */}
+  1006→      <div className="bg-white border-b border-gray-200 px-4 py-2">
+  1007→        <div className="flex items-center space-x-6">
+  1008→          <div className="flex items-center space-x-3">
+  1009→            <label className="font-bold text-sm text-gray-700">Filter by City Population:</label>
+  1010→            <select
+  1011→              value={citySizeFilter}
+  1012→              onChange={(e) => {
+  1013→                setCitySizeFilter(e.target.value);
+  1014→                setCurrentPage(1); // Reset to first page when filtering
+  1015→              }}
+  1016→              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1017→            >
+  1018→              <option value="all">All Records</option>
+  1019→              <option value="under-25k">Under 25k</option>
+  1020→              <option value="25k-50k">25k - 50k</option>
+  1021→              <option value="50k-100k">50k - 100k</option>
+  1022→              <option value="100k-500k">100k - 500k</option>
+  1023→              <option value="500k-plus">500k+</option>
+  1024→            </select>
+  1025→          </div>
+  1026→          
+  1027→          <div className="flex items-center space-x-3">
+  1028→            <label className="font-bold text-sm text-gray-700">State:</label>
+  1029→            <select
+  1030→              value={stateFilter}
+  1031→              onChange={(e) => {
+  1032→                setStateFilter(e.target.value);
+  1033→                setCurrentPage(1); // Reset to first page when filtering
+  1034→              }}
+  1035→              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1036→            >
+  1037→              <option value="all">All States</option>
+  1038→              {usStates.map(state => (
+  1039→                <option key={state.code} value={state.code}>
+  1040→                  {state.code} - {state.name}
+  1041→                </option>
+  1042→              ))}
+  1043→            </select>
+  1044→          </div>
+  1045→          
+  1046→          <div className="flex items-center space-x-3">
+  1047→            <label className="font-bold text-sm text-gray-700">Industry Name:</label>
+  1048→            <select
+  1049→              value={industryFilter}
+  1050→              onChange={(e) => {
+  1051→                setIndustryFilter(e.target.value);
+  1052→                setCurrentPage(1); // Reset to first page when filtering
+  1053→              }}
+  1054→              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1055→            >
+  1056→              <option value="all">All Industries</option>
+  1057→              {industries
+  1058→                .slice() // Create a copy to avoid mutating the original array
+  1059→                .sort((a, b) => (a.industry_name || '').localeCompare(b.industry_name || ''))
+  1060→                .map(industry => (
+  1061→                  <option key={industry.industry_id} value={industry.industry_name || ''}>
+  1062→                    {industry.industry_name}
+  1063→                  </option>
+  1064→                ))}
+  1065→            </select>
+  1066→          </div>
+  1067→          
+  1068→          {/* Debug info */}
+  1069→          <div className="text-xs text-gray-500">
+  1070→            Debug: {data.length} total, {filteredAndSortedData.length} filtered
+  1071→          </div>
+  1072→        </div>
+  1073→      </div>
+  1074→
+  1075→      {/* Top Header Area */}
+  1076→      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
+  1077→        <div className="flex justify-between items-center">
+  1078→          <div className="flex items-center space-x-6">
+  1079→            <NubraTablefaceKite tableType="cncglub-grid" />
+  1080→            <button
+  1081→              onClick={handleF355PopulateClick}
+  1082→              disabled={isF355Running}
+  1083→              className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors flex items-center space-x-2"
+  1084→            >
+  1085→              {isF355Running ? (
+  1086→                <>
+  1087→                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+  1088→                  <span>Running...</span>
+  1089→                </>
+  1090→              ) : (
+  1091→                <span>f355 populate cncglub</span>
+  1092→              )}
+  1093→            </button>
+  1094→            <button
+  1095→              onClick={handleF360DeleteClick}
+  1096→              disabled={isF360Running}
+  1097→              className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors flex items-center space-x-2"
+  1098→            >
+  1099→              {isF360Running ? (
+  1100→                <>
+  1101→                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+  1102→                  <span>Deleting...</span>
+  1103→                </>
+  1104→              ) : (
+  1105→                <span>f360 delete all cncglub records</span>
+  1106→              )}
+  1107→            </button>
+  1108→            <div className="text-sm text-gray-600">
+  1109→              {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
+  1110→              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+  1111→            </div>
+  1112→            <PaginationControls />
+  1113→            <div className="relative">
+  1114→              <input
+  1115→                type="text"
+  1116→                placeholder="Search all fields..."
+  1117→                value={searchTerm}
+  1118→                onChange={(e) => {
+  1119→                  setSearchTerm(e.target.value);
+  1120→                  setCurrentPage(1);
+  1121→                }}
+  1122→                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+  1123→              />
+  1124→              <button
+  1125→                onClick={() => {
+  1126→                  setSearchTerm('');
+  1127→                  setCurrentPage(1);
+  1128→                }}
+  1129→                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+  1130→              >
+  1131→                CL
+  1132→              </button>
+  1133→            </div>
+  1134→          </div>
+  1135→          <div className="flex items-center space-x-2">
+  1136→            <button
+  1137→              onClick={createNewRecordInline}
+  1138→              className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+  1139→            >
+  1140→              Create New (Inline)
+  1141→            </button>
+  1142→            <button
+  1143→              onClick={() => setIsCreateModalOpen(true)}
+  1144→              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+  1145→            >
+  1146→              Create New (Popup)
+  1147→            </button>
+  1148→          </div>
+  1149→        </div>
+  1150→      </div>
+  1151→
+  1152→      {/* Table */}
+  1153→      <div className="bg-white overflow-hidden">
+  1154→        <div className="overflow-x-auto" style={{ maxHeight: '720px', overflowY: 'auto' }}>
+  1155→          <table className="w-full border-collapse border border-gray-200">
+  1156→            <thead className="bg-gray-50 sticky top-0 z-10">
+  1157→              {/* Additional blank header row */}
+  1158→              <tr>
+  1159→                <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
+  1160→                  {/* Blank cell corresponding to checkbox column */}
+  1161→                </th>
+  1162→                {allColumns.map((column, index) => {
+  1163→                  let bgColorClass = '';
+  1164→                  let tableText = '';
+  1165→                  
+  1166→                  if (column.isJoined) {
+  1167→                    if (column.isKeyword) {
+  1168→                      bgColorClass = 'bg-[#bcc4f1]';
+  1169→                      tableText = 'keywordshub';
+  1170→                    } else if (column.key.startsWith('cities.')) {
+  1171→                      bgColorClass = 'bg-[#bff8e8]';
+  1172→                      tableText = 'cities';
+  1173→                    } else if (column.key.startsWith('industries.')) {
+  1174→                      bgColorClass = 'bg-[#f8ebbf]';
+  1175→                      tableText = 'industries';
+  1176→                    }
+  1177→                  } else {
+  1178→                    bgColorClass = 'bg-[#f6bff8]';
+  1179→                    tableText = 'cncglub';
+  1180→                  }
+  1181→                  
+  1182→                  return (
+  1183→                    <th
+  1184→                      key={`blank-${column.key}`}
+  1185→                      className={`text-left border border-gray-200 px-2 py-1 ${bgColorClass} ${
+  1186→                        column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+  1187→                      } ${
+  1188→                        column.leftSeparator === 'black-3px' ? 'border-l-black border-l-[3px]' : ''
+  1189→                      }`}
+  1190→                    >
+  1191→                      <span className="text-xs font-normal text-gray-600">{tableText}</span>
+  1192→                    </th>
+  1193→                  );
+  1194→                })}
+  1195→              </tr>
+  1196→              {/* Primary identifying row for columns */}
+  1197→              <tr>
+  1198→                <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '50px' }}>
+  1199→                  <div 
+  1200→                    className="w-full h-full flex items-center justify-center cursor-pointer"
+  1201→                    onClick={() => {
+  1202→                      if (selectedRows.size === paginatedData.length && paginatedData.length > 0) {
+  1203→                        setSelectedRows(new Set());
+  1204→                      } else {
+  1205→                        setSelectedRows(new Set(paginatedData.map(item => item.cncg_id)));
+  1206→                      }
+  1207→                    }}
+  1208→                  >
+  1209→                    <input
+  1210→                      type="checkbox"
+  1211→                      style={{ width: '20px', height: '20px' }}
+  1212→                      checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+  1213→                      onChange={() => {}} // Handled by div onClick
+  1214→                    />
+  1215→                  </div>
+  1216→                </th>
+  1217→                {allColumns.map((column) => (
+  1218→                  <th
+  1219→                    key={column.key}
+  1220→                    className={`text-left ${(!column.isJoined || column.sortable) ? 'cursor-pointer hover:bg-gray-100' : ''} border border-gray-200 px-2 py-1 ${
+  1221→                      column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+  1222→                    } ${
+  1223→                      column.leftSeparator === 'black-3px' ? 'border-l-black border-l-[3px]' : ''
+  1224→                    }`}
+  1225→                    onClick={() => (!column.isJoined || column.sortable) && handleSort(column.key)}
+  1226→                  >
+  1227→                    <div className="flex items-center space-x-1">
+  1228→                      <span className="font-bold text-xs lowercase">{column.label}</span>
+  1229→                      {(!column.isJoined || column.sortable) && sortField === column.key && (
+  1230→                        <span className="text-xs">
+  1231→                          {sortOrder === 'asc' ? '↑' : '↓'}
+  1232→                        </span>
+  1233→                      )}
+  1234→                    </div>
+  1235→                  </th>
+  1236→                ))}
+  1237→              </tr>
+  1238→            </thead>
+  1239→            <tbody className="bg-white">
+  1240→              {paginatedData.map((item) => (
+  1241→                <tr key={item.cncg_id} className="hover:bg-gray-50">
+  1242→                  <td className="px-2 py-1 border border-gray-200">
+  1243→                    <div 
+  1244→                      className="w-full h-full flex items-center justify-center cursor-pointer"
+  1245→                      onClick={() => {
+  1246→                        const newSelected = new Set(selectedRows);
+  1247→                        if (newSelected.has(item.cncg_id)) {
+  1248→                          newSelected.delete(item.cncg_id);
+  1249→                        } else {
+  1250→                          newSelected.add(item.cncg_id);
+  1251→                        }
+  1252→                        setSelectedRows(newSelected);
+  1253→                      }}
+  1254→                    >
+  1255→                      <input
+  1256→                        type="checkbox"
+  1257→                        style={{ width: '20px', height: '20px' }}
+  1258→                        checked={selectedRows.has(item.cncg_id)}
+  1259→                        onChange={() => {}} // Handled by div onClick
+  1260→                      />
+  1261→                    </div>
+  1262→                  </td>
+  1263→                  {allColumns.map((column) => (
+  1264→                    <td 
+  1265→                      key={column.key} 
+  1266→                      className={`border border-gray-200 ${
+  1267→                        column.separator === 'black-3px' ? 'border-r-black border-r-[3px]' : ''
+  1268→                      } ${
+  1269→                        column.leftSeparator === 'black-3px' ? 'border-l-black border-l-[3px]' : ''
+  1270→                      }`}
+  1271→                    >
+  1272→                      {renderCell(item, column)}
+  1273→                    </td>
+  1274→                  ))}
+  1275→                </tr>
+  1276→              ))}
+  1277→            </tbody>
+  1278→          </table>
+  1279→        </div>
+  1280→      </div>
+  1281→
+  1282→      {/* Bottom Pagination */}
+  1283→      <div className="bg-white border-t border-gray-200 px-4 py-2">
+  1284→        <div className="flex justify-between items-center">
+  1285→          <div className="flex items-center space-x-6">
+  1286→            <div className="text-sm text-gray-600">
+  1287→              {startIndex + 1}-{Math.min(startIndex + (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage), filteredAndSortedData.length)} of {filteredAndSortedData.length} records
+  1288→              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+  1289→            </div>
+  1290→            <PaginationControls />
+  1291→          </div>
+  1292→        </div>
+  1293→      </div>
+  1294→
+  1295→      {/* Create Modal */}
+  1296→      {isCreateModalOpen && (
+  1297→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  1298→          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+  1299→            <h2 className="text-xl font-bold mb-4">Create New City-Industry Combination</h2>
+  1300→            
+  1301→            <div className="grid grid-cols-1 gap-4">
+  1302→              <div>
+  1303→                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+  1304→                <select
+  1305→                  value={formData.rel_city_id}
+  1306→                  onChange={(e) => setFormData({ ...formData, rel_city_id: parseInt(e.target.value) || 0 })}
+  1307→                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1308→                >
+  1309→                  <option value={0}>Select a city...</option>
+  1310→                  {cities.map(city => (
+  1311→                    <option key={city.city_id} value={city.city_id}>
+  1312→                      {city.city_name}, {city.state_code}
+  1313→                    </option>
+  1314→                  ))}
+  1315→                </select>
+  1316→              </div>
+  1317→              
+  1318→              <div>
+  1319→                <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+  1320→                <select
+  1321→                  value={formData.rel_industry_id}
+  1322→                  onChange={(e) => setFormData({ ...formData, rel_industry_id: parseInt(e.target.value) || 0 })}
+  1323→                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1324→                >
+  1325→                  <option value={0}>Select an industry...</option>
+  1326→                  {industries.map(industry => (
+  1327→                    <option key={industry.industry_id} value={industry.industry_id}>
+  1328→                      {industry.industry_name}
+  1329→                    </option>
+  1330→                  ))}
+  1331→                </select>
+  1332→              </div>
+  1333→            </div>
+  1334→
+  1335→            <div className="mt-6 flex justify-end space-x-3">
+  1336→              <button
+  1337→                onClick={() => {
+  1338→                  setIsCreateModalOpen(false);
+  1339→                  resetForm();
+  1340→                }}
+  1341→                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+  1342→              >
+  1343→                Cancel
+  1344→              </button>
+  1345→              <button
+  1346→                onClick={handleCreateSubmit}
+  1347→                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+  1348→              >
+  1349→                Create Combination
+  1350→              </button>
+  1351→            </div>
+  1352→          </div>
+  1353→        </div>
+  1354→      )}
+  1355→
+  1356→      {/* F355 Double Confirmation Modal */}
+  1357→      {isF355ConfirmOpen && (
+  1358→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  1359→          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+  1360→            <h2 className="text-xl font-bold mb-4 text-purple-700">
+  1361→              F355 Populate All City-Industry Combinations
+  1362→            </h2>
+  1363→            
+  1364→            {f355ConfirmStep === 1 && (
+  1365→              <>
+  1366→                <div className="mb-6">
+  1367→                  <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
+  1368→                    <div className="flex">
+  1369→                      <div className="flex-shrink-0">
+  1370→                        <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+  1371→                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+  1372→                        </svg>
+  1373→                      </div>
+  1374→                      <div className="ml-3">
+  1375→                        <h3 className="text-sm font-medium text-yellow-800">First Confirmation</h3>
+  1376→                        <div className="mt-2 text-sm text-yellow-700">
+  1377→                          <p>This will create a new row in cncglub for EVERY combination of cities and industries that doesn't already exist.</p>
+  1378→                        </div>
+  1379→                      </div>
+  1380→                    </div>
+  1381→                  </div>
+  1382→                  <p className="text-gray-600 mb-4">
+  1383→                    This action will:
+  1384→                  </p>
+  1385→                  <ul className="list-disc list-inside text-gray-600 mb-4 space-y-1">
+  1386→                    <li>Fetch all cities from the cities table</li>
+  1387→                    <li>Fetch all industries from the industries table</li>
+  1388→                    <li>Create combinations for all cities × all industries</li>
+  1389→                    <li>Skip combinations that already exist in cncglub</li>
+  1390→                    <li>Insert all missing combinations into cncglub table</li>
+  1391→                  </ul>
+  1392→                  <p className="text-sm text-gray-500">
+  1393→                    Are you sure you want to proceed? This is the first confirmation.
+  1394→                  </p>
+  1395→                </div>
+  1396→                
+  1397→                <div className="flex justify-end space-x-3">
+  1398→                  <button
+  1399→                    onClick={handleF355Cancel}
+  1400→                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+  1401→                  >
+  1402→                    Cancel
+  1403→                  </button>
+  1404→                  <button
+  1405→                    onClick={handleF355Confirm}
+  1406→                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+  1407→                  >
+  1408→                    Confirm (Step 1)
+  1409→                  </button>
+  1410→                </div>
+  1411→              </>
+  1412→            )}
+  1413→            
+  1414→            {f355ConfirmStep === 2 && (
+  1415→              <>
+  1416→                <div className="mb-6">
+  1417→                  <div className="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
+  1418→                    <div className="flex">
+  1419→                      <div className="flex-shrink-0">
+  1420→                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+  1421→                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+  1422→                        </svg>
+  1423→                      </div>
+  1424→                      <div className="ml-3">
+  1425→                        <h3 className="text-sm font-medium text-red-800">Final Confirmation</h3>
+  1426→                        <div className="mt-2 text-sm text-red-700">
+  1427→                          <p><strong>WARNING:</strong> This action cannot be undone!</p>
+  1428→                        </div>
+  1429→                      </div>
+  1430→                    </div>
+  1431→                  </div>
+  1432→                  <p className="text-gray-800 font-semibold mb-4">
+  1433→                    This is your FINAL confirmation. Are you absolutely sure?
+  1434→                  </p>
+  1435→                  <div className="bg-gray-100 p-3 rounded text-sm text-gray-600">
+  1436→                    <p>The F355 populate function will run and may create thousands of new records. This could take several seconds to complete.</p>
+  1437→                  </div>
+  1438→                  {isF355Running && (
+  1439→                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+  1440→                      <div className="flex items-center space-x-3">
+  1441→                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+  1442→                        <span className="text-blue-700">Running F355 populate function...</span>
+  1443→                      </div>
+  1444→                    </div>
+  1445→                  )}
+  1446→                  {f355Message && (
+  1447→                    <div className={`mt-4 p-4 rounded ${f355Message.includes('Error') ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+  1448→                      {f355Message}
+  1449→                    </div>
+  1450→                  )}
+  1451→                </div>
+  1452→                
+  1453→                <div className="flex justify-end space-x-3">
+  1454→                  <button
+  1455→                    onClick={handleF355Cancel}
+  1456→                    disabled={isF355Running}
+  1457→                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 transition-colors"
+  1458→                  >
+  1459→                    Cancel
+  1460→                  </button>
+  1461→                  <button
+  1462→                    onClick={handleF355Confirm}
+  1463→                    disabled={isF355Running}
+  1464→                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-400 transition-colors flex items-center space-x-2"
+  1465→                  >
+  1466→                    {isF355Running ? (
+  1467→                      <>
+  1468→                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+  1469→                        <span>Running...</span>
+  1470→                      </>
+  1471→                    ) : (
+  1472→                      <span>RUN F355 POPULATE</span>
+  1473→                    )}
+  1474→                  </button>
+  1475→                </div>
+  1476→              </>
+  1477→            )}
+  1478→          </div>
+  1479→        </div>
+  1480→      )}
+  1481→
+  1482→      {/* F360 Triple Confirmation Modal */}
+  1483→      {isF360ConfirmOpen && (
+  1484→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  1485→          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+  1486→            <h2 className="text-xl font-bold mb-4 text-red-700">
+  1487→              F360 DELETE ALL CNCGLUB RECORDS
+  1488→            </h2>
+  1489→            
+  1490→            {f360ConfirmStep === 1 && (
+  1491→              <>
+  1492→                <div className="mb-6">
+  1493→                  <div className="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
+  1494→                    <div className="flex">
+  1495→                      <div className="flex-shrink-0">
+  1496→                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+  1497→                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+  1498→                        </svg>
+  1499→                      </div>
+  1500→                      <div className="ml-3">
+  1501→                        <h3 className="text-sm font-medium text-red-800">⚠️ FIRST WARNING ⚠️</h3>
+  1502→                        <div className="mt-2 text-sm text-red-700">
+  1503→                          <p>This will DELETE ALL records from the cncglub table!</p>
+  1504→                        </div>
+  1505→                      </div>
+  1506→                    </div>
+  1507→                  </div>
+  1508→                  <p className="text-gray-800 font-semibold mb-4">
+  1509→                    This action will permanently delete ALL cncglub records.
+  1510→                  </p>
+  1511→                  <ul className="list-disc list-inside text-gray-600 mb-4 space-y-1">
+  1512→                    <li>All city-industry combinations will be removed</li>
+  1513→                    <li>This cannot be undone</li>
+  1514→                    <li>You will need to run f355 to repopulate data</li>
+  1515→                  </ul>
+  1516→                  <p className="text-sm text-red-600 font-bold">
+  1517→                    Are you absolutely sure you want to proceed?
+  1518→                  </p>
+  1519→                </div>
+  1520→                
+  1521→                <div className="flex justify-end space-x-3">
+  1522→                  <button
+  1523→                    onClick={handleF360Cancel}
+  1524→                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+  1525→                  >
+  1526→                    Cancel
+  1527→                  </button>
+  1528→                  <button
+  1529→                    onClick={handleF360Confirm}
+  1530→                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+  1531→                  >
+  1532→                    Continue (Warning 1 of 3)
+  1533→                  </button>
+  1534→                </div>
+  1535→              </>
+  1536→            )}
+  1537→            
+  1538→            {f360ConfirmStep === 2 && (
+  1539→              <>
+  1540→                <div className="mb-6">
+  1541→                  <div className="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
+  1542→                    <div className="flex">
+  1543→                      <div className="flex-shrink-0">
+  1544→                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+  1545→                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+  1546→                        </svg>
+  1547→                      </div>
+  1548→                      <div className="ml-3">
+  1549→                        <h3 className="text-sm font-medium text-red-800">⚠️⚠️ SECOND WARNING ⚠️⚠️</h3>
+  1550→                        <div className="mt-2 text-sm text-red-700">
+  1551→                          <p><strong>THIS IS DESTRUCTIVE AND IRREVERSIBLE!</strong></p>
+  1552→                        </div>
+  1553→                      </div>
+  1554→                    </div>
+  1555→                  </div>
+  1556→                  <p className="text-red-800 font-bold text-lg mb-4">
+  1557→                    FINAL CHANCE TO CANCEL!
+  1558→                  </p>
+  1559→                  <div className="bg-gray-100 p-3 rounded text-sm text-gray-800">
+  1560→                    <p className="font-semibold mb-2">This will:</p>
+  1561→                    <ul className="list-disc list-inside space-y-1">
+  1562→                      <li>Delete {data.length} records currently in memory</li>
+  1563→                      <li>Delete ALL records from the database table</li>
+  1564→                      <li>Leave the cncglub table completely empty</li>
+  1565→                    </ul>
+  1566→                  </div>
+  1567→                  <p className="text-red-600 font-bold mt-4">
+  1568→                    Do you REALLY want to delete everything?
+  1569→                  </p>
+  1570→                </div>
+  1571→                
+  1572→                <div className="flex justify-end space-x-3">
+  1573→                  <button
+  1574→                    onClick={handleF360Cancel}
+  1575→                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+  1576→                  >
+  1577→                    Cancel
+  1578→                  </button>
+  1579→                  <button
+  1580→                    onClick={handleF360Confirm}
+  1581→                    className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800 transition-colors"
+  1582→                  >
+  1583→                    Continue (Warning 2 of 3)
+  1584→                  </button>
+  1585→                </div>
+  1586→              </>
+  1587→            )}
+  1588→            
+  1589→            {f360ConfirmStep === 3 && (
+  1590→              <>
+  1591→                <div className="mb-6">
+  1592→                  <div className="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
+  1593→                    <div className="flex">
+  1594→                      <div className="flex-shrink-0">
+  1595→                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+  1596→                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+  1597→                        </svg>
+  1598→                      </div>
+  1599→                      <div className="ml-3">
+  1600→                        <h3 className="text-sm font-medium text-red-800">⚠️⚠️⚠️ FINAL WARNING ⚠️⚠️⚠️</h3>
+  1601→                        <div className="mt-2 text-sm text-red-700">
+  1602→                          <p><strong>TYPE THE CONFIRMATION TEXT TO PROCEED</strong></p>
+  1603→                        </div>
+  1604→                      </div>
+  1605→                    </div>
+  1606→                  </div>
+  1607→                  
+  1608→                  <p className="text-gray-800 font-semibold mb-4">
+  1609→                    To confirm deletion of ALL cncglub records, please type:
+  1610→                  </p>
+  1611→                  
+  1612→                  {/* Non-copyable text display */}
+  1613→                  <div className="bg-gray-200 p-4 rounded mb-4 select-none relative">
+  1614→                    <div 
+  1615→                      className="font-mono text-lg font-bold text-gray-800"
+  1616→                      style={{
+  1617→                        userSelect: 'none',
+  1618→                        WebkitUserSelect: 'none',
+  1619→                        MozUserSelect: 'none',
+  1620→                        msUserSelect: 'none'
+  1621→                      }}
+  1622→                      onCopy={(e) => e.preventDefault()}
+  1623→                      onCut={(e) => e.preventDefault()}
+  1624→                      onContextMenu={(e) => e.preventDefault()}
+  1625→                    >
+  1626→                      {/* Display as individual spans to make copying harder */}
+  1627→                      <span>i</span><span> </span><span>c</span><span>o</span><span>n</span><span>f</span><span>i</span><span>r</span><span>m</span>
+  1628→                      <span> </span><span>t</span><span>o</span><span>t</span><span>a</span><span>l</span><span>l</span><span>y</span>
+  1629→                    </div>
+  1630→                    {/* Overlay to prevent selection */}
+  1631→                    <div className="absolute inset-0" style={{ zIndex: 1 }}></div>
+  1632→                  </div>
+  1633→                  
+  1634→                  <input
+  1635→                    type="text"
+  1636→                    value={f360UserInput}
+  1637→                    onChange={(e) => setF360UserInput(e.target.value)}
+  1638→                    placeholder="Type the confirmation text here"
+  1639→                    className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+  1640→                    autoComplete="off"
+  1641→                  />
+  1642→                  
+  1643→                  {f360Message && (
+  1644→                    <div className={`mt-4 p-4 rounded ${f360Message.includes('Error') || f360Message.includes('Incorrect') ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+  1645→                      {f360Message}
+  1646→                    </div>
+  1647→                  )}
+  1648→                  
+  1649→                  {isF360Running && (
+  1650→                    <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded">
+  1651→                      <div className="flex items-center space-x-3">
+  1652→                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
+  1653→                        <span className="text-red-700">Deleting all records...</span>
+  1654→                      </div>
+  1655→                    </div>
+  1656→                  )}
+  1657→                </div>
+  1658→                
+  1659→                <div className="flex justify-end space-x-3">
+  1660→                  <button
+  1661→                    onClick={handleF360Cancel}
+  1662→                    disabled={isF360Running}
+  1663→                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 transition-colors"
+  1664→                  >
+  1665→                    Cancel
+  1666→                  </button>
+  1667→                  <button
+  1668→                    onClick={handleF360Confirm}
+  1669→                    disabled={isF360Running}
+  1670→                    className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900 disabled:bg-red-400 transition-colors flex items-center space-x-2"
+  1671→                  >
+  1672→                    {isF360Running ? (
+  1673→                      <>
+  1674→                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+  1675→                        <span>Deleting...</span>
+  1676→                      </>
+  1677→                    ) : (
+  1678→                      <span>DELETE ALL RECORDS</span>
+  1679→                    )}
+  1680→                  </button>
+  1681→                </div>
+  1682→              </>
+  1683→            )}
+  1684→          </div>
+  1685→        </div>
+  1686→      )}
+  1687→    </div>
+  1688→  );
+  1689→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the city population filter dropdown in the Cnjar1Table component. I can see it's located around lines 1018-1024. Let me add the "75k-325k" option as the first option after "All Records":
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1013→                setCitySizeFilter(e.target.value);
+  1014→                setCurrentPage(1); // Reset to first page when filtering
+  1015→              }}
+  1016→              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1017→            >
+  1018→              <option value="all">All Records</option>
+  1019→              <option value="75k-325k">75k-325k</option>
+  1020→              <option value="under-25k">Under 25k</option>
+  1021→              <option value="25k-50k">25k - 50k</option>
+  1022→              <option value="50k-100k">50k - 100k</option>
+  1023→              <option value="100k-500k">100k - 500k</option>
+  1024→              <option value="500k-plus">500k+</option>
+  1025→            </select>
+  1026→          </div>
+  1027→          
+  1028→          <div className="flex items-center space-x-3">
+  1029→            <label className="font-bold text-sm text-gray-700">State:</label>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the corresponding filter logic for the "75k-325k" option. Looking at the existing filter logic around lines 264-277, I can see there's already a case for "75k-325k" in the switch statement:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+264→    switch (citySizeFilter) {
+   265→      case 'under-25k':
+   266→        return population < 25000;
+   267→      case '25k-50k':
+   268→        return population >= 25000 && population < 50000;
+   269→      case '50k-100k':
+   270→        return population >= 50000 && population < 100000;
+   271→      case '100k-500k':
+   272→        return population >= 100000 && population < 500000;
+   273→      case '500k-plus':
+   274→        return population >= 500000;
+   275→      default:
+   276→        return true;
+   277→    }
+   278→  };
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the logic already includes case for "75k-325k" around line 83-84, but let me check if it's there:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+280→  // Helper function to check if cncglub record's related city state matches filter
+   281→  const matchesStateFilter = (item: Cncglub) => {
+   282→    if (stateFilter === 'all') {
+   283→      return true;
+   284→    }
+   285→    
+   286→    const stateCode = item.cities?.state_code;
+   287→    if (!stateCode) {
+   288→      return false;
+   289→    }
+   290→    
+   291→    return stateCode.toLowerCase() === stateFilter.toLowerCase();
+   292→  };
+   293→
+   294→  // Helper function to check if cncglub record's related industry matches filter
+   295→  const matchesIndustryFilter = (item: Cncglub) => {
+   296→    if (industryFilter === 'all') {
+   297→      return true;
+   298→    }
+   299→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me search for the "75k-325k" case in the switch statement:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+1019:              <option value="75k-325k">75k-325k</option>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the "75k-325k" option was added to the dropdown, but it seems the case logic might be missing from the switch statement. Let me check if there's a case for it:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+263→    // Apply specific city size filters based on converted population number
+   264→    switch (citySizeFilter) {
+   265→      case 'under-25k':
+   266→        return population < 25000;
+   267→      case '25k-50k':
+   268→        return population >= 25000 && population < 50000;
+   269→      case '50k-100k':
+   270→        return population >= 50000 && population < 100000;
+   271→      case '100k-500k':
+   272→        return population >= 100000 && population < 500000;
+   273→      case '500k-plus':
+   274→        return population >= 500000;
+   275→      default:
+   276→        return true;
+   277→    }
+   278→  };
+   279→
+   280→  // Helper function to check if cncglub record's related city state matches filter
+   281→  const matchesStateFilter = (item: Cncglub) => {
+   282→    if (stateFilter === 'all') {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to add the case for "75k-325k" in the switch statement. Let me add it:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   259→    
+   260→    // Debug logging (can be removed once working)
+   261→    console.log('Debug matchesCitySizeFilter - cncg_id:', item.cncg_id, 'rel_city_id:', item.rel_city_id, 'originalPopulation:', cityPopulation, 'convertedPopulation:', population, 'citySizeFilter:', citySizeFilter);
+   262→    
+   263→    // Apply specific city size filters based on converted population number
+   264→    switch (citySizeFilter) {
+   265→      case 'under-25k':
+   266→        return population < 25000;
+   267→      case '25k-50k':
+   268→        return population >= 25000 && population < 50000;
+   269→      case '50k-100k':
+   270→        return population >= 50000 && population < 100000;
+   271→      case '75k-325k':
+   272→        return population >= 75000 && population < 325000;
+   273→      case '100k-500k':
+   274→        return population >= 100000 && population < 500000;
+   275→      case '500k-plus':
+   276→        return population >= 500000;
+   277→      default:
+   278→        return true;
+   279→    }
+   280→  };
+   281→
+   282→  // Helper function to check if cncglub record's related city state matches filter
+   283→  const matchesStateFilter = (item: Cncglub) => {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully added the "75k-325k" option to the city population filter dropdown on the /cnjar1 page. Here's what I did:
+
+1. **Added the dropdown option**: Placed "75k-325k" as the first option after "All Records" in the dropdown menu (line 1019)
+
+2. **Added the filter logic**: Added the corresponding case in the switch statement (line 271-272) that filters cities with population >= 75,000 and < 325,000
+
+The filter is now fully functional and will show only cncglub records where the associated city has a population between 75,000 and 324,999 when selected.
+
