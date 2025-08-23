@@ -73,7 +73,7 @@ export default function ReddjarTable({
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
-  const [sortField, setSortField] = useState<keyof RedditUrl>('created_at');
+  const [sortField, setSortField] = useState<keyof RedditUrl>('estimated_traffic_cost');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Column pagination states
@@ -847,6 +847,10 @@ export default function ReddjarTable({
 
     // Special handling for url_datum column to show copy and open URL buttons
     if (column.key === 'url_datum') {
+      // Create shortened display value for screen space
+      const shortenedDisplayValue = displayValue ? 
+        displayValue.replace(/^https:\/\/www\.reddit\.com/, '') : '';
+      
       return (
         <div className="flex items-center gap-1">
           <button
@@ -858,7 +862,7 @@ export default function ReddjarTable({
             }}
             className="w-5 h-5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded transition-colors flex items-center justify-center"
             style={{ fontSize: '10px' }}
-            title="Copy URL to clipboard"
+            title="Copy full URL to clipboard"
           >
             C
           </button>
@@ -870,7 +874,7 @@ export default function ReddjarTable({
               }
             }}
             className="w-5 h-5 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded transition-colors flex items-center justify-center"
-            title="Open URL in new tab"
+            title="Open full URL in new tab"
           >
             →
           </button>
@@ -880,9 +884,9 @@ export default function ReddjarTable({
               !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
             } ${isReadOnly ? 'text-gray-500' : ''}`}
             style={{ whiteSpace: 'nowrap' }}
-            title={isReadOnly ? displayValue : `${displayValue} (Click to edit)`}
+            title={isReadOnly ? `Full URL: ${displayValue}` : `Full URL: ${displayValue} (Click to edit)`}
           >
-            {displayValue}
+            {shortenedDisplayValue}
           </div>
         </div>
       );

@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
-import KwjarClient from './KwjarClient';
+import KwjarClient from './pclient';
 
 export const metadata: Metadata = {
-  title: '/kwjar',
+  title: 'kwjar',
 };
 
 export default function KwjarPage() {

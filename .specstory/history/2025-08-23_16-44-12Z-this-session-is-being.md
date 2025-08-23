@@ -5992,3 +5992,4090 @@ Result:
     31→}
 ```
 
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useAuth } from '../../context/AuthContext';
+
+export default function HomeClient() {
+  const { user } = useAuth();
+
+  return (
+    <div className="py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-2xl font-semibold text-gray-900">Home</h1>
+        <div className="mt-6">
+          <div className="bg-white shadow rounded-lg p-6">
+            <p className="text-gray-600">
+              Welcome to Snefuru! This is a protected page that can only be accessed when logged in.
+            </p>
+            <p className="mt-4 text-gray-600">
+              You are currently logged in as: {user?.email}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/home/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+import { Metadata } from 'next';
+import HomeClient from './pclient';
+
+export const metadata: Metadata = {
+  title: 'home',
+};
+
+export default function HomePage() {
+  return <HomeClient />;
+}
+```
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/home/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import HomeClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'home',
+     6→};
+     7→
+     8→export default function HomePage() {
+     9→  return <HomeClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 1: Main/Core Pages to Method 1
+- [X] 🌡️ Convert /home to Method 1
+- [⚡] 🌡️ Convert /profile to Method 1
+- [ ] 🌡️ Convert /myhub to Method 1
+- [ ] 🌡️ Convert /valan to Method 1
+- [ ] 🌡️ Convert /indusjar to Method 1
+- [ ] 🌡️ Convert /gconjar1 to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/profile/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useAuth } from '../../context/AuthContext';
+     5→import { supabase } from '@/lib/supabase';
+     6→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     7→
+     8→type Profile = {
+     9→  id: string;
+    10→  full_name: string;
+    11→  avatar_url: string;
+    12→  updated_at: string;
+    13→};
+    14→
+    15→type UserSettings = {
+    16→  id: string;
+    17→  email: string;
+    18→  sidebar_menu_active: boolean;
+    19→};
+    20→
+    21→export default function Profile() {
+    22→  const { user } = useAuth();
+    23→  const [profile, setProfile] = useState<Profile | null>(null);
+    24→  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
+    25→  const [loading, setLoading] = useState(true);
+    26→  const [error, setError] = useState<string | null>(null);
+    27→  const [fullName, setFullName] = useState('');
+    28→  const [sidebarMenuActive, setSidebarMenuActive] = useState(false);
+    29→  const [isSaving, setIsSaving] = useState(false);
+    30→  const [editing, setEditing] = useState(false);
+    31→  const supabaseClient = createClientComponentClient();
+    32→
+    33→  useEffect(() => {
+    34→    const fetchData = async () => {
+    35→      try {
+    36→        if (!user) return;
+    37→
+    38→        // Only fetch user settings from users table (no profiles table)
+    39→        const { data: userData, error: userError } = await supabaseClient
+    40→          .from('users')
+    41→          .select('id, email, sidebar_menu_active')
+    42→          .eq('auth_id', user.id)
+    43→          .single();
+    44→
+    45→        if (userError) throw userError;
+    46→        
+    47→        setUserSettings(userData);
+    48→        setSidebarMenuActive(userData?.sidebar_menu_active || false);
+    49→        
+    50→        // Set email as full name since we don't have profiles
+    51→        setFullName(userData?.email || '');
+    52→      } catch (err) {
+    53→        setError(err instanceof Error ? err.message : 'An error occurred');
+    54→      } finally {
+    55→        setLoading(false);
+    56→      }
+    57→    };
+    58→
+    59→    fetchData();
+    60→  }, [user, supabaseClient]);
+    61→
+    62→  useEffect(() => {
+    63→    // Set document title
+    64→    document.title = 'profile - Snefuru';
+    65→  }, []);
+    66→
+    67→  const handleSaveProfile = async (e: React.FormEvent) => {
+    68→    e.preventDefault();
+    69→    if (!userSettings) return;
+    70→
+    71→    setIsSaving(true);
+    72→    try {
+    73→      // Since we don't have a profiles table, we'll just show a message
+    74→      // that profile updates aren't available
+    75→      setError('Profile updates not available - using users table only');
+    76→    } catch (err) {
+    77→      setError(err instanceof Error ? err.message : 'An error occurred');
+    78→    } finally {
+    79→      setIsSaving(false);
+    80→    }
+    81→  };
+    82→
+    83→  const handleSidebarToggle = async (newValue: boolean) => {
+    84→    if (!userSettings) {
+    85→      setError('User settings not loaded');
+    86→      return;
+    87→    }
+    88→
+    89→    console.log('Toggling sidebar from', sidebarMenuActive, 'to', newValue);
+    90→    setSidebarMenuActive(newValue);
+    91→    
+    92→    try {
+    93→      console.log('Updating user ID:', userSettings.id, 'with value:', newValue);
+    94→      const { error } = await supabaseClient
+    95→        .from('users')
+    96→        .update({ sidebar_menu_active: newValue })
+    97→        .eq('id', userSettings.id);
+    98→
+    99→      if (error) {
+   100→        console.error('Supabase error:', error);
+   101→        throw error;
+   102→      }
+   103→      
+   104→      console.log('Successfully updated sidebar setting');
+   105→      setUserSettings(prev => prev ? { ...prev, sidebar_menu_active: newValue } : null);
+   106→      
+   107→      // Clear any previous errors
+   108→      setError(null);
+   109→    } catch (err) {
+   110→      console.error('Error in handleSidebarToggle:', err);
+   111→      // Revert on error
+   112→      setSidebarMenuActive(!newValue);
+   113→      setError(err instanceof Error ? err.message : 'Failed to update sidebar setting');
+   114→    }
+   115→  };
+   116→
+   117→  if (loading) {
+   118→    return (
+   119→      <div className="py-6">
+   120→        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   121→          <div className="text-center">Loading...</div>
+   122→        </div>
+   123→      </div>
+   124→    );
+   125→  }
+   126→
+   127→  return (
+   128→    <div className="py-6">
+   129→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   130→        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Profile Settings</h1>
+   131→        
+   132→        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+   133→          <div className="px-4 py-5 sm:p-6">
+   134→            <form onSubmit={handleSaveProfile}>
+   135→              {error && (
+   136→                <div className="mb-4 rounded-md bg-red-50 p-4">
+   137→                  <div className="text-sm text-red-700">{error}</div>
+   138→                </div>
+   139→              )}
+   140→              
+   141→              <div className="space-y-6">
+   142→                <div>
+   143→                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+   144→                    Email
+   145→                  </label>
+   146→                  <div className="mt-1">
+   147→                    <input
+   148→                      type="email"
+   149→                      name="email"
+   150→                      id="email"
+   151→                      value={user?.email || ''}
+   152→                      disabled
+   153→                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-gray-50"
+   154→                    />
+   155→                  </div>
+   156→                  <p className="mt-2 text-sm text-gray-500">
+   157→                    Your email address cannot be changed.
+   158→                  </p>
+   159→                </div>
+   160→
+   161→                <div>
+   162→                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+   163→                    Email (from users table)
+   164→                  </label>
+   165→                  <div className="mt-1">
+   166→                    <input
+   167→                      type="text"
+   168→                      name="fullName"
+   169→                      id="fullName"
+   170→                      value={userSettings?.email || ''}
+   171→                      disabled
+   172→                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-gray-50"
+   173→                    />
+   174→                  </div>
+   175→                  <p className="mt-2 text-sm text-gray-500">
+   176→                    Profile editing not available - using users table only.
+   177→                  </p>
+   178→                </div>
+   179→              </div>
+   180→            </form>
+   181→          </div>
+   182→        </div>
+   183→
+   184→        {/* Sidebar Menu Settings */}
+   185→        <div className="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
+   186→          <div className="px-4 py-5 sm:p-6">
+   187→            <h3 className="text-lg font-medium text-gray-900 mb-4">Sidebar Menu Settings</h3>
+   188→            
+   189→            <div className="flex items-center justify-between">
+   190→              <div className="flex-grow">
+   191→                <label htmlFor="sidebar-toggle" className="block text-sm font-medium text-gray-700">
+   192→                  sidebar_menu_active
+   193→                </label>
+   194→                <p className="text-sm text-gray-500 mt-1">
+   195→                  Toggle the sidebar menu on/off for all pages
+   196→                </p>
+   197→              </div>
+   198→              
+   199→              <div className="ml-4">
+   200→                <button
+   201→                  type="button"
+   202→                  onClick={() => handleSidebarToggle(!sidebarMenuActive)}
+   203→                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+   204→                    sidebarMenuActive ? 'bg-green-600' : 'bg-gray-200'
+   205→                  }`}
+   206→                  role="switch"
+   207→                  aria-checked={sidebarMenuActive}
+   208→                  aria-labelledby="sidebar-toggle"
+   209→                >
+   210→                  <span
+   211→                    aria-hidden="true"
+   212→                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition duration-200 ease-in-out ${
+   213→                      sidebarMenuActive ? 'translate-x-5' : 'translate-x-0'
+   214→                    }`}
+   215→                  />
+   216→                </button>
+   217→              </div>
+   218→            </div>
+   219→          </div>
+   220→        </div>
+   221→      </div>
+   222→    </div>
+   223→  );
+   224→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+type Profile = {
+  id: string;
+  full_name: string;
+  avatar_url: string;
+  updated_at: string;
+};
+
+type UserSettings = {
+  id: string;
+  email: string;
+  sidebar_menu_active: boolean;
+};
+
+export default function ProfileClient() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [fullName, setFullName] = useState('');
+  const [sidebarMenuActive, setSidebarMenuActive] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const supabaseClient = createClientComponentClient();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!user) return;
+
+        // Only fetch user settings from users table (no profiles table)
+        const { data: userData, error: userError } = await supabaseClient
+          .from('users')
+          .select('id, email, sidebar_menu_active')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (userError) throw userError;
+        
+        setUserSettings(userData);
+        setSidebarMenuActive(userData?.sidebar_menu_active || false);
+        
+        // Set email as full name since we don't have profiles
+        setFullName(userData?.email || '');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user, supabaseClient]);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userSettings) return;
+
+    setIsSaving(true);
+    try {
+      // Since we don't have a profiles table, we'll just show a message
+      // that profile updates aren't available
+      setError('Profile updates not available - using users table only');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSidebarToggle = async (newValue: boolean) => {
+    if (!userSettings) {
+      setError('User settings not loaded');
+      return;
+    }
+
+    console.log('Toggling sidebar from', sidebarMenuActive, 'to', newValue);
+    setSidebarMenuActive(newValue);
+    
+    try {
+      console.log('Updating user ID:', userSettings.id, 'with value:', newValue);
+      const { error } = await supabaseClient
+        .from('users')
+        .update({ sidebar_menu_active: newValue })
+        .eq('id', userSettings.id);
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Successfully updated sidebar setting');
+      setUserSettings(prev => prev ? { ...prev, sidebar_menu_active: newValue } : null);
+      
+      // Clear any previous errors
+      setError(null);
+    } catch (err) {
+      console.error('Error in handleSidebarToggle:', err);
+      // Revert on error
+      setSidebarMenuActive(!newValue);
+      setError(err instanceof Error ? err.message : 'Failed to update sidebar setting');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Profile Settings</h1>
+        
+        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <form onSubmit={handleSaveProfile}>
+              {error && (
+                <div className="mb-4 rounded-md bg-red-50 p-4">
+                  <div className="text-sm text-red-700">{error}</div>
+                </div>
+              )}
+              
+              <div className="space-y-6">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      value={user?.email || ''}
+                      disabled
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-gray-50"
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Your email address cannot be changed.
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                    Email (from users table)
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      name="fullName"
+                      id="fullName"
+                      value={userSettings?.email || ''}
+                      disabled
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-gray-50"
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500">
+                    Profile editing not available - using users table only.
+                  </p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Sidebar Menu Settings */}
+        <div className="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Sidebar Menu Settings</h3>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex-grow">
+                <label htmlFor="sidebar-toggle" className="block text-sm font-medium text-gray-700">
+                  sidebar_menu_active
+                </label>
+                <p className="text-sm text-gray-500 mt-1">
+                  Toggle the sidebar menu on/off for all pages
+                </p>
+              </div>
+              
+              <div className="ml-4">
+                <button
+                  type="button"
+                  onClick={() => handleSidebarToggle(!sidebarMenuActive)}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                    sidebarMenuActive ? 'bg-green-600' : 'bg-gray-200'
+                  }`}
+                  role="switch"
+                  aria-checked={sidebarMenuActive}
+                  aria-labelledby="sidebar-toggle"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition duration-200 ease-in-out ${
+                      sidebarMenuActive ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/profile/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+import { Metadata } from 'next';
+import ProfileClient from './pclient';
+
+export const metadata: Metadata = {
+  title: 'profile',
+};
+
+export default function ProfilePage() {
+  return <ProfileClient />;
+}
+```
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/profile/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import ProfileClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'profile',
+     6→};
+     7→
+     8→export default function ProfilePage() {
+     9→  return <ProfileClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/myhub/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect, useState } from 'react';
+     4→import { useRouter, useSearchParams } from 'next/navigation';
+     5→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     6→import { useAuth } from '@/app/context/AuthContext';
+     7→import BensaFieldTable from '@/app/(protected3)/bensa/components/BensaFieldTable';
+     8→import { bensaUtgsConfig } from '@/app/(protected3)/bensa/config/bensaUtgsConfig';
+     9→import { bensaZarnosConfig } from '@/app/(protected3)/bensa/config/bensaZarnosConfig';
+    10→import { bensaXpagesConfig } from '@/app/(protected3)/bensa/config/bensaXpagesConfig';
+    11→import { bensaUsersConfig } from '@/app/(protected3)/bensa/config/bensaUsersConfig';
+    12→
+    13→interface XPage {
+    14→  xpage_id: number;
+    15→  title1: string | null;
+    16→  main_url: string | null;
+    17→  meta_title: string | null;
+    18→  title2: string | null;
+    19→  desc1: string | null;
+    20→  caption: string | null;
+    21→  pagepath_url: string | null;
+    22→  pagepath_long: string | null;
+    23→  pagepath_short: string | null;
+    24→  position_marker: number | null;
+    25→  show_in_all_pages_nav_area1: boolean | null;
+    26→  broad_parent_container: string | null;
+    27→  has_mutation_observer: string | null;
+    28→  created_at: string;
+    29→  updated_at: string;
+    30→}
+    31→
+    32→interface UTG {
+    33→  utg_id: string;
+    34→  utg_name: string;
+    35→  rel_xpage_id: number | null;
+    36→}
+    37→
+    38→interface Zarno {
+    39→  zarno_id: number;
+    40→  fk_xpage_id: number | null;
+    41→  zarno_name: string | null;
+    42→  zarno_type: string | null;
+    43→  zarno_path: string | null;
+    44→  zarno_status: string | null;
+    45→  zarno_config: any;
+    46→  execution_order: number | null;
+    47→  dependencies: any;
+    48→  metadata: any;
+    49→  is_enabled: boolean;
+    50→  created_at: string;
+    51→  updated_at: string;
+    52→  created_by: string | null;
+    53→}
+    54→
+    55→interface ZarnoDropdownItem {
+    56→  zarno_id: number;
+    57→  zarno_name: string | null;
+    58→  fk_xpage_id: number | null;
+    59→}
+    60→
+    61→interface User {
+    62→  id: string;
+    63→  email: string | null;
+    64→  is_admin: boolean | null;
+    65→  sidebar_menu_active: boolean | null;
+    66→  ruplin_api_key_1: string | null;
+    67→  background_processing_settings: any;
+    68→  created_at: string;
+    69→  auth_id: string;
+    70→}
+    71→
+    72→export default function MyHubPage() {
+    73→  const [activeTab, setActiveTab] = useState<'general' | 'billing' | 'settings'>('general');
+    74→  const [xpages, setXpages] = useState<XPage[]>([]);
+    75→  const [utgs, setUtgs] = useState<UTG[]>([]);
+    76→  const [zarnos, setZarnos] = useState<ZarnoDropdownItem[]>([]);
+    77→  const [users, setUsers] = useState<User[]>([]);
+    78→  const [selectedXpage, setSelectedXpage] = useState<XPage | null>(null);
+    79→  const [selectedXpageId, setSelectedXpageId] = useState<number | null>(null);
+    80→  const [selectedUtgId, setSelectedUtgId] = useState<string | null>(null);
+    81→  const [selectedUtgRecord, setSelectedUtgRecord] = useState<any | null>(null);
+    82→  const [selectedZarnoId, setSelectedZarnoId] = useState<number | null>(null);
+    83→  const [selectedZarnoRecord, setSelectedZarnoRecord] = useState<Zarno | null>(null);
+    84→  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+    85→  const [selectedUserRecord, setSelectedUserRecord] = useState<User | null>(null);
+    86→  const [loading, setLoading] = useState(true);
+    87→  const [loadingUtgs, setLoadingUtgs] = useState(false);
+    88→  const [loadingZarnos, setLoadingZarnos] = useState(false);
+    89→  const [showTooltip, setShowTooltip] = useState(false);
+    90→  const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
+    91→  const [editingField, setEditingField] = useState<string | null>(null);
+    92→  const [editingValue, setEditingValue] = useState<string>('');
+    93→  const [fieldMetadata, setFieldMetadata] = useState<{[key: string]: {starred: boolean, flagged: boolean}}>({});
+    94→  const [sortBy, setSortBy] = useState<string>('starred');
+    95→  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    96→  const [boxEditorOpen, setBoxEditorOpen] = useState(false);
+    97→  const [boxEditorValue, setBoxEditorValue] = useState('');
+    98→  const [boxEditorField, setBoxEditorField] = useState<string>('');
+    99→  const [boxEditorRecord, setBoxEditorRecord] = useState<any>(null);
+   100→  const [boxEditorUpdateHandler, setBoxEditorUpdateHandler] = useState<((field: string, value: any) => Promise<void>) | null>(null);
+   101→  const [currentUser, setCurrentUser] = useState<User | null>(null);
+   102→  const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
+   103→  
+   104→  const router = useRouter();
+   105→  const searchParams = useSearchParams();
+   106→  const supabase = createClientComponentClient();
+   107→  const { user } = useAuth();
+   108→
+   109→  // Initialize page - only run once
+   110→  useEffect(() => {
+   111→    document.title = 'MyHub Account Settings - Snefuru';
+   112→    fetchXpages();
+   113→    fetchUsers();
+   114→    fetchFieldMetadata();
+   115→  }, []);
+   116→
+   117→  // Handle URL parameters - only when searchParams change
+   118→  useEffect(() => {
+   119→    if (!searchParams) return;
+   120→    
+   121→    // Get tab from URL if present
+   122→    const tabParam = searchParams.get('tab');
+   123→    if (tabParam && (tabParam === 'general' || tabParam === 'billing' || tabParam === 'settings')) {
+   124→      setActiveTab(tabParam as 'general' | 'billing' | 'settings');
+   125→    }
+   126→    
+   127→    // Get xpage_id from URL if present
+   128→    const xpageIdParam = searchParams.get('xpage_id');
+   129→    if (xpageIdParam) {
+   130→      const xpageId = parseInt(xpageIdParam);
+   131→      setSelectedXpageId(xpageId);
+   132→      fetchSelectedXpage(xpageId);
+   133→    }
+   134→    
+   135→    // Get utg_id from URL if present
+   136→    const utgIdParam = searchParams.get('utg_id');
+   137→    if (utgIdParam) {
+   138→      setSelectedUtgId(utgIdParam);
+   139→      fetchSelectedUtg(utgIdParam);
+   140→    }
+   141→    
+   142→    // Get zarno_id from URL if present
+   143→    const zarnoIdParam = searchParams.get('zarno_id');
+   144→    if (zarnoIdParam) {
+   145→      const zarnoId = parseInt(zarnoIdParam);
+   146→      setSelectedZarnoId(zarnoId);
+   147→      fetchSelectedZarno(zarnoId);
+   148→    }
+   149→  }, [searchParams]);
+   150→
+   151→  // Fetch UTGs when xpage is selected
+   152→  useEffect(() => {
+   153→    if (selectedXpageId) {
+   154→      fetchRelatedUtgs(selectedXpageId);
+   155→    } else {
+   156→      setUtgs([]);
+   157→      setSelectedUtgId(null);
+   158→      setSelectedUtgRecord(null);
+   159→    }
+   160→  }, [selectedXpageId]);
+   161→
+   162→  // Fetch Zarnos when xpage is selected
+   163→  useEffect(() => {
+   164→    if (selectedXpageId) {
+   165→      fetchRelatedZarnos(selectedXpageId);
+   166→    } else {
+   167→      setZarnos([]);
+   168→      setSelectedZarnoId(null);
+   169→      setSelectedZarnoRecord(null);
+   170→    }
+   171→  }, [selectedXpageId]);
+   172→
+   173→  const fetchXpages = async () => {
+   174→    try {
+   175→      const { data, error } = await supabase
+   176→        .from('xpages')
+   177→        .select('*')
+   178→        .order('xpage_id', { ascending: true });
+   179→
+   180→      if (error) {
+   181→        console.error('Error fetching xpages:', error);
+   182→        return;
+   183→      }
+   184→
+   185→      setXpages(data || []);
+   186→    } catch (error) {
+   187→      console.error('Error:', error);
+   188→    } finally {
+   189→      setLoading(false);
+   190→    }
+   191→  };
+   192→
+   193→  const fetchSelectedXpage = async (xpageId: number) => {
+   194→    try {
+   195→      const { data, error } = await supabase
+   196→        .from('xpages')
+   197→        .select('*')
+   198→        .eq('xpage_id', xpageId)
+   199→        .single();
+   200→
+   201→      if (error) {
+   202→        console.error('Error fetching selected xpage:', error);
+   203→        return;
+   204→      }
+   205→
+   206→      setSelectedXpage(data);
+   207→    } catch (error) {
+   208→      console.error('Error:', error);
+   209→    }
+   210→  };
+   211→
+   212→  const fetchUsers = async () => {
+   213→    try {
+   214→      const { data, error } = await supabase
+   215→        .from('users')
+   216→        .select('*')
+   217→        .order('email', { ascending: true });
+   218→
+   219→      if (error) {
+   220→        console.error('Error fetching users:', error);
+   221→        return;
+   222→      }
+   223→
+   224→      setUsers(data || []);
+   225→      
+   226→      // Find current user and set admin status
+   227→      if (user?.id) {
+   228→        const currentUserRecord = data?.find(u => u.auth_id === user.id);
+   229→        if (currentUserRecord) {
+   230→          setCurrentUser(currentUserRecord);
+   231→          setIsCurrentUserAdmin(currentUserRecord.is_admin || false);
+   232→          // Auto-select current user if no user is selected
+   233→          if (!selectedUserId) {
+   234→            setSelectedUserId(currentUserRecord.id);
+   235→            setSelectedUserRecord(currentUserRecord);
+   236→          }
+   237→        }
+   238→      }
+   239→    } catch (error) {
+   240→      console.error('Error:', error);
+   241→    }
+   242→  };
+   243→
+   244→  const fetchSelectedUser = async (userId: string) => {
+   245→    try {
+   246→      const { data, error } = await supabase
+   247→        .from('users')
+   248→        .select('*')
+   249→        .eq('id', userId)
+   250→        .single();
+   251→
+   252→      if (error) {
+   253→        console.error('Error fetching selected user:', error);
+   254→        return;
+   255→      }
+   256→
+   257→      setSelectedUserRecord(data);
+   258→    } catch (error) {
+   259→      console.error('Error:', error);
+   260→    }
+   261→  };
+   262→
+   263→  const fetchSelectedUtg = async (utgId: string) => {
+   264→    try {
+   265→      const { data, error } = await supabase
+   266→        .from('utgs')
+   267→        .select('*')
+   268→        .eq('utg_id', utgId)
+   269→        .single();
+   270→
+   271→      if (error) {
+   272→        console.error('Error fetching selected utg:', error);
+   273→        return;
+   274→      }
+   275→
+   276→      setSelectedUtgRecord(data);
+   277→    } catch (error) {
+   278→      console.error('Error:', error);
+   279→    }
+   280→  };
+   281→
+   282→  const fetchFieldMetadata = async () => {
+   283→    try {
+   284→      const { data, error } = await supabase
+   285→        .from('frenzi_field_metadata')
+   286→        .select('field_name, starred, flagged')
+   287→        .eq('table_name', 'xpages');
+   288→
+   289→      if (error) {
+   290→        console.error('Error fetching field metadata:', error);
+   291→        return;
+   292→      }
+   293→
+   294→      const metadataMap: {[key: string]: {starred: boolean, flagged: boolean}} = {};
+   295→      data?.forEach(item => {
+   296→        metadataMap[item.field_name] = {
+   297→          starred: item.starred || false,
+   298→          flagged: item.flagged || false
+   299→        };
+   300→      });
+   301→      setFieldMetadata(metadataMap);
+   302→    } catch (error) {
+   303→      console.error('Error:', error);
+   304→    }
+   305→  };
+   306→
+   307→  const fetchRelatedUtgs = async (xpageId: number) => {
+   308→    try {
+   309→      setLoadingUtgs(true);
+   310→      
+   311→      // Fetch UTGs where rel_xpage_id matches the selected xpage_id
+   312→      const { data, error } = await supabase
+   313→        .from('utgs')
+   314→        .select('utg_id, utg_name, rel_xpage_id')
+   315→        .eq('rel_xpage_id', xpageId)
+   316→        .order('utg_name', { ascending: true });
+   317→
+   318→      if (error) {
+   319→        console.error('Error fetching UTGs:', error);
+   320→        return;
+   321→      }
+   322→
+   323→      setUtgs(data || []);
+   324→      
+   325→      // Auto-select if only one UTG available (only if no UTG is currently selected)
+   326→      if (data && data.length === 1 && !selectedUtgId) {
+   327→        const singleUtg = data[0];
+   328→        setSelectedUtgId(singleUtg.utg_id);
+   329→        fetchSelectedUtg(singleUtg.utg_id);
+   330→      }
+   331→    } catch (error) {
+   332→      console.error('Error:', error);
+   333→    } finally {
+   334→      setLoadingUtgs(false);
+   335→    }
+   336→  };
+   337→
+   338→  const fetchSelectedZarno = async (zarnoId: number) => {
+   339→    try {
+   340→      const { data, error } = await supabase
+   341→        .from('zarnos')
+   342→        .select('*')
+   343→        .eq('zarno_id', zarnoId)
+   344→        .single();
+   345→
+   346→      if (error) {
+   347→        console.error('Error fetching selected zarno:', error);
+   348→        return;
+   349→      }
+   350→
+   351→      setSelectedZarnoRecord(data);
+   352→    } catch (error) {
+   353→      console.error('Error:', error);
+   354→    }
+   355→  };
+   356→
+   357→  const fetchRelatedZarnos = async (xpageId: number) => {
+   358→    try {
+   359→      setLoadingZarnos(true);
+   360→      
+   361→      // Fetch Zarnos where fk_xpage_id matches the selected xpage_id
+   362→      const { data, error } = await supabase
+   363→        .from('zarnos')
+   364→        .select('zarno_id, zarno_name, fk_xpage_id')
+   365→        .eq('fk_xpage_id', xpageId)
+   366→        .order('zarno_name', { ascending: true });
+   367→
+   368→      if (error) {
+   369→        console.error('Error fetching Zarnos:', error);
+   370→        return;
+   371→      }
+   372→
+   373→      setZarnos(data || []);
+   374→      
+   375→      // Auto-select if only one Zarno available (only if no Zarno is currently selected)
+   376→      if (data && data.length === 1 && !selectedZarnoId) {
+   377→        const singleZarno = data[0];
+   378→        setSelectedZarnoId(singleZarno.zarno_id);
+   379→        fetchSelectedZarno(singleZarno.zarno_id);
+   380→      }
+   381→    } catch (error) {
+   382→      console.error('Error:', error);
+   383→    } finally {
+   384→      setLoadingZarnos(false);
+   385→    }
+   386→  };
+   387→
+   388→  const updateURLWithCurrentState = (updates: {
+   389→    tab?: 'general' | 'billing' | 'settings';
+   390→    xpage_id?: number;
+   391→    utg_id?: string;
+   392→    zarno_id?: number;
+   393→  }) => {
+   394→    const params = new URLSearchParams(searchParams || '');
+   395→    
+   396→    // Update or set tab
+   397→    if (updates.tab) {
+   398→      params.set('tab', updates.tab);
+   399→    }
+   400→    
+   401→    // Update or set xpage_id
+   402→    if (updates.xpage_id !== undefined) {
+   403→      params.set('xpage_id', updates.xpage_id.toString());
+   404→    }
+   405→    
+   406→    // Update or set utg_id
+   407→    if (updates.utg_id !== undefined) {
+   408→      if (updates.utg_id) {
+   409→        params.set('utg_id', updates.utg_id);
+   410→      } else {
+   411→        params.delete('utg_id');
+   412→      }
+   413→    }
+   414→    
+   415→    // Update or set zarno_id
+   416→    if (updates.zarno_id !== undefined) {
+   417→      if (updates.zarno_id) {
+   418→        params.set('zarno_id', updates.zarno_id.toString());
+   419→      } else {
+   420→        params.delete('zarno_id');
+   421→      }
+   422→    }
+   423→    
+   424→    router.push(`/myhub?${params.toString()}`);
+   425→  };
+   426→
+   427→  const handleXpageChange = (xpageId: number) => {
+   428→    setSelectedXpageId(xpageId);
+   429→    fetchSelectedXpage(xpageId);
+   430→    // Reset selected UTG and Zarno when XPage changes
+   431→    setSelectedUtgId(null);
+   432→    setSelectedUtgRecord(null);
+   433→    setSelectedZarnoId(null);
+   434→    setSelectedZarnoRecord(null);
+   435→    
+   436→    updateURLWithCurrentState({ xpage_id: xpageId, utg_id: '', zarno_id: 0 });
+   437→    
+   438→    // Fetch related entities after URL update (which will auto-select if only one option)
+   439→    setTimeout(() => {
+   440→      fetchRelatedUtgs(xpageId);
+   441→      fetchRelatedZarnos(xpageId);
+   442→    }, 100);
+   443→  };
+   444→
+   445→  const handleUtgChange = (utgId: string) => {
+   446→    setSelectedUtgId(utgId);
+   447→    if (utgId) {
+   448→      fetchSelectedUtg(utgId);
+   449→    } else {
+   450→      setSelectedUtgRecord(null);
+   451→    }
+   452→    updateURLWithCurrentState({ utg_id: utgId });
+   453→  };
+   454→
+   455→  const handleUserChange = (userId: string) => {
+   456→    // Security check: non-admin users can only select themselves
+   457→    if (!isCurrentUserAdmin && currentUser) {
+   458→      const selectedUser = users.find(u => u.id === userId);
+   459→      if (selectedUser && selectedUser.auth_id !== currentUser.auth_id) {
+   460→        alert('You can only access your own user record.');
+   461→        return;
+   462→      }
+   463→    }
+   464→    
+   465→    setSelectedUserId(userId);
+   466→    if (userId) {
+   467→      fetchSelectedUser(userId);
+   468→    } else {
+   469→      setSelectedUserRecord(null);
+   470→    }
+   471→  };
+   472→
+   473→  const handleZarnoChange = (zarnoId: number) => {
+   474→    const validZarnoId = zarnoId > 0 ? zarnoId : null;
+   475→    setSelectedZarnoId(validZarnoId);
+   476→    if (validZarnoId) {
+   477→      fetchSelectedZarno(validZarnoId);
+   478→    } else {
+   479→      setSelectedZarnoRecord(null);
+   480→    }
+   481→    updateURLWithCurrentState({ zarno_id: validZarnoId || 0 });
+   482→  };
+   483→
+   484→  const copyTooltipText = () => {
+   485→    const text = 'All rows from utgs where rel_xpage_id matches xpages.xpage_id';
+   486→    navigator.clipboard.writeText(text);
+   487→  };
+   488→
+   489→  // Define field properties for xpages table
+   490→  const xpageFields = [
+   491→    { key: 'xpage_id', type: 'integer', editable: false },
+   492→    { key: 'title1', type: 'text', editable: true },
+   493→    { key: 'main_url', type: 'text', editable: true },
+   494→    { key: 'meta_title', type: 'text', editable: true },
+   495→    { key: 'title2', type: 'text', editable: true },
+   496→    { key: 'desc1', type: 'text', editable: true },
+   497→    { key: 'caption', type: 'text', editable: true },
+   498→    { key: 'pagepath_url', type: 'text', editable: true },
+   499→    { key: 'pagepath_long', type: 'text', editable: true },
+   500→    { key: 'pagepath_short', type: 'text', editable: true },
+   501→    { key: 'position_marker', type: 'integer', editable: true },
+   502→    { key: 'show_in_all_pages_nav_area1', type: 'boolean', editable: true },
+   503→    { key: 'broad_parent_container', type: 'text', editable: true },
+   504→    { key: 'urlparam_total_keys_listed', type: 'jsonb', editable: true },
+   505→    { key: 'created_at', type: 'timestamp', editable: false },
+   506→    { key: 'updated_at', type: 'timestamp', editable: false }
+   507→  ];
+   508→
+   509→  const updateXpageField = async (field: string, value: any) => {
+   510→    if (!selectedXpageId) return;
+   511→
+   512→    try {
+   513→      const { error } = await supabase
+   514→        .from('xpages')
+   515→        .update({ [field]: value })
+   516→        .eq('xpage_id', selectedXpageId);
+   517→
+   518→      if (error) {
+   519→        console.error('Error updating field:', error);
+   520→        return;
+   521→      }
+   522→
+   523→      // Update local state
+   524→      setSelectedXpage((prev: XPage | null) => prev ? { ...prev, [field]: value } : null);
+   525→    } catch (error) {
+   526→      console.error('Error updating field:', error);
+   527→    }
+   528→  };
+   529→
+   530→  const updateUserField = async (field: string, value: any) => {
+   531→    if (!selectedUserId) return;
+   532→
+   533→    // Security check: non-admin users can only edit their own records
+   534→    if (!isCurrentUserAdmin && selectedUserRecord && selectedUserRecord.auth_id !== currentUser?.auth_id) {
+   535→      alert('You can only edit your own user record.');
+   536→      return;
+   537→    }
+   538→
+   539→    // Additional security check: only admins can edit admin-only fields
+   540→    const adminOnlyFields = ['is_admin', 'ruplin_api_key_1', 'background_processing_settings'];
+   541→    if (adminOnlyFields.includes(field) && !isCurrentUserAdmin) {
+   542→      alert('Only administrators can edit this field.');
+   543→      return;
+   544→    }
+   545→
+   546→    try {
+   547→      const { error } = await supabase
+   548→        .from('users')
+   549→        .update({ [field]: value })
+   550→        .eq('id', selectedUserId);
+   551→
+   552→      if (error) {
+   553→        console.error('Error updating user field:', error);
+   554→        return;
+   555→      }
+   556→
+   557→      // Update local state
+   558→      setSelectedUserRecord((prev: User | null) => prev ? { ...prev, [field]: value } : null);
+   559→      
+   560→      // If updating current user, also update the currentUser state
+   561→      if (selectedUserRecord && selectedUserRecord.auth_id === currentUser?.auth_id) {
+   562→        setCurrentUser((prev: User | null) => prev ? { ...prev, [field]: value } : null);
+   563→        
+   564→        // Update admin status if is_admin was changed
+   565→        if (field === 'is_admin') {
+   566→          setIsCurrentUserAdmin(value);
+   567→        }
+   568→      }
+   569→    } catch (error) {
+   570→      console.error('Error:', error);
+   571→    }
+   572→  };
+   573→
+   574→  const handleFieldClick = (field: string, currentValue: any) => {
+   575→    const fieldConfig = xpageFields.find(f => f.key === field);
+   576→    if (!fieldConfig?.editable) return;
+   577→
+   578→    setEditingField(field);
+   579→    setEditingValue(currentValue?.toString() || '');
+   580→  };
+   581→
+   582→  const handleFieldSave = async () => {
+   583→    if (!editingField) return;
+   584→
+   585→    const fieldConfig = xpageFields.find(f => f.key === editingField);
+   586→    let processedValue: any = editingValue;
+   587→
+   588→    if (fieldConfig?.type === 'integer') {
+   589→      processedValue = editingValue === '' ? null : parseInt(editingValue);
+   590→      if (isNaN(processedValue)) processedValue = null;
+   591→    } else if (fieldConfig?.type === 'boolean') {
+   592→      processedValue = editingValue === 'true';
+   593→    } else if (editingValue === '') {
+   594→      processedValue = null;
+   595→    }
+   596→
+   597→    await updateXpageField(editingField, processedValue);
+   598→    setEditingField(null);
+   599→    setEditingValue('');
+   600→  };
+   601→
+   602→  const handleFieldCancel = () => {
+   603→    setEditingField(null);
+   604→    setEditingValue('');
+   605→  };
+   606→
+   607→  const handleBooleanToggle = async (field: string, currentValue: boolean | null) => {
+   608→    const newValue = currentValue === null ? true : !currentValue;
+   609→    await updateXpageField(field, newValue);
+   610→  };
+   611→
+   612→  const handleFieldCheckboxChange = (field: string, checked: boolean) => {
+   613→    const newSelected = new Set(selectedFields);
+   614→    if (checked) {
+   615→      newSelected.add(field);
+   616→    } else {
+   617→      newSelected.delete(field);
+   618→    }
+   619→    setSelectedFields(newSelected);
+   620→  };
+   621→
+   622→  const handleSelectAllFields = (checked: boolean) => {
+   623→    if (checked) {
+   624→      setSelectedFields(new Set(xpageFields.map(f => f.key)));
+   625→    } else {
+   626→      setSelectedFields(new Set());
+   627→    }
+   628→  };
+   629→
+   630→  const handleUtgUpdate = async (field: string, value: any) => {
+   631→    if (!selectedUtgId) return;
+   632→
+   633→    try {
+   634→      const { error } = await supabase
+   635→        .from('utgs')
+   636→        .update({ [field]: value })
+   637→        .eq('utg_id', selectedUtgId);
+   638→
+   639→      if (error) {
+   640→        console.error('Error updating utg field:', error);
+   641→        return;
+   642→      }
+   643→
+   644→      // Update local state
+   645→      setSelectedUtgRecord((prev: any) => prev ? { ...prev, [field]: value } : null);
+   646→    } catch (error) {
+   647→      console.error('Error updating utg field:', error);
+   648→    }
+   649→  };
+   650→
+   651→  const handleZarnoUpdate = async (field: string, value: any) => {
+   652→    if (!selectedZarnoId) return;
+   653→
+   654→    try {
+   655→      const { error } = await supabase
+   656→        .from('zarnos')
+   657→        .update({ [field]: value })
+   658→        .eq('zarno_id', selectedZarnoId);
+   659→
+   660→      if (error) {
+   661→        console.error('Error updating zarno field:', error);
+   662→        return;
+   663→      }
+   664→
+   665→      // Update local state
+   666→      setSelectedZarnoRecord((prev: Zarno | null) => prev ? { ...prev, [field]: value } : null);
+   667→    } catch (error) {
+   668→      console.error('Error updating zarno field:', error);
+   669→    }
+   670→  };
+   671→
+   672→  const handleBoxEditorOpen = (field: string, value: string, record: any, updateHandler: (field: string, value: any) => Promise<void>) => {
+   673→    setBoxEditorField(field);
+   674→    setBoxEditorValue(value || '');
+   675→    setBoxEditorRecord(record);
+   676→    setBoxEditorUpdateHandler(() => updateHandler);
+   677→    setBoxEditorOpen(true);
+   678→  };
+   679→
+   680→  const handleBoxEditorSave = async () => {
+   681→    if (boxEditorUpdateHandler) {
+   682→      await boxEditorUpdateHandler(boxEditorField, boxEditorValue);
+   683→    }
+   684→    setBoxEditorOpen(false);
+   685→  };
+   686→
+   687→  const handleBoxEditorClose = () => {
+   688→    setBoxEditorOpen(false);
+   689→  };
+   690→
+   691→  const toggleFieldStar = async (fieldName: string) => {
+   692→    const currentStarred = fieldMetadata[fieldName]?.starred || false;
+   693→    const newStarred = !currentStarred;
+   694→
+   695→    try {
+   696→      const { error } = await supabase
+   697→        .from('frenzi_field_metadata')
+   698→        .upsert({
+   699→          table_name: 'xpages',
+   700→          field_name: fieldName,
+   701→          starred: newStarred,
+   702→          flagged: fieldMetadata[fieldName]?.flagged || false
+   703→        }, {
+   704→          onConflict: 'table_name,field_name'
+   705→        });
+   706→
+   707→      if (error) {
+   708→        console.error('Error updating field star:', error);
+   709→        return;
+   710→      }
+   711→
+   712→      // Update local state
+   713→      setFieldMetadata(prev => ({
+   714→        ...prev,
+   715→        [fieldName]: {
+   716→          starred: newStarred,
+   717→          flagged: prev[fieldName]?.flagged || false
+   718→        }
+   719→      }));
+   720→    } catch (error) {
+   721→      console.error('Error:', error);
+   722→    }
+   723→  };
+   724→
+   725→  const toggleFieldFlag = async (fieldName: string) => {
+   726→    const currentFlagged = fieldMetadata[fieldName]?.flagged || false;
+   727→    const newFlagged = !currentFlagged;
+   728→
+   729→    try {
+   730→      const { error } = await supabase
+   731→        .from('frenzi_field_metadata')
+   732→        .upsert({
+   733→          table_name: 'xpages',
+   734→          field_name: fieldName,
+   735→          starred: fieldMetadata[fieldName]?.starred || false,
+   736→          flagged: newFlagged
+   737→        }, {
+   738→          onConflict: 'table_name,field_name'
+   739→        });
+   740→
+   741→      if (error) {
+   742→        console.error('Error updating field flag:', error);
+   743→        return;
+   744→      }
+   745→
+   746→      // Update local state
+   747→      setFieldMetadata(prev => ({
+   748→        ...prev,
+   749→        [fieldName]: {
+   750→          starred: prev[fieldName]?.starred || false,
+   751→          flagged: newFlagged
+   752→        }
+   753→      }));
+   754→    } catch (error) {
+   755→      console.error('Error:', error);
+   756→    }
+   757→  };
+   758→
+   759→  // Handle column header click for sorting
+   760→  const handleSort = (column: string) => {
+   761→    if (sortBy === column) {
+   762→      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+   763→    } else {
+   764→      setSortBy(column);
+   765→      setSortDirection('asc');
+   766→    }
+   767→  };
+   768→
+   769→  // Sort fields based on selected sort option
+   770→  const getSortedFields = () => {
+   771→    const fieldsWithMetadata = xpageFields.map(field => ({
+   772→      ...field,
+   773→      starred: fieldMetadata[field.key]?.starred || false,
+   774→      flagged: fieldMetadata[field.key]?.flagged || false,
+   775→      value: selectedXpage ? selectedXpage[field.key as keyof XPage] : null
+   776→    }));
+   777→
+   778→    return fieldsWithMetadata.sort((a, b) => {
+   779→      let compareResult = 0;
+   780→
+   781→      switch (sortBy) {
+   782→        case 'starred':
+   783→          compareResult = (b.starred ? 1 : 0) - (a.starred ? 1 : 0);
+   784→          break;
+   785→        case 'flagged':
+   786→          compareResult = (b.flagged ? 1 : 0) - (a.flagged ? 1 : 0);
+   787→          break;
+   788→        case 'field_name':
+   789→          compareResult = a.key.localeCompare(b.key);
+   790→          break;
+   791→        case 'value':
+   792→          const aVal = a.value?.toString() || '';
+   793→          const bVal = b.value?.toString() || '';
+   794→          compareResult = aVal.localeCompare(bVal);
+   795→          break;
+   796→        default:
+   797→          compareResult = 0;
+   798→      }
+   799→
+   800→      return sortDirection === 'asc' ? compareResult : -compareResult;
+   801→    });
+   802→  };
+   803→
+   804→  const dropdownContainerStyle = {
+   805→    marginBottom: '20px',
+   806→    display: 'flex',
+   807→    alignItems: 'center',
+   808→    gap: '10px'
+   809→  };
+   810→
+   811→  const labelStyle = {
+   812→    fontSize: '14px',
+   813→    fontWeight: '600'
+   814→  };
+   815→
+   816→  const selectStyle = {
+   817→    padding: '8px 12px',
+   818→    fontSize: '14px',
+   819→    border: '1px solid #ccc',
+   820→    borderRadius: '4px',
+   821→    backgroundColor: '#fff',
+   822→    minWidth: '300px',
+   823→    cursor: 'pointer'
+   824→  };
+   825→
+   826→  const disabledSelectStyle = {
+   827→    ...selectStyle,
+   828→    backgroundColor: '#f5f5f5',
+   829→    cursor: 'not-allowed',
+   830→    opacity: 0.6
+   831→  };
+   832→
+   833→  const tooltipContainerStyle = {
+   834→    position: 'relative' as const,
+   835→    display: 'inline-flex',
+   836→    alignItems: 'center',
+   837→    gap: '5px'
+   838→  };
+   839→
+   840→  const tooltipIconStyle = {
+   841→    cursor: 'help',
+   842→    fontSize: '16px',
+   843→    color: '#666'
+   844→  };
+   845→
+   846→  const tooltipBoxStyle = {
+   847→    position: 'absolute' as const,
+   848→    top: '100%',
+   849→    left: '0',
+   850→    marginTop: '5px',
+   851→    padding: '10px',
+   852→    backgroundColor: '#333',
+   853→    color: '#fff',
+   854→    borderRadius: '4px',
+   855→    fontSize: '12px',
+   856→    whiteSpace: 'nowrap' as const,
+   857→    zIndex: 1000,
+   858→    display: showTooltip ? 'flex' : 'none',
+   859→    alignItems: 'center',
+   860→    gap: '10px',
+   861→    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+   862→  };
+   863→
+   864→  const copyButtonStyle = {
+   865→    padding: '2px 8px',
+   866→    backgroundColor: '#555',
+   867→    border: 'none',
+   868→    borderRadius: '3px',
+   869→    color: '#fff',
+   870→    fontSize: '11px',
+   871→    cursor: 'pointer'
+   872→  };
+   873→
+   874→  const tabContainerStyle = {
+   875→    width: '100%',
+   876→    marginBottom: '20px'
+   877→  };
+   878→
+   879→  const tabListStyle = {
+   880→    display: 'flex',
+   881→    width: '100%',
+   882→    margin: '0',
+   883→    padding: '0',
+   884→    listStyle: 'none'
+   885→  };
+   886→
+   887→  const tabStyle = {
+   888→    flex: '1',
+   889→    textAlign: 'center' as const,
+   890→    padding: '12px 16px',
+   891→    cursor: 'pointer',
+   892→    borderTop: '2px solid #a4a4a4',
+   893→    borderLeft: '2px solid #a4a4a4',
+   894→    borderRight: '2px solid #a4a4a4',
+   895→    borderBottom: '2px solid #ba5816',
+   896→    backgroundColor: '#f8f9fa',
+   897→    fontSize: '20px',
+   898→    fontWeight: '500'
+   899→  };
+   900→
+   901→  const activeTabStyle = {
+   902→    ...tabStyle,
+   903→    backgroundColor: '#fff',
+   904→    borderBottom: '2px solid #fff',
+   905→    borderTop: '2px solid #ba5816',
+   906→    borderLeft: '2px solid #ba5816',
+   907→    borderRight: '2px solid #ba5816',
+   908→    fontWeight: 'bold'
+   909→  };
+   910→
+   911→  const contentStyle = {
+   912→    padding: '20px',
+   913→    minHeight: '400px'
+   914→  };
+   915→
+   916→  // Function to get appropriate tab style based on active tab and position
+   917→  const getTabStyle = (tabName: 'general' | 'billing' | 'settings') => {
+   918→    if (tabName === activeTab) {
+   919→      return activeTabStyle;
+   920→    }
+   921→    
+   922→    // For inactive tabs, handle border collision with active tab and adjacent tabs
+   923→    let style = { ...tabStyle };
+   924→    
+   925→    // Remove right border if this tab is to the left of active tab
+   926→    if ((tabName === 'general' && activeTab === 'billing') || 
+   927→        (tabName === 'billing' && activeTab === 'settings')) {
+   928→      style.borderRight = 'none';
+   929→    }
+   930→    
+   931→    // Remove left border if this tab is to the right of active tab
+   932→    if ((tabName === 'billing' && activeTab === 'general') || 
+   933→        (tabName === 'settings' && activeTab === 'billing')) {
+   934→      style.borderLeft = 'none';
+   935→    }
+   936→    
+   937→    // Handle border doubling between adjacent inactive tabs
+   938→    // Remove right border from left tab in inactive pairs
+   939→    if (tabName === 'general' && activeTab === 'settings') {
+   940→      // general and billing are both inactive, remove right border from general
+   941→      style.borderRight = 'none';
+   942→    } else if (tabName === 'billing' && activeTab === 'general') {
+   943→      // billing and settings are both inactive, remove right border from billing
+   944→      style.borderRight = 'none';
+   945→    }
+   946→    
+   947→    return style;
+   948→  };
+   949→
+   950→  return (
+   951→    <div>
+   952→      <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>
+   953→        <span style={{ fontWeight: 'bold' }}>MyHub Account Settings</span>
+   954→      </h1>
+   955→
+   956→      <div style={dropdownContainerStyle}>
+   957→        <label style={labelStyle}>Select users:</label>
+   958→        <select 
+   959→          style={selectStyle}
+   960→          value={selectedUserId || ''}
+   961→          onChange={(e) => handleUserChange(e.target.value)}
+   962→          disabled={loading}
+   963→        >
+   964→          <option value="">-- Select a User --</option>
+   965→          {users.map((user) => (
+   966→            <option 
+   967→              key={user.id} 
+   968→              value={user.id}
+   969→              disabled={!isCurrentUserAdmin && user.auth_id !== currentUser?.auth_id}
+   970→            >
+   971→              {user.id} - {user.email || '(No email)'} - {user.auth_id === currentUser?.auth_id ? 'CurrentlyLoggedInAccount' : '-'}
+   972→            </option>
+   973→          ))}
+   974→        </select>
+   975→        
+   976→        <label style={labelStyle}>empty (waiting):</label>
+   977→        <select 
+   978→          style={{...selectStyle, opacity: 0.5, cursor: 'not-allowed'}}
+   979→          disabled={true}
+   980→        >
+   981→          <option value="">-- Coming Soon --</option>
+   982→        </select>
+   983→        
+   984→        <label style={labelStyle}>empty (waiting):</label>
+   985→        <select 
+   986→          style={{...selectStyle, opacity: 0.5, cursor: 'not-allowed'}}
+   987→          disabled={true}
+   988→        >
+   989→          <option value="">-- Coming Soon --</option>
+   990→        </select>
+   991→
+   992→        <div style={tooltipContainerStyle}>
+   993→          <span 
+   994→            style={tooltipIconStyle}
+   995→            onMouseEnter={() => setShowTooltip(true)}
+   996→            onMouseLeave={() => setShowTooltip(false)}
+   997→          >
+   998→            ℹ️
+   999→          </span>
+  1000→        </div>
+  1001→      </div>
+  1002→
+  1003→      <div style={tabContainerStyle}>
+  1004→        <ul style={tabListStyle}>
+  1005→          <li 
+  1006→            style={getTabStyle('general')}
+  1007→            onClick={() => {
+  1008→              setActiveTab('general');
+  1009→              updateURLWithCurrentState({ tab: 'general' });
+  1010→            }}
+  1011→          >
+  1012→            {activeTab === 'general' ? 
+  1013→              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+  1014→              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+  1015→            }
+  1016→            general
+  1017→          </li>
+  1018→          <li 
+  1019→            style={getTabStyle('billing')}
+  1020→            onClick={() => {
+  1021→              setActiveTab('billing');
+  1022→              updateURLWithCurrentState({ tab: 'billing' });
+  1023→            }}
+  1024→          >
+  1025→            {activeTab === 'billing' ? 
+  1026→              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+  1027→              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+  1028→            }
+  1029→            billing
+  1030→          </li>
+  1031→          <li 
+  1032→            style={getTabStyle('settings')}
+  1033→            onClick={() => {
+  1034→              setActiveTab('settings');
+  1035→              updateURLWithCurrentState({ tab: 'settings' });
+  1036→            }}
+  1037→          >
+  1038→            {activeTab === 'settings' ? 
+  1039→              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+  1040→              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+  1041→            }
+  1042→            settings
+  1043→          </li>
+  1044→        </ul>
+  1045→      </div>
+  1046→
+  1047→      <div style={contentStyle}>
+  1048→        {!selectedUserId ? (
+  1049→          <div style={{ textAlign: 'center', color: '#666', marginTop: '50px' }}>
+  1050→            <p>Please select a User from the dropdown above to manage account settings.</p>
+  1051→          </div>
+  1052→        ) : (
+  1053→          <>
+  1054→            {activeTab === 'general' && (
+  1055→              <div>
+  1056→                <div style={{
+  1057→                  backgroundColor: '#f8f9fa',
+  1058→                  border: '1px solid #dee2e6',
+  1059→                  borderRadius: '4px',
+  1060→                  padding: '15px',
+  1061→                  marginBottom: '20px'
+  1062→                }}>
+  1063→                  <div style={{
+  1064→                    fontSize: '16px',
+  1065→                    fontWeight: 'bold',
+  1066→                    color: 'black',
+  1067→                    marginBottom: '10px'
+  1068→                  }}>
+  1069→                    devinfobox
+  1070→                  </div>
+  1071→                  <div style={{
+  1072→                    backgroundColor: '#f1f3f4',
+  1073→                    border: '1px solid #ccc',
+  1074→                    borderRadius: '4px',
+  1075→                    padding: '8px',
+  1076→                    fontFamily: 'monospace',
+  1077→                    fontSize: '14px',
+  1078→                    display: 'flex',
+  1079→                    alignItems: 'center',
+  1080→                    gap: '8px'
+  1081→                  }}>
+  1082→                    <button
+  1083→                      onClick={() => {
+  1084→                        const url = 'vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx';
+  1085→                        navigator.clipboard.writeText(url);
+  1086→                      }}
+  1087→                      style={{
+  1088→                        width: '20px',
+  1089→                        height: '20px',
+  1090→                        backgroundColor: '#6c757d',
+  1091→                        color: 'white',
+  1092→                        border: 'none',
+  1093→                        borderRadius: '2px',
+  1094→                        cursor: 'pointer',
+  1095→                        fontSize: '12px',
+  1096→                        display: 'flex',
+  1097→                        alignItems: 'center',
+  1098→                        justifyContent: 'center'
+  1099→                      }}
+  1100→                      title="Copy to clipboard"
+  1101→                    >
+  1102→                      📋
+  1103→                    </button>
+  1104→                    <a 
+  1105→                      href="vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx"
+  1106→                      style={{
+  1107→                        color: '#0066cc',
+  1108→                        textDecoration: 'none',
+  1109→                        flex: 1
+  1110→                      }}
+  1111→                    >
+  1112→                      vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx
+  1113→                    </a>
+  1114→                  </div>
+  1115→                </div>
+  1116→                <h2>User Account Settings</h2>
+  1117→                <p>Configure account settings for User ID: {selectedUserId}</p>
+  1118→                
+  1119→                {selectedUserRecord && (
+  1120→                  <>
+  1121→                    <div style={{ 
+  1122→                      backgroundColor: '#b5edbc', 
+  1123→                      border: '1px solid #273929', 
+  1124→                      borderRadius: '7px', 
+  1125→                      padding: '4px', 
+  1126→                      marginBottom: '15px', 
+  1127→                      fontSize: '16px', 
+  1128→                      color: '#252525' 
+  1129→                    }}>
+  1130→                      <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
+  1131→                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on users, and other database tables.</span>
+  1132→                    </div>
+  1133→                    <BensaFieldTable
+  1134→                      config={bensaUsersConfig}
+  1135→                      selectedRecord={selectedUserRecord}
+  1136→                      onRecordUpdate={updateUserField}
+  1137→                      onBoxEditorOpen={handleBoxEditorOpen}
+  1138→                    />
+  1139→                  </>
+  1140→                )}
+  1141→              </div>
+  1142→            )}
+  1143→            {activeTab === 'billing' && (
+  1144→              <div>
+  1145→                <h2>Billing Settings</h2>
+  1146→                <p>Manage billing preferences and payment methods for User ID: {selectedUserId}</p>
+  1147→                
+  1148→                <div style={{
+  1149→                  backgroundColor: '#f8f9fa',
+  1150→                  border: '1px solid #dee2e6',
+  1151→                  borderRadius: '4px',
+  1152→                  padding: '20px',
+  1153→                  marginTop: '20px'
+  1154→                }}>
+  1155→                  <h3 style={{ marginTop: '0', color: '#495057' }}>Coming Soon</h3>
+  1156→                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+  1157→                    • Subscription management
+  1158→                  </p>
+  1159→                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+  1160→                    • Payment method settings
+  1161→                  </p>
+  1162→                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+  1163→                    • Billing history and invoices
+  1164→                  </p>
+  1165→                  <p style={{ color: '#6c757d', marginBottom: '0' }}>
+  1166→                    • Usage tracking and limits
+  1167→                  </p>
+  1168→                </div>
+  1169→              </div>
+  1170→            )}
+  1171→            {activeTab === 'settings' && (
+  1172→              <div>
+  1173→                <h2>Account Settings</h2>
+  1174→                <p>Configure system preferences and security settings for User ID: {selectedUserId}</p>
+  1175→                
+  1176→                <div style={{
+  1177→                  backgroundColor: '#f8f9fa',
+  1178→                  border: '1px solid #dee2e6',
+  1179→                  borderRadius: '4px',
+  1180→                  padding: '20px',
+  1181→                  marginTop: '20px'
+  1182→                }}>
+  1183→                  <h3 style={{ marginTop: '0', color: '#495057' }}>Coming Soon</h3>
+  1184→                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+  1185→                    • Two-factor authentication
+  1186→                  </p>
+  1187→                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+  1188→                    • Password management
+  1189→                  </p>
+  1190→                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+  1191→                    • Session management
+  1192→                  </p>
+  1193→                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+  1194→                    • Privacy preferences
+  1195→                  </p>
+  1196→                  <p style={{ color: '#6c757d', marginBottom: '0' }}>
+  1197→                    • Notification settings
+  1198→                  </p>
+  1199→                </div>
+  1200→              </div>
+  1201→            )}
+  1202→          </>
+  1203→        )}
+  1204→      </div>
+  1205→
+  1206→      {/* Box Editor Popup */}
+  1207→      {boxEditorOpen && (
+  1208→        <div style={{
+  1209→          position: 'fixed',
+  1210→          top: '50%',
+  1211→          left: '50%',
+  1212→          transform: 'translate(-50%, -50%)',
+  1213→          width: '660px',
+  1214→          height: '760px',
+  1215→          backgroundColor: 'white',
+  1216→          border: '2px solid #ccc',
+  1217→          borderRadius: '8px',
+  1218→          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+  1219→          zIndex: 1000,
+  1220→          display: 'flex',
+  1221→          flexDirection: 'column',
+  1222→          padding: '20px'
+  1223→        }}>
+  1224→          <div style={{
+  1225→            display: 'flex',
+  1226→            justifyContent: 'space-between',
+  1227→            alignItems: 'center',
+  1228→            marginBottom: '20px',
+  1229→            borderBottom: '1px solid #ddd',
+  1230→            paddingBottom: '10px'
+  1231→          }}>
+  1232→            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>
+  1233→              Box Editor - {boxEditorField}
+  1234→            </h3>
+  1235→            <button
+  1236→              onClick={handleBoxEditorClose}
+  1237→              style={{
+  1238→                background: 'none',
+  1239→                border: 'none',
+  1240→                fontSize: '24px',
+  1241→                cursor: 'pointer',
+  1242→                color: '#666'
+  1243→              }}
+  1244→            >
+  1245→              ×
+  1246→            </button>
+  1247→          </div>
+  1248→          
+  1249→          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+  1250→            <textarea
+  1251→              value={boxEditorValue}
+  1252→              onChange={(e) => setBoxEditorValue(e.target.value)}
+  1253→              style={{
+  1254→                flex: 1,
+  1255→                width: '100%',
+  1256→                padding: '10px',
+  1257→                border: '1px solid #ccc',
+  1258→                borderRadius: '4px',
+  1259→                fontSize: '14px',
+  1260→                fontFamily: 'monospace',
+  1261→                resize: 'none',
+  1262→                outline: 'none',
+  1263→                whiteSpace: 'pre-wrap'
+  1264→              }}
+  1265→              placeholder="Enter text here..."
+  1266→            />
+  1267→          </div>
+  1268→          
+  1269→          <div style={{
+  1270→            display: 'flex',
+  1271→            justifyContent: 'flex-end',
+  1272→            gap: '10px',
+  1273→            marginTop: '20px',
+  1274→            borderTop: '1px solid #ddd',
+  1275→            paddingTop: '10px'
+  1276→          }}>
+  1277→            <button
+  1278→              onClick={handleBoxEditorClose}
+  1279→              style={{
+  1280→                padding: '8px 16px',
+  1281→                backgroundColor: '#f5f5f5',
+  1282→                color: '#333',
+  1283→                border: '1px solid #ccc',
+  1284→                borderRadius: '4px',
+  1285→                cursor: 'pointer'
+  1286→              }}
+  1287→            >
+  1288→              Cancel
+  1289→            </button>
+  1290→            <button
+  1291→              onClick={handleBoxEditorSave}
+  1292→              style={{
+  1293→                padding: '8px 16px',
+  1294→                backgroundColor: '#22c55e',
+  1295→                color: 'white',
+  1296→                border: 'none',
+  1297→                borderRadius: '4px',
+  1298→                cursor: 'pointer'
+  1299→              }}
+  1300→            >
+  1301→              Save
+  1302→            </button>
+  1303→          </div>
+  1304→        </div>
+  1305→      )}
+  1306→    </div>
+  1307→  );
+  1308→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useAuth } from '@/app/context/AuthContext';
+import BensaFieldTable from '@/app/(protected3)/bensa/components/BensaFieldTable';
+import { bensaUtgsConfig } from '@/app/(protected3)/bensa/config/bensaUtgsConfig';
+import { bensaZarnosConfig } from '@/app/(protected3)/bensa/config/bensaZarnosConfig';
+import { bensaXpagesConfig } from '@/app/(protected3)/bensa/config/bensaXpagesConfig';
+import { bensaUsersConfig } from '@/app/(protected3)/bensa/config/bensaUsersConfig';
+
+interface XPage {
+  xpage_id: number;
+  title1: string | null;
+  main_url: string | null;
+  meta_title: string | null;
+  title2: string | null;
+  desc1: string | null;
+  caption: string | null;
+  pagepath_url: string | null;
+  pagepath_long: string | null;
+  pagepath_short: string | null;
+  position_marker: number | null;
+  show_in_all_pages_nav_area1: boolean | null;
+  broad_parent_container: string | null;
+  has_mutation_observer: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface UTG {
+  utg_id: string;
+  utg_name: string;
+  rel_xpage_id: number | null;
+}
+
+interface Zarno {
+  zarno_id: number;
+  fk_xpage_id: number | null;
+  zarno_name: string | null;
+  zarno_type: string | null;
+  zarno_path: string | null;
+  zarno_status: string | null;
+  zarno_config: any;
+  execution_order: number | null;
+  dependencies: any;
+  metadata: any;
+  is_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+}
+
+interface ZarnoDropdownItem {
+  zarno_id: number;
+  zarno_name: string | null;
+  fk_xpage_id: number | null;
+}
+
+interface User {
+  id: string;
+  email: string | null;
+  is_admin: boolean | null;
+  sidebar_menu_active: boolean | null;
+  ruplin_api_key_1: string | null;
+  background_processing_settings: any;
+  created_at: string;
+  auth_id: string;
+}
+
+export default function MyHubClient() {
+  const [activeTab, setActiveTab] = useState<'general' | 'billing' | 'settings'>('general');
+  const [xpages, setXpages] = useState<XPage[]>([]);
+  const [utgs, setUtgs] = useState<UTG[]>([]);
+  const [zarnos, setZarnos] = useState<ZarnoDropdownItem[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedXpage, setSelectedXpage] = useState<XPage | null>(null);
+  const [selectedXpageId, setSelectedXpageId] = useState<number | null>(null);
+  const [selectedUtgId, setSelectedUtgId] = useState<string | null>(null);
+  const [selectedUtgRecord, setSelectedUtgRecord] = useState<any | null>(null);
+  const [selectedZarnoId, setSelectedZarnoId] = useState<number | null>(null);
+  const [selectedZarnoRecord, setSelectedZarnoRecord] = useState<Zarno | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserRecord, setSelectedUserRecord] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingUtgs, setLoadingUtgs] = useState(false);
+  const [loadingZarnos, setLoadingZarnos] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
+  const [fieldMetadata, setFieldMetadata] = useState<{[key: string]: {starred: boolean, flagged: boolean}}>({});
+  const [sortBy, setSortBy] = useState<string>('starred');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [boxEditorOpen, setBoxEditorOpen] = useState(false);
+  const [boxEditorValue, setBoxEditorValue] = useState('');
+  const [boxEditorField, setBoxEditorField] = useState<string>('');
+  const [boxEditorRecord, setBoxEditorRecord] = useState<any>(null);
+  const [boxEditorUpdateHandler, setBoxEditorUpdateHandler] = useState<((field: string, value: any) => Promise<void>) | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
+  
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const supabase = createClientComponentClient();
+  const { user } = useAuth();
+
+  // Initialize page - only run once
+  useEffect(() => {
+    fetchXpages();
+    fetchUsers();
+    fetchFieldMetadata();
+  }, []);
+
+  // Handle URL parameters - only when searchParams change
+  useEffect(() => {
+    if (!searchParams) return;
+    
+    // Get tab from URL if present
+    const tabParam = searchParams.get('tab');
+    if (tabParam && (tabParam === 'general' || tabParam === 'billing' || tabParam === 'settings')) {
+      setActiveTab(tabParam as 'general' | 'billing' | 'settings');
+    }
+    
+    // Get xpage_id from URL if present
+    const xpageIdParam = searchParams.get('xpage_id');
+    if (xpageIdParam) {
+      const xpageId = parseInt(xpageIdParam);
+      setSelectedXpageId(xpageId);
+      fetchSelectedXpage(xpageId);
+    }
+    
+    // Get utg_id from URL if present
+    const utgIdParam = searchParams.get('utg_id');
+    if (utgIdParam) {
+      setSelectedUtgId(utgIdParam);
+      fetchSelectedUtg(utgIdParam);
+    }
+    
+    // Get zarno_id from URL if present
+    const zarnoIdParam = searchParams.get('zarno_id');
+    if (zarnoIdParam) {
+      const zarnoId = parseInt(zarnoIdParam);
+      setSelectedZarnoId(zarnoId);
+      fetchSelectedZarno(zarnoId);
+    }
+  }, [searchParams]);
+
+  // Fetch UTGs when xpage is selected
+  useEffect(() => {
+    if (selectedXpageId) {
+      fetchRelatedUtgs(selectedXpageId);
+    } else {
+      setUtgs([]);
+      setSelectedUtgId(null);
+      setSelectedUtgRecord(null);
+    }
+  }, [selectedXpageId]);
+
+  // Fetch Zarnos when xpage is selected
+  useEffect(() => {
+    if (selectedXpageId) {
+      fetchRelatedZarnos(selectedXpageId);
+    } else {
+      setZarnos([]);
+      setSelectedZarnoId(null);
+      setSelectedZarnoRecord(null);
+    }
+  }, [selectedXpageId]);
+
+  const fetchXpages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('xpages')
+        .select('*')
+        .order('xpage_id', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching xpages:', error);
+        return;
+      }
+
+      setXpages(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSelectedXpage = async (xpageId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from('xpages')
+        .select('*')
+        .eq('xpage_id', xpageId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching selected xpage:', error);
+        return;
+      }
+
+      setSelectedXpage(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('email', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching users:', error);
+        return;
+      }
+
+      setUsers(data || []);
+      
+      // Find current user and set admin status
+      if (user?.id) {
+        const currentUserRecord = data?.find(u => u.auth_id === user.id);
+        if (currentUserRecord) {
+          setCurrentUser(currentUserRecord);
+          setIsCurrentUserAdmin(currentUserRecord.is_admin || false);
+          // Auto-select current user if no user is selected
+          if (!selectedUserId) {
+            setSelectedUserId(currentUserRecord.id);
+            setSelectedUserRecord(currentUserRecord);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchSelectedUser = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching selected user:', error);
+        return;
+      }
+
+      setSelectedUserRecord(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchSelectedUtg = async (utgId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('utgs')
+        .select('*')
+        .eq('utg_id', utgId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching selected utg:', error);
+        return;
+      }
+
+      setSelectedUtgRecord(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchFieldMetadata = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('frenzi_field_metadata')
+        .select('field_name, starred, flagged')
+        .eq('table_name', 'xpages');
+
+      if (error) {
+        console.error('Error fetching field metadata:', error);
+        return;
+      }
+
+      const metadataMap: {[key: string]: {starred: boolean, flagged: boolean}} = {};
+      data?.forEach(item => {
+        metadataMap[item.field_name] = {
+          starred: item.starred || false,
+          flagged: item.flagged || false
+        };
+      });
+      setFieldMetadata(metadataMap);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchRelatedUtgs = async (xpageId: number) => {
+    try {
+      setLoadingUtgs(true);
+      
+      // Fetch UTGs where rel_xpage_id matches the selected xpage_id
+      const { data, error } = await supabase
+        .from('utgs')
+        .select('utg_id, utg_name, rel_xpage_id')
+        .eq('rel_xpage_id', xpageId)
+        .order('utg_name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching UTGs:', error);
+        return;
+      }
+
+      setUtgs(data || []);
+      
+      // Auto-select if only one UTG available (only if no UTG is currently selected)
+      if (data && data.length === 1 && !selectedUtgId) {
+        const singleUtg = data[0];
+        setSelectedUtgId(singleUtg.utg_id);
+        fetchSelectedUtg(singleUtg.utg_id);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoadingUtgs(false);
+    }
+  };
+
+  const fetchSelectedZarno = async (zarnoId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from('zarnos')
+        .select('*')
+        .eq('zarno_id', zarnoId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching selected zarno:', error);
+        return;
+      }
+
+      setSelectedZarnoRecord(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchRelatedZarnos = async (xpageId: number) => {
+    try {
+      setLoadingZarnos(true);
+      
+      // Fetch Zarnos where fk_xpage_id matches the selected xpage_id
+      const { data, error } = await supabase
+        .from('zarnos')
+        .select('zarno_id, zarno_name, fk_xpage_id')
+        .eq('fk_xpage_id', xpageId)
+        .order('zarno_name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching Zarnos:', error);
+        return;
+      }
+
+      setZarnos(data || []);
+      
+      // Auto-select if only one Zarno available (only if no Zarno is currently selected)
+      if (data && data.length === 1 && !selectedZarnoId) {
+        const singleZarno = data[0];
+        setSelectedZarnoId(singleZarno.zarno_id);
+        fetchSelectedZarno(singleZarno.zarno_id);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoadingZarnos(false);
+    }
+  };
+
+  const updateURLWithCurrentState = (updates: {
+    tab?: 'general' | 'billing' | 'settings';
+    xpage_id?: number;
+    utg_id?: string;
+    zarno_id?: number;
+  }) => {
+    const params = new URLSearchParams(searchParams || '');
+    
+    // Update or set tab
+    if (updates.tab) {
+      params.set('tab', updates.tab);
+    }
+    
+    // Update or set xpage_id
+    if (updates.xpage_id !== undefined) {
+      params.set('xpage_id', updates.xpage_id.toString());
+    }
+    
+    // Update or set utg_id
+    if (updates.utg_id !== undefined) {
+      if (updates.utg_id) {
+        params.set('utg_id', updates.utg_id);
+      } else {
+        params.delete('utg_id');
+      }
+    }
+    
+    // Update or set zarno_id
+    if (updates.zarno_id !== undefined) {
+      if (updates.zarno_id) {
+        params.set('zarno_id', updates.zarno_id.toString());
+      } else {
+        params.delete('zarno_id');
+      }
+    }
+    
+    router.push(`/myhub?${params.toString()}`);
+  };
+
+  const handleXpageChange = (xpageId: number) => {
+    setSelectedXpageId(xpageId);
+    fetchSelectedXpage(xpageId);
+    // Reset selected UTG and Zarno when XPage changes
+    setSelectedUtgId(null);
+    setSelectedUtgRecord(null);
+    setSelectedZarnoId(null);
+    setSelectedZarnoRecord(null);
+    
+    updateURLWithCurrentState({ xpage_id: xpageId, utg_id: '', zarno_id: 0 });
+    
+    // Fetch related entities after URL update (which will auto-select if only one option)
+    setTimeout(() => {
+      fetchRelatedUtgs(xpageId);
+      fetchRelatedZarnos(xpageId);
+    }, 100);
+  };
+
+  const handleUtgChange = (utgId: string) => {
+    setSelectedUtgId(utgId);
+    if (utgId) {
+      fetchSelectedUtg(utgId);
+    } else {
+      setSelectedUtgRecord(null);
+    }
+    updateURLWithCurrentState({ utg_id: utgId });
+  };
+
+  const handleUserChange = (userId: string) => {
+    // Security check: non-admin users can only select themselves
+    if (!isCurrentUserAdmin && currentUser) {
+      const selectedUser = users.find(u => u.id === userId);
+      if (selectedUser && selectedUser.auth_id !== currentUser.auth_id) {
+        alert('You can only access your own user record.');
+        return;
+      }
+    }
+    
+    setSelectedUserId(userId);
+    if (userId) {
+      fetchSelectedUser(userId);
+    } else {
+      setSelectedUserRecord(null);
+    }
+  };
+
+  const handleZarnoChange = (zarnoId: number) => {
+    const validZarnoId = zarnoId > 0 ? zarnoId : null;
+    setSelectedZarnoId(validZarnoId);
+    if (validZarnoId) {
+      fetchSelectedZarno(validZarnoId);
+    } else {
+      setSelectedZarnoRecord(null);
+    }
+    updateURLWithCurrentState({ zarno_id: validZarnoId || 0 });
+  };
+
+  const copyTooltipText = () => {
+    const text = 'All rows from utgs where rel_xpage_id matches xpages.xpage_id';
+    navigator.clipboard.writeText(text);
+  };
+
+  // Define field properties for xpages table
+  const xpageFields = [
+    { key: 'xpage_id', type: 'integer', editable: false },
+    { key: 'title1', type: 'text', editable: true },
+    { key: 'main_url', type: 'text', editable: true },
+    { key: 'meta_title', type: 'text', editable: true },
+    { key: 'title2', type: 'text', editable: true },
+    { key: 'desc1', type: 'text', editable: true },
+    { key: 'caption', type: 'text', editable: true },
+    { key: 'pagepath_url', type: 'text', editable: true },
+    { key: 'pagepath_long', type: 'text', editable: true },
+    { key: 'pagepath_short', type: 'text', editable: true },
+    { key: 'position_marker', type: 'integer', editable: true },
+    { key: 'show_in_all_pages_nav_area1', type: 'boolean', editable: true },
+    { key: 'broad_parent_container', type: 'text', editable: true },
+    { key: 'urlparam_total_keys_listed', type: 'jsonb', editable: true },
+    { key: 'created_at', type: 'timestamp', editable: false },
+    { key: 'updated_at', type: 'timestamp', editable: false }
+  ];
+
+  const updateXpageField = async (field: string, value: any) => {
+    if (!selectedXpageId) return;
+
+    try {
+      const { error } = await supabase
+        .from('xpages')
+        .update({ [field]: value })
+        .eq('xpage_id', selectedXpageId);
+
+      if (error) {
+        console.error('Error updating field:', error);
+        return;
+      }
+
+      // Update local state
+      setSelectedXpage((prev: XPage | null) => prev ? { ...prev, [field]: value } : null);
+    } catch (error) {
+      console.error('Error updating field:', error);
+    }
+  };
+
+  const updateUserField = async (field: string, value: any) => {
+    if (!selectedUserId) return;
+
+    // Security check: non-admin users can only edit their own records
+    if (!isCurrentUserAdmin && selectedUserRecord && selectedUserRecord.auth_id !== currentUser?.auth_id) {
+      alert('You can only edit your own user record.');
+      return;
+    }
+
+    // Additional security check: only admins can edit admin-only fields
+    const adminOnlyFields = ['is_admin', 'ruplin_api_key_1', 'background_processing_settings'];
+    if (adminOnlyFields.includes(field) && !isCurrentUserAdmin) {
+      alert('Only administrators can edit this field.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ [field]: value })
+        .eq('id', selectedUserId);
+
+      if (error) {
+        console.error('Error updating user field:', error);
+        return;
+      }
+
+      // Update local state
+      setSelectedUserRecord((prev: User | null) => prev ? { ...prev, [field]: value } : null);
+      
+      // If updating current user, also update the currentUser state
+      if (selectedUserRecord && selectedUserRecord.auth_id === currentUser?.auth_id) {
+        setCurrentUser((prev: User | null) => prev ? { ...prev, [field]: value } : null);
+        
+        // Update admin status if is_admin was changed
+        if (field === 'is_admin') {
+          setIsCurrentUserAdmin(value);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleFieldClick = (field: string, currentValue: any) => {
+    const fieldConfig = xpageFields.find(f => f.key === field);
+    if (!fieldConfig?.editable) return;
+
+    setEditingField(field);
+    setEditingValue(currentValue?.toString() || '');
+  };
+
+  const handleFieldSave = async () => {
+    if (!editingField) return;
+
+    const fieldConfig = xpageFields.find(f => f.key === editingField);
+    let processedValue: any = editingValue;
+
+    if (fieldConfig?.type === 'integer') {
+      processedValue = editingValue === '' ? null : parseInt(editingValue);
+      if (isNaN(processedValue)) processedValue = null;
+    } else if (fieldConfig?.type === 'boolean') {
+      processedValue = editingValue === 'true';
+    } else if (editingValue === '') {
+      processedValue = null;
+    }
+
+    await updateXpageField(editingField, processedValue);
+    setEditingField(null);
+    setEditingValue('');
+  };
+
+  const handleFieldCancel = () => {
+    setEditingField(null);
+    setEditingValue('');
+  };
+
+  const handleBooleanToggle = async (field: string, currentValue: boolean | null) => {
+    const newValue = currentValue === null ? true : !currentValue;
+    await updateXpageField(field, newValue);
+  };
+
+  const handleFieldCheckboxChange = (field: string, checked: boolean) => {
+    const newSelected = new Set(selectedFields);
+    if (checked) {
+      newSelected.add(field);
+    } else {
+      newSelected.delete(field);
+    }
+    setSelectedFields(newSelected);
+  };
+
+  const handleSelectAllFields = (checked: boolean) => {
+    if (checked) {
+      setSelectedFields(new Set(xpageFields.map(f => f.key)));
+    } else {
+      setSelectedFields(new Set());
+    }
+  };
+
+  const handleUtgUpdate = async (field: string, value: any) => {
+    if (!selectedUtgId) return;
+
+    try {
+      const { error } = await supabase
+        .from('utgs')
+        .update({ [field]: value })
+        .eq('utg_id', selectedUtgId);
+
+      if (error) {
+        console.error('Error updating utg field:', error);
+        return;
+      }
+
+      // Update local state
+      setSelectedUtgRecord((prev: any) => prev ? { ...prev, [field]: value } : null);
+    } catch (error) {
+      console.error('Error updating utg field:', error);
+    }
+  };
+
+  const handleZarnoUpdate = async (field: string, value: any) => {
+    if (!selectedZarnoId) return;
+
+    try {
+      const { error } = await supabase
+        .from('zarnos')
+        .update({ [field]: value })
+        .eq('zarno_id', selectedZarnoId);
+
+      if (error) {
+        console.error('Error updating zarno field:', error);
+        return;
+      }
+
+      // Update local state
+      setSelectedZarnoRecord((prev: Zarno | null) => prev ? { ...prev, [field]: value } : null);
+    } catch (error) {
+      console.error('Error updating zarno field:', error);
+    }
+  };
+
+  const handleBoxEditorOpen = (field: string, value: string, record: any, updateHandler: (field: string, value: any) => Promise<void>) => {
+    setBoxEditorField(field);
+    setBoxEditorValue(value || '');
+    setBoxEditorRecord(record);
+    setBoxEditorUpdateHandler(() => updateHandler);
+    setBoxEditorOpen(true);
+  };
+
+  const handleBoxEditorSave = async () => {
+    if (boxEditorUpdateHandler) {
+      await boxEditorUpdateHandler(boxEditorField, boxEditorValue);
+    }
+    setBoxEditorOpen(false);
+  };
+
+  const handleBoxEditorClose = () => {
+    setBoxEditorOpen(false);
+  };
+
+  const toggleFieldStar = async (fieldName: string) => {
+    const currentStarred = fieldMetadata[fieldName]?.starred || false;
+    const newStarred = !currentStarred;
+
+    try {
+      const { error } = await supabase
+        .from('frenzi_field_metadata')
+        .upsert({
+          table_name: 'xpages',
+          field_name: fieldName,
+          starred: newStarred,
+          flagged: fieldMetadata[fieldName]?.flagged || false
+        }, {
+          onConflict: 'table_name,field_name'
+        });
+
+      if (error) {
+        console.error('Error updating field star:', error);
+        return;
+      }
+
+      // Update local state
+      setFieldMetadata(prev => ({
+        ...prev,
+        [fieldName]: {
+          starred: newStarred,
+          flagged: prev[fieldName]?.flagged || false
+        }
+      }));
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const toggleFieldFlag = async (fieldName: string) => {
+    const currentFlagged = fieldMetadata[fieldName]?.flagged || false;
+    const newFlagged = !currentFlagged;
+
+    try {
+      const { error } = await supabase
+        .from('frenzi_field_metadata')
+        .upsert({
+          table_name: 'xpages',
+          field_name: fieldName,
+          starred: fieldMetadata[fieldName]?.starred || false,
+          flagged: newFlagged
+        }, {
+          onConflict: 'table_name,field_name'
+        });
+
+      if (error) {
+        console.error('Error updating field flag:', error);
+        return;
+      }
+
+      // Update local state
+      setFieldMetadata(prev => ({
+        ...prev,
+        [fieldName]: {
+          starred: prev[fieldName]?.starred || false,
+          flagged: newFlagged
+        }
+      }));
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  // Handle column header click for sorting
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortDirection('asc');
+    }
+  };
+
+  // Sort fields based on selected sort option
+  const getSortedFields = () => {
+    const fieldsWithMetadata = xpageFields.map(field => ({
+      ...field,
+      starred: fieldMetadata[field.key]?.starred || false,
+      flagged: fieldMetadata[field.key]?.flagged || false,
+      value: selectedXpage ? selectedXpage[field.key as keyof XPage] : null
+    }));
+
+    return fieldsWithMetadata.sort((a, b) => {
+      let compareResult = 0;
+
+      switch (sortBy) {
+        case 'starred':
+          compareResult = (b.starred ? 1 : 0) - (a.starred ? 1 : 0);
+          break;
+        case 'flagged':
+          compareResult = (b.flagged ? 1 : 0) - (a.flagged ? 1 : 0);
+          break;
+        case 'field_name':
+          compareResult = a.key.localeCompare(b.key);
+          break;
+        case 'value':
+          const aVal = a.value?.toString() || '';
+          const bVal = b.value?.toString() || '';
+          compareResult = aVal.localeCompare(bVal);
+          break;
+        default:
+          compareResult = 0;
+      }
+
+      return sortDirection === 'asc' ? compareResult : -compareResult;
+    });
+  };
+
+  const dropdownContainerStyle = {
+    marginBottom: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
+  };
+
+  const labelStyle = {
+    fontSize: '14px',
+    fontWeight: '600'
+  };
+
+  const selectStyle = {
+    padding: '8px 12px',
+    fontSize: '14px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    backgroundColor: '#fff',
+    minWidth: '300px',
+    cursor: 'pointer'
+  };
+
+  const disabledSelectStyle = {
+    ...selectStyle,
+    backgroundColor: '#f5f5f5',
+    cursor: 'not-allowed',
+    opacity: 0.6
+  };
+
+  const tooltipContainerStyle = {
+    position: 'relative' as const,
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '5px'
+  };
+
+  const tooltipIconStyle = {
+    cursor: 'help',
+    fontSize: '16px',
+    color: '#666'
+  };
+
+  const tooltipBoxStyle = {
+    position: 'absolute' as const,
+    top: '100%',
+    left: '0',
+    marginTop: '5px',
+    padding: '10px',
+    backgroundColor: '#333',
+    color: '#fff',
+    borderRadius: '4px',
+    fontSize: '12px',
+    whiteSpace: 'nowrap' as const,
+    zIndex: 1000,
+    display: showTooltip ? 'flex' : 'none',
+    alignItems: 'center',
+    gap: '10px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+  };
+
+  const copyButtonStyle = {
+    padding: '2px 8px',
+    backgroundColor: '#555',
+    border: 'none',
+    borderRadius: '3px',
+    color: '#fff',
+    fontSize: '11px',
+    cursor: 'pointer'
+  };
+
+  const tabContainerStyle = {
+    width: '100%',
+    marginBottom: '20px'
+  };
+
+  const tabListStyle = {
+    display: 'flex',
+    width: '100%',
+    margin: '0',
+    padding: '0',
+    listStyle: 'none'
+  };
+
+  const tabStyle = {
+    flex: '1',
+    textAlign: 'center' as const,
+    padding: '12px 16px',
+    cursor: 'pointer',
+    borderTop: '2px solid #a4a4a4',
+    borderLeft: '2px solid #a4a4a4',
+    borderRight: '2px solid #a4a4a4',
+    borderBottom: '2px solid #ba5816',
+    backgroundColor: '#f8f9fa',
+    fontSize: '20px',
+    fontWeight: '500'
+  };
+
+  const activeTabStyle = {
+    ...tabStyle,
+    backgroundColor: '#fff',
+    borderBottom: '2px solid #fff',
+    borderTop: '2px solid #ba5816',
+    borderLeft: '2px solid #ba5816',
+    borderRight: '2px solid #ba5816',
+    fontWeight: 'bold'
+  };
+
+  const contentStyle = {
+    padding: '20px',
+    minHeight: '400px'
+  };
+
+  // Function to get appropriate tab style based on active tab and position
+  const getTabStyle = (tabName: 'general' | 'billing' | 'settings') => {
+    if (tabName === activeTab) {
+      return activeTabStyle;
+    }
+    
+    // For inactive tabs, handle border collision with active tab and adjacent tabs
+    let style = { ...tabStyle };
+    
+    // Remove right border if this tab is to the left of active tab
+    if ((tabName === 'general' && activeTab === 'billing') || 
+        (tabName === 'billing' && activeTab === 'settings')) {
+      style.borderRight = 'none';
+    }
+    
+    // Remove left border if this tab is to the right of active tab
+    if ((tabName === 'billing' && activeTab === 'general') || 
+        (tabName === 'settings' && activeTab === 'billing')) {
+      style.borderLeft = 'none';
+    }
+    
+    // Handle border doubling between adjacent inactive tabs
+    // Remove right border from left tab in inactive pairs
+    if (tabName === 'general' && activeTab === 'settings') {
+      // general and billing are both inactive, remove right border from general
+      style.borderRight = 'none';
+    } else if (tabName === 'billing' && activeTab === 'general') {
+      // billing and settings are both inactive, remove right border from billing
+      style.borderRight = 'none';
+    }
+    
+    return style;
+  };
+
+  return (
+    <div>
+      <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>
+        <span style={{ fontWeight: 'bold' }}>MyHub Account Settings</span>
+      </h1>
+
+      <div style={dropdownContainerStyle}>
+        <label style={labelStyle}>Select users:</label>
+        <select 
+          style={selectStyle}
+          value={selectedUserId || ''}
+          onChange={(e) => handleUserChange(e.target.value)}
+          disabled={loading}
+        >
+          <option value="">-- Select a User --</option>
+          {users.map((user) => (
+            <option 
+              key={user.id} 
+              value={user.id}
+              disabled={!isCurrentUserAdmin && user.auth_id !== currentUser?.auth_id}
+            >
+              {user.id} - {user.email || '(No email)'} - {user.auth_id === currentUser?.auth_id ? 'CurrentlyLoggedInAccount' : '-'}
+            </option>
+          ))}
+        </select>
+        
+        <label style={labelStyle}>empty (waiting):</label>
+        <select 
+          style={{...selectStyle, opacity: 0.5, cursor: 'not-allowed'}}
+          disabled={true}
+        >
+          <option value="">-- Coming Soon --</option>
+        </select>
+        
+        <label style={labelStyle}>empty (waiting):</label>
+        <select 
+          style={{...selectStyle, opacity: 0.5, cursor: 'not-allowed'}}
+          disabled={true}
+        >
+          <option value="">-- Coming Soon --</option>
+        </select>
+
+        <div style={tooltipContainerStyle}>
+          <span 
+            style={tooltipIconStyle}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
+            ℹ️
+          </span>
+        </div>
+      </div>
+
+      <div style={tabContainerStyle}>
+        <ul style={tabListStyle}>
+          <li 
+            style={getTabStyle('general')}
+            onClick={() => {
+              setActiveTab('general');
+              updateURLWithCurrentState({ tab: 'general' });
+            }}
+          >
+            {activeTab === 'general' ? 
+              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+            }
+            general
+          </li>
+          <li 
+            style={getTabStyle('billing')}
+            onClick={() => {
+              setActiveTab('billing');
+              updateURLWithCurrentState({ tab: 'billing' });
+            }}
+          >
+            {activeTab === 'billing' ? 
+              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+            }
+            billing
+          </li>
+          <li 
+            style={getTabStyle('settings')}
+            onClick={() => {
+              setActiveTab('settings');
+              updateURLWithCurrentState({ tab: 'settings' });
+            }}
+          >
+            {activeTab === 'settings' ? 
+              <span style={{ color: 'red', marginRight: '14px' }}>★</span> : 
+              <span style={{ color: 'black', marginRight: '14px' }}>•</span>
+            }
+            settings
+          </li>
+        </ul>
+      </div>
+
+      <div style={contentStyle}>
+        {!selectedUserId ? (
+          <div style={{ textAlign: 'center', color: '#666', marginTop: '50px' }}>
+            <p>Please select a User from the dropdown above to manage account settings.</p>
+          </div>
+        ) : (
+          <>
+            {activeTab === 'general' && (
+              <div>
+                <div style={{
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  padding: '15px',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: 'black',
+                    marginBottom: '10px'
+                  }}>
+                    devinfobox
+                  </div>
+                  <div style={{
+                    backgroundColor: '#f1f3f4',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '8px',
+                    fontFamily: 'monospace',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <button
+                      onClick={() => {
+                        const url = 'vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx';
+                        navigator.clipboard.writeText(url);
+                      }}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '2px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title="Copy to clipboard"
+                    >
+                      📋
+                    </button>
+                    <a 
+                      href="vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx"
+                      style={{
+                        color: '#0066cc',
+                        textDecoration: 'none',
+                        flex: 1
+                      }}
+                    >
+                      vscode://file/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/azo/page.tsx
+                    </a>
+                  </div>
+                </div>
+                <h2>User Account Settings</h2>
+                <p>Configure account settings for User ID: {selectedUserId}</p>
+                
+                {selectedUserRecord && (
+                  <>
+                    <div style={{ 
+                      backgroundColor: '#b5edbc', 
+                      border: '1px solid #273929', 
+                      borderRadius: '7px', 
+                      padding: '4px', 
+                      marginBottom: '15px', 
+                      fontSize: '16px', 
+                      color: '#252525' 
+                    }}>
+                      <span style={{ fontWeight: 'bold' }}>bensa table instance</span>
+                      <span style={{ fontWeight: 'normal' }}> (bensa is a sub-system of the jetla ui tables system) - bensa constrains columns and other behavior across tabs on users, and other database tables.</span>
+                    </div>
+                    <BensaFieldTable
+                      config={bensaUsersConfig}
+                      selectedRecord={selectedUserRecord}
+                      onRecordUpdate={updateUserField}
+                      onBoxEditorOpen={handleBoxEditorOpen}
+                    />
+                  </>
+                )}
+              </div>
+            )}
+            {activeTab === 'billing' && (
+              <div>
+                <h2>Billing Settings</h2>
+                <p>Manage billing preferences and payment methods for User ID: {selectedUserId}</p>
+                
+                <div style={{
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  padding: '20px',
+                  marginTop: '20px'
+                }}>
+                  <h3 style={{ marginTop: '0', color: '#495057' }}>Coming Soon</h3>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Subscription management
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Payment method settings
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Billing history and invoices
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '0' }}>
+                    • Usage tracking and limits
+                  </p>
+                </div>
+              </div>
+            )}
+            {activeTab === 'settings' && (
+              <div>
+                <h2>Account Settings</h2>
+                <p>Configure system preferences and security settings for User ID: {selectedUserId}</p>
+                
+                <div style={{
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  padding: '20px',
+                  marginTop: '20px'
+                }}>
+                  <h3 style={{ marginTop: '0', color: '#495057' }}>Coming Soon</h3>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Two-factor authentication
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Password management
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Session management
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '10px' }}>
+                    • Privacy preferences
+                  </p>
+                  <p style={{ color: '#6c757d', marginBottom: '0' }}>
+                    • Notification settings
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Box Editor Popup */}
+      {boxEditorOpen && (
+        <div style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '660px',
+          height: '760px',
+          backgroundColor: 'white',
+          border: '2px solid #ccc',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '20px'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+            borderBottom: '1px solid #ddd',
+            paddingBottom: '10px'
+          }}>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>
+              Box Editor - {boxEditorField}
+            </h3>
+            <button
+              onClick={handleBoxEditorClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666'
+              }}
+            >
+              ×
+            </button>
+          </div>
+          
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <textarea
+              value={boxEditorValue}
+              onChange={(e) => setBoxEditorValue(e.target.value)}
+              style={{
+                flex: 1,
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '14px',
+                fontFamily: 'monospace',
+                resize: 'none',
+                outline: 'none',
+                whiteSpace: 'pre-wrap'
+              }}
+              placeholder="Enter text here..."
+            />
+          </div>
+          
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '10px',
+            marginTop: '20px',
+            borderTop: '1px solid #ddd',
+            paddingTop: '10px'
+          }}>
+            <button
+              onClick={handleBoxEditorClose}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f5f5f5',
+                color: '#333',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleBoxEditorSave}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#22c55e',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/myhub/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+import { Metadata } from 'next';
+import MyHubClient from './pclient';
+
+export const metadata: Metadata = {
+  title: 'MyHub Account Settings',
+};
+
+export default function MyHubPage() {
+  return <MyHubClient />;
+}
+```
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/myhub/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import MyHubClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'MyHub Account Settings',
+     6→};
+     7→
+     8→export default function MyHubPage() {
+     9→  return <MyHubClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Convert Batch 1: Main/Core Pages to Method 1
+- [X] 🌡️ Convert /home to Method 1
+- [X] 🌡️ Convert /profile to Method 1
+- [X] 🌡️ Convert /myhub to Method 1
+- [⚡] 🌡️ Convert /valan to Method 1
+- [ ] 🌡️ Convert /indusjar to Method 1
+- [ ] 🌡️ Convert /gconjar1 to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/valan/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useSearchParams } from 'next/navigation';
+     6→import Link from 'next/link';
+     7→import dynamic from 'next/dynamic';
+     8→import { useAvalancheContent } from './hooks/useAvalancheContent';
+     9→
+    10→// Dynamically import components to avoid SSR issues
+    11→const TipTapEditor = dynamic(() => import('./components/TipTapEditor'), {
+    12→  ssr: false,
+    13→  loading: () => <div className="h-96 flex items-center justify-center">Loading editor...</div>
+    14→});
+    15→
+    16→const AvalancheSidebar1 = dynamic(() => import('./components/AvalancheSidebar1'), {
+    17→  ssr: false,
+    18→  loading: () => <div className="w-64 h-96 bg-gray-100 animate-pulse"></div>
+    19→});
+    20→
+    21→export default function ValanPage() {
+    22→  const { user } = useAuth();
+    23→  const searchParams = useSearchParams();
+    24→  const [editorContent, setEditorContent] = useState('');
+    25→  const [editorLines, setEditorLines] = useState<string[]>([]);
+    26→  const [avalTitle, setAvalTitle] = useState('');
+    27→  const [avalMetadataMode, setAvalMetadataMode] = useState('');
+    28→  const [isSaving, setIsSaving] = useState(false);
+    29→  const [saveMessage, setSaveMessage] = useState('');
+    30→
+    31→  // Get ID from URL parameters
+    32→  const id = searchParams?.get('id');
+    33→
+    34→  // Fetch Avalanche content
+    35→  const { gconPiece, avalUnits, loading, error } = useAvalancheContent(id);
+    36→
+    37→  const handleEditorChange = (content: string) => {
+    38→    setEditorContent(content);
+    39→  };
+    40→
+    41→  const handleLinesChange = (lines: string[]) => {
+    42→    setEditorLines(lines);
+    43→  };
+    44→
+    45→  // Set initial content when data loads
+    46→  useEffect(() => {
+    47→    if (gconPiece?.aval_content) {
+    48→      setEditorContent(gconPiece.aval_content);
+    49→    }
+    50→    if (gconPiece?.aval_title) {
+    51→      setAvalTitle(gconPiece.aval_title);
+    52→      // Update browser title when data loads
+    53→      const siteBase = gconPiece.asn_sitespren_base || '';
+    54→      document.title = `valan_${gconPiece.aval_title}_${siteBase}`;
+    55→    }
+    56→    if (gconPiece?.aval_metadata_mode) {
+    57→      setAvalMetadataMode(gconPiece.aval_metadata_mode);
+    58→    }
+    59→  }, [gconPiece?.aval_content, gconPiece?.aval_title, gconPiece?.aval_metadata_mode]);
+    60→
+    61→  // Set initial title when page loads (fallback)
+    62→  useEffect(() => {
+    63→    if (!avalTitle && gconPiece) {
+    64→      const siteBase = gconPiece.asn_sitespren_base || '';
+    65→      document.title = siteBase ? `valan_${siteBase}` : 'valan';
+    66→    } else if (!avalTitle && !gconPiece) {
+    67→      document.title = 'valan';
+    68→    }
+    69→  }, [avalTitle, gconPiece]);
+    70→
+    71→  // Save function
+    72→  const handleSave = async () => {
+    73→    if (!id) return;
+    74→    
+    75→    setIsSaving(true);
+    76→    setSaveMessage('');
+    77→    
+    78→    try {
+    79→      const response = await fetch('/api/valan-save', {
+    80→        method: 'POST',
+    81→        headers: {
+    82→          'Content-Type': 'application/json',
+    83→        },
+    84→        body: JSON.stringify({
+    85→          id,
+    86→          aval_title: avalTitle,
+    87→          aval_content: editorContent,
+    88→          aval_metadata_mode: avalMetadataMode,
+    89→          // aval_fk_featured_image_plan_id will be added later
+    90→        }),
+    91→      });
+    92→
+    93→      const result = await response.json();
+    94→
+    95→      if (result.success) {
+    96→        setSaveMessage('✅ Saved successfully');
+    97→        // Update browser tab title
+    98→        const siteBase = gconPiece?.asn_sitespren_base || '';
+    99→        if (avalTitle && siteBase) {
+   100→          document.title = `valan_${avalTitle}_${siteBase}`;
+   101→        } else if (avalTitle) {
+   102→          document.title = `valan_${avalTitle}`;
+   103→        } else if (siteBase) {
+   104→          document.title = `valan_${siteBase}`;
+   105→        } else {
+   106→          document.title = 'valan';
+   107→        }
+   108→        // Clear message after 3 seconds
+   109→        setTimeout(() => setSaveMessage(''), 3000);
+   110→      } else {
+   111→        setSaveMessage(`❌ Error: ${result.message}`);
+   112→      }
+   113→    } catch (error) {
+   114→      console.error('Save error:', error);
+   115→      setSaveMessage('❌ Failed to save');
+   116→    } finally {
+   117→      setIsSaving(false);
+   118→    }
+   119→  };
+   120→
+   121→  if (!user) {
+   122→    return (
+   123→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   124→        <p className="text-gray-500">Please log in to access this page.</p>
+   125→      </div>
+   126→    );
+   127→  }
+   128→
+   129→  if (loading) {
+   130→    return (
+   131→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   132→        <div className="text-center">
+   133→          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+   134→          <p className="mt-2 text-gray-600">Loading Avalanche content...</p>
+   135→        </div>
+   136→      </div>
+   137→    );
+   138→  }
+   139→
+   140→  if (error) {
+   141→    return (
+   142→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   143→        <div className="text-center">
+   144→          <p className="text-red-600">Error: {error}</p>
+   145→          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+   146→            ← Back to Dashboard
+   147→          </Link>
+   148→        </div>
+   149→      </div>
+   150→    );
+   151→  }
+   152→
+   153→  if (!gconPiece) {
+   154→    return (
+   155→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   156→        <div className="text-center">
+   157→          <p className="text-gray-600">No content found for this ID</p>
+   158→          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+   159→            ← Back to Dashboard
+   160→          </Link>
+   161→        </div>
+   162→      </div>
+   163→    );
+   164→  }
+   165→
+   166→  return (
+   167→    <div className="min-h-screen bg-gray-50">
+   168→        <div className="p-4">
+   169→        <div className="mb-4">
+   170→          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
+   171→            ← Back to Dashboard
+   172→          </Link>
+   173→        </div>
+   174→        
+   175→        <div className="mb-4">
+   176→          <h1 className="text-2xl font-bold">Valan - Avalanche Editor</h1>
+   177→          <div className="text-sm text-gray-600 mt-1">
+   178→            <span>Editing: {gconPiece.meta_title || 'Untitled'}</span>
+   179→            {gconPiece.asn_sitespren_base && (
+   180→              <span className="ml-2">({gconPiece.asn_sitespren_base})</span>
+   181→            )}
+   182→          </div>
+   183→          <div className="text-xs text-gray-500 mt-1">
+   184→            ID: {id} • {avalUnits.length} units loaded
+   185→          </div>
+   186→        </div>
+   187→
+   188→        {/* Main Editor Layout */}
+   189→        <div className="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-7xl">
+   190→          {/* Avalanche Sidebar - 50% width */}
+   191→          <div className="w-1/2">
+   192→            <AvalancheSidebar1 
+   193→              units={avalUnits}
+   194→              lines={editorLines}
+   195→            />
+   196→          </div>
+   197→
+   198→          {/* TipTap Editor - 50% width */}
+   199→          <div className="w-1/2">
+   200→            {/* Controls Area - Above Editor */}
+   201→            <div className="p-4 bg-gray-50 border-b border-gray-300">
+   202→              {/* Site Spren Base */}
+   203→              <div className="mb-4">
+   204→                <label className="block text-sm font-bold text-gray-700 mb-2">
+   205→                  asn_sitespren_base
+   206→                </label>
+   207→                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm">
+   208→                  {gconPiece.asn_sitespren_base || 'Not set'}
+   209→                </div>
+   210→              </div>
+   211→
+   212→              {/* Post Name */}
+   213→              <div className="mb-4">
+   214→                <label className="block text-sm font-bold text-gray-700 mb-2">
+   215→                  post_name
+   216→                </label>
+   217→                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+   218→                  <button
+   219→                    onClick={() => {
+   220→                      if (gconPiece.asn_sitespren_base && gconPiece.post_name) {
+   221→                        window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.post_name}`, '_blank');
+   222→                      }
+   223→                    }}
+   224→                    disabled={!gconPiece.post_name || !gconPiece.asn_sitespren_base}
+   225→                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+   226→                    title="Open in new tab"
+   227→                  >
+   228→                    ↗
+   229→                  </button>
+   230→                  <button
+   231→                    onClick={() => navigator.clipboard.writeText(gconPiece.post_name || '')}
+   232→                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+   233→                    title="Copy to clipboard"
+   234→                  >
+   235→                    📋
+   236→                  </button>
+   237→                  <span className="flex-1 px-2">
+   238→                    {gconPiece.post_name || 'Not set'}
+   239→                  </span>
+   240→                </div>
+   241→              </div>
+   242→
+   243→              {/* Page Slug */}
+   244→              <div className="mb-4">
+   245→                <label className="block text-sm font-bold text-gray-700 mb-2">
+   246→                  pageslug
+   247→                </label>
+   248→                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+   249→                  <button
+   250→                    onClick={() => {
+   251→                      if (gconPiece.asn_sitespren_base && gconPiece.pageslug) {
+   252→                        window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.pageslug}`, '_blank');
+   253→                      }
+   254→                    }}
+   255→                    disabled={!gconPiece.pageslug || !gconPiece.asn_sitespren_base}
+   256→                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+   257→                    title="Open in new tab"
+   258→                  >
+   259→                    ↗
+   260→                  </button>
+   261→                  <button
+   262→                    onClick={() => navigator.clipboard.writeText(gconPiece.pageslug || '')}
+   263→                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+   264→                    title="Copy to clipboard"
+   265→                  >
+   266→                    📋
+   267→                  </button>
+   268→                  <span className="flex-1 px-2">
+   269→                    {gconPiece.pageslug || 'Not set'}
+   270→                  </span>
+   271→                </div>
+   272→              </div>
+   273→
+   274→              {/* Page URL */}
+   275→              <div className="mb-4">
+   276→                <label className="block text-sm font-bold text-gray-700 mb-2">
+   277→                  pageurl
+   278→                </label>
+   279→                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+   280→                  <button
+   281→                    onClick={() => {
+   282→                      if (gconPiece.pageurl) {
+   283→                        window.open(gconPiece.pageurl, '_blank');
+   284→                      }
+   285→                    }}
+   286→                    disabled={!gconPiece.pageurl}
+   287→                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+   288→                    title="Open in new tab"
+   289→                  >
+   290→                    ↗
+   291→                  </button>
+   292→                  <button
+   293→                    onClick={() => navigator.clipboard.writeText(gconPiece.pageurl || '')}
+   294→                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+   295→                    title="Copy to clipboard"
+   296→                  >
+   297→                    📋
+   298→                  </button>
+   299→                  <span className="flex-1 px-2">
+   300→                    {gconPiece.pageurl || 'Not set'}
+   301→                  </span>
+   302→                </div>
+   303→              </div>
+   304→
+   305→              {/* Save Button */}
+   306→              <div className="mb-4">
+   307→                <button
+   308→                  onClick={handleSave}
+   309→                  disabled={isSaving}
+   310→                  className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 transition-colors font-medium"
+   311→                >
+   312→                  {isSaving ? 'Saving...' : 'Save Avalanche Content'}
+   313→                </button>
+   314→                {saveMessage && (
+   315→                  <span className="ml-3 text-sm">{saveMessage}</span>
+   316→                )}
+   317→              </div>
+   318→
+   319→              {/* Metadata Mode */}
+   320→              <div className="mb-4">
+   321→                <label className="block text-sm font-bold text-gray-700 mb-2">
+   322→                  aval_metadata_mode
+   323→                </label>
+   324→                <input
+   325→                  type="text"
+   326→                  value={avalMetadataMode}
+   327→                  onChange={(e) => setAvalMetadataMode(e.target.value)}
+   328→                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+   329→                  placeholder="Enter metadata mode..."
+   330→                />
+   331→              </div>
+   332→
+   333→              {/* Image Plan Batch ID */}
+   334→              <div className="mb-4">
+   335→                <label className="block text-sm font-bold text-gray-700 mb-2">
+   336→                  aval_fk_imgplan_batch_id
+   337→                </label>
+   338→                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm">
+   339→                  {gconPiece.aval_fk_imgplan_batch_id || 'Not set'}
+   340→                </div>
+   341→              </div>
+   342→
+   343→              {/* Featured Image Selector */}
+   344→              <div className="mb-4">
+   345→                <label className="block text-sm font-bold text-gray-700 mb-2">
+   346→                  aval_fk_featured_image_plan_id
+   347→                </label>
+   348→                <button
+   349→                  type="button"
+   350→                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+   351→                >
+   352→                  Select
+   353→                </button>
+   354→              </div>
+   355→
+   356→              {/* Title Editor */}
+   357→              <div className="mb-4">
+   358→                <label className="block text-sm font-bold text-gray-700 mb-2">
+   359→                  aval_title
+   360→                </label>
+   361→                <input
+   362→                  type="text"
+   363→                  value={avalTitle}
+   364→                  onChange={(e) => setAvalTitle(e.target.value)}
+   365→                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+   366→                  placeholder="Enter avalanche title..."
+   367→                />
+   368→              </div>
+   369→            </div>
+   370→
+   371→            {/* aval_content Label */}
+   372→            <div className="p-2 bg-gray-100 border-b border-gray-300">
+   373→              <label className="text-sm font-bold text-gray-700">
+   374→                aval_content
+   375→              </label>
+   376→            </div>
+   377→
+   378→            {/* TipTap Editor */}
+   379→            <TipTapEditor 
+   380→              initialContent={'<p>Loading content...</p>'}
+   381→              content={gconPiece.aval_content || '<p>Start editing your Avalanche content...</p>'}
+   382→              onChange={handleEditorChange}
+   383→              onLinesChange={handleLinesChange}
+   384→            />
+   385→          </div>
+   386→        </div>
+   387→
+   388→        {/* Debug Info */}
+   389→        <div className="mt-4 p-4 bg-gray-100 rounded text-xs text-gray-600 max-w-7xl">
+   390→          <div className="grid grid-cols-2 gap-4">
+   391→            <div>
+   392→              <p><strong>Content:</strong> {editorContent.length} characters</p>
+   393→              <p><strong>Lines:</strong> {editorLines.length}</p>
+   394→              <p><strong>Units:</strong> {avalUnits.length}</p>
+   395→            </div>
+   396→            <div>
+   397→              <details>
+   398→                <summary className="cursor-pointer">View Units Data</summary>
+   399→                <pre className="mt-2 p-2 bg-white rounded overflow-x-auto text-xs">
+   400→                  {JSON.stringify(avalUnits.map(u => ({ 
+   401→                    line_key1: u.line_key1, 
+   402→                    unit_type: u.unit_type, 
+   403→                    payload: u.payload 
+   404→                  })), null, 2)}
+   405→                </pre>
+   406→              </details>
+   407→            </div>
+   408→          </div>
+   409→        </div>
+   410→      </div>
+   411→    </div>
+   412→  );
+   413→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import dynamic from 'next/dynamic';
+import { useAvalancheContent } from './hooks/useAvalancheContent';
+
+// Dynamically import components to avoid SSR issues
+const TipTapEditor = dynamic(() => import('./components/TipTapEditor'), {
+  ssr: false,
+  loading: () => <div className="h-96 flex items-center justify-center">Loading editor...</div>
+});
+
+const AvalancheSidebar1 = dynamic(() => import('./components/AvalancheSidebar1'), {
+  ssr: false,
+  loading: () => <div className="w-64 h-96 bg-gray-100 animate-pulse"></div>
+});
+
+export default function ValanClient() {
+  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const [editorContent, setEditorContent] = useState('');
+  const [editorLines, setEditorLines] = useState<string[]>([]);
+  const [avalTitle, setAvalTitle] = useState('');
+  const [avalMetadataMode, setAvalMetadataMode] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+
+  // Get ID from URL parameters
+  const id = searchParams?.get('id');
+
+  // Fetch Avalanche content
+  const { gconPiece, avalUnits, loading, error } = useAvalancheContent(id);
+
+  const handleEditorChange = (content: string) => {
+    setEditorContent(content);
+  };
+
+  const handleLinesChange = (lines: string[]) => {
+    setEditorLines(lines);
+  };
+
+  // Set initial content when data loads
+  useEffect(() => {
+    if (gconPiece?.aval_content) {
+      setEditorContent(gconPiece.aval_content);
+    }
+    if (gconPiece?.aval_title) {
+      setAvalTitle(gconPiece.aval_title);
+    }
+    if (gconPiece?.aval_metadata_mode) {
+      setAvalMetadataMode(gconPiece.aval_metadata_mode);
+    }
+  }, [gconPiece?.aval_content, gconPiece?.aval_title, gconPiece?.aval_metadata_mode]);
+
+  // Save function
+  const handleSave = async () => {
+    if (!id) return;
+    
+    setIsSaving(true);
+    setSaveMessage('');
+    
+    try {
+      const response = await fetch('/api/valan-save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+          aval_title: avalTitle,
+          aval_content: editorContent,
+          aval_metadata_mode: avalMetadataMode,
+          // aval_fk_featured_image_plan_id will be added later
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSaveMessage('✅ Saved successfully');
+        // Clear message after 3 seconds
+        setTimeout(() => setSaveMessage(''), 3000);
+      } else {
+        setSaveMessage(`❌ Error: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      setSaveMessage('❌ Failed to save');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-500">Please log in to access this page.</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading Avalanche content...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">Error: {error}</p>
+          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            ← Back to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!gconPiece) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">No content found for this ID</p>
+          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            ← Back to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+        <div className="p-4">
+        <div className="mb-4">
+          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
+            ← Back to Dashboard
+          </Link>
+        </div>
+        
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold">Valan - Avalanche Editor</h1>
+          <div className="text-sm text-gray-600 mt-1">
+            <span>Editing: {gconPiece.meta_title || 'Untitled'}</span>
+            {gconPiece.asn_sitespren_base && (
+              <span className="ml-2">({gconPiece.asn_sitespren_base})</span>
+            )}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            ID: {id} • {avalUnits.length} units loaded
+          </div>
+        </div>
+
+        {/* Main Editor Layout */}
+        <div className="flex bg-white rounded-lg shadow-lg overflow-hidden max-w-7xl">
+          {/* Avalanche Sidebar - 50% width */}
+          <div className="w-1/2">
+            <AvalancheSidebar1 
+              units={avalUnits}
+              lines={editorLines}
+            />
+          </div>
+
+          {/* TipTap Editor - 50% width */}
+          <div className="w-1/2">
+            {/* Controls Area - Above Editor */}
+            <div className="p-4 bg-gray-50 border-b border-gray-300">
+              {/* Site Spren Base */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  asn_sitespren_base
+                </label>
+                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm">
+                  {gconPiece.asn_sitespren_base || 'Not set'}
+                </div>
+              </div>
+
+              {/* Post Name */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  post_name
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => {
+                      if (gconPiece.asn_sitespren_base && gconPiece.post_name) {
+                        window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.post_name}`, '_blank');
+                      }
+                    }}
+                    disabled={!gconPiece.post_name || !gconPiece.asn_sitespren_base}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece.post_name || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece.post_name || 'Not set'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Page Slug */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  pageslug
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => {
+                      if (gconPiece.asn_sitespren_base && gconPiece.pageslug) {
+                        window.open(`https://${gconPiece.asn_sitespren_base}/${gconPiece.pageslug}`, '_blank');
+                      }
+                    }}
+                    disabled={!gconPiece.pageslug || !gconPiece.asn_sitespren_base}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece.pageslug || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece.pageslug || 'Not set'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Page URL */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  pageurl
+                </label>
+                <div className="flex items-center gap-1 p-2 bg-gray-900 text-green-400 rounded font-mono text-sm border">
+                  <button
+                    onClick={() => {
+                      if (gconPiece.pageurl) {
+                        window.open(gconPiece.pageurl, '_blank');
+                      }
+                    }}
+                    disabled={!gconPiece.pageurl}
+                    className="w-6 h-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded flex items-center justify-center"
+                    title="Open in new tab"
+                  >
+                    ↗
+                  </button>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(gconPiece.pageurl || '')}
+                    className="w-6 h-6 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center justify-center"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <span className="flex-1 px-2">
+                    {gconPiece.pageurl || 'Not set'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="mb-4">
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 transition-colors font-medium"
+                >
+                  {isSaving ? 'Saving...' : 'Save Avalanche Content'}
+                </button>
+                {saveMessage && (
+                  <span className="ml-3 text-sm">{saveMessage}</span>
+                )}
+              </div>
+
+              {/* Metadata Mode */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  aval_metadata_mode
+                </label>
+                <input
+                  type="text"
+                  value={avalMetadataMode}
+                  onChange={(e) => setAvalMetadataMode(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter metadata mode..."
+                />
+              </div>
+
+              {/* Image Plan Batch ID */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  aval_fk_imgplan_batch_id
+                </label>
+                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm">
+                  {gconPiece.aval_fk_imgplan_batch_id || 'Not set'}
+                </div>
+              </div>
+
+              {/* Featured Image Selector */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  aval_fk_featured_image_plan_id
+                </label>
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                >
+                  Select
+                </button>
+              </div>
+
+              {/* Title Editor */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  aval_title
+                </label>
+                <input
+                  type="text"
+                  value={avalTitle}
+                  onChange={(e) => setAvalTitle(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                  placeholder="Enter avalanche title..."
+                />
+              </div>
+            </div>
+
+            {/* aval_content Label */}
+            <div className="p-2 bg-gray-100 border-b border-gray-300">
+              <label className="text-sm font-bold text-gray-700">
+                aval_content
+              </label>
+            </div>
+
+            {/* TipTap Editor */}
+            <TipTapEditor 
+              initialContent={'<p>Loading content...</p>'}
+              content={gconPiece.aval_content || '<p>Start editing your Avalanche content...</p>'}
+              onChange={handleEditorChange}
+              onLinesChange={handleLinesChange}
+            />
+          </div>
+        </div>
+
+        {/* Debug Info */}
+        <div className="mt-4 p-4 bg-gray-100 rounded text-xs text-gray-600 max-w-7xl">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p><strong>Content:</strong> {editorContent.length} characters</p>
+              <p><strong>Lines:</strong> {editorLines.length}</p>
+              <p><strong>Units:</strong> {avalUnits.length}</p>
+            </div>
+            <div>
+              <details>
+                <summary className="cursor-pointer">View Units Data</summary>
+                <pre className="mt-2 p-2 bg-white rounded overflow-x-auto text-xs">
+                  {JSON.stringify(avalUnits.map(u => ({ 
+                    line_key1: u.line_key1, 
+                    unit_type: u.unit_type, 
+                    payload: u.payload 
+                  })), null, 2)}
+                </pre>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/valan/pclient.tsx
+```
+

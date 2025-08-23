@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import ZhefetchjarClient from './pclient';
 
 export const metadata: Metadata = {
-  title: '/zhefetchjar',
+  title: 'zhefetchjar',
 };
 
 export default function ZhefetchjarPage() {

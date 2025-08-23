@@ -17,6 +17,9 @@ interface RedditSubmission {
   is_self: boolean;
   created_utc: number;
   author: string;
+  archived: boolean;
+  locked: boolean;
+  contest_mode?: boolean;
 }
 
 interface ExtractedLink {
@@ -75,6 +78,27 @@ function extractDomain(url: string): string {
   } catch {
     return '';
   }
+}
+
+// Check if a Reddit thread is commentable
+function isThreadCommentable(submission: RedditSubmission): boolean {
+  // A thread is NOT commentable if:
+  // 1. It's archived (older than 6 months)
+  // 2. It's locked by moderators
+  // 3. Contest mode might restrict commenting (optional check)
+  
+  if (submission.archived) {
+    return false;
+  }
+  
+  if (submission.locked) {
+    return false;
+  }
+  
+  // Contest mode doesn't prevent commenting, just hides scores and randomizes order
+  // So we don't use it as a commentable check
+  
+  return true;
 }
 
 // Strip tracking parameters
@@ -166,7 +190,10 @@ async function fetchRedditThread(redditUrl: string): Promise<{ submission: Reddi
       url: submissionData.url || '',
       is_self: submissionData.is_self || false,
       created_utc: submissionData.created_utc || 0,
-      author: submissionData.author || ''
+      author: submissionData.author || '',
+      archived: submissionData.archived || false,
+      locked: submissionData.locked || false,
+      contest_mode: submissionData.contest_mode || false
     };
     
     // Recursively extract comments
@@ -243,6 +270,21 @@ export async function POST(request: NextRequest) {
         
         const { submission, comments } = threadData;
         const allLinks: ExtractedLink[] = [];
+        
+        // Check if thread is commentable
+        const isCommentable = isThreadCommentable(submission);
+        
+        // Update the is_commentable field in the database
+        const { error: updateError } = await supabase
+          .from('redditurlsvat')
+          .update({ is_commentable: isCommentable })
+          .eq('url_id', redditUrl.url_id);
+        
+        if (updateError) {
+          console.error('Error updating is_commentable field:', updateError);
+        } else {
+          console.log(`Updated is_commentable for URL ${redditUrl.url_id}: ${isCommentable ? 'Open' : 'Closed'}`);
+        }
         
         // Extract links from submission
         if (!submission.is_self && submission.url) {

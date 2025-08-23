@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import KwtagzarClient from './pclient';
 
 export const metadata: Metadata = {
-  title: '/kwtagzar',
+  title: 'kwtagzar',
 };
 
 export default function KwtagzarPage() {
