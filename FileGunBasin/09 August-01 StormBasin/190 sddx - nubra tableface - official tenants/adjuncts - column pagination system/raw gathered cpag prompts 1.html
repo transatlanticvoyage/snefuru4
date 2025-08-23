@@ -30,20 +30,24 @@ the first one means "qty" of columns per page (applies to first column paginatio
 the second one means "spec" or "specific" page in the column pagination selected (applies to second button bar on our page for column pagination)
 
 
-———————————————————————
+==========================================================
+============== SEPARATOR =================================
+==========================================================
 
-Is it possible to do the following?
+please do the following on our page at:
+/cnjar1
 
 I want the following UI columns to be excluded from the normal column pagination:
 
-keyword_id
-keyword_datum
-search_volume
-cpc
+cncg_id
+cities->city_name
+cities->state_code
+industries->industry_name
+
 
 We already have the checkbox column, which is presumably excluded in this manner.
 
-So now we should have the checkbox plus the other four UI columns listed above always appearing at the far left of the table.
+So now we should have the checkbox plus the other UI columns listed above always appearing at the far left of the table.
 
 Then, the column pagination settings should apply only to the other columns that are not in this list.
 
@@ -53,6 +57,26 @@ No matter what column pagination setting is selected by the user, these columns 
 
 
 ———————————————————————
+SPECIAL NOTE ABOUT DUPLICATE LISTING COLUMNS:
+this ui table grid that we are working on on page of /cnjar1 has many columns that have "duplicate instances"
+
+in the list of columns above in this prompt, i am only referring to the versions that occur to the "farthest left" in the ui table. I'm not referring to the other versions that occur "later" or farther to the right in the table
+
+of course, im referring to these columns:
+cities->city_name
+cities->state_code
+industries->industry_name
+
+the "sticky" versions are the versions that should be excluded from the main column pagination system
+
+only the first versions (the versions that occur farthest left in the table) are the ones that should be "excluded" like this as "sticky columns"
+
+the other instances of these columns that appear later (farther to the right) in the table should be included in the column pagination system (not excluded)
+
+
+==========================================================
+============== SEPARATOR =================================
+==========================================================
 
 
 please alter the utg on /cnjar1 page so that the <table> element is not taking up 100% the width of its parent

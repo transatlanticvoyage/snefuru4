@@ -128,10 +128,9 @@ export default function Cnjar1Table({
     { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
     { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
     { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
-    { key: 'blank1' as any, label: 'blank1b', type: 'text', readOnly: true, isBlank: true },
+    { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
     { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
     { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
-    { key: 'blank5' as any, label: 'blank5b', type: 'text', readOnly: true, isBlank: true },
     { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
     { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', leftSeparator: 'black-3px' }
   ];
