@@ -108,7 +108,11 @@ export default function Cnjar1Table() {
   const columns = [
     { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
     { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
+    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+    { key: 'blank1' as any, label: 'blank1b', type: 'text', readOnly: true, isBlank: true },
     { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
+    { key: 'blank5' as any, label: 'blank5b', type: 'text', readOnly: true, isBlank: true },
     { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
     { key: 'created_at' as keyof Cncglub, label: 'created_at', type: 'datetime', readOnly: true },
     { key: 'updated_at' as keyof Cncglub, label: 'updated_at', type: 'datetime', readOnly: true },
@@ -710,6 +714,15 @@ export default function Cnjar1Table() {
   const renderCell = (item: Cncglub, column: any) => {
     let value: any;
     
+    // Handle blank columns
+    if (column.isBlank) {
+      return (
+        <div className="px-2 py-1 cursor-default bg-gray-50">
+          {/* Blank cell - content will be added later */}
+        </div>
+      );
+    }
+    
     // Handle joined columns
     if (column.isJoined) {
       value = getJoinedValue(item, column.key);
@@ -782,14 +795,14 @@ export default function Cnjar1Table() {
       );
     }
 
-    // Special display for foreign keys
+    // Special display for foreign keys - show raw integer values
     if (column.key === 'rel_city_id') {
       return (
         <div
           onClick={() => !isReadOnly && handleCellClick(item.cncg_id, column.key, value)}
           className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'}`}
         >
-          {getCityDisplay(value as number)}
+          {value}
         </div>
       );
     }
@@ -800,7 +813,7 @@ export default function Cnjar1Table() {
           onClick={() => !isReadOnly && handleCellClick(item.cncg_id, column.key, value)}
           className={`cursor-pointer hover:bg-gray-100 px-2 py-1 ${!isReadOnly ? 'cursor-text' : 'cursor-default'}`}
         >
-          {getIndustryDisplay(value as number)}
+          {value}
         </div>
       );
     }
@@ -1166,7 +1179,14 @@ export default function Cnjar1Table() {
                   let bgColorClass = '';
                   let tableText = '';
                   
-                  if (column.isJoined) {
+                  if (column.isBlank) {
+                    bgColorClass = 'bg-gray-100';
+                    if (column.key === 'blank1') {
+                      tableText = 'blank1a';
+                    } else if (column.key === 'blank5') {
+                      tableText = 'blank5a';
+                    }
+                  } else if (column.isJoined) {
                     if (column.isKeyword) {
                       bgColorClass = 'bg-[#bcc4f1]';
                       tableText = 'keywordshub';

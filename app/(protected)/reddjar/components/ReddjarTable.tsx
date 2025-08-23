@@ -12,6 +12,7 @@ const NubraTablefaceKite = dynamic(
 interface RedditUrl {
   url_id: number;
   url_datum: string | null;
+  count_obls?: number;
   subreddit_name: string | null;
   post_id: string | null;
   post_title: string | null;
@@ -35,16 +36,32 @@ interface RedditUrl {
   updated_at: string;
 }
 
-export default function ReddjarTable() {
+interface ReddjarTableProps {
+  onColumnPaginationRender?: (controls: {
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  }) => void;
+  selectedRows?: Set<number>;
+  onSelectionChange?: (selectedRows: Set<number>) => void;
+}
+
+export default function ReddjarTable({ 
+  onColumnPaginationRender, 
+  selectedRows = new Set(), 
+  onSelectionChange 
+}: ReddjarTableProps = {}) {
   const [data, setData] = useState<RedditUrl[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortField, setSortField] = useState<keyof RedditUrl>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Column pagination states
+  const [columnsPerPage] = useState(8); // Show 8 columns at a time
+  const [currentColumnPage, setCurrentColumnPage] = useState(1);
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -56,6 +73,7 @@ export default function ReddjarTable() {
   // Form data for creating/editing
   const [formData, setFormData] = useState({
     url_datum: '',
+    count_obls: 0,
     subreddit_name: '',
     post_id: '',
     post_title: '',
@@ -89,7 +107,8 @@ export default function ReddjarTable() {
     label: string;
   }> = [
     { key: 'url_id', type: 'integer', width: '80px', label: 'url_id' },
-    { key: 'url_datum', type: 'text', width: '400px', label: 'url_datum' },
+    { key: 'url_datum', type: 'text', width: '280px', label: 'url_datum' },
+    { key: 'count_obls', type: 'integer', width: '100px', label: 'count_obls' },
     { key: 'subreddit_name', type: 'text', width: '150px', label: 'subreddit_name' },
     { key: 'post_id', type: 'text', width: '120px', label: 'post_id' },
     { key: 'post_title', type: 'text', width: '250px', label: 'post_title', separator: 'right' },
@@ -113,6 +132,124 @@ export default function ReddjarTable() {
     { key: 'updated_at', type: 'timestamp', width: '180px', label: 'updated_at' }
   ];
   
+  // Column pagination logic
+  const totalColumnPages = Math.ceil(columns.length / columnsPerPage);
+  const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
+  const visibleColumns = columns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+  
+  // Column Pagination Components - Define before use
+  const ColumnPaginationBar1 = () => {
+    if (totalColumnPages <= 1) return null;
+    
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <button
+            onClick={() => setCurrentColumnPage(1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            First
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage - 1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Prev
+          </button>
+          
+          {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
+            const pageNum = Math.max(1, Math.min(totalColumnPages - 4, currentColumnPage - 2)) + i;
+            if (pageNum > totalColumnPages) return null;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentColumnPage(pageNum)}
+                className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+                  currentColumnPage === pageNum 
+                    ? 'bg-blue-500 text-white border-blue-500' 
+                    : 'bg-white hover:bg-gray-200'
+                }`}
+                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage + 1)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Next
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(totalColumnPages)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Last
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const ColumnPaginationBar2 = () => {
+    if (totalColumnPages <= 1) return null;
+    
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <button
+            onClick={() => setCurrentColumnPage(1)}
+            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${currentColumnPage === 1 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            1
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(2)}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${currentColumnPage === 2 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            2
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(3)}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${currentColumnPage === 3 ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            3
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(totalColumnPages)}
+            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${currentColumnPage === totalColumnPages ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-200'}`}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            All
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
+  // Pass pagination components to parent
+  useEffect(() => {
+    if (onColumnPaginationRender) {
+      onColumnPaginationRender({
+        ColumnPaginationBar1,
+        ColumnPaginationBar2
+      });
+    }
+  }, [onColumnPaginationRender, currentColumnPage, totalColumnPages]);
+
   // Fetch data
   useEffect(() => {
     fetchData();
@@ -121,18 +258,66 @@ export default function ReddjarTable() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      
+      // Fetch main data first
       const { data: tableData, error: fetchError } = await supabase
         .from('redditurlsvat')
         .select('*')
         .order('created_at', { ascending: false });
         
       if (fetchError) throw fetchError;
-      setData(tableData || []);
+      
+      if (!tableData || tableData.length === 0) {
+        setData([]);
+        return;
+      }
+      
+      // Initialize data with count_obls as 0 for now
+      const processedData = tableData.map(item => ({
+        ...item,
+        count_obls: 0
+      }));
+      
+      setData(processedData);
+      
+      // Fetch counts asynchronously without blocking the UI
+      fetchOutboundLinkCounts(processedData);
+      
     } catch (err) {
       console.error('Error fetching reddit urls:', err);
       setError('Failed to fetch reddit urls');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Separate function to fetch outbound link counts
+  const fetchOutboundLinkCounts = async (tableData: RedditUrl[]) => {
+    try {
+      // Get all outbound links and count by source_url_id
+      const { data: linkCounts } = await supabase
+        .from('redditoblinks')
+        .select('source_url_id');
+      
+      if (linkCounts) {
+        // Create a map of url_id to count
+        const countsMap = new Map();
+        linkCounts.forEach(link => {
+          const count = countsMap.get(link.source_url_id) || 0;
+          countsMap.set(link.source_url_id, count + 1);
+        });
+        
+        // Update the data with counts
+        const updatedData = tableData.map(item => ({
+          ...item,
+          count_obls: countsMap.get(item.url_id) || 0
+        }));
+        
+        setData(updatedData);
+      }
+    } catch (err) {
+      console.warn('Error fetching outbound link counts:', err);
+      // Keep the original data with counts as 0
     }
   };
   
@@ -693,7 +878,7 @@ export default function ReddjarTable() {
       {/* Table */}
       <div className="bg-white overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '3000px' }}>
+          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '3000px', tableLayout: 'fixed' }}>
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '40px' }}>
@@ -713,17 +898,19 @@ export default function ReddjarTable() {
                       style={{ width: '20px', height: '20px' }}
                       checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
                       onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedRows(new Set(paginatedData.map(item => item.url_id)));
-                        } else {
-                          setSelectedRows(new Set());
+                        if (onSelectionChange) {
+                          if (e.target.checked) {
+                            onSelectionChange(new Set(paginatedData.map(item => item.url_id)));
+                          } else {
+                            onSelectionChange(new Set());
+                          }
                         }
                       }}
                     />
                   </div>
                 </th>
-                {columns.map((column, index) => {
-                  const isReadOnly = column.key === 'url_id' || column.key === 'created_at';
+                {visibleColumns.map((column, index) => {
+                  const isReadOnly = column.key === 'url_id' || column.key === 'created_at' || column.key === 'count_obls';
                   const hasRightSeparator = column.separator === 'right';
                   
                   return (
@@ -735,7 +922,8 @@ export default function ReddjarTable() {
                       style={{ 
                         width: column.width,
                         minWidth: column.width,
-                        maxWidth: column.width
+                        maxWidth: column.width,
+                        backgroundColor: column.key === 'count_obls' ? '#dbeafe' : undefined
                       }}
                       onClick={() => handleSort(column.key)}
                     >
@@ -791,18 +979,20 @@ export default function ReddjarTable() {
                         style={{ width: '20px', height: '20px' }}
                         checked={selectedRows.has(item.url_id)}
                         onChange={(e) => {
-                          const newSelected = new Set(selectedRows);
-                          if (e.target.checked) {
-                            newSelected.add(item.url_id);
-                          } else {
-                            newSelected.delete(item.url_id);
+                          if (onSelectionChange) {
+                            const newSelected = new Set(selectedRows);
+                            if (e.target.checked) {
+                              newSelected.add(item.url_id);
+                            } else {
+                              newSelected.delete(item.url_id);
+                            }
+                            onSelectionChange(newSelected);
                           }
-                          setSelectedRows(newSelected);
                         }}
                       />
                     </div>
                   </td>
-                  {columns.map((column, index) => {
+                  {visibleColumns.map((column, index) => {
                     const hasRightSeparator = column.separator === 'right';
                     
                     return (
@@ -811,7 +1001,11 @@ export default function ReddjarTable() {
                         className={`text-sm border border-gray-200 px-2 py-1 ${
                           hasRightSeparator ? 'border-r-4 border-r-black' : ''
                         }`}
-                        style={{ width: column.width }}
+                        style={{ 
+                          width: column.width,
+                          minWidth: column.width,
+                          maxWidth: column.width
+                        }}
                       >
                         {renderCell(item, column)}
                       </td>
@@ -1063,3 +1257,4 @@ export default function ReddjarTable() {
     </div>
   );
 }
+

@@ -7,6 +7,12 @@ const supabase = createClient(
 );
 
 export async function POST(request: NextRequest) {
+  // Add timeout protection - kill process after 10 minutes
+  const timeoutId = setTimeout(() => {
+    console.error('F370 process timed out after 10 minutes');
+    throw new Error('F370 process timed out');
+  }, 10 * 60 * 1000);
+
   try {
     const body = await request.json();
     const {
@@ -108,6 +114,14 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`Query returned ${cncglubRows.length} rows`);
+    
+    // Safety check - prevent processing too many rows at once
+    if (cncglubRows.length > 10000) {
+      return NextResponse.json({ 
+        error: `Too many rows to process (${cncglubRows.length}). Please use more specific filters to reduce the dataset to under 10,000 rows.` 
+      }, { status: 400 });
+    }
+    
     if (cncglubRows.length > 0) {
       console.log('Sample row:', {
         cncg_id: cncglubRows[0].cncg_id,
@@ -195,6 +209,14 @@ export async function POST(request: NextRequest) {
 
         if (keywordInsertError) {
           console.error('Error creating keyword:', keywordInsertError);
+          console.error('Failed for keyword:', renderedKeyword, 'City:', city.city_name);
+          
+          // If too many consecutive errors, abort the process
+          if (keywordsCreatedCount === 0 && existingKeywordsCount === 0 && createdKeywords.length > 10) {
+            return NextResponse.json({ 
+              error: 'Too many consecutive keyword creation errors. Please check database schema.' 
+            }, { status: 500 });
+          }
           continue;
         }
 
@@ -291,5 +313,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('F370 function error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } finally {
+    clearTimeout(timeoutId);
   }
 }

@@ -5680,3 +5680,1650 @@ Result:
     10→https://www.reddit.com/r/smallbusiness/comments/1hw68kd/owners_who_run_their_own_businesses_what/,best accounting software for small business,1,1,6600,59,19.68,1636,0,32196,0.44,260000000,"54,44,54,81,54,81,100,100,100,81,66,81",5/25/25,"Image pack, Sitelinks, Reviews, Video, People also ask, Popular products, Related searches, Discussions and forums",commercial,Organic
 ```
 
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I can see the CSV structure. Let me create a Node.js script to import this data into the `redditurlsvat` table:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```javascript
+#!/usr/bin/env node
+
+import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import csv from 'csv-parser';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('Missing Supabase environment variables. Check .env.local file.');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+const BATCH_SIZE = 100; // Supabase batch insert limit
+const CSV_FILE_PATH = './FileGunBasin/9 August-04 StormBasin/redditurlsfox2.csv';
+
+console.log('🚀 Starting Reddit URLs import...');
+console.log(`📂 Reading file: ${CSV_FILE_PATH}`);
+
+const results = [];
+let rowCount = 0;
+let errorCount = 0;
+
+// Helper function to safely parse integers
+const parseInteger = (value) => {
+  if (!value || value === '' || value === 'null') return null;
+  const parsed = parseInt(value);
+  return isNaN(parsed) ? null : parsed;
+};
+
+// Helper function to safely parse decimals
+const parseDecimal = (value) => {
+  if (!value || value === '' || value === 'null') return null;
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? null : parsed;
+};
+
+// Helper function to parse trends data
+const parseTrends = (trendsString) => {
+  if (!trendsString || trendsString === '' || trendsString === 'null') return null;
+  try {
+    // Remove quotes and split by comma
+    const cleaned = trendsString.replace(/"/g, '');
+    const trends = cleaned.split(',').map(val => parseInt(val.trim())).filter(val => !isNaN(val));
+    return trends.length > 0 ? trends : null;
+  } catch (error) {
+    console.warn(`Failed to parse trends: ${trendsString}`);
+    return null;
+  }
+};
+
+// Helper function to parse arrays (SERP features, keyword intents)
+const parseArray = (arrayString) => {
+  if (!arrayString || arrayString === '' || arrayString === 'null') return null;
+  try {
+    // Split by comma and clean up
+    const items = arrayString.split(',').map(item => item.trim()).filter(item => item.length > 0);
+    return items.length > 0 ? items : null;
+  } catch (error) {
+    console.warn(`Failed to parse array: ${arrayString}`);
+    return null;
+  }
+};
+
+// Helper function to parse timestamp (assuming MM/DD/YY format)
+const parseTimestamp = (timestampString) => {
+  if (!timestampString || timestampString === '' || timestampString === 'null') return null;
+  try {
+    // Convert MM/DD/YY to YYYY-MM-DD
+    const [month, day, year] = timestampString.split('/');
+    const fullYear = year.length === 2 ? `20${year}` : year;
+    return `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  } catch (error) {
+    console.warn(`Failed to parse timestamp: ${timestampString}`);
+    return null;
+  }
+};
+
+// Helper function to extract subreddit name from URL
+const extractSubredditName = (url) => {
+  try {
+    const match = url.match(/reddit\.com\/r\/([^\/]+)\//);
+    return match ? match[1] : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+// Helper function to extract post ID from URL
+const extractPostId = (url) => {
+  try {
+    const match = url.match(/comments\/([^\/]+)\//);
+    return match ? match[1] : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+// Helper function to extract post title from URL
+const extractPostTitle = (url) => {
+  try {
+    const match = url.match(/comments\/[^\/]+\/([^\/]+)\//);
+    if (match) {
+      // Convert URL-encoded title back to readable format
+      return decodeURIComponent(match[1].replace(/_/g, ' '));
+    }
+    return null;
+  } catch (error) {
+    return null;
+  }
+};
+
+fs.createReadStream(CSV_FILE_PATH)
+  .pipe(csv())
+  .on('data', (data) => {
+    rowCount++;
+    
+    try {
+      // Transform CSV data to match database schema
+      const transformed = {
+        url_datum: data['URL'] || null,
+        subreddit_name: extractSubredditName(data['URL']),
+        post_id: extractPostId(data['URL']),
+        post_title: extractPostTitle(data['URL']),
+        keyword: data['Keyword'] || null,
+        current_position: parseInteger(data['Position']),
+        previous_position: parseInteger(data['Previous position']) || 0,
+        position_type: data['Position Type'] || 'Organic',
+        search_volume: parseInteger(data['Search Volume']),
+        keyword_difficulty: parseInteger(data['Keyword Difficulty']),
+        cpc: parseDecimal(data['CPC']),
+        competition: parseDecimal(data['Competition']),
+        number_of_results: parseInteger(data['Number of Results']),
+        estimated_traffic: parseInteger(data['Traffic']),
+        traffic_percentage: parseDecimal(data['Traffic (%)']) || 0,
+        estimated_traffic_cost: parseDecimal(data['Traffic Cost']),
+        trends_data: parseTrends(data['Trends']),
+        serp_features: parseArray(data['SERP Features by Keyword']),
+        keyword_intents: parseArray(data['Keyword Intents']),
+        data_timestamp: parseTimestamp(data['Timestamp'])
+      };
+
+      results.push(transformed);
+
+      // Log progress every 1000 rows
+      if (rowCount % 1000 === 0) {
+        console.log(`📊 Processed ${rowCount} rows...`);
+      }
+
+    } catch (error) {
+      errorCount++;
+      console.error(`❌ Error processing row ${rowCount}:`, error.message);
+      console.error(`Raw data:`, data);
+    }
+  })
+  .on('end', async () => {
+    console.log(`\n✅ Finished reading CSV file`);
+    console.log(`📊 Total rows processed: ${rowCount}`);
+    console.log(`❌ Parsing errors: ${errorCount}`);
+    console.log(`✅ Valid records to insert: ${results.length}`);
+
+    if (results.length === 0) {
+      console.log('❌ No valid records to insert. Exiting.');
+      return;
+    }
+
+    console.log('\n🚀 Starting database insertion...');
+    let insertedCount = 0;
+    let batchErrors = 0;
+
+    // Insert in batches
+    for (let i = 0; i < results.length; i += BATCH_SIZE) {
+      const batch = results.slice(i, i + BATCH_SIZE);
+      const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(results.length / BATCH_SIZE);
+
+      try {
+        const { data, error } = await supabase
+          .from('redditurlsvat')
+          .insert(batch);
+
+        if (error) {
+          batchErrors++;
+          console.error(`❌ Batch ${batchNumber}/${totalBatches} failed:`, error.message);
+          
+          // Log the first few records in the failed batch for debugging
+          console.error('Sample records from failed batch:', batch.slice(0, 2));
+        } else {
+          insertedCount += batch.length;
+          console.log(`✅ Batch ${batchNumber}/${totalBatches} inserted successfully (${batch.length} records)`);
+        }
+
+        // Add a small delay to avoid overwhelming Supabase
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+      } catch (error) {
+        batchErrors++;
+        console.error(`❌ Batch ${batchNumber}/${totalBatches} failed with exception:`, error.message);
+      }
+    }
+
+    console.log('\n🏁 Import completed!');
+    console.log(`✅ Successfully inserted: ${insertedCount} records`);
+    console.log(`❌ Failed batches: ${batchErrors}`);
+    console.log(`📊 Success rate: ${((insertedCount / results.length) * 100).toFixed(1)}%`);
+
+    if (insertedCount > 0) {
+      console.log(`\n🎉 Data imported successfully! Check your Supabase dashboard or visit /reddjar to view the data.`);
+    }
+  })
+  .on('error', (error) => {
+    console.error('❌ Error reading CSV file:', error.message);
+    process.exit(1);
+  });
+
+console.log(`📝 CSV processing started. This may take a few minutes for ${CSV_FILE_PATH}...`);
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/import-reddit-data.js
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check if we have the required dependencies and create a package.json entry for the import script:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./package.json`
+
+Result:
+
+```
+1→{
+     2→  "name": "nextjs",
+     3→  "version": "0.1.0",
+     4→  "private": true,
+     5→  "engines": {
+     6→    "node": ">=18.x"
+     7→  },
+     8→  "scripts": {
+     9→    "dev": "next dev",
+    10→    "build": "next build",
+    11→    "start": "next start",
+    12→    "lint": "next lint",
+    13→    "update-jetstream-csv": "cd \"app/(protected2)/fava/components/jetstream/docs\" && node updateCSV.js"
+    14→  },
+    15→  "dependencies": {
+    16→    "@apollo/client": "^3.13.9",
+    17→    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    18→    "@supabase/supabase-js": "^2.49.8",
+    19→    "@tanstack/react-table": "^8.21.3",
+    20→    "@tanstack/react-virtual": "^3.13.12",
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to check if csv-parser is installed and add the import script to package.json:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Check if csv-parser is installed
+
+`npm list csv-parser`
+
+Error:
+
+```
+nextjs@0.1.0 /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+└── (empty)
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me install the required dependency and run the import:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Install csv-parser dependency
+
+`npm install csv-parser`
+
+Result:
+
+```
+added 1 package, and audited 348 packages in 2s
+
+88 packages are looking for funding
+  run `npm fund` for details
+
+2 vulnerabilities (1 low, 1 high)
+
+To address all issues possible, run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Great! Now let me run the import script:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Run the Reddit data import script
+
+`node import-reddit-data.js`
+
+Error:
+
+```
+(node:76888) Warning: To load an ES module, set "type": "module" in the package.json or use the .mjs extension.
+(Use `node --trace-warnings ...` to show where the warning was created)
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/import-reddit-data.js:3
+import { createClient } from '@supabase/supabase-js';
+^^^^^^
+
+SyntaxError: Cannot use import statement outside a module
+    at wrapSafe (node:internal/modules/cjs/loader:1378:20)
+    at Module._compile (node:internal/modules/cjs/loader:1428:41)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49
+
+Node.js v20.18.1
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to update the import script to use CommonJS syntax. Let me fix that:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/import-reddit-data.js has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→#!/usr/bin/env node
+     2→
+     3→const { createClient } = require('@supabase/supabase-js');
+     4→const fs = require('fs');
+     5→const csv = require('csv-parser');
+     6→const dotenv = require('dotenv');
+     7→
+     8→// Load environment variables
+     9→dotenv.config({ path: '.env.local' });
+    10→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check if dotenv is installed:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Check if dotenv is installed
+
+`npm list dotenv`
+
+Error:
+
+```
+nextjs@0.1.0 /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+└── (empty)
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Install dotenv dependency
+
+`npm install dotenv`
+
+Result:
+
+```
+added 1 package, and audited 349 packages in 1s
+
+89 packages are looking for funding
+  run `npm fund` for details
+
+2 vulnerabilities (1 low, 1 high)
+
+To address all issues possible, run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me run the import script again:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Run the Reddit data import script
+
+`node import-reddit-data.js`
+
+Result:
+
+```
+[dotenv@17.2.1] injecting env (6) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+🚀 Starting Reddit URLs import...
+📂 Reading file: ./FileGunBasin/9 August-04 StormBasin/redditurlsfox2.csv
+📝 CSV processing started. This may take a few minutes for ./FileGunBasin/9 August-04 StormBasin/redditurlsfox2.csv...
+📊 Processed 1000 rows...
+📊 Processed 2000 rows...
+📊 Processed 3000 rows...
+📊 Processed 4000 rows...
+📊 Processed 5000 rows...
+📊 Processed 6000 rows...
+📊 Processed 7000 rows...
+📊 Processed 8000 rows...
+📊 Processed 9000 rows...
+📊 Processed 10000 rows...
+📊 Processed 11000 rows...
+📊 Processed 12000 rows...
+📊 Processed 13000 rows...
+📊 Processed 14000 rows...
+📊 Processed 15000 rows...
+📊 Processed 16000 rows...
+📊 Processed 17000 rows...
+📊 Processed 18000 rows...
+📊 Processed 19000 rows...
+📊 Processed 20000 rows...
+📊 Processed 21000 rows...
+📊 Processed 22000 rows...
+📊 Processed 23000 rows...
+📊 Processed 24000 rows...
+📊 Processed 25000 rows...
+📊 Processed 26000 rows...
+📊 Processed 27000 rows...
+📊 Processed 28000 rows...
+📊 Processed 29000 rows...
+📊 Processed 30000 rows...
+
+✅ Finished reading CSV file
+📊 Total rows processed: 30000
+❌ Parsing errors: 0
+✅ Valid records to insert: 30000
+
+🚀 Starting database insertion...
+
+🏁 Import completed!
+✅ Successfully inserted: 0 records
+❌ Failed batches: 300
+📊 Success rate: 0.0%
+❌ Batch 1/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best motorcycle accident lawyer',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Discussions and forums',
+    search_volume: 5400,
+    keyword_difficulty: 15,
+    cpc: 102.91,
+    competition: 0.03,
+    number_of_results: 50800000,
+    estimated_traffic: 712,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 73271,
+    trends_data: [
+      44, 66, 54, 100,  8,
+      10, 19, 54,  81, 66,
+      13, 29
+    ],
+    serp_features: [ 'Image pack', 'Reviews', 'Video', 'Discussions and forums' ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-25'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best car insurance reddit',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 2400,
+    keyword_difficulty: 30,
+    cpc: 24.93,
+    competition: 0.25,
+    number_of_results: 205000000,
+    estimated_traffic: 1920,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 47865,
+    trends_data: [
+      100, 36, 66, 66, 52,
+       52, 52, 66, 66, 66,
+       52, 66
+    ],
+    serp_features: [ 'Ads bottom', 'Related searches' ],
+    keyword_intents: [ 'commercial', 'navigational' ],
+    data_timestamp: '2025-05-21'
+  }
+]
+❌ Batch 2/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best sports betting app reddit',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 480,
+    keyword_difficulty: 37,
+    cpc: 26.19,
+    competition: 0.19,
+    number_of_results: 19800000,
+    estimated_traffic: 384,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 10056,
+    trends_data: [
+      48, 39,  32, 32, 39,
+      72, 59, 100, 59, 32,
+      26, 26
+    ],
+    serp_features: [ 'People also ask', 'Related searches' ],
+    keyword_intents: [ 'navigational' ],
+    data_timestamp: '2025-05-24'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best password manager',
+    current_position: 2,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 33100,
+    keyword_difficulty: 80,
+    cpc: 3.6,
+    competition: 0.48,
+    number_of_results: 611000000,
+    estimated_traffic: 2714,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 9770,
+    trends_data: [
+       20, 30, 36, 36, 81,
+      100, 24, 54, 66, 30,
+       20, 20
+    ],
+    serp_features: [
+      'Sitelinks',
+      'People also ask',
+      'Related searches',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-25'
+  }
+]
+❌ Batch 3/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best payroll service',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 720,
+    keyword_difficulty: 58,
+    cpc: 37.85,
+    competition: 0.38,
+    number_of_results: 407000000,
+    estimated_traffic: 178,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 6737,
+    trends_data: [
+      20, 16, 20, 20, 20,
+      11, 13, 20, 24, 24,
+      20, 55
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'Ads top',
+      'Ads bottom',
+      'People also ask',
+      'Related searches'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-18'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best website host',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 2400,
+    keyword_difficulty: 100,
+    cpc: 11.3,
+    competition: 0.29,
+    number_of_results: 2110000000,
+    estimated_traffic: 595,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 6723,
+    trends_data: [
+      16,  23,  2, 23, 54,
+      35, 100, 12,  1,  2,
+      29,  44
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Short videos'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-21'
+  }
+]
+❌ Batch 4/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best bed sheets',
+    current_position: 3,
+    previous_position: 2,
+    position_type: 'Organic',
+    search_volume: 22200,
+    keyword_difficulty: 51,
+    cpc: 2.88,
+    competition: 1,
+    number_of_results: 329000000,
+    estimated_traffic: 1820,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 5241,
+    trends_data: [
+      66, 66, 100, 54, 81,
+      66, 54,  54, 66, 36,
+      29, 36
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Video',
+      'Image',
+      'Ads top',
+      'Ads bottom',
+      'Shopping ads',
+      'People also ask',
+      'Popular products',
+      'Related searches',
+      'Buying guide'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best way to invest money',
+    current_position: 1,
+    previous_position: 2,
+    position_type: 'Organic',
+    search_volume: 6600,
+    keyword_difficulty: 48,
+    cpc: 3.19,
+    competition: 0.63,
+    number_of_results: 1310000000,
+    estimated_traffic: 1636,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 5218,
+    trends_data: [
+      54, 54, 44, 54, 44,
+      36, 44, 44, 44, 54,
+      44, 54
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  }
+]
+❌ Batch 5/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best moving companies cross country',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 590,
+    keyword_difficulty: 43,
+    cpc: 29.51,
+    competition: 0.68,
+    number_of_results: 211000000,
+    estimated_traffic: 146,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 4308,
+    trends_data: [
+      11, 11, 100, 11, 3,
+       2, 65,   3,  3, 7,
+       8, 20
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Ads top',
+      'Ads bottom',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-12'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best online colleges',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'People also ask',
+    search_volume: 9900,
+    keyword_difficulty: 51,
+    cpc: 19.8,
+    competition: 0.59,
+    number_of_results: 474000000,
+    estimated_traffic: 217,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 4296,
+    trends_data: [
+       66, 81, 66, 81, 100,
+      100, 81, 81, 81, 100,
+       81, 81
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  }
+]
+❌ Batch 6/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best beginner credit card',
+    current_position: 2,
+    previous_position: 0,
+    position_type: 'People also ask',
+    search_volume: 12100,
+    keyword_difficulty: 45,
+    cpc: 7.53,
+    competition: 0.53,
+    number_of_results: 1870000000,
+    estimated_traffic: 496,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 3734,
+    trends_data: [
+       66, 100, 66, 81, 81,
+      100,  54, 81, 36, 66,
+       36,  36
+    ],
+    serp_features: [
+      'Image pack',
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Short videos',
+      'Discussions and forums',
+      'Ads middle'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best credit card for rewards',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 4400,
+    keyword_difficulty: 62,
+    cpc: 6.43,
+    competition: 0.34,
+    number_of_results: 474000000,
+    estimated_traffic: 580,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 3729,
+    trends_data: [
+      24, 24, 24, 29, 24,
+      24, 29, 44, 29, 29,
+      29, 44
+    ],
+    serp_features: [
+      'Image pack',
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  }
+]
+❌ Batch 7/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best web builder',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'AI overview',
+    search_volume: 3600,
+    keyword_difficulty: 86,
+    cpc: 13.23,
+    competition: 0.39,
+    number_of_results: 725000000,
+    estimated_traffic: 249,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 3294,
+    trends_data: [
+      44, 66, 19,  6, 2,
+      29, 29, 12, 36, 1,
+       4,  6
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Short videos',
+      'Discussions and forums',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best credit card to have',
+    current_position: 1,
+    previous_position: 2,
+    position_type: 'Organic',
+    search_volume: 2400,
+    keyword_difficulty: 65,
+    cpc: 5.53,
+    competition: 0.73,
+    number_of_results: 1910000000,
+    estimated_traffic: 595,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 3290,
+    trends_data: [
+      52, 52, 66, 66, 66,
+      66, 52, 52, 52, 52,
+      66, 52
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'People also ask',
+      'Related searches',
+      'Short videos',
+      'Discussions and forums'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-25'
+  }
+]
+❌ Batch 8/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'reddit best renters insurance',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 260,
+    keyword_difficulty: 34,
+    cpc: 14.11,
+    competition: 0.19,
+    number_of_results: 11500000,
+    estimated_traffic: 208,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2934,
+    trends_data: [
+      15,  5, 15, 67, 100,
+      29,  5,  7, 23,  19,
+      23, 44
+    ],
+    serp_features: [ 'Ads top', 'Ads bottom', 'Related searches' ],
+    keyword_intents: [ 'commercial', 'navigational' ],
+    data_timestamp: '2025-05-19'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best travel card reddit',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 480,
+    keyword_difficulty: 29,
+    cpc: 7.64,
+    competition: 0.46,
+    number_of_results: 327000000,
+    estimated_traffic: 384,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2933,
+    trends_data: [
+      66, 100, 66, 66,  81,
+      81,  54, 44, 81, 100,
+      66,  81
+    ],
+    serp_features: [ 'Related searches' ],
+    keyword_intents: [ 'commercial', 'navigational' ],
+    data_timestamp: '2025-05-17'
+  }
+]
+❌ Batch 9/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best frozen pizza',
+    current_position: 2,
+    previous_position: 2,
+    position_type: 'Organic',
+    search_volume: 27100,
+    keyword_difficulty: 51,
+    cpc: 0.75,
+    competition: 0.97,
+    number_of_results: 207000000,
+    estimated_traffic: 3577,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2682,
+    trends_data: [
+      54, 54, 54, 81, 54,
+      54, 54, 66, 66, 81,
+      66, 66
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Video',
+      'Popular products',
+      'Related searches',
+      'Discussions and forums'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best remote desktop software reddit',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 260,
+    keyword_difficulty: 30,
+    cpc: 12.89,
+    competition: 0.17,
+    number_of_results: 60500000,
+    estimated_traffic: 208,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2681,
+    trends_data: [
+      53, 66, 100, 66, 53,
+      53, 43,  53, 53, 66,
+      43, 66
+    ],
+    serp_features: [ 'Related searches' ],
+    keyword_intents: [ 'commercial', 'navigational' ],
+    data_timestamp: '2025-05-16'
+  }
+]
+❌ Batch 10/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best cheap web hosting',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 720,
+    keyword_difficulty: 54,
+    cpc: 13.66,
+    competition: 0.23,
+    number_of_results: 262000000,
+    estimated_traffic: 178,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2431,
+    trends_data: [
+       46, 25, 25,  2, 20,
+       16, 31, 25, 20, 46,
+      100, 52
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'Ads top',
+      'Ads bottom',
+      'People also ask',
+      'Related searches'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-17'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best bond etf',
+    current_position: 3,
+    previous_position: 3,
+    position_type: 'Organic',
+    search_volume: 5400,
+    keyword_difficulty: 42,
+    cpc: 5.49,
+    competition: 0.3,
+    number_of_results: 65300000,
+    estimated_traffic: 442,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2426,
+    trends_data: [
+      16, 16, 29, 100, 81,
+      19, 16, 16,  16, 24,
+      16, 19
+    ],
+    serp_features: [
+      'Image pack',
+      'Sitelinks',
+      'Video',
+      'Ads bottom',
+      'Related searches'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  }
+]
+❌ Batch 11/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best esim',
+    current_position: 2,
+    previous_position: 2,
+    position_type: 'Organic',
+    search_volume: 2400,
+    keyword_difficulty: 60,
+    cpc: 7.02,
+    competition: 1,
+    number_of_results: 441000000,
+    estimated_traffic: 316,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2218,
+    trends_data: [
+      10, 28, 100, 66, 24,
+      24, 24,  24, 28, 24,
+      24, 28
+    ],
+    serp_features: [
+      'Image pack',
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-20'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best credit card miles program',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'People also ask',
+    search_volume: 5400,
+    keyword_difficulty: 76,
+    cpc: 10.04,
+    competition: 0.43,
+    number_of_results: 36300000,
+    estimated_traffic: 221,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2218,
+    trends_data: [
+      10,   7, 4, 8, 16,
+       5,   5, 0, 1,  0,
+      66, 100
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  }
+]
+❌ Batch 12/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best compact suv',
+    current_position: 3,
+    previous_position: 3,
+    position_type: 'Organic',
+    search_volume: 14800,
+    keyword_difficulty: 44,
+    cpc: 2.13,
+    competition: 0.95,
+    number_of_results: 193000000,
+    estimated_traffic: 962,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2049,
+    trends_data: [
+      54, 66, 66, 66, 81,
+      54, 66, 66, 54, 66,
+      66, 66
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Video',
+      'Image',
+      'People also ask',
+      'Related searches',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-25'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best mvno',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 1900,
+    keyword_difficulty: 34,
+    cpc: 4.35,
+    competition: 0.47,
+    number_of_results: 2930000,
+    estimated_traffic: 471,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 2048,
+    trends_data: [
+       20,  29, 36, 22, 29,
+      100,  43, 54, 29, 43,
+       29, 100
+    ],
+    serp_features: [ 'Sitelinks', 'Video', 'Related searches', 'See results about' ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-19'
+  }
+]
+❌ Batch 13/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best whole home water filter',
+    current_position: 2,
+    previous_position: 2,
+    position_type: 'Organic',
+    search_volume: 3600,
+    keyword_difficulty: 25,
+    cpc: 4,
+    competition: 0.45,
+    number_of_results: 316000000,
+    estimated_traffic: 475,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1900,
+    trends_data: [
+      29, 100, 100, 19, 29,
+       8,  35,  44, 19, 29,
+      35,  44
+    ],
+    serp_features: [
+      'Image pack',
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'Image',
+      'People also ask',
+      'Related searches'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-23'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'reddit best protein powder',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 590,
+    keyword_difficulty: 31,
+    cpc: 4.02,
+    competition: 0.72,
+    number_of_results: 69200000,
+    estimated_traffic: 472,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1897,
+    trends_data: [
+      59, 59, 72, 48,  59,
+      72, 48, 48, 48, 100,
+      59, 59
+    ],
+    serp_features: [ 'Image pack', 'Reviews', 'Video', 'Related searches' ],
+    keyword_intents: [ 'commercial', 'navigational' ],
+    data_timestamp: '2025-05-11'
+  }
+]
+❌ Batch 14/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best hotels',
+    current_position: 1,
+    previous_position: 0,
+    position_type: 'AI overview',
+    search_volume: 12100,
+    keyword_difficulty: 62,
+    cpc: 2.11,
+    competition: 0.26,
+    number_of_results: 693000000,
+    estimated_traffic: 840,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1772,
+    trends_data: [
+      44,  24, 36, 29,  54,
+      36,  36, 29, 36, 100,
+      29, 100
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best free tax filing reddit',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 320,
+    keyword_difficulty: 30,
+    cpc: 6.92,
+    competition: 0.32,
+    number_of_results: 39000000,
+    estimated_traffic: 256,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1771,
+    trends_data: [
+      72,   2, 2, 2,  2,
+       3,   3, 2, 3, 88,
+      88, 100
+    ],
+    serp_features: [ 'People also ask', 'Related searches' ],
+    keyword_intents: [ 'navigational' ],
+    data_timestamp: '2025-05-14'
+  }
+]
+❌ Batch 15/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best trading platform reddit',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 210,
+    keyword_difficulty: 28,
+    cpc: 9.9,
+    competition: 0.17,
+    number_of_results: 87300000,
+    estimated_traffic: 168,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1663,
+    trends_data: [
+      4, 3, 3, 5, 4,
+      4, 3, 3, 5, 4,
+      4, 3
+    ],
+    serp_features: [ 'Related searches' ],
+    keyword_intents: [ 'commercial', 'navigational' ],
+    data_timestamp: '2025-04-30'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best wood floor cleaner',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 5400,
+    keyword_difficulty: 55,
+    cpc: 1.24,
+    competition: 1,
+    number_of_results: 231000000,
+    estimated_traffic: 1339,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1660,
+    trends_data: [
+      29,  44, 36, 66, 44,
+      29, 100, 66, 44, 66,
+      66,  66
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'Image',
+      'People also ask',
+      'Popular products',
+      'Related searches'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  }
+]
+❌ Batch 16/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best website hosting for small business',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 1000,
+    keyword_difficulty: 46,
+    cpc: 11.92,
+    competition: 0.78,
+    number_of_results: 274000000,
+    estimated_traffic: 132,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1573,
+    trends_data: [
+      52, 52, 46, 100, 52,
+      46, 52, 37,  52, 68,
+      46, 68
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-22'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best kitty litter',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 6600,
+    keyword_difficulty: 38,
+    cpc: 0.96,
+    competition: 1,
+    number_of_results: 23300000,
+    estimated_traffic: 1636,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1570,
+    trends_data: [
+       19, 16, 13, 13, 13,
+      100, 29, 24, 36, 36,
+       36, 36
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'Image',
+      'People also ask',
+      'Popular products',
+      'Related searches'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  }
+]
+❌ Batch 17/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best digital marketing companies',
+    current_position: 1,
+    previous_position: 1,
+    position_type: 'Organic',
+    search_volume: 1300,
+    keyword_difficulty: 50,
+    cpc: 8.71,
+    competition: 0.09,
+    number_of_results: 887000000,
+    estimated_traffic: 171,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1489,
+    trends_data: [
+      30,  41, 36, 41, 36,
+      36,  54, 54, 54, 54,
+      66, 100
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'People also ask',
+      'Related searches',
+      'Discussions and forums',
+      'Ads middle',
+      'AI overview'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-23'
+  },
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best wallpapers',
+    current_position: 2,
+    previous_position: 3,
+    position_type: 'Organic',
+    search_volume: 12100,
+    keyword_difficulty: 41,
+    cpc: 0.93,
+    competition: 0.82,
+    number_of_results: 7640000000,
+    estimated_traffic: 1597,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1485,
+    trends_data: [
+      54, 36, 36, 24, 44,
+      36, 36, 54, 44, 54,
+      36, 54
+    ],
+    serp_features: [
+      'Image pack',
+      'Sitelinks',
+      'Video',
+      'Image',
+      'Related searches',
+      'Short videos'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-25'
+  }
+]
+❌ Batch 18/300 failed: null value in column "url_datum" of relation "redditurlsvat" violates not-null constraint
+Sample records from failed batch: [
+  {
+    url_datum: null,
+    subreddit_name: null,
+    post_id: null,
+    post_title: null,
+    keyword: 'best baby monitor',
+    current_position: 2,
+    previous_position: 2,
+    position_type: 'Organic',
+    search_volume: 22200,
+    keyword_difficulty: 56,
+    cpc: 0.48,
+    competition: 1,
+    number_of_results: 1030000000,
+    estimated_traffic: 2930,
+    traffic_percentage: 0,
+    estimated_traffic_cost: 1406,
+    trends_data: [
+      36, 44, 100, 66, 44,
+      54, 66,  36, 36, 36,
+      36, 36
+    ],
+    serp_features: [
+      'Sitelinks',
+      'Reviews',
+      'Video',
+      'Image',
+      'People also ask',
+      'Related searches'
+    ],
+    keyword_intents: [ 'commercial' ],
+    data_timestamp: '2025-05-24'
+  }
+
+... [19112 lines truncated] ...
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the issue! The problem is that the CSV has a BOM (Byte Order Mark) character at the beginning which is causing the URL column to not be read correctly. Let me fix the import script:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Search for redditurlsfox2.csv file
+- [⚡] 🌡️ Fix BOM issue and retry CSV import
+- [ ] 🌡️ Complete data import to redditurlsvat table
+
+
