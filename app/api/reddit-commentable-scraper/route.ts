@@ -68,9 +68,9 @@ async function fetchRedditThreadCommentability(redditUrl: string): Promise<Reddi
       is_self: submissionData.is_self || false,
       created_utc: submissionData.created_utc || 0,
       author: submissionData.author || '',
-      archived: submissionData.archived || false,
-      locked: submissionData.locked || false,
-      contest_mode: submissionData.contest_mode || false
+      archived: Boolean(submissionData.archived),
+      locked: Boolean(submissionData.locked),
+      contest_mode: Boolean(submissionData.contest_mode)
     };
     
     return submission;
@@ -122,6 +122,10 @@ export async function POST(request: NextRequest) {
         
         // Check if thread is commentable
         const isCommentable = isThreadCommentable(submission);
+        console.log(`🔍 REDDIT SCRAPER DEBUG - Thread ${submission.id}:`);
+        console.log(`   📊 Raw data: archived=${submission.archived}, locked=${submission.locked}, contest_mode=${submission.contest_mode}`);
+        console.log(`   🎯 Result: is_commentable=${isCommentable} (should be ${isCommentable ? 'OPEN ✓' : 'CLOSED ✗'})`);
+        console.log(`   🗄️ Updating database for url_id=${redditUrl.url_id}`);
         
         // Update the is_commentable field in the database
         const { error: updateError } = await supabase
@@ -130,7 +134,7 @@ export async function POST(request: NextRequest) {
           .eq('url_id', redditUrl.url_id);
         
         if (updateError) {
-          console.error('Error updating is_commentable field:', updateError);
+          console.error('❌ Database update FAILED:', updateError);
           results.push({
             url_id: redditUrl.url_id,
             url: redditUrl.url_datum,
@@ -139,7 +143,7 @@ export async function POST(request: NextRequest) {
             is_commentable: isCommentable
           });
         } else {
-          console.log(`Updated is_commentable for URL ${redditUrl.url_id}: ${isCommentable ? 'Open' : 'Closed'}`);
+          console.log(`✅ Database update SUCCESS: URL ${redditUrl.url_id} set to is_commentable=${isCommentable} (${isCommentable ? 'OPEN ✓' : 'CLOSED ✗'})`);
           results.push({
             url_id: redditUrl.url_id,
             url: redditUrl.url_datum,

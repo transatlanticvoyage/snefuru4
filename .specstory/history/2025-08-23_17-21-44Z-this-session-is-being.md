@@ -955,3 +955,2016 @@ The user now has two scraping options:
 
 Both buttons work independently and provide clear feedback on what they're doing!
 
+---
+
+_**User**_
+
+one of the row pagination button bars is using the yellow bg color for its actively selected item. somehow this accidentally happened when we created the 2 column pagination button bars. please revert it to use the blue color that the other row pagination button bar is already correctly using for its active item bg color
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [ ] 🌡️ Find and fix yellow background color on column pagination button bar
+- [ ] 🌡️ Change active item color from yellow to blue to match other pagination bar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Find and fix yellow background color on column pagination button bar
+- [ ] 🌡️ Change active item color from yellow to blue to match other pagination bar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to check the ReddjarTable component to find the column pagination buttons with the incorrect yellow background:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/reddjar/components/ReddjarTable.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import dynamic from 'next/dynamic';
+     6→
+     7→const NubraTablefaceKite = dynamic(
+     8→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+     9→  { ssr: false }
+    10→);
+    11→
+    12→interface RedditUrl {
+    13→  url_id: number;
+    14→  url_datum: string | null;
+    15→  is_commentable: boolean | null;
+    16→  count_obls?: number;
+    17→  subreddit_name: string | null;
+    18→  post_id: string | null;
+    19→  post_title: string | null;
+    20→  keyword: string | null;
+    21→  current_position: number | null;
+    22→  previous_position: number | null;
+    23→  position_type: string | null;
+    24→  search_volume: number | null;
+    25→  keyword_difficulty: number | null;
+    26→  cpc: number | null;
+    27→  competition: number | null;
+    28→  number_of_results: number | null;
+    29→  estimated_traffic: number | null;
+    30→  traffic_percentage: number | null;
+    31→  estimated_traffic_cost: number | null;
+    32→  trends_data: any;
+    33→  serp_features: string[] | null;
+    34→  keyword_intents: string[] | null;
+    35→  data_timestamp: string | null;
+    36→  created_at: string;
+    37→  updated_at: string;
+    38→}
+    39→
+    40→interface OutboundLink {
+    41→  link_id: number;
+    42→  source_url_id: number;
+    43→  comment_id: string | null;
+    44→  source_type: string | null;
+    45→  raw_url: string | null;
+    46→  resolved_url: string | null;
+    47→  domain: string | null;
+    48→  anchor_text: string | null;
+    49→  http_status: number | null;
+    50→  first_seen: string;
+    51→  last_seen: string;
+    52→  created_at: string;
+    53→  updated_at: string;
+    54→}
+    55→
+    56→interface ReddjarTableProps {
+    57→  onColumnPaginationRender?: (controls: {
+    58→    ColumnPaginationBar1: () => JSX.Element | null;
+    59→    ColumnPaginationBar2: () => JSX.Element | null;
+    60→  }) => void;
+    61→  selectedRows?: Set<number>;
+    62→  onSelectionChange?: (selectedRows: Set<number>) => void;
+    63→}
+    64→
+    65→export default function ReddjarTable({ 
+    66→  onColumnPaginationRender, 
+    67→  selectedRows = new Set(), 
+    68→  onSelectionChange 
+    69→}: ReddjarTableProps = {}) {
+    70→  const [data, setData] = useState<RedditUrl[]>([]);
+    71→  const [loading, setLoading] = useState(true);
+    72→  const [error, setError] = useState<string | null>(null);
+    73→  const [searchTerm, setSearchTerm] = useState('');
+    74→  const [currentPage, setCurrentPage] = useState(1);
+    75→  const [itemsPerPage, setItemsPerPage] = useState(100);
+    76→  const [sortField, setSortField] = useState<keyof RedditUrl>('estimated_traffic_cost');
+    77→  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    78→  
+    79→  // Column pagination states
+    80→  const [columnsPerPage, setColumnsPerPage] = useState(8); // Show 8 columns at a time
+    81→  const [currentColumnPage, setCurrentColumnPage] = useState(1);
+    82→  
+    83→  // Modal states
+    84→  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    85→  
+    86→  // Inline editing states
+    87→  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+    88→  const [editingValue, setEditingValue] = useState<string>('');
+    89→  
+    90→  // Expandable row states
+    91→  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+    92→  const [outboundLinks, setOutboundLinks] = useState<Record<number, OutboundLink[]>>({});
+    93→  const [loadingLinks, setLoadingLinks] = useState<Set<number>>(new Set());
+    94→  
+    95→  // Form data for creating/editing
+    96→  const [formData, setFormData] = useState({
+    97→    url_datum: '',
+    98→    is_commentable: true,
+    99→    count_obls: 0,
+   100→    subreddit_name: '',
+   101→    post_id: '',
+   102→    post_title: '',
+   103→    keyword: '',
+   104→    current_position: 0,
+   105→    previous_position: 0,
+   106→    position_type: 'Organic',
+   107→    search_volume: 0,
+   108→    keyword_difficulty: 0,
+   109→    cpc: 0,
+   110→    competition: 0,
+   111→    number_of_results: 0,
+   112→    estimated_traffic: 0,
+   113→    traffic_percentage: 0,
+   114→    estimated_traffic_cost: 0,
+   115→    trends_data: '',
+   116→    serp_features: '',
+   117→    keyword_intents: '',
+   118→    data_timestamp: ''
+   119→  });
+   120→  
+   121→  const supabase = createClientComponentClient();
+   122→  
+   123→  // Column definitions with proper grouping and widths
+   124→  const columns: Array<{ 
+   125→    key: keyof RedditUrl; 
+   126→    type: string; 
+   127→    width: string; 
+   128→    group?: string; 
+   129→    separator?: 'right';
+   130→    label: string;
+   131→  }> = [
+   132→    { key: 'url_id', type: 'integer', width: '80px', label: 'url_id' },
+   133→    { key: 'url_datum', type: 'text', width: '280px', label: 'url_datum' },
+   134→    { key: 'is_commentable', type: 'boolean', width: '90px', label: 'is_commentable' },
+   135→    { key: 'count_obls', type: 'integer', width: '100px', label: 'count_obls' },
+   136→    { key: 'subreddit_name', type: 'text', width: '150px', label: 'subreddit_name' },
+   137→    { key: 'post_id', type: 'text', width: '120px', label: 'post_id' },
+   138→    { key: 'post_title', type: 'text', width: '250px', label: 'post_title', separator: 'right' },
+   139→    { key: 'keyword', type: 'text', width: '200px', label: 'keyword' },
+   140→    { key: 'current_position', type: 'integer', width: '80px', label: 'current_position' },
+   141→    { key: 'previous_position', type: 'integer', width: '80px', label: 'previous_position' },
+   142→    { key: 'position_type', type: 'text', width: '100px', label: 'position_type', separator: 'right' },
+   143→    { key: 'search_volume', type: 'integer', width: '100px', label: 'search_volume' },
+   144→    { key: 'keyword_difficulty', type: 'integer', width: '80px', label: 'keyword_difficulty' },
+   145→    { key: 'cpc', type: 'decimal', width: '80px', label: 'cpc' },
+   146→    { key: 'competition', type: 'decimal', width: '80px', label: 'competition' },
+   147→    { key: 'number_of_results', type: 'integer', width: '120px', label: 'number_of_results', separator: 'right' },
+   148→    { key: 'estimated_traffic', type: 'integer', width: '100px', label: 'estimated_traffic' },
+   149→    { key: 'traffic_percentage', type: 'decimal', width: '100px', label: 'traffic_percentage' },
+   150→    { key: 'estimated_traffic_cost', type: 'decimal', width: '120px', label: 'estimated_traffic_cost', separator: 'right' },
+   151→    { key: 'trends_data', type: 'json', width: '200px', label: 'trends_data' },
+   152→    { key: 'serp_features', type: 'array', width: '200px', label: 'serp_features' },
+   153→    { key: 'keyword_intents', type: 'array', width: '150px', label: 'keyword_intents', separator: 'right' },
+   154→    { key: 'data_timestamp', type: 'date', width: '120px', label: 'data_timestamp' },
+   155→    { key: 'created_at', type: 'timestamp', width: '180px', label: 'created_at' },
+   156→    { key: 'updated_at', type: 'timestamp', width: '180px', label: 'updated_at' }
+   157→  ];
+   158→  
+   159→  // Column pagination logic
+   160→  const totalColumnPages = Math.ceil(columns.length / columnsPerPage);
+   161→  const startColumnIndex = (currentColumnPage - 1) * columnsPerPage;
+   162→  const visibleColumns = columns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+   163→  
+   164→  // Column Pagination Components - Define before use
+   165→  // Bar 1: Columns per page quantity selector
+   166→  const ColumnPaginationBar1 = () => {
+   167→    return (
+   168→      <div className="flex items-center">
+   169→        <div className="flex items-center">
+   170→          <span className="text-xs text-gray-600 mr-2">Cols/page:</span>
+   171→          <button
+   172→            onClick={() => {
+   173→              setColumnsPerPage(4);
+   174→              setCurrentColumnPage(1);
+   175→            }}
+   176→            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${
+   177→              columnsPerPage === 4 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+   178→            }`}
+   179→            style={{ 
+   180→              fontSize: '14px', 
+   181→              paddingTop: '10px', 
+   182→              paddingBottom: '10px',
+   183→              backgroundColor: columnsPerPage === 4 ? '#f8f782' : undefined
+   184→            }}
+   185→          >
+   186→            4
+   187→          </button>
+   188→          <button
+   189→            onClick={() => {
+   190→              setColumnsPerPage(6);
+   191→              setCurrentColumnPage(1);
+   192→            }}
+   193→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+   194→              columnsPerPage === 6 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+   195→            }`}
+   196→            style={{ 
+   197→              fontSize: '14px', 
+   198→              paddingTop: '10px', 
+   199→              paddingBottom: '10px',
+   200→              backgroundColor: columnsPerPage === 6 ? '#f8f782' : undefined
+   201→            }}
+   202→          >
+   203→            6
+   204→          </button>
+   205→          <button
+   206→            onClick={() => {
+   207→              setColumnsPerPage(8);
+   208→              setCurrentColumnPage(1);
+   209→            }}
+   210→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+   211→              columnsPerPage === 8 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+   212→            }`}
+   213→            style={{ 
+   214→              fontSize: '14px', 
+   215→              paddingTop: '10px', 
+   216→              paddingBottom: '10px',
+   217→              backgroundColor: columnsPerPage === 8 ? '#f8f782' : undefined
+   218→            }}
+   219→          >
+   220→            8
+   221→          </button>
+   222→          <button
+   223→            onClick={() => {
+   224→              setColumnsPerPage(10);
+   225→              setCurrentColumnPage(1);
+   226→            }}
+   227→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+   228→              columnsPerPage === 10 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+   229→            }`}
+   230→            style={{ 
+   231→              fontSize: '14px', 
+   232→              paddingTop: '10px', 
+   233→              paddingBottom: '10px',
+   234→              backgroundColor: columnsPerPage === 10 ? '#f8f782' : undefined
+   235→            }}
+   236→          >
+   237→            10
+   238→          </button>
+   239→          <button
+   240→            onClick={() => {
+   241→              setColumnsPerPage(12);
+   242→              setCurrentColumnPage(1);
+   243→            }}
+   244→            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${
+   245→              columnsPerPage === 12 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+   246→            }`}
+   247→            style={{ 
+   248→              fontSize: '14px', 
+   249→              paddingTop: '10px', 
+   250→              paddingBottom: '10px',
+   251→              backgroundColor: columnsPerPage === 12 ? '#f8f782' : undefined
+   252→            }}
+   253→          >
+   254→            12
+   255→          </button>
+   256→        </div>
+   257→      </div>
+   258→    );
+   259→  };
+   260→
+   261→  // Bar 2: Current column page selector
+   262→  const ColumnPaginationBar2 = () => {
+   263→    if (totalColumnPages <= 1) return null;
+   264→    
+   265→    return (
+   266→      <div className="flex items-center">
+   267→        <div className="flex items-center">
+   268→          <span className="text-xs text-gray-600 mr-2">Col page:</span>
+   269→          <button
+   270→            onClick={() => setCurrentColumnPage(1)}
+   271→            disabled={currentColumnPage === 1}
+   272→            className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   273→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+   274→          >
+   275→            First
+   276→          </button>
+   277→          <button
+   278→            onClick={() => setCurrentColumnPage(currentColumnPage - 1)}
+   279→            disabled={currentColumnPage === 1}
+   280→            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   281→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+   282→          >
+   283→            Prev
+   284→          </button>
+   285→          
+   286→          {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
+   287→            const pageNum = Math.max(1, Math.min(totalColumnPages - 4, currentColumnPage - 2)) + i;
+   288→            if (pageNum > totalColumnPages) return null;
+   289→            return (
+   290→              <button
+   291→                key={pageNum}
+   292→                onClick={() => setCurrentColumnPage(pageNum)}
+   293→                className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+   294→                  currentColumnPage === pageNum 
+   295→                    ? 'text-black border-black' 
+   296→                    : 'bg-white hover:bg-gray-200'
+   297→                }`}
+   298→                style={{ 
+   299→                  fontSize: '14px', 
+   300→                  paddingTop: '10px', 
+   301→                  paddingBottom: '10px',
+   302→                  backgroundColor: currentColumnPage === pageNum ? '#f8f782' : undefined
+   303→                }}
+   304→              >
+   305→                {pageNum}
+   306→              </button>
+   307→            );
+   308→          })}
+   309→          
+   310→          <button
+   311→            onClick={() => setCurrentColumnPage(currentColumnPage + 1)}
+   312→            disabled={currentColumnPage === totalColumnPages}
+   313→            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   314→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+   315→          >
+   316→            Next
+   317→          </button>
+   318→          <button
+   319→            onClick={() => setCurrentColumnPage(totalColumnPages)}
+   320→            disabled={currentColumnPage === totalColumnPages}
+   321→            className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+   322→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+   323→          >
+   324→            Last
+   325→          </button>
+   326→        </div>
+   327→      </div>
+   328→    );
+   329→  };
+   330→  
+   331→  // Pass pagination components to parent
+   332→  useEffect(() => {
+   333→    if (onColumnPaginationRender) {
+   334→      onColumnPaginationRender({
+   335→        ColumnPaginationBar1,
+   336→        ColumnPaginationBar2
+   337→      });
+   338→    }
+   339→  }, [onColumnPaginationRender, currentColumnPage, totalColumnPages]);
+   340→
+   341→  // Fetch data
+   342→  useEffect(() => {
+   343→    fetchData();
+   344→  }, []);
+   345→  
+   346→  const fetchData = async () => {
+   347→    try {
+   348→      setLoading(true);
+   349→      
+   350→      // Fetch main data first
+   351→      const { data: tableData, error: fetchError } = await supabase
+   352→        .from('redditurlsvat')
+   353→        .select('*')
+   354→        .order('created_at', { ascending: false });
+   355→        
+   356→      if (fetchError) throw fetchError;
+   357→      
+   358→      if (!tableData || tableData.length === 0) {
+   359→        setData([]);
+   360→        return;
+   361→      }
+   362→      
+   363→      // Initialize data with count_obls as 0 for now
+   364→      const processedData = tableData.map(item => ({
+   365→        ...item,
+   366→        count_obls: 0
+   367→      }));
+   368→      
+   369→      setData(processedData);
+   370→      
+   371→      // Fetch counts asynchronously without blocking the UI
+   372→      fetchOutboundLinkCounts(processedData);
+   373→      
+   374→    } catch (err) {
+   375→      console.error('Error fetching reddit urls:', err);
+   376→      setError('Failed to fetch reddit urls');
+   377→    } finally {
+   378→      setLoading(false);
+   379→    }
+   380→  };
+   381→
+   382→  // Separate function to fetch outbound link counts
+   383→  const fetchOutboundLinkCounts = async (tableData: RedditUrl[]) => {
+   384→    try {
+   385→      // Get all outbound links and count by source_url_id
+   386→      const { data: linkCounts } = await supabase
+   387→        .from('redditoblinks')
+   388→        .select('source_url_id');
+   389→      
+   390→      if (linkCounts) {
+   391→        // Create a map of url_id to count
+   392→        const countsMap = new Map();
+   393→        linkCounts.forEach(link => {
+   394→          const count = countsMap.get(link.source_url_id) || 0;
+   395→          countsMap.set(link.source_url_id, count + 1);
+   396→        });
+   397→        
+   398→        // Update the data with counts
+   399→        const updatedData = tableData.map(item => ({
+   400→          ...item,
+   401→          count_obls: countsMap.get(item.url_id) || 0
+   402→        }));
+   403→        
+   404→        setData(updatedData);
+   405→      }
+   406→    } catch (err) {
+   407→      console.warn('Error fetching outbound link counts:', err);
+   408→      // Keep the original data with counts as 0
+   409→    }
+   410→  };
+   411→  
+   412→  // Filter and sort data
+   413→  const filteredAndSortedData = useMemo(() => {
+   414→    let filtered = data.filter(item => {
+   415→      if (!searchTerm) return true;
+   416→      return Object.values(item).some(value => 
+   417→        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+   418→      );
+   419→    });
+   420→
+   421→    // Sort data
+   422→    filtered.sort((a, b) => {
+   423→      const aValue = a[sortField];
+   424→      const bValue = b[sortField];
+   425→      
+   426→      if (aValue === null && bValue === null) return 0;
+   427→      if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
+   428→      if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
+   429→      
+   430→      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+   431→      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+   432→      return 0;
+   433→    });
+   434→
+   435→    return filtered;
+   436→  }, [data, searchTerm, sortField, sortOrder]);
+   437→
+   438→  // Pagination
+   439→  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
+   440→  const startIndex = (currentPage - 1) * itemsPerPage;
+   441→  const paginatedData = filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+   442→
+   443→  const handleSort = (field: keyof RedditUrl) => {
+   444→    if (sortField === field) {
+   445→      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+   446→    } else {
+   447→      setSortField(field);
+   448→      setSortOrder('asc');
+   449→    }
+   450→  };
+   451→
+   452→  // Handle inline editing
+   453→  const handleCellClick = (id: number, field: string, currentValue: any) => {
+   454→    if (field === 'url_id' || field === 'created_at') {
+   455→      return; // Don't allow editing these fields
+   456→    }
+   457→    
+   458→    setEditingCell({ id, field });
+   459→    setEditingValue(currentValue?.toString() || '');
+   460→  };
+   461→
+   462→  const handleCellSave = async () => {
+   463→    if (!editingCell) return;
+   464→
+   465→    const { id, field } = editingCell;
+   466→    let processedValue: any = editingValue;
+   467→
+   468→    // Process value based on field type
+   469→    const column = columns.find(col => col.key === field);
+   470→    if (column?.type === 'boolean') {
+   471→      processedValue = editingValue === 'true' || editingValue === '1' || editingValue.toLowerCase() === 'yes';
+   472→    } else if (column?.type === 'integer') {
+   473→      processedValue = editingValue === '' ? null : parseInt(editingValue);
+   474→      if (isNaN(processedValue)) {
+   475→        processedValue = null;
+   476→      }
+   477→    } else if (column?.type === 'decimal') {
+   478→      processedValue = editingValue === '' ? null : parseFloat(editingValue);
+   479→      if (isNaN(processedValue)) {
+   480→        processedValue = null;
+   481→      }
+   482→    } else if (column?.type === 'json') {
+   483→      if (editingValue.trim()) {
+   484→        try {
+   485→          processedValue = JSON.parse(editingValue);
+   486→        } catch {
+   487→          alert('Invalid JSON format');
+   488→          return;
+   489→        }
+   490→      } else {
+   491→        processedValue = null;
+   492→      }
+   493→    } else if (column?.type === 'array') {
+   494→      if (editingValue.trim()) {
+   495→        try {
+   496→          processedValue = JSON.parse(editingValue);
+   497→          if (!Array.isArray(processedValue)) {
+   498→            // If it's not an array, make it one
+   499→            processedValue = [processedValue];
+   500→          }
+   501→        } catch {
+   502→          // Try to split by comma as fallback
+   503→          processedValue = editingValue.split(',').map(s => s.trim()).filter(s => s);
+   504→        }
+   505→      } else {
+   506→        processedValue = null;
+   507→      }
+   508→    } else if (editingValue === '') {
+   509→      processedValue = null;
+   510→    }
+   511→
+   512→    await updateField(id, field as keyof RedditUrl, processedValue);
+   513→    setEditingCell(null);
+   514→    setEditingValue('');
+   515→  };
+   516→
+   517→  const handleCellCancel = () => {
+   518→    setEditingCell(null);
+   519→    setEditingValue('');
+   520→  };
+   521→
+   522→  const updateField = async (id: number, field: keyof RedditUrl, value: any) => {
+   523→    try {
+   524→      const { error } = await supabase
+   525→        .from('redditurlsvat')
+   526→        .update({ [field]: value })
+   527→        .eq('url_id', id);
+   528→
+   529→      if (error) {
+   530→        console.error('Error updating field:', error);
+   531→        return;
+   532→      }
+   533→
+   534→      // Update local state
+   535→      setData(prev => prev.map(item => 
+   536→        item.url_id === id ? { ...item, [field]: value } : item
+   537→      ));
+   538→    } catch (error) {
+   539→      console.error('Error updating field:', error);
+   540→    }
+   541→  };
+   542→
+   543→  // Create new record inline
+   544→  const createNewUrlInline = async () => {
+   545→    try {
+   546→      const { data: newRecord, error } = await supabase
+   547→        .from('redditurlsvat')
+   548→        .insert({
+   549→          url_datum: null,
+   550→          is_commentable: true,
+   551→          subreddit_name: null,
+   552→          post_id: null,
+   553→          post_title: null,
+   554→          keyword: null,
+   555→          current_position: null,
+   556→          previous_position: 0,
+   557→          position_type: 'Organic',
+   558→          search_volume: null,
+   559→          keyword_difficulty: null,
+   560→          cpc: null,
+   561→          competition: null,
+   562→          number_of_results: null,
+   563→          estimated_traffic: null,
+   564→          traffic_percentage: 0,
+   565→          estimated_traffic_cost: null,
+   566→          trends_data: null,
+   567→          serp_features: null,
+   568→          keyword_intents: null,
+   569→          data_timestamp: null
+   570→        })
+   571→        .select()
+   572→        .single();
+   573→
+   574→      if (error) {
+   575→        console.error('Error creating new reddit url record:', error);
+   576→        return;
+   577→      }
+   578→
+   579→      // Add the new record to the local state
+   580→      setData(prev => [newRecord, ...prev]);
+   581→      
+   582→      // Reset to first page to show the new record
+   583→      setCurrentPage(1);
+   584→    } catch (error) {
+   585→      console.error('Error creating new reddit url record:', error);
+   586→    }
+   587→  };
+   588→
+   589→  // Handle create from modal
+   590→  const handleCreate = async () => {
+   591→    try {
+   592→      let trendsData = null;
+   593→      if (formData.trends_data && formData.trends_data.trim()) {
+   594→        try {
+   595→          trendsData = JSON.parse(formData.trends_data);
+   596→        } catch (parseError) {
+   597→          alert('Invalid JSON in trends_data field. Please check the format.');
+   598→          return;
+   599→        }
+   600→      }
+   601→
+   602→      let serpFeatures = null;
+   603→      if (formData.serp_features && formData.serp_features.trim()) {
+   604→        try {
+   605→          serpFeatures = JSON.parse(formData.serp_features);
+   606→          if (!Array.isArray(serpFeatures)) {
+   607→            serpFeatures = [serpFeatures];
+   608→          }
+   609→        } catch (parseError) {
+   610→          serpFeatures = formData.serp_features.split(',').map(s => s.trim()).filter(s => s);
+   611→        }
+   612→      }
+   613→
+   614→      let keywordIntents = null;
+   615→      if (formData.keyword_intents && formData.keyword_intents.trim()) {
+   616→        try {
+   617→          keywordIntents = JSON.parse(formData.keyword_intents);
+   618→          if (!Array.isArray(keywordIntents)) {
+   619→            keywordIntents = [keywordIntents];
+   620→          }
+   621→        } catch (parseError) {
+   622→          keywordIntents = formData.keyword_intents.split(',').map(s => s.trim()).filter(s => s);
+   623→        }
+   624→      }
+   625→      
+   626→      const insertData = {
+   627→        url_datum: formData.url_datum?.trim() || null,
+   628→        is_commentable: formData.is_commentable,
+   629→        subreddit_name: formData.subreddit_name?.trim() || null,
+   630→        post_id: formData.post_id?.trim() || null,
+   631→        post_title: formData.post_title?.trim() || null,
+   632→        keyword: formData.keyword?.trim() || null,
+   633→        current_position: formData.current_position || null,
+   634→        previous_position: formData.previous_position || 0,
+   635→        position_type: formData.position_type?.trim() || 'Organic',
+   636→        search_volume: formData.search_volume || null,
+   637→        keyword_difficulty: formData.keyword_difficulty || null,
+   638→        cpc: formData.cpc || null,
+   639→        competition: formData.competition || null,
+   640→        number_of_results: formData.number_of_results || null,
+   641→        estimated_traffic: formData.estimated_traffic || null,
+   642→        traffic_percentage: formData.traffic_percentage || 0,
+   643→        estimated_traffic_cost: formData.estimated_traffic_cost || null,
+   644→        trends_data: trendsData,
+   645→        serp_features: serpFeatures,
+   646→        keyword_intents: keywordIntents,
+   647→        data_timestamp: formData.data_timestamp?.trim() || null
+   648→      };
+   649→      
+   650→      const { error: insertError } = await supabase
+   651→        .from('redditurlsvat')
+   652→        .insert([insertData]);
+   653→        
+   654→      if (insertError) throw insertError;
+   655→      
+   656→      setIsCreateModalOpen(false);
+   657→      resetForm();
+   658→      fetchData();
+   659→    } catch (err) {
+   660→      console.error('Error creating record:', err);
+   661→      alert(`Failed to create record: ${err instanceof Error ? err.message : 'Unknown error'}`);
+   662→    }
+   663→  };
+   664→
+   665→  // Reset form
+   666→  const resetForm = () => {
+   667→    setFormData({
+   668→      url_datum: '',
+   669→      is_commentable: true,
+   670→      subreddit_name: '',
+   671→      post_id: '',
+   672→      post_title: '',
+   673→      keyword: '',
+   674→      current_position: 0,
+   675→      previous_position: 0,
+   676→      position_type: 'Organic',
+   677→      search_volume: 0,
+   678→      keyword_difficulty: 0,
+   679→      cpc: 0,
+   680→      competition: 0,
+   681→      number_of_results: 0,
+   682→      estimated_traffic: 0,
+   683→      traffic_percentage: 0,
+   684→      estimated_traffic_cost: 0,
+   685→      trends_data: '',
+   686→      serp_features: '',
+   687→      keyword_intents: '',
+   688→      data_timestamp: ''
+   689→    });
+   690→  };
+   691→
+   692→  // Fetch outbound links for a specific URL
+   693→  const fetchOutboundLinks = async (urlId: number) => {
+   694→    if (outboundLinks[urlId]) {
+   695→      return; // Already fetched
+   696→    }
+   697→
+   698→    setLoadingLinks(prev => new Set(prev).add(urlId));
+   699→    
+   700→    try {
+   701→      const { data, error } = await supabase
+   702→        .from('redditoblinks')
+   703→        .select('*')
+   704→        .eq('source_url_id', urlId)
+   705→        .order('created_at', { ascending: false });
+   706→
+   707→      if (error) {
+   708→        console.error('Error fetching outbound links:', error);
+   709→        return;
+   710→      }
+   711→
+   712→      setOutboundLinks(prev => ({
+   713→        ...prev,
+   714→        [urlId]: data || []
+   715→      }));
+   716→    } catch (error) {
+   717→      console.error('Error fetching outbound links:', error);
+   718→    } finally {
+   719→      setLoadingLinks(prev => {
+   720→        const newSet = new Set(prev);
+   721→        newSet.delete(urlId);
+   722→        return newSet;
+   723→      });
+   724→    }
+   725→  };
+   726→
+   727→  // Toggle expanded row
+   728→  const toggleRowExpansion = (urlId: number) => {
+   729→    const newExpanded = new Set(expandedRows);
+   730→    if (newExpanded.has(urlId)) {
+   731→      newExpanded.delete(urlId);
+   732→    } else {
+   733→      newExpanded.add(urlId);
+   734→      // Fetch outbound links when expanding
+   735→      fetchOutboundLinks(urlId);
+   736→    }
+   737→    setExpandedRows(newExpanded);
+   738→  };
+   739→
+   740→  // Render cell content
+   741→  const renderCell = (item: RedditUrl, column: typeof columns[0]) => {
+   742→    const value = item[column.key];
+   743→    const isEditing = editingCell?.id === item.url_id && editingCell?.field === column.key;
+   744→    const isReadOnly = column.key === 'url_id' || column.key === 'created_at';
+   745→
+   746→    if (isEditing) {
+   747→      return (
+   748→        <div className="flex items-center space-x-2">
+   749→          <textarea
+   750→            value={editingValue}
+   751→            onChange={(e) => setEditingValue(e.target.value)}
+   752→            onBlur={handleCellSave}
+   753→            onKeyDown={(e) => {
+   754→              if (e.key === 'Enter' && !e.shiftKey) {
+   755→                e.preventDefault();
+   756→                handleCellSave();
+   757→              }
+   758→              if (e.key === 'Escape') handleCellCancel();
+   759→            }}
+   760→            className="w-full px-1 py-0.5 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+   761→            autoFocus
+   762→            rows={column.type === 'json' || column.type === 'array' ? 3 : 1}
+   763→          />
+   764→          <button
+   765→            onClick={handleCellSave}
+   766→            className="text-green-600 hover:text-green-800 text-sm"
+   767→            title="Save"
+   768→          >
+   769→            ✓
+   770→          </button>
+   771→          <button
+   772→            onClick={handleCellCancel}
+   773→            className="text-red-600 hover:text-red-800 text-sm"
+   774→            title="Cancel"
+   775→          >
+   776→            ✕
+   777→          </button>
+   778→        </div>
+   779→      );
+   780→    }
+   781→
+   782→    // Format display value
+   783→    let displayValue = '';
+   784→    if (column.type === 'boolean') {
+   785→      displayValue = value === null || value === undefined ? '' : (value ? 'true' : 'false');
+   786→    } else if (column.type === 'json') {
+   787→      displayValue = value ? JSON.stringify(value) : '';
+   788→    } else if (column.type === 'array') {
+   789→      displayValue = value && Array.isArray(value) ? JSON.stringify(value) : (value ? String(value) : '');
+   790→    } else if (column.type === 'timestamp') {
+   791→      displayValue = value ? new Date(value as string).toLocaleString() : '';
+   792→    } else if (column.type === 'date') {
+   793→      displayValue = value ? new Date(value as string).toLocaleDateString() : '';
+   794→    } else if (column.type === 'decimal') {
+   795→      displayValue = value !== null && value !== undefined ? parseFloat(value as string).toFixed(2) : '';
+   796→    } else {
+   797→      displayValue = value?.toString() || '';
+   798→    }
+   799→
+   800→    // Special handling for is_commentable column to show visual indicator
+   801→    if (column.key === 'is_commentable') {
+   802→      const booleanValue = value as boolean;
+   803→      return (
+   804→        <div className="flex items-center gap-1">
+   805→          <div
+   806→            onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
+   807→            className={`min-h-[1.25rem] px-2 py-0.5 rounded text-xs font-bold ${
+   808→              !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+   809→            } ${booleanValue ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} ${isReadOnly ? 'opacity-60' : ''}`}
+   810→            style={{ whiteSpace: 'nowrap' }}
+   811→            title={isReadOnly ? displayValue : `${displayValue} (Click to edit)`}
+   812→          >
+   813→            {booleanValue ? '✓ Open' : '✗ Closed'}
+   814→          </div>
+   815→        </div>
+   816→      );
+   817→    }
+   818→
+   819→    // Special handling for count_obls column to show EXP button
+   820→    if (column.key === 'count_obls') {
+   821→      return (
+   822→        <div className="flex items-center gap-1">
+   823→          <div
+   824→            onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
+   825→            className={`min-h-[1.25rem] px-1 py-0.5 rounded ${
+   826→              !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+   827→            } ${isReadOnly ? 'text-gray-500' : ''}`}
+   828→            style={{ whiteSpace: 'nowrap' }}
+   829→            title={isReadOnly ? displayValue : `${displayValue} (Click to edit)`}
+   830→          >
+   831→            {displayValue}
+   832→          </div>
+   833→          <button
+   834→            onClick={(e) => {
+   835→              e.stopPropagation();
+   836→              toggleRowExpansion(item.url_id);
+   837→            }}
+   838→            className="w-8 h-7 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded transition-colors flex items-center justify-center"
+   839→            style={{ fontSize: '10px' }}
+   840→            title={expandedRows.has(item.url_id) ? 'Collapse outbound links' : 'Expand outbound links'}
+   841→          >
+   842→            EXP
+   843→          </button>
+   844→        </div>
+   845→      );
+   846→    }
+   847→
+   848→    // Special handling for url_datum column to show copy and open URL buttons
+   849→    if (column.key === 'url_datum') {
+   850→      // Create shortened display value for screen space
+   851→      const shortenedDisplayValue = displayValue ? 
+   852→        displayValue.replace(/^https:\/\/www\.reddit\.com/, '') : '';
+   853→      
+   854→      return (
+   855→        <div className="flex items-center gap-1">
+   856→          <button
+   857→            onClick={(e) => {
+   858→              e.stopPropagation();
+   859→              if (displayValue) {
+   860→                navigator.clipboard.writeText(displayValue);
+   861→              }
+   862→            }}
+   863→            className="w-5 h-5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded transition-colors flex items-center justify-center"
+   864→            style={{ fontSize: '10px' }}
+   865→            title="Copy full URL to clipboard"
+   866→          >
+   867→            C
+   868→          </button>
+   869→          <button
+   870→            onClick={(e) => {
+   871→              e.stopPropagation();
+   872→              if (displayValue) {
+   873→                window.open(displayValue, '_blank', 'noopener,noreferrer');
+   874→              }
+   875→            }}
+   876→            className="w-5 h-5 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded transition-colors flex items-center justify-center"
+   877→            title="Open full URL in new tab"
+   878→          >
+   879→            →
+   880→          </button>
+   881→          <div
+   882→            onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
+   883→            className={`min-h-[1.25rem] px-1 py-0.5 rounded ${
+   884→              !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+   885→            } ${isReadOnly ? 'text-gray-500' : ''}`}
+   886→            style={{ whiteSpace: 'nowrap' }}
+   887→            title={isReadOnly ? `Full URL: ${displayValue}` : `Full URL: ${displayValue} (Click to edit)`}
+   888→          >
+   889→            {shortenedDisplayValue}
+   890→          </div>
+   891→        </div>
+   892→      );
+   893→    }
+   894→
+   895→    return (
+   896→      <div
+   897→        onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
+   898→        className={`min-h-[1.25rem] px-1 py-0.5 rounded ${
+   899→          !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+   900→        } ${isReadOnly ? 'text-gray-500' : ''}`}
+   901→        style={{ 
+   902→          whiteSpace: 'nowrap'
+   903→        }}
+   904→        title={isReadOnly ? displayValue : `${displayValue} (Click to edit)`}
+   905→      >
+   906→        {displayValue}
+   907→      </div>
+   908→    );
+   909→  };
+   910→
+   911→  if (loading) {
+   912→    return (
+   913→      <div className="min-h-screen flex items-center justify-center">
+   914→        <div className="text-xl">Loading Reddit URLs...</div>
+   915→      </div>
+   916→    );
+   917→  }
+   918→
+   919→  if (error) {
+   920→    return (
+   921→      <div className="min-h-screen flex items-center justify-center">
+   922→        <div className="text-xl text-red-600">Error: {error}</div>
+   923→      </div>
+   924→    );
+   925→  }
+   926→
+   927→  // Pagination component
+   928→  const PaginationControls = () => {
+   929→    if (totalPages <= 1) return null;
+   930→    
+   931→    return (
+   932→      <div className="flex items-center">
+   933→        <div className="flex items-center">
+   934→          <button
+   935→            onClick={() => {
+   936→              setItemsPerPage(10);
+   937→              setCurrentPage(1);
+   938→            }}
+   939→            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${itemsPerPage === 10 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+   940→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 10 ? '#f8f782' : undefined }}
+   941→          >
+   942→            10
+   943→          </button>
+   944→          <button
+   945→            onClick={() => {
+   946→              setItemsPerPage(20);
+   947→              setCurrentPage(1);
+   948→            }}
+   949→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 20 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+   950→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 20 ? '#f8f782' : undefined }}
+   951→          >
+   952→            20
+   953→          </button>
+   954→          <button
+   955→            onClick={() => {
+   956→              setItemsPerPage(50);
+   957→              setCurrentPage(1);
+   958→            }}
+   959→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 50 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+   960→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 50 ? '#f8f782' : undefined }}
+   961→          >
+   962→            50
+   963→          </button>
+   964→          <button
+   965→            onClick={() => {
+   966→              setItemsPerPage(100);
+   967→              setCurrentPage(1);
+   968→            }}
+   969→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 100 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+   970→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 100 ? '#f8f782' : undefined }}
+   971→          >
+   972→            100
+   973→          </button>
+   974→          <button
+   975→            onClick={() => {
+   976→              setItemsPerPage(200);
+   977→              setCurrentPage(1);
+   978→            }}
+   979→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 200 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+   980→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 200 ? '#f8f782' : undefined }}
+   981→          >
+   982→            200
+   983→          </button>
+   984→          <button
+   985→            onClick={() => {
+   986→              setItemsPerPage(500);
+   987→              setCurrentPage(1);
+   988→            }}
+   989→            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${itemsPerPage === 500 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+   990→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === 500 ? '#f8f782' : undefined }}
+   991→          >
+   992→            500
+   993→          </button>
+   994→          <button
+   995→            onClick={() => {
+   996→              setItemsPerPage(filteredAndSortedData.length);
+   997→              setCurrentPage(1);
+   998→            }}
+   999→            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${itemsPerPage === filteredAndSortedData.length ? 'text-black border-black' : 'bg-white hover:bg-gray-200'}`}
+  1000→            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px', backgroundColor: itemsPerPage === filteredAndSortedData.length ? '#f8f782' : undefined }}
+  1001→          >
+  1002→            All
+  1003→          </button>
+  1004→        </div>
+  1005→        <div className="border-l border-gray-300 pl-2 ml-2">
+  1006→          <div className="flex items-center">
+  1007→            <button
+  1008→              onClick={() => setCurrentPage(1)}
+  1009→              disabled={currentPage === 1}
+  1010→              className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+  1011→              style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+  1012→            >
+  1013→              First
+  1014→            </button>
+  1015→            <button
+  1016→              onClick={() => setCurrentPage(currentPage - 1)}
+  1017→              disabled={currentPage === 1}
+  1018→              className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+  1019→              style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+  1020→            >
+  1021→              Prev
+  1022→            </button>
+  1023→            
+  1024→            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+  1025→              const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+  1026→              if (pageNum > totalPages) return null;
+  1027→              return (
+  1028→                <button
+  1029→                  key={pageNum}
+  1030→                  onClick={() => setCurrentPage(pageNum)}
+  1031→                  className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+  1032→                    currentPage === pageNum 
+  1033→                      ? 'bg-blue-500 text-white border-blue-500' 
+  1034→                      : 'bg-white hover:bg-gray-200'
+  1035→                  }`}
+  1036→                  style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+  1037→                >
+  1038→                  {pageNum}
+  1039→                </button>
+  1040→              );
+  1041→            })}
+  1042→            
+  1043→            <button
+  1044→              onClick={() => setCurrentPage(currentPage + 1)}
+  1045→              disabled={currentPage === totalPages}
+  1046→              className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+  1047→              style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+  1048→            >
+  1049→              Next
+  1050→            </button>
+  1051→            <button
+  1052→              onClick={() => setCurrentPage(totalPages)}
+  1053→              disabled={currentPage === totalPages}
+  1054→              className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+  1055→              style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+  1056→            >
+  1057→              Last
+  1058→            </button>
+  1059→          </div>
+  1060→        </div>
+  1061→      </div>
+  1062→    );
+  1063→  };
+  1064→
+  1065→  return (
+  1066→    <div className="w-full">
+  1067→      {/* Top Controls */}
+  1068→      <div className="bg-white border-b border-gray-200 px-4 py-2 border-t-0">
+  1069→        <div className="flex justify-between items-center">
+  1070→          <div className="flex items-center space-x-6">
+  1071→            <NubraTablefaceKite text="nubra-tableface-kite" />
+  1072→            <div className="text-sm text-gray-600">
+  1073→              {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} urls
+  1074→              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+  1075→            </div>
+  1076→            <PaginationControls />
+  1077→            <div className="relative">
+  1078→              <input
+  1079→                type="text"
+  1080→                placeholder="Search all fields..."
+  1081→                value={searchTerm}
+  1082→                onChange={(e) => {
+  1083→                  setSearchTerm(e.target.value);
+  1084→                  setCurrentPage(1);
+  1085→                }}
+  1086→                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+  1087→              />
+  1088→              <button
+  1089→                onClick={() => {
+  1090→                  setSearchTerm('');
+  1091→                  setCurrentPage(1);
+  1092→                }}
+  1093→                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+  1094→              >
+  1095→                CL
+  1096→              </button>
+  1097→            </div>
+  1098→          </div>
+  1099→          <div className="flex items-center space-x-4">
+  1100→            <div className="flex space-x-2">
+  1101→              <button
+  1102→                onClick={createNewUrlInline}
+  1103→                className="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+  1104→              >
+  1105→                Create New (Inline)
+  1106→              </button>
+  1107→              <button
+  1108→                onClick={() => setIsCreateModalOpen(true)}
+  1109→                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-md text-sm transition-colors"
+  1110→              >
+  1111→                Create New (Popup)
+  1112→              </button>
+  1113→            </div>
+  1114→          </div>
+  1115→        </div>
+  1116→      </div>
+  1117→
+  1118→      {/* Table */}
+  1119→      <div className="bg-white overflow-hidden">
+  1120→        <div className="overflow-x-auto">
+  1121→          <table className="border-collapse border border-gray-200" style={{ tableLayout: 'auto' }}>
+  1122→            <thead className="bg-gray-50">
+  1123→              <tr>
+  1124→                <th className="px-2 py-3 text-left border border-gray-200">
+  1125→                  <div 
+  1126→                    className="w-full h-full cursor-pointer flex items-center justify-center"
+  1127→                    onClick={(e) => {
+  1128→                      const target = e.target as HTMLElement;
+  1129→                      const checkbox = target.closest('th')?.querySelector('input[type="checkbox"]') as HTMLInputElement;
+  1130→                      if (checkbox && target !== checkbox) {
+  1131→                        checkbox.checked = !checkbox.checked;
+  1132→                        checkbox.dispatchEvent(new Event('change'));
+  1133→                      }
+  1134→                    }}
+  1135→                  >
+  1136→                    <input
+  1137→                      type="checkbox"
+  1138→                      style={{ width: '20px', height: '20px' }}
+  1139→                      checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
+  1140→                      onChange={(e) => {
+  1141→                        if (onSelectionChange) {
+  1142→                          if (e.target.checked) {
+  1143→                            onSelectionChange(new Set(paginatedData.map(item => item.url_id)));
+  1144→                          } else {
+  1145→                            onSelectionChange(new Set());
+  1146→                          }
+  1147→                        }
+  1148→                      }}
+  1149→                    />
+  1150→                  </div>
+  1151→                </th>
+  1152→                {visibleColumns.map((column, index) => {
+  1153→                  const isReadOnly = column.key === 'url_id' || column.key === 'created_at' || column.key === 'count_obls';
+  1154→                  const hasRightSeparator = column.separator === 'right';
+  1155→                  
+  1156→                  return (
+  1157→                    <th
+  1158→                      key={column.key}
+  1159→                      className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1 ${
+  1160→                        hasRightSeparator ? 'border-r-4 border-r-black' : ''
+  1161→                      }`}
+  1162→                      style={{ 
+  1163→                        backgroundColor: column.key === 'count_obls' ? '#dbeafe' : undefined,
+  1164→                        whiteSpace: 'nowrap'
+  1165→                      }}
+  1166→                      onClick={() => handleSort(column.key)}
+  1167→                    >
+  1168→                      <div className="flex items-center space-x-1">
+  1169→                        <span 
+  1170→                          className={`font-bold text-xs lowercase ${isReadOnly ? 'text-gray-500' : 'text-gray-900'}`}
+  1171→                          style={{
+  1172→                            wordBreak: 'break-all',
+  1173→                            lineHeight: '1.1',
+  1174→                            display: '-webkit-box',
+  1175→                            WebkitLineClamp: 2,
+  1176→                            WebkitBoxOrient: 'vertical',
+  1177→                            overflow: 'hidden',
+  1178→                            textOverflow: 'ellipsis',
+  1179→                            maxHeight: '2.2em'
+  1180→                          }}
+  1181→                        >
+  1182→                          {column.label.toLowerCase()}
+  1183→                        </span>
+  1184→                        {!isReadOnly && (
+  1185→                          <span className="text-blue-500 text-xs" title="Click cells to edit">
+  1186→                            ✎
+  1187→                          </span>
+  1188→                        )}
+  1189→                        {sortField === column.key && (
+  1190→                          <span className="text-gray-400">
+  1191→                            {sortOrder === 'asc' ? '↑' : '↓'}
+  1192→                          </span>
+  1193→                        )}
+  1194→                      </div>
+  1195→                    </th>
+  1196→                  );
+  1197→                })}
+  1198→              </tr>
+  1199→            </thead>
+  1200→            <tbody className="divide-y divide-gray-200">
+  1201→              {paginatedData.map((item) => (
+  1202→                <>
+  1203→                  <tr key={item.url_id} className="hover:bg-gray-50">
+  1204→                    <td className="px-2 py-3 border border-gray-200">
+  1205→                      <div 
+  1206→                        className="w-full h-full cursor-pointer flex items-center justify-center"
+  1207→                        onClick={(e) => {
+  1208→                          const target = e.target as HTMLElement;
+  1209→                          const checkbox = target.closest('td')?.querySelector('input[type="checkbox"]') as HTMLInputElement;
+  1210→                          if (checkbox && target !== checkbox) {
+  1211→                            checkbox.checked = !checkbox.checked;
+  1212→                            checkbox.dispatchEvent(new Event('change'));
+  1213→                          }
+  1214→                        }}
+  1215→                      >
+  1216→                        <input
+  1217→                          type="checkbox"
+  1218→                          style={{ width: '20px', height: '20px' }}
+  1219→                          checked={selectedRows.has(item.url_id)}
+  1220→                          onChange={(e) => {
+  1221→                            if (onSelectionChange) {
+  1222→                              const newSelected = new Set(selectedRows);
+  1223→                              if (e.target.checked) {
+  1224→                                newSelected.add(item.url_id);
+  1225→                              } else {
+  1226→                                newSelected.delete(item.url_id);
+  1227→                              }
+  1228→                              onSelectionChange(newSelected);
+  1229→                            }
+  1230→                          }}
+  1231→                        />
+  1232→                      </div>
+  1233→                    </td>
+  1234→                    {visibleColumns.map((column, index) => {
+  1235→                      const hasRightSeparator = column.separator === 'right';
+  1236→                      
+  1237→                      return (
+  1238→                        <td
+  1239→                          key={column.key}
+  1240→                          className={`text-sm border border-gray-200 px-2 py-1 ${
+  1241→                            hasRightSeparator ? 'border-r-4 border-r-black' : ''
+  1242→                          }`}
+  1243→                          style={{ 
+  1244→                            whiteSpace: 'nowrap'
+  1245→                          }}
+  1246→                        >
+  1247→                          {renderCell(item, column)}
+  1248→                        </td>
+  1249→                      );
+  1250→                    })}
+  1251→                  </tr>
+  1252→                  
+  1253→                  {/* Expanded row for outbound links */}
+  1254→                  {expandedRows.has(item.url_id) && (
+  1255→                    <tr key={`expanded-${item.url_id}`} className="bg-gray-50">
+  1256→                      <td colSpan={visibleColumns.length + 1} className="px-4 py-4 border border-gray-200">
+  1257→                        <div className="space-y-3">
+  1258→                          <h3 className="font-bold text-base text-gray-800">
+  1259→                            Outbound Links
+  1260→                          </h3>
+  1261→                          
+  1262→                          {loadingLinks.has(item.url_id) ? (
+  1263→                            <div className="text-gray-500 text-sm">Loading outbound links...</div>
+  1264→                          ) : outboundLinks[item.url_id]?.length > 0 ? (
+  1265→                            <div className="overflow-x-auto">
+  1266→                              <table className="min-w-full bg-white border border-gray-300 rounded-md">
+  1267→                                <thead className="bg-gray-100">
+  1268→                                  <tr>
+  1269→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">link_id</th>
+  1270→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">source_url_id</th>
+  1271→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">comment_id</th>
+  1272→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">source_type</th>
+  1273→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">raw_url</th>
+  1274→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">resolved_url</th>
+  1275→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">domain</th>
+  1276→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">anchor_text</th>
+  1277→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">http_status</th>
+  1278→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">first_seen</th>
+  1279→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">last_seen</th>
+  1280→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">created_at</th>
+  1281→                                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 border-b border-gray-300">updated_at</th>
+  1282→                                  </tr>
+  1283→                                </thead>
+  1284→                                <tbody>
+  1285→                                  {outboundLinks[item.url_id].map((link) => (
+  1286→                                    <tr key={link.link_id} className="hover:bg-gray-50">
+  1287→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.link_id}</td>
+  1288→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.source_url_id}</td>
+  1289→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.comment_id || '-'}</td>
+  1290→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.source_type || '-'}</td>
+  1291→                                      <td className="px-3 py-2 text-sm text-blue-600 border-b border-gray-200 max-w-xs truncate" title={link.raw_url || ''}>
+  1292→                                        {link.raw_url ? (
+  1293→                                          <a href={link.raw_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+  1294→                                            {link.raw_url}
+  1295→                                          </a>
+  1296→                                        ) : '-'}
+  1297→                                      </td>
+  1298→                                      <td className="px-3 py-2 text-sm text-blue-600 border-b border-gray-200 max-w-xs truncate" title={link.resolved_url || ''}>
+  1299→                                        {link.resolved_url ? (
+  1300→                                          <a href={link.resolved_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+  1301→                                            {link.resolved_url}
+  1302→                                          </a>
+  1303→                                        ) : '-'}
+  1304→                                      </td>
+  1305→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.domain || '-'}</td>
+  1306→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200 max-w-xs truncate" title={link.anchor_text || ''}>{link.anchor_text || '-'}</td>
+  1307→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.http_status || '-'}</td>
+  1308→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.first_seen ? new Date(link.first_seen).toLocaleDateString() : '-'}</td>
+  1309→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{link.last_seen ? new Date(link.last_seen).toLocaleDateString() : '-'}</td>
+  1310→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{new Date(link.created_at).toLocaleDateString()}</td>
+  1311→                                      <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">{new Date(link.updated_at).toLocaleDateString()}</td>
+  1312→                                    </tr>
+  1313→                                  ))}
+  1314→                                </tbody>
+  1315→                              </table>
+  1316→                            </div>
+  1317→                          ) : (
+  1318→                            <div className="text-gray-500 text-sm">No outbound links found for this URL.</div>
+  1319→                          )}
+  1320→                        </div>
+  1321→                      </td>
+  1322→                    </tr>
+  1323→                  )}
+  1324→                </>
+  1325→              ))}
+  1326→            </tbody>
+  1327→          </table>
+  1328→        </div>
+  1329→      </div>
+  1330→
+  1331→      {/* Bottom Controls */}
+  1332→      <div className="bg-white border-t border-gray-200 px-4 py-2">
+  1333→        <div className="flex justify-between items-center">
+  1334→          <div className="flex items-center space-x-6">
+  1335→            <div className="text-sm text-gray-600">
+  1336→              {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} urls
+  1337→              {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
+  1338→            </div>
+  1339→            <PaginationControls />
+  1340→            <div className="relative">
+  1341→              <input
+  1342→                type="text"
+  1343→                placeholder="Search all fields..."
+  1344→                value={searchTerm}
+  1345→                onChange={(e) => {
+  1346→                  setSearchTerm(e.target.value);
+  1347→                  setCurrentPage(1);
+  1348→                }}
+  1349→                className="w-80 px-3 py-2 pr-12 border border-gray-300 rounded-md text-sm"
+  1350→              />
+  1351→              <button
+  1352→                onClick={() => {
+  1353→                  setSearchTerm('');
+  1354→                  setCurrentPage(1);
+  1355→                }}
+  1356→                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 rounded text-xs font-medium"
+  1357→              >
+  1358→                CL
+  1359→              </button>
+  1360→            </div>
+  1361→          </div>
+  1362→          <div></div>
+  1363→        </div>
+  1364→      </div>
+  1365→
+  1366→      {/* Create Modal */}
+  1367→      {isCreateModalOpen && (
+  1368→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  1369→          <div className="bg-white p-6 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+  1370→            <h3 className="text-lg font-semibold mb-4">Create New Reddit URL Record</h3>
+  1371→            <form onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
+  1372→              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+  1373→                {/* URL Information */}
+  1374→                <div className="md:col-span-4">
+  1375→                  <h4 className="font-medium text-gray-700 mb-2">URL Information</h4>
+  1376→                </div>
+  1377→                <div className="md:col-span-2">
+  1378→                  <label className="block text-sm font-medium text-gray-700 mb-1">URL Datum</label>
+  1379→                  <input
+  1380→                    type="text"
+  1381→                    value={formData.url_datum}
+  1382→                    onChange={(e) => setFormData({...formData, url_datum: e.target.value})}
+  1383→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1384→                    placeholder="https://www.reddit.com/r/subreddit/comments/..."
+  1385→                  />
+  1386→                </div>
+  1387→                <div>
+  1388→                  <label className="block text-sm font-medium text-gray-700 mb-1">Comments Status</label>
+  1389→                  <select
+  1390→                    value={formData.is_commentable.toString()}
+  1391→                    onChange={(e) => setFormData({...formData, is_commentable: e.target.value === 'true'})}
+  1392→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1393→                  >
+  1394→                    <option value="true">Open (Comments Allowed)</option>
+  1395→                    <option value="false">Closed (Comments Locked)</option>
+  1396→                  </select>
+  1397→                </div>
+  1398→                <div>
+  1399→                  <label className="block text-sm font-medium text-gray-700 mb-1">Subreddit Name</label>
+  1400→                  <input
+  1401→                    type="text"
+  1402→                    value={formData.subreddit_name}
+  1403→                    onChange={(e) => setFormData({...formData, subreddit_name: e.target.value})}
+  1404→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1405→                    placeholder="askreddit"
+  1406→                  />
+  1407→                </div>
+  1408→                <div>
+  1409→                  <label className="block text-sm font-medium text-gray-700 mb-1">Post ID</label>
+  1410→                  <input
+  1411→                    type="text"
+  1412→                    value={formData.post_id}
+  1413→                    onChange={(e) => setFormData({...formData, post_id: e.target.value})}
+  1414→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1415→                    placeholder="1kovuni"
+  1416→                  />
+  1417→                </div>
+  1418→                <div className="md:col-span-2">
+  1419→                  <label className="block text-sm font-medium text-gray-700 mb-1">Post Title</label>
+  1420→                  <input
+  1421→                    type="text"
+  1422→                    value={formData.post_title}
+  1423→                    onChange={(e) => setFormData({...formData, post_title: e.target.value})}
+  1424→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1425→                    placeholder="Post title here..."
+  1426→                  />
+  1427→                </div>
+  1428→
+  1429→                {/* SEO Data */}
+  1430→                <div className="md:col-span-4 mt-4">
+  1431→                  <h4 className="font-medium text-gray-700 mb-2">SEO Data</h4>
+  1432→                </div>
+  1433→                <div>
+  1434→                  <label className="block text-sm font-medium text-gray-700 mb-1">Keyword</label>
+  1435→                  <input
+  1436→                    type="text"
+  1437→                    value={formData.keyword}
+  1438→                    onChange={(e) => setFormData({...formData, keyword: e.target.value})}
+  1439→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1440→                    placeholder="best buy"
+  1441→                  />
+  1442→                </div>
+  1443→                <div>
+  1444→                  <label className="block text-sm font-medium text-gray-700 mb-1">Current Position</label>
+  1445→                  <input
+  1446→                    type="number"
+  1447→                    value={formData.current_position}
+  1448→                    onChange={(e) => setFormData({...formData, current_position: Number(e.target.value)})}
+  1449→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1450→                  />
+  1451→                </div>
+  1452→                <div>
+  1453→                  <label className="block text-sm font-medium text-gray-700 mb-1">Previous Position</label>
+  1454→                  <input
+  1455→                    type="number"
+  1456→                    value={formData.previous_position}
+  1457→                    onChange={(e) => setFormData({...formData, previous_position: Number(e.target.value)})}
+  1458→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1459→                  />
+  1460→                </div>
+  1461→                <div>
+  1462→                  <label className="block text-sm font-medium text-gray-700 mb-1">Position Type</label>
+  1463→                  <select
+  1464→                    value={formData.position_type}
+  1465→                    onChange={(e) => setFormData({...formData, position_type: e.target.value})}
+  1466→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1467→                  >
+  1468→                    <option value="Organic">Organic</option>
+  1469→                    <option value="AI overview">AI overview</option>
+  1470→                    <option value="Paid">Paid</option>
+  1471→                  </select>
+  1472→                </div>
+  1473→
+  1474→                {/* Metrics */}
+  1475→                <div>
+  1476→                  <label className="block text-sm font-medium text-gray-700 mb-1">Search Volume</label>
+  1477→                  <input
+  1478→                    type="number"
+  1479→                    value={formData.search_volume}
+  1480→                    onChange={(e) => setFormData({...formData, search_volume: Number(e.target.value)})}
+  1481→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1482→                  />
+  1483→                </div>
+  1484→                <div>
+  1485→                  <label className="block text-sm font-medium text-gray-700 mb-1">Keyword Difficulty</label>
+  1486→                  <input
+  1487→                    type="number"
+  1488→                    value={formData.keyword_difficulty}
+  1489→                    onChange={(e) => setFormData({...formData, keyword_difficulty: Number(e.target.value)})}
+  1490→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1491→                  />
+  1492→                </div>
+  1493→                <div>
+  1494→                  <label className="block text-sm font-medium text-gray-700 mb-1">CPC</label>
+  1495→                  <input
+  1496→                    type="number"
+  1497→                    step="0.01"
+  1498→                    value={formData.cpc}
+  1499→                    onChange={(e) => setFormData({...formData, cpc: Number(e.target.value)})}
+  1500→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1501→                  />
+  1502→                </div>
+  1503→                <div>
+  1504→                  <label className="block text-sm font-medium text-gray-700 mb-1">Competition</label>
+  1505→                  <input
+  1506→                    type="number"
+  1507→                    step="0.01"
+  1508→                    value={formData.competition}
+  1509→                    onChange={(e) => setFormData({...formData, competition: Number(e.target.value)})}
+  1510→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1511→                  />
+  1512→                </div>
+  1513→
+  1514→                <div>
+  1515→                  <label className="block text-sm font-medium text-gray-700 mb-1">Data Timestamp</label>
+  1516→                  <input
+  1517→                    type="date"
+  1518→                    value={formData.data_timestamp}
+  1519→                    onChange={(e) => setFormData({...formData, data_timestamp: e.target.value})}
+  1520→                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+  1521→                  />
+  1522→                </div>
+  1523→              </div>
+  1524→              
+  1525→              <div className="mt-4">
+  1526→                <label className="block text-sm font-medium text-gray-700 mb-1">Trends Data (JSON)</label>
+  1527→                <textarea
+  1528→                  value={formData.trends_data}
+  1529→                  onChange={(e) => setFormData({...formData, trends_data: e.target.value})}
+  1530→                  className="w-full border border-gray-300 rounded-md px-3 py-2 h-20"
+  1531→                  placeholder='[29,54,36,36,36,24,44,81,44,29,24,36]'
+  1532→                />
+  1533→              </div>
+  1534→
+  1535→              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+  1536→                <div>
+  1537→                  <label className="block text-sm font-medium text-gray-700 mb-1">SERP Features (JSON array or comma-separated)</label>
+  1538→                  <textarea
+  1539→                    value={formData.serp_features}
+  1540→                    onChange={(e) => setFormData({...formData, serp_features: e.target.value})}
+  1541→                    className="w-full border border-gray-300 rounded-md px-3 py-2 h-20"
+  1542→                    placeholder='["Knowledge panel", "Local pack", "Sitelinks"] or Knowledge panel, Local pack, Sitelinks'
+  1543→                  />
+  1544→                </div>
+  1545→                <div>
+  1546→                  <label className="block text-sm font-medium text-gray-700 mb-1">Keyword Intents (JSON array or comma-separated)</label>
+  1547→                  <textarea
+  1548→                    value={formData.keyword_intents}
+  1549→                    onChange={(e) => setFormData({...formData, keyword_intents: e.target.value})}
+  1550→                    className="w-full border border-gray-300 rounded-md px-3 py-2 h-20"
+  1551→                    placeholder='["commercial", "navigational"] or commercial, navigational'
+  1552→                  />
+  1553→                </div>
+  1554→              </div>
+  1555→              
+  1556→              <div className="mt-6 flex justify-end space-x-4">
+  1557→                <button
+  1558→                  type="button"
+  1559→                  onClick={() => {
+  1560→                    setIsCreateModalOpen(false);
+  1561→                    resetForm();
+  1562→                  }}
+  1563→                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+  1564→                >
+  1565→                  Cancel
+  1566→                </button>
+  1567→                <button
+  1568→                  type="submit"
+  1569→                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+  1570→                >
+  1571→                  Create Reddit URL Record
+  1572→                </button>
+  1573→              </div>
+  1574→            </form>
+  1575→          </div>
+  1576→        </div>
+  1577→      )}
+  1578→    </div>
+  1579→  );
+  1580→}
+  1581→
+  1582→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the issue. I can see that both column pagination bars are using the yellow color `#f8f782`. I need to find the second pagination bar (Bar 2) and change it from yellow to blue to match the main row pagination buttons.
+
+Looking at the code, I can see:
+
+1. **ColumnPaginationBar1** (lines 183, 200, 217, 234, 251) - Uses `#f8f782` (yellow) 
+2. **ColumnPaginationBar2** (lines 302) - Also uses `#f8f782` (yellow)
+3. **Row pagination** (lines 1033) - Uses `bg-blue-500` (blue) ✅
+
+I need to change ColumnPaginationBar2 to use blue instead of yellow:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find and fix yellow background color on column pagination button bar
+- [⚡] 🌡️ Change active item color from yellow to blue to match other pagination bar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/components/ReddjarTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   289→            return (
+   290→              <button
+   291→                key={pageNum}
+   292→                onClick={() => setCurrentColumnPage(pageNum)}
+   293→                className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+   294→                  currentColumnPage === pageNum 
+   295→                    ? 'bg-blue-500 text-white border-blue-500' 
+   296→                    : 'bg-white hover:bg-gray-200'
+   297→                }`}
+   298→                style={{ 
+   299→                  fontSize: '14px', 
+   300→                  paddingTop: '10px', 
+   301→                  paddingBottom: '10px'
+   302→                }}
+   303→              >
+   304→                {pageNum}
+   305→              </button>
+   306→            );
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find and fix yellow background color on column pagination button bar
+- [X] 🌡️ Change active item color from yellow to blue to match other pagination bar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully fixed the yellow background color issue. Here's what I corrected:
+
+## Fixed ✅
+
+**Column Pagination Bar 2** (the page number buttons) now uses **blue** instead of yellow to match the row pagination buttons.
+
+## Changes Made:
+
+1. **Removed yellow background**: Deleted `backgroundColor: currentColumnPage === pageNum ? '#f8f782' : undefined` from the inline styles
+2. **Added blue styling**: Changed the className to use `'bg-blue-500 text-white border-blue-500'` for active buttons
+3. **Consistent styling**: Now matches the main row pagination buttons exactly
+
+## Current Color Scheme:
+
+- **Row Pagination** (bottom): Blue active buttons ✅
+- **Column Pagination Bar 1** (columns per page): Yellow active buttons 🟡
+- **Column Pagination Bar 2** (page numbers): Blue active buttons ✅ (Fixed!)
+
+Now both the row pagination and Column Pagination Bar 2 use the same consistent blue color (`bg-blue-500`) for their active states, while Column Pagination Bar 1 keeps its distinct yellow color to differentiate between the different types of controls.
+
+---
+
+_**User**_
+
+to the right of these 2 buttons:
+scrape links
+scrape is_commentable
+
+
+pleaes create a new bold 16 px piece of text that says:
+is_commentable
+
+then, below this text, have a dropdown that says:
+all
+yes
+no
+
+
+then make the filter functional for the actual table obviosuyly as a filter
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [ ] 🌡️ Add is_commentable filter label and dropdown to the UI
+- [ ] 🌡️ Make the filter functional for the table data
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add is_commentable filter label and dropdown to the UI
+- [ ] 🌡️ Make the filter functional for the table data
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll add the is_commentable filter to the right of the scraping buttons. First, I'll add the state for the filter, then add the UI elements.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    11→  const [columnPaginationControls, setColumnPaginationControls] = useState<{
+    12→    ColumnPaginationBar1: () => JSX.Element | null;
+    13→    ColumnPaginationBar2: () => JSX.Element | null;
+    14→  } | null>(null);
+    15→  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    16→  const [isScrapingLinks, setIsScrapingLinks] = useState(false);
+    17→  const [isScrapingCommentable, setIsScrapingCommentable] = useState(false);
+    18→  const [commentableFilter, setCommentableFilter] = useState<'all' | 'yes' | 'no'>('all');
+    19→
+    20→  const handleScrapeLinks = async () => {
+    21→    if (selectedRows.size === 0) {
+    22→      alert('Please select at least one Reddit URL to scrape');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll add the filter UI to the right of the scraping buttons:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   152→              >
+   153→                {isScrapingLinks ? 'Scraping...' : 'scrape links'}
+   154→              </button>
+   155→              
+   156→              <button
+   157→                onClick={handleScrapeCommentable}
+   158→                disabled={isScrapingCommentable || isScrapingLinks || selectedRows.size === 0}
+   159→                className={`px-4 py-2 text-sm font-medium rounded-md border transition-colors ${
+   160→                  isScrapingCommentable || isScrapingLinks || selectedRows.size === 0
+   161→                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+   162→                    : 'bg-green-500 text-white border-green-500 hover:bg-green-600 hover:border-green-600'
+   163→                }`}
+   164→              >
+   165→                {isScrapingCommentable ? 'Checking...' : 'scrape is_commentable'}
+   166→              </button>
+   167→            </div>
+   168→            
+   169→            {/* is_commentable Filter */}
+   170→            <div className="flex flex-col items-center">
+   171→              <div className="text-black font-bold mb-1" style={{ fontSize: '16px' }}>
+   172→                is_commentable
+   173→              </div>
+   174→              <select
+   175→                value={commentableFilter}
+   176→                onChange={(e) => setCommentableFilter(e.target.value as 'all' | 'yes' | 'no')}
+   177→                className="px-3 py-2 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+   178→              >
+   179→                <option value="all">all</option>
+   180→                <option value="yes">yes</option>
+   181→                <option value="no">no</option>
+   182→              </select>
+   183→            </div>
+   184→          </div>
+   185→          <div className="text-right">
+   186→            <div className="text-sm text-gray-500">Table: redditurlsvat</div>
+   187→            <div className="text-xs text-gray-400">Reddit SEO Tracking</div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add is_commentable filter label and dropdown to the UI
+- [⚡] 🌡️ Make the filter functional for the table data
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to pass the filter state down to the ReddjarTable component and make it functional. First, let me pass the filter as a prop:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   190→      </div>
+   191→
+   192→      {/* Main Content - Full Width ReddjarTable */}
+   193→      <div className="flex-1 overflow-hidden">
+   194→        <ReddjarTable 
+   195→          onColumnPaginationRender={setColumnPaginationControls}
+   196→          selectedRows={selectedRows}
+   197→          onSelectionChange={setSelectedRows}
+   198→          commentableFilter={commentableFilter}
+   199→        />
+   200→      </div>
+   201→    </div>
+   202→  );
+   203→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the ReddjarTable component to accept and use this filter. Let me modify the ReddjarTable interface and implementation:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/components/ReddjarTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    52→  created_at: string;
+    53→  updated_at: string;
+    54→}
+    55→
+    56→interface ReddjarTableProps {
+    57→  onColumnPaginationRender?: (controls: {
+    58→    ColumnPaginationBar1: () => JSX.Element | null;
+    59→    ColumnPaginationBar2: () => JSX.Element | null;
+    60→  }) => void;
+    61→  selectedRows?: Set<number>;
+    62→  onSelectionChange?: (selectedRows: Set<number>) => void;
+    63→  commentableFilter?: 'all' | 'yes' | 'no';
+    64→}
+    65→
+    66→export default function ReddjarTable({ 
+    67→  onColumnPaginationRender, 
+    68→  selectedRows = new Set(),
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/components/ReddjarTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    62→  onSelectionChange?: (selectedRows: Set<number>) => void;
+    63→  commentableFilter?: 'all' | 'yes' | 'no';
+    64→}
+    65→
+    66→export default function ReddjarTable({ 
+    67→  onColumnPaginationRender, 
+    68→  selectedRows = new Set(), 
+    69→  onSelectionChange,
+    70→  commentableFilter = 'all'
+    71→}: ReddjarTableProps = {}) {
+    72→  const [data, setData] = useState<RedditUrl[]>([]);
+    73→  const [loading, setLoading] = useState(true);
+    74→  const [error, setError] = useState<string | null>(null);
+    75→  const [searchTerm, setSearchTerm] = useState('');
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the filtering logic to include the commentable filter. Let me find the filteredAndSortedData function:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/components/ReddjarTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   409→      // Keep the original data with counts as 0
+   410→    }
+   411→  };
+   412→  
+   413→  // Filter and sort data
+   414→  const filteredAndSortedData = useMemo(() => {
+   415→    let filtered = data.filter(item => {
+   416→      // Apply search term filter
+   417→      if (searchTerm && !Object.values(item).some(value => 
+   418→        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+   419→      )) {
+   420→        return false;
+   421→      }
+   422→      
+   423→      // Apply commentable filter
+   424→      if (commentableFilter !== 'all') {
+   425→        if (commentableFilter === 'yes' && item.is_commentable !== true) {
+   426→          return false;
+   427→        }
+   428→        if (commentableFilter === 'no' && item.is_commentable !== false) {
+   429→          return false;
+   430→        }
+   431→      }
+   432→      
+   433→      return true;
+   434→    });
+   435→
+   436→    // Sort data
+   437→    filtered.sort((a, b) => {
+   438→      const aValue = a[sortField];
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I also need to update the useMemo dependency array to include the commentableFilter:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/components/ReddjarTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   446→      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+   447→      return 0;
+   448→    });
+   449→
+   450→    return filtered;
+   451→  }, [data, searchTerm, sortField, sortOrder, commentableFilter]);
+   452→
+   453→  // Pagination
+   454→  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
+   455→  const startIndex = (currentPage - 1) * itemsPerPage;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add is_commentable filter label and dropdown to the UI
+- [X] 🌡️ Make the filter functional for the table data
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully added the is_commentable filter functionality to the ReddJar page. Here's what I implemented:
+
+## New Feature Added ✅
+
+**is_commentable Filter**: A new filtering control positioned to the right of the scraping buttons.
+
+## Features:
+
+1. **Bold Label**: "is_commentable" text at 16px, styled in bold black
+2. **Dropdown Options**:
+   - **"all"** - Shows all records (no filtering)
+   - **"yes"** - Shows only open/commentable threads (`is_commentable = true`)
+   - **"no"** - Shows only closed/locked threads (`is_commentable = false`)
+
+3. **Functional Filtering**: The filter works in combination with the existing search functionality
+4. **Real-time Updates**: Table filters instantly when dropdown selection changes
+5. **State Management**: Filter state is managed at the parent level and passed down to the table component
+
+## How It Works:
+
+- **Filter Logic**: Applied in the `filteredAndSortedData` useMemo hook
+- **Combined Filtering**: Works alongside the existing search term filter
+- **Type Safety**: Uses TypeScript unions for filter values (`'all' | 'yes' | 'no'`)
+- **Performance**: Uses memoization to prevent unnecessary re-calculations
+
+## UI Layout:
+
+```
+[scrape links] [scrape is_commentable] | is_commentable
+                                       | [dropdown: all/yes/no]
+```
+
+Users can now quickly filter the Reddit URLs table to show:
+- All threads
+- Only threads that are open for comments (✓ Open)
+- Only threads that are closed/locked (✗ Closed)
+
+The filter updates the table count display and pagination accordingly, making it easy to analyze commentable vs non-commentable Reddit threads in the dataset!
+

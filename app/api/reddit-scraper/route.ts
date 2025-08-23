@@ -191,9 +191,9 @@ async function fetchRedditThread(redditUrl: string): Promise<{ submission: Reddi
       is_self: submissionData.is_self || false,
       created_utc: submissionData.created_utc || 0,
       author: submissionData.author || '',
-      archived: submissionData.archived || false,
-      locked: submissionData.locked || false,
-      contest_mode: submissionData.contest_mode || false
+      archived: Boolean(submissionData.archived),
+      locked: Boolean(submissionData.locked),
+      contest_mode: Boolean(submissionData.contest_mode)
     };
     
     // Recursively extract comments
