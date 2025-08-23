@@ -1,0 +1,178 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+
+interface RedditSubmission {
+  id: string;
+  title: string;
+  selftext: string;
+  url: string;
+  is_self: boolean;
+  created_utc: number;
+  author: string;
+  archived: boolean;
+  locked: boolean;
+  contest_mode?: boolean;
+}
+
+// Check if a Reddit thread is commentable
+function isThreadCommentable(submission: RedditSubmission): boolean {
+  // A thread is NOT commentable if:
+  // 1. It's archived (older than 6 months)
+  // 2. It's locked by moderators
+  
+  if (submission.archived) {
+    return false;
+  }
+  
+  if (submission.locked) {
+    return false;
+  }
+  
+  return true;
+}
+
+// Fetch Reddit thread data using Reddit's JSON API (commentability check only)
+async function fetchRedditThreadCommentability(redditUrl: string): Promise<RedditSubmission | null> {
+  try {
+    // Convert Reddit URL to JSON API format
+    let jsonUrl = redditUrl;
+    if (!jsonUrl.endsWith('.json')) {
+      jsonUrl = jsonUrl.replace(/\/$/, '') + '.json';
+    }
+    
+    const response = await fetch(jsonUrl, {
+      headers: {
+        'User-Agent': 'RedditCommentabilityScraper/1.0'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Reddit data: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Reddit JSON API returns an array with [submission_listing, comments_listing]
+    const submissionData = data[0]?.data?.children?.[0]?.data;
+    
+    if (!submissionData) {
+      throw new Error('No submission data found');
+    }
+    
+    const submission: RedditSubmission = {
+      id: submissionData.id,
+      title: submissionData.title || '',
+      selftext: submissionData.selftext || '',
+      url: submissionData.url || '',
+      is_self: submissionData.is_self || false,
+      created_utc: submissionData.created_utc || 0,
+      author: submissionData.author || '',
+      archived: submissionData.archived || false,
+      locked: submissionData.locked || false,
+      contest_mode: submissionData.contest_mode || false
+    };
+    
+    return submission;
+    
+  } catch (error) {
+    console.error('Error fetching Reddit thread commentability:', error);
+    return null;
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { selectedUrlIds } = await request.json();
+    
+    if (!Array.isArray(selectedUrlIds) || selectedUrlIds.length === 0) {
+      return NextResponse.json({ error: 'No URLs provided' }, { status: 400 });
+    }
+    
+    const supabase = createServerComponentClient({ cookies });
+    
+    // Fetch the selected Reddit URLs from the database
+    const { data: redditUrls, error: fetchError } = await supabase
+      .from('redditurlsvat')
+      .select('url_id, url_datum')
+      .in('url_id', selectedUrlIds);
+    
+    if (fetchError) {
+      return NextResponse.json({ error: 'Failed to fetch Reddit URLs' }, { status: 500 });
+    }
+    
+    const results = [];
+    
+    for (const redditUrl of redditUrls) {
+      try {
+        console.log(`Checking commentability for Reddit URL: ${redditUrl.url_datum}`);
+        
+        // Fetch Reddit thread data (commentability only)
+        const submission = await fetchRedditThreadCommentability(redditUrl.url_datum);
+        if (!submission) {
+          results.push({
+            url_id: redditUrl.url_id,
+            url: redditUrl.url_datum,
+            success: false,
+            error: 'Failed to fetch Reddit thread data',
+            is_commentable: null
+          });
+          continue;
+        }
+        
+        // Check if thread is commentable
+        const isCommentable = isThreadCommentable(submission);
+        
+        // Update the is_commentable field in the database
+        const { error: updateError } = await supabase
+          .from('redditurlsvat')
+          .update({ is_commentable: isCommentable })
+          .eq('url_id', redditUrl.url_id);
+        
+        if (updateError) {
+          console.error('Error updating is_commentable field:', updateError);
+          results.push({
+            url_id: redditUrl.url_id,
+            url: redditUrl.url_datum,
+            success: false,
+            error: 'Failed to update database',
+            is_commentable: isCommentable
+          });
+        } else {
+          console.log(`Updated is_commentable for URL ${redditUrl.url_id}: ${isCommentable ? 'Open' : 'Closed'}`);
+          results.push({
+            url_id: redditUrl.url_id,
+            url: redditUrl.url_datum,
+            success: true,
+            is_commentable: isCommentable
+          });
+        }
+        
+        // Small delay to be polite to Reddit's API
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+      } catch (error) {
+        console.error(`Error processing ${redditUrl.url_datum}:`, error);
+        results.push({
+          url_id: redditUrl.url_id,
+          url: redditUrl.url_datum,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          is_commentable: null
+        });
+      }
+    }
+    
+    return NextResponse.json({
+      message: 'Commentability check completed',
+      results
+    });
+    
+  } catch (error) {
+    console.error('Reddit commentability scraper error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

@@ -60,12 +60,14 @@ interface ReddjarTableProps {
   }) => void;
   selectedRows?: Set<number>;
   onSelectionChange?: (selectedRows: Set<number>) => void;
+  commentableFilter?: 'all' | 'yes' | 'no';
 }
 
 export default function ReddjarTable({ 
   onColumnPaginationRender, 
   selectedRows = new Set(), 
-  onSelectionChange 
+  onSelectionChange,
+  commentableFilter = 'all'
 }: ReddjarTableProps = {}) {
   const [data, setData] = useState<RedditUrl[]>([]);
   const [loading, setLoading] = useState(true);
@@ -292,14 +294,13 @@ export default function ReddjarTable({
                 onClick={() => setCurrentColumnPage(pageNum)}
                 className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
                   currentColumnPage === pageNum 
-                    ? 'text-black border-black' 
+                    ? 'bg-blue-500 text-white border-blue-500' 
                     : 'bg-white hover:bg-gray-200'
                 }`}
                 style={{ 
                   fontSize: '14px', 
                   paddingTop: '10px', 
-                  paddingBottom: '10px',
-                  backgroundColor: currentColumnPage === pageNum ? '#f8f782' : undefined
+                  paddingBottom: '10px'
                 }}
               >
                 {pageNum}
@@ -412,10 +413,24 @@ export default function ReddjarTable({
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
     let filtered = data.filter(item => {
-      if (!searchTerm) return true;
-      return Object.values(item).some(value => 
+      // Apply search term filter
+      if (searchTerm && !Object.values(item).some(value => 
         value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      )) {
+        return false;
+      }
+      
+      // Apply commentable filter
+      if (commentableFilter !== 'all') {
+        if (commentableFilter === 'yes' && item.is_commentable !== true) {
+          return false;
+        }
+        if (commentableFilter === 'no' && item.is_commentable !== false) {
+          return false;
+        }
+      }
+      
+      return true;
     });
 
     // Sort data
@@ -433,7 +448,7 @@ export default function ReddjarTable({
     });
 
     return filtered;
-  }, [data, searchTerm, sortField, sortOrder]);
+  }, [data, searchTerm, sortField, sortOrder, commentableFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
@@ -866,18 +881,24 @@ export default function ReddjarTable({
           >
             C
           </button>
-          <button
+          <a
+            href={displayValue || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={(e) => {
               e.stopPropagation();
-              if (displayValue) {
-                window.open(displayValue, '_blank', 'noopener,noreferrer');
+              if (!displayValue) {
+                e.preventDefault();
               }
             }}
-            className="w-5 h-5 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded transition-colors flex items-center justify-center"
-            title="Open full URL in new tab"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+            }}
+            className="w-5 h-5 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded transition-colors flex items-center justify-center cursor-pointer no-underline"
+            title="Left-click: Open in new tab (switch to tab) | Middle-click: Open in background tab"
           >
             →
-          </button>
+          </a>
           <div
             onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
             className={`min-h-[1.25rem] px-1 py-0.5 rounded ${
