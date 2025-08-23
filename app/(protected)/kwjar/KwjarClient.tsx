@@ -42,10 +42,6 @@ export default function KwjarClient() {
     }
   }, [user, router]);
 
-  // Set page title
-  useEffect(() => {
-    document.title = '/kwjar - Snefuru';
-  }, []);
 
   // Handle URL parameters for popup, tab state, tag filtering, and column pagination
   useEffect(() => {
