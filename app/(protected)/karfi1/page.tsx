@@ -1,15 +1,10 @@
-'use client';
+import { Metadata } from 'next';
+import Karfi1Client from './pclient';
 
-import { useEffect } from 'react';
+export const metadata: Metadata = {
+  title: '/karfi1 - Snefuru',
+};
 
 export default function Karfi1Page() {
-  useEffect(() => {
-    document.title = '/karfi1 - Snefuru';
-  }, []);
-
-  return (
-    <div className="w-full h-screen bg-gray-100">
-      {/* Blank page with solid color background */}
-    </div>
-  );
+  return <Karfi1Client />;
 }

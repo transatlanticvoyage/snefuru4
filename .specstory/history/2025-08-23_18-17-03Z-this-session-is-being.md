@@ -3893,3 +3893,2766 @@ The conversions handled various complexities:
 
 This brings the total systematic conversion progress significantly forward, working through the remaining ~60 pages that still need Method 1 conversion. The pattern is well-established and I'm efficiently converting both simple and complex pages while preserving all functionality.
 
+---
+
+_**User**_
+
+ok pleaes proceed to the next batch 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll continue with the next batch of Method 1 conversions. Let me find more pages that need conversion:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Find next pages to convert
+
+`grep -r "document.title" app/ --include="*.tsx" | head -20`
+
+Result:
+
+```
+app/(protected2)/fava/components/pureFavaPageMaster.tsx:    // Set document title if provided
+app/(protected2)/fava/components/pureFavaPageMaster.tsx:      document.title = documentTitle;
+app/(protected)/bin41/domnivid/page.tsx:    // Set document title
+app/(protected)/bin41/domnivid/page.tsx:    document.title = 'domnivid - Snefuru';
+app/(protected)/ruplin-api-keys-p1/page.tsx:    document.title = 'API Keys - Ruplin WP Plugin - Snefuru';
+app/(protected)/favprar1/page.tsx:    document.title = 'favprar1 - Snefuru';
+app/(protected)/bin36/domjar1/page.tsx:    // Set document title
+app/(protected)/bin36/domjar1/page.tsx:    document.title = 'domjar1 - Snefuru';
+app/(protected)/bin31/panjar4/components/panjar4.tsx:    // Note: document.title is now handled by parent page component using static cache
+app/(protected)/bin31/panjar4/page.tsx:    console.log('[panjar4] Setting static document title to:', staticTitle);
+app/(protected)/bin31/panjar4/page.tsx:    document.title = staticTitle;
+app/(protected)/bin38/rangivid/page.tsx:    // Set document title
+app/(protected)/bin38/rangivid/page.tsx:    document.title = 'rangivid - Snefuru';
+app/(protected)/downloadplugin/page.tsx:    document.title = 'Download Plugin - Snefuru';
+app/(protected)/karfi1/page.tsx:    document.title = '/karfi1 - Snefuru';
+app/(protected)/admin/jetlamaster/page.tsx:    document.title = "Jetla Masterlist - Snefuru Admin";
+app/(protected)/admin/moonjar/page.tsx:    document.title = 'Moonjar - Moon Row Modules Management System';
+app/(protected)/admin/sunjar/page.tsx:    document.title = 'Sunjar - Sun Row System Management';
+app/(protected)/admin/popnow/page.tsx:    document.title = '/admin/popnow - Snefuru';
+app/(protected)/admin/jexplain/page.tsx:    document.title = "Jexplain - Snefuru Admin";
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me start with `/bin41/domnivid` since it appears to be related to the domjar2 page I just converted:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/bin41/domnivid/page.tsx`
+
+Result:
+
+```
+1→"use client";
+     2→import { useEffect, useState } from 'react';
+     3→import { useAuth } from '@/app/context/AuthContext';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import { useSearchParams } from 'next/navigation';
+     6→
+     7→export default function DomnividPage() {
+     8→  const { user } = useAuth();
+     9→  const [domain, setDomain] = useState<any>(null);
+    10→  const [loading, setLoading] = useState(false);
+    11→  const [error, setError] = useState<string | null>(null);
+    12→  const [wpUser1, setWpUser1] = useState<string>('');
+    13→  const [wpPass1, setWpPass1] = useState<string>('');
+    14→  const [wpCredentialsLoading, setWpCredentialsLoading] = useState(false);
+    15→  const [wpCredentialsResult, setWpCredentialsResult] = useState<string | null>(null);
+    16→  const [wpPluginInstalled1, setWpPluginInstalled1] = useState<boolean>(false);
+    17→  const [wpPluginConnected2, setWpPluginConnected2] = useState<boolean>(false);
+    18→  const [installActivateLoading, setInstallActivateLoading] = useState(false);
+    19→  const [installActivateResult, setInstallActivateResult] = useState<string | null>(null);
+    20→  const searchParams = useSearchParams();
+    21→  const domainBase = searchParams?.get('domain_base');
+    22→  const supabase = createClientComponentClient();
+    23→
+    24→  useEffect(() => {
+    25→    // Set document title
+    26→    document.title = 'domnivid - Snefuru';
+    27→  }, []);
+    28→
+    29→  useEffect(() => {
+    30→    const fetchDomainDetails = async () => {
+    31→      if (!domainBase || !user?.id) {
+    32→        setDomain(null);
+    33→        setLoading(false);
+    34→        return;
+    35→      }
+    36→
+    37→      setLoading(true);
+    38→      setError(null);
+    39→      
+    40→      try {
+    41→        // Get user's DB id from users table
+    42→        const { data: userData, error: userError } = await supabase
+    43→          .from('users')
+    44→          .select('id')
+    45→          .eq('auth_id', user.id)
+    46→          .single();
+    47→          
+    48→        if (userError || !userData) {
+    49→          setError('Could not find user record.');
+    50→          setDomain(null);
+    51→          setLoading(false);
+    52→          return;
+    53→        }
+    54→        
+    55→        // Fetch specific domain for this user
+    56→        const { data, error } = await supabase
+    57→          .from('domains1')
+    58→          .select('*')
+    59→          .eq('domain_base', domainBase)
+    60→          .eq('fk_user_id', userData.id)
+    61→          .single();
+    62→          
+    63→        if (error) {
+    64→          if (error.code === 'PGRST116') {
+    65→            setError('Domain not found or you do not have access to it.');
+    66→          } else {
+    67→            throw error;
+    68→          }
+    69→          setDomain(null);
+    70→        } else {
+    71→          setDomain(data);
+    72→          // Populate WordPress credentials if they exist
+    73→          setWpUser1(data.wpuser1 || '');
+    74→          setWpPass1(data.wppass1 || '');
+    75→          // Populate WordPress plugin status
+    76→          setWpPluginInstalled1(data.wp_plugin_installed1 || false);
+    77→          setWpPluginConnected2(data.wp_plugin_connected2 || false);
+    78→        }
+    79→      } catch (err) {
+    80→        setError(err instanceof Error ? err.message : 'Failed to fetch domain details');
+    81→        setDomain(null);
+    82→      } finally {
+    83→        setLoading(false);
+    84→      }
+    85→    };
+    86→    
+    87→    fetchDomainDetails();
+    88→  }, [domainBase, user, supabase]);
+    89→
+    90→  // Handle WordPress credentials update
+    91→  const handleWpCredentialsUpdate = async () => {
+    92→    if (!domain?.id) {
+    93→      setWpCredentialsResult('No domain found to update.');
+    94→      return;
+    95→    }
+    96→
+    97→    setWpCredentialsLoading(true);
+    98→    setWpCredentialsResult(null);
+    99→    
+   100→    try {
+   101→      // Update the domain with WordPress credentials
+   102→      const { error } = await supabase
+   103→        .from('domains1')
+   104→        .update({ 
+   105→          wpuser1: wpUser1.trim() || null,
+   106→          wppass1: wpPass1.trim() || null
+   107→        })
+   108→        .eq('id', domain.id);
+   109→        
+   110→      if (error) throw error;
+   111→      
+   112→      setWpCredentialsResult('✅ WordPress credentials updated successfully!');
+   113→      
+   114→      // Refresh domain data to show updated information
+   115→      setDomain((prev: any) => ({ 
+   116→        ...prev, 
+   117→        wpuser1: wpUser1.trim() || null,
+   118→        wppass1: wpPass1.trim() || null
+   119→      }));
+   120→      
+   121→    } catch (err) {
+   122→      console.error('Error updating WordPress credentials:', err);
+   123→      setWpCredentialsResult('❌ Error updating WordPress credentials. Please try again.');
+   124→    } finally {
+   125→      setWpCredentialsLoading(false);
+   126→    }
+   127→  };
+   128→
+   129→  // Handle WordPress plugin status update
+   130→  const handleWpPluginStatusUpdate = async (field: 'wp_plugin_installed1' | 'wp_plugin_connected2', value: boolean) => {
+   131→    if (!domain?.id) return;
+   132→
+   133→    try {
+   134→      const { error } = await supabase
+   135→        .from('domains1')
+   136→        .update({ [field]: value })
+   137→        .eq('id', domain.id);
+   138→        
+   139→      if (error) throw error;
+   140→      
+   141→      // Update local state
+   142→      if (field === 'wp_plugin_installed1') {
+   143→        setWpPluginInstalled1(value);
+   144→      } else {
+   145→        setWpPluginConnected2(value);
+   146→      }
+   147→      
+   148→      // Refresh domain data
+   149→      const { data: refreshedData } = await supabase
+   150→        .from('domains1')
+   151→        .select('*')
+   152→        .eq('id', domain.id)
+   153→        .single();
+   154→        
+   155→      if (refreshedData) {
+   156→        setDomain(refreshedData);
+   157→      }
+   158→      
+   159→    } catch (error) {
+   160→      console.error('Error updating WordPress plugin status:', error);
+   161→    }
+   162→  };
+   163→
+   164→  // Handle automatic WordPress plugin installation and activation
+   165→  const handleInstallActivatePlugin = async () => {
+   166→    if (!domain?.id || !domain?.domain_base) {
+   167→      setInstallActivateResult('❌ Domain information not available.');
+   168→      return;
+   169→    }
+   170→
+   171→    if (!domain?.wpuser1 || !domain?.wppass1) {
+   172→      setInstallActivateResult('❌ WordPress credentials are required. Please add wpuser1 and wppass1 first.');
+   173→      return;
+   174→    }
+   175→
+   176→    setInstallActivateLoading(true);
+   177→    setInstallActivateResult(null);
+   178→
+   179→    try {
+   180→      const response = await fetch('/api/wordpress/install-activate-plugin', {
+   181→        method: 'POST',
+   182→        headers: {
+   183→          'Content-Type': 'application/json',
+   184→        },
+   185→        body: JSON.stringify({
+   186→          domain_id: domain.id,
+   187→          domain_base: domain.domain_base,
+   188→          wp_username: domain.wpuser1,
+   189→          wp_password: domain.wppass1,
+   190→        }),
+   191→      });
+   192→
+   193→      const result = await response.json();
+   194→
+   195→      if (response.ok) {
+   196→        setInstallActivateResult(`✅ ${result.message}`);
+   197→        
+   198→        // Update plugin status if installation was successful
+   199→        if (result.success) {
+   200→          await handleWpPluginStatusUpdate('wp_plugin_installed1', true);
+   201→          await handleWpPluginStatusUpdate('wp_plugin_connected2', true);
+   202→        }
+   203→      } else {
+   204→        setInstallActivateResult(`❌ ${result.error || 'Failed to install and activate plugin'}`);
+   205→      }
+   206→    } catch (error) {
+   207→      console.error('Error installing WordPress plugin:', error);
+   208→      setInstallActivateResult('❌ Network error. Please try again.');
+   209→    } finally {
+   210→      setInstallActivateLoading(false);
+   211→    }
+   212→  };
+   213→
+   214→  // If no domain_base parameter, show empty state
+   215→  if (!domainBase) {
+   216→    return (
+   217→      <div className="p-6 min-h-screen bg-gray-50">
+   218→        <div className="max-w-4xl mx-auto">
+   219→          <div className="text-center py-12">
+   220→            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+   221→              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   222→                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9" />
+   223→              </svg>
+   224→            </div>
+   225→            <h3 className="text-lg font-medium text-gray-900 mb-2">No Domain Selected</h3>
+   226→            <p className="text-gray-500 mb-4">
+   227→              Add a domain_base parameter to the URL to view domain details.
+   228→            </p>
+   229→            <p className="text-sm text-gray-400 font-mono">
+   230→              Example: /bin41/domnivid?domain_base=example.com
+   231→            </p>
+   232→          </div>
+   233→        </div>
+   234→      </div>
+   235→    );
+   236→  }
+   237→
+   238→  if (loading) {
+   239→    return (
+   240→      <div className="p-6 min-h-screen bg-gray-50">
+   241→        <div className="max-w-4xl mx-auto">
+   242→          <div className="text-center py-12">
+   243→            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+   244→            <p className="text-gray-600">Loading domain details...</p>
+   245→          </div>
+   246→        </div>
+   247→      </div>
+   248→    );
+   249→  }
+   250→
+   251→  if (error) {
+   252→    return (
+   253→      <div className="p-6 min-h-screen bg-gray-50">
+   254→        <div className="max-w-4xl mx-auto">
+   255→          <div className="text-center py-12">
+   256→            <div className="mx-auto h-12 w-12 text-red-400 mb-4">
+   257→              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   258→                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+   259→              </svg>
+   260→            </div>
+   261→            <h3 className="text-lg font-medium text-red-900 mb-2">Error Loading Domain</h3>
+   262→            <p className="text-red-600">{error}</p>
+   263→          </div>
+   264→        </div>
+   265→      </div>
+   266→    );
+   267→  }
+   268→
+   269→  if (!domain) {
+   270→    return (
+   271→      <div className="p-6 min-h-screen bg-gray-50">
+   272→        <div className="max-w-4xl mx-auto">
+   273→          <div className="text-center py-12">
+   274→            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+   275→              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   276→                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9" />
+   277→              </svg>
+   278→            </div>
+   279→            <h3 className="text-lg font-medium text-gray-900 mb-2">Domain Not Found</h3>
+   280→            <p className="text-gray-500">
+   281→              The requested domain could not be found or you don't have access to it.
+   282→            </p>
+   283→          </div>
+   284→        </div>
+   285→      </div>
+   286→    );
+   287→  }
+   288→
+   289→  // Format field names for display
+   290→  const formatFieldName = (key: string) => {
+   291→    return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+   292→  };
+   293→
+   294→  // Format field values for display
+   295→  const formatFieldValue = (key: string, value: any) => {
+   296→    if (value === null || value === undefined) return 'N/A';
+   297→    
+   298→    if (key.includes('created_at') || key.includes('updated_at')) {
+   299→      return new Date(value).toLocaleString();
+   300→    }
+   301→    
+   302→    if (typeof value === 'string' && value.length > 100) {
+   303→      return value.substring(0, 100) + '...';
+   304→    }
+   305→    
+   306→    return String(value);
+   307→  };
+   308→
+   309→  return (
+   310→    <div className="p-6 min-h-screen bg-gray-50">
+   311→      <div className="max-w-4xl mx-auto">
+   312→        {/* Header */}
+   313→        <div className="mb-6">
+   314→          <div className="flex items-center justify-between">
+   315→            <div>
+   316→              <h1 className="text-2xl font-bold text-gray-900">Domain Details</h1>
+   317→              <p className="text-sm text-gray-500 mt-1">
+   318→                Viewing domain: <span className="font-mono text-gray-700">{domainBase}</span>
+   319→              </p>
+   320→            </div>
+   321→            <div className="text-sm text-gray-500">
+   322→              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+   323→                Active Domain
+   324→              </span>
+   325→            </div>
+   326→          </div>
+   327→        </div>
+   328→
+   329→        {/* Domain Details Card */}
+   330→        <div className="bg-white shadow-sm rounded-lg border border-gray-200">
+   331→          <div className="px-6 py-4 border-b border-gray-200">
+   332→            <h2 className="text-lg font-medium text-gray-900">Domain Information</h2>
+   333→          </div>
+   334→          
+   335→          <div className="p-6">
+   336→            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+   337→              {Object.entries(domain).map(([key, value]) => (
+   338→                <div key={key} className="sm:col-span-1">
+   339→                  <dt className="text-sm font-medium text-gray-500">
+   340→                    {formatFieldName(key)}
+   341→                  </dt>
+   342→                  <dd className="mt-1 text-sm text-gray-900">
+   343→                    <div className="max-w-full">
+   344→                      {key.includes('id') ? (
+   345→                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+   346→                          {formatFieldValue(key, value)}
+   347→                        </span>
+   348→                      ) : key === 'domain_base' ? (
+   349→                        <span className="font-medium text-indigo-600">
+   350→                          {formatFieldValue(key, value)}
+   351→                        </span>
+   352→                      ) : (
+   353→                        <span className="break-words">
+   354→                          {formatFieldValue(key, value)}
+   355→                        </span>
+   356→                      )}
+   357→                    </div>
+   358→                  </dd>
+   359→                </div>
+   360→              ))}
+   361→            </dl>
+   362→          </div>
+   363→        </div>
+   364→
+   365→        {/* WordPress Credentials Section */}
+   366→        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+   367→          <div className="px-6 py-4 border-b border-gray-200">
+   368→            <h2 className="text-lg font-medium text-gray-900">WordPress Credentials</h2>
+   369→            <p className="text-sm text-gray-500 mt-1">
+   370→              Manage WordPress login credentials for this domain
+   371→            </p>
+   372→          </div>
+   373→          
+   374→          <div className="p-6">
+   375→            <div className="space-y-4">
+   376→              {/* Current Credentials Display */}
+   377→              {(domain.wpuser1 || domain.wppass1) && (
+   378→                <div className="mb-4 p-3 bg-blue-50 rounded-md">
+   379→                  <p className="text-sm text-blue-700">
+   380→                    <strong>Current WordPress User:</strong> {domain.wpuser1 || 'Not set'}
+   381→                    <br />
+   382→                    <strong>Password Status:</strong> {domain.wppass1 ? 'Set' : 'Not set'}
+   383→                  </p>
+   384→                </div>
+   385→              )}
+   386→
+   387→              {/* WordPress Username Field */}
+   388→              <div>
+   389→                <label htmlFor="wp-username" className="block text-sm font-medium text-gray-700 mb-2">
+   390→                  WordPress Username
+   391→                </label>
+   392→                <input
+   393→                  type="text"
+   394→                  id="wp-username"
+   395→                  value={wpUser1}
+   396→                  onChange={(e) => setWpUser1(e.target.value)}
+   397→                  placeholder="Enter WordPress username"
+   398→                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+   399→                  disabled={wpCredentialsLoading}
+   400→                />
+   401→              </div>
+   402→
+   403→              {/* WordPress Password Field */}
+   404→              <div>
+   405→                <label htmlFor="wp-password" className="block text-sm font-medium text-gray-700 mb-2">
+   406→                  WordPress Password
+   407→                </label>
+   408→                <input
+   409→                  type="password"
+   410→                  id="wp-password"
+   411→                  value={wpPass1}
+   412→                  onChange={(e) => setWpPass1(e.target.value)}
+   413→                  placeholder="Enter WordPress password"
+   414→                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+   415→                  disabled={wpCredentialsLoading}
+   416→                />
+   417→              </div>
+   418→
+   419→              {/* Update Button */}
+   420→              <div className="flex items-center space-x-3">
+   421→                <button
+   422→                  onClick={handleWpCredentialsUpdate}
+   423→                  disabled={wpCredentialsLoading}
+   424→                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+   425→                >
+   426→                  {wpCredentialsLoading ? (
+   427→                    <>
+   428→                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+   429→                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+   430→                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+   431→                      </svg>
+   432→                      Updating...
+   433→                    </>
+   434→                  ) : (
+   435→                    'Update WordPress Credentials'
+   436→                  )}
+   437→                </button>
+   438→                
+   439→                {/* Clear Button */}
+   440→                <button
+   441→                  onClick={() => {
+   442→                    setWpUser1('');
+   443→                    setWpPass1('');
+   444→                  }}
+   445→                  disabled={wpCredentialsLoading}
+   446→                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+   447→                >
+   448→                  Clear Fields
+   449→                </button>
+   450→              </div>
+   451→              
+   452→              {/* Result Message */}
+   453→              {wpCredentialsResult && (
+   454→                <div className={`mt-3 text-sm ${wpCredentialsResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+   455→                  {wpCredentialsResult}
+   456→                </div>
+   457→              )}
+   458→              
+   459→              {/* Security Note */}
+   460→              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+   461→                <div className="flex">
+   462→                  <svg className="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   463→                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.863-.833-2.632 0L4.182 18.5c-.77.833.192 2.5 1.732 2.5z" />
+   464→                  </svg>
+   465→                  <div>
+   466→                    <h3 className="text-sm font-medium text-yellow-800">Security Notice</h3>
+   467→                    <p className="text-sm text-yellow-700 mt-1">
+   468→                      WordPress credentials are stored securely. Consider using application passwords instead of your main account password for better security.
+   469→                    </p>
+   470→                  </div>
+   471→                </div>
+   472→              </div>
+   473→            </div>
+   474→          </div>
+   475→        </div>
+   476→
+   477→        {/* WordPress Plugin Status Section */}
+   478→        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+   479→          <div className="px-6 py-4 border-b border-gray-200">
+   480→            <h2 className="text-lg font-medium text-gray-900">WordPress Plugin Status</h2>
+   481→            <p className="text-sm text-gray-500 mt-1">
+   482→              Current status of the Snefuruplin Cloud Connector plugin for this domain
+   483→            </p>
+   484→          </div>
+   485→          
+   486→          <div className="p-6">
+   487→            <div className="space-y-6">
+   488→              {/* Plugin Installed Status */}
+   489→              <div className="flex items-center justify-between">
+   490→                <div>
+   491→                  <label className="text-sm font-medium text-gray-700">
+   492→                    WP Plugin Currently Installed
+   493→                  </label>
+   494→                  <p className="text-xs text-gray-500 mt-1">
+   495→                    Whether the plugin is installed on this WordPress site
+   496→                  </p>
+   497→                </div>
+   498→                <div className="flex items-center space-x-4">
+   499→                  <span className={`text-lg font-semibold ${wpPluginInstalled1 ? 'text-green-600' : 'text-red-600'}`}>
+   500→                    {wpPluginInstalled1 ? 'Yes' : 'No'}
+   501→                  </span>
+   502→                  <div className="flex items-center space-x-2">
+   503→                    <button
+   504→                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_installed1', true)}
+   505→                      className={`px-3 py-1 text-xs rounded ${wpPluginInstalled1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-800'}`}
+   506→                    >
+   507→                      Yes
+   508→                    </button>
+   509→                    <button
+   510→                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_installed1', false)}
+   511→                      className={`px-3 py-1 text-xs rounded ${!wpPluginInstalled1 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-800'}`}
+   512→                    >
+   513→                      No
+   514→                    </button>
+   515→                  </div>
+   516→                </div>
+   517→              </div>
+   518→
+   519→              {/* Plugin Connected Status */}
+   520→              <div className="flex items-center justify-between">
+   521→                <div>
+   522→                  <label className="text-sm font-medium text-gray-700">
+   523→                    WP Plugin Currently Connected
+   524→                  </label>
+   525→                  <p className="text-xs text-gray-500 mt-1">
+   526→                    Whether the plugin is actively connected and syncing data
+   527→                  </p>
+   528→                </div>
+   529→                <div className="flex items-center space-x-4">
+   530→                  <span className={`text-lg font-semibold ${wpPluginConnected2 ? 'text-green-600' : 'text-red-600'}`}>
+   531→                    {wpPluginConnected2 ? 'Yes' : 'No'}
+   532→                  </span>
+   533→                  <div className="flex items-center space-x-2">
+   534→                    <button
+   535→                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_connected2', true)}
+   536→                      className={`px-3 py-1 text-xs rounded ${wpPluginConnected2 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-800'}`}
+   537→                    >
+   538→                      Yes
+   539→                    </button>
+   540→                    <button
+   541→                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_connected2', false)}
+   542→                      className={`px-3 py-1 text-xs rounded ${!wpPluginConnected2 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-800'}`}
+   543→                    >
+   544→                      No
+   545→                    </button>
+   546→                  </div>
+   547→                </div>
+   548→              </div>
+   549→
+   550→              {/* Plugin Download Link */}
+   551→              <div className="pt-4 border-t border-gray-200">
+   552→                <div className="flex items-center justify-between">
+   553→                  <div>
+   554→                    <label className="text-sm font-medium text-gray-700">
+   555→                      Plugin Download
+   556→                    </label>
+   557→                    <p className="text-xs text-gray-500 mt-1">
+   558→                      Download the latest version of the Snefuruplin Cloud Connector plugin
+   559→                    </p>
+   560→                  </div>
+   561→                  <a
+   562→                    href="/api/snefuruplin/download"
+   563→                    target="_blank"
+   564→                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+   565→                  >
+   566→                    <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   567→                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+   568→                    </svg>
+   569→                    Download Plugin
+   570→                  </a>
+   571→                </div>
+   572→              </div>
+   573→            </div>
+   574→          </div>
+   575→        </div>
+   576→
+   577→        {/* Install And Activate WP Plugin Section */}
+   578→        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+   579→          <div className="px-6 py-4 border-b border-gray-200">
+   580→            <h2 className="text-lg font-medium text-gray-900">Install And Activate WP Plugin Using The wpuser1 and wppass1</h2>
+   581→            <p className="text-sm text-gray-500 mt-1">
+   582→              Automatically install and activate the Snefuruplin Cloud Connector plugin on this WordPress site
+   583→            </p>
+   584→          </div>
+   585→          
+   586→          <div className="p-6">
+   587→            <div className="space-y-4">
+   588→              {/* Prerequisites Check */}
+   589→              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+   590→                <h3 className="text-sm font-medium text-blue-800 mb-2">Prerequisites:</h3>
+   591→                <ul className="text-sm text-blue-700 space-y-1">
+   592→                  <li className="flex items-center">
+   593→                    <span className={`mr-2 ${domain?.domain_base ? 'text-green-600' : 'text-red-600'}`}>
+   594→                      {domain?.domain_base ? '✓' : '✗'}
+   595→                    </span>
+   596→                    Domain URL: {domain?.domain_base || 'Not available'}
+   597→                  </li>
+   598→                  <li className="flex items-center">
+   599→                    <span className={`mr-2 ${domain?.wpuser1 ? 'text-green-600' : 'text-red-600'}`}>
+   600→                      {domain?.wpuser1 ? '✓' : '✗'}
+   601→                    </span>
+   602→                    WordPress Username: {domain?.wpuser1 ? 'Set' : 'Not set'}
+   603→                  </li>
+   604→                  <li className="flex items-center">
+   605→                    <span className={`mr-2 ${domain?.wppass1 ? 'text-green-600' : 'text-red-600'}`}>
+   606→                      {domain?.wppass1 ? '✓' : '✗'}
+   607→                    </span>
+   608→                    WordPress Password: {domain?.wppass1 ? 'Set' : 'Not set'}
+   609→                  </li>
+   610→                </ul>
+   611→              </div>
+   612→
+   613→              {/* Installation Process Description */}
+   614→              <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+   615→                <h3 className="text-sm font-medium text-gray-800 mb-2">What this will do:</h3>
+   616→                <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+   617→                  <li>Connect to your WordPress site using the provided credentials</li>
+   618→                  <li>Download the latest Snefuruplin Cloud Connector plugin</li>
+   619→                  <li>Install the plugin on your WordPress site</li>
+   620→                  <li>Activate the plugin automatically</li>
+   621→                  <li>Update the plugin status in our system</li>
+   622→                </ol>
+   623→              </div>
+   624→
+   625→              {/* Install/Activate Button */}
+   626→              <div className="flex items-center justify-between pt-4">
+   627→                <div>
+   628→                  <p className="text-sm text-gray-600">
+   629→                    Ready to install and activate the WordPress plugin automatically?
+   630→                  </p>
+   631→                </div>
+   632→                <button
+   633→                  onClick={handleInstallActivatePlugin}
+   634→                  disabled={installActivateLoading || !domain?.wpuser1 || !domain?.wppass1}
+   635→                  className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+   636→                >
+   637→                  {installActivateLoading ? (
+   638→                    <>
+   639→                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+   640→                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+   641→                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+   642→                      </svg>
+   643→                      Installing...
+   644→                    </>
+   645→                  ) : (
+   646→                    <>
+   647→                      <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   648→                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+   649→                      </svg>
+   650→                      func_52_install_activate
+   651→                    </>
+   652→                  )}
+   653→                </button>
+   654→              </div>
+   655→
+   656→              {/* Result Message */}
+   657→              {installActivateResult && (
+   658→                <div className={`mt-4 p-3 rounded-md ${installActivateResult.startsWith('✅') ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+   659→                  <p className={`text-sm ${installActivateResult.startsWith('✅') ? 'text-green-700' : 'text-red-700'}`}>
+   660→                    {installActivateResult}
+   661→                  </p>
+   662→                </div>
+   663→              )}
+   664→
+   665→              {/* Security Warning */}
+   666→              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+   667→                <div className="flex">
+   668→                  <svg className="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   669→                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.863-.833-2.632 0L4.182 18.5c-.77.833.192 2.5 1.732 2.5z" />
+   670→                  </svg>
+   671→                  <div>
+   672→                    <h3 className="text-sm font-medium text-yellow-800">Security Notice</h3>
+   673→                    <p className="text-sm text-yellow-700 mt-1">
+   674→                      This process will use your WordPress admin credentials to install the plugin. Ensure your credentials are secure and consider using application passwords for better security.
+   675→                    </p>
+   676→                  </div>
+   677→                </div>
+   678→              </div>
+   679→            </div>
+   680→          </div>
+   681→        </div>
+   682→
+   683→        {/* Additional Actions */}
+   684→        <div className="mt-6 flex items-center justify-between">
+   685→          <button
+   686→            onClick={() => window.history.back()}
+   687→            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+   688→          >
+   689→            <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   690→              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+   691→            </svg>
+   692→            Back
+   693→          </button>
+   694→          
+   695→          <div className="flex space-x-3">
+   696→            <button
+   697→              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+   698→              onClick={() => {
+   699→                // TODO: Implement edit functionality
+   700→                alert('Edit functionality coming soon!');
+   701→              }}
+   702→            >
+   703→              <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   704→                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+   705→              </svg>
+   706→              Edit Domain
+   707→            </button>
+   708→          </div>
+   709→          
+   710→          <div className="text-xs text-gray-400">
+   711→            Last updated: {domain.updated_at ? new Date(domain.updated_at).toLocaleString() : 'N/A'}
+   712→          </div>
+   713→        </div>
+   714→      </div>
+   715→    </div>
+   716→  );
+   717→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+This is a comprehensive WordPress domain management page with complex functionality. Let me create the client component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+"use client";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useSearchParams } from 'next/navigation';
+
+export default function DomnividClient() {
+  const { user } = useAuth();
+  const [domain, setDomain] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [wpUser1, setWpUser1] = useState<string>('');
+  const [wpPass1, setWpPass1] = useState<string>('');
+  const [wpCredentialsLoading, setWpCredentialsLoading] = useState(false);
+  const [wpCredentialsResult, setWpCredentialsResult] = useState<string | null>(null);
+  const [wpPluginInstalled1, setWpPluginInstalled1] = useState<boolean>(false);
+  const [wpPluginConnected2, setWpPluginConnected2] = useState<boolean>(false);
+  const [installActivateLoading, setInstallActivateLoading] = useState(false);
+  const [installActivateResult, setInstallActivateResult] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const domainBase = searchParams?.get('domain_base');
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const fetchDomainDetails = async () => {
+      if (!domainBase || !user?.id) {
+        setDomain(null);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Get user's DB id from users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', user.id)
+          .single();
+          
+        if (userError || !userData) {
+          setError('Could not find user record.');
+          setDomain(null);
+          setLoading(false);
+          return;
+        }
+        
+        // Fetch specific domain for this user
+        const { data, error } = await supabase
+          .from('domains1')
+          .select('*')
+          .eq('domain_base', domainBase)
+          .eq('fk_user_id', userData.id)
+          .single();
+          
+        if (error) {
+          if (error.code === 'PGRST116') {
+            setError('Domain not found or you do not have access to it.');
+          } else {
+            throw error;
+          }
+          setDomain(null);
+        } else {
+          setDomain(data);
+          // Populate WordPress credentials if they exist
+          setWpUser1(data.wpuser1 || '');
+          setWpPass1(data.wppass1 || '');
+          // Populate WordPress plugin status
+          setWpPluginInstalled1(data.wp_plugin_installed1 || false);
+          setWpPluginConnected2(data.wp_plugin_connected2 || false);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch domain details');
+        setDomain(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchDomainDetails();
+  }, [domainBase, user, supabase]);
+
+  // Handle WordPress credentials update
+  const handleWpCredentialsUpdate = async () => {
+    if (!domain?.id) {
+      setWpCredentialsResult('No domain found to update.');
+      return;
+    }
+
+    setWpCredentialsLoading(true);
+    setWpCredentialsResult(null);
+    
+    try {
+      // Update the domain with WordPress credentials
+      const { error } = await supabase
+        .from('domains1')
+        .update({ 
+          wpuser1: wpUser1.trim() || null,
+          wppass1: wpPass1.trim() || null
+        })
+        .eq('id', domain.id);
+        
+      if (error) throw error;
+      
+      setWpCredentialsResult('✅ WordPress credentials updated successfully!');
+      
+      // Refresh domain data to show updated information
+      setDomain((prev: any) => ({ 
+        ...prev, 
+        wpuser1: wpUser1.trim() || null,
+        wppass1: wpPass1.trim() || null
+      }));
+      
+    } catch (err) {
+      console.error('Error updating WordPress credentials:', err);
+      setWpCredentialsResult('❌ Error updating WordPress credentials. Please try again.');
+    } finally {
+      setWpCredentialsLoading(false);
+    }
+  };
+
+  // Handle WordPress plugin status update
+  const handleWpPluginStatusUpdate = async (field: 'wp_plugin_installed1' | 'wp_plugin_connected2', value: boolean) => {
+    if (!domain?.id) return;
+
+    try {
+      const { error } = await supabase
+        .from('domains1')
+        .update({ [field]: value })
+        .eq('id', domain.id);
+        
+      if (error) throw error;
+      
+      // Update local state
+      if (field === 'wp_plugin_installed1') {
+        setWpPluginInstalled1(value);
+      } else {
+        setWpPluginConnected2(value);
+      }
+      
+      // Refresh domain data
+      const { data: refreshedData } = await supabase
+        .from('domains1')
+        .select('*')
+        .eq('id', domain.id)
+        .single();
+        
+      if (refreshedData) {
+        setDomain(refreshedData);
+      }
+      
+    } catch (error) {
+      console.error('Error updating WordPress plugin status:', error);
+    }
+  };
+
+  // Handle automatic WordPress plugin installation and activation
+  const handleInstallActivatePlugin = async () => {
+    if (!domain?.id || !domain?.domain_base) {
+      setInstallActivateResult('❌ Domain information not available.');
+      return;
+    }
+
+    if (!domain?.wpuser1 || !domain?.wppass1) {
+      setInstallActivateResult('❌ WordPress credentials are required. Please add wpuser1 and wppass1 first.');
+      return;
+    }
+
+    setInstallActivateLoading(true);
+    setInstallActivateResult(null);
+
+    try {
+      const response = await fetch('/api/wordpress/install-activate-plugin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          domain_id: domain.id,
+          domain_base: domain.domain_base,
+          wp_username: domain.wpuser1,
+          wp_password: domain.wppass1,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setInstallActivateResult(`✅ ${result.message}`);
+        
+        // Update plugin status if installation was successful
+        if (result.success) {
+          await handleWpPluginStatusUpdate('wp_plugin_installed1', true);
+          await handleWpPluginStatusUpdate('wp_plugin_connected2', true);
+        }
+      } else {
+        setInstallActivateResult(`❌ ${result.error || 'Failed to install and activate plugin'}`);
+      }
+    } catch (error) {
+      console.error('Error installing WordPress plugin:', error);
+      setInstallActivateResult('❌ Network error. Please try again.');
+    } finally {
+      setInstallActivateLoading(false);
+    }
+  };
+
+  // If no domain_base parameter, show empty state
+  if (!domainBase) {
+    return (
+      <div className="p-6 min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Domain Selected</h3>
+            <p className="text-gray-500 mb-4">
+              Add a domain_base parameter to the URL to view domain details.
+            </p>
+            <p className="text-sm text-gray-400 font-mono">
+              Example: /bin41/domnivid?domain_base=example.com
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="p-6 min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading domain details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <div className="mx-auto h-12 w-12 text-red-400 mb-4">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-red-900 mb-2">Error Loading Domain</h3>
+            <p className="text-red-600">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!domain) {
+    return (
+      <div className="p-6 min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Domain Not Found</h3>
+            <p className="text-gray-500">
+              The requested domain could not be found or you don't have access to it.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Format field names for display
+  const formatFieldName = (key: string) => {
+    return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+
+  // Format field values for display
+  const formatFieldValue = (key: string, value: any) => {
+    if (value === null || value === undefined) return 'N/A';
+    
+    if (key.includes('created_at') || key.includes('updated_at')) {
+      return new Date(value).toLocaleString();
+    }
+    
+    if (typeof value === 'string' && value.length > 100) {
+      return value.substring(0, 100) + '...';
+    }
+    
+    return String(value);
+  };
+
+  return (
+    <div className="p-6 min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Domain Details</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Viewing domain: <span className="font-mono text-gray-700">{domainBase}</span>
+              </p>
+            </div>
+            <div className="text-sm text-gray-500">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Active Domain
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Domain Details Card */}
+        <div className="bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Domain Information</h2>
+          </div>
+          
+          <div className="p-6">
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+              {Object.entries(domain).map(([key, value]) => (
+                <div key={key} className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">
+                    {formatFieldName(key)}
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    <div className="max-w-full">
+                      {key.includes('id') ? (
+                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                          {formatFieldValue(key, value)}
+                        </span>
+                      ) : key === 'domain_base' ? (
+                        <span className="font-medium text-indigo-600">
+                          {formatFieldValue(key, value)}
+                        </span>
+                      ) : (
+                        <span className="break-words">
+                          {formatFieldValue(key, value)}
+                        </span>
+                      )}
+                    </div>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+
+        {/* WordPress Credentials Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">WordPress Credentials</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Manage WordPress login credentials for this domain
+            </p>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Current Credentials Display */}
+              {(domain.wpuser1 || domain.wppass1) && (
+                <div className="mb-4 p-3 bg-blue-50 rounded-md">
+                  <p className="text-sm text-blue-700">
+                    <strong>Current WordPress User:</strong> {domain.wpuser1 || 'Not set'}
+                    <br />
+                    <strong>Password Status:</strong> {domain.wppass1 ? 'Set' : 'Not set'}
+                  </p>
+                </div>
+              )}
+
+              {/* WordPress Username Field */}
+              <div>
+                <label htmlFor="wp-username" className="block text-sm font-medium text-gray-700 mb-2">
+                  WordPress Username
+                </label>
+                <input
+                  type="text"
+                  id="wp-username"
+                  value={wpUser1}
+                  onChange={(e) => setWpUser1(e.target.value)}
+                  placeholder="Enter WordPress username"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  disabled={wpCredentialsLoading}
+                />
+              </div>
+
+              {/* WordPress Password Field */}
+              <div>
+                <label htmlFor="wp-password" className="block text-sm font-medium text-gray-700 mb-2">
+                  WordPress Password
+                </label>
+                <input
+                  type="password"
+                  id="wp-password"
+                  value={wpPass1}
+                  onChange={(e) => setWpPass1(e.target.value)}
+                  placeholder="Enter WordPress password"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  disabled={wpCredentialsLoading}
+                />
+              </div>
+
+              {/* Update Button */}
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleWpCredentialsUpdate}
+                  disabled={wpCredentialsLoading}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {wpCredentialsLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating...
+                    </>
+                  ) : (
+                    'Update WordPress Credentials'
+                  )}
+                </button>
+                
+                {/* Clear Button */}
+                <button
+                  onClick={() => {
+                    setWpUser1('');
+                    setWpPass1('');
+                  }}
+                  disabled={wpCredentialsLoading}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Clear Fields
+                </button>
+              </div>
+              
+              {/* Result Message */}
+              {wpCredentialsResult && (
+                <div className={`mt-3 text-sm ${wpCredentialsResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+                  {wpCredentialsResult}
+                </div>
+              )}
+              
+              {/* Security Note */}
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="flex">
+                  <svg className="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.863-.833-2.632 0L4.182 18.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <div>
+                    <h3 className="text-sm font-medium text-yellow-800">Security Notice</h3>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      WordPress credentials are stored securely. Consider using application passwords instead of your main account password for better security.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* WordPress Plugin Status Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">WordPress Plugin Status</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Current status of the Snefuruplin Cloud Connector plugin for this domain
+            </p>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-6">
+              {/* Plugin Installed Status */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    WP Plugin Currently Installed
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Whether the plugin is installed on this WordPress site
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className={`text-lg font-semibold ${wpPluginInstalled1 ? 'text-green-600' : 'text-red-600'}`}>
+                    {wpPluginInstalled1 ? 'Yes' : 'No'}
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_installed1', true)}
+                      className={`px-3 py-1 text-xs rounded ${wpPluginInstalled1 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-800'}`}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_installed1', false)}
+                      className={`px-3 py-1 text-xs rounded ${!wpPluginInstalled1 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-800'}`}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Plugin Connected Status */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    WP Plugin Currently Connected
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Whether the plugin is actively connected and syncing data
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className={`text-lg font-semibold ${wpPluginConnected2 ? 'text-green-600' : 'text-red-600'}`}>
+                    {wpPluginConnected2 ? 'Yes' : 'No'}
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_connected2', true)}
+                      className={`px-3 py-1 text-xs rounded ${wpPluginConnected2 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-800'}`}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      onClick={() => handleWpPluginStatusUpdate('wp_plugin_connected2', false)}
+                      className={`px-3 py-1 text-xs rounded ${!wpPluginConnected2 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-800'}`}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Plugin Download Link */}
+              <div className="pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      Plugin Download
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Download the latest version of the Snefuruplin Cloud Connector plugin
+                    </p>
+                  </div>
+                  <a
+                    href="/api/snefuruplin/download"
+                    target="_blank"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download Plugin
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Install And Activate WP Plugin Section */}
+        <div className="mt-8 bg-white shadow-sm rounded-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Install And Activate WP Plugin Using The wpuser1 and wppass1</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Automatically install and activate the Snefuruplin Cloud Connector plugin on this WordPress site
+            </p>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Prerequisites Check */}
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                <h3 className="text-sm font-medium text-blue-800 mb-2">Prerequisites:</h3>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li className="flex items-center">
+                    <span className={`mr-2 ${domain?.domain_base ? 'text-green-600' : 'text-red-600'}`}>
+                      {domain?.domain_base ? '✓' : '✗'}
+                    </span>
+                    Domain URL: {domain?.domain_base || 'Not available'}
+                  </li>
+                  <li className="flex items-center">
+                    <span className={`mr-2 ${domain?.wpuser1 ? 'text-green-600' : 'text-red-600'}`}>
+                      {domain?.wpuser1 ? '✓' : '✗'}
+                    </span>
+                    WordPress Username: {domain?.wpuser1 ? 'Set' : 'Not set'}
+                  </li>
+                  <li className="flex items-center">
+                    <span className={`mr-2 ${domain?.wppass1 ? 'text-green-600' : 'text-red-600'}`}>
+                      {domain?.wppass1 ? '✓' : '✗'}
+                    </span>
+                    WordPress Password: {domain?.wppass1 ? 'Set' : 'Not set'}
+                  </li>
+                </ul>
+              </div>
+
+              {/* Installation Process Description */}
+              <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+                <h3 className="text-sm font-medium text-gray-800 mb-2">What this will do:</h3>
+                <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                  <li>Connect to your WordPress site using the provided credentials</li>
+                  <li>Download the latest Snefuruplin Cloud Connector plugin</li>
+                  <li>Install the plugin on your WordPress site</li>
+                  <li>Activate the plugin automatically</li>
+                  <li>Update the plugin status in our system</li>
+                </ol>
+              </div>
+
+              {/* Install/Activate Button */}
+              <div className="flex items-center justify-between pt-4">
+                <div>
+                  <p className="text-sm text-gray-600">
+                    Ready to install and activate the WordPress plugin automatically?
+                  </p>
+                </div>
+                <button
+                  onClick={handleInstallActivatePlugin}
+                  disabled={installActivateLoading || !domain?.wpuser1 || !domain?.wppass1}
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {installActivateLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Installing...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      func_52_install_activate
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Result Message */}
+              {installActivateResult && (
+                <div className={`mt-4 p-3 rounded-md ${installActivateResult.startsWith('✅') ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                  <p className={`text-sm ${installActivateResult.startsWith('✅') ? 'text-green-700' : 'text-red-700'}`}>
+                    {installActivateResult}
+                  </p>
+                </div>
+              )}
+
+              {/* Security Warning */}
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="flex">
+                  <svg className="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.863-.833-2.632 0L4.182 18.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <div>
+                    <h3 className="text-sm font-medium text-yellow-800">Security Notice</h3>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      This process will use your WordPress admin credentials to install the plugin. Ensure your credentials are secure and consider using application passwords for better security.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Actions */}
+        <div className="mt-6 flex items-center justify-between">
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back
+          </button>
+          
+          <div className="flex space-x-3">
+            <button
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={() => {
+                // TODO: Implement edit functionality
+                alert('Edit functionality coming soon!');
+              }}
+            >
+              <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Domain
+            </button>
+          </div>
+          
+          <div className="text-xs text-gray-400">
+            Last updated: {domain.updated_at ? new Date(domain.updated_at).toLocaleString() : 'N/A'}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin41/domnivid/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me convert the main page with dynamic metadata for the domain parameter:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin41/domnivid/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import DomnividClient from './pclient';
+     3→
+     4→type Props = {
+     5→  searchParams: { [key: string]: string | string[] | undefined }
+     6→}
+     7→
+     8→export async function generateMetadata(
+     9→  { searchParams }: Props
+    10→): Promise<Metadata> {
+    11→  const domainBase = searchParams.domain_base;
+    12→  const domainDisplay = typeof domainBase === 'string' ? ` - ${domainBase}` : '';
+    13→  
+    14→  return {
+    15→    title: `domnivid${domainDisplay} - Snefuru`,
+    16→  }
+    17→}
+    18→
+    19→export default function DomnividPage() {
+    20→  return <DomnividClient />;
+    21→}
+    22→
+    23→  useEffect(() => {
+    24→    const fetchDomainDetails = async () => {
+    25→      if (!domainBase || !user?.id) {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to remove the remaining old content that wasn't replaced. Let me fix that:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/bin41/domnivid/page.tsx`
+
+Result:
+
+```
+1→import { Metadata } from 'next';
+     2→import DomnividClient from './pclient';
+     3→
+     4→type Props = {
+     5→  searchParams: { [key: string]: string | string[] | undefined }
+     6→}
+     7→
+     8→export async function generateMetadata(
+     9→  { searchParams }: Props
+    10→): Promise<Metadata> {
+    11→  const domainBase = searchParams.domain_base;
+    12→  const domainDisplay = typeof domainBase === 'string' ? ` - ${domainBase}` : '';
+    13→  
+    14→  return {
+    15→    title: `domnivid${domainDisplay} - Snefuru`,
+    16→  }
+    17→}
+    18→
+    19→export default function DomnividPage() {
+    20→  return <DomnividClient />;
+    21→}
+    22→
+    23→  useEffect(() => {
+    24→    const fetchDomainDetails = async () => {
+    25→      if (!domainBase || !user?.id) {
+    26→        setDomain(null);
+    27→        setLoading(false);
+    28→        return;
+    29→      }
+    30→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to rewrite the entire file to remove the leftover content:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+import { Metadata } from 'next';
+import DomnividClient from './pclient';
+
+type Props = {
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata(
+  { searchParams }: Props
+): Promise<Metadata> {
+  const domainBase = searchParams.domain_base;
+  const domainDisplay = typeof domainBase === 'string' ? ` - ${domainBase}` : '';
+  
+  return {
+    title: `domnivid${domainDisplay} - Snefuru`,
+  }
+}
+
+export default function DomnividPage() {
+  return <DomnividClient />;
+}
+```
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin41/domnivid/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import DomnividClient from './pclient';
+     3→
+     4→type Props = {
+     5→  searchParams: { [key: string]: string | string[] | undefined }
+     6→}
+     7→
+     8→export async function generateMetadata(
+     9→  { searchParams }: Props
+    10→): Promise<Metadata> {
+    11→  const domainBase = searchParams.domain_base;
+    12→  const domainDisplay = typeof domainBase === 'string' ? ` - ${domainBase}` : '';
+    13→  
+    14→  return {
+    15→    title: `domnivid${domainDisplay} - Snefuru`,
+    16→  }
+    17→}
+    18→
+    19→export default function DomnividPage() {
+    20→  return <DomnividClient />;
+    21→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now let me continue with another page. Let me look at `/ruplin-api-keys-p1`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/ruplin-api-keys-p1/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     6→
+     7→export default function RuplinApiKeysPage() {
+     8→  const [apiKey, setApiKey] = useState('');
+     9→  const [loading, setLoading] = useState(true);
+    10→  const { user } = useAuth();
+    11→  const supabase = createClientComponentClient();
+    12→
+    13→  useEffect(() => {
+    14→    document.title = 'API Keys - Ruplin WP Plugin - Snefuru';
+    15→  }, []);
+    16→
+    17→  useEffect(() => {
+    18→    const fetchApiKey = async () => {
+    19→      if (!user?.id) {
+    20→        setLoading(false);
+    21→        return;
+    22→      }
+    23→
+    24→      try {
+    25→        const { data, error } = await supabase
+    26→          .from('users')
+    27→          .select('ruplin_api_key_1')
+    28→          .eq('auth_id', user.id)
+    29→          .single();
+    30→
+    31→        if (error) {
+    32→          console.error('Error fetching API key:', error);
+    33→        } else {
+    34→          setApiKey(data?.ruplin_api_key_1 || '');
+    35→        }
+    36→      } catch (err) {
+    37→        console.error('Error:', err);
+    38→      } finally {
+    39→        setLoading(false);
+    40→      }
+    41→    };
+    42→
+    43→    fetchApiKey();
+    44→  }, [user?.id, supabase]);
+    45→
+    46→  const handleCopy = async () => {
+    47→    try {
+    48→      await navigator.clipboard.writeText(apiKey);
+    49→      // Show success feedback
+    50→      const button = document.getElementById('copy-button');
+    51→      if (button) {
+    52→        const originalText = button.textContent;
+    53→        button.textContent = 'Copied!';
+    54→        button.className = button.className.replace('bg-gray-600 hover:bg-gray-700', 'bg-green-600 hover:bg-green-700');
+    55→        setTimeout(() => {
+    56→          button.textContent = originalText;
+    57→          button.className = button.className.replace('bg-green-600 hover:bg-green-700', 'bg-gray-600 hover:bg-gray-700');
+    58→        }, 2000);
+    59→      }
+    60→    } catch (err) {
+    61→      console.error('Failed to copy text: ', err);
+    62→      alert('Failed to copy to clipboard. Please manually select and copy the key.');
+    63→    }
+    64→  };
+    65→
+    66→  if (loading) {
+    67→    return (
+    68→      <div className="p-6">
+    69→        <div className="max-w-2xl mx-auto">
+    70→          <h1 className="text-2xl font-bold text-gray-900 mb-6">
+    71→            API Keys - Ruplin WP Plugin
+    72→          </h1>
+    73→          <div className="bg-white shadow rounded-lg p-6">
+    74→            <p>Loading...</p>
+    75→          </div>
+    76→        </div>
+    77→      </div>
+    78→    );
+    79→  }
+    80→
+    81→  return (
+    82→    <div className="p-6">
+    83→      <div className="max-w-2xl mx-auto">
+    84→        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+    85→          API Keys - Ruplin WP Plugin
+    86→        </h1>
+    87→        
+    88→        <div className="bg-white shadow rounded-lg p-6">
+    89→          <div className="mb-4">
+    90→            <label 
+    91→              htmlFor="api-key" 
+    92→              className="block text-sm font-medium text-gray-700 mb-2"
+    93→            >
+    94→              ruplin_api_key_1
+    95→            </label>
+    96→            <div className="flex gap-2">
+    97→              <input
+    98→                id="api-key"
+    99→                type="text"
+   100→                value={apiKey}
+   101→                readOnly
+   102→                className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+   103→              />
+   104→              <button
+   105→                id="copy-button"
+   106→                onClick={handleCopy}
+   107→                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+   108→              >
+   109→                Copy
+   110→              </button>
+   111→            </div>
+   112→            {!apiKey && (
+   113→              <p className="mt-2 text-sm text-gray-500">
+   114→                No API key found. This may be an existing account that needs key generation.
+   115→              </p>
+   116→            )}
+   117→          </div>
+   118→        </div>
+   119→      </div>
+   120→    </div>
+   121→  );
+   122→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+This is a simpler API key management page. Let me create the client component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+export default function RuplinApiKeysClient() {
+  const [apiKey, setApiKey] = useState('');
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('ruplin_api_key_1')
+          .eq('auth_id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching API key:', error);
+        } else {
+          setApiKey(data?.ruplin_api_key_1 || '');
+        }
+      } catch (err) {
+        console.error('Error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApiKey();
+  }, [user?.id, supabase]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(apiKey);
+      // Show success feedback
+      const button = document.getElementById('copy-button');
+      if (button) {
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        button.className = button.className.replace('bg-gray-600 hover:bg-gray-700', 'bg-green-600 hover:bg-green-700');
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.className = button.className.replace('bg-green-600 hover:bg-green-700', 'bg-gray-600 hover:bg-gray-700');
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      alert('Failed to copy to clipboard. Please manually select and copy the key.');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">
+            API Keys - Ruplin WP Plugin
+          </h1>
+          <div className="bg-white shadow rounded-lg p-6">
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+          API Keys - Ruplin WP Plugin
+        </h1>
+        
+        <div className="bg-white shadow rounded-lg p-6">
+          <div className="mb-4">
+            <label 
+              htmlFor="api-key" 
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              ruplin_api_key_1
+            </label>
+            <div className="flex gap-2">
+              <input
+                id="api-key"
+                type="text"
+                value={apiKey}
+                readOnly
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <button
+                id="copy-button"
+                onClick={handleCopy}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              >
+                Copy
+              </button>
+            </div>
+            {!apiKey && (
+              <p className="mt-2 text-sm text-gray-500">
+                No API key found. This may be an existing account that needs key generation.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/ruplin-api-keys-p1/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me convert the main page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/ruplin-api-keys-p1/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import RuplinApiKeysClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'API Keys - Ruplin WP Plugin - Snefuru',
+     6→};
+     7→
+     8→export default function RuplinApiKeysPage() {
+     9→  return <RuplinApiKeysClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Great! Let me continue with another page. Let me look at `/favprar1`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/favprar1/page.tsx`
+
+Result:
+
+```
+1→"use client";
+     2→import { useEffect, useState } from 'react';
+     3→import { useAuth } from '@/app/context/AuthContext';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→
+     6→interface FavoritePrompt {
+     7→  favorite_id: string;
+     8→  fk_user_id: string;
+     9→  title: string;
+    10→  prompt_text: string;
+    11→  description: string;
+    12→  category: string;
+    13→  tags: string[];
+    14→  created_at: string;
+    15→  updated_at: string;
+    16→}
+    17→
+    18→const columns = [
+    19→  'favorite_id',
+    20→  'fk_user_id',
+    21→  'title',
+    22→  'prompt_text',
+    23→  'description',
+    24→  'category',
+    25→  'tags',
+    26→  'created_at',
+    27→  'updated_at'
+    28→];
+    29→
+    30→export default function Favprar1Page() {
+    31→  const [data, setData] = useState<FavoritePrompt[]>([]);
+    32→  const [filteredData, setFilteredData] = useState<FavoritePrompt[]>([]);
+    33→  const [loading, setLoading] = useState(true);
+    34→  const [error, setError] = useState<string | null>(null);
+    35→  const [currentPage, setCurrentPage] = useState(1);
+    36→  const [pageSize, setPageSize] = useState(10);
+    37→  const [searchTerm, setSearchTerm] = useState('');
+    38→  
+    39→  const pageSizeOptions = [5, 10, 20, 50, 100];
+    40→  const { user } = useAuth();
+    41→  const supabase = createClientComponentClient();
+    42→
+    43→  useEffect(() => {
+    44→    document.title = 'favprar1 - Snefuru';
+    45→  }, []);
+    46→
+    47→  useEffect(() => {
+    48→    fetchFavoritePrompts();
+    49→  }, [user]);
+    50→
+    51→  useEffect(() => {
+    52→    // Filter data based on search term
+    53→    if (searchTerm) {
+    54→      const filtered = data.filter(item => 
+    55→        item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    56→        item.prompt_text?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    57→        item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    58→        item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    59→        item.favorite_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    60→        (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
+    61→      );
+    62→      setFilteredData(filtered);
+    63→    } else {
+    64→      setFilteredData(data);
+    65→    }
+    66→    setCurrentPage(1); // Reset to first page when filtering
+    67→  }, [searchTerm, data]);
+    68→
+    69→  const fetchFavoritePrompts = async () => {
+    70→    setLoading(true);
+    71→    setError(null);
+    72→    try {
+    73→      if (!user?.id) {
+    74→        setData([]);
+    75→        setLoading(false);
+    76→        return;
+    77→      }
+    78→      
+    79→      // Get user's DB id from users table
+    80→      const { data: userData, error: userError } = await supabase
+    81→        .from('users')
+    82→        .select('id')
+    83→        .eq('auth_id', user.id)
+    84→        .single();
+    85→        
+    86→      if (userError || !userData) {
+    87→        setError('Could not find user record.');
+    88→        setData([]);
+    89→        setLoading(false);
+    90→        return;
+    91→      }
+    92→      
+    93→      // Fetch favorite_prompts for this user
+    94→      const { data: favoritePrompts, error: favoritePromptsError } = await supabase
+    95→        .from('favorite_prompts')
+    96→        .select('*')
+    97→        .eq('fk_user_id', userData.id)
+    98→        .order('created_at', { ascending: false });
+    99→        
+   100→      if (favoritePromptsError) throw favoritePromptsError;
+   101→      setData(favoritePrompts || []);
+   102→      setFilteredData(favoritePrompts || []);
+   103→    } catch (err) {
+   104→      setError(err instanceof Error ? err.message : 'Failed to fetch favorite prompts');
+   105→      setData([]);
+   106→      setFilteredData([]);
+   107→    } finally {
+   108→      setLoading(false);
+   109→    }
+   110→  };
+   111→
+   112→  // Pagination calculations
+   113→  const totalItems = filteredData.length;
+   114→  const totalPages = Math.ceil(totalItems / pageSize);
+   115→  const startIndex = (currentPage - 1) * pageSize;
+   116→  const endIndex = Math.min(startIndex + pageSize, totalItems);
+   117→  const currentItems = filteredData.slice(startIndex, endIndex);
+   118→
+   119→  const handlePageChange = (newPage: number) => {
+   120→    setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
+   121→  };
+   122→
+   123→  const handlePageSizeChange = (size: number) => {
+   124→    setPageSize(size);
+   125→    setCurrentPage(1);
+   126→  };
+   127→
+   128→  const formatColumnData = (col: string, value: any) => {
+   129→    if (value === null || value === undefined) return '-';
+   130→    
+   131→    switch (col) {
+   132→      case 'favorite_id':
+   133→      case 'fk_user_id':
+   134→        return value.substring(0, 8) + '...';
+   135→      case 'title':
+   136→        return String(value).length > 50 ? String(value).substring(0, 50) + '...' : String(value);
+   137→      case 'prompt_text':
+   138→        return String(value).length > 100 ? String(value).substring(0, 100) + '...' : String(value);
+   139→      case 'description':
+   140→        return String(value).length > 80 ? String(value).substring(0, 80) + '...' : String(value);
+   141→      case 'category':
+   142→        return String(value).length > 30 ? String(value).substring(0, 30) + '...' : String(value);
+   143→      case 'tags':
+   144→        if (Array.isArray(value)) {
+   145→          if (value.length === 0) return '-';
+   146→          const tagsString = value.join(', ');
+   147→          return tagsString.length > 60 ? tagsString.substring(0, 60) + '...' : tagsString;
+   148→        }
+   149→        return String(value);
+   150→      case 'created_at':
+   151→      case 'updated_at':
+   152→        return new Date(value).toLocaleString();
+   153→      default:
+   154→        return String(value);
+   155→    }
+   156→  };
+   157→
+   158→  const getColumnDisplayName = (col: string) => {
+   159→    return col; // Return the exact column name as specified
+   160→  };
+   161→
+   162→  const getPageNumbers = () => {
+   163→    const pageNumbers = [];
+   164→    const maxVisiblePages = 5;
+   165→    
+   166→    if (totalPages <= maxVisiblePages) {
+   167→      for (let i = 1; i <= totalPages; i++) {
+   168→        pageNumbers.push(i);
+   169→      }
+   170→    } else {
+   171→      const halfVisible = Math.floor(maxVisiblePages / 2);
+   172→      let startPage = Math.max(1, currentPage - halfVisible);
+   173→      let endPage = Math.min(totalPages, currentPage + halfVisible);
+   174→      
+   175→      if (startPage === 1) {
+   176→        endPage = Math.min(totalPages, maxVisiblePages);
+   177→      }
+   178→      
+   179→      if (endPage === totalPages) {
+   180→        startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+   181→      }
+   182→      
+   183→      if (startPage > 1) {
+   184→        pageNumbers.push(1);
+   185→        if (startPage > 2) {
+   186→          pageNumbers.push('...');
+   187→        }
+   188→      }
+   189→      
+   190→      for (let i = startPage; i <= endPage; i++) {
+   191→        pageNumbers.push(i);
+   192→      }
+   193→      
+   194→      if (endPage < totalPages) {
+   195→        if (endPage < totalPages - 1) {
+   196→          pageNumbers.push('...');
+   197→        }
+   198→        pageNumbers.push(totalPages);
+   199→      }
+   200→    }
+   201→    
+   202→    return pageNumbers;
+   203→  };
+   204→
+   205→  if (loading) return <div className="p-6">Loading favorite prompts...</div>;
+   206→  if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+   207→
+   208→  return (
+   209→    <div className="p-6">
+   210→      <h1 className="text-2xl font-bold text-gray-800 mb-2">Favorite Prompts Management</h1>
+   211→      <p className="text-sm text-gray-600 mb-6"><span className="font-bold">db table:</span> favorite_prompts</p>
+   212→      
+   213→      {/* Search and Filter Section */}
+   214→      <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+   215→        <div className="flex items-center space-x-4">
+   216→          <div className="flex-1">
+   217→            <label htmlFor="search" className="sr-only">Search Favorite Prompts</label>
+   218→            <div className="relative">
+   219→              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+   220→                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   221→                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+   222→                </svg>
+   223→              </div>
+   224→              <input
+   225→                type="text"
+   226→                id="search"
+   227→                value={searchTerm}
+   228→                onChange={(e) => setSearchTerm(e.target.value)}
+   229→                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+   230→                placeholder="Search by title, prompt text, description, category, tags, or ID..."
+   231→              />
+   232→            </div>
+   233→          </div>
+   234→          <button
+   235→            onClick={fetchFavoritePrompts}
+   236→            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+   237→          >
+   238→            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   239→              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+   240→            </svg>
+   241→            Refresh
+   242→          </button>
+   243→        </div>
+   244→      </div>
+   245→
+   246→      {/* Statistics Bar */}
+   247→      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+   248→        <div className="flex items-center justify-between text-sm text-gray-600">
+   249→          <span>
+   250→            Showing <span className="font-medium text-gray-900">{startIndex + 1}</span> to{' '}
+   251→            <span className="font-medium text-gray-900">{endIndex}</span> of{' '}
+   252→            <span className="font-medium text-gray-900">{totalItems}</span> favorite prompts
+   253→          </span>
+   254→          <div className="flex items-center space-x-2">
+   255→            <label htmlFor="pageSize" className="text-sm font-medium text-gray-700">
+   256→              Items per page:
+   257→            </label>
+   258→            <select
+   259→              id="pageSize"
+   260→              value={pageSize}
+   261→              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+   262→              className="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+   263→            >
+   264→              {pageSizeOptions.map(size => (
+   265→                <option key={size} value={size}>
+   266→                  {size}
+   267→                </option>
+   268→              ))}
+   269→            </select>
+   270→          </div>
+   271→        </div>
+   272→      </div>
+   273→
+   274→      {/* Table */}
+   275→      <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+   276→        <table className="min-w-full divide-y divide-gray-200">
+   277→          <thead className="bg-gray-50">
+   278→            <tr>
+   279→              {columns.map(col => (
+   280→                <th 
+   281→                  key={col} 
+   282→                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider"
+   283→                >
+   284→                  {getColumnDisplayName(col)}
+   285→                </th>
+   286→              ))}
+   287→            </tr>
+   288→          </thead>
+   289→          <tbody className="bg-white divide-y divide-gray-200">
+   290→            {currentItems.map((favoritePrompt, index) => (
+   291→              <tr key={favoritePrompt.favorite_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+   292→                {columns.map(col => (
+   293→                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+   294→                    <div className="max-w-xs">
+   295→                      {formatColumnData(col, favoritePrompt[col as keyof FavoritePrompt])}
+   296→                    </div>
+   297→                  </td>
+   298→                ))}
+   299→              </tr>
+   300→            ))}
+   301→          </tbody>
+   302→        </table>
+   303→      </div>
+   304→
+   305→      {/* Pagination Controls */}
+   306→      <div className="mt-6 flex items-center justify-between">
+   307→        <div className="flex items-center">
+   308→          <p className="text-sm text-gray-700">
+   309→            Page <span className="font-medium">{currentPage}</span> of{' '}
+   310→            <span className="font-medium">{totalPages}</span>
+   311→          </p>
+   312→        </div>
+   313→        
+   314→        <div className="flex items-center space-x-2">
+   315→          <button
+   316→            onClick={() => handlePageChange(1)}
+   317→            disabled={currentPage === 1}
+   318→            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   319→            title="First Page"
+   320→          >
+   321→            <span className="sr-only">First</span>
+   322→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   323→              <path fillRule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+   324→            </svg>
+   325→          </button>
+   326→
+   327→          <button
+   328→            onClick={() => handlePageChange(currentPage - 1)}
+   329→            disabled={currentPage === 1}
+   330→            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   331→            title="Previous Page"
+   332→          >
+   333→            <span className="sr-only">Previous</span>
+   334→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   335→              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+   336→            </svg>
+   337→          </button>
+   338→
+   339→          {getPageNumbers().map((pageNum, index) => (
+   340→            <span key={index}>
+   341→              {pageNum === '...' ? (
+   342→                <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+   343→                  ...
+   344→                </span>
+   345→              ) : (
+   346→                <button
+   347→                  onClick={() => handlePageChange(pageNum as number)}
+   348→                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+   349→                    currentPage === pageNum
+   350→                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+   351→                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+   352→                  }`}
+   353→                >
+   354→                  {pageNum}
+   355→                </button>
+   356→              )}
+   357→            </span>
+   358→          ))}
+   359→
+   360→          <button
+   361→            onClick={() => handlePageChange(currentPage + 1)}
+   362→            disabled={currentPage === totalPages}
+   363→            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   364→            title="Next Page"
+   365→          >
+   366→            <span className="sr-only">Next</span>
+   367→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   368→              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+   369→            </svg>
+   370→          </button>
+   371→
+   372→          <button
+   373→            onClick={() => handlePageChange(totalPages)}
+   374→            disabled={currentPage === totalPages}
+   375→            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+   376→            title="Last Page"
+   377→          >
+   378→            <span className="sr-only">Last</span>
+   379→            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+   380→              <path fillRule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0zm-6 0a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+   381→            </svg>
+   382→          </button>
+   383→        </div>
+   384→      </div>
+   385→
+   386→      {/* Empty State */}
+   387→      {filteredData.length === 0 && (
+   388→        <div className="text-center py-12">
+   389→          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+   390→            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+   391→          </svg>
+   392→          <h3 className="mt-2 text-sm font-medium text-gray-900">No favorite prompts found</h3>
+   393→          <p className="mt-1 text-sm text-gray-500">
+   394→            {searchTerm ? 'No favorite prompts match your search criteria.' : 'You have not saved any favorite prompts yet.'}
+   395→          </p>
+   396→        </div>
+   397→      )}
+   398→    </div>
+   399→  );
+   400→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+This is a comprehensive favorite prompts management page with search, pagination, and full CRUD functionality. Let me create the client component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+"use client";
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+interface FavoritePrompt {
+  favorite_id: string;
+  fk_user_id: string;
+  title: string;
+  prompt_text: string;
+  description: string;
+  category: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+const columns = [
+  'favorite_id',
+  'fk_user_id',
+  'title',
+  'prompt_text',
+  'description',
+  'category',
+  'tags',
+  'created_at',
+  'updated_at'
+];
+
+export default function Favprar1Client() {
+  const [data, setData] = useState<FavoritePrompt[]>([]);
+  const [filteredData, setFilteredData] = useState<FavoritePrompt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const pageSizeOptions = [5, 10, 20, 50, 100];
+  const { user } = useAuth();
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    fetchFavoritePrompts();
+  }, [user]);
+
+  useEffect(() => {
+    // Filter data based on search term
+    if (searchTerm) {
+      const filtered = data.filter(item => 
+        item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.prompt_text?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.favorite_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+    setCurrentPage(1); // Reset to first page when filtering
+  }, [searchTerm, data]);
+
+  const fetchFavoritePrompts = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!user?.id) {
+        setData([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Get user's DB id from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+        
+      if (userError || !userData) {
+        setError('Could not find user record.');
+        setData([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch favorite_prompts for this user
+      const { data: favoritePrompts, error: favoritePromptsError } = await supabase
+        .from('favorite_prompts')
+        .select('*')
+        .eq('fk_user_id', userData.id)
+        .order('created_at', { ascending: false });
+        
+      if (favoritePromptsError) throw favoritePromptsError;
+      setData(favoritePrompts || []);
+      setFilteredData(favoritePrompts || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch favorite prompts');
+      setData([]);
+      setFilteredData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Pagination calculations
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const currentItems = filteredData.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  const formatColumnData = (col: string, value: any) => {
+    if (value === null || value === undefined) return '-';
+    
+    switch (col) {
+      case 'favorite_id':
+      case 'fk_user_id':
+        return value.substring(0, 8) + '...';
+      case 'title':
+        return String(value).length > 50 ? String(value).substring(0, 50) + '...' : String(value);
+      case 'prompt_text':
+        return String(value).length > 100 ? String(value).substring(0, 100) + '...' : String(value);
+      case 'description':
+        return String(value).length > 80 ? String(value).substring(0, 80) + '...' : String(value);
+      case 'category':
+        return String(value).length > 30 ? String(value).substring(0, 30) + '...' : String(value);
+      case 'tags':
+        if (Array.isArray(value)) {
+          if (value.length === 0) return '-';
+          const tagsString = value.join(', ');
+          return tagsString.length > 60 ? tagsString.substring(0, 60) + '...' : tagsString;
+        }
+        return String(value);
+      case 'created_at':
+      case 'updated_at':
+        return new Date(value).toLocaleString();
+      default:
+        return String(value);
+    }
+  };
+
+  const getColumnDisplayName = (col: string) => {
+    return col; // Return the exact column name as specified
+  };
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      const halfVisible = Math.floor(maxVisiblePages / 2);
+      let startPage = Math.max(1, currentPage - halfVisible);
+      let endPage = Math.min(totalPages, currentPage + halfVisible);
+      
+      if (startPage === 1) {
+        endPage = Math.min(totalPages, maxVisiblePages);
+      }
+      
+      if (endPage === totalPages) {
+        startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+      }
+      
+      if (startPage > 1) {
+        pageNumbers.push(1);
+        if (startPage > 2) {
+          pageNumbers.push('...');
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push('...');
+        }
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
+  };
+
+  if (loading) return <div className="p-6">Loading favorite prompts...</div>;
+  if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">Favorite Prompts Management</h1>
+      <p className="text-sm text-gray-600 mb-6"><span className="font-bold">db table:</span> favorite_prompts</p>
+      
+      {/* Search and Filter Section */}
+      <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex-1">
+            <label htmlFor="search" className="sr-only">Search Favorite Prompts</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Search by title, prompt text, description, category, tags, or ID..."
+              />
+            </div>
+          </div>
+          <button
+            onClick={fetchFavoritePrompts}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Statistics Bar */}
+      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between text-sm text-gray-600">
+          <span>
+            Showing <span className="font-medium text-gray-900">{startIndex + 1}</span> to{' '}
+            <span className="font-medium text-gray-900">{endIndex}</span> of{' '}
+            <span className="font-medium text-gray-900">{totalItems}</span> favorite prompts
+          </span>
+          <div className="flex items-center space-x-2">
+            <label htmlFor="pageSize" className="text-sm font-medium text-gray-700">
+              Items per page:
+            </label>
+            <select
+              id="pageSize"
+              value={pageSize}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+              className="rounded-md border-gray-300 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+            >
+              {pageSizeOptions.map(size => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              {columns.map(col => (
+                <th 
+                  key={col} 
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 lowercase tracking-wider"
+                >
+                  {getColumnDisplayName(col)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {currentItems.map((favoritePrompt, index) => (
+              <tr key={favoritePrompt.favorite_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                {columns.map(col => (
+                  <td key={col} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div className="max-w-xs">
+                      {formatColumnData(col, favoritePrompt[col as keyof FavoritePrompt])}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="mt-6 flex items-center justify-between">
+        <div className="flex items-center">
+          <p className="text-sm text-gray-700">
+            Page <span className="font-medium">{currentPage}</span> of{' '}
+            <span className="font-medium">{totalPages}</span>
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handlePageChange(1)}
+            disabled={currentPage === 1}
+            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="First Page"
+          >
+            <span className="sr-only">First</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Previous Page"
+          >
+            <span className="sr-only">Previous</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          {getPageNumbers().map((pageNum, index) => (
+            <span key={index}>
+              {pageNum === '...' ? (
+                <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                  ...
+                </span>
+              ) : (
+                <button
+                  onClick={() => handlePageChange(pageNum as number)}
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                    currentPage === pageNum
+                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              )}
+            </span>
+          ))}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Next Page"
+          >
+            <span className="sr-only">Next</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => handlePageChange(totalPages)}
+            disabled={currentPage === totalPages}
+            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Last Page"
+          >
+            <span className="sr-only">Last</span>
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0zm-6 0a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Empty State */}
+      {filteredData.length === 0 && (
+        <div className="text-center py-12">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No favorite prompts found</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {searchTerm ? 'No favorite prompts match your search criteria.' : 'You have not saved any favorite prompts yet.'}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/favprar1/pclient.tsx
+```
+

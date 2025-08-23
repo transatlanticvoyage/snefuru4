@@ -124,6 +124,16 @@ export async function POST(request: NextRequest) {
         // Fetch Reddit thread data (commentability only)
         const submission = await fetchRedditThreadCommentability(redditUrl.url_datum);
         if (!submission) {
+          // Update database with failure status
+          await supabase
+            .from('redditurlsvat')
+            .update({ 
+              is_commentable_scraped_at: new Date().toISOString(),
+              is_commentable_scrape_status: 'failed',
+              is_commentable_scrape_error: 'Failed to fetch Reddit thread data'
+            })
+            .eq('url_id', redditUrl.url_id);
+          
           results.push({
             url_id: redditUrl.url_id,
             url: redditUrl.url_datum,
@@ -146,12 +156,24 @@ export async function POST(request: NextRequest) {
           .from('redditurlsvat')
           .update({ 
             is_commentable: isCommentable,
-            is_commentable_scraped_at: new Date().toISOString()
+            is_commentable_scraped_at: new Date().toISOString(),
+            is_commentable_scrape_status: 'success',
+            is_commentable_scrape_error: null
           })
           .eq('url_id', redditUrl.url_id);
         
         if (updateError) {
           console.error('❌ Database update FAILED:', updateError);
+          // Try to update just the error status
+          await supabase
+            .from('redditurlsvat')
+            .update({ 
+              is_commentable_scraped_at: new Date().toISOString(),
+              is_commentable_scrape_status: 'db_error',
+              is_commentable_scrape_error: `Database update failed: ${updateError.message}`
+            })
+            .eq('url_id', redditUrl.url_id);
+          
           results.push({
             url_id: redditUrl.url_id,
             url: redditUrl.url_datum,
@@ -175,11 +197,23 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.error(`💥 ERROR processing ${redditUrl.url_datum}:`, error);
         console.error('💥 Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        
+        // Update database with error status
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        await supabase
+          .from('redditurlsvat')
+          .update({ 
+            is_commentable_scraped_at: new Date().toISOString(),
+            is_commentable_scrape_status: 'failed',
+            is_commentable_scrape_error: errorMessage
+          })
+          .eq('url_id', redditUrl.url_id);
+        
         results.push({
           url_id: redditUrl.url_id,
           url: redditUrl.url_datum,
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: errorMessage,
           is_commentable: null
         });
       }
