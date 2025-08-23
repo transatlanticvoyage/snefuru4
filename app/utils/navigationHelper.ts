@@ -291,7 +291,8 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
     { name: 'bren1', path: '/bren1' },
     { name: 'sitejar4', path: '/sitejar4' },
     { name: 'gconjar1', path: '/gconjar1' },
-    { name: 'nwjar1', path: '/nwjar1' }
+    { name: 'nwjar1', path: '/nwjar1' },
+    { name: 'reddjar', path: '/reddjar' }
   ];
 
   // Debug logging
