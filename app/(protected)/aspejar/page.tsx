@@ -1,65 +1,10 @@
-'use client';
+import { Metadata } from 'next';
+import AspejarClient from './pclient';
 
-import { useEffect } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import AspejarTable from './components/AspejarTable';
-
-const DrenjariButtonBarDriggsmanLinks = dynamic(
-  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
-  { ssr: false }
-);
+export const metadata: Metadata = {
+  title: '/aspejar',
+};
 
 export default function AspejarPage() {
-  const { user } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-  }, [user, router]);
-
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    );
-  }
-
-  // Set page title
-  useEffect(() => {
-    document.title = '/aspejar - Snefuru';
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Address Species Manager
-            </h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            <DrenjariButtonBarDriggsmanLinks />
-            <div className="text-right">
-              <div className="text-sm text-gray-500">Address Format Management</div>
-              <div className="text-xs text-gray-400">Regional & International Standards</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content - Full Width AspejarTable */}
-      <div className="flex-1 overflow-hidden">
-        <AspejarTable />
-      </div>
-    </div>
-  );
+  return <AspejarClient />;
 }
