@@ -56,6 +56,11 @@ export default function KwjarPage() {
                   {selectedTag.tag_name}
                 </div>
               )}
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                delete kws and clear from any cncglub.kwslot*
+              </button>
             </div>
           </div>
           <div className="text-right">
