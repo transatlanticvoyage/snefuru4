@@ -28,12 +28,16 @@ export default function Cnjar1Page() {
   });
 
   useEffect(() => {
+    // Set document title
+    document.title = '/cnjar1 - Snefuru';
+  }, []);
+
+  useEffect(() => {
     if (!user) {
       router.push('/login');
       return;
     }
   }, [user, router]);
-
 
   // Save header visibility state to localStorage and update body class
   useEffect(() => {
@@ -59,11 +63,6 @@ export default function Cnjar1Page() {
       </div>
     );
   }
-
-  // Set page title
-  useEffect(() => {
-    document.title = '/cnjar1 - Snefuru';
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
