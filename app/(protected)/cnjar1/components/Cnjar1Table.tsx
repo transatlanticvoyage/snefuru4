@@ -60,7 +60,22 @@ interface Industry {
   industry_name: string | null;
 }
 
-export default function Cnjar1Table() {
+interface Cnjar1TableProps {
+  onColumnPaginationRender?: (controls: {
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  }) => void;
+  initialColumnsPerPage?: number;
+  initialColumnPage?: number;
+  onColumnPaginationChange?: (columnsPerPage: number, currentPage: number) => void;
+}
+
+export default function Cnjar1Table({ 
+  onColumnPaginationRender, 
+  initialColumnsPerPage = 8,
+  initialColumnPage = 1,
+  onColumnPaginationChange
+}: Cnjar1TableProps = {}) {
   const [data, setData] = useState<Cncglub[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -72,6 +87,10 @@ export default function Cnjar1Table() {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortField, setSortField] = useState<keyof Cncglub | string>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Column pagination states
+  const [columnsPerPage, setColumnsPerPage] = useState(initialColumnsPerPage); // Show 8 columns at a time
+  const [currentColumnPage, setCurrentColumnPage] = useState(initialColumnPage);
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -210,6 +229,7 @@ export default function Cnjar1Table() {
   useEffect(() => {
     fetchData();
   }, []);
+
 
   // Helper function to get city display name
   const getCityDisplay = (cityId: number) => {
@@ -449,10 +469,32 @@ export default function Cnjar1Table() {
     });
   }, [data, searchTerm, sortField, sortOrder, cities, industries, citySizeFilter, stateFilter, industryFilter]);
 
-  // Pagination
+  // Column pagination logic
+  const totalColumnPages = columnsPerPage === 0 ? 1 : Math.ceil(allColumns.length / columnsPerPage);
+  const startColumnIndex = columnsPerPage === 0 ? 0 : (currentColumnPage - 1) * columnsPerPage;
+  const paginatedColumns = columnsPerPage === 0 ? allColumns : allColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+  
+  // Row pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));
   const startIndex = (currentPage - 1) * (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage);
   const paginatedData = itemsPerPage === -1 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+
+  // Pass pagination components to parent (after totalColumnPages is calculated)
+  useEffect(() => {
+    if (onColumnPaginationRender) {
+      onColumnPaginationRender({
+        ColumnPaginationBar1,
+        ColumnPaginationBar2
+      });
+    }
+  }, [onColumnPaginationRender, currentColumnPage, totalColumnPages, columnsPerPage]);
+
+  // Notify parent of column pagination changes
+  useEffect(() => {
+    if (onColumnPaginationChange) {
+      onColumnPaginationChange(columnsPerPage, currentColumnPage);
+    }
+  }, [onColumnPaginationChange, columnsPerPage, currentColumnPage]);
 
   // Handle sorting
   const handleSort = (field: keyof Cncglub | string) => {
@@ -907,6 +949,190 @@ export default function Cnjar1Table() {
     );
   };
 
+  // Column Pagination Components - Define before PaginationControls
+  // Bar 1: Columns per page quantity selector
+  const ColumnPaginationBar1 = () => {
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Cols/page:</span>
+          <button
+            onClick={() => {
+              setColumnsPerPage(0);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${
+              columnsPerPage === 0 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 0 ? '#f8f782' : undefined
+            }}
+          >
+            All
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(4);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 4 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 4 ? '#f8f782' : undefined
+            }}
+          >
+            4
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(6);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 6 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 6 ? '#f8f782' : undefined
+            }}
+          >
+            6
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(8);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 8 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 8 ? '#f8f782' : undefined
+            }}
+          >
+            8
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(10);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 10 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 10 ? '#f8f782' : undefined
+            }}
+          >
+            10
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(12);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${
+              columnsPerPage === 12 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 12 ? '#f8f782' : undefined
+            }}
+          >
+            12
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Bar 2: Current column page selector
+  const ColumnPaginationBar2 = () => {
+    if (totalColumnPages <= 1) return null;
+    
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Col page:</span>
+          <button
+            onClick={() => setCurrentColumnPage(1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            First
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage - 1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Prev
+          </button>
+          
+          {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
+            const pageNum = Math.max(1, Math.min(totalColumnPages - 4, currentColumnPage - 2)) + i;
+            if (pageNum > totalColumnPages) return null;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentColumnPage(pageNum)}
+                className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+                  currentColumnPage === pageNum 
+                    ? 'text-black border-black' 
+                    : 'bg-white hover:bg-gray-200'
+                }`}
+                style={{ 
+                  fontSize: '14px', 
+                  paddingTop: '10px', 
+                  paddingBottom: '10px',
+                  backgroundColor: currentColumnPage === pageNum ? '#f8f782' : undefined
+                }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage + 1)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Next
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(totalColumnPages)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Last
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   // Pagination Controls Component
   const PaginationControls = () => (
     <div className="flex items-center space-x-4">
@@ -1166,14 +1392,14 @@ export default function Cnjar1Table() {
       {/* Table */}
       <div className="bg-white overflow-hidden">
         <div className="overflow-x-auto" style={{ maxHeight: '720px', overflowY: 'auto' }}>
-          <table className="w-full border-collapse border border-gray-200">
+          <table className="border-collapse border border-gray-200" style={{ width: 'auto' }}>
             <thead className="bg-gray-50 sticky top-0 z-10">
               {/* Additional blank header row */}
               <tr>
                 <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
                   {/* Blank cell corresponding to checkbox column */}
                 </th>
-                {allColumns.map((column, index) => {
+                {paginatedColumns.map((column, index) => {
                   let bgColorClass = '';
                   let tableText = '';
                   
@@ -1235,7 +1461,7 @@ export default function Cnjar1Table() {
                     />
                   </div>
                 </th>
-                {allColumns.map((column) => (
+                {paginatedColumns.map((column) => (
                   <th
                     key={column.key}
                     className={`text-left ${(!column.isJoined || column.sortable) ? 'cursor-pointer hover:bg-gray-100' : ''} border border-gray-200 px-2 py-1 ${
@@ -1281,7 +1507,7 @@ export default function Cnjar1Table() {
                       />
                     </div>
                   </td>
-                  {allColumns.map((column) => (
+                  {paginatedColumns.map((column) => (
                     <td 
                       key={column.key} 
                       className={`border border-gray-200 ${

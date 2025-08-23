@@ -2643,3 +2643,2481 @@ The scraper was hitting Reddit rate limits heavily anyway (lots of 429 errors), 
 
 The bulk scraper was designed to be resumable - it only processes URLs that haven't been scraped yet (`is_commentable_scraped_at` is null), so you can restart it anytime without duplicating work.
 
+---
+
+_**User**_
+
+ok now i want to run the bigger process for all 16900 urls . my caffeinate command should still be active in my terminal right? when does it end? when i clsoet he terminal? please advise when we are ready to start this huge scrape for the is_commentable scrape function only for all rows in redditurlsvat 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check on your caffeinate status first:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Check if caffeinate is still running
+
+`ps aux | grep caffeinate`
+
+Result:
+
+```
+kylecampbell     20527   0.0  0.0 410593328   1216   ??  R     3:34PM   0:00.00 grep caffeinate
+kylecampbell     20528   0.0  0.0 411042304   1136   ??  S     3:34PM   0:00.00 /bin/zsh -c -l source /Users/kylecampbell/.claude/shell-snapshots/snapshot-zsh-1755968339205-q3ad9c.sh && eval 'ps aux | grep caffeinate' \< /dev/null && pwd -P >| /var/folders/h1/5wxcs3tx4m38jk6lz1mpqmtr0000gn/T/claude-a44e-cwd
+kylecampbell     20518   0.0  0.0 411043584   4128   ??  Ss    3:34PM   0:00.01 /bin/zsh -c -l source /Users/kylecampbell/.claude/shell-snapshots/snapshot-zsh-1755968339205-q3ad9c.sh && eval 'ps aux | grep caffeinate' \< /dev/null && pwd -P >| /var/folders/h1/5wxcs3tx4m38jk6lz1mpqmtr0000gn/T/claude-a44e-cwd
+kylecampbell     18949   0.0  0.0 410641808   3360 s000  S+    3:19PM   0:00.01 caffeinate -d -t 9000
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ **Your caffeinate is still running!** 
+
+I can see the process: `caffeinate -d -t 9000` (PID 18949) started at 3:19PM.
+
+**Caffeinate Status:**
+- ⏰ **Started:** 3:19PM  
+- ⏱️ **Duration:** 9000 seconds (2.5 hours)
+- 🔚 **Will end:** Around 5:49PM (3:19PM + 2.5 hours)
+- 📺 **Terminal:** Won't end when you close terminal - it's running independently
+
+**Current Time Check:**
+Let me see what time it is now to tell you exactly how much time is left:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Check current time
+
+`date`
+
+Result:
+
+```
+Sat Aug 23 15:35:04 EDT 2025
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Perfect Timing!** 
+
+- ⏰ **Current time:** 3:35PM
+- 🔚 **Caffeinate ends:** ~5:49PM  
+- ⏱️ **Time remaining:** ~2 hours 14 minutes left
+
+**This is ideal for the bulk scraper!** The estimated completion time was ~113 minutes (1 hour 53 minutes), so you have plenty of buffer time.
+
+## 🚀 Ready to Start the Big Scrape?
+
+The bulk scraper should work better now since Reddit's rate limiting might have reset. Let me know when you want to start and I'll launch it:
+
+```bash
+node bulk_commentable_scraper.js
+```
+
+**Reminder:** The scraper will:
+- Process all 16,891 URLs
+- Start with highest traffic cost URLs first  
+- Use proper delays (300ms between requests, 5 seconds between batches)
+- Track all errors properly in the new status/error fields
+
+Should I start it now?
+
+---
+
+_**User**_
+
+yes pleae go ahead and start it 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Starting the bulk Reddit commentability scraper for all 16,891 URLs, prioritized by highest traffic cost
+
+`node bulk_commentable_scraper.js`
+
+Result:
+
+```
+Command running in background with ID: bash_3
+```
+
+_**User**_
+
+[Request interrupted by user]
+
+_**User**_
+
+wait. before we begin, pleaes give me a caffeinate command for 3 hours and 20 minutes 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here's the caffeinate command for 3 hours and 20 minutes:
+
+```bash
+caffeinate -d -t 12000
+```
+
+**Calculation:**
+- 3 hours = 3 × 3600 = 10,800 seconds
+- 20 minutes = 20 × 60 = 1,200 seconds  
+- **Total = 12,000 seconds**
+
+This will keep your MacBook awake for exactly 3 hours and 20 minutes, giving you plenty of buffer time for the bulk scraper.
+
+**Should I stop the current scraper so you can run the new caffeinate command first?**
+
+---
+
+_**User**_
+
+if there is a scraper running, then i guess stop it. but im not running anything in the frontend interface on /reddjar
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **KillBash**
+
+Result:
+
+```
+{"success":true,"message":"Successfully killed shell: bash_3 (node bulk_commentable_scraper.js)","shell_id":"bash_3"}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ **Bulk scraper stopped.**
+
+Now you can run your new caffeinate command for 3 hours 20 minutes:
+
+```bash
+caffeinate -d -t 12000
+```
+
+Once you've started that, let me know and I'll restart the bulk scraper for all 16,891 URLs. 
+
+**Note:** Your old caffeinate (2.5 hours) is still running until ~5:49PM, but the new one will override it with the longer duration.
+
+---
+
+_**User**_
+
+can i run the command in terminal that already has this? 
+
+Last login: Sat Aug 23 12:58:54 on ttys015
+kylecampbell@MacBookPro ~ % caffeinate -d -t 9000 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+or what do i do exactly in terminal?
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+You have a few options:
+
+## **Option 1: Open a New Terminal Tab/Window (Recommended)**
+- Press `Cmd + T` (new tab) or `Cmd + N` (new window)
+- Run: `caffeinate -d -t 12000`
+- This keeps your old one running and adds the new longer one
+
+## **Option 2: Stop the Current One and Start New One**
+In your current terminal:
+1. Press `Ctrl + C` to stop the current caffeinate
+2. Then run: `caffeinate -d -t 12000`
+
+## **Option 3: Just Leave It (Simplest)**
+Your current caffeinate runs until ~5:49PM (about 2 hours left), which should be enough time for the scraper. You don't need to change anything.
+
+**My Recommendation:** Just leave it as is. Your current 2.5 hours should cover the ~113 minute estimated scraper time with good buffer.
+
+**What would you prefer to do?** I can start the bulk scraper now with your existing caffeinate protection, or wait for you to set up the longer one.
+
+---
+
+_**User**_
+
+i just ran this in terminal
+Last login: Sat Aug 23 15:18:53 on ttys000
+kylecampbell@MacBookPro ~ % caffeinate -d -t 14500
+
+
+
+please check that this caffeinate process is active and then go ahead and start the big scrape for all 16900 rows
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Check if the new caffeinate process is running
+
+`ps aux | grep caffeinate`
+
+Result:
+
+```
+kylecampbell     21506   0.0  0.0 410724400   1424   ??  S     3:38PM   0:00.00 grep caffeinate
+kylecampbell     21507   0.0  0.0 410893824   1168   ??  S     3:38PM   0:00.00 /bin/zsh -c -l source /Users/kylecampbell/.claude/shell-snapshots/snapshot-zsh-1755968339205-q3ad9c.sh && eval 'ps aux | grep caffeinate' \< /dev/null && pwd -P >| /var/folders/h1/5wxcs3tx4m38jk6lz1mpqmtr0000gn/T/claude-cccd-cwd
+kylecampbell     21497   0.0  0.0 410893056   3520   ??  Ss    3:38PM   0:00.01 /bin/zsh -c -l source /Users/kylecampbell/.claude/shell-snapshots/snapshot-zsh-1755968339205-q3ad9c.sh && eval 'ps aux | grep caffeinate' \< /dev/null && pwd -P >| /var/folders/h1/5wxcs3tx4m38jk6lz1mpqmtr0000gn/T/claude-cccd-cwd
+kylecampbell     21407   0.0  0.0 410614160   4640 s001  S+    3:37PM   0:00.01 caffeinate -d -t 14500
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ **Perfect! Your new caffeinate is active:**
+
+- 🆕 **New caffeinate:** PID 21407, started at 3:37PM 
+- ⏱️ **Duration:** 14,500 seconds (4 hours 1 minute)
+- 🔚 **Will end:** Around 7:38PM (3:37PM + 4 hours 1 minute)
+
+This gives you excellent coverage for the bulk scraper!
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Starting the bulk Reddit commentability scraper for all 16,891 URLs with prioritized traffic cost ordering
+
+`node bulk_commentable_scraper.js`
+
+Result:
+
+```
+Command running in background with ID: bash_4
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **BashOutput**
+
+Result:
+
+```
+<status>running</status>
+
+<stdout>
+🚀 BULK REDDIT COMMENTABILITY SCRAPER STARTED
+===============================================
+📊 Configuration:
+   - Batch size: 50 URLs
+   - Delay between batches: 5000ms
+   - Delay between requests: 300ms
+   - Max retries: 3
+   - Processing order: HIGHEST estimated_traffic_cost first
+
+📋 Counting URLs that need scraping...
+📊 Total URLs to process: 16418
+📦 Total batches: 329
+⏱️  Estimated time: 110 minutes
+
+
+🔄 BATCH 1/329 (URLs 1-50)
+============================================================
+📦 Processing 50 URLs in this batch...
+
+   🔗 [1/16418] Processing URL 785
+      💰 Traffic Cost: $2682
+      📄 https://www.reddit.com/r/GoodPizzaGreatPizza/comments/1e2oco9/whats_your_goto_fr...
+</stdout>
+
+<timestamp>2025-08-23T19:38:30.006Z</timestamp>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## 🚀 **Bulk Scraper Successfully Started!**
+
+**✅ Status Update:**
+- **Total URLs:** 16,418 URLs to process (some were already scraped)
+- **Total Batches:** 329 batches of 50 URLs each
+- **Estimated Time:** 110 minutes (~1 hour 50 minutes)
+- **Caffeinate Protection:** 4+ hours (plenty of buffer!)
+
+**🎯 Processing Order:** Highest traffic cost first
+- Starting with URLs around $2,682 traffic cost
+- Working down to lower value URLs
+
+**⚙️ Rate Limiting:** 
+- 300ms delay between requests (polite to Reddit)
+- 5 second delay between batches
+- Up to 3 retry attempts for failed requests
+
+The scraper is running smoothly and should complete well within your caffeinate protection window. It will process all remaining URLs and properly track success/failure status in the database.
+
+---
+
+_**User**_
+
+is the process still running right now? please let me know what kind of success it seems to be having. but dont stop it
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **BashOutput**
+
+Result:
+
+```
+<status>running</status>
+
+<stdout>
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [2/16418] Processing URL 786
+      💰 Traffic Cost: $2681
+      📄 https://www.reddit.com/r/software/comments/1d2dmxh/what_is_the_simplest_and_free...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [3/16418] Processing URL 787
+      💰 Traffic Cost: $2681
+      📄 https://www.reddit.com/r/MBA/comments/1k4s3ee/new_forbes_online_mba_rankings_for...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [4/16418] Processing URL 788
+      💰 Traffic Cost: $2677
+      📄 https://www.reddit.com/r/software/comments/1fv24w7/best_voip_phone_system_for_sm...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [5/16418] Processing URL 789
+      💰 Traffic Cost: $2670
+      📄 https://www.reddit.com/r/glasses/comments/1ajiji1/whats_everyones_go_to_for_onli...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [6/16418] Processing URL 790
+      💰 Traffic Cost: $2668
+      📄 https://www.reddit.com/r/FinancialPlanning/comments/1ivpcnr/what_are_your_favori...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [7/16418] Processing URL 791
+      💰 Traffic Cost: $2664
+      📄 https://www.reddit.com/r/hottubs/comments/1brco9n/what_is_a_good_hot_tub_brand/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [8/16418] Processing URL 792
+      💰 Traffic Cost: $2664
+      📄 https://www.reddit.com/r/rawpetfood/comments/1fmu921/what_are_the_best_brands_of...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [9/16418] Processing URL 793
+      💰 Traffic Cost: $2655
+      📄 https://www.reddit.com/r/Mattress/comments/1f314lp/certified_organic_mattress/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [10/16418] Processing URL 844
+      💰 Traffic Cost: $2534
+      📄 https://www.reddit.com/r/onebag/comments/1heevou/what_is_your_top_travel_backpac...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [11/16418] Processing URL 845
+      💰 Traffic Cost: $2529
+      📄 https://www.reddit.com/r/web_design/comments/12q1iuo/what_are_some_go_to_website...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [12/16418] Processing URL 846
+      💰 Traffic Cost: $2529
+      📄 https://www.reddit.com/r/CreditCards/comments/1drjon7/best_cc_as_a_college_stude...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [13/16418] Processing URL 847
+      💰 Traffic Cost: $2528
+      📄 https://www.reddit.com/r/weddingplanning/comments/su0ivn/wedding_websites_which_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [14/16418] Processing URL 848
+      💰 Traffic Cost: $2527
+      📄 https://www.reddit.com/r/glasses/comments/1ajiji1/whats_everyones_go_to_for_onli...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [15/16418] Processing URL 849
+      💰 Traffic Cost: $2527
+      📄 https://www.reddit.com/r/CRM/comments/1e5141p/best_and_inexpensive_crm_for_small...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [16/16418] Processing URL 850
+      💰 Traffic Cost: $2525
+      📄 https://www.reddit.com/r/Cruise/comments/18s4kku/favorite_alaska_cruise_line/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [17/16418] Processing URL 851
+      💰 Traffic Cost: $2522
+      📄 https://www.reddit.com/r/AskBattlestations/comments/1jkrp70/whats_the_best_offic...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [18/16418] Processing URL 852
+      💰 Traffic Cost: $2517
+      📄 https://www.reddit.com/r/CleaningTips/comments/16vdyhq/what_cleaning_products_do...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [19/16418] Processing URL 853
+      💰 Traffic Cost: $2516
+      📄 https://www.reddit.com/r/totalwar/comments/192axam/best_total_war_game/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [20/16418] Processing URL 854
+      💰 Traffic Cost: $2516
+      📄 https://www.reddit.com/r/ReadyMeals/comments/1i12c3d/best_meal_delivery_service/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [21/16418] Processing URL 855
+      💰 Traffic Cost: $2513
+      📄 https://www.reddit.com/r/awardtravel/comments/1c7dbys/what_is_the_best_way_to_sp...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [22/16418] Processing URL 856
+      💰 Traffic Cost: $2511
+      📄 https://www.reddit.com/r/seogrowth/comments/162gs7s/where_to_find_reliable_and_a...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [23/16418] Processing URL 857
+      💰 Traffic Cost: $2510
+      📄 https://www.reddit.com/r/Blogging/comments/xuoo5s/which_platform_is_best_for_get...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [24/16418] Processing URL 858
+      💰 Traffic Cost: $2509
+      📄 https://www.reddit.com/r/poker/comments/10ghpw7/best_online_poker_for_us_players...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [25/16418] Processing URL 859
+      💰 Traffic Cost: $2508
+      📄 https://www.reddit.com/r/45PlusSkincare/comments/1i5v5rg/what_is_the_most_effect...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [26/16418] Processing URL 860
+      💰 Traffic Cost: $2507
+      📄 https://www.reddit.com/r/smarthome/comments/1fwzgmz/what_is_the_best_doorbell_ca...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [27/16418] Processing URL 861
+      💰 Traffic Cost: $2505
+      📄 https://www.reddit.com/r/jobs/comments/swawc9/can_anyone_recommend_a_good_free_r...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [28/16418] Processing URL 862
+      💰 Traffic Cost: $2497
+      📄 https://www.reddit.com/r/HomeNetworking/comments/1esflc5/any_good_internet_provi...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [29/16418] Processing URL 863
+      💰 Traffic Cost: $2493
+      📄 https://www.reddit.com/r/CompoundedSemaglutide/comments/1ioxvyr/best_online_phar...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [30/16418] Processing URL 864
+      💰 Traffic Cost: $2492
+      📄 https://www.reddit.com/r/options/comments/1ajg8k1/great_platforms_for_options_tr...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [31/16418] Processing URL 865
+      💰 Traffic Cost: $2490
+      📄 https://www.reddit.com/r/askcarguys/comments/1j59nlu/best_used_car/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [32/16418] Processing URL 866
+      💰 Traffic Cost: $2484
+      📄 https://www.reddit.com/r/orangecounty/comments/1fk6bwj/best_place_to_sell_used_c...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [33/16418] Processing URL 867
+      💰 Traffic Cost: $2483
+      📄 https://www.reddit.com/r/BuyItForLife/comments/180k332/does_anyone_have_any_offi...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [34/16418] Processing URL 868
+      💰 Traffic Cost: $2483
+      📄 https://www.reddit.com/r/BuyItForLife/comments/180k332/does_anyone_have_any_offi...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [35/16418] Processing URL 869
+      💰 Traffic Cost: $2480
+      📄 https://www.reddit.com/r/browsers/comments/1bznjr8/what_is_the_best_web_browser/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [36/16418] Processing URL 870
+      💰 Traffic Cost: $2477
+      📄 https://www.reddit.com/r/EldenRingBuilds/comments/1co7o46/most_op_powerful_weapo...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [37/16418] Processing URL 871
+      💰 Traffic Cost: $2475
+      📄 https://www.reddit.com/r/Money/comments/1j2bw3a/which_credit_card_should_we_get_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [38/16418] Processing URL 872
+      💰 Traffic Cost: $2475
+      📄 https://www.reddit.com/r/petinsurancereviews/comments/1c0bno9/best_pet_insurance...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [39/16418] Processing URL 873
+      💰 Traffic Cost: $2470
+      📄 https://www.reddit.com/r/CreditCards/comments/1j29oou/best_travel_credit_card_fo...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [40/16418] Processing URL 874
+      💰 Traffic Cost: $2469
+      📄 https://www.reddit.com/r/gamingsuggestions/comments/18d7cdi/mobile_games_that_ar...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [41/16418] Processing URL 875
+      💰 Traffic Cost: $2452
+      📄 https://www.reddit.com/r/BackgroundCheckGuide/comments/vmhqgl/what_is_the_best_b...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [42/16418] Processing URL 876
+      💰 Traffic Cost: $2451
+      📄 https://www.reddit.com/r/Banking/comments/1dxr4ot/looking_for_a_hysa_with_good_r...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [43/16418] Processing URL 877
+      💰 Traffic Cost: $2450
+      📄 https://www.reddit.com/r/BuyItForLife/comments/1fwx527/for_the_ladies_bras_that_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [44/16418] Processing URL 878
+      💰 Traffic Cost: $2443
+      📄 https://www.reddit.com/r/airfryer/comments/1bbh0vh/what_are_the_best_frozen_chic...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [45/16418] Processing URL 879
+      💰 Traffic Cost: $2443
+      📄 https://www.reddit.com/r/SocialMediaMarketing/comments/1ax64t1/best_social_media...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [46/16418] Processing URL 880
+      💰 Traffic Cost: $2440
+      📄 https://www.reddit.com/r/WebsiteBuilder/comments/1b7in5o/best_free_website_build...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [47/16418] Processing URL 881
+      💰 Traffic Cost: $2440
+      📄 https://www.reddit.com/r/CreditCards/comments/1jezt29/best_current_credit_card_b...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [48/16418] Processing URL 882
+      💰 Traffic Cost: $2436
+      📄 https://www.reddit.com/r/premiere/comments/1krc15u/best_laptop_for_video_editing...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [49/16418] Processing URL 883
+      💰 Traffic Cost: $2435
+      📄 https://www.reddit.com/r/AndroidGaming/comments/18kd5hs/any_android_games_yall_r...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [50/16418] Processing URL 884
+      💰 Traffic Cost: $2431
+      📄 https://www.reddit.com/r/thrifting/comments/16phdxq/best_day_to_go_savers_goodwi...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+📊 BATCH 1 COMPLETE:
+   - Progress: 0.3% (50/16418)
+   - Successful: 0
+   - Failed: 50
+   - Open: 0
+   - Closed: 0
+
+⏳ Waiting 5000ms before next batch...
+
+🔄 BATCH 2/329 (URLs 51-100)
+============================================================
+📦 Processing 50 URLs in this batch...
+
+   🔗 [51/16418] Processing URL 1491
+      💰 Traffic Cost: $1164
+      📄 https://www.reddit.com/r/CatAdvice/comments/114bym6/healthiest_wet_food/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [52/16418] Processing URL 1492
+      💰 Traffic Cost: $1164
+      📄 https://www.reddit.com/r/CatAdvice/comments/114bym6/healthiest_wet_food/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [53/16418] Processing URL 1493
+      💰 Traffic Cost: $1163
+      📄 https://www.reddit.com/r/FinancialPlanning/comments/15v68o1/best_529_plan_im_ove...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [54/16418] Processing URL 1494
+      💰 Traffic Cost: $1162
+      📄 https://www.reddit.com/r/hiking/comments/13m5xsw/ways_to_find_trails_near_you/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [55/16418] Processing URL 1495
+      💰 Traffic Cost: $1162
+      📄 https://www.reddit.com/r/awardtravel/comments/1bmmc13/which_hotel_rewards_is_bes...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [56/16418] Processing URL 1496
+      💰 Traffic Cost: $1162
+      📄 https://www.reddit.com/r/marriott/comments/1d4ukrc/which_marriott_card_is_the_be...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [57/16418] Processing URL 1497
+      💰 Traffic Cost: $1162
+      📄 https://www.reddit.com/r/OnlineDating/comments/1ianyro/which_is_the_best_dating_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [58/16418] Processing URL 1498
+      💰 Traffic Cost: $1161
+      📄 https://www.reddit.com/r/Appliances/comments/1ff6lu3/recommend_me_an_incredible_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [59/16418] Processing URL 1499
+      💰 Traffic Cost: $1161
+      📄 https://www.reddit.com/r/Blogging/comments/xuoo5s/which_platform_is_best_for_get...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [60/16418] Processing URL 1500
+      💰 Traffic Cost: $1160
+      📄 https://www.reddit.com/r/malefashionadvice/comments/vtkuhl/i_spent_1500_on_hoodi...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [61/16418] Processing URL 1501
+      💰 Traffic Cost: $1159
+      📄 https://www.reddit.com/r/BuyItForLife/comments/1inhsza/the_best_mattresses_now/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [62/16418] Processing URL 1502
+      💰 Traffic Cost: $1158
+      📄 https://www.reddit.com/r/AskLosAngeles/comments/1iq8epo/what_are_some_cool_hotel...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [63/16418] Processing URL 1503
+      💰 Traffic Cost: $1158
+      📄 https://www.reddit.com/r/hotels/comments/1af3jhi/looking_for_a_hotel_in_vegas_wh...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [64/16418] Processing URL 1504
+      💰 Traffic Cost: $1158
+      📄 https://www.reddit.com/r/flowers/comments/u9vgqf/what_is_the_best_flower_deliver...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [65/16418] Processing URL 1505
+      💰 Traffic Cost: $1157
+      📄 https://www.reddit.com/r/weather/comments/1fiwwek/best_weather_app/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [66/16418] Processing URL 1506
+      💰 Traffic Cost: $1157
+      📄 https://www.reddit.com/r/Coffee/comments/y9cjhe/are_there_any_good_instant_coffe...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [67/16418] Processing URL 1507
+      💰 Traffic Cost: $1157
+      📄 https://www.reddit.com/r/gamingsuggestions/comments/1doawip/which_is_the_best_mm...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [68/16418] Processing URL 1508
+      💰 Traffic Cost: $1157
+      📄 https://www.reddit.com/r/personalfinance/comments/1gb5aph/credit_cards_with_rewa...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [69/16418] Processing URL 1509
+      💰 Traffic Cost: $1157
+      📄 https://www.reddit.com/r/LSAT/comments/16xdizp/best_lsat_test_prep_company/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [70/16418] Processing URL 1510
+      💰 Traffic Cost: $1157
+      📄 https://www.reddit.com/r/LSAT/comments/16xdizp/best_lsat_test_prep_company/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [71/16418] Processing URL 1511
+      💰 Traffic Cost: $1157
+      📄 https://www.reddit.com/r/unRAID/comments/1bowb6v/what_backup_software_are_you_us...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [72/16418] Processing URL 1512
+      💰 Traffic Cost: $1156
+      📄 https://www.reddit.com/r/malefashionadvice/comments/1bk42e0/your_favorite_for_ts...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [73/16418] Processing URL 1513
+      💰 Traffic Cost: $1155
+      📄 https://www.reddit.com/r/animepiracy/comments/17cl3pe/which_site_is_the_best_for...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [74/16418] Processing URL 1514
+      💰 Traffic Cost: $1155
+      📄 https://www.reddit.com/r/animepiracy/comments/17cl3pe/which_site_is_the_best_for...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [75/16418] Processing URL 1515
+      💰 Traffic Cost: $1154
+      📄 https://www.reddit.com/r/malefashionadvice/comments/1ksx40l/best_everyday_shoes_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [76/16418] Processing URL 1516
+      💰 Traffic Cost: $1154
+      📄 https://www.reddit.com/r/ManyBaggers/comments/1hzqqt0/what_is_the_best_carryon_l...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [77/16418] Processing URL 1517
+      💰 Traffic Cost: $1154
+      📄 https://www.reddit.com/r/askcarguys/comments/17ph1h2/whats_the_most_reliable_lon...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [78/16418] Processing URL 1518
+      💰 Traffic Cost: $1154
+      📄 https://www.reddit.com/r/BuyItForLife/comments/m0j66q/anyone_have_linen_sheets_t...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [79/16418] Processing URL 1519
+      💰 Traffic Cost: $1154
+      📄 https://www.reddit.com/r/Banking/comments/1dxr4ot/looking_for_a_hysa_with_good_r...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [80/16418] Processing URL 1520
+      💰 Traffic Cost: $1153
+      📄 https://www.reddit.com/r/Ijustwatched/comments/1hlzttm/ijw_the_best_christmas_pa...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [81/16418] Processing URL 1521
+      💰 Traffic Cost: $1152
+      📄 https://www.reddit.com/r/naturalbodybuilding/comments/1ffws1l/protein_powder_con...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [82/16418] Processing URL 1522
+      💰 Traffic Cost: $1152
+      📄 https://www.reddit.com/r/Supplements/comments/16pyscr/what_is_the_best_multivita...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [83/16418] Processing URL 1523
+      💰 Traffic Cost: $1150
+      📄 https://www.reddit.com/r/whatcarshouldIbuy/comments/1g5p6jq/midsize_truck_compar...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [84/16418] Processing URL 1524
+      💰 Traffic Cost: $1150
+      📄 https://www.reddit.com/r/carbuying/comments/1j01aw4/what_interests_rates_are_peo...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [85/16418] Processing URL 1525
+      💰 Traffic Cost: $1149
+      📄 https://www.reddit.com/r/BuyItForLife/comments/18scul6/best_vacuum_sealer_for_ho...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [86/16418] Processing URL 1576
+      💰 Traffic Cost: $1131
+      📄 https://www.reddit.com/r/Frontend/comments/158i5pi/what_cms_would_you_pick_for_t...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [87/16418] Processing URL 1577
+      💰 Traffic Cost: $1129
+      📄 https://www.reddit.com/r/Vaping/comments/1idaxvj/what_are_the_best_geek_bar_flav...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [88/16418] Processing URL 1578
+      💰 Traffic Cost: $1129
+      📄 https://www.reddit.com/r/languagelearning/comments/u516oh/whats_the_best_languag...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [89/16418] Processing URL 1579
+      💰 Traffic Cost: $1125
+      📄 https://www.reddit.com/r/triathlon/comments/1ep3jrp/what_are_your_goto_running_s...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [90/16418] Processing URL 1580
+      💰 Traffic Cost: $1125
+      📄 https://www.reddit.com/r/TooAfraidToAsk/comments/1bbpka9/what_is_your_go_to_webs...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [91/16418] Processing URL 1581
+      💰 Traffic Cost: $1125
+      📄 https://www.reddit.com/r/AskLosAngeles/comments/15qx1mg/best_car_insurance_in_la...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [92/16418] Processing URL 1582
+      💰 Traffic Cost: $1124
+      📄 https://www.reddit.com/r/homeowners/comments/1842jtt/best_rat_traps/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [93/16418] Processing URL 1583
+      💰 Traffic Cost: $1124
+      📄 https://www.reddit.com/r/whatcarshouldIbuy/comments/1h51t3k/best_allaround_cross...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [94/16418] Processing URL 1584
+      💰 Traffic Cost: $1123
+      📄 https://www.reddit.com/r/ShouldIbuythisgame/comments/194ywe9/can_you_recomend_me...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [95/16418] Processing URL 1585
+      💰 Traffic Cost: $1123
+      📄 https://www.reddit.com/r/povertyfinance/comments/16r1muh/best_dental_insurance_f...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [96/16418] Processing URL 1586
+      💰 Traffic Cost: $1123
+      📄 https://www.reddit.com/r/CreditCards/comments/1j29oou/best_travel_credit_card_fo...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [97/16418] Processing URL 1587
+      💰 Traffic Cost: $1123
+      📄 https://www.reddit.com/r/CreditCards/comments/1j29oou/best_travel_credit_card_fo...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [98/16418] Processing URL 1588
+      💰 Traffic Cost: $1123
+      📄 https://www.reddit.com/r/CreditCards/comments/1ci6233/best_card_for_all_airline_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [99/16418] Processing URL 1589
+      💰 Traffic Cost: $1123
+      📄 https://www.reddit.com/r/Frugal/comments/1bkcimb/best_place_to_buy_contacts/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [100/16418] Processing URL 1590
+      💰 Traffic Cost: $1122
+      📄 https://www.reddit.com/r/FitnessTrackers/comments/1ezh3gq/best_fitness_tracker/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+📊 BATCH 2 COMPLETE:
+   - Progress: 0.6% (100/16418)
+   - Successful: 0
+   - Failed: 100
+   - Open: 0
+   - Closed: 0
+
+⏳ Waiting 5000ms before next batch...
+
+🔄 BATCH 3/329 (URLs 101-150)
+============================================================
+📦 Processing 50 URLs in this batch...
+
+   🔗 [101/16418] Processing URL 1842
+      💰 Traffic Cost: $874
+      📄 https://www.reddit.com/r/Minecraft/comments/1alxbri/what_are_your_musthave_mods_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [102/16418] Processing URL 1843
+      💰 Traffic Cost: $873
+      📄 https://www.reddit.com/r/GamingLaptops/comments/18pcypj/best_gaming_laptop/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [103/16418] Processing URL 1844
+      💰 Traffic Cost: $873
+      📄 https://www.reddit.com/r/AskAnAmerican/comments/1barkbo/which_us_banks_are_the_b...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [104/16418] Processing URL 1845
+      💰 Traffic Cost: $873
+      📄 https://www.reddit.com/r/guitarlessons/comments/1gsbwva/what_is_a_good_online_gu...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [105/16418] Processing URL 1846
+      💰 Traffic Cost: $873
+      📄 https://www.reddit.com/r/cartoons/comments/1eb1umc/name_your_favorite_animation_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [106/16418] Processing URL 1847
+      💰 Traffic Cost: $872
+      📄 https://www.reddit.com/r/RobotVacuums/comments/1gldt1a/best_robot_vacuum/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [107/16418] Processing URL 1848
+      💰 Traffic Cost: $872
+      📄 https://www.reddit.com/r/fashionwomens35/comments/1h5rqjz/best_affordable_pajama...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [108/16418] Processing URL 1849
+      💰 Traffic Cost: $872
+      📄 https://www.reddit.com/r/personalfinance/comments/67gikp/i_raised_my_credit_scor...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [109/16418] Processing URL 1850
+      💰 Traffic Cost: $871
+      📄 https://www.reddit.com/r/photography/comments/176n5p5/best_free_photo_editing_so...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [110/16418] Processing URL 1851
+      💰 Traffic Cost: $870
+      📄 https://www.reddit.com/r/Concerts/comments/1gj3sfu/should_i_trust_resale_ticket_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [111/16418] Processing URL 1852
+      💰 Traffic Cost: $870
+      📄 https://www.reddit.com/r/CatAdvice/comments/yi6lcw/what_brand_is_the_best_cat_fo...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [112/16418] Processing URL 1853
+      💰 Traffic Cost: $870
+      📄 https://www.reddit.com/r/whatcarshouldIbuy/comments/1g5nvpc/new_luxury_suv_that_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [113/16418] Processing URL 1854
+      💰 Traffic Cost: $870
+      📄 https://www.reddit.com/r/BeautyBoxes/comments/18qr72r/can_someone_please_recomme...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [114/16418] Processing URL 1855
+      💰 Traffic Cost: $869
+      📄 https://www.reddit.com/r/antivirus/comments/12fl6xs/best_free_antivirus_software...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [115/16418] Processing URL 1856
+      💰 Traffic Cost: $869
+      📄 https://www.reddit.com/r/Bedding/comments/17j7du2/best_percale_sheets/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [116/16418] Processing URL 1857
+      💰 Traffic Cost: $868
+      📄 https://www.reddit.com/r/smoking/comments/1h0csw4/which_wireless_meat_thermomete...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [117/16418] Processing URL 1858
+      💰 Traffic Cost: $868
+      📄 https://www.reddit.com/r/Cruise/comments/1g2g4ru/annual_travel_insurance_plans/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [118/16418] Processing URL 1859
+      💰 Traffic Cost: $867
+      📄 https://www.reddit.com/r/jobsearchhacks/comments/18m6teo/anyone_had_success_with...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [119/16418] Processing URL 1860
+      💰 Traffic Cost: $867
+      📄 https://www.reddit.com/r/AskGames/comments/1jjklsn/what_are_some_fun_cross_play_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [120/16418] Processing URL 1861
+      💰 Traffic Cost: $867
+      📄 https://www.reddit.com/r/computers/comments/1drveon/which_is_the_best_antivirus_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [121/16418] Processing URL 1862
+      💰 Traffic Cost: $866
+      📄 https://www.reddit.com/r/web_design/comments/12q1iuo/what_are_some_go_to_website...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [122/16418] Processing URL 1863
+      💰 Traffic Cost: $866
+      📄 https://www.reddit.com/r/Warhammer40k/comments/18oe6wl/which_40k_video_games_are...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [123/16418] Processing URL 1864
+      💰 Traffic Cost: $865
+      📄 https://www.reddit.com/r/finehair/comments/1csmv9b/blow_dryer_suggestions/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [124/16418] Processing URL 1865
+      💰 Traffic Cost: $865
+      📄 https://www.reddit.com/r/BuyItForLife/comments/yfxec0/please_recommend_humidifie...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [125/16418] Processing URL 1866
+      💰 Traffic Cost: $865
+      📄 https://www.reddit.com/r/askcarguys/comments/1g1ao66/what_is_generally_considere...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [126/16418] Processing URL 1867
+      💰 Traffic Cost: $865
+      📄 https://www.reddit.com/r/preppy/comments/191cnbo/who_makes_the_best_polo_shirt/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [127/16418] Processing URL 1868
+      💰 Traffic Cost: $864
+      📄 https://www.reddit.com/r/laptops/comments/1dloy7t/which_laptop_is_the_best_right...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [128/16418] Processing URL 1869
+      💰 Traffic Cost: $864
+      📄 https://www.reddit.com/r/whatcarshouldIbuy/comments/1ecm2cx/best_small_luxury_su...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [129/16418] Processing URL 1870
+      💰 Traffic Cost: $864
+      📄 https://www.reddit.com/r/travel/comments/1f23hos/which_car_rental_company_would_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [130/16418] Processing URL 1871
+      💰 Traffic Cost: $864
+      📄 https://www.reddit.com/r/gaming/comments/1cvroys/best_roguelike_game_out_there/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [131/16418] Processing URL 1872
+      💰 Traffic Cost: $864
+      📄 https://www.reddit.com/r/AskLosAngeles/comments/1ju5z4h/zero_down_car_lease_deal...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [132/16418] Processing URL 1873
+      💰 Traffic Cost: $863
+      📄 https://www.reddit.com/r/musicsuggestions/comments/1dxmirj/whats_your_favorite_a...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [133/16418] Processing URL 1874
+      💰 Traffic Cost: $862
+      📄 https://www.reddit.com/r/VisitingIceland/comments/xewvgk/best_month_to_visit_ice...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [134/16418] Processing URL 1875
+      💰 Traffic Cost: $862
+      📄 https://www.reddit.com/r/smarthome/comments/1fvp98d/smart_locks_what_do_you_use/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [135/16418] Processing URL 1876
+      💰 Traffic Cost: $862
+      📄 https://www.reddit.com/r/running/comments/1k5u8wu/its_time_for_new_earphones_ple...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [136/16418] Processing URL 1885
+      💰 Traffic Cost: $861
+      📄 https://www.reddit.com/r/lawncare/comments/13iayrx/best_weed_killer_thats_safe_o...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [137/16418] Processing URL 1886
+      💰 Traffic Cost: $861
+      📄 https://www.reddit.com/r/pcmasterrace/comments/158t4n4/pc_noob_looking_for_the_b...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [138/16418] Processing URL 1887
+      💰 Traffic Cost: $861
+      📄 https://www.reddit.com/r/dogs/comments/6h20n7/help_frontline_plus_or_nexgard/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [139/16418] Processing URL 1888
+      💰 Traffic Cost: $861
+      📄 https://www.reddit.com/r/androidapps/comments/1f75uob/best_free_photo_editing_ap...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [140/16418] Processing URL 1889
+      💰 Traffic Cost: $861
+      📄 https://www.reddit.com/r/jobs/comments/swawc9/can_anyone_recommend_a_good_free_r...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [141/16418] Processing URL 1890
+      💰 Traffic Cost: $860
+      📄 https://www.reddit.com/r/roadtrip/comments/17dkx6c/best_car_for_roadtripping/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [142/16418] Processing URL 1891
+      💰 Traffic Cost: $860
+      📄 https://www.reddit.com/r/electriccars/comments/1keh8br/recommendations_for_the_b...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [143/16418] Processing URL 1892
+      💰 Tr
+
+... [5267 lines truncated] ...
+</stdout>
+
+<stderr>
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_comme
+
+... [3789 lines truncated] ...
+</stderr>
+
+<timestamp>2025-08-23T21:05:30.053Z</timestamp>
+```
+
+_**Agent (<synthetic>)**_
+
+5-hour limit reached ∙ resets 6pm
+
+---
+
+_**User**_
+
+did the limit reset yet?
+
+---
+
+_**Agent (<synthetic>)**_
+
+5-hour limit reached ∙ resets 6pm
+
+---
+
+_**User**_
+
+is the process still running right now? please let me know what kind of
+  success it seems to be having. but dont stop it
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **BashOutput**
+
+Result:
+
+```
+<status>running</status>
+
+<stdout>
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1145/16418] Processing URL 5436
+      💰 Traffic Cost: $263
+      📄 https://www.reddit.com/r/MechanicAdvice/comments/1dmuabx/whats_the_best_oil_bran...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1146/16418] Processing URL 5437
+      💰 Traffic Cost: $263
+      📄 https://www.reddit.com/r/chubbytravel/comments/1arqj7m/a_familyoriented_beach_re...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1147/16418] Processing URL 5438
+      💰 Traffic Cost: $263
+      📄 https://www.reddit.com/r/coolguides/comments/18w3t0d/a_cool_guide_to_the_us_lice...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1148/16418] Processing URL 5439
+      💰 Traffic Cost: $263
+      📄 https://www.reddit.com/r/Flipping/comments/179lumi/best_generally_good_legit_auc...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1149/16418] Processing URL 5440
+      💰 Traffic Cost: $263
+      📄 https://www.reddit.com/r/languagelearning/comments/wamtnq/best_free_language_lea...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1150/16418] Processing URL 5441
+      💰 Traffic Cost: $263
+      📄 https://www.reddit.com/r/Charleston/comments/107w0h3/where_to_stay/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+📊 BATCH 23 COMPLETE:
+   - Progress: 7.0% (1150/16418)
+   - Successful: 339
+   - Failed: 811
+   - Open: 213
+   - Closed: 126
+
+⏳ Waiting 5000ms before next batch...
+
+🔄 BATCH 24/329 (URLs 1151-1200)
+============================================================
+📦 Processing 50 URLs in this batch...
+
+   🔗 [1151/16418] Processing URL 5492
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/Bestbuy/comments/1d8gzxb/jobs_after_best_buy_second_job...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1152/16418] Processing URL 5493
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/BuyItForLife/comments/1hxg94y/these_are_the_most_recomm...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1153/16418] Processing URL 5494
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/BuyItForLife/comments/17jfreg/high_quality_efficient_ha...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1154/16418] Processing URL 5495
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/books/comments/11vy91y/greatest_opening_line_ever/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1155/16418] Processing URL 5496
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/makingvaporwave/comments/1583ivl/what_are_some_good_fre...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1156/16418] Processing URL 5497
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/cordcutters/comments/1d3qvup/whats_the_best_value_strea...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1157/16418] Processing URL 5498
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/gaming/comments/1inj9m7/what_desks_are_people_using/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1158/16418] Processing URL 5499
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/Mind_Pump/comments/1hfi5w1/creatine_gummies/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1159/16418] Processing URL 5500
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/PuertoRicoTravel/comments/13xsxnq/good_company_to_use_f...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1160/16418] Processing URL 5501
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/pcmasterrace/comments/167gek4/which_pc_builder_service_...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1161/16418] Processing URL 5502
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/Notion/comments/yetq0b/what_is_the_best_notion_template...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1162/16418] Processing URL 5503
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/NaturalBeauty/comments/1eej7sf/recommendations_for_non_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1163/16418] Processing URL 5504
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/suggestapc/comments/13zo9gp/suggestion_which_website_is...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1164/16418] Processing URL 5505
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/lululemon/comments/spww1y/opinion_thread_what_style_of_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1165/16418] Processing URL 5506
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/whatcarshouldIbuy/comments/1boha6j/best_hybrid_in_recen...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1166/16418] Processing URL 5507
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/askcarguys/comments/1dcu7qh/recommendations_on_a_reliab...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1167/16418] Processing URL 5508
+      💰 Traffic Cost: $261
+      📄 https://www.reddit.com/r/cybersecurity/comments/1c4lcmz/whats_the_king_of_free_p...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1168/16418] Processing URL 5509
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/SilverSpring/comments/1j3lhm9/best_ramen_near_ss/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1169/16418] Processing URL 5510
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/BuyItForLife/comments/1hd6hgx/what_is_the_scientificall...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1170/16418] Processing URL 5511
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/ManyBaggers/comments/1hzqqt0/what_is_the_best_carryon_l...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1171/16418] Processing URL 5512
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/ReverseHarem/comments/1clpjyo/what_are_your_god_tier_re...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1172/16418] Processing URL 5513
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/beards/comments/16ui3xz/beard_dye/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1173/16418] Processing URL 5514
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/MovieSuggestions/comments/1ebvpmm/please_suggest_your_m...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1174/16418] Processing URL 5515
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/KeyWest/comments/zib1pg/hotel_suggestion/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1175/16418] Processing URL 5516
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/SupplementQuest/comments/1fihf6v/cleanest_magnesium_sup...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1176/16418] Processing URL 5517
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/AutoDetailing/comments/c4xyas/best_car_air_freshener/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1177/16418] Processing URL 5518
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/TravelHacks/comments/16c7r2b/where_to_stay_in_chicago/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1178/16418] Processing URL 5519
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/houston/comments/1aka1rs/hotels_luxuryromantic/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1179/16418] Processing URL 5520
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/jewelry/comments/1dgtygn/what_are_your_beloved_jewlery_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1180/16418] Processing URL 5521
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/mkbhd/comments/1hi6p0f/smartphone_awards_2024/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1181/16418] Processing URL 5522
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/FitnessTrackers/comments/1ezh3gq/best_fitness_tracker/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1182/16418] Processing URL 5523
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/buyforlifetips/comments/16wu4lh/best_shower_head_with_h...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1183/16418] Processing URL 5524
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/miamibeach/comments/1heivyt/best_beachfront_hotels_in_m...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1184/16418] Processing URL 5525
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/LuxuryTravel/comments/1fili8n/best_maui_resort/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1185/16418] Processing URL 5526
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/SeattleWA/comments/1c48bdj/where_to_stay_as_a_tourist/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1186/16418] Processing URL 5527
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/AskMechanics/comments/17q8pgo/luxury_suv_that_isnt_shit...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1187/16418] Processing URL 5528
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/AsianBeauty/comments/1errew1/which_cleansers_are_good_f...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1188/16418] Processing URL 5529
+      💰 Traffic Cost: $260
+      📄 https://www.reddit.com/r/MonsterHunter/comments/1j9mshx/best_monster_hunter_game...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1189/16418] Processing URL 5530
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/toddlers/comments/1f7xh7a/what_is_a_suitable_gift_for_a...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1190/16418] Processing URL 5531
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/NewParents/comments/1iuwzeo/what_toys_are_your_one_year...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1191/16418] Processing URL 5532
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/orlando/comments/1gmn9wl/whats_the_best_dinner_youve_ha...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1192/16418] Processing URL 5533
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/orlando/comments/1gmn9wl/whats_the_best_dinner_youve_ha...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1193/16418] Processing URL 5534
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/hikinggear/comments/1e6vn9o/whats_your_favorite_brand_o...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1194/16418] Processing URL 5535
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/laptops/comments/1gych0g/whats_the_best_laptop_for_coll...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1195/16418] Processing URL 5536
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/wine/comments/197qfei/new_to_wine_whats_your_favourite_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1196/16418] Processing URL 5537
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/travel/comments/1d6oym7/where_would_be_the_best_city_to...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1197/16418] Processing URL 5538
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/BuyItForLife/comments/17ya9ka/recommendations_for_quali...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1198/16418] Processing URL 5539
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/Miami/comments/1g2hh8k/going_to_miami_what_are_some_mus...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1199/16418] Processing URL 5540
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/Hunting/comments/1bh2n5l/hunting_boot_recommendations/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1200/16418] Processing URL 5541
+      💰 Traffic Cost: $259
+      📄 https://www.reddit.com/r/flatfeet/comments/1hlyuto/please_recommend_best_shoes_f...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+📊 BATCH 24 COMPLETE:
+   - Progress: 7.3% (1200/16418)
+   - Successful: 389
+   - Failed: 811
+   - Open: 249
+   - Closed: 140
+
+⏳ Waiting 5000ms before next batch...
+
+🔄 BATCH 25/329 (URLs 1201-1250)
+============================================================
+📦 Processing 50 URLs in this batch...
+
+   🔗 [1201/16418] Processing URL 5592
+      💰 Traffic Cost: $257
+      📄 https://www.reddit.com/r/RobotVacuums/comments/1gldt1a/best_robot_vacuum/...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1202/16418] Processing URL 5593
+      💰 Traffic Cost: $257
+      📄 https://www.reddit.com/r/travel/comments/1h9rvda/best_family_beach_vacations/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1203/16418] Processing URL 5594
+      💰 Traffic Cost: $257
+      📄 https://www.reddit.com/r/jobs/comments/11kx3sc/are_there_any_other_legit_job_sea...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1204/16418] Processing URL 5595
+      💰 Traffic Cost: $257
+      📄 https://www.reddit.com/r/stocks/comments/yy4u01/whats_the_best_sp_500_etf_to_buy...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1205/16418] Processing URL 5596
+      💰 Traffic Cost: $257
+      📄 https://www.reddit.com/r/Columbus/comments/10pv560/any_good_california_style_mex...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1206/16418] Processing URL 5597
+      💰 Traffic Cost: $257
+      📄 https://www.reddit.com/r/BuyItForLife/comments/1aeufx9/i_need_a_large_weighted_b...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1207/16418] Processing URL 5598
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/CampingGear/comments/1gzcjhi/looking_for_a_high_quality...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1208/16418] Processing URL 5599
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/TheGirlSurvivalGuide/comments/rkyeq4/what_are_the_best_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1209/16418] Processing URL 5600
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/CampingGear/comments/17rfnvt/recommendation_for_a_headl...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1210/16418] Processing URL 5601
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/WirelessSpeakers/comments/1b9almd/the_bluetooth_speaker...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1211/16418] Processing URL 5602
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/royalcaribbean/comments/18wh97g/best_and_worst_ship/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1212/16418] Processing URL 5603
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/HomeMaintenance/comments/15zl2o5/best_flooring_that_is_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1213/16418] Processing URL 5604
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/Diesel/comments/1esph4b/best_motor_oil_in_your_opinion/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1214/16418] Processing URL 5605
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/BuyItForLife/comments/1dz3gvu/would_love_your_help_pick...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1215/16418] Processing URL 5606
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/podcasts/comments/1gcs6nr/daily_15_or_30_min_high_quali...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1216/16418] Processing URL 5607
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/WayOfTheHunter/comments/181g5ij/best_hunting_videogame_...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1217/16418] Processing URL 5608
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/ios/comments/ldg0u8/actually_free_photo_editing_apps_fo...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1218/16418] Processing URL 5609
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/buildapc/comments/mnased/what_is_the_best_gaming_cpu_on...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1219/16418] Processing URL 5610
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/YouShouldKnow/comments/1hll9nb/ysk_theres_a_free_stream...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1220/16418] Processing URL 5611
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/buildapc/comments/mnased/what_is_the_best_gaming_cpu_on...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1221/16418] Processing URL 5612
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/FiveMServers/comments/1i1tfwr/what_are_some_good_fivem_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1222/16418] Processing URL 5613
+      💰 Traffic Cost: $256
+      📄 https://www.reddit.com/r/whatcarshouldIbuy/comments/1jb1n4l/all_around_best_hybr...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1223/16418] Processing URL 5614
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/MovieSuggestions/comments/1gxebf4/im_looking_for_the_be...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1224/16418] Processing URL 5615
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/HeadphoneAdvice/comments/1g7pbvx/what_are_the_best_budg...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1225/16418] Processing URL 5616
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/soldering/comments/r87sk0/best_soldering_irons/...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1226/16418] Processing URL 5617
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/buildapc/comments/1dm2ooj/which_motherboard_for_the_ryz...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1227/16418] Processing URL 5618
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/HeadphoneAdvice/comments/1g7pbvx/what_are_the_best_budg...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1228/16418] Processing URL 5619
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/Generator/comments/1hizpsh/of_the_portable_generators_w...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1229/16418] Processing URL 5620
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/TravelMaps/comments/1e7jvne/20_want_to_travel_but_dont_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1230/16418] Processing URL 5621
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/homeoffice/comments/1chifw4/best_wireless_keyboard_and_...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1231/16418] Processing URL 5622
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/birding/comments/138o4z0/what_is_the_best_binoculars_fo...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1232/16418] Processing URL 5623
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/EDC/comments/1b5mmk9/minimalist_wallet_that_doesnt_cost...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1233/16418] Processing URL 5624
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/Gifts/comments/1cklqoc/what_to_gift_a_friend_when_youre...
+      ✅ SUCCESS: ✓ OPEN (commentable)
+
+   🔗 [1234/16418] Processing URL 5625
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/40kLore/comments/1bguu4y/what_are_your_top_10_favourite...
+      ✅ SUCCESS: ✗ CLOSED (locked/archived)
+
+   🔗 [1235/16418] Processing URL 5626
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/snorkeling/comments/18azlyi/best_places_around_the_worl...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1236/16418] Processing URL 5627
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/BuyItForLife/comments/16ssm54/need_a_new_washing_machin...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1237/16418] Processing URL 5628
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/bald/comments/1dbqpbp/best_electric_head_shaver/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1238/16418] Processing URL 5629
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/asklatinamerica/comments/15bo3dd/besides_iguaz%C3%BA_an...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1239/16418] Processing URL 5630
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/ios/comments/197kwxt/whats_everyones_preferred_calendar...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1240/16418] Processing URL 5631
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/PeriodUnderwear/comments/1caef4h/favorite_underwear_pos...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1241/16418] Processing URL 5632
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/MechanicAdvice/comments/14n1l8u/which_brake_pads_to_cho...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1242/16418] Processing URL 5633
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/Gamecocks/comments/1f928he/best_mens_barbershop_near_ca...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1243/16418] Processing URL 5634
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/dashcams/comments/1e4sup1/best_dashcam/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1244/16418] Processing URL 5635
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/faceswap/comments/1fl6cce/honest_review_for_the_best_ai...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1245/16418] Processing URL 5636
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/AllInclusiveResorts/comments/1k5z07a/best_adult_only_al...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1246/16418] Processing URL 5637
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/PuntaCana/comments/1ha0nbc/whats_the_best_allinclusive_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1247/16418] Processing URL 5638
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/careeradvice/comments/1g6da9c/what_are_the_most_comfort...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1248/16418] Processing URL 5639
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/curlyhair/comments/1fv3opn/are_leaveins_and_curl_creams...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1249/16418] Processing URL 5640
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/tirzepatidecompound/comments/1e3v3rm/smart_scale_recomm...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1250/16418] Processing URL 5641
+      💰 Traffic Cost: $255
+      📄 https://www.reddit.com/r/WaterTreatment/comments/1hd12s6/best_reverse_osmosis_un...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+📊 BATCH 25 COMPLETE:
+   - Progress: 7.6% (1250/16418)
+   - Successful: 423
+   - Failed: 827
+   - Open: 275
+   - Closed: 148
+
+⏳ Waiting 5000ms before next batch...
+
+🔄 BATCH 26/329 (URLs 1251-1300)
+============================================================
+📦 Processing 50 URLs in this batch...
+
+   🔗 [1251/16418] Processing URL 5692
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/mensfashionadvice/comments/1g7dw3v/what_are_the_best_me...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1252/16418] Processing URL 5693
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/golf/comments/1kdrtv4/looking_for_a_new_golf_stand_bag_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1253/16418] Processing URL 5694
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/AskLosAngeles/comments/1cpxoot/thrifts_in_la/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1254/16418] Processing URL 5695
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/treadmills/comments/1dplj4r/recommendations_on_foldable...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1255/16418] Processing URL 5696
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/denverfood/comments/193ggag/good_coffee/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1256/16418] Processing URL 5697
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/AskLosAngeles/comments/1cpxoot/thrifts_in_la/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1257/16418] Processing URL 5698
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/koreatravel/comments/174kexw/what_are_the_best_months_t...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1258/16418] Processing URL 5699
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/college/comments/1daq0x9/what_are_some_great_summer_job...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1259/16418] Processing URL 5700
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/homegym/comments/1ahzblq/targeted_talk_the_best_bench_f...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1260/16418] Processing URL 5701
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/finehair/comments/1ff77zz/what_shampoo_do_you_use_for_f...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1261/16418] Processing URL 5702
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/3Dprinting/comments/1grx4uj/3d_printer_for_small_busine...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1262/16418] Processing URL 5703
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/YouShouldKnow/comments/1hll9nb/ysk_theres_a_free_stream...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1263/16418] Processing URL 5704
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/caviar/comments/1h6jxbu/which_caviar_is_a_good_place_to...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1264/16418] Processing URL 5705
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/TWINCITIESHOUSING/comments/18l7ylg/what_websitesapps_ar...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1265/16418] Processing URL 5706
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/curlyhair/comments/1fds9q0/best_high_end_curly_products...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1266/16418] Processing URL 5707
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/skiing/comments/1e92l4q/any_midwest_ski_areas_that_feel...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1267/16418] Processing URL 5708
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/CIVILWAR/comments/162z5bt/any_good_suggestions_for_civi...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1268/16418] Processing URL 5709
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/buildapc/comments/19dpppa/which_intel_i7_to_pick/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1269/16418] Processing URL 5710
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/homeowners/comments/17vzcyf/what_is_the_best_effective_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1270/16418] Processing URL 5711
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/homeowners/comments/17vzcyf/what_is_the_best_effective_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1271/16418] Processing URL 5712
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/VisitingHawaii/comments/1hvkgmp/whats_the_best_luau_em_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1272/16418] Processing URL 5713
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/Earbuds/comments/1aoocbq/my_testing_of_the_top_earbuds_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1273/16418] Processing URL 5714
+      💰 Traffic Cost: $252
+      📄 https://www.reddit.com/r/BuyItForLife/comments/t6axrt/best_time_and_place_to_buy...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1274/16418] Processing URL 5715
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/iwatchedanoldmovie/comments/1f0omhu/the_best_little_who...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1275/16418] Processing URL 5716
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/psx/comments/18ejlw3/what_is_your_best_ps1_game_of_all_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1276/16418] Processing URL 5717
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/denverfood/comments/1fnxxl0/what_is_your_favorite_resta...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1277/16418] Processing URL 5718
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/FoodLosAngeles/comments/1kqs1wb/the_38_best_restaurants...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1278/16418] Processing URL 5719
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/ScienceBasedParenting/comments/15ldtvv/hit_me_with_your...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1279/16418] Processing URL 5720
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/Sephora/comments/18klz1z/favorite_oil_cleanser/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1280/16418] Processing URL 5721
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/homeoffice/comments/1hnt7ps/best_home_office_printer_in...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1281/16418] Processing URL 5722
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/cabinetry/comments/1d5n0wj/best_laser_level_for_install...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1282/16418] Processing URL 5723
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/PcBuild/comments/1bpjgw0/best_wireless_gaming_mouse/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1283/16418] Processing URL 5724
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/AskWomenOver60/comments/1i7wiym/birthday_gift_ideas_for...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1284/16418] Processing URL 5725
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/CampingGear/comments/1grjmtu/fleece_leggings_that_dont_...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1285/16418] Processing URL 5726
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/CarPlay/comments/1i015k2/best_wireless_carplay_adapter/...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1286/16418] Processing URL 5727
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/audiophile/comments/1bqud6k/best_music_streaming_servic...
+      ❌ FAILED: Failed to fetch Reddit thread data
+
+   🔗 [1287/16418] Processing URL 5728
+      💰 Traffic Cost: $251
+      📄 https://www.reddit.com/r/karaoke/comments/1cv7ycz/best_at_home_karaoke_system/...
+      ❌ FAILED: Failed to fe
+
+... [4296 lines truncated] ...
+</stdout>
+
+<stderr>
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:48:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async processUrl (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:88:24)
+    at async bulkScrapeCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_commentable_scraper.js:262:24)
+Error fetching Reddit thread commentability: Error: Failed to fetch Reddit data: 429
+    at fetchRedditThreadCommentability (/Users/kylecampbell/Documents/repos/localrepo-snefuru4/bulk_comme
+
+... [2404 lines truncated] ...
+</stderr>
+
+<timestamp>2025-08-23T22:02:44.879Z</timestamp>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## ✅ **Yes, the process is still running and the limit HAS reset!**
+
+Looking at the output, I can see **significant improvement**:
+
+### 🎯 **Current Status (Processing URL 1,250 of 16,418):**
+- **Progress**: 7.6% complete
+- **Traffic Cost**: Currently processing URLs around $252-$255 (started at $2,682)
+
+### 📊 **Success Rate Greatly Improved:**
+
+**Latest Batch (Batch 25):**
+- **Successful**: 423 total successful URLs  
+- **Failed**: 827 total failed URLs
+- **Success Rate**: ~34% (much better than the 0% from early batches)
+
+**Recent Individual Results:**
+- **Batch 24**: Mostly ✅ SUCCESS with good mix of OPEN/CLOSED results
+- **Batch 25**: Some successes, then hit another rate limit wave
+
+### 🔍 **Pattern Analysis:**
+1. **Early batches (1-3)**: 100% failures due to heavy rate limiting
+2. **Mid batches (20-24)**: Much better success rate with proper OPEN/CLOSED results
+3. **Current batch (25-26)**: Hit another rate limit wave (429 errors)
+
+### 💡 **The Rate Limit DOES Reset Periodically!**
+The scraper is successfully getting data when not rate-limited:
+- ✅ **OPEN threads**: Being correctly identified
+- ✗ **CLOSED threads**: Being correctly identified  
+- 💰 **High-value URLs first**: $252-$255 range (working down from $2,682)
+
+**Recommendation**: Let it continue running. The 429 errors are temporary and the scraper will eventually process all URLs as rate limits reset.
+

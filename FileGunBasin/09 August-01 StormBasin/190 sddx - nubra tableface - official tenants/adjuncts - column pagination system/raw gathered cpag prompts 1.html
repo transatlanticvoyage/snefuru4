@@ -1,0 +1,63 @@
+
+
+NEED PROMPT HERE FOR ADDING COLUMN PAGINATION IN GENERAL TO THESE PAGES
+
+Please view the two button bars for “column pagination” on the kwjar page.
+
+Implement two button bars like this on the /cnjar1 page.
+
+Place them above the current two button bars for “row pagination” that already exist on the cnjar1 page.
+
+Make sure they are styled the same as the button bars on the kwjar example page.
+
+Ensure the system actively works to filter the UI table grid on the page using these column pagination options.
+
+———————————————————————
+
+please add these url parameters
+
+cpag_qty
+cpag_spec
+
+these should be on /kwjar page
+
+they should apply to the column pagination system
+
+this way user can visit url that already has the same settings active
+
+the first one means "qty" of columns per page (applies to first column pagination button bar)
+
+the second one means "spec" or "specific" page in the column pagination selected (applies to second button bar on our page for column pagination)
+
+
+———————————————————————
+
+Is it possible to do the following?
+
+I want the following UI columns to be excluded from the normal column pagination:
+
+keyword_id
+keyword_datum
+search_volume
+cpc
+
+We already have the checkbox column, which is presumably excluded in this manner.
+
+So now we should have the checkbox plus the other four UI columns listed above always appearing at the far left of the table.
+
+Then, the column pagination settings should apply only to the other columns that are not in this list.
+
+In effect, I’m trying to create “sticky columns” that represent the core identity of each row. Currently, only the checkbox column always appears this way, but I want all of these important columns to appear in the same way.
+
+No matter what column pagination setting is selected by the user, these columns will always remain visible on the left of the table, while the pagination controls switch the other columns to the right.
+
+
+———————————————————————
+
+
+please alter the utg on /cnjar1 page so that the <table> element is not taking up 100% the width of its parent
+
+the table should only take up the width of its contents (columns)
+
+also please make sure each ui column is only taking up enough space to hold its contents (it may already be configured like this - I'm not sure)
+

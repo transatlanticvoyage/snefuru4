@@ -27,6 +27,22 @@ export default function Cnjar1Client() {
     return true;
   });
 
+  // Column pagination controls state
+  const [columnPaginationControls, setColumnPaginationControls] = useState<{
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  } | null>(null);
+
+  // Column pagination URL parameter states
+  const [columnsPerPage, setColumnsPerPage] = useState(8);
+  const [currentColumnPage, setCurrentColumnPage] = useState(1);
+
+  // Handle column pagination changes from table component
+  const handleColumnPaginationChange = (newColumnsPerPage: number, newCurrentPage: number) => {
+    setColumnsPerPage(newColumnsPerPage);
+    setCurrentColumnPage(newCurrentPage);
+  };
+
   useEffect(() => {
     if (!user) {
       router.push('/login');
@@ -89,6 +105,20 @@ export default function Cnjar1Client() {
         </button>
       </div>
 
+      {/* Column Pagination Button Bars */}
+      {columnPaginationControls && (
+        <div className="px-6 py-2 bg-white border-b">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              {columnPaginationControls.ColumnPaginationBar1()}
+            </div>
+            <div className="flex items-center">
+              {columnPaginationControls.ColumnPaginationBar2()}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Drenjari Links at Top */}
       <div className="px-6 py-4">
         <DrenjariButtonBarDriggsmanLinks />
@@ -96,7 +126,12 @@ export default function Cnjar1Client() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
-        <Cnjar1Table />
+        <Cnjar1Table
+          onColumnPaginationRender={setColumnPaginationControls}
+          initialColumnsPerPage={columnsPerPage}
+          initialColumnPage={currentColumnPage}
+          onColumnPaginationChange={handleColumnPaginationChange}
+        />
       </div>
     </div>
   );
