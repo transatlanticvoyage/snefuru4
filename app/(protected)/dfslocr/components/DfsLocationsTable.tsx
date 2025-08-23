@@ -215,15 +215,39 @@ export default function DfsLocationsTable() {
         throw error;
       }
       
-      // Apply client-side filtering for "before comma" searches
+      // Apply client-side filtering for special search modes
       let filteredResults = results || [];
+      
       if (searchOnlyBeforeComma) {
+        // Filter to only search before first comma
         filteredResults = (results || []).filter(location => {
           const locationName = location.location_name || '';
           const beforeComma = locationName.split(',')[0].trim();
           return beforeComma.toLowerCase().includes(term.toLowerCase());
         });
         console.log(`🔍 Before comma filter: ${results?.length || 0} → ${filteredResults.length}`);
+      } else if (term.includes(',')) {
+        // Multi-segment search: user typed comma-separated terms
+        const searchSegments = term.split(',').map(seg => seg.trim().toLowerCase()).filter(seg => seg.length > 0);
+        
+        filteredResults = (results || []).filter(location => {
+          const locationName = location.location_name || '';
+          const locationSegments = locationName.split(',').map(seg => seg.trim().toLowerCase());
+          
+          // Check if each search segment matches the corresponding location segment (or any segment)
+          return searchSegments.every((searchSeg, index) => {
+            // First try exact position match
+            if (index < locationSegments.length && locationSegments[index].includes(searchSeg)) {
+              return true;
+            }
+            // Then try any position match as fallback
+            return locationSegments.some(locSeg => locSeg.includes(searchSeg));
+          });
+        });
+        
+        console.log(`🔍 Multi-segment search for "${term}":`, 
+          `Search segments: [${searchSegments.join(', ')}]`, 
+          `Results: ${results?.length || 0} → ${filteredResults.length}`);
       }
       
       // Sort results by relevance (client-side sorting for better relevance)

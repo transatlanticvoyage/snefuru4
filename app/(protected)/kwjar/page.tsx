@@ -1,14 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
 import KeywordsHubTable from './components/KeywordsHubTable';
+import TagsPlenchPopup from './components/TagsPlenchPopup';
 
 export default function KwjarPage() {
   const { user } = useAuth();
   const router = useRouter();
+  
+  // Tags plench popup state
+  const [isTagsPopupOpen, setIsTagsPopupOpen] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<{ tag_id: number; tag_name: string } | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -39,6 +44,19 @@ export default function KwjarPage() {
           <div className="flex items-center space-x-6">
             <h1 className="text-2xl font-bold text-gray-800">🔍 Keywords Hub</h1>
             <ZhedoriButtonBar />
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setIsTagsPopupOpen(true)}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                tags plench button
+              </button>
+              {selectedTag && (
+                <div className="text-sm text-gray-600 font-medium">
+                  {selectedTag.tag_name}
+                </div>
+              )}
+            </div>
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-500">DataForSEO Integration</div>
@@ -49,8 +67,21 @@ export default function KwjarPage() {
 
       {/* Main Content - Full Width KeywordsHubTable */}
       <div className="flex-1 overflow-hidden">
-        <KeywordsHubTable />
+        <KeywordsHubTable selectedTagId={selectedTag?.tag_id} />
       </div>
+
+      {/* Tags Plench Popup */}
+      {isTagsPopupOpen && (
+        <TagsPlenchPopup
+          isOpen={isTagsPopupOpen}
+          onClose={() => setIsTagsPopupOpen(false)}
+          onSelectTag={(tag) => {
+            setSelectedTag(tag);
+            setIsTagsPopupOpen(false);
+          }}
+          selectedTag={selectedTag}
+        />
+      )}
     </div>
   );
 }

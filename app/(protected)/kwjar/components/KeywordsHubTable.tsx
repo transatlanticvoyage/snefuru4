@@ -60,7 +60,11 @@ const columns: ColumnDefinition[] = [
   { key: 'last_updated_by', label: 'last_updated_by', type: 'text' }
 ];
 
-export default function KeywordsHubTable() {
+interface KeywordsHubTableProps {
+  selectedTagId?: number;
+}
+
+export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<KeywordRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,10 +129,34 @@ export default function KeywordsHubTable() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data: keywords, error } = await supabase
+      
+      let query = supabase
         .from('keywordshub')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
+
+      // If a tag is selected, filter by keywords that have this tag
+      if (selectedTagId) {
+        // Get keyword IDs that have this tag
+        const { data: taggedKeywordIds, error: tagError } = await supabase
+          .from('keywordshub_tag_relations')
+          .select('fk_keyword_id')
+          .eq('fk_tag_id', selectedTagId);
+
+        if (tagError) throw tagError;
+
+        const keywordIds = taggedKeywordIds.map(rel => rel.fk_keyword_id);
+        
+        if (keywordIds.length > 0) {
+          query = query.in('keyword_id', keywordIds);
+        } else {
+          // No keywords have this tag, return empty array
+          setData([]);
+          setLoading(false);
+          return;
+        }
+      }
+
+      const { data: keywords, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
       
@@ -143,7 +171,7 @@ export default function KeywordsHubTable() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedTagId]);
 
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
