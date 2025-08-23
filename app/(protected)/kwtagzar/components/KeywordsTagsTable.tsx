@@ -18,6 +18,7 @@ interface KeywordTag {
   created_at: string;
   updated_at: string;
   user_id: string;
+  keyword_count?: number;
 }
 
 const columns = [
@@ -33,6 +34,7 @@ const columns = [
     type: 'number', 
     width: '180px' 
   },
+  { key: 'keyword_count', label: 'count of keywords', type: 'number', width: '120px' },
   { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
   { key: 'tag_order', label: 'tag_order', type: 'number', width: '120px' },
   { key: 'created_at', label: 'created_at', type: 'datetime', width: '180px' },
@@ -101,7 +103,40 @@ export default function KeywordsTagsTable() {
         throw new Error(result.error || 'Failed to fetch data');
       }
       
-      setData(result.tags || []);
+      const tags = result.tags || [];
+      
+      if (tags.length > 0) {
+        // Get keyword counts for each tag
+        const tagIds = tags.map((tag: KeywordTag) => tag.tag_id);
+        
+        const { data: tagCounts, error: countError } = await supabase
+          .from('keywordshub_tag_relations')
+          .select('fk_tag_id')
+          .in('fk_tag_id', tagIds);
+        
+        if (countError) {
+          console.error('Error fetching tag counts:', countError);
+        }
+        
+        // Count keywords per tag
+        const countsByTagId: Record<number, number> = {};
+        if (tagCounts) {
+          tagCounts.forEach(relation => {
+            const tagId = relation.fk_tag_id;
+            countsByTagId[tagId] = (countsByTagId[tagId] || 0) + 1;
+          });
+        }
+        
+        // Add keyword counts to tags
+        const tagsWithCounts = tags.map((tag: KeywordTag) => ({
+          ...tag,
+          keyword_count: countsByTagId[tag.tag_id] || 0
+        }));
+        
+        setData(tagsWithCounts);
+      } else {
+        setData([]);
+      }
     } catch (err) {
       console.error('Error fetching tags:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch data');

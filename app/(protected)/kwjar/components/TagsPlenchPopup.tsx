@@ -17,6 +17,7 @@ interface KeywordTag {
   created_at: string;
   updated_at: string;
   user_id: string;
+  keyword_count?: number;
 }
 
 interface TagsPlenchPopupProps {
@@ -27,6 +28,7 @@ interface TagsPlenchPopupProps {
 }
 
 const columns = [
+  { key: 'keyword_count', label: 'count of keywords', type: 'number', width: '120px' },
   { key: 'filter', label: 'Filter', type: 'action', width: '80px' },
   { key: 'tag_id', label: 'tag_id', type: 'number', width: '80px' },
   { key: 'tag_name', label: 'tag_name', type: 'text', width: '200px' },
@@ -84,7 +86,38 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
 
       if (error) throw error;
       
-      setData(tags || []);
+      if (tags && tags.length > 0) {
+        // Get keyword counts for each tag
+        const tagIds = tags.map(tag => tag.tag_id);
+        
+        const { data: tagCounts, error: countError } = await supabase
+          .from('keywordshub_tag_relations')
+          .select('fk_tag_id')
+          .in('fk_tag_id', tagIds);
+        
+        if (countError) {
+          console.error('Error fetching tag counts:', countError);
+        }
+        
+        // Count keywords per tag
+        const countsByTagId: Record<number, number> = {};
+        if (tagCounts) {
+          tagCounts.forEach(relation => {
+            const tagId = relation.fk_tag_id;
+            countsByTagId[tagId] = (countsByTagId[tagId] || 0) + 1;
+          });
+        }
+        
+        // Add keyword counts to tags
+        const tagsWithCounts = tags.map(tag => ({
+          ...tag,
+          keyword_count: countsByTagId[tag.tag_id] || 0
+        }));
+        
+        setData(tagsWithCounts);
+      } else {
+        setData([]);
+      }
     } catch (err) {
       console.error('Error fetching tags:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -186,7 +219,7 @@ export default function TagsPlenchPopup({ isOpen, onClose, onSelectTag, selected
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl" style={{ width: '1000px', height: '800px' }}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">

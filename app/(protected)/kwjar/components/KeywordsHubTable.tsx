@@ -29,6 +29,7 @@ interface KeywordRecord {
   updated_at: string;
   created_by: string | null;
   last_updated_by: string | null;
+  tags?: Array<{ tag_id: number; tag_name: string }>;
 }
 
 interface ColumnDefinition {
@@ -57,14 +58,28 @@ const columns: ColumnDefinition[] = [
   { key: 'created_at', label: 'created_at', type: 'datetime' },
   { key: 'updated_at', label: 'updated_at', type: 'datetime' },
   { key: 'created_by', label: 'created_by', type: 'text' },
-  { key: 'last_updated_by', label: 'last_updated_by', type: 'text' }
+  { key: 'last_updated_by', label: 'last_updated_by', type: 'text' },
+  { key: 'tags', label: 'tags', type: 'tags' }
 ];
 
 interface KeywordsHubTableProps {
   selectedTagId?: number;
+  onColumnPaginationRender?: (controls: {
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  }) => void;
+  initialColumnsPerPage?: number;
+  initialColumnPage?: number;
+  onColumnPaginationChange?: (columnsPerPage: number, currentPage: number) => void;
 }
 
-export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProps) {
+export default function KeywordsHubTable({ 
+  selectedTagId, 
+  onColumnPaginationRender, 
+  initialColumnsPerPage = 8,
+  initialColumnPage = 1,
+  onColumnPaginationChange
+}: KeywordsHubTableProps) {
   const { user } = useAuth();
   const [data, setData] = useState<KeywordRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,6 +90,10 @@ export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProp
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [sortField, setSortField] = useState<keyof KeywordRecord>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Column pagination states
+  const [columnsPerPage, setColumnsPerPage] = useState(initialColumnsPerPage); // Show 8 columns at a time
+  const [currentColumnPage, setCurrentColumnPage] = useState(initialColumnPage);
   
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -160,7 +179,53 @@ export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProp
 
       if (error) throw error;
       
-      setData(keywords || []);
+      // Fetch tag information for each keyword
+      if (keywords && keywords.length > 0) {
+        const keywordIds = keywords.map(k => k.keyword_id);
+        
+        // Get all tag relations for these keywords
+        const { data: tagRelations, error: tagRelError } = await supabase
+          .from('keywordshub_tag_relations')
+          .select(`
+            fk_keyword_id,
+            keywordshub_tags (
+              tag_id,
+              tag_name
+            )
+          `)
+          .in('fk_keyword_id', keywordIds);
+        
+        if (tagRelError) {
+          console.error('Error fetching tag relations:', tagRelError);
+        }
+        
+        // Group tags by keyword_id
+        const tagsByKeywordId: Record<number, Array<{ tag_id: number; tag_name: string }>> = {};
+        
+        if (tagRelations) {
+          tagRelations.forEach(relation => {
+            const keywordId = relation.fk_keyword_id;
+            const tagInfo = relation.keywordshub_tags;
+            
+            if (tagInfo) {
+              if (!tagsByKeywordId[keywordId]) {
+                tagsByKeywordId[keywordId] = [];
+              }
+              tagsByKeywordId[keywordId].push({ tag_id: tagInfo.tag_id, tag_name: tagInfo.tag_name });
+            }
+          });
+        }
+        
+        // Add tags to keywords
+        const keywordsWithTags = keywords.map(keyword => ({
+          ...keyword,
+          tags: tagsByKeywordId[keyword.keyword_id] || []
+        }));
+        
+        setData(keywordsWithTags);
+      } else {
+        setData([]);
+      }
     } catch (err) {
       console.error('Error fetching keywords:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch data');
@@ -204,6 +269,18 @@ export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProp
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
+  // Column pagination logic with sticky columns
+  const stickyColumnKeys = ['keyword_id', 'keyword_datum', 'search_volume', 'cpc'];
+  const stickyColumns = columns.filter(col => stickyColumnKeys.includes(col.key));
+  const paginatedColumns = columns.filter(col => !stickyColumnKeys.includes(col.key));
+  
+  const totalColumnPages = columnsPerPage === 0 ? 1 : Math.ceil(paginatedColumns.length / columnsPerPage);
+  const startColumnIndex = columnsPerPage === 0 ? 0 : (currentColumnPage - 1) * columnsPerPage;
+  const visiblePaginatedColumns = columnsPerPage === 0 ? paginatedColumns : paginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+  
+  // Combined visible columns: sticky columns + paginated columns
+  const visibleColumns = [...stickyColumns, ...visiblePaginatedColumns];
+
   // Handle sort
   const handleSort = (field: keyof KeywordRecord) => {
     if (sortField === field) {
@@ -233,6 +310,207 @@ export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProp
       setSelectedRows(new Set(paginatedData.map(item => item.keyword_id)));
     }
   };
+
+  // Column Pagination Components - Define before use
+  // Bar 1: Columns per page quantity selector
+  const ColumnPaginationBar1 = () => {
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Cols/page:</span>
+          <button
+            onClick={() => {
+              setColumnsPerPage(0);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-l -mr-px cursor-pointer ${
+              columnsPerPage === 0 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 0 ? '#f8f782' : undefined
+            }}
+          >
+            All
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(4);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 4 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 4 ? '#f8f782' : undefined
+            }}
+          >
+            4
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(6);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 6 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 6 ? '#f8f782' : undefined
+            }}
+          >
+            6
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(8);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 8 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 8 ? '#f8f782' : undefined
+            }}
+          >
+            8
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(10);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+              columnsPerPage === 10 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 10 ? '#f8f782' : undefined
+            }}
+          >
+            10
+          </button>
+          <button
+            onClick={() => {
+              setColumnsPerPage(12);
+              setCurrentColumnPage(1);
+            }}
+            className={`px-2 py-2.5 text-sm border rounded-r cursor-pointer ${
+              columnsPerPage === 12 ? 'text-black border-black' : 'bg-white hover:bg-gray-200'
+            }`}
+            style={{ 
+              fontSize: '14px', 
+              paddingTop: '10px', 
+              paddingBottom: '10px',
+              backgroundColor: columnsPerPage === 12 ? '#f8f782' : undefined
+            }}
+          >
+            12
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Bar 2: Current column page selector
+  const ColumnPaginationBar2 = () => {
+    if (totalColumnPages <= 1) return null;
+    
+    return (
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600 mr-2">Col page:</span>
+          <button
+            onClick={() => setCurrentColumnPage(1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border rounded-l -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            First
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage - 1)}
+            disabled={currentColumnPage === 1}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Prev
+          </button>
+          
+          {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
+            const pageNum = Math.max(1, Math.min(totalColumnPages - 4, currentColumnPage - 2)) + i;
+            if (pageNum > totalColumnPages) return null;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentColumnPage(pageNum)}
+                className={`px-2 py-2.5 text-sm border -mr-px cursor-pointer ${
+                  currentColumnPage === pageNum 
+                    ? 'text-black border-black' 
+                    : 'bg-white hover:bg-gray-200'
+                }`}
+                style={{ 
+                  fontSize: '14px', 
+                  paddingTop: '10px', 
+                  paddingBottom: '10px',
+                  backgroundColor: currentColumnPage === pageNum ? '#f8f782' : undefined
+                }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => setCurrentColumnPage(currentColumnPage + 1)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border -mr-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Next
+          </button>
+          <button
+            onClick={() => setCurrentColumnPage(totalColumnPages)}
+            disabled={currentColumnPage === totalColumnPages}
+            className="px-2 py-2.5 text-sm border rounded-r disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-white hover:bg-gray-200"
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            Last
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Pass pagination components to parent
+  useEffect(() => {
+    if (onColumnPaginationRender) {
+      onColumnPaginationRender({
+        ColumnPaginationBar1,
+        ColumnPaginationBar2
+      });
+    }
+  }, [onColumnPaginationRender, currentColumnPage, totalColumnPages, columnsPerPage]);
+
+  // Notify parent of column pagination changes
+  useEffect(() => {
+    if (onColumnPaginationChange) {
+      onColumnPaginationChange(columnsPerPage, currentColumnPage);
+    }
+  }, [columnsPerPage, currentColumnPage, onColumnPaginationChange]);
 
   // Inline editing functions
   const startEditing = (id: number, field: string, currentValue: any) => {
@@ -606,6 +884,31 @@ export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProp
       );
     }
 
+    // Special handling for tags column
+    if (column.key === 'tags') {
+      const tags = item.tags || [];
+      return (
+        <div className="px-2 py-1 text-xs">
+          {tags.length > 0 ? (
+            <div className="flex flex-wrap gap-1">
+              {tags.map((tag) => (
+                <div
+                  key={tag.tag_id}
+                  className="inline-flex px-2 py-1 rounded-full text-xs font-medium"
+                  style={{ backgroundColor: '#ffffe0', color: '#333' }}
+                  title={`Tag ID: ${tag.tag_id}`}
+                >
+                  ({tag.tag_id}) - {tag.tag_name}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <span className="text-gray-400">No tags</span>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div
         className={cellClass}
@@ -837,23 +1140,30 @@ export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProp
       {/* Table */}
       <div className="flex-1 bg-white overflow-hidden">
         <div className="h-full overflow-auto">
-          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '2500px' }}>
+          <table className="border-collapse border border-gray-200">
             <thead className="bg-gray-50 sticky top-0">
-              {/* New keywordshub header row */}
+              {/* First header row */}
               <tr>
                 <th className="px-2 py-3 text-left border border-gray-200 bg-[#bcc4f1]" style={{ width: '20px' }}>
                   {/* Empty cell for checkbox column */}
                 </th>
-                {columns.map((column) => (
+                {visibleColumns.map((column) => (
                   <th
                     key={`keywordshub-${column.key}`}
-                    className={`px-2 py-3 text-left border border-gray-200 bg-[#bcc4f1] ${
+                    className={`px-2 py-3 text-left border border-gray-200 ${
+                      column.key === 'tags' ? '' : 'bg-[#bcc4f1]'
+                    } ${
                       column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
                     } ${
                       column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
                     }`}
+                    style={{ 
+                      backgroundColor: column.key === 'tags' ? '#d3d3d3' : undefined 
+                    }}
                   >
-                    <span className="font-bold text-xs">keywordshub</span>
+                    <span className="font-bold text-xs">
+                      {column.key === 'tags' ? 'multi db tables' : 'keywordshub'}
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -878,7 +1188,7 @@ export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProp
                     </div>
                   </div>
                 </th>
-                {columns.map((column) => (
+                {visibleColumns.map((column) => (
                   <th
                     key={column.key}
                     className={`px-2 py-3 text-left border border-gray-200 cursor-pointer hover:bg-gray-100 ${
@@ -923,7 +1233,7 @@ export default function KeywordsHubTable({ selectedTagId }: KeywordsHubTableProp
                       </div>
                     </div>
                   </td>
-                  {columns.map((column) => (
+                  {visibleColumns.map((column) => (
                     <td 
                       key={column.key} 
                       className={`border border-gray-200 ${

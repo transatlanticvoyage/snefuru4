@@ -17,6 +17,14 @@ export default function KwjarClient() {
   // Tags plench popup state
   const [isTagsPopupOpen, setIsTagsPopupOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<{ tag_id: number; tag_name: string } | null>(null);
+  const [columnPaginationControls, setColumnPaginationControls] = useState<{
+    ColumnPaginationBar1: () => JSX.Element | null;
+    ColumnPaginationBar2: () => JSX.Element | null;
+  } | null>(null);
+
+  // Column pagination URL parameter states
+  const [columnsPerPage, setColumnsPerPage] = useState(8);
+  const [currentColumnPage, setCurrentColumnPage] = useState(1);
   
   // FPopup1 state (matching nwjar1)
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -39,10 +47,11 @@ export default function KwjarClient() {
     document.title = '/kwjar - Snefuru';
   }, []);
 
-  // Handle URL parameters for popup and tab state
+  // Handle URL parameters for popup, tab state, tag filtering, and column pagination
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const fpop = urlParams.get('fpop');
+    const kwtag = urlParams.get('kwtag');
     const ptab1 = urlParams.get('ptab1');
     const ptab2 = urlParams.get('ptab2');
     const ptab3 = urlParams.get('ptab3');
@@ -50,7 +59,48 @@ export default function KwjarClient() {
     const ptab5 = urlParams.get('ptab5');
     const ptab6 = urlParams.get('ptab6');
     const ptab7 = urlParams.get('ptab7');
+    const cpagQty = urlParams.get('cpag_qty');
+    const cpagSpec = urlParams.get('cpag_spec');
     
+    // Auto-load tag if kwtag parameter is present
+    if (kwtag) {
+      const tagId = parseInt(kwtag);
+      if (!isNaN(tagId)) {
+        // Fetch tag details from database
+        const loadTagFromUrl = async () => {
+          try {
+            const { data: tagData, error } = await supabase
+              .from('keywordshub_tags')
+              .select('tag_id, tag_name')
+              .eq('tag_id', tagId)
+              .single();
+            
+            if (!error && tagData) {
+              setSelectedTag({ tag_id: tagData.tag_id, tag_name: tagData.tag_name });
+            }
+          } catch (err) {
+            console.error('Error loading tag from URL:', err);
+          }
+        };
+        loadTagFromUrl();
+      }
+    }
+    
+    // Handle column pagination URL parameters
+    if (cpagQty) {
+      const qtyValue = cpagQty === 'All' ? 0 : parseInt(cpagQty);
+      if (!isNaN(qtyValue) || cpagQty === 'All') {
+        setColumnsPerPage(qtyValue);
+      }
+    }
+    
+    if (cpagSpec) {
+      const specValue = parseInt(cpagSpec);
+      if (!isNaN(specValue) && specValue > 0) {
+        setCurrentColumnPage(specValue);
+      }
+    }
+
     // Auto-open popup if fpop=open is in URL
     if (fpop === 'open') {
       setIsPopupOpen(true);
@@ -72,12 +122,35 @@ export default function KwjarClient() {
         setActivePopupTab('ptab7');
       }
     }
-  }, []);
+  }, [supabase]);
 
-  // Update URL when popup state changes
+  // Update URL when popup state, tag selection, or column pagination changes
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     
+    // Handle tag parameter
+    if (selectedTag) {
+      urlParams.set('kwtag', selectedTag.tag_id.toString());
+    } else {
+      urlParams.delete('kwtag');
+    }
+    
+    // Handle column pagination parameters
+    if (columnsPerPage === 0) {
+      urlParams.set('cpag_qty', 'All');
+    } else if (columnsPerPage !== 8) { // Only set if different from default
+      urlParams.set('cpag_qty', columnsPerPage.toString());
+    } else {
+      urlParams.delete('cpag_qty');
+    }
+    
+    if (currentColumnPage !== 1) { // Only set if different from default
+      urlParams.set('cpag_spec', currentColumnPage.toString());
+    } else {
+      urlParams.delete('cpag_spec');
+    }
+    
+    // Handle popup parameters
     if (isPopupOpen) {
       urlParams.set('fpop', 'open');
       // Clear all tab params first
@@ -96,7 +169,7 @@ export default function KwjarClient() {
     const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
     window.history.replaceState({}, '', newUrl);
     setCurrentUrl(window.location.href);
-  }, [isPopupOpen, activePopupTab]);
+  }, [isPopupOpen, activePopupTab, selectedTag, columnsPerPage, currentColumnPage]);
 
   // Fetch custom colors for uelbar37 and uelbar38 (matching nwjar1 exactly)
   useEffect(() => {
@@ -133,6 +206,12 @@ export default function KwjarClient() {
 
     fetchUelBarColors();
   }, [supabase]);
+
+  // Handle column pagination changes from table component
+  const handleColumnPaginationChange = (newColumnsPerPage: number, newCurrentPage: number) => {
+    setColumnsPerPage(newColumnsPerPage);
+    setCurrentColumnPage(newCurrentPage);
+  };
 
   // Track URL changes for uelbar37 display (like nwjar1)
   useEffect(() => {
@@ -225,6 +304,19 @@ export default function KwjarClient() {
           <div className="flex items-center space-x-6">
             <h1 className="text-2xl font-bold text-gray-800">🔍 Keywords Hub</h1>
             <ZhedoriButtonBar />
+            
+            {/* Column Pagination Button Bars */}
+            {columnPaginationControls && (
+              <>
+                <div className="flex items-center">
+                  {columnPaginationControls.ColumnPaginationBar1()}
+                </div>
+                <div className="flex items-center">
+                  {columnPaginationControls.ColumnPaginationBar2()}
+                </div>
+              </>
+            )}
+            
             <div className="flex items-center space-x-2">
               {/* Functions Popup Button (styled like nwjar1) */}
               <button
@@ -240,8 +332,17 @@ export default function KwjarClient() {
                 tags plench button
               </button>
               {selectedTag && (
-                <div className="text-sm text-gray-600 font-medium">
-                  {selectedTag.tag_name}
+                <div className="flex items-center space-x-2">
+                  <div className="text-sm font-medium bg-navy text-white border border-black px-3 py-1 rounded" style={{ backgroundColor: 'navy' }}>
+                    {selectedTag.tag_name}
+                  </div>
+                  <button
+                    onClick={() => setSelectedTag(null)}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
+                    title="Clear filter"
+                  >
+                    ×
+                  </button>
                 </div>
               )}
               <button
@@ -260,7 +361,13 @@ export default function KwjarClient() {
 
       {/* Main Content - Full Width KeywordsHubTable */}
       <div className="flex-1 overflow-hidden">
-        <KeywordsHubTable selectedTagId={selectedTag?.tag_id} />
+        <KeywordsHubTable 
+          selectedTagId={selectedTag?.tag_id}
+          onColumnPaginationRender={setColumnPaginationControls}
+          initialColumnsPerPage={columnsPerPage}
+          initialColumnPage={currentColumnPage}
+          onColumnPaginationChange={handleColumnPaginationChange}
+        />
       </div>
 
       {/* Tags Plench Popup */}

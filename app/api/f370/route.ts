@@ -224,20 +224,20 @@ export async function POST(request: NextRequest) {
         console.log(`Created new keyword ID: ${keywordId}`);
       }
 
-      // Tag the keyword (only if tag assignments table exists)
+      // Tag the keyword
       try {
         const { error: tagAssignError } = await supabase
-          .from('keywordshub_tag_assignments')
+          .from('keywordshub_tag_relations')
           .insert({
-            fk_keywordshub_id: keywordId,
-            fk_keywordshub_tags_id: tagId
+            fk_keyword_id: keywordId,
+            fk_tag_id: tagId
           });
 
         if (tagAssignError && !tagAssignError.message.includes('duplicate key')) {
           console.error('Error assigning tag (continuing):', tagAssignError.message);
         }
       } catch (tagError) {
-        console.log('Tag assignment failed (table may not exist), continuing...');
+        console.log('Tag assignment failed, continuing...', tagError);
       }
 
       // Prepare cncglub update
