@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { f355PopulateCncglub } from '../utils/f355-populate-cncglub';
 import { f360DeleteAllCncglub } from '../utils/f360-delete-all-cncglub';
@@ -76,6 +77,9 @@ export default function Cnjar1Table({
   initialColumnPage = 1,
   onColumnPaginationChange
 }: Cnjar1TableProps = {}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [data, setData] = useState<Cncglub[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -106,10 +110,16 @@ export default function Cnjar1Table({
   const [f360Message, setF360Message] = useState('');
   const [f360UserInput, setF360UserInput] = useState('');
   
-  // Filter states
-  const [citySizeFilter, setCitySizeFilter] = useState('all');
-  const [stateFilter, setStateFilter] = useState('all');
-  const [industryFilter, setIndustryFilter] = useState('all');
+  // Filter states - initialize from URL parameters
+  const [citySizeFilter, setCitySizeFilter] = useState(() => {
+    return searchParams.get('citySize') || 'all';
+  });
+  const [stateFilter, setStateFilter] = useState(() => {
+    return searchParams.get('state') || 'all';
+  });
+  const [industryFilter, setIndustryFilter] = useState(() => {
+    return searchParams.get('industry') || 'all';
+  });
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
@@ -123,14 +133,50 @@ export default function Cnjar1Table({
 
   const supabase = createClientComponentClient();
 
-  // Define columns
-  const columns = [
+  // Function to update URL parameters
+  const updateURLParams = (newParams: { citySize?: string; state?: string; industry?: string }) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value && value !== 'all') {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+    
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    router.replace(newUrl);
+  };
+
+  // Filter setter functions that also update URL
+  const handleCitySizeFilterChange = (value: string) => {
+    setCitySizeFilter(value);
+    updateURLParams({ citySize: value });
+  };
+
+  const handleStateFilterChange = (value: string) => {
+    setStateFilter(value);
+    updateURLParams({ state: value });
+  };
+
+  const handleIndustryFilterChange = (value: string) => {
+    setIndustryFilter(value);
+    updateURLParams({ industry: value });
+  };
+
+  // Sticky columns (always visible on the left, excluded from pagination)
+  const stickyColumns = [
     { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
-    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
     { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
     { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
+    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true }
+  ];
+
+  // Define remaining columns (subject to column pagination)
+  const paginatedColumns = [
+    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
     { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
-    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
     { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
     { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', leftSeparator: 'black-3px' }
   ];
@@ -166,8 +212,11 @@ export default function Cnjar1Table({
     { key: 'industries.industry_description', label: 'industry_description', type: 'text', readOnly: true, isJoined: true }
   ];
 
-  // Combine all columns
-  const allColumns = [...columns, ...keywordColumns, ...cityColumns, ...industryColumns];
+  // Combine all paginated columns (excludes sticky columns)
+  const allPaginatedColumns = [...paginatedColumns, ...keywordColumns, ...cityColumns, ...industryColumns];
+  
+  // All columns combined (sticky + paginated) for data processing
+  const allColumns = [...stickyColumns, ...allPaginatedColumns];
 
   // Fetch data from Supabase
   const fetchData = async () => {
@@ -468,10 +517,13 @@ export default function Cnjar1Table({
     });
   }, [data, searchTerm, sortField, sortOrder, cities, industries, citySizeFilter, stateFilter, industryFilter]);
 
-  // Column pagination logic
-  const totalColumnPages = columnsPerPage === 0 ? 1 : Math.ceil(allColumns.length / columnsPerPage);
+  // Column pagination logic (only applies to paginatedColumns, not sticky columns)
+  const totalColumnPages = columnsPerPage === 0 ? 1 : Math.ceil(allPaginatedColumns.length / columnsPerPage);
   const startColumnIndex = columnsPerPage === 0 ? 0 : (currentColumnPage - 1) * columnsPerPage;
-  const paginatedColumns = columnsPerPage === 0 ? allColumns : allColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+  const paginatedPortionColumns = columnsPerPage === 0 ? allPaginatedColumns : allPaginatedColumns.slice(startColumnIndex, startColumnIndex + columnsPerPage);
+  
+  // Combine sticky columns + paginated portion for display
+  const displayColumns = [...stickyColumns, ...paginatedPortionColumns];
   
   // Row pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / (itemsPerPage === -1 ? filteredAndSortedData.length : itemsPerPage));
@@ -1248,7 +1300,7 @@ export default function Cnjar1Table({
             <select
               value={citySizeFilter}
               onChange={(e) => {
-                setCitySizeFilter(e.target.value);
+                handleCitySizeFilterChange(e.target.value);
                 setCurrentPage(1); // Reset to first page when filtering
               }}
               className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -1268,7 +1320,7 @@ export default function Cnjar1Table({
             <select
               value={stateFilter}
               onChange={(e) => {
-                setStateFilter(e.target.value);
+                handleStateFilterChange(e.target.value);
                 setCurrentPage(1); // Reset to first page when filtering
               }}
               className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -1287,7 +1339,7 @@ export default function Cnjar1Table({
             <select
               value={industryFilter}
               onChange={(e) => {
-                setIndustryFilter(e.target.value);
+                handleIndustryFilterChange(e.target.value);
                 setCurrentPage(1); // Reset to first page when filtering
               }}
               className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -1398,7 +1450,7 @@ export default function Cnjar1Table({
                 <th className="px-2 py-1 text-left border border-gray-200" style={{ width: '50px' }}>
                   {/* Blank cell corresponding to checkbox column */}
                 </th>
-                {paginatedColumns.map((column, index) => {
+                {displayColumns.map((column, index) => {
                   let bgColorClass = '';
                   let tableText = '';
                   
@@ -1460,7 +1512,7 @@ export default function Cnjar1Table({
                     />
                   </div>
                 </th>
-                {paginatedColumns.map((column) => (
+                {displayColumns.map((column) => (
                   <th
                     key={column.key}
                     className={`text-left ${(!column.isJoined || column.sortable) ? 'cursor-pointer hover:bg-gray-100' : ''} border border-gray-200 px-2 py-1 ${
@@ -1506,7 +1558,7 @@ export default function Cnjar1Table({
                       />
                     </div>
                   </td>
-                  {paginatedColumns.map((column) => (
+                  {displayColumns.map((column) => (
                     <td 
                       key={column.key} 
                       className={`border border-gray-200 ${

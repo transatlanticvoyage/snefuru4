@@ -6618,3 +6618,229 @@ The remaining `industries.industry_name` column is in the `industryColumns` arra
 
 The table should now only have the intended single `industries.industry_name` column in its proper location within the industry columns section, not as duplicates in the early columns.
 
+---
+
+_**User**_
+
+you now removed 3 instances of the column when i told you to remove 2 instances of that column
+
+now please create a new intance of the same column here:
+immediately to right of rel_industry_id column 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+You're absolutely right! I apologize for the confusion. You asked me to remove 2 specific instances, but I only removed 1 (the one immediately to the left of is_sko). Let me add the `industries.industry_name` column immediately to the right of the `rel_industry_id` column as requested.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   122→  });
+   123→
+   124→  const supabase = createClientComponentClient();
+   125→
+   126→  // Define columns
+   127→  const columns = [
+   128→    { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
+   129→    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
+   130→    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+   131→    { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
+   132→    { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+   133→    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
+   134→    { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
+   135→    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', leftSeparator: 'black-3px' }
+   136→  ];
+   137→
+   138→  // Keyword columns (new section with different background)
+   139→  const keywordColumns = [
+   140→    { key: 'kwslot1_keyword.keyword_datum', label: 'keyword_datum', type: 'text', readOnly: true, isJoined: true, isKeyword: true },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've now added the `industries.industry_name` column immediately to the right of the `rel_industry_id` column as requested.
+
+The current column order is now:
+1. `cncg_id`
+2. `rel_city_id`
+3. `cities.city_name`
+4. `cities.state_code`
+5. `rel_industry_id`
+6. **`industries.industry_name`** ← (newly added here)
+7. `is_sko`
+8. `kwslot1`
+
+Now you should have the `industries.industry_name` column in the correct position - immediately to the right of the `rel_industry_id` column, plus the original one that exists later in the `industryColumns` section.
+
+---
+
+_**User**_
+
+please do the following on our page at:
+/cnjar1
+
+I want the following UI columns to be excluded from the normal column pagination:
+
+cncg_id
+cities->city_name
+cities->state_code
+industries->industry_name
+
+
+We already have the checkbox column, which is presumably excluded in this manner.
+
+So now we should have the checkbox plus the other UI columns listed above always appearing at the far left of the table.
+
+Then, the column pagination settings should apply only to the other columns that are not in this list.
+
+In effect, I’m trying to create “sticky columns” that represent the core identity of each row. Currently, only the checkbox column always appears this way, but I want all of these important columns to appear in the same way.
+
+No matter what column pagination setting is selected by the user, these columns will always remain visible on the left of the table, while the pagination controls switch the other columns to the right.
+
+
+———————————————————————
+SPECIAL NOTE ABOUT DUPLICATE LISTING COLUMNS:
+this ui table grid that we are working on on page of /cnjar1 has many columns that have "duplicate instances"
+
+in the list of columns above in this prompt, i am only referring to the versions that occur to the "farthest left" in the ui table. I'm not referring to the other versions that occur "later" or farther to the right in the table
+
+of course, im referring to these columns:
+cities->city_name
+cities->state_code
+industries->industry_name
+
+the "sticky" versions are the versions that should be excluded from the main column pagination system
+
+only the first versions (the versions that occur farthest left in the table) are the ones that should be "excluded" like this as "sticky columns"
+
+the other instances of these columns that appear later (farther to the right) in the table should be included in the column pagination system (not excluded)
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I understand! You want to create "sticky columns" that always remain visible on the left side of the table, while column pagination only applies to the remaining columns. Let me implement this by separating the sticky columns from the paginated columns.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+126→  // Define columns
+   127→  const columns = [
+   128→    { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
+   129→    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
+   130→    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+   131→    { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
+   132→    { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+   133→    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
+   134→    { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
+   135→    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', leftSeparator: 'black-3px' }
+   136→  ];
+   137→
+   138→  // Keyword columns (new section with different background)
+   139→  const keywordColumns = [
+   140→    { key: 'kwslot1_keyword.keyword_datum', label: 'keyword_datum', type: 'text', readOnly: true, isJoined: true, isKeyword: true },
+   141→    { key: 'kwslot1_keyword.search_volume', label: 'search_volume', type: 'number', readOnly: true, isJoined: true, isKeyword: true },
+   142→    { key: 'kwslot1_keyword.cpc', label: 'cpc', type: 'number', readOnly: true, isJoined: true, isKeyword: true, separator: 'black-3px' }
+   143→  ];
+   144→
+   145→  // City columns from cityjar
+   146→  const cityColumns = [
+   147→    { key: 'cities.fk_dfs_location_code', label: 'fk_dfs_location_code', type: 'number', readOnly: true, isJoined: true },
+   148→    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+   149→    { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
+   150→    { key: 'cities.state_full', label: 'state_full', type: 'text', readOnly: true, isJoined: true },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see the current structure. Now I need to separate the sticky columns from the paginated ones. Let me restructure this:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   122→  });
+   123→
+   124→  const supabase = createClientComponentClient();
+   125→
+   126→  // Sticky columns (always visible on the left, excluded from pagination)
+   127→  const stickyColumns = [
+   128→    { key: 'cncg_id' as keyof Cncglub, label: 'cncg_id', type: 'number', readOnly: true },
+   129→    { key: 'cities.city_name', label: 'city_name', type: 'text', readOnly: true, isJoined: true },
+   130→    { key: 'cities.state_code', label: 'state_code', type: 'text', readOnly: true, isJoined: true },
+   131→    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true }
+   132→  ];
+   133→
+   134→  // Define remaining columns (subject to column pagination)
+   135→  const paginatedColumns = [
+   136→    { key: 'rel_city_id' as keyof Cncglub, label: 'rel_city_id', type: 'number' },
+   137→    { key: 'rel_industry_id' as keyof Cncglub, label: 'rel_industry_id', type: 'number' },
+   138→    { key: 'is_sko' as keyof Cncglub, label: 'is_sko', type: 'boolean' },
+   139→    { key: 'kwslot1' as keyof Cncglub, label: 'kwslot1', type: 'number', leftSeparator: 'black-3px' }
+   140→  ];
+   141→
+   142→  // Keyword columns (new section with different background)
+   143→  const keywordColumns = [
+   144→    { key: 'kwslot1_keyword.keyword_datum', label: 'keyword_datum', type: 'text', readOnly: true, isJoined: true, isKeyword: true },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the `allColumns` definition and the column pagination logic:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/components/Cnjar1Table.tsx`
+
+Result:
+
+```
+165→  ];
+   166→
+   167→  // Industry columns from indusjar
+   168→  const industryColumns = [
+   169→    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
+   170→    { key: 'industries.industry_description', label: 'industry_description', type: 'text', readOnly: true, isJoined: true }
+   171→  ];
+   172→
+   173→  // Combine all columns
+   174→  const allColumns = [...columns, ...keywordColumns, ...cityColumns, ...industryColumns];
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   169→    { key: 'industries.industry_name', label: 'industry_name', type: 'text', readOnly: true, isJoined: true },
+   170→    { key: 'industries.industry_description', label: 'industry_description', type: 'text', readOnly: true, isJoined: true }
+   171→  ];
+   172→
+   173→  // Combine all paginated columns (excludes sticky columns)
+   174→  const allPaginatedColumns = [...paginatedColumns, ...keywordColumns, ...cityColumns, ...industryColumns];
+   175→  
+   176→  // All columns combined (sticky + paginated) for data processing
+   177→  const allColumns = [...stickyColumns, ...allPaginatedColumns];
+   178→
+   179→  // Fetch data from Supabase
+   180→  const fetchData = async () => {
+   181→    try {
+```
+

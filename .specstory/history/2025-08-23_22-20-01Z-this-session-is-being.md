@@ -5657,3 +5657,1848 @@ The work continues effectively, with each conversion:
 
 I'm ready to continue with the next batch of pages when requested.
 
+---
+
+_**User**_
+
+please continue with the next batch
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Convert /admin/rstormanager to Method 1
+- [X] 🌡️ Convert /admin/mapping1 to Method 1
+- [X] 🌡️ Convert /admin/xpagesmanager1 to Method 1
+- [X] 🌡️ Convert /bin31/panjar4 to Method 1
+- [X] 🌡️ Convert /admin/baklivid to Method 1
+- [⚡] 🌡️ Convert /admin/columnrobot to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Let me continue with the next batch. I'll start with `/admin/columnrobot` which I saw in the grep results:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/admin/columnrobot/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     6→import Link from 'next/link';
+     7→
+     8→export default function ColumnRobotPage() {
+     9→  const { user } = useAuth();
+    10→  const [loading, setLoading] = useState(true);
+    11→  const [error, setError] = useState<string | null>(null);
+    12→  
+    13→  // Random storage state
+    14→  const [rstorData, setRstorData] = useState<string>('');
+    15→  const [rstorLoading, setRstorLoading] = useState(true);
+    16→  const supabase = createClientComponentClient();
+    17→
+    18→  // Fetch random storage data
+    19→  const fetchRstorData = async () => {
+    20→    try {
+    21→      setRstorLoading(true);
+    22→      const { data, error } = await supabase
+    23→        .from('admin_random_storage')
+    24→        .select('rstor_body')
+    25→        .eq('fk_app_page', '/admin/columnrobot')
+    26→        .single();
+    27→
+    28→      if (error) {
+    29→        console.error('Error fetching rstor data:', error);
+    30→        setRstorData('');
+    31→      } else {
+    32→        const bodyContent = data?.rstor_body ? JSON.stringify(data.rstor_body, null, 2) : '';
+    33→        setRstorData(bodyContent);
+    34→      }
+    35→    } catch (err) {
+    36→      console.error('Error:', err);
+    37→      setRstorData('');
+    38→    } finally {
+    39→      setRstorLoading(false);
+    40→    }
+    41→  };
+    42→
+    43→  // Copy functions
+    44→  const handleCopyLabel = () => {
+    45→    const labelText = 'admin_random_storage.rstor_body where fk_app_page = /admin/columnrobot';
+    46→    navigator.clipboard.writeText(labelText);
+    47→  };
+    48→
+    49→  const handleCopyRstorData = () => {
+    50→    navigator.clipboard.writeText(rstorData);
+    51→  };
+    52→
+    53→  useEffect(() => {
+    54→    document.title = "Column Robot - Snefuru Admin";
+    55→    setLoading(false);
+    56→    fetchRstorData();
+    57→  }, []);
+    58→
+    59→  if (loading) {
+    60→    return (
+    61→      <div className="flex items-center justify-center min-h-screen">
+    62→        <div className="text-lg">Loading...</div>
+    63→      </div>
+    64→    );
+    65→  }
+    66→
+    67→  if (error) {
+    68→    return (
+    69→      <div className="flex items-center justify-center min-h-screen">
+    70→        <div className="text-red-600">Error: {error}</div>
+    71→      </div>
+    72→    );
+    73→  }
+    74→
+    75→  return (
+    76→    <div className="container mx-auto px-4 py-8">
+    77→      {/* Header */}
+    78→      <div className="mb-8">
+    79→        <div className="flex items-center justify-between">
+    80→          <div>
+    81→            <h1 className="text-3xl font-bold text-gray-900">Column Robot</h1>
+    82→            <p className="mt-2 text-sm text-gray-600">
+    83→              Automated column template management system
+    84→            </p>
+    85→          </div>
+    86→          <div className="flex items-center gap-4">
+    87→            <Link
+    88→              href="/admin"
+    89→              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    90→            >
+    91→              ← Back to Admin
+    92→            </Link>
+    93→          </div>
+    94→        </div>
+    95→      </div>
+    96→
+    97→      {/* Main Controls Section */}
+    98→      <div className="main_controls bg-white shadow rounded-lg mb-6" style={{ height: '350px', width: '100%' }}>
+    99→        <div className="px-6 py-4">
+   100→          <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '16px' }}>
+   101→            div.main_controls
+   102→          </div>
+   103→          
+   104→          {/* Random Storage Display */}
+   105→          <div style={{ marginBottom: '16px' }}>
+   106→            {/* Label with copy button */}
+   107→            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0px' }}>
+   108→              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+   109→                admin_random_storage.rstor_body where fk_app_page = /admin/columnrobot
+   110→              </div>
+   111→              <button
+   112→                onClick={handleCopyLabel}
+   113→                style={{
+   114→                  height: '20px',
+   115→                  width: '30px',
+   116→                  fontSize: '10px',
+   117→                  backgroundColor: '#e5e7eb',
+   118→                  border: '1px solid #d1d5db',
+   119→                  borderRadius: '4px',
+   120→                  cursor: 'pointer'
+   121→                }}
+   122→              >
+   123→                📋
+   124→              </button>
+   125→            </div>
+   126→            
+   127→            {/* Copy button and textarea container */}
+   128→            <div style={{ width: '400px' }}>
+   129→              <button
+   130→                onClick={handleCopyRstorData}
+   131→                disabled={!rstorData}
+   132→                style={{
+   133→                  width: '100%',
+   134→                  height: '20px',
+   135→                  fontSize: '12px',
+   136→                  backgroundColor: rstorData ? '#3b82f6' : '#e5e7eb',
+   137→                  color: rstorData ? 'white' : '#9ca3af',
+   138→                  border: '1px solid #d1d5db',
+   139→                  borderRadius: '4px 4px 0 0',
+   140→                  cursor: rstorData ? 'pointer' : 'not-allowed',
+   141→                  display: 'block',
+   142→                  marginBottom: '0px'
+   143→                }}
+   144→              >
+   145→                📋 Copy Content
+   146→              </button>
+   147→              
+   148→              {/* Textarea */}
+   149→              <textarea
+   150→                value={rstorLoading ? 'Loading...' : rstorData}
+   151→                readOnly
+   152→                style={{
+   153→                  width: '100%',
+   154→                  height: '100px',
+   155→                  border: '1px solid #d1d5db',
+   156→                  borderTop: 'none',
+   157→                  borderRadius: '0 0 4px 4px',
+   158→                  padding: '8px',
+   159→                  fontSize: '12px',
+   160→                  fontFamily: 'monospace',
+   161→                  resize: 'none',
+   162→                  backgroundColor: '#f9fafb',
+   163→                  display: 'block',
+   164→                  boxSizing: 'border-box'
+   165→                }}
+   166→                placeholder="No data found for this page..."
+   167→              />
+   168→            </div>
+   169→          </div>
+   170→          
+   171→          {/* UTG Selection */}
+   172→          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '20px' }}>
+   173→            <div style={{ fontSize: '17px' }}>
+   174→              <span style={{ fontWeight: 'bold' }}>db table:</span> <span style={{ fontWeight: 'normal' }}>utgs</span>
+   175→            </div>
+   176→            <select
+   177→              style={{
+   178→                padding: '6px 12px',
+   179→                fontSize: '14px',
+   180→                border: '1px solid #d1d5db',
+   181→                borderRadius: '4px',
+   182→                backgroundColor: 'white',
+   183→                cursor: 'pointer'
+   184→              }}
+   185→            >
+   186→              <option>Select your UTG</option>
+   187→            </select>
+   188→          </div>
+   189→        </div>
+   190→      </div>
+   191→
+   192→      {/* Principal Content Section */}
+   193→      <div className="princ_content bg-white shadow rounded-lg" style={{ width: '100%' }}>
+   194→        <div className="px-6 py-4">
+   195→          <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '16px' }}>
+   196→            div.princ_content
+   197→          </div>
+   198→          
+   199→          {/* 6 Brain Columns */}
+   200→          <div style={{ display: 'flex' }}>
+   201→            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+   202→              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+   203→                div.brain_column
+   204→              </div>
+   205→              <div className="robot_ui_label" style={{ 
+   206→                padding: '7px', 
+   207→                width: '100%', 
+   208→                height: '200px',
+   209→                fontSize: '16px', 
+   210→                display: 'flex', 
+   211→                alignItems: 'flex-end', 
+   212→                overflow: 'hidden',
+   213→                fontWeight: 'bold',
+   214→                marginBottom: '8px',
+   215→                wordWrap: 'break-word',
+   216→                whiteSpace: 'normal',
+   217→                backgroundColor: '#e1e1e1'
+   218→              }}>
+   219→                ui table grid columns definition utgcd
+   220→              </div>
+   221→              <textarea
+   222→                style={{
+   223→                  width: '100%',
+   224→                  height: '500px',
+   225→                  border: '1px solid #d1d5db',
+   226→                  borderRadius: '4px',
+   227→                  padding: '8px',
+   228→                  fontSize: '12px',
+   229→                  fontFamily: 'monospace',
+   230→                  resize: 'none'
+   231→                }}
+   232→                placeholder="DB columns / HTML classes..."
+   233→              />
+   234→            </div>
+   235→            
+   236→            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+   237→              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+   238→                div.brain_column
+   239→              </div>
+   240→              <div className="robot_ui_label" style={{ 
+   241→                padding: '7px', 
+   242→                width: '100%', 
+   243→                height: '200px',
+   244→                fontSize: '16px', 
+   245→                display: 'flex', 
+   246→                alignItems: 'flex-end', 
+   247→                overflow: 'hidden',
+   248→                fontWeight: 'bold',
+   249→                marginBottom: '8px',
+   250→                wordWrap: 'break-word',
+   251→                whiteSpace: 'normal',
+   252→                backgroundColor: '#e1e1e1'
+   253→              }}>
+   254→                sql view (if any)
+   255→              </div>
+   256→              <textarea
+   257→                style={{
+   258→                  width: '100%',
+   259→                  height: '500px',
+   260→                  border: '1px solid #d1d5db',
+   261→                  borderRadius: '4px',
+   262→                  padding: '8px',
+   263→                  fontSize: '12px',
+   264→                  fontFamily: 'monospace',
+   265→                  resize: 'none'
+   266→                }}
+   267→                placeholder="DB columns / HTML classes..."
+   268→              />
+   269→            </div>
+   270→            
+   271→            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+   272→              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+   273→                div.brain_column
+   274→              </div>
+   275→              <div className="robot_ui_label" style={{ 
+   276→                padding: '7px', 
+   277→                width: '100%', 
+   278→                height: '200px',
+   279→                fontSize: '16px', 
+   280→                display: 'flex', 
+   281→                alignItems: 'flex-end', 
+   282→                overflow: 'hidden',
+   283→                fontWeight: 'bold',
+   284→                marginBottom: '8px',
+   285→                wordWrap: 'break-word',
+   286→                whiteSpace: 'normal',
+   287→                backgroundColor: '#e1e1e1'
+   288→              }}>
+   289→                db tables with fields in the actual columns of this utg
+   290→              </div>
+   291→              <textarea
+   292→                style={{
+   293→                  width: '100%',
+   294→                  height: '500px',
+   295→                  border: '1px solid #d1d5db',
+   296→                  borderRadius: '4px',
+   297→                  padding: '8px',
+   298→                  fontSize: '12px',
+   299→                  fontFamily: 'monospace',
+   300→                  resize: 'none'
+   301→                }}
+   302→                placeholder="DB columns / HTML classes..."
+   303→              />
+   304→            </div>
+   305→            
+   306→            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+   307→              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+   308→                div.brain_column
+   309→              </div>
+   310→              <div className="robot_ui_label" style={{ 
+   311→                padding: '7px', 
+   312→                width: '100%', 
+   313→                height: '200px',
+   314→                fontSize: '16px', 
+   315→                display: 'flex', 
+   316→                alignItems: 'flex-end', 
+   317→                overflow: 'hidden',
+   318→                fontWeight: 'bold',
+   319→                marginBottom: '8px',
+   320→                wordWrap: 'break-word',
+   321→                whiteSpace: 'normal',
+   322→                backgroundColor: '#e1e1e1'
+   323→              }}>
+   324→                list of specific fields
+   325→              </div>
+   326→              <textarea
+   327→                style={{
+   328→                  width: '100%',
+   329→                  height: '500px',
+   330→                  border: '1px solid #d1d5db',
+   331→                  borderRadius: '4px',
+   332→                  padding: '8px',
+   333→                  fontSize: '12px',
+   334→                  fontFamily: 'monospace',
+   335→                  resize: 'none'
+   336→                }}
+   337→                placeholder="DB columns / HTML classes..."
+   338→              />
+   339→            </div>
+   340→            
+   341→            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+   342→              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+   343→                div.brain_column
+   344→              </div>
+   345→              <div className="robot_ui_label" style={{ 
+   346→                padding: '7px', 
+   347→                width: '100%', 
+   348→                height: '200px',
+   349→                fontSize: '16px', 
+   350→                display: 'flex', 
+   351→                alignItems: 'flex-end', 
+   352→                overflow: 'hidden',
+   353→                fontWeight: 'bold',
+   354→                marginBottom: '8px',
+   355→                wordWrap: 'break-word',
+   356→                whiteSpace: 'normal',
+   357→                backgroundColor: '#e1e1e1'
+   358→              }}>
+   359→                entire field set of specific db tables including fields not in the utg for comparison
+   360→              </div>
+   361→              <textarea
+   362→                style={{
+   363→                  width: '100%',
+   364→                  height: '500px',
+   365→                  border: '1px solid #d1d5db',
+   366→                  borderRadius: '4px',
+   367→                  padding: '8px',
+   368→                  fontSize: '12px',
+   369→                  fontFamily: 'monospace',
+   370→                  resize: 'none'
+   371→                }}
+   372→                placeholder="DB columns / HTML classes..."
+   373→              />
+   374→            </div>
+   375→            
+   376→            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+   377→              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+   378→                div.brain_column
+   379→              </div>
+   380→              <div className="robot_ui_label" style={{ 
+   381→                padding: '7px', 
+   382→                width: '100%', 
+   383→                height: '200px',
+   384→                fontSize: '16px', 
+   385→                display: 'flex', 
+   386→                alignItems: 'flex-end', 
+   387→                overflow: 'hidden',
+   388→                fontWeight: 'bold',
+   389→                marginBottom: '8px',
+   390→                wordWrap: 'break-word',
+   391→                whiteSpace: 'normal',
+   392→                backgroundColor: '#e1e1e1'
+   393→              }}>
+   394→                linked db tables
+   395→              </div>
+   396→              <textarea
+   397→                style={{
+   398→                  width: '100%',
+   399→                  height: '500px',
+   400→                  border: '1px solid #d1d5db',
+   401→                  borderRadius: '4px',
+   402→                  padding: '8px',
+   403→                  fontSize: '12px',
+   404→                  fontFamily: 'monospace',
+   405→                  resize: 'none'
+   406→                }}
+   407→                placeholder="DB columns / HTML classes..."
+   408→              />
+   409→            </div>
+   410→          </div>
+   411→        </div>
+   412→      </div>
+   413→    </div>
+   414→  );
+   415→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Great! I found the `document.title` on line 54. This is a Column Robot management page with 415 lines. Let me convert it to Method 1:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import Link from 'next/link';
+
+export default function ColumnRobotClient() {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Random storage state
+  const [rstorData, setRstorData] = useState<string>('');
+  const [rstorLoading, setRstorLoading] = useState(true);
+  const supabase = createClientComponentClient();
+
+  // Fetch random storage data
+  const fetchRstorData = async () => {
+    try {
+      setRstorLoading(true);
+      const { data, error } = await supabase
+        .from('admin_random_storage')
+        .select('rstor_body')
+        .eq('fk_app_page', '/admin/columnrobot')
+        .single();
+
+      if (error) {
+        console.error('Error fetching rstor data:', error);
+        setRstorData('');
+      } else {
+        const bodyContent = data?.rstor_body ? JSON.stringify(data.rstor_body, null, 2) : '';
+        setRstorData(bodyContent);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setRstorData('');
+    } finally {
+      setRstorLoading(false);
+    }
+  };
+
+  // Copy functions
+  const handleCopyLabel = () => {
+    const labelText = 'admin_random_storage.rstor_body where fk_app_page = /admin/columnrobot';
+    navigator.clipboard.writeText(labelText);
+  };
+
+  const handleCopyRstorData = () => {
+    navigator.clipboard.writeText(rstorData);
+  };
+
+  useEffect(() => {
+    setLoading(false);
+    fetchRstorData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Column Robot</h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Automated column template management system
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              ← Back to Admin
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Controls Section */}
+      <div className="main_controls bg-white shadow rounded-lg mb-6" style={{ height: '350px', width: '100%' }}>
+        <div className="px-6 py-4">
+          <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '16px' }}>
+            div.main_controls
+          </div>
+          
+          {/* Random Storage Display */}
+          <div style={{ marginBottom: '16px' }}>
+            {/* Label with copy button */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                admin_random_storage.rstor_body where fk_app_page = /admin/columnrobot
+              </div>
+              <button
+                onClick={handleCopyLabel}
+                style={{
+                  height: '20px',
+                  width: '30px',
+                  fontSize: '10px',
+                  backgroundColor: '#e5e7eb',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                📋
+              </button>
+            </div>
+            
+            {/* Copy button and textarea container */}
+            <div style={{ width: '400px' }}>
+              <button
+                onClick={handleCopyRstorData}
+                disabled={!rstorData}
+                style={{
+                  width: '100%',
+                  height: '20px',
+                  fontSize: '12px',
+                  backgroundColor: rstorData ? '#3b82f6' : '#e5e7eb',
+                  color: rstorData ? 'white' : '#9ca3af',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px 4px 0 0',
+                  cursor: rstorData ? 'pointer' : 'not-allowed',
+                  display: 'block',
+                  marginBottom: '0px'
+                }}
+              >
+                📋 Copy Content
+              </button>
+              
+              {/* Textarea */}
+              <textarea
+                value={rstorLoading ? 'Loading...' : rstorData}
+                readOnly
+                style={{
+                  width: '100%',
+                  height: '100px',
+                  border: '1px solid #d1d5db',
+                  borderTop: 'none',
+                  borderRadius: '0 0 4px 4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none',
+                  backgroundColor: '#f9fafb',
+                  display: 'block',
+                  boxSizing: 'border-box'
+                }}
+                placeholder="No data found for this page..."
+              />
+            </div>
+          </div>
+          
+          {/* UTG Selection */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '20px' }}>
+            <div style={{ fontSize: '17px' }}>
+              <span style={{ fontWeight: 'bold' }}>db table:</span> <span style={{ fontWeight: 'normal' }}>utgs</span>
+            </div>
+            <select
+              style={{
+                padding: '6px 12px',
+                fontSize: '14px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              <option>Select your UTG</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Principal Content Section */}
+      <div className="princ_content bg-white shadow rounded-lg" style={{ width: '100%' }}>
+        <div className="px-6 py-4">
+          <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '16px' }}>
+            div.princ_content
+          </div>
+          
+          {/* 6 Brain Columns */}
+          <div style={{ display: 'flex' }}>
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                div.brain_column
+              </div>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                height: '200px',
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
+              }}>
+                ui table grid columns definition utgcd
+              </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
+            </div>
+            
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                div.brain_column
+              </div>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                height: '200px',
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
+              }}>
+                sql view (if any)
+              </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
+            </div>
+            
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                div.brain_column
+              </div>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                height: '200px',
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
+              }}>
+                db tables with fields in the actual columns of this utg
+              </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
+            </div>
+            
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                div.brain_column
+              </div>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                height: '200px',
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
+              }}>
+                list of specific fields
+              </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
+            </div>
+            
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                div.brain_column
+              </div>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                height: '200px',
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
+              }}>
+                entire field set of specific db tables including fields not in the utg for comparison
+              </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
+            </div>
+            
+            <div className="brain_column" style={{ width: '225px', padding: '8px', border: '3px solid gray' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>
+                div.brain_column
+              </div>
+              <div className="robot_ui_label" style={{ 
+                padding: '7px', 
+                width: '100%', 
+                height: '200px',
+                fontSize: '16px', 
+                display: 'flex', 
+                alignItems: 'flex-end', 
+                overflow: 'hidden',
+                fontWeight: 'bold',
+                marginBottom: '8px',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                backgroundColor: '#e1e1e1'
+              }}>
+                linked db tables
+              </div>
+              <textarea
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'monospace',
+                  resize: 'none'
+                }}
+                placeholder="DB columns / HTML classes..."
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/columnrobot/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me replace the page.tsx with the server component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/columnrobot/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import ColumnRobotClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'Column Robot - Snefuru Admin',
+     6→};
+     7→
+     8→export default function ColumnRobotPage() {
+     9→  return <ColumnRobotClient />;
+    10→}
+    11→
+    12→  if (loading) {
+    13→    return (
+    14→      <div className="flex items-center justify-center min-h-screen">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I see there's leftover content. Let me clean it up:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+import { Metadata } from 'next';
+import ColumnRobotClient from './pclient';
+
+export const metadata: Metadata = {
+  title: 'Column Robot - Snefuru Admin',
+};
+
+export default function ColumnRobotPage() {
+  return <ColumnRobotClient />;
+}
+```
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/columnrobot/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import ColumnRobotClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'Column Robot - Snefuru Admin',
+     6→};
+     7→
+     8→export default function ColumnRobotPage() {
+     9→  return <ColumnRobotClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Let me update the todo and move to the next page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Convert /admin/rstormanager to Method 1
+- [X] 🌡️ Convert /admin/mapping1 to Method 1
+- [X] 🌡️ Convert /admin/xpagesmanager1 to Method 1
+- [X] 🌡️ Convert /bin31/panjar4 to Method 1
+- [X] 🌡️ Convert /admin/baklivid to Method 1
+- [X] 🌡️ Convert /admin/columnrobot to Method 1
+- [⚡] 🌡️ Convert /admin/baklijar to Method 1
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me continue with `/admin/baklijar` which I saw in the grep results:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/admin/baklijar/page.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     6→import Link from 'next/link';
+     7→
+     8→interface BakliMockup {
+     9→  bakli_id: string;
+    10→  bakli_name: string;
+    11→  bakli_description: string | null;
+    12→  bakli_status: string;
+    13→  bakli_folder: string | null;
+    14→  bakli_tags: string[] | null;
+    15→  is_public: boolean;
+    16→  view_count: number;
+    17→  created_at: string;
+    18→  updated_at: string;
+    19→  last_viewed_at: string | null;
+    20→  bakli_priority: number;
+    21→}
+    22→
+    23→export default function BaklijarPage() {
+    24→  const { user } = useAuth();
+    25→  const supabase = createClientComponentClient();
+    26→  
+    27→  const [mockups, setMockups] = useState<BakliMockup[]>([]);
+    28→  const [loading, setLoading] = useState(true);
+    29→  const [error, setError] = useState<string | null>(null);
+    30→  const [searchTerm, setSearchTerm] = useState('');
+    31→  const [filterStatus, setFilterStatus] = useState('all');
+    32→  const [filterFolder, setFilterFolder] = useState('all');
+    33→  const [currentPage, setCurrentPage] = useState(1);
+    34→  const [itemsPerPage, setItemsPerPage] = useState(200);
+    35→  const [isCreating, setIsCreating] = useState(false);
+    36→  const [newMockupName, setNewMockupName] = useState('');
+    37→
+    38→  useEffect(() => {
+    39→    document.title = 'Bakli Mockups - Admin - Snefuru';
+    40→    fetchMockups();
+    41→  }, []);
+    42→
+    43→  const fetchMockups = async () => {
+    44→    try {
+    45→      setLoading(true);
+    46→      
+    47→      if (!user?.id) {
+    48→        setError('User not authenticated');
+    49→        return;
+    50→      }
+    51→
+    52→      // Get user's internal ID
+    53→      const { data: userData } = await supabase
+    54→        .from('users')
+    55→        .select('id')
+    56→        .eq('auth_id', user.id)
+    57→        .single();
+    58→
+    59→      if (!userData) {
+    60→        setError('User not found');
+    61→        return;
+    62→      }
+    63→
+    64→      // Fetch user's mockups
+    65→      const { data, error } = await supabase
+    66→        .from('bakli_mockups')
+    67→        .select('*')
+    68→        .eq('fk_user_id', userData.id)
+    69→        .order('updated_at', { ascending: false });
+    70→
+    71→      if (error) throw error;
+    72→      setMockups(data || []);
+    73→    } catch (err) {
+    74→      console.error('Error fetching mockups:', err);
+    75→      setError('Failed to load mockups');
+    76→    } finally {
+    77→      setLoading(false);
+    78→    }
+    79→  };
+    80→
+    81→  const handleCreateNew = async () => {
+    82→    if (!newMockupName.trim()) {
+    83→      alert('Please enter a name for the new mockup');
+    84→      return;
+    85→    }
+    86→
+    87→    setIsCreating(true);
+    88→
+    89→    try {
+    90→      if (!user?.id) {
+    91→        throw new Error('User not authenticated');
+    92→      }
+    93→
+    94→      // Get user's internal ID
+    95→      const { data: userData } = await supabase
+    96→        .from('users')
+    97→        .select('id')
+    98→        .eq('auth_id', user.id)
+    99→        .single();
+   100→
+   101→      if (!userData) {
+   102→        throw new Error('User not found');
+   103→      }
+   104→
+   105→      const { data, error } = await supabase
+   106→        .from('bakli_mockups')
+   107→        .insert([{
+   108→          fk_user_id: userData.id,
+   109→          bakli_name: newMockupName.trim(),
+   110→          bakli_content: '<div>\n  <h1>Hello World</h1>\n  <p>Start building your mockup here...</p>\n</div>',
+   111→          bakli_css: '/* Add your CSS styles here */\nh1 {\n  color: #333;\n  font-family: Arial, sans-serif;\n}\n\np {\n  color: #666;\n  line-height: 1.6;\n}'
+   112→        }])
+   113→        .select()
+   114→        .single();
+   115→
+   116→      if (error) throw error;
+   117→
+   118→      setNewMockupName('');
+   119→      await fetchMockups();
+   120→
+   121→      // Navigate to the new mockup
+   122→      if (data) {
+   123→        window.location.href = `/admin/baklivid?bakli_id=${data.bakli_id}`;
+   124→      }
+   125→    } catch (err) {
+   126→      console.error('Error creating mockup:', err);
+   127→      alert('Failed to create new mockup');
+   128→    } finally {
+   129→      setIsCreating(false);
+   130→    }
+   131→  };
+   132→
+   133→  const handleDelete = async (bakliId: string, mockupName: string) => {
+   134→    if (!confirm(`Are you sure you want to delete "${mockupName}"? This action cannot be undone.`)) {
+   135→      return;
+   136→    }
+   137→
+   138→    try {
+   139→      const { error } = await supabase
+   140→        .from('bakli_mockups')
+   141→        .delete()
+   142→        .eq('bakli_id', bakliId);
+   143→
+   144→      if (error) throw error;
+   145→      
+   146→      await fetchMockups();
+   147→      alert('Mockup deleted successfully');
+   148→    } catch (err) {
+   149→      console.error('Error deleting mockup:', err);
+   150→      alert('Failed to delete mockup');
+   151→    }
+   152→  };
+   153→
+   154→  // Filter and search logic
+   155→  const filteredMockups = mockups.filter(mockup => {
+   156→    const matchesSearch = searchTerm === '' || 
+   157→      mockup.bakli_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+   158→      (mockup.bakli_description || '').toLowerCase().includes(searchTerm.toLowerCase());
+   159→    
+   160→    const matchesStatus = filterStatus === 'all' || mockup.bakli_status === filterStatus;
+   161→    const matchesFolder = filterFolder === 'all' || mockup.bakli_folder === filterFolder;
+   162→    
+   163→    return matchesSearch && matchesStatus && matchesFolder;
+   164→  });
+   165→
+   166→  // Pagination
+   167→  const totalPages = Math.ceil(filteredMockups.length / itemsPerPage);
+   168→  const startIndex = (currentPage - 1) * itemsPerPage;
+   169→  const paginatedMockups = filteredMockups.slice(startIndex, startIndex + itemsPerPage);
+   170→
+   171→  // Get unique folders for filter
+   172→  const uniqueFolders = Array.from(new Set(mockups.map(m => m.bakli_folder).filter(Boolean)));
+   173→
+   174→  if (!user) {
+   175→    return (
+   176→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   177→        <p className="text-gray-500">Please log in to access this page.</p>
+   178→      </div>
+   179→    );
+   180→  }
+   181→
+   182→  if (loading) {
+   183→    return (
+   184→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   185→        <p className="text-gray-500">Loading mockups...</p>
+   186→      </div>
+   187→    );
+   188→  }
+   189→
+   190→  return (
+   191→    <div className="min-h-screen bg-gray-50">
+   192→      {/* Header */}
+   193→      <div className="bg-purple-600 text-white p-4 mb-6">
+   194→        <div className="max-w-7xl mx-auto">
+   195→          <h1 className="text-2xl font-bold">Bakli Mockups</h1>
+   196→          <p className="mt-1 opacity-90">HTML/CSS Mockup Creation System</p>
+   197→        </div>
+   198→      </div>
+   199→
+   200→      {/* Main Content */}
+   201→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   202→        {/* Controls */}
+   203→        <div className="mb-6 space-y-4">
+   204→          {/* Create New Section */}
+   205→          <div className="bg-white p-4 rounded-lg shadow">
+   206→            <h3 className="text-lg font-medium mb-3">Create New Mockup</h3>
+   207→            <div className="flex gap-3">
+   208→              <input
+   209→                type="text"
+   210→                placeholder="Enter mockup name..."
+   211→                value={newMockupName}
+   212→                onChange={(e) => setNewMockupName(e.target.value)}
+   213→                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+   214→                onKeyPress={(e) => e.key === 'Enter' && handleCreateNew()}
+   215→              />
+   216→              <button
+   217→                onClick={handleCreateNew}
+   218→                disabled={isCreating || !newMockupName.trim()}
+   219→                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+   220→              >
+   221→                {isCreating ? 'Creating...' : 'Create New'}
+   222→              </button>
+   223→            </div>
+   224→          </div>
+   225→
+   226→          {/* Search and Filters */}
+   227→          <div className="flex flex-wrap gap-4">
+   228→            <div className="flex-1 min-w-[300px]">
+   229→              <input
+   230→                type="text"
+   231→                placeholder="Search mockups..."
+   232→                value={searchTerm}
+   233→                onChange={(e) => setSearchTerm(e.target.value)}
+   234→                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+   235→              />
+   236→            </div>
+   237→            
+   238→            <select
+   239→              value={filterStatus}
+   240→              onChange={(e) => setFilterStatus(e.target.value)}
+   241→              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+   242→            >
+   243→              <option value="all">All Status</option>
+   244→              <option value="draft">Draft</option>
+   245→              <option value="published">Published</option>
+   246→              <option value="archived">Archived</option>
+   247→            </select>
+   248→            
+   249→            <select
+   250→              value={filterFolder}
+   251→              onChange={(e) => setFilterFolder(e.target.value)}
+   252→              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+   253→            >
+   254→              <option value="all">All Folders</option>
+   255→              {uniqueFolders.map(folder => (
+   256→                <option key={folder} value={folder || ''}>{folder}</option>
+   257→              ))}
+   258→            </select>
+   259→          </div>
+   260→          
+   261→          {/* Items per page */}
+   262→          <div className="flex items-center gap-2">
+   263→            <span className="text-sm text-gray-600">Items per page:</span>
+   264→            <select
+   265→              value={itemsPerPage}
+   266→              onChange={(e) => {
+   267→                setItemsPerPage(Number(e.target.value));
+   268→                setCurrentPage(1);
+   269→              }}
+   270→              className="px-2 py-1 border border-gray-300 rounded-md"
+   271→            >
+   272→              <option value={10}>10</option>
+   273→              <option value={20}>20</option>
+   274→              <option value={50}>50</option>
+   275→              <option value={100}>100</option>
+   276→            </select>
+   277→          </div>
+   278→        </div>
+   279→
+   280→        {/* Mockups Table */}
+   281→        <div className="bg-white rounded-lg shadow overflow-hidden">
+   282→          <div className="overflow-x-auto">
+   283→            <table className="w-full border-collapse border border-gray-200">
+   284→              <thead className="bg-gray-50">
+   285→                <tr>
+   286→                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">link</th>
+   287→                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_name</th>
+   288→                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_description</th>
+   289→                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_status</th>
+   290→                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_folder</th>
+   291→                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">view_count</th>
+   292→                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">updated_at</th>
+   293→                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">actions</th>
+   294→                </tr>
+   295→              </thead>
+   296→              <tbody className="bg-white">
+   297→                {paginatedMockups.map((mockup) => (
+   298→                  <tr key={mockup.bakli_id} className="hover:bg-gray-50">
+   299→                    <td className="px-4 py-3 border border-gray-200">
+   300→                      <Link 
+   301→                        href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
+   302→                        className="inline-flex items-center px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors"
+   303→                      >
+   304→                        Edit
+   305→                      </Link>
+   306→                    </td>
+   307→                    <td className="px-4 py-3 border border-gray-200">
+   308→                      <Link 
+   309→                        href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
+   310→                        className="text-purple-600 hover:text-purple-800 font-medium"
+   311→                      >
+   312→                        {mockup.bakli_name}
+   313→                      </Link>
+   314→                    </td>
+   315→                    <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate border border-gray-200">
+   316→                      {mockup.bakli_description || '-'}
+   317→                    </td>
+   318→                    <td className="px-4 py-3 border border-gray-200">
+   319→                      <span className={`px-2 py-1 text-xs rounded ${
+   320→                        mockup.bakli_status === 'published' ? 'bg-green-100 text-green-800' :
+   321→                        mockup.bakli_status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+   322→                        'bg-gray-100 text-gray-800'
+   323→                      }`}>
+   324→                        {mockup.bakli_status}
+   325→                      </span>
+   326→                    </td>
+   327→                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
+   328→                      {mockup.bakli_folder || '-'}
+   329→                    </td>
+   330→                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
+   331→                      {mockup.view_count}
+   332→                    </td>
+   333→                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
+   334→                      {new Date(mockup.updated_at).toLocaleDateString()}
+   335→                    </td>
+   336→                    <td className="px-4 py-3 border border-gray-200">
+   337→                      <div className="flex gap-2">
+   338→                        <Link
+   339→                          href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
+   340→                          className="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700"
+   341→                        >
+   342→                          Edit
+   343→                        </Link>
+   344→                        <button
+   345→                          onClick={() => handleDelete(mockup.bakli_id, mockup.bakli_name)}
+   346→                          className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+   347→                        >
+   348→                          Delete
+   349→                        </button>
+   350→                      </div>
+   351→                    </td>
+   352→                  </tr>
+   353→                ))}
+   354→                {paginatedMockups.length === 0 && (
+   355→                  <tr>
+   356→                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500 border border-gray-200">
+   357→                      {filteredMockups.length === 0 ? 'No mockups found' : 'No mockups match your filters'}
+   358→                    </td>
+   359→                  </tr>
+   360→                )}
+   361→              </tbody>
+   362→            </table>
+   363→          </div>
+   364→        </div>
+   365→
+   366→        {/* Pagination */}
+   367→        {totalPages > 1 && (
+   368→          <div className="mt-4 flex items-center justify-between">
+   369→            <div className="text-sm text-gray-700">
+   370→              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredMockups.length)} of {filteredMockups.length} results
+   371→            </div>
+   372→            <div className="flex gap-2">
+   373→              <button
+   374→                onClick={() => setCurrentPage(1)}
+   375→                disabled={currentPage === 1}
+   376→                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+   377→              >
+   378→                First
+   379→              </button>
+   380→              <button
+   381→                onClick={() => setCurrentPage(currentPage - 1)}
+   382→                disabled={currentPage === 1}
+   383→                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+   384→              >
+   385→                Previous
+   386→              </button>
+   387→              <span className="px-3 py-1">
+   388→                Page {currentPage} of {totalPages}
+   389→              </span>
+   390→              <button
+   391→                onClick={() => setCurrentPage(currentPage + 1)}
+   392→                disabled={currentPage === totalPages}
+   393→                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+   394→              >
+   395→                Next
+   396→              </button>
+   397→              <button
+   398→                onClick={() => setCurrentPage(totalPages)}
+   399→                disabled={currentPage === totalPages}
+   400→                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+   401→              >
+   402→                Last
+   403→              </button>
+   404→            </div>
+   405→          </div>
+   406→        )}
+   407→      </div>
+   408→    </div>
+   409→  );
+   410→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Great! I found the `document.title` on line 39. This is a Bakli mockups management page with 410 lines. Let me convert it to Method 1:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import Link from 'next/link';
+
+interface BakliMockup {
+  bakli_id: string;
+  bakli_name: string;
+  bakli_description: string | null;
+  bakli_status: string;
+  bakli_folder: string | null;
+  bakli_tags: string[] | null;
+  is_public: boolean;
+  view_count: number;
+  created_at: string;
+  updated_at: string;
+  last_viewed_at: string | null;
+  bakli_priority: number;
+}
+
+export default function BaklijarClient() {
+  const { user } = useAuth();
+  const supabase = createClientComponentClient();
+  
+  const [mockups, setMockups] = useState<BakliMockup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterFolder, setFilterFolder] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(200);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newMockupName, setNewMockupName] = useState('');
+
+  useEffect(() => {
+    fetchMockups();
+  }, []);
+
+  const fetchMockups = async () => {
+    try {
+      setLoading(true);
+      
+      if (!user?.id) {
+        setError('User not authenticated');
+        return;
+      }
+
+      // Get user's internal ID
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (!userData) {
+        setError('User not found');
+        return;
+      }
+
+      // Fetch user's mockups
+      const { data, error } = await supabase
+        .from('bakli_mockups')
+        .select('*')
+        .eq('fk_user_id', userData.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      setMockups(data || []);
+    } catch (err) {
+      console.error('Error fetching mockups:', err);
+      setError('Failed to load mockups');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateNew = async () => {
+    if (!newMockupName.trim()) {
+      alert('Please enter a name for the new mockup');
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      // Get user's internal ID
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (!userData) {
+        throw new Error('User not found');
+      }
+
+      const { data, error } = await supabase
+        .from('bakli_mockups')
+        .insert([{
+          fk_user_id: userData.id,
+          bakli_name: newMockupName.trim(),
+          bakli_content: '<div>\n  <h1>Hello World</h1>\n  <p>Start building your mockup here...</p>\n</div>',
+          bakli_css: '/* Add your CSS styles here */\nh1 {\n  color: #333;\n  font-family: Arial, sans-serif;\n}\n\np {\n  color: #666;\n  line-height: 1.6;\n}'
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setNewMockupName('');
+      await fetchMockups();
+
+      // Navigate to the new mockup
+      if (data) {
+        window.location.href = `/admin/baklivid?bakli_id=${data.bakli_id}`;
+      }
+    } catch (err) {
+      console.error('Error creating mockup:', err);
+      alert('Failed to create new mockup');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleDelete = async (bakliId: string, mockupName: string) => {
+    if (!confirm(`Are you sure you want to delete "${mockupName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('bakli_mockups')
+        .delete()
+        .eq('bakli_id', bakliId);
+
+      if (error) throw error;
+      
+      await fetchMockups();
+      alert('Mockup deleted successfully');
+    } catch (err) {
+      console.error('Error deleting mockup:', err);
+      alert('Failed to delete mockup');
+    }
+  };
+
+  // Filter and search logic
+  const filteredMockups = mockups.filter(mockup => {
+    const matchesSearch = searchTerm === '' || 
+      mockup.bakli_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (mockup.bakli_description || '').toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = filterStatus === 'all' || mockup.bakli_status === filterStatus;
+    const matchesFolder = filterFolder === 'all' || mockup.bakli_folder === filterFolder;
+    
+    return matchesSearch && matchesStatus && matchesFolder;
+  });
+
+  // Pagination
+  const totalPages = Math.ceil(filteredMockups.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedMockups = filteredMockups.slice(startIndex, startIndex + itemsPerPage);
+
+  // Get unique folders for filter
+  const uniqueFolders = Array.from(new Set(mockups.map(m => m.bakli_folder).filter(Boolean)));
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-500">Please log in to access this page.</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-500">Loading mockups...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-purple-600 text-white p-4 mb-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold">Bakli Mockups</h1>
+          <p className="mt-1 opacity-90">HTML/CSS Mockup Creation System</p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Controls */}
+        <div className="mb-6 space-y-4">
+          {/* Create New Section */}
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-lg font-medium mb-3">Create New Mockup</h3>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                placeholder="Enter mockup name..."
+                value={newMockupName}
+                onChange={(e) => setNewMockupName(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                onKeyPress={(e) => e.key === 'Enter' && handleCreateNew()}
+              />
+              <button
+                onClick={handleCreateNew}
+                disabled={isCreating || !newMockupName.trim()}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCreating ? 'Creating...' : 'Create New'}
+              </button>
+            </div>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[300px]">
+              <input
+                type="text"
+                placeholder="Search mockups..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
+            
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="all">All Status</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+            
+            <select
+              value={filterFolder}
+              onChange={(e) => setFilterFolder(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="all">All Folders</option>
+              {uniqueFolders.map(folder => (
+                <option key={folder} value={folder || ''}>{folder}</option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Items per page */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Items per page:</span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-2 py-1 border border-gray-300 rounded-md"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Mockups Table */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">link</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_name</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_description</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_status</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">bakli_folder</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">view_count</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">updated_at</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 lowercase border border-gray-200">actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {paginatedMockups.map((mockup) => (
+                  <tr key={mockup.bakli_id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 border border-gray-200">
+                      <Link 
+                        href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
+                        className="inline-flex items-center px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors"
+                      >
+                        Edit
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 border border-gray-200">
+                      <Link 
+                        href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
+                        className="text-purple-600 hover:text-purple-800 font-medium"
+                      >
+                        {mockup.bakli_name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate border border-gray-200">
+                      {mockup.bakli_description || '-'}
+                    </td>
+                    <td className="px-4 py-3 border border-gray-200">
+                      <span className={`px-2 py-1 text-xs rounded ${
+                        mockup.bakli_status === 'published' ? 'bg-green-100 text-green-800' :
+                        mockup.bakli_status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {mockup.bakli_status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
+                      {mockup.bakli_folder || '-'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
+                      {mockup.view_count}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 border border-gray-200">
+                      {new Date(mockup.updated_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 border border-gray-200">
+                      <div className="flex gap-2">
+                        <Link
+                          href={`/admin/baklivid?bakli_id=${mockup.bakli_id}`}
+                          className="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(mockup.bakli_id, mockup.bakli_name)}
+                          className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {paginatedMockups.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500 border border-gray-200">
+                      {filteredMockups.length === 0 ? 'No mockups found' : 'No mockups match your filters'}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredMockups.length)} of {filteredMockups.length} results
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+              >
+                First
+              </button>
+              <button
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="px-3 py-1">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+              >
+                Next
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50"
+              >
+                Last
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/baklijar/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me replace the page.tsx with the server component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+import { Metadata } from 'next';
+import BaklijarClient from './pclient';
+
+export const metadata: Metadata = {
+  title: 'Bakli Mockups - Admin - Snefuru',
+};
+
+export default function BaklijarPage() {
+  return <BaklijarClient />;
+}
+```
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/baklijar/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import { Metadata } from 'next';
+     2→import BaklijarClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'Bakli Mockups - Admin - Snefuru',
+     6→};
+     7→
+     8→export default function BaklijarPage() {
+     9→  return <BaklijarClient />;
+    10→}
+```
+
