@@ -616,7 +616,8 @@ export default function Header() {
                         isGconjarPage ? (colors['headerbg1_gconjar1'] || '#ffffff') :
                         isPedtorPage ? (colors['headerbg1_pedtor'] || '#ffffff') : 
                         isPedbarPage ? (colors['headerbg_pedbar'] || '#ffffff') : 
-                        '#ffffff'
+                        '#ffffff',
+        borderBottom: '2px solid #4a5568'
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
