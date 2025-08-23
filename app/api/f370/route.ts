@@ -199,7 +199,6 @@ export async function POST(request: NextRequest) {
           .insert({
             keyword_datum: renderedKeyword,
             rel_dfs_location_code: parseInt(rel_dfs_location_code),
-            location_display_name: city.city_name + ', ' + city.state_code,
             language_code: language_code,
             language_name: 'English'
           })
