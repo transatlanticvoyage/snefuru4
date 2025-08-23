@@ -12,6 +12,7 @@ const NubraTablefaceKite = dynamic(
 interface RedditUrl {
   url_id: number;
   url_datum: string | null;
+  is_commentable: boolean | null;
   count_obls?: number;
   subreddit_name: string | null;
   post_id: string | null;
@@ -94,6 +95,7 @@ export default function ReddjarTable({
   // Form data for creating/editing
   const [formData, setFormData] = useState({
     url_datum: '',
+    is_commentable: true,
     count_obls: 0,
     subreddit_name: '',
     post_id: '',
@@ -129,6 +131,7 @@ export default function ReddjarTable({
   }> = [
     { key: 'url_id', type: 'integer', width: '80px', label: 'url_id' },
     { key: 'url_datum', type: 'text', width: '280px', label: 'url_datum' },
+    { key: 'is_commentable', type: 'boolean', width: '90px', label: 'is_commentable' },
     { key: 'count_obls', type: 'integer', width: '100px', label: 'count_obls' },
     { key: 'subreddit_name', type: 'text', width: '150px', label: 'subreddit_name' },
     { key: 'post_id', type: 'text', width: '120px', label: 'post_id' },
@@ -464,7 +467,9 @@ export default function ReddjarTable({
 
     // Process value based on field type
     const column = columns.find(col => col.key === field);
-    if (column?.type === 'integer') {
+    if (column?.type === 'boolean') {
+      processedValue = editingValue === 'true' || editingValue === '1' || editingValue.toLowerCase() === 'yes';
+    } else if (column?.type === 'integer') {
       processedValue = editingValue === '' ? null : parseInt(editingValue);
       if (isNaN(processedValue)) {
         processedValue = null;
@@ -542,6 +547,7 @@ export default function ReddjarTable({
         .from('redditurlsvat')
         .insert({
           url_datum: null,
+          is_commentable: true,
           subreddit_name: null,
           post_id: null,
           post_title: null,
@@ -619,6 +625,7 @@ export default function ReddjarTable({
       
       const insertData = {
         url_datum: formData.url_datum?.trim() || null,
+        is_commentable: formData.is_commentable,
         subreddit_name: formData.subreddit_name?.trim() || null,
         post_id: formData.post_id?.trim() || null,
         post_title: formData.post_title?.trim() || null,
@@ -659,6 +666,7 @@ export default function ReddjarTable({
   const resetForm = () => {
     setFormData({
       url_datum: '',
+      is_commentable: true,
       subreddit_name: '',
       post_id: '',
       post_title: '',
@@ -773,7 +781,9 @@ export default function ReddjarTable({
 
     // Format display value
     let displayValue = '';
-    if (column.type === 'json') {
+    if (column.type === 'boolean') {
+      displayValue = value === null || value === undefined ? '' : (value ? 'true' : 'false');
+    } else if (column.type === 'json') {
       displayValue = value ? JSON.stringify(value) : '';
     } else if (column.type === 'array') {
       displayValue = value && Array.isArray(value) ? JSON.stringify(value) : (value ? String(value) : '');
@@ -785,6 +795,25 @@ export default function ReddjarTable({
       displayValue = value !== null && value !== undefined ? parseFloat(value as string).toFixed(2) : '';
     } else {
       displayValue = value?.toString() || '';
+    }
+
+    // Special handling for is_commentable column to show visual indicator
+    if (column.key === 'is_commentable') {
+      const booleanValue = value as boolean;
+      return (
+        <div className="flex items-center gap-1">
+          <div
+            onClick={() => !isReadOnly && handleCellClick(item.url_id, column.key, value)}
+            className={`min-h-[1.25rem] px-2 py-0.5 rounded text-xs font-bold ${
+              !isReadOnly ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+            } ${booleanValue ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} ${isReadOnly ? 'opacity-60' : ''}`}
+            style={{ whiteSpace: 'nowrap' }}
+            title={isReadOnly ? displayValue : `${displayValue} (Click to edit)`}
+          >
+            {booleanValue ? '✓ Open' : '✗ Closed'}
+          </div>
+        </div>
+      );
     }
 
     // Special handling for count_obls column to show EXP button
@@ -1350,6 +1379,17 @@ export default function ReddjarTable({
                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                     placeholder="https://www.reddit.com/r/subreddit/comments/..."
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Comments Status</label>
+                  <select
+                    value={formData.is_commentable.toString()}
+                    onChange={(e) => setFormData({...formData, is_commentable: e.target.value === 'true'})}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  >
+                    <option value="true">Open (Comments Allowed)</option>
+                    <option value="false">Closed (Comments Locked)</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Subreddit Name</label>

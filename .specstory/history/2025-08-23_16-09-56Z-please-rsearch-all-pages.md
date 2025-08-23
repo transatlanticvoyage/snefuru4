@@ -2432,3 +2432,976 @@ mv app/(protected)/sitejar4 app/(protected)/sitejar
 
 This plan will cleanly rename sitejar4 to /sitejar while removing the obsolete sitejar3, giving you the clean `/sitejar` URL you want.
 
+---
+
+_**User**_
+
+please do somethign else first. please find our main header component that shows on all pages. please add a border to it that is 2 px solid and dark gray . the border should only be on the bottom of the heasder. 
+
+_**User**_
+
+[Request interrupted by user]
+
+_**User**_
+
+plpleaes continue with the instructions from before when i cut you off (regarding border)
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll help you find the main header component and add a 2px solid dark gray bottom border. Let me search for the header component first.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep**
+
+Result:
+
+```
+Found 147 files
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/scafjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/skojar2/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/skojar1/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar2/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/metrojar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cityjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/aspejar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/callplatjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cgigjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/fabric/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/zhefetchjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwtagzar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/dfslocr/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwjar/KwjarClient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwtagzar/components/KeywordsTagsTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwjar/components/TagsPlenchPopup.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kwjar/components/KeywordsHubTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(prot5)/test502/Test502Client.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(prot5)/test501/Test501Client.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(prot5)/ProtectedLayoutClient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/components/Cnjar1Table.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cityjar/components/CityjarTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/zhefetchjar/components/SerpFetchesTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/components/SerpResultsTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/yoshidexman/components/YoshidexSessionsTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(prot3)/sabjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(prot3)/sabjar/components/SaberTableFixed.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(prot3)/sabjar/components/SaberTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(prot3)/sabjar/components/AdvancedDataGrid.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(prot3)/layout.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/ExportSitesComponent.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/shared/InputsExpandEditor.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/aspejar/components/AspejarTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/tshelljar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/rackjar/components/RackuiColumnsTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filejar/components/FilejarTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/components/ui/card.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/admin/rapidlyxman/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/torna3/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filegun/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/folderjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/shared/FilegunFoldersTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filegun/components/FilegunColumnView.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filegun/components/MeadControl.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filegun/components/SentinelControl.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/layout.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/fobjectjar/components/FobjectjarTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/fobjectjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/folderjar/components/FolderjarTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/SidebarMenu.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/Header.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filegun-nav-demo/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filejar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/filegun/components/FilegunExplorer.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/xpagesmanager1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/torna3/components/Torna3ZarnoAccordion.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/pureFavaPageMaster.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/plutoDebugMonitor.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/favaPageMasterWithPagination.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/favaPageMaster.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/coltempcommand/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/favaMinimalTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/pagination/favaMinimalTablePaginated.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/tornado/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/jetstream/sunrowslots/SunRowsHeader.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/plutoTestPage.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/favaTaniPopup/favaTaniModal.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/favaTaniPopup/favaTaniConditionalComponents.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/fava/components/favaHeader.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/obi/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/rstormanager/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/torna2/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected2)/bren1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/myhub/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/gconjar1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected3)/bensa/components/BensaFieldTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin31/panjar4/components/panjar4.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/utg_manager/components/UiTableGridsTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/MinimalTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/baklivid/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/columnrobot/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/ketch_manager/components/KetchSettingsTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/baklijar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/jexplain/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/tornado/components/WaterTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/torya/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/torya/components/WaterTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin42/narpo1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin34/tebnar2/components/Tebnar2Main.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/mesagen/components/MesagenTableEditor.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/mesagen/[id]/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/depline_imperatives/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/nwjar1/components/NwpiContentTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/kxtemplates/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/gconjar1/components/GconPiecesTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/nwjar1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/choptext/components/SharmiChopTextLayout.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/nwjar1/components/NwpiPusherButton.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/edable/components/EdableTableEditor.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/edable/components/DorliEditor.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/valan/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/torlid1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/downloadplugin/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/pedtor1/components/ElementorEditor.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/clevnar3/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/pedtor1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/utilpr1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin43/narpivid/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin34/tebnar2/components/Tebnar2Table.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin32/tebnar1/components/tebnar1.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/bin65/charla1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/popnow/components/KPopup1.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/colors1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/ContentDataLineageTableHeaderTierSystem1.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/pedbar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/components/ui/FPopup1Template/FPopup1TemplateProvider.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/components/ui/FPopup1Template/FPopup1Template.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/components/ui/FPopup1Template/FPopup1Header.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin/create-new-api-key-slots/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin34/tebnar2/components/Tebnar2ExcelPasteGrid.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin34/tebnar2/components/Tebnar2Columns.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/admin-tools/f23-storage-cleanup/components/F23StorageCleanupForm.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/nwivid/components/NwpiContentView.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/nwivid/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin38/rangivid/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/siteupd1/components/SpreadsheetGrid.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/siteupd1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitnivid/components/SitesprenEditor.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitnivid/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/hcomjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/pages/bin150/sitesjar1.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin34/statusjar1/components/StatusJar1.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/bin47/wepfol/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/bin45/weplich1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin51/uidev1/components/uidev1.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin41/domnivid/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/bin35/statusbox1/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/stuff1/layout.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the main header component. Let me read it to see its current structure:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/components/Header.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import React from "react";
+     4→import { useState, useRef, useEffect, useCallback } from 'react';
+     5→import Link from 'next/link';
+     6→import Image from 'next/image';
+     7→import { useAuth } from '@/app/context/AuthContext';
+     8→import { useRouter, usePathname } from 'next/navigation';
+     9→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+    10→import { useCustomColors } from '@/app/hooks/useCustomColors';
+    11→import { createNavigationStructure } from '@/app/utils/navigationHelper';
+    12→import { useRecentPages } from '@/app/hooks/useRecentPages';
+    13→
+    14→interface NavItem {
+    15→  name: string;
+    16→  path?: string;
+    17→  children?: NavItem[];
+    18→}
+    19→
+    20→export default function Header() {
+    21→  const { user, signOut } = useAuth();
+    22→  const router = useRouter();
+    23→  const pathname = usePathname();
+    24→  const supabase = createClientComponentClient();
+    25→  
+    26→  // Get dynamic base URL
+    27→  const getBaseUrl = () => {
+    28→    if (typeof window !== 'undefined') {
+    29→      return window.location.origin;
+    30→    }
+    31→    return 'https://snef.me'; // Fallback for SSR
+    32→  };
+    33→  
+    34→  const baseUrl = getBaseUrl();
+    35→  
+    36→  // kzstylerule - custom header bg color for /admin/ pages
+    37→  const isAdminPage = pathname?.startsWith('/admin/');
+    38→  // kzstylerule - custom header bg color for /pedbar page
+    39→  const isPedbarPage = pathname === '/pedbar';
+    40→  // kzstylerule - custom header bg color for /pedtor1 page
+    41→  const isPedtorPage = pathname === '/pedtor1';
+    42→  // kzstylerule - custom header bg color for /gconjar1 page
+    43→  const isGconjarPage = pathname === '/gconjar1';
+    44→  // kzstylerule - custom header bg color for /nwjar1 page
+    45→  const isNwjarPage = pathname === '/nwjar1';
+    46→  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+    47→  const [navDropdowns, setNavDropdowns] = useState<{[key: string]: boolean}>({});
+    48→  const [navItems, setNavItems] = useState<NavItem[]>([]);
+    49→  const [isNeptuneNavOpen, setIsNeptuneNavOpen] = useState(false);
+    50→  const userDropdownRef = useRef<HTMLDivElement>(null);
+    51→  const navDropdownRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+    52→  const { recentPages, clearRecents } = useRecentPages();
+    53→
+    54→  // Fetch custom colors for headers
+    55→  const { colors } = useCustomColors([
+    56→    'headerbg_pedbar',
+    57→    'headerbg1_pedtor',
+    58→    'headerbg1_gconjar1',
+    59→    'headerbg1_nwjar1'
+    60→  ]);
+    61→
+    62→  useEffect(() => {
+    63→    function handleClickOutside(event: MouseEvent) {
+    64→      const target = event.target as HTMLElement;
+    65→      
+    66→      // Don't close dropdown if clicking on a link or inside a link
+    67→      const isLinkClick = target.tagName === 'A' || target.closest('a');
+    68→      if (isLinkClick) {
+    69→        return;
+    70→      }
+    71→      
+    72→      // Close user dropdown
+    73→      if (
+    74→        userDropdownRef.current &&
+    75→        !userDropdownRef.current.contains(target)
+    76→      ) {
+    77→        setIsUserDropdownOpen(false);
+    78→      }
+    79→      
+    80→      // Close nav dropdowns
+    81→      Object.keys(navDropdowns).forEach(key => {
+    82→        if (
+    83→          navDropdownRefs.current[key] &&
+    84→          !navDropdownRefs.current[key]?.contains(target)
+    85→        ) {
+    86→          setNavDropdowns(prev => ({ ...prev, [key]: false }));
+    87→        }
+    88→      });
+    89→    }
+    90→    document.addEventListener('mousedown', handleClickOutside);
+    91→    return () => document.removeEventListener('mousedown', handleClickOutside);
+    92→  }, [navDropdowns]);
+    93→
+    94→
+    95→  useEffect(() => {
+    96→    // Fetch navigation items when component mounts
+    97→    const fetchNavItems = async () => {
+    98→      try {
+    99→        console.log('Fetching navigation items...');
+   100→        const response = await fetch('/api/navigation');
+   101→        console.log('Navigation response:', response);
+   102→        const data = await response.json();
+   103→        console.log('Navigation data:', data);
+   104→        setNavItems(data);
+   105→      } catch (error) {
+   106→        console.error('Error fetching navigation:', error);
+   107→      }
+   108→    };
+   109→
+   110→    fetchNavItems();
+   111→  }, []);
+   112→
+   113→
+   114→  const handleLogout = async () => {
+   115→    try {
+   116→      await signOut();
+   117→      router.push('/login');
+   118→    } catch (error) {
+   119→      console.error('Error signing out:', error);
+   120→    }
+   121→  };
+   122→
+   123→  const toggleNavDropdown = (itemName: string) => {
+   124→    setNavDropdowns(prev => ({
+   125→      ...prev,
+   126→      [itemName]: !prev[itemName]
+   127→    }));
+   128→  };
+   129→
+   130→  const copyToClipboard = async (text: string) => {
+   131→    try {
+   132→      await navigator.clipboard.writeText(text);
+   133→    } catch (err) {
+   134→      console.error('Failed to copy text: ', err);
+   135→    }
+   136→  };
+   137→
+   138→  const copyFullUrlToClipboard = async (path: string) => {
+   139→    try {
+   140→      const fullUrl = `${getBaseUrl()}${path}`;
+   141→      await navigator.clipboard.writeText(fullUrl);
+   142→    } catch (err) {
+   143→      console.error('Failed to copy full URL: ', err);
+   144→    }
+   145→  };
+   146→
+   147→  // Split navigation items into 2 rows, with break after panjar3
+   148→  const splitNavItems = () => {
+   149→    const { adminMenuItem, specialFirstItem, oldAllGroupItem, plutoJetstreamItem, hardcodedNavItems } = createNavigationStructure(navItems);
+   150→
+   151→    // Create the OPEN FULL NAV button item
+   152→    const openFullNavButton: NavItem = {
+   153→      name: 'OPEN FULL NAV',
+   154→      path: undefined // No path - this will be handled as a button
+   155→    };
+   156→
+   157→    // Create the recents menu item
+   158→    const recentsChildren: NavItem[] = [];
+   159→    
+   160→    // Add recent pages
+   161→    recentPages.forEach((page, index) => {
+   162→      recentsChildren.push({
+   163→        name: page.title,
+   164→        path: page.path
+   165→      });
+   166→    });
+   167→    
+   168→    // Add separator and clear option if there are recent pages
+   169→    if (recentPages.length > 0) {
+   170→      recentsChildren.push({
+   171→        name: '---recents-separator---',
+   172→        path: undefined // No link - separator
+   173→      });
+   174→      recentsChildren.push({
+   175→        name: 'Clear All',
+   176→        path: undefined, // Special handling for clear action
+   177→        clearAction: true
+   178→      } as NavItem & { clearAction?: boolean });
+   179→    }
+   180→    
+   181→    // If no recent pages, show message
+   182→    if (recentPages.length === 0) {
+   183→      recentsChildren.push({
+   184→        name: 'No recent pages',
+   185→        path: undefined
+   186→      });
+   187→    }
+   188→
+   189→    const recentsMenuItem: NavItem = {
+   190→      name: 'recents',
+   191→      children: recentsChildren
+   192→    };
+   193→
+   194→    // Create the favorites menu item
+   195→    const favoritesMenuItem: NavItem = {
+   196→      name: 'favorites',
+   197→      children: [
+   198→        {
+   199→          name: 'No favorites yet',
+   200→          path: undefined
+   201→        }
+   202→      ]
+   203→    };
+   204→
+   205→    // Create the final nav items array with OPEN FULL NAV button first, then recents, then favorites, then admin, pluto jetstream, then special item, then oldallgroup, then hardcoded items
+   206→    const finalNavItems = [openFullNavButton, recentsMenuItem, favoritesMenuItem, adminMenuItem, plutoJetstreamItem, specialFirstItem, oldAllGroupItem, ...hardcodedNavItems];
+   207→
+   208→    const panjar3Index = finalNavItems.findIndex(item => item.name === 'panjar3');
+   209→    if (panjar3Index === -1) {
+   210→      // If panjar3 not found, split roughly in half
+   211→      const midPoint = Math.ceil(finalNavItems.length / 2);
+   212→      return {
+   213→        firstRow: finalNavItems.slice(0, midPoint),
+   214→        secondRow: finalNavItems.slice(midPoint)
+   215→      };
+   216→    } else {
+   217→      // Split after panjar3 (include panjar3 in first row)
+   218→      return {
+   219→        firstRow: finalNavItems.slice(0, panjar3Index + 1),
+   220→        secondRow: finalNavItems.slice(panjar3Index + 1)
+   221→      };
+   222→    }
+   223→  };
+   224→
+   225→  const renderNavItem = (item: NavItem) => {
+   226→    if (item.children && item.children.length > 0) {
+   227→      // Render dropdown menu for parent items
+   228→      return (
+   229→        <div
+   230→          key={item.name}
+   231→          className="relative"
+   232→          ref={(el) => { navDropdownRefs.current[item.name] = el; }}
+   233→        >
+   234→          <button
+   235→            onClick={() => toggleNavDropdown(item.name)}
+   236→            className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700 focus:outline-none"
+   237→          >
+   238→            {item.name === 'admin' && (
+   239→              <svg 
+   240→                className="w-4 h-4 mr-1 text-black" 
+   241→                style={{ 
+   242→                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+   243→                }}
+   244→                fill="currentColor" 
+   245→                viewBox="0 0 20 20"
+   246→              >
+   247→                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+   248→              </svg>
+   249→            )}
+   250→            {item.name === 'navgroup1' && (
+   251→              <svg 
+   252→                className="w-4 h-4 mr-1 text-black" 
+   253→                style={{ 
+   254→                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+   255→                }}
+   256→                fill="currentColor" 
+   257→                stroke="white"
+   258→                strokeWidth="1"
+   259→                viewBox="0 0 20 20"
+   260→              >
+   261→                <path d="M10 3l7 14H3z" />
+   262→              </svg>
+   263→            )}
+   264→            {item.name === 'recents' && (
+   265→              <svg 
+   266→                className="w-4 h-4 mr-1 text-black" 
+   267→                style={{ 
+   268→                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+   269→                }}
+   270→                fill="currentColor" 
+   271→                stroke="white"
+   272→                strokeWidth="1"
+   273→                viewBox="0 0 20 20"
+   274→              >
+   275→                <rect x="4" y="4" width="12" height="12" />
+   276→              </svg>
+   277→            )}
+   278→            {item.name === 'favorites' && (
+   279→              <svg 
+   280→                className="w-4 h-4 mr-1 text-black" 
+   281→                style={{ 
+   282→                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+   283→                }}
+   284→                fill="currentColor" 
+   285→                stroke="white"
+   286→                strokeWidth="1"
+   287→                viewBox="0 0 20 20"
+   288→              >
+   289→                <path d="M10 3l6.18 4.5-2.36 7.26h-7.64L3.82 7.5z" />
+   290→              </svg>
+   291→            )}
+   292→            {item.name === 'pluto jetstream' && (
+   293→              <svg 
+   294→                className="w-4 h-4 mr-1 text-black" 
+   295→                style={{ 
+   296→                  filter: 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)'
+   297→                }}
+   298→                fill="currentColor" 
+   299→                viewBox="0 0 20 20"
+   300→              >
+   301→                <circle cx="10" cy="10" r="8" />
+   302→              </svg>
+   303→            )}
+   304→            {item.name}
+   305→            <svg
+   306→              className={`ml-1 h-4 w-4 transition-transform ${
+   307→                navDropdowns[item.name] ? 'rotate-180' : ''
+   308→              }`}
+   309→              fill="none"
+   310→              viewBox="0 0 24 24"
+   311→              stroke="currentColor"
+   312→            >
+   313→              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+   314→            </svg>
+   315→          </button>
+   316→          
+   317→          {navDropdowns[item.name] && (
+   318→            <div className={`absolute left-0 mt-1 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 ${
+   319→              item.name === 'navgroup1' ? 'w-auto min-w-96' : 'w-48'
+   320→            }`}>
+   321→              {item.children.map((child, childIndex) => {
+   322→                // Check if this is a separator item (no path)
+   323→                if (!child.path && !child.children) {
+   324→                  // Special handling for pluto jetstream separators
+   325→                  if (item.name === 'pluto jetstream' && (child.name === '---separator---' || child.name === '---separator2---' || child.name === '---separator3---' || child.name === '---separator4---')) {
+   326→                    return (
+   327→                      <div
+   328→                        key={`${item.name}-${child.name}-${childIndex}`}
+   329→                        className="block my-1"
+   330→                        style={{ height: '6px', backgroundColor: '#000000', width: '100%' }}
+   331→                      >
+   332→                      </div>
+   333→                    );
+   334→                  }
+   335→                  
+   336→                  // Special handling for recents separators
+   337→                  if (item.name === 'recents' && child.name === '---recents-separator---') {
+   338→                    return (
+   339→                      <div
+   340→                        key={`${item.name}-${child.name}-${childIndex}`}
+   341→                        className="block my-1"
+   342→                        style={{ height: '6px', backgroundColor: '#000000', width: '100%' }}
+   343→                      >
+   344→                      </div>
+   345→                    );
+   346→                  }
+   347→                  
+   348→                  // Special handling for "Clear All" action in recents
+   349→                  if (item.name === 'recents' && child.name === 'Clear All') {
+   350→                    return (
+   351→                      <button
+   352→                        key={`${item.name}-${child.name}-${childIndex}`}
+   353→                        onClick={(e) => {
+   354→                          e.preventDefault();
+   355→                          e.stopPropagation();
+   356→                          clearRecents();
+   357→                          setNavDropdowns(prev => ({ ...prev, [item.name]: false }));
+   358→                        }}
+   359→                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium"
+   360→                      >
+   361→                        {child.name}
+   362→                      </button>
+   363→                    );
+   364→                  }
+   365→                  
+   366→                  // Regular separator (for other dropdowns)
+   367→                  return (
+   368→                    <div
+   369→                      key={`${item.name}-${child.name}-${childIndex}`}
+   370→                      className={`block px-4 py-2 text-sm font-medium bg-black text-white ${
+   371→                        item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
+   372→                      }`}
+   373→                    >
+   374→                      {child.name}
+   375→                    </div>
+   376→                  );
+   377→                }
+   378→                
+   379→                // Check if this child has its own children (sub-dropdown)
+   380→                if (child.children && child.children.length > 0) {
+   381→                  return (
+   382→                    <div
+   383→                      key={`${item.name}-${child.name}-${childIndex}`}
+   384→                      className="relative group"
+   385→                    >
+   386→                      <button
+   387→                        className={`w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between ${
+   388→                          item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
+   389→                        }`}
+   390→                      >
+   391→                        {child.name}
+   392→                        <svg
+   393→                          className="ml-1 h-4 w-4"
+   394→                          fill="none"
+   395→                          viewBox="0 0 24 24"
+   396→                          stroke="currentColor"
+   397→                        >
+   398→                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+   399→                        </svg>
+   400→                      </button>
+   401→                      
+   402→                      {/* Sub-dropdown menu */}
+   403→                      <div className="absolute left-full top-0 ml-1 hidden group-hover:block rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 w-48">
+   404→                        {child.children.map((grandchild, grandchildIndex) => {
+   405→                          if (!grandchild.path) {
+   406→                            return (
+   407→                              <div
+   408→                                key={`${child.name}-${grandchild.name}-${grandchildIndex}`}
+   409→                                className="block px-4 py-2 text-sm font-medium bg-black text-white"
+   410→                              >
+   411→                                {grandchild.name}
+   412→                              </div>
+   413→                            );
+   414→                          }
+   415→                          
+   416→                          return (
+   417→                            <Link
+   418→                              key={`${child.name}-${grandchild.name}-${grandchildIndex}`}
+   419→                              href={grandchild.path}
+   420→                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+   421→                              onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
+   422→                            >
+   423→                              {grandchild.name}
+   424→                            </Link>
+   425→                          );
+   426→                        })}
+   427→                      </div>
+   428→                    </div>
+   429→                  );
+   430→                }
+   431→                
+   432→                // Regular menu item with link (no children)
+   433→                if (child.path) {
+   434→                  // Special handling for pluto jetstream items - add copy button
+   435→                  if (item.name === 'pluto jetstream') {
+   436→                    return (
+   437→                      <div
+   438→                        key={`${item.name}-${child.name}-${childIndex}`}
+   439→                        className="flex items-center hover:bg-gray-100"
+   440→                      >
+   441→                        <button
+   442→                          onClick={(e) => {
+   443→                            e.preventDefault();
+   444→                            e.stopPropagation();
+   445→                            // TODO: Add to favorites functionality
+   446→                          }}
+   447→                          className="ml-4 mr-1 bg-white hover:bg-yellow-100 transition-colors duration-200 flex items-center justify-center border border-gray-400"
+   448→                          style={{
+   449→                            width: '12px',
+   450→                            height: '12px',
+   451→                            minWidth: '12px',
+   452→                            minHeight: '12px'
+   453→                          }}
+   454→                          title={`Add "${child.name}" to favorites`}
+   455→                        >
+   456→                          <svg
+   457→                            className="w-2 h-2 text-gray-400"
+   458→                            fill="none"
+   459→                            stroke="currentColor"
+   460→                            strokeWidth="1"
+   461→                            viewBox="0 0 24 24"
+   462→                          >
+   463→                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+   464→                          </svg>
+   465→                        </button>
+   466→                        <button
+   467→                          onClick={(e) => {
+   468→                            e.preventDefault();
+   469→                            e.stopPropagation();
+   470→                            copyFullUrlToClipboard(child.path);
+   471→                          }}
+   472→                          className="ml-4 mr-1 bg-gray-300 hover:bg-yellow-400 transition-colors duration-200 flex items-center justify-center"
+   473→                          style={{
+   474→                            width: '12px',
+   475→                            height: '12px',
+   476→                            minWidth: '12px',
+   477→                            minHeight: '12px',
+   478→                            fontSize: '9px',
+   479→                            fontWeight: 'bold'
+   480→                          }}
+   481→                          title={`Copy full URL "${getBaseUrl()}${child.path}"`}
+   482→                        >
+   483→                          F
+   484→                        </button>
+   485→                        <button
+   486→                          onClick={(e) => {
+   487→                            e.preventDefault();
+   488→                            e.stopPropagation();
+   489→                            copyToClipboard(child.name);
+   490→                          }}
+   491→                          className="mr-2 bg-gray-300 hover:bg-yellow-400 transition-colors duration-200"
+   492→                          style={{
+   493→                            width: '12px',
+   494→                            height: '12px',
+   495→                            minWidth: '12px',
+   496→                            minHeight: '12px'
+   497→                          }}
+   498→                          title={`Copy "${child.name}"`}
+   499→                        />
+   500→                        <Link
+   501→                          href={child.path}
+   502→                          className="flex-1 pr-4 py-2 text-sm text-gray-700 block"
+   503→                          onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
+   504→                        >
+   505→                          <span className="flex items-center justify-between">
+   506→                            <span>{child.name}</span>
+   507→                            {/* Database table mapping */}
+   508→                            {(() => {
+   509→                              const dbTableMap: { [key: string]: string } = {
+   510→                                'sunjar': 'suns',
+   511→                                'moonjar': 'moons',
+   512→                                'rackjar': 'rackuic',
+   513→                                'yegjar': 'yegdbc',
+   514→                                'zugjar': 'zugdbt',
+   515→                                'cfdefjar': 'cfdef',
+   516→                                'cfvaljar': 'cfval'
+   517→                              };
+   518→                              const tableName = dbTableMap[child.name];
+   519→                              return tableName ? (
+   520→                                <span className="kremnav_utg_box text-gray-500 text-sm ml-2">
+   521→                                  {tableName}
+   522→                                </span>
+   523→                              ) : null;
+   524→                            })()}
+   525→                          </span>
+   526→                        </Link>
+   527→                      </div>
+   528→                    );
+   529→                  }
+   530→                  
+   531→                  // Regular menu item for other dropdowns
+   532→                  return (
+   533→                    <Link
+   534→                      key={`${item.name}-${child.name}-${childIndex}`}
+   535→                      href={child.path}
+   536→                      className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
+   537→                        item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
+   538→                      }`}
+   539→                      onClick={() => setNavDropdowns(prev => ({ ...prev, [item.name]: false }))}
+   540→                    >
+   541→                      {child.name}
+   542→                    </Link>
+   543→                  );
+   544→                }
+   545→                
+   546→                // Fallback for items without path or children
+   547→                return (
+   548→                  <span
+   549→                    key={`${item.name}-${child.name}-${childIndex}`}
+   550→                    className={`block px-4 py-2 text-sm text-gray-500 ${
+   551→                      item.name === 'navgroup1' ? 'whitespace-nowrap' : ''
+   552→                    }`}
+   553→                  >
+   554→                    {child.name}
+   555→                  </span>
+   556→                );
+   557→              })}
+   558→            </div>
+   559→          )}
+   560→        </div>
+   561→      );
+   562→    } else {
+   563→      // Render regular navigation link only if path exists
+   564→      if (!item.path) {
+   565→        // Special handling for OPEN FULL NAV button
+   566→        if (item.name === 'OPEN FULL NAV') {
+   567→          return (
+   568→            <button
+   569→              key={item.name}
+   570→              onClick={() => setIsNeptuneNavOpen(true)}
+   571→              className="text-gray-900 hover:text-gray-700"
+   572→              style={{
+   573→                fontSize: '14px',
+   574→                padding: '4px',
+   575→                borderRadius: '4px',
+   576→                border: '1px solid #9ca3af',
+   577→                display: 'inline-flex',
+   578→                alignItems: 'center'
+   579→              }}
+   580→            >
+   581→              {item.name}
+   582→            </button>
+   583→          );
+   584→        }
+   585→        
+   586→        return (
+   587→          <span
+   588→            key={item.name}
+   589→            className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-500"
+   590→          >
+   591→            {item.name}
+   592→          </span>
+   593→        );
+   594→      }
+   595→      
+   596→      return (
+   597→        <Link
+   598→          key={item.name}
+   599→          href={item.path}
+   600→          className="inline-flex items-center px-1 py-1 text-sm font-medium text-gray-900 hover:text-gray-700"
+   601→        >
+   602→          {item.name}
+   603→        </Link>
+   604→      );
+   605→    }
+   606→  };
+   607→
+   608→  const { firstRow, secondRow } = splitNavItems();
+   609→
+   610→  return (
+   611→    <>
+   612→    <header 
+   613→      className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
+   614→      style={{ 
+   615→        backgroundColor: isNwjarPage ? (colors['headerbg1_nwjar1'] || '#ffffff') :
+   616→                        isGconjarPage ? (colors['headerbg1_gconjar1'] || '#ffffff') :
+   617→                        isPedtorPage ? (colors['headerbg1_pedtor'] || '#ffffff') : 
+   618→                        isPedbarPage ? (colors['headerbg_pedbar'] || '#ffffff') : 
+   619→                        '#ffffff'
+   620→      }}
+   621→    >
+   622→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   623→        <div className="flex justify-between h-20"> {/* Increased height for 2 rows */}
+   624→          <div className="flex">
+   625→            <div className="flex-shrink-0 flex items-center">
+   626→              <Link href="/" className="flex items-center space-x-3">
+   627→                {/* Logo - Planet */}
+   628→                <div className="relative h-10 w-10 flex-shrink-0">
+   629→                  <svg
+   630→                    width="40"
+   631→                    height="40"
+   632→                    viewBox="0 0 40 40"
+   633→                    fill="none"
+   634→                    xmlns="http://www.w3.org/2000/svg"
+   635→                  >
+   636→                    <circle
+   637→                      cx="20"
+   638→                      cy="20"
+   639→                      r="18"
+   640→                      fill="#87CEEB"
+   641→                    />
+   642→                  </svg>
+   643→                </div>
+   644→                {/* App Name */}
+   645→                <span className="text-xl font-bold text-indigo-600">
+   646→                  Tregnar
+   647→                </span>
+   648→              </Link>
+   649→            </div>
+   650→            <nav className="ml-6 flex flex-col justify-center space-y-1"> {/* Changed to flex-col with space-y-1 */}
+   651→              {/* First row */}
+   652→              <div className="flex space-x-8">
+   653→                {firstRow.map((item) => renderNavItem(item))}
+   654→              </div>
+   655→              {/* Second row */}
+   656→              {secondRow.length > 0 && (
+   657→                <div className="flex space-x-8">
+   658→                  {secondRow.map((item) => renderNavItem(item))}
+   659→                </div>
+   660→              )}
+   661→            </nav>
+   662→          </div>
+   663→          <div className="flex items-center">
+   664→            <div className="relative" ref={userDropdownRef}>
+   665→              <button
+   666→                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+   667→                className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+   668→              >
+   669→                <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+   670→                  {user?.email?.[0].toUpperCase() || 'U'}
+   671→                </div>
+   672→              </button>
+   673→              {isUserDropdownOpen && (
+   674→                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50">
+   675→                  <div className="px-4 py-2 text-sm text-gray-700 border-b">
+   676→                    {user?.email}
+   677→                  </div>
+   678→                  <Link
+   679→                    href="/myhub"
+   680→                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+   681→                  >
+   682→                    MyHub Account Settings
+   683→                  </Link>
+   684→                  <Link
+   685→                    href="/profile"
+   686→                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+   687→                  >
+   688→                    Profile Settings
+   689→                  </Link>
+   690→                  <Link
+   691→                    href="/downloadplugin"
+   692→                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+   693→                  >
+   694→                    Download Snefuruplin WP Plugin
+   695→                  </Link>
+   696→                  <Link
+   697→                    href="/ruplin-api-keys-p1"
+   698→                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+   699→                  >
+   700→                    API Keys - Ruplin WP Plugin
+   701→                  </Link>
+   702→                  <Link
+   703→                    href="/clevnar3"
+   704→                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+   705→                  >
+   706→                    API Keys - External
+   707→                  </Link>
+   708→                  <button
+   709→                    onClick={handleLogout}
+   710→                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+   711→                  >
+   712→                    Sign out
+   713→                  </button>
+   714→                </div>
+   715→              )}
+   716→            </div>
+   717→          </div>
+   718→        </div>
+   719→      </div>
+   720→    </header>
+   721→    
+   722→    {/* Neptune Nav Popup */}
+   723→    {isNeptuneNavOpen && (
+   724→      <div 
+   725→        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+   726→        onClick={() => setIsNeptuneNavOpen(false)}
+   727→      >
+   728→        <div 
+   729→          className="bg-white rounded shadow-lg flex items-center justify-center"
+   730→          style={{
+   731→            width: '200px',
+   732→            height: '200px'
+   733→          }}
+   734→          onClick={(e) => e.stopPropagation()}
+   735→        >
+   736→          <span className="text-black font-medium">Neptune Nav Popup</span>
+   737→        </div>
+   738→      </div>
+   739→    )}
+   740→    </>
+   741→  );
+   742→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the main header component. Now I need to add a 2px solid dark gray bottom border to it. I can see the header element starts at line 612. I'll add the border style to it.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/Header.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   608→  const { firstRow, secondRow } = splitNavItems();
+   609→
+   610→  return (
+   611→    <>
+   612→    <header 
+   613→      className={`shadow ${isAdminPage ? 'admin-header' : ''}`}
+   614→      style={{ 
+   615→        backgroundColor: isNwjarPage ? (colors['headerbg1_nwjar1'] || '#ffffff') :
+   616→                        isGconjarPage ? (colors['headerbg1_gconjar1'] || '#ffffff') :
+   617→                        isPedtorPage ? (colors['headerbg1_pedtor'] || '#ffffff') : 
+   618→                        isPedbarPage ? (colors['headerbg_pedbar'] || '#ffffff') : 
+   619→                        '#ffffff',
+   620→        borderBottom: '2px solid #4a5568'
+   621→      }}
+   622→    >
+   623→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   624→        <div className="flex justify-between h-20"> {/* Increased height for 2 rows */}
+   625→          <div className="flex">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully added a 2px solid dark gray bottom border to the main header component. The border color `#4a5568` is a dark gray that should provide good visual separation.
+
+The change I made:
+- Added `borderBottom: '2px solid #4a5568'` to the header's inline styles at line 620
+
+This border will now appear on the bottom of the header across all pages in your application, providing a consistent visual boundary between the header and the page content.
+
