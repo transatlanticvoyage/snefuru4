@@ -97,12 +97,18 @@ export async function POST(request: NextRequest) {
     const tagId = tagData.tag_id;
 
     // Step 3: Process each cncglub row
-    const processedKeywords = [];
+    const createdKeywords = [];
     const cncglubUpdates = [];
+    let keywordsCreatedCount = 0;
+
+    console.log(`Processing ${cncglubRows.length} cncglub rows...`);
 
     for (const row of cncglubRows) {
       const city = row.cities;
-      if (!city) continue;
+      if (!city) {
+        console.log(`Skipping row ${row.cncg_id} - no city data`);
+        continue;
+      }
 
       // Render dynamic shortcodes in kw_rubric
       let renderedKeyword = kw_rubric;
@@ -113,28 +119,34 @@ export async function POST(request: NextRequest) {
         renderedKeyword = renderedKeyword.replace(/\(state_code\)/g, city.state_code);
       }
 
+      console.log(`Rendered keyword for ${city.city_name}: ${renderedKeyword}`);
+
       // Check if keyword already exists
       const { data: existingKeyword, error: keywordCheckError } = await supabase
         .from('keywordshub')
         .select('keyword_id')
         .eq('keyword_datum', renderedKeyword)
-        .eq('rel_dfs_location_code', rel_dfs_location_code)
+        .eq('location_code', rel_dfs_location_code)
         .eq('language_code', language_code)
-        .single();
+        .maybeSingle();
 
       let keywordId;
+      let wasCreated = false;
 
       if (existingKeyword) {
         // Keyword exists, use existing ID
         keywordId = existingKeyword.keyword_id;
+        console.log(`Using existing keyword ID: ${keywordId}`);
       } else {
         // Create new keyword
         const { data: newKeyword, error: keywordInsertError } = await supabase
           .from('keywordshub')
           .insert({
             keyword_datum: renderedKeyword,
-            rel_dfs_location_code: parseInt(rel_dfs_location_code),
-            language_code: language_code
+            location_code: rel_dfs_location_code,
+            location_display_name: city.city_name + ', ' + city.state_code,
+            language_code: language_code,
+            language_name: 'English'
           })
           .select('keyword_id')
           .single();
@@ -145,34 +157,43 @@ export async function POST(request: NextRequest) {
         }
 
         keywordId = newKeyword.keyword_id;
+        keywordsCreatedCount++;
+        wasCreated = true;
+        console.log(`Created new keyword ID: ${keywordId}`);
       }
 
-      // Tag the keyword
-      const { error: tagAssignError } = await supabase
-        .from('keywordshub_tag_assignments')
-        .insert({
-          fk_keywordshub_id: keywordId,
-          fk_keywordshub_tags_id: tagId
-        });
+      // Tag the keyword (only if tag assignments table exists)
+      try {
+        const { error: tagAssignError } = await supabase
+          .from('keywordshub_tag_assignments')
+          .insert({
+            fk_keywordshub_id: keywordId,
+            fk_keywordshub_tags_id: tagId
+          });
 
-      if (tagAssignError && !tagAssignError.message.includes('duplicate key')) {
-        console.error('Error assigning tag:', tagAssignError);
+        if (tagAssignError && !tagAssignError.message.includes('duplicate key')) {
+          console.error('Error assigning tag (continuing):', tagAssignError.message);
+        }
+      } catch (tagError) {
+        console.log('Tag assignment failed (table may not exist), continuing...');
       }
 
       // Prepare cncglub update
       const updateData: any = {};
-      updateData[`kwslot${kwslot.replace('kwslot', '')}`] = keywordId;
+      const slotNumber = kwslot.replace('kwslot', '');
+      updateData[`kwslot${slotNumber}`] = keywordId;
 
       cncglubUpdates.push({
         cncg_id: row.cncg_id,
         updateData
       });
 
-      processedKeywords.push({
+      createdKeywords.push({
         keyword_id: keywordId,
         keyword_datum: renderedKeyword,
         city_name: city.city_name,
-        state_code: city.state_code
+        state_code: city.state_code,
+        was_created: wasCreated
       });
     }
 
@@ -210,14 +231,17 @@ export async function POST(request: NextRequest) {
       console.error('Error creating fabrication launch:', launchError);
     }
 
+    console.log(`Final results: Created ${keywordsCreatedCount} new keywords, processed ${createdKeywords.length} total`);
+
     return NextResponse.json({
       success: true,
-      message: `Processed ${processedKeywords.length} keywords from ${cncglubRows.length} cncglub rows`,
+      message: `Created ${keywordsCreatedCount} keywords from ${cncglubRows.length} cncglub rows`,
       tag_id: tagId,
       tag_name: tag_name,
-      keywords_processed: processedKeywords.length,
+      keywords_created: keywordsCreatedCount,
+      keywords_total: createdKeywords.length,
       cncglub_rows_processed: cncglubRows.length,
-      launch_id: launchData?.launch_id
+      launch_id: launchData?.launch_id || 'N/A'
     });
 
   } catch (error) {

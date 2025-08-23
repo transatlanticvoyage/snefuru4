@@ -20,6 +20,7 @@ export default function FabricPage() {
   const [showResultModal, setShowResultModal] = useState(false);
   const [resultMessage, setResultMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [fabricationLaunches, setFabricationLaunches] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     country: 'United States',
     industry_id: '',
@@ -66,6 +67,50 @@ export default function FabricPage() {
     fetchIndustries();
   }, [user]);
 
+  // Fetch fabrication launches for Tab 2
+  useEffect(() => {
+    const fetchFabricationLaunches = async () => {
+      if (!user) return;
+      
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const { data, error } = await supabase
+        .from('fabrication_launches')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (!error && data) {
+        setFabricationLaunches(data);
+      }
+    };
+
+    fetchFabricationLaunches();
+  }, [user]);
+
+  // Refresh fabrication launches after successful F370 process
+  const refreshFabricationLaunches = async () => {
+    if (!user) return;
+    
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { data, error } = await supabase
+      .from('fabrication_launches')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (!error && data) {
+      setFabricationLaunches(data);
+    }
+  };
+
   const handleF370Process = () => {
     setShowFirstConfirm(true);
   };
@@ -94,12 +139,15 @@ export default function FabricPage() {
         setIsSuccess(true);
         setResultMessage(
           `✅ F370 Process Completed Successfully!\n\n` +
-          `• Processed ${result.keywords_processed} keywords\n` +
+          `• Created ${result.keywords_created} new keywords\n` +
+          `• Total keywords managed: ${result.keywords_total}\n` +
           `• Updated ${result.cncglub_rows_processed} cncglub rows\n` +
           `• Created tag: ${result.tag_name} (ID: ${result.tag_id})\n` +
           `• Launch ID: ${result.launch_id}\n\n` +
           `Process completed at: ${new Date().toLocaleString()}`
         );
+        // Refresh fabrication launches data
+        await refreshFabricationLaunches();
       } else {
         setIsSuccess(false);
         setResultMessage(`❌ Error: ${result.error || 'Unknown error occurred'}`);
@@ -559,9 +607,43 @@ next, populate the field cncglub.kwslot* (the asterisk corresponds to "kwslot op
                     <th className="border border-gray-300 p-3 font-bold text-left">status</th>
                   </tr>
                 </thead>
-                {/* Empty tbody - no data rows yet */}
                 <tbody>
-                  {/* No rows until f370 function is created and executed */}
+                  {fabricationLaunches.length === 0 ? (
+                    <tr>
+                      <td colSpan={12} className="border border-gray-300 p-4 text-center text-gray-500 italic">
+                        No fabrication launches yet. Run F370 function to see data here.
+                      </td>
+                    </tr>
+                  ) : (
+                    fabricationLaunches.map((launch, index) => (
+                      <tr key={launch.launch_id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.launch_id}</td>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.rel_keywordshub_tag_id || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2 text-xs">
+                          {launch.created_at ? new Date(launch.created_at).toLocaleString() : 'N/A'}
+                        </td>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.user_id || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.opt_country || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.opt_industry_id || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.opt_city_population_filter || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2 text-xs max-w-32 truncate" title={launch.opt_kw_style}>
+                          {launch.opt_kw_style || 'N/A'}
+                        </td>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.opt_kw_slot || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.opt_rel_dfs_location_code || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2 text-xs">{launch.opt_language_code || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2 text-xs">
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            launch.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            launch.status === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {launch.status || 'unknown'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
