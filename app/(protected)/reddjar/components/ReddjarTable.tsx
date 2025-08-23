@@ -13,6 +13,9 @@ interface RedditUrl {
   url_id: number;
   url_datum: string | null;
   is_commentable: boolean | null;
+  is_commentable_scraped_at: string | null;
+  is_commentable_scrape_status: string | null;
+  is_commentable_scrape_error: string | null;
   count_obls?: number;
   subreddit_name: string | null;
   post_id: string | null;
@@ -134,6 +137,9 @@ export default function ReddjarTable({
     { key: 'url_id', type: 'integer', width: '80px', label: 'url_id' },
     { key: 'url_datum', type: 'text', width: '280px', label: 'url_datum' },
     { key: 'is_commentable', type: 'boolean', width: '90px', label: 'is_commentable' },
+    { key: 'is_commentable_scraped_at', type: 'timestamp', width: '160px', label: 'is_commentable_scraped_at' },
+    { key: 'is_commentable_scrape_status', type: 'text', width: '120px', label: 'is_commentable_scrape_status' },
+    { key: 'is_commentable_scrape_error', type: 'text', width: '200px', label: 'is_commentable_scrape_error' },
     { key: 'count_obls', type: 'integer', width: '100px', label: 'count_obls' },
     { key: 'subreddit_name', type: 'text', width: '150px', label: 'subreddit_name' },
     { key: 'post_id', type: 'text', width: '120px', label: 'post_id' },

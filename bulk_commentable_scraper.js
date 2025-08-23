@@ -14,22 +14,10 @@ const DELAY_BETWEEN_BATCHES = 5000;  // 5 second delay between batches
 const DELAY_BETWEEN_REQUESTS = 300;  // 300ms delay between individual Reddit API calls
 const MAX_RETRIES = 3;          // Retry failed requests up to 3 times
 
-// Reddit API interfaces
-interface RedditSubmission {
-  id: string;
-  title: string;
-  selftext: string;
-  url: string;
-  is_self: boolean;
-  created_utc: number;
-  author: string;
-  archived: boolean;
-  locked: boolean;
-  contest_mode?: boolean;
-}
+// Reddit API interfaces (JavaScript - no TypeScript interfaces needed)
 
 // Check if a Reddit thread is commentable
-function isThreadCommentable(submission: RedditSubmission): boolean {
+function isThreadCommentable(submission) {
   if (submission.archived) {
     return false;
   }
@@ -42,7 +30,7 @@ function isThreadCommentable(submission: RedditSubmission): boolean {
 }
 
 // Fetch Reddit thread data for commentability check
-async function fetchRedditThreadCommentability(redditUrl: string): Promise<RedditSubmission | null> {
+async function fetchRedditThreadCommentability(redditUrl) {
   try {
     // Convert Reddit URL to JSON API format
     let jsonUrl = redditUrl;
@@ -69,7 +57,7 @@ async function fetchRedditThreadCommentability(redditUrl: string): Promise<Reddi
       throw new Error('No submission data found');
     }
     
-    const submission: RedditSubmission = {
+    const submission = {
       id: submissionData.id,
       title: submissionData.title || '',
       selftext: submissionData.selftext || '',
@@ -91,36 +79,71 @@ async function fetchRedditThreadCommentability(redditUrl: string): Promise<Reddi
 }
 
 // Process a single URL with retry logic
-async function processUrl(redditUrl: any, retryCount = 0): Promise<any> {
+async function processUrl(redditUrl, retryCount = 0) {
+  let scrapeError = null;
+  let scrapeStatus = 'processing';
+  
   try {
     // Fetch Reddit thread data
     const submission = await fetchRedditThreadCommentability(redditUrl.url_datum);
     if (!submission) {
+      scrapeError = 'Failed to fetch Reddit thread data';
+      scrapeStatus = 'failed';
+      
+      // Update database with failure
+      await supabase
+        .from('redditurlsvat')
+        .update({ 
+          is_commentable_scraped_at: new Date().toISOString(),
+          is_commentable_scrape_status: scrapeStatus,
+          is_commentable_scrape_error: scrapeError
+        })
+        .eq('url_id', redditUrl.url_id);
+      
       return {
         url_id: redditUrl.url_id,
         url: redditUrl.url_datum,
         success: false,
-        error: 'Failed to fetch Reddit thread data',
+        error: scrapeError,
         is_commentable: null
       };
     }
     
     // Check if thread is commentable
     const isCommentable = isThreadCommentable(submission);
+    scrapeStatus = 'success';
     
-    // Update the is_commentable field in the database
+    // Update the database with successful result
     const { error: updateError } = await supabase
       .from('redditurlsvat')
-      .update({ is_commentable: isCommentable })
+      .update({ 
+        is_commentable: isCommentable,
+        is_commentable_scraped_at: new Date().toISOString(),
+        is_commentable_scrape_status: scrapeStatus,
+        is_commentable_scrape_error: null
+      })
       .eq('url_id', redditUrl.url_id);
     
     if (updateError) {
       console.error(`❌ Database update failed for URL ${redditUrl.url_id}:`, updateError);
+      scrapeError = `Database update failed: ${updateError.message}`;
+      scrapeStatus = 'db_error';
+      
+      // Try to update just the error status
+      await supabase
+        .from('redditurlsvat')
+        .update({ 
+          is_commentable_scraped_at: new Date().toISOString(),
+          is_commentable_scrape_status: scrapeStatus,
+          is_commentable_scrape_error: scrapeError
+        })
+        .eq('url_id', redditUrl.url_id);
+      
       return {
         url_id: redditUrl.url_id,
         url: redditUrl.url_datum,
         success: false,
-        error: 'Database update failed',
+        error: scrapeError,
         is_commentable: isCommentable
       };
     }
@@ -139,11 +162,24 @@ async function processUrl(redditUrl: any, retryCount = 0): Promise<any> {
       return processUrl(redditUrl, retryCount + 1);
     }
     
+    scrapeError = error instanceof Error ? error.message : 'Unknown error';
+    scrapeStatus = 'failed';
+    
+    // Update database with final failure
+    await supabase
+      .from('redditurlsvat')
+      .update({ 
+        is_commentable_scraped_at: new Date().toISOString(),
+        is_commentable_scrape_status: scrapeStatus,
+        is_commentable_scrape_error: scrapeError
+      })
+      .eq('url_id', redditUrl.url_id);
+    
     return {
       url_id: redditUrl.url_id,
       url: redditUrl.url_datum,
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: scrapeError,
       is_commentable: null
     };
   }
@@ -159,15 +195,17 @@ async function bulkScrapeCommentability() {
   console.log(`   - Delay between batches: ${DELAY_BETWEEN_BATCHES}ms`);
   console.log(`   - Delay between requests: ${DELAY_BETWEEN_REQUESTS}ms`);
   console.log(`   - Max retries: ${MAX_RETRIES}`);
+  console.log(`   - Processing order: HIGHEST estimated_traffic_cost first`);
   console.log('');
   
   try {
-    // Get total count first
-    console.log('📋 Counting total URLs...');
+    // Get total count of URLs that haven't been scraped yet
+    console.log('📋 Counting URLs that need scraping...');
     const { count: totalCount, error: countError } = await supabase
       .from('redditurlsvat')
       .select('*', { count: 'exact', head: true })
-      .not('url_datum', 'is', null);
+      .not('url_datum', 'is', null)
+      .is('is_commentable_scraped_at', null);
     
     if (countError) {
       throw new Error(`Failed to count URLs: ${countError.message}`);
@@ -190,12 +228,14 @@ async function bulkScrapeCommentability() {
       console.log(`\n🔄 BATCH ${batchNumber}/${Math.ceil(totalCount / BATCH_SIZE)} (URLs ${offset + 1}-${Math.min(offset + BATCH_SIZE, totalCount)})`);
       console.log('=' .repeat(60));
       
-      // Fetch batch of URLs
+      // Fetch batch of URLs that haven't been scraped yet (ordered by highest traffic cost first)
       const { data: redditUrls, error: fetchError } = await supabase
         .from('redditurlsvat')
-        .select('url_id, url_datum')
+        .select('url_id, url_datum, estimated_traffic_cost')
         .not('url_datum', 'is', null)
-        .order('url_id', { ascending: true })
+        .is('is_commentable_scraped_at', null)
+        .order('estimated_traffic_cost', { ascending: false, nullsLast: true })
+        .order('url_id', { ascending: true }) // Secondary sort for consistent pagination
         .range(offset, offset + BATCH_SIZE - 1);
       
       if (fetchError) {
@@ -216,6 +256,7 @@ async function bulkScrapeCommentability() {
         const urlNumber = offset + i + 1;
         
         console.log(`\n   🔗 [${urlNumber}/${totalCount}] Processing URL ${redditUrl.url_id}`);
+        console.log(`      💰 Traffic Cost: $${redditUrl.estimated_traffic_cost || '0.00'}`);
         console.log(`      📄 ${redditUrl.url_datum.substring(0, 80)}...`);
         
         const result = await processUrl(redditUrl);

@@ -141,10 +141,13 @@ export async function POST(request: NextRequest) {
         console.log(`   🎯 Result: is_commentable=${isCommentable} (should be ${isCommentable ? 'OPEN ✓' : 'CLOSED ✗'})`);
         console.log(`   🗄️ Updating database for url_id=${redditUrl.url_id}`);
         
-        // Update the is_commentable field in the database
+        // Update the is_commentable field and timestamp in the database
         const { error: updateError } = await supabase
           .from('redditurlsvat')
-          .update({ is_commentable: isCommentable })
+          .update({ 
+            is_commentable: isCommentable,
+            is_commentable_scraped_at: new Date().toISOString()
+          })
           .eq('url_id', redditUrl.url_id);
         
         if (updateError) {
