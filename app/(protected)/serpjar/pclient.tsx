@@ -233,6 +233,9 @@ export default function SerpjarClient() {
           <div className="flex items-center space-x-6">
             <h1 className="text-2xl font-bold text-gray-800">🎯 SERP Results</h1>
             <ZhedoriButtonBar />
+            <div className="border border-black px-3 py-2">
+              <div className="font-bold text-base">keywordshub.cached_cncglub_ids</div>
+            </div>
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-500">Search Engine Results</div>
@@ -303,6 +306,22 @@ export default function SerpjarClient() {
             }`}
           >
             {completeLoading ? 'Checking...' : 'Complete Pending Fetch'}
+          </button>
+
+          {/* F410 Stamp EMD Match Button */}
+          <button
+            onClick={() => {
+              // TODO: Add F410 functionality
+              console.log('F410 Stamp EMD Match button clicked for keyword_id:', keywordId);
+            }}
+            disabled={!keywordId}
+            className={`ml-3 px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-orange-500 text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2'
+            }`}
+          >
+            Run F410 Stamp EMD Match 1
           </button>
         </div>
       </div>

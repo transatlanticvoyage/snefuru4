@@ -65,7 +65,7 @@ const columns: ColumnDefinition[] = [
   { key: 'created_by', label: 'created_by', type: 'text' },
   { key: 'last_updated_by', label: 'last_updated_by', type: 'text' },
   { key: 'tags', label: 'tags', type: 'tags' },
-  { key: 'reverse_lookup', label: 'reverse_lookup', type: 'text', headerRow1Text: 'reverse lookup - cncglub.kwslot1', headerRow2Text: 'cncglub.cncg_id(s)', headerRow1BgClass: 'bg-gray-200' }
+  { key: 'reverse_lookup', label: 'reverse_lookup', type: 'text', headerRow1Text: 'keywordshub', headerRow2Text: 'cached_cncglub_ids (revlook)', headerRow1BgClass: 'bg-gray-200' }
 ];
 
 interface KeywordsHubTableProps {

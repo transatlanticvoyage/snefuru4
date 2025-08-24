@@ -1,0 +1,48 @@
+note: this button must be grayed out/unavailable unless a specific keyword_id paramater is set in the url
+
+here is how function should work:
+
+look through the zhe_serp_results (the top 100 that show in the table from the active kw selection)
+
+and look at the k_root_domain column
+
+
+———————————————————————
+side note:
+
+please create new button in orange bg color to right of the complete pending fetch button taht says                
+
+run f410 stamp emd match 1                                                                                                                                                                                                      
+when user clicks this, the following function will be run:                                                     
+
+(we must add new db field called k_root_domain to db table zhe_serp_results)
+
+
+
+please issue sql for this with field type of text
+
+then create some type of trigger or automatic process that any time a new db row is created and there is a value in field "domain" in zhe_serp_results, run a parse or extraction process that does the following:
+
+extracts the root domain
+
+so if "domain" column holds value "www.dogs.com"
+
+then the k_root_domain column becomes "dogs.com"
+
+and "parsons.jarls.cats.com" becomes "cats.com" in our new column
+
+(so all subdomains must be removed - we must accurately get a list of current domain extensions or have a way to know how to do this accurately because there are many weird domain extensions like .co.nz , .net.za, etc. and we don't want our system not understandign that those are not a root domain themselves but rather a multi-part domain extension)
+
+———————————————————————
+
+
+continuing on with our previous function from above
+
+the system must look at these 2 db columns and their values:
+
+industries.emd_stamp_slug
+cities.city_name
+
+as
+
+

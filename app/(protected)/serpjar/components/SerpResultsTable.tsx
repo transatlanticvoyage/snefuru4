@@ -15,6 +15,7 @@ interface SerpResult {
   result_type: string;
   rank_in_group: string;
   rank_absolute: string;
+  k_root_domain: string | null;
   is_match_emd_stamp: boolean | null;
   domain: string;
   title: string;
@@ -58,6 +59,7 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
     { key: 'result_type', type: 'text', width: '120px', label: 'result_type' },
     { key: 'rank_in_group', type: 'number', width: '100px', label: 'rank_in_group' },
     { key: 'rank_absolute', type: 'number', width: '100px', label: 'rank_absolute' },
+    { key: 'k_root_domain', type: 'text', width: '150px', label: 'k_root_domain' },
     { key: 'is_match_emd_stamp', type: 'boolean', width: '120px', label: 'is_match_emd_stamp' },
     { key: 'domain', type: 'text', width: '200px', label: 'domain' },
     { key: 'title', type: 'text', width: '300px', label: 'title' },
@@ -595,7 +597,7 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
       {/* Table */}
       <div className="bg-white overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '2000px' }}>
+          <table className="w-full border-collapse border border-gray-200" style={{ minWidth: '2150px' }}>
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-2 py-3 text-left border border-gray-200" style={{ width: '20px' }}>
