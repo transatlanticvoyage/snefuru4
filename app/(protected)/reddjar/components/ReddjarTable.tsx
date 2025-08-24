@@ -12,6 +12,7 @@ const NubraTablefaceKite = dynamic(
 interface RedditUrl {
   url_id: number;
   url_datum: string | null;
+  is_starred: boolean | null;
   is_commentable: boolean | null;
   is_commentable_scraped_at: string | null;
   is_commentable_scrape_status: string | null;
@@ -64,13 +65,15 @@ interface ReddjarTableProps {
   selectedRows?: Set<number>;
   onSelectionChange?: (selectedRows: Set<number>) => void;
   commentableFilter?: 'all' | 'yes' | 'no';
+  scrapeStatusFilter?: 'all' | 'success' | 'failed';
 }
 
 export default function ReddjarTable({ 
   onColumnPaginationRender, 
   selectedRows = new Set(), 
   onSelectionChange,
-  commentableFilter = 'all'
+  commentableFilter = 'all',
+  scrapeStatusFilter = 'all'
 }: ReddjarTableProps = {}) {
   const [data, setData] = useState<RedditUrl[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,6 +138,7 @@ export default function ReddjarTable({
     label: string;
   }> = [
     { key: 'url_id', type: 'integer', width: '80px', label: 'url_id' },
+    { key: 'is_starred', type: 'boolean', width: '60px', label: '⭐' },
     { key: 'url_datum', type: 'text', width: '280px', label: 'url_datum' },
     { key: 'is_commentable', type: 'boolean', width: '90px', label: 'is_commentable' },
     { key: 'is_commentable_scraped_at', type: 'timestamp', width: '160px', label: 'is_commentable_scraped_at' },
@@ -436,6 +440,16 @@ export default function ReddjarTable({
         }
       }
       
+      // Apply scrape status filter
+      if (scrapeStatusFilter !== 'all') {
+        if (scrapeStatusFilter === 'success' && item.is_commentable_scrape_status !== 'success') {
+          return false;
+        }
+        if (scrapeStatusFilter === 'failed' && item.is_commentable_scrape_status !== 'failed') {
+          return false;
+        }
+      }
+      
       return true;
     });
 
@@ -454,7 +468,7 @@ export default function ReddjarTable({
     });
 
     return filtered;
-  }, [data, searchTerm, sortField, sortOrder, commentableFilter]);
+  }, [data, searchTerm, sortField, sortOrder, commentableFilter, scrapeStatusFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
@@ -558,6 +572,38 @@ export default function ReddjarTable({
       ));
     } catch (error) {
       console.error('Error updating field:', error);
+    }
+  };
+
+  // Toggle star status with immediate UI update
+  const toggleStar = async (id: number, currentValue: boolean | null) => {
+    const newValue = !currentValue;
+    
+    // Optimistically update UI immediately
+    setData(prev => prev.map(item => 
+      item.url_id === id ? { ...item, is_starred: newValue } : item
+    ));
+    
+    // Update database
+    try {
+      const { error } = await supabase
+        .from('redditurlsvat')
+        .update({ is_starred: newValue })
+        .eq('url_id', id);
+
+      if (error) {
+        console.error('Error updating star:', error);
+        // Revert optimistic update on error
+        setData(prev => prev.map(item => 
+          item.url_id === id ? { ...item, is_starred: currentValue } : item
+        ));
+      }
+    } catch (error) {
+      console.error('Error updating star:', error);
+      // Revert optimistic update on error
+      setData(prev => prev.map(item => 
+        item.url_id === id ? { ...item, is_starred: currentValue } : item
+      ));
     }
   };
 
@@ -816,6 +862,35 @@ export default function ReddjarTable({
       displayValue = value !== null && value !== undefined ? parseFloat(value as string).toFixed(2) : '';
     } else {
       displayValue = value?.toString() || '';
+    }
+
+    // Special handling for is_starred column to show clickable star
+    if (column.key === 'is_starred') {
+      const isStarred = value as boolean;
+      return (
+        <div className="flex items-center justify-center">
+          <div
+            onClick={() => toggleStar(item.url_id, isStarred)}
+            className="cursor-pointer hover:scale-110 transition-transform duration-200 p-1"
+            title={isStarred ? "Click to unstar" : "Click to star"}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              className={isStarred ? "text-red-600" : "text-gray-400"}
+            >
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                fill={isStarred ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+      );
     }
 
     // Special handling for is_commentable column to show visual indicator

@@ -4918,3 +4918,402 @@ Perfect! ✅ **The F370 tag assignment bug has been fixed.**
 
 The F370 function will now properly apply the tags it creates to the keywords it processes, completing the full workflow as intended! 🎯
 
+---
+
+_**User**_
+
+on page at /serpjar please do the following:
+
+add bold text 20 px that says:
+keywordshub.keyword_id
+
+add this text just below the "SERP Results" heading on the page 
+
+then to the right of this new text, create a ui table that has 1 header row and 1 tbody row, and 5 columns
+
+make the header row have a light gray bg and bold text
+
+make the body row be white bg color 
+
+give every cell and outside edge of the table a border of 1px solid dark gray . use border collapse
+
+in the header row put this in each cell for now as placeholder text
+1
+2
+3
+4
+5
+
+(for each column)
+
+do not fill the table with any real logic or functionaltiy. that is coming in future prompts
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll add the requested elements to the /serpjar page. Let me first locate the page and examine its current structure:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/components/SerpResultsTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/page.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/serpjar/page.tsx`
+
+Result:
+
+```
+1→import { Metadata } from 'next';
+     2→import SerpjarClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'serpjar',
+     6→};
+     7→
+     8→export default function SerpjarPage() {
+     9→  return <SerpjarClient />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/serpjar/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import ZhedoriButtonBar from '@/app/components/ZhedoriButtonBar';
+     7→import SerpResultsTable from './components/SerpResultsTable';
+     8→
+     9→export default function SerpjarClient() {
+    10→  const { user } = useAuth();
+    11→  const router = useRouter();
+    12→
+    13→  useEffect(() => {
+    14→    if (!user) {
+    15→      router.push('/login');
+    16→      return;
+    17→    }
+    18→  }, [user, router]);
+    19→
+    20→  if (!user) {
+    21→    return (
+    22→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    23→        <div className="text-gray-500">Loading...</div>
+    24→      </div>
+    25→    );
+    26→  }
+    27→
+    28→  return (
+    29→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    30→      {/* Header */}
+    31→      <div className="bg-white border-b px-6 py-4">
+    32→        <div className="flex items-center justify-between">
+    33→          <div className="flex items-center space-x-6">
+    34→            <h1 className="text-2xl font-bold text-gray-800">🎯 SERP Results</h1>
+    35→            <ZhedoriButtonBar />
+    36→          </div>
+    37→          <div className="text-right">
+    38→            <div className="text-sm text-gray-500">Search Engine Results</div>
+    39→            <div className="text-xs text-gray-400">Project: DataForSEO Integration</div>
+    40→          </div>
+    41→        </div>
+    42→      </div>
+    43→
+    44→      {/* Main Content - Full Width SerpResultsTable */}
+    45→      <div className="flex-1 overflow-hidden">
+    46→        <SerpResultsTable />
+    47→      </div>
+    48→    </div>
+    49→  );
+    50→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll update the pclient.tsx file to add the requested elements below the "SERP Results" heading:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    26→  }
+    27→
+    28→  return (
+    29→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    30→      {/* Header */}
+    31→      <div className="bg-white border-b px-6 py-4">
+    32→        <div className="flex items-center justify-between">
+    33→          <div className="flex items-center space-x-6">
+    34→            <h1 className="text-2xl font-bold text-gray-800">🎯 SERP Results</h1>
+    35→            <ZhedoriButtonBar />
+    36→          </div>
+    37→          <div className="text-right">
+    38→            <div className="text-sm text-gray-500">Search Engine Results</div>
+    39→            <div className="text-xs text-gray-400">Project: DataForSEO Integration</div>
+    40→          </div>
+    41→        </div>
+    42→        
+    43→        {/* New section below SERP Results heading */}
+    44→        <div className="mt-4 flex items-start space-x-6">
+    45→          <div className="font-bold text-gray-800" style={{ fontSize: '20px' }}>
+    46→            keywordshub.keyword_id
+    47→          </div>
+    48→          
+    49→          {/* UI Table */}
+    50→          <table className="border-collapse" style={{ border: '1px solid #4a5568' }}>
+    51→            <thead>
+    52→              <tr className="bg-gray-200">
+    53→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>1</th>
+    54→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>2</th>
+    55→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>3</th>
+    56→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>4</th>
+    57→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>5</th>
+    58→              </tr>
+    59→            </thead>
+    60→            <tbody>
+    61→              <tr className="bg-white">
+    62→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+    63→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+    64→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+    65→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+    66→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+    67→              </tr>
+    68→            </tbody>
+    69→          </table>
+    70→        </div>
+    71→      </div>
+    72→
+    73→      {/* Main Content - Full Width SerpResultsTable */}
+    74→      <div className="flex-1 overflow-hidden">
+    75→        <SerpResultsTable />
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! ✅ **I've successfully added the requested elements to the /serpjar page:**
+
+## Summary of Changes Made:
+
+**Added to `/app/(protected)/serpjar/pclient.tsx` (lines 43-70):**
+
+1. **✅ Bold Text "keywordshub.keyword_id"**:
+   - Font size: 20px 
+   - Bold styling
+   - Positioned below the "SERP Results" heading
+
+2. **✅ UI Table with 5 Columns**:
+   - **Header row**: Light gray background (`bg-gray-200`) with bold text
+   - **Body row**: White background (`bg-white`)
+   - **Borders**: 1px solid dark gray (`#4a5568`) on all cells and table edges
+   - **Border collapse**: Applied to table
+   - **Placeholder content**: Header cells contain "1", "2", "3", "4", "5"
+   - **Empty cells**: Body row cells are empty as requested
+
+3. **✅ Layout**:
+   - Text and table positioned side-by-side using flexbox
+   - Proper spacing between elements
+   - Integrated cleanly within the existing header section
+
+The table structure is ready for future functionality as requested. The placeholder numbered headers (1-5) are in place and the body row is empty, waiting for real logic and functionality in future prompts! 🎯
+
+---
+
+_**User**_
+
+please create sql that i can run in supabase to do the following
+
+in existing db table
+
+industries
+
+create new db column named
+
+emd_stamp_slug
+
+type is text
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here's the SQL command you can run in Supabase to add the new column to the industries table:
+
+```sql
+ALTER TABLE industries 
+ADD COLUMN emd_stamp_slug TEXT;
+```
+
+This SQL will:
+- ✅ Add a new column named `emd_stamp_slug`
+- ✅ Set the data type as `TEXT`
+- ✅ Allow NULL values (which is the default)
+- ✅ Add the column to the existing `industries` table without affecting existing data
+
+You can run this in the Supabase SQL editor under Database → SQL Editor.
+
+---
+
+_**User**_
+
+i ran the sql. pleaes now add new ui column to the main ui table grid at indusjar for this new db column
+
+pleaes add the ui column just to immediate right of existing ui column for industry_name 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll add the new `emd_stamp_slug` column to the indusjar table. Let me first locate the indusjar components:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/page.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/indusjar/components/IndusjarTable.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import dynamic from 'next/dynamic';
+     6→
+     7→const NubraTablefaceKite = dynamic(
+     8→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+     9→  { ssr: false }
+    10→);
+    11→
+    12→interface Industry {
+    13→  industry_id: number;
+    14→  industry_name: string | null;
+    15→  industry_description: string | null;
+    16→  created_at: string;
+    17→  updated_at: string | null;
+    18→}
+    19→
+    20→export default function IndusjarTable() {
+    21→  const [data, setData] = useState<Industry[]>([]);
+    22→  const [loading, setLoading] = useState(true);
+    23→  const [error, setError] = useState<string | null>(null);
+    24→  const [searchTerm, setSearchTerm] = useState('');
+    25→  const [currentPage, setCurrentPage] = useState(1);
+    26→  const [itemsPerPage, setItemsPerPage] = useState(100);
+    27→  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    28→  const [sortField, setSortField] = useState<keyof Industry>('created_at');
+    29→  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    30→  
+    31→  // Modal states
+    32→  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    33→  
+    34→  // Inline editing states
+    35→  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
+    36→  const [editingValue, setEditingValue] = useState<string>('');
+    37→  
+    38→  // Form data for creating
+    39→  const [formData, setFormData] = useState({
+    40→    industry_name: '',
+    41→    industry_description: ''
+    42→  });
+    43→
+    44→  const supabase = createClientComponentClient();
+    45→
+    46→  // Define columns
+    47→  const columns = [
+    48→    { key: 'industry_id' as keyof Industry, label: 'industry_id', type: 'number', readOnly: true },
+    49→    { key: 'industry_name' as keyof Industry, label: 'industry_name', type: 'text' },
+    50→    { key: 'industry_description' as keyof Industry, label: 'industry_description', type: 'text' },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/indusjar/components/IndusjarTable.tsx`
+
+Result:
+
+```
+46→  // Define columns
+    47→  const columns = [
+    48→    { key: 'industry_id' as keyof Industry, label: 'industry_id', type: 'number', readOnly: true },
+    49→    { key: 'industry_name' as keyof Industry, label: 'industry_name', type: 'text' },
+    50→    { key: 'industry_description' as keyof Industry, label: 'industry_description', type: 'text' },
+    51→    { key: 'created_at' as keyof Industry, label: 'created_at', type: 'datetime', readOnly: true },
+    52→    { key: 'updated_at' as keyof Industry, label: 'updated_at', type: 'datetime', readOnly: true }
+    53→  ];
+    54→
+    55→  // Fetch data from Supabase
+    56→  const fetchData = async () => {
+    57→    try {
+    58→      setLoading(true);
+    59→      const { data: industriesData, error } = await supabase
+    60→        .from('industries')
+    61→        .select('*')
+    62→        .order('created_at', { ascending: false });
+    63→
+    64→      if (error) throw error;
+    65→      setData(industriesData || []);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the Industry interface and add the new column. Let me do this in two steps:
+
+1. First, update the Industry interface to include the new column:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/indusjar/components/IndusjarTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     8→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+     9→  { ssr: false }
+    10→);
+    11→
+    12→interface Industry {
+    13→  industry_id: number;
+    14→  industry_name: string | null;
+    15→  emd_stamp_slug: string | null;
+    16→  industry_description: string | null;
+    17→  created_at: string;
+    18→  updated_at: string | null;
+    19→}
+    20→
+    21→export default function IndusjarTable() {
+    22→  const [data, setData] = useState<Industry[]>([]);
+    23→  const [loading, setLoading] = useState(true);
+```
+

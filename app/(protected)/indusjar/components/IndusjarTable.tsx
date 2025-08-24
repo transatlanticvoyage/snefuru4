@@ -12,6 +12,7 @@ const NubraTablefaceKite = dynamic(
 interface Industry {
   industry_id: number;
   industry_name: string | null;
+  emd_stamp_slug: string | null;
   industry_description: string | null;
   created_at: string;
   updated_at: string | null;
@@ -38,6 +39,7 @@ export default function IndusjarTable() {
   // Form data for creating
   const [formData, setFormData] = useState({
     industry_name: '',
+    emd_stamp_slug: '',
     industry_description: ''
   });
 
@@ -47,6 +49,7 @@ export default function IndusjarTable() {
   const columns = [
     { key: 'industry_id' as keyof Industry, label: 'industry_id', type: 'number', readOnly: true },
     { key: 'industry_name' as keyof Industry, label: 'industry_name', type: 'text' },
+    { key: 'emd_stamp_slug' as keyof Industry, label: 'emd_stamp_slug', type: 'text' },
     { key: 'industry_description' as keyof Industry, label: 'industry_description', type: 'text' },
     { key: 'created_at' as keyof Industry, label: 'created_at', type: 'datetime', readOnly: true },
     { key: 'updated_at' as keyof Industry, label: 'updated_at', type: 'datetime', readOnly: true }
@@ -195,6 +198,7 @@ export default function IndusjarTable() {
     try {
       const newRecord = {
         industry_name: 'New Industry',
+        emd_stamp_slug: '',
         industry_description: 'Industry description here'
       };
 
@@ -223,6 +227,7 @@ export default function IndusjarTable() {
     try {
       const insertData = {
         industry_name: formData.industry_name?.trim() || null,
+        emd_stamp_slug: formData.emd_stamp_slug?.trim() || null,
         industry_description: formData.industry_description?.trim() || null
       };
       
@@ -247,6 +252,7 @@ export default function IndusjarTable() {
   const resetForm = () => {
     setFormData({
       industry_name: '',
+      emd_stamp_slug: '',
       industry_description: ''
     });
   };
@@ -594,6 +600,17 @@ export default function IndusjarTable() {
                   onChange={(e) => setFormData({ ...formData, industry_name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Enter industry name"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">EMD Stamp Slug</label>
+                <input
+                  type="text"
+                  value={formData.emd_stamp_slug}
+                  onChange={(e) => setFormData({ ...formData, emd_stamp_slug: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Enter EMD stamp slug"
                 />
               </div>
               

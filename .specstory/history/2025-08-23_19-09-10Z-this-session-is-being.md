@@ -5121,3 +5121,9 @@ The scraper is successfully getting data when not rate-limited:
 
 **Recommendation**: Let it continue running. The 429 errors are temporary and the scraper will eventually process all URLs as rate limits reset.
 
+---
+
+_**User**_
+
+pleaes report to me on the status of this . what was the success rate? is it ongoing? 
+

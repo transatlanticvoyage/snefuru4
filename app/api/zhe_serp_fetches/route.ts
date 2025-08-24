@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
         *,
         keywordshub:rel_keyword_id (
           keyword_datum,
-          location_code,
+          rel_dfs_location_code,
           language_code,
           location_display_name,
           language_name

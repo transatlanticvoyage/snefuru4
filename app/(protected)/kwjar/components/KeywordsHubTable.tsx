@@ -45,6 +45,7 @@ interface ColumnDefinition {
 }
 
 const columns: ColumnDefinition[] = [
+  { key: 'serp_tool', label: 'serp_tool', type: 'button' },
   { key: 'keyword_id', label: 'keyword_id', type: 'number' },
   { key: 'keyword_datum', label: 'keyword_datum', type: 'text' },
   { key: 'search_volume', label: 'search_volume', type: 'number' },
@@ -277,7 +278,7 @@ export default function KeywordsHubTable({
   const paginatedData = itemsPerPage === 0 ? filteredAndSortedData : filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
 
   // Column pagination logic with sticky columns
-  const stickyColumnKeys = ['keyword_id', 'keyword_datum', 'search_volume', 'cpc'];
+  const stickyColumnKeys = ['serp_tool', 'keyword_id', 'keyword_datum', 'search_volume', 'cpc'];
   const stickyColumns = columns.filter(col => stickyColumnKeys.includes(col.key));
   const paginatedColumns = columns.filter(col => !stickyColumnKeys.includes(col.key));
   
@@ -1069,6 +1070,23 @@ export default function KeywordsHubTable({
       );
     }
 
+    // Special handling for SERP tool column
+    if (column.key === 'serp_tool') {
+      return (
+        <div className="px-2 py-1 flex items-center justify-center">
+          <button
+            onClick={() => {
+              window.open(`/serpjar?keyword_id=${item.keyword_id}`, '_blank');
+            }}
+            className="w-4 h-4 bg-black text-white font-bold text-xs flex items-center justify-center hover:bg-gray-800 transition-colors"
+            title={`Open SERP tool for keyword: ${item.keyword_datum}`}
+          >
+            S
+          </button>
+        </div>
+      );
+    }
+
     // Special handling for reverse lookup column
     if (column.key === 'reverse_lookup') {
       const cachedIds = item.cached_cncglub_ids;
@@ -1365,7 +1383,8 @@ export default function KeywordsHubTable({
                     }}
                   >
                     <span className="font-bold text-xs">
-                      {column.headerRow1Text || (column.key === 'tags' ? 'multi db tables' : 'keywordshub')}
+                      {column.key === 'serp_tool' ? 'tool' : 
+                       column.headerRow1Text || (column.key === 'tags' ? 'multi db tables' : 'keywordshub')}
                     </span>
                   </th>
                 ))}
@@ -1394,16 +1413,20 @@ export default function KeywordsHubTable({
                 {visibleColumns.map((column) => (
                   <th
                     key={column.key}
-                    className={`px-2 py-3 text-left border border-gray-200 cursor-pointer hover:bg-gray-100 ${
+                    className={`px-2 py-3 text-left border border-gray-200 ${
+                      column.key === 'serp_tool' ? '' : 'cursor-pointer hover:bg-gray-100'
+                    } ${
                       column.leftSeparator === 'black-4px' ? 'border-l-black border-l-[4px]' : ''
                     } ${
                       column.rightSeparator === 'black-4px' ? 'border-r-black border-r-[4px]' : ''
                     }`}
-                    onClick={() => handleSort(column.key as keyof KeywordRecord)}
+                    onClick={column.key === 'serp_tool' ? undefined : () => handleSort(column.key as keyof KeywordRecord)}
                   >
                     <div className="flex items-center space-x-1">
-                      <span className="font-bold text-xs lowercase">{column.headerRow2Text || column.label}</span>
-                      {sortField === column.key && (
+                      <span className="font-bold text-xs lowercase">
+                        {column.key === 'serp_tool' ? 'serp' : (column.headerRow2Text || column.label)}
+                      </span>
+                      {sortField === column.key && column.key !== 'serp_tool' && (
                         <span className="text-xs">
                           {sortOrder === 'asc' ? '↑' : '↓'}
                         </span>

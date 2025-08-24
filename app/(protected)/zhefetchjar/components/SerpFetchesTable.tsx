@@ -21,7 +21,7 @@ interface SerpFetch {
   created_at: string;
   keywordshub?: {
     keyword_datum: string;
-    location_code: string;
+    rel_dfs_location_code: number;
     language_code: string;
     location_display_name: string;
     language_name: string;

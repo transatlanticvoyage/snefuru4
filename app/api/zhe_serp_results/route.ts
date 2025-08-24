@@ -4,18 +4,58 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 export async function GET(request: NextRequest) {
   try {
     const supabase = supabaseAdmin;
+    const { searchParams } = new URL(request.url);
+    const keywordId = searchParams.get('keyword_id');
 
-    // Fetch all serp results
-    const { data: results, error } = await supabase
-      .from('zhe_serp_results')
-      .select('*')
-      .order('created_at', { ascending: false });
+    let query;
+
+    if (keywordId) {
+      // Filter results by keyword_id using the relationship chain:
+      // zhe_serp_results.rel_fetch_id -> zhe_serp_fetches.rel_keyword_id -> keywordshub.keyword_id
+      console.log(`Filtering results for keyword_id: ${keywordId}`);
+      
+      // First get fetch_ids for this keyword_id
+      const { data: fetches, error: fetchError } = await supabase
+        .from('zhe_serp_fetches')
+        .select('fetch_id')
+        .eq('rel_keyword_id', parseInt(keywordId));
+
+      if (fetchError) {
+        console.error('Error fetching fetch_ids:', fetchError);
+        return NextResponse.json({ error: 'Failed to fetch fetch data' }, { status: 500 });
+      }
+
+      if (!fetches || fetches.length === 0) {
+        console.log(`No fetches found for keyword_id: ${keywordId}`);
+        return NextResponse.json({ results: [] });
+      }
+
+      const fetchIds = fetches.map(f => f.fetch_id);
+      console.log(`Found ${fetchIds.length} fetch_ids: ${fetchIds.join(', ')}`);
+
+      // Now get results for these fetch_ids
+      query = supabase
+        .from('zhe_serp_results')
+        .select('*')
+        .in('rel_fetch_id', fetchIds)
+        .order('rank_absolute', { ascending: true, nullsLast: true });
+
+    } else {
+      // Fetch all serp results if no keyword_id specified
+      query = supabase
+        .from('zhe_serp_results')
+        .select('*')
+        .order('created_at', { ascending: false });
+    }
+
+    const { data: results, error } = await query;
 
     if (error) {
       console.error('Error fetching zhe_serp_results:', error);
       return NextResponse.json({ error: 'Failed to fetch results' }, { status: 500 });
     }
 
+    console.log(`Returning ${results?.length || 0} results`);
     return NextResponse.json({ results });
 
   } catch (error) {

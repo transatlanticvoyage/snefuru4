@@ -16,6 +16,7 @@ export default function ReddjarClient() {
   const [isScrapingLinks, setIsScrapingLinks] = useState(false);
   const [isScrapingCommentable, setIsScrapingCommentable] = useState(false);
   const [commentableFilter, setCommentableFilter] = useState<'all' | 'yes' | 'no'>('all');
+  const [scrapeStatusFilter, setScrapeStatusFilter] = useState<'all' | 'success' | 'failed'>('all');
 
   const handleScrapeLinks = async () => {
     if (selectedRows.size === 0) {
@@ -194,6 +195,22 @@ export default function ReddjarClient() {
                 <option value="no">no</option>
               </select>
             </div>
+            
+            {/* is_commentable_scrape_status Filter */}
+            <div className="flex flex-col items-center">
+              <div className="text-black font-bold mb-1" style={{ fontSize: '16px' }}>
+                is_commentable_scrape_status
+              </div>
+              <select
+                value={scrapeStatusFilter}
+                onChange={(e) => setScrapeStatusFilter(e.target.value as 'all' | 'success' | 'failed')}
+                className="px-3 py-2 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">All</option>
+                <option value="success">Success</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-500">Table: redditurlsvat</div>
@@ -209,6 +226,7 @@ export default function ReddjarClient() {
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
           commentableFilter={commentableFilter}
+          scrapeStatusFilter={scrapeStatusFilter}
         />
       </div>
     </div>

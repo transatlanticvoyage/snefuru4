@@ -15,6 +15,7 @@ interface SerpResult {
   result_type: string;
   rank_in_group: string;
   rank_absolute: string;
+  is_match_emd_stamp: boolean | null;
   domain: string;
   title: string;
   description: string;
@@ -23,7 +24,12 @@ interface SerpResult {
   created_at: string;
 }
 
-export default function SerpResultsTable() {
+interface SerpResultsTableProps {
+  keywordId?: number | null;
+  keywordData?: {keyword_id: number, keyword_datum: string} | null;
+}
+
+export default function SerpResultsTable({ keywordId, keywordData }: SerpResultsTableProps) {
   const [data, setData] = useState<SerpResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,8 +37,8 @@ export default function SerpResultsTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [sortField, setSortField] = useState<keyof SerpResult>('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortField, setSortField] = useState<keyof SerpResult>(keywordId ? 'rank_absolute' : 'created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(keywordId ? 'asc' : 'desc');
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
@@ -50,8 +56,9 @@ export default function SerpResultsTable() {
     { key: 'result_id', type: 'integer', width: '80px', label: 'result_id' },
     { key: 'rel_fetch_id', type: 'integer', width: '100px', label: 'rel_fetch_id' },
     { key: 'result_type', type: 'text', width: '120px', label: 'result_type' },
-    { key: 'rank_in_group', type: 'text', width: '100px', label: 'rank_in_group' },
-    { key: 'rank_absolute', type: 'text', width: '100px', label: 'rank_absolute' },
+    { key: 'rank_in_group', type: 'number', width: '100px', label: 'rank_in_group' },
+    { key: 'rank_absolute', type: 'number', width: '100px', label: 'rank_absolute' },
+    { key: 'is_match_emd_stamp', type: 'boolean', width: '120px', label: 'is_match_emd_stamp' },
     { key: 'domain', type: 'text', width: '200px', label: 'domain' },
     { key: 'title', type: 'text', width: '300px', label: 'title' },
     { key: 'description', type: 'text', width: '400px', label: 'description' },
@@ -63,18 +70,26 @@ export default function SerpResultsTable() {
   // Fetch data
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [keywordId]);
   
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/zhe_serp_results');
+      
+      // Build API URL with keyword_id parameter if provided
+      const apiUrl = keywordId 
+        ? `/api/zhe_serp_results?keyword_id=${keywordId}`
+        : '/api/zhe_serp_results';
+      
+      console.log(`Fetching SERP results from: ${apiUrl}`);
+      const response = await fetch(apiUrl);
       const result = await response.json();
 
       if (!response.ok) {
         throw new Error(result.error || 'Failed to fetch data');
       }
       
+      console.log(`Received ${result.results?.length || 0} SERP results`);
       setData(result.results || []);
     } catch (err) {
       console.error('Error fetching serp results:', err);
@@ -102,8 +117,48 @@ export default function SerpResultsTable() {
       if (aValue === null) return sortOrder === 'asc' ? -1 : 1;
       if (bValue === null) return sortOrder === 'asc' ? 1 : -1;
       
-      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      // Handle numerical string values for rank columns
+      const numericalFields = ['rank_in_group', 'rank_absolute', 'result_id', 'rel_fetch_id'];
+      if (numericalFields.includes(sortField as string)) {
+        const aNum = parseInt(aValue?.toString() || '0', 10);
+        const bNum = parseInt(bValue?.toString() || '0', 10);
+        
+        // Handle NaN cases (non-numeric strings)
+        if (isNaN(aNum) && isNaN(bNum)) return 0;
+        if (isNaN(aNum)) return sortOrder === 'asc' ? -1 : 1;
+        if (isNaN(bNum)) return sortOrder === 'asc' ? 1 : -1;
+        
+        if (aNum < bNum) return sortOrder === 'asc' ? -1 : 1;
+        if (aNum > bNum) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      }
+      
+      // Handle timestamp fields
+      if (sortField === 'created_at') {
+        const aTime = new Date(aValue as string).getTime();
+        const bTime = new Date(bValue as string).getTime();
+        
+        if (aTime < bTime) return sortOrder === 'asc' ? -1 : 1;
+        if (aTime > bTime) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      }
+      
+      // Handle boolean fields
+      if (typeof aValue === 'boolean' || typeof bValue === 'boolean') {
+        const aBool = aValue === true ? 1 : aValue === false ? 0 : -1;
+        const bBool = bValue === true ? 1 : bValue === false ? 0 : -1;
+        
+        if (aBool < bBool) return sortOrder === 'asc' ? -1 : 1;
+        if (aBool > bBool) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      }
+      
+      // Default string comparison (case-insensitive)
+      const aStr = (aValue?.toString() || '').toLowerCase();
+      const bStr = (bValue?.toString() || '').toLowerCase();
+      
+      if (aStr < bStr) return sortOrder === 'asc' ? -1 : 1;
+      if (aStr > bStr) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
 
@@ -159,8 +214,10 @@ export default function SerpResultsTable() {
       
       // Convert value based on field type
       const column = columns.find(col => col.key === editingCell.field);
-      if (column?.type === 'integer') {
+      if (column?.type === 'integer' || column?.type === 'number') {
         value = editingValue === '' ? null : Number(editingValue);
+      } else if (column?.type === 'boolean') {
+        value = editingValue === 'true' ? true : editingValue === 'false' ? false : null;
       }
 
       const response = await fetch('/api/zhe_serp_results', {
@@ -202,17 +259,71 @@ export default function SerpResultsTable() {
     setEditingValue('');
   };
 
+  // Handle boolean toggle
+  const handleBooleanToggle = async (id: number, field: keyof SerpResult, currentValue: boolean | null) => {
+    const newValue = currentValue === null ? true : !currentValue;
+    
+    try {
+      const response = await fetch('/api/zhe_serp_results', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          result_id: id,
+          [field]: newValue
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to update');
+      }
+
+      // Update local data
+      setData(prevData => 
+        prevData.map(item => 
+          item.result_id === id ? { ...item, [field]: newValue } : item
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling boolean:', error);
+      alert('Failed to update field');
+    }
+  };
+
   // Render cell content
   const renderCell = (item: SerpResult, column: typeof columns[0]) => {
     const value = item[column.key as keyof SerpResult];
     const isEditing = editingCell?.id === item.result_id && editingCell?.field === column.key;
     const isReadOnly = column.key === 'result_id' || column.key === 'created_at';
 
+    // Handle boolean column type
+    if (column.type === 'boolean' && !isReadOnly) {
+      return (
+        <div className="px-2 py-1 flex items-center justify-center">
+          <button
+            onClick={() => handleBooleanToggle(item.result_id, column.key, value as boolean | null)}
+            className={`w-12 h-6 rounded-full transition-colors ${
+              value === true ? 'bg-green-500' : 
+              value === false ? 'bg-gray-300' : 'bg-yellow-300'
+            }`}
+          >
+            <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+              value === true ? 'translate-x-6' : 
+              value === false ? 'translate-x-1' : 'translate-x-3'
+            }`} />
+          </button>
+        </div>
+      );
+    }
+
     if (isEditing && !isReadOnly) {
       return (
         <div className="flex items-center space-x-2">
           <input
-            type={column.type === 'integer' ? 'number' : 'text'}
+            type={column.type === 'integer' || column.type === 'number' ? 'number' : 'text'}
             value={editingValue}
             onChange={(e) => setEditingValue(e.target.value)}
             onKeyDown={(e) => {
@@ -251,7 +362,7 @@ export default function SerpResultsTable() {
       );
     }
 
-    if (column.type === 'integer' && value !== null) {
+    if ((column.type === 'integer' || column.type === 'number') && value !== null) {
       return (
         <div
           className={cellClass}
@@ -414,6 +525,19 @@ export default function SerpResultsTable() {
     );
   }
 
+  if (data.length === 0 && keywordId) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="text-gray-500 mb-2">No SERP results found for keyword_id: {keywordId}</div>
+          <div className="text-sm text-gray-400">
+            This keyword may not have been fetched yet. Use the F400 SERP Fetch button to get results.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       {/* Top Header Area */}
@@ -422,6 +546,11 @@ export default function SerpResultsTable() {
           <div className="flex items-center space-x-6">
             <div className="text-sm text-gray-600">
               {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} results
+              {keywordId && (
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
+                  Filtered by keyword_id: {keywordId}
+                </span>
+              )}
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
             </div>
             <NubraTablefaceKite text="nubra-tableface-kite" />
@@ -481,11 +610,14 @@ export default function SerpResultsTable() {
                 </th>
                 {columns.map((column) => {
                   const isReadOnly = column.key === 'result_id' || column.key === 'created_at';
+                  const isBooleanColumn = column.type === 'boolean';
                   
                   return (
                     <th
                       key={column.key}
-                      className="text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1"
+                      className={`text-left cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1 ${
+                        column.key === 'is_match_emd_stamp' ? 'bg-yellow-100' : ''
+                      }`}
                       style={{ 
                         width: column.width,
                         minWidth: column.width,
@@ -509,9 +641,14 @@ export default function SerpResultsTable() {
                         >
                           {column.label.toLowerCase()}
                         </span>
-                        {!isReadOnly && (
+                        {!isReadOnly && !isBooleanColumn && (
                           <span className="text-blue-500 text-xs" title="Click cells to edit">
                             ✎
+                          </span>
+                        )}
+                        {isBooleanColumn && (
+                          <span className="text-green-500 text-xs" title="Click to toggle">
+                            ⚡
                           </span>
                         )}
                         {sortField === column.key && (
@@ -566,6 +703,11 @@ export default function SerpResultsTable() {
           <div className="flex items-center space-x-6">
             <div className="text-sm text-gray-600">
               {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAndSortedData.length)} of {filteredAndSortedData.length} results
+              {keywordId && (
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
+                  Filtered by keyword_id: {keywordId}
+                </span>
+              )}
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}
             </div>
             <PaginationControls />
