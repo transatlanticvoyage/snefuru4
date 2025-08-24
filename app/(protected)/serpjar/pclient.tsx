@@ -17,6 +17,7 @@ export default function SerpjarClient() {
   const [keywordData, setKeywordData] = useState<{keyword_id: number, keyword_datum: string} | null>(null);
   const [loading, setLoading] = useState(true);
   const [f400Loading, setF400Loading] = useState(false);
+  const [completeLoading, setCompleteLoading] = useState(false);
   const [showFirstWarning, setShowFirstWarning] = useState(false);
   const [showSecondWarning, setShowSecondWarning] = useState(false);
 
@@ -104,7 +105,37 @@ export default function SerpjarClient() {
 
       // Show success message based on status
       if (result.status === 'pending') {
-        alert(`${result.message}\n\n${result.note}\n\nDataForSEO Task ID: ${result.dataforseo_task_id}\nFetch ID: ${result.fetch_id}`);
+        alert(`${result.message}\n\n${result.note}\n\nDataForSEO Task ID: ${result.dataforseo_task_id}\nFetch ID: ${result.fetch_id}\n\nThe system will automatically attempt to retrieve results in 2 minutes.`);
+        
+        // Automatically attempt to complete the pending fetch after 2 minutes
+        setTimeout(async () => {
+          try {
+            console.log(`Attempting to complete pending fetch_id: ${result.fetch_id}`);
+            
+            const completeResponse = await fetch('/api/f400-complete', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                fetch_id: result.fetch_id,
+              }),
+            });
+
+            const completeResult = await completeResponse.json();
+
+            if (completeResponse.ok && completeResult.success) {
+              alert(`🎉 Great news! Your SERP results are now ready!\n\nKeyword: ${keywordData?.keyword_datum}\nResults stored: ${completeResult.organic_results_stored || 0}\n\nPlease refresh the page to see the results.`);
+            } else {
+              console.log('Pending fetch completion failed:', completeResult);
+              // Don't show an error alert, as this is a background operation
+            }
+          } catch (error) {
+            console.error('Error completing pending fetch:', error);
+            // Don't show an error alert, as this is a background operation
+          }
+        }, 120000); // 2 minutes delay
+        
       } else {
         alert(`${result.message}\n\nResults stored: ${result.organic_results_stored || 0}\nPlease refresh the page to see new results.`);
       }
@@ -120,6 +151,70 @@ export default function SerpjarClient() {
   const handleWarningCancel = () => {
     setShowFirstWarning(false);
     setShowSecondWarning(false);
+  };
+
+  // Complete Pending Fetches Handler
+  const handleCompletePendingFetches = async () => {
+    if (!keywordId) return;
+    
+    setCompleteLoading(true);
+    try {
+      // First, get the fetch_id for this keyword
+      const { data: fetchData, error: fetchError } = await supabase
+        .from('zhe_serp_fetches')
+        .select('fetch_id, api_response_json, items_count')
+        .eq('rel_keyword_id', keywordId)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (fetchError || !fetchData || fetchData.length === 0) {
+        alert('No fetch records found for this keyword.');
+        return;
+      }
+
+      const fetchRecord = fetchData[0];
+      
+      // Check if it's already completed
+      if (parseInt(fetchRecord.items_count) > 0) {
+        alert('This fetch is already completed and has results.');
+        return;
+      }
+
+      // Check if it has a pending task_id
+      if (!fetchRecord.api_response_json?.task_id) {
+        alert('No pending DataForSEO task found for this fetch.');
+        return;
+      }
+
+      // Attempt to complete it
+      const completeResponse = await fetch('/api/f400-complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fetch_id: fetchRecord.fetch_id,
+        }),
+      });
+
+      const completeResult = await completeResponse.json();
+
+      if (!completeResponse.ok) {
+        throw new Error(completeResult.error || 'Failed to complete pending fetch');
+      }
+
+      if (completeResult.success) {
+        alert(`🎉 Success! Completed pending fetch for "${keywordData?.keyword_datum}"\n\nResults stored: ${completeResult.organic_results_stored || 0}\n\nPlease refresh the page to see the results.`);
+      } else {
+        alert(`Unable to complete: ${completeResult.message || 'Results may not be ready yet'}`);
+      }
+
+    } catch (error) {
+      console.error('Complete pending fetch error:', error);
+      alert(`Failed to complete pending fetch: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setCompleteLoading(false);
+    }
   };
 
   if (!user) {
@@ -195,6 +290,19 @@ export default function SerpjarClient() {
             }`}
           >
             {f400Loading ? 'Processing...' : 'Run F400 ZHE SERP Fetch'}
+          </button>
+
+          {/* Complete Pending Fetches Button */}
+          <button
+            onClick={() => keywordId && handleCompletePendingFetches()}
+            disabled={!keywordId || completeLoading}
+            className={`ml-3 px-6 py-3 text-sm font-medium rounded-lg transition-colors ${
+              !keywordId || completeLoading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
+            }`}
+          >
+            {completeLoading ? 'Checking...' : 'Complete Pending Fetch'}
           </button>
         </div>
       </div>
