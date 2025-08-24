@@ -2,13 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
   try {
+    console.log(`🔄 [${new Date().toISOString()}] Starting bulk refresh API request...`);
+    
     const { keyword_ids, field } = await request.json();
+    const parseTime = Date.now() - startTime;
+    console.log(`📋 Request parsed in ${parseTime}ms - ${keyword_ids?.length || 0} keyword IDs received`);
 
     if (!keyword_ids || !Array.isArray(keyword_ids) || keyword_ids.length === 0) {
       return NextResponse.json(
@@ -24,13 +29,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Add safety limits and warnings for large batches
+    const MAX_RECOMMENDED_KEYWORDS = 200;
+    const MAX_ABSOLUTE_KEYWORDS = 1000;
+    
+    if (keyword_ids.length > MAX_ABSOLUTE_KEYWORDS) {
+      return NextResponse.json(
+        { error: `Too many keywords. Maximum allowed: ${MAX_ABSOLUTE_KEYWORDS}, received: ${keyword_ids.length}. Please split into smaller batches.` },
+        { status: 400 }
+      );
+    }
+    
+    if (keyword_ids.length > MAX_RECOMMENDED_KEYWORDS) {
+      console.log(`⚠️  Large batch warning: Processing ${keyword_ids.length} keywords (recommended max: ${MAX_RECOMMENDED_KEYWORDS})`);
+      console.log(`   This may cause timeouts or performance issues. Consider splitting into smaller batches.`);
+    }
+
     console.log(`🔄 Starting bulk DataForSEO refresh for ${keyword_ids.length} keywords (${field})`);
 
     // Get the keyword records
+    const dbStartTime = Date.now();
     const { data: keywordRecords, error: keywordError } = await supabase
       .from('keywordshub')
       .select('*')
       .in('keyword_id', keyword_ids);
+    
+    const dbTime = Date.now() - dbStartTime;
+    console.log(`💾 Database query completed in ${dbTime}ms - Retrieved ${keywordRecords?.length || 0} records`);
 
     if (keywordError || !keywordRecords) {
       return NextResponse.json(
@@ -204,12 +229,20 @@ export async function POST(request: NextRequest) {
     };
 
     // Process chunks with concurrency limit
+    const processingStartTime = Date.now();
+    console.log(`🚀 Starting to process ${chunkedGroups.length} chunks in batches of ${MAX_CONCURRENT_REQUESTS}...`);
+    
     const processingPromises = [];
     for (let i = 0; i < chunkedGroups.length; i += MAX_CONCURRENT_REQUESTS) {
+      const batchStartTime = Date.now();
       const batch = chunkedGroups.slice(i, i + MAX_CONCURRENT_REQUESTS);
-      const batchPromises = batch.map(processChunk);
+      console.log(`📦 Processing batch ${Math.floor(i / MAX_CONCURRENT_REQUESTS) + 1}/${Math.ceil(chunkedGroups.length / MAX_CONCURRENT_REQUESTS)} with ${batch.length} chunks...`);
       
+      const batchPromises = batch.map(processChunk);
       const batchResults = await Promise.allSettled(batchPromises);
+      
+      const batchTime = Date.now() - batchStartTime;
+      console.log(`⏱️ Batch completed in ${batchTime}ms (${(batchTime / 1000).toFixed(1)}s)`);
       
       batchResults.forEach((result, index) => {
         if (result.status === 'fulfilled') {
@@ -231,8 +264,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const processingTime = Date.now() - processingStartTime;
+    const totalTime = Date.now() - startTime;
+    
     // Store task information for later retrieval (optional - could be in a separate table)
-    console.log(`📋 Created ${taskIds.length} DataForSEO tasks, ${errors.length} errors`);
+    console.log(`📋 API Processing Summary:`);
+    console.log(`   - Created ${taskIds.length} DataForSEO tasks, ${errors.length} errors`);
+    console.log(`   - Processing time: ${processingTime}ms (${(processingTime / 1000).toFixed(1)}s)`);
+    console.log(`   - Total API time: ${totalTime}ms (${(totalTime / 1000).toFixed(1)}s)`);
 
     // Start a background process to check and update results
     // For now, we'll just return the task IDs and let the user refresh manually
@@ -253,7 +292,13 @@ export async function POST(request: NextRequest) {
         processing_info: {
           max_keywords_per_chunk: MAX_KEYWORDS_PER_REQUEST,
           max_concurrent_requests: MAX_CONCURRENT_REQUESTS,
-          background_retrieval_started: true
+          background_retrieval_started: true,
+          timing: {
+            total_time_ms: totalTime,
+            processing_time_ms: processingTime,
+            total_time_seconds: (totalTime / 1000).toFixed(1),
+            processing_time_seconds: (processingTime / 1000).toFixed(1)
+          }
         }
       },
       errors: errors.length > 0 ? errors : undefined

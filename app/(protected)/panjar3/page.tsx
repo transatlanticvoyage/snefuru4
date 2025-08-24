@@ -1,13 +1,10 @@
-'use client';
+import { Metadata } from 'next';
+import Panjar3Client from './pclient';
 
-import Panjar3UI from './components/panjar3';
-import { useEffect } from 'react';
+export const metadata: Metadata = {
+  title: 'panjar3 - Snefuru',
+};
 
 export default function Panjar3Page() {
-  useEffect(() => {
-    // Set document title
-    document.title = 'panjar3 - Snefuru';
-  }, []);
-
-  return <Panjar3UI />;
+  return <Panjar3Client />;
 } 

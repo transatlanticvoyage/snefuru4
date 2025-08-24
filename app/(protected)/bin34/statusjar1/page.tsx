@@ -1,12 +1,10 @@
-"use client";
-import StatusJar1 from './components/StatusJar1';
-import { useEffect } from 'react';
+import { Metadata } from 'next';
+import StatusJar1Client from './pclient';
+
+export const metadata: Metadata = {
+  title: 'statusjar1 - Snefuru',
+};
 
 export default function StatusJar1Page() {
-  useEffect(() => {
-    // Set document title
-    document.title = 'statusjar1 - Snefuru';
-  }, []);
-
-  return <StatusJar1 />;
+  return <StatusJar1Client />;
 } 

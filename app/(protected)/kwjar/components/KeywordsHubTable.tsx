@@ -29,6 +29,7 @@ interface KeywordRecord {
   updated_at: string;
   created_by: string | null;
   last_updated_by: string | null;
+  cached_cncglub_ids: string | null;
   tags?: Array<{ tag_id: number; tag_name: string }>;
 }
 
@@ -63,7 +64,7 @@ const columns: ColumnDefinition[] = [
   { key: 'created_by', label: 'created_by', type: 'text' },
   { key: 'last_updated_by', label: 'last_updated_by', type: 'text' },
   { key: 'tags', label: 'tags', type: 'tags' },
-  { key: 'reverse_lookup', label: 'reverse_lookup', type: 'text', headerRow1Text: 'reverse lookup - cncglub.kwslot1', headerRow2Text: 'cncglub.cncg_id', headerRow1BgClass: 'bg-gray-200' }
+  { key: 'reverse_lookup', label: 'reverse_lookup', type: 'text', headerRow1Text: 'reverse lookup - cncglub.kwslot1', headerRow2Text: 'cncglub.cncg_id(s)', headerRow1BgClass: 'bg-gray-200' }
 ];
 
 interface KeywordsHubTableProps {
@@ -109,6 +110,8 @@ export default function KeywordsHubTable({
   // DataForSEO refresh states
   const [refreshingKeywords, setRefreshingKeywords] = useState<Set<number>>(new Set());
   const [bulkRefreshing, setBulkRefreshing] = useState(false);
+  const [blankRefreshing, setBlankRefreshing] = useState(false);
+  const [reverseLookupRefreshing, setReverseLookupRefreshing] = useState(false);
   
   // Form data for creating
   const [formData, setFormData] = useState({
@@ -623,13 +626,109 @@ export default function KeywordsHubTable({
         return;
       }
 
+      console.log(`🚀 Starting bulk refresh for ${selectedKeywordIds.length} keywords...`);
+      console.log('📋 Keyword IDs:', selectedKeywordIds.slice(0, 10), selectedKeywordIds.length > 10 ? `... and ${selectedKeywordIds.length - 10} more` : '');
+
+      const startTime = Date.now();
+      
+      // Create timeout promise
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`Request timeout after 120 seconds (${selectedKeywordIds.length} keywords)`));
+        }, 120000); // 2 minutes timeout
+      });
+
+      const requestPayload = {
+        keyword_ids: selectedKeywordIds,
+        field: 'cpc'
+      };
+      
+      console.log(`📦 Request payload size: ${JSON.stringify(requestPayload).length} characters`);
+
+      // Race between fetch and timeout
+      const fetchPromise = fetch('/api/dataforseo-refresh-bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestPayload),
+      });
+
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
+      const fetchTime = Date.now() - startTime;
+      
+      console.log(`⏱️ Fetch completed in ${fetchTime}ms (${(fetchTime / 1000).toFixed(1)}s)`);
+      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ API Error Response (${response.status}):`, errorText);
+        throw new Error(`API Error ${response.status}: ${errorText}`);
+      }
+
+      const result = await response.json();
+      const totalTime = Date.now() - startTime;
+      
+      console.log(`✅ Full request completed in ${totalTime}ms (${(totalTime / 1000).toFixed(1)}s)`);
+      console.log('📊 API Response:', result);
+
+      // Enhanced success message with actual processing details
+      const successMsg = `✅ BULK REFRESH COMPLETED SUCCESSFULLY\n\n` +
+        `🎯 Keywords Processed: ${selectedKeywordIds.length}\n` +
+        `⏱️  Processing Time: ${(totalTime / 1000).toFixed(1)} seconds\n` +
+        `📊 Status: ${result.message || 'Processing initiated'}\n\n` +
+        `🔍 Background processing has been initiated.\n` +
+        `📈 Updated metrics will appear in the table shortly.\n\n` +
+        `💡 The system successfully processed your large batch!`;
+      
+      alert(successMsg);
+      
+      // Refresh the table data after a delay to show updated metrics
+      setTimeout(() => {
+        console.log('🔄 Refreshing table data to show updated metrics...');
+        fetchData();
+      }, 5000);
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('❌ Bulk refresh failed:', {
+        error: errorMessage,
+        keywordCount: Array.from(selectedRows).length,
+        timestamp: new Date().toISOString()
+      });
+      
+      // More detailed error message for user
+      alert(`Failed to start bulk refresh: ${errorMessage}\n\nKeywords: ${Array.from(selectedRows).length}\nTime: ${new Date().toLocaleTimeString()}\n\nCheck console for details.`);
+    } finally {
+      setBulkRefreshing(false);
+    }
+  };
+
+  // Bulk refresh function for blank keywords only
+  const bulkRefreshBlanks = async () => {
+    setBlankRefreshing(true);
+    
+    try {
+      // Filter keywords that have blank/null cpc OR search_volume
+      const blankKeywordIds = data
+        .filter(keyword => 
+          (keyword.cpc === null || keyword.cpc === undefined) || 
+          (keyword.search_volume === null || keyword.search_volume === undefined)
+        )
+        .map(keyword => keyword.keyword_id);
+
+      if (blankKeywordIds.length === 0) {
+        alert('No keywords with blank CPC or search volume found.');
+        return;
+      }
+
       const response = await fetch('/api/dataforseo-refresh-bulk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          keyword_ids: selectedKeywordIds,
+          keyword_ids: blankKeywordIds,
           field: 'cpc'
         }),
       });
@@ -640,7 +739,7 @@ export default function KeywordsHubTable({
         throw new Error(result.error || 'Failed to start bulk refresh');
       }
 
-      alert(`Bulk refresh started for ${selectedKeywordIds.length} keywords. Results will be available shortly.`);
+      alert(`Bulk refresh started for ${blankKeywordIds.length} keywords with blank data. Results will be available shortly.`);
       
       // Refresh the table data after a delay
       setTimeout(() => {
@@ -648,10 +747,67 @@ export default function KeywordsHubTable({
       }, 5000);
 
     } catch (error) {
-      console.error('❌ Failed to start bulk refresh:', error);
-      alert(`Failed to start bulk refresh: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('❌ Failed to start blank refresh:', error);
+      alert(`Failed to start blank refresh: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      setBulkRefreshing(false);
+      setBlankRefreshing(false);
+    }
+  };
+
+  // Reverse lookup refresh function
+  const bulkRefreshReverseLookup = async () => {
+    setReverseLookupRefreshing(true);
+    
+    try {
+      // Get all visible keyword IDs (or selected if any)
+      const targetKeywordIds = selectedRows.size > 0 
+        ? Array.from(selectedRows) 
+        : paginatedData.map(keyword => keyword.keyword_id);
+
+      if (targetKeywordIds.length === 0) {
+        alert('No keywords available for reverse lookup refresh.');
+        return;
+      }
+
+      console.log(`🔍 Starting reverse lookup refresh for ${targetKeywordIds.length} keywords...`);
+      const startTime = Date.now();
+
+      const response = await fetch('/api/reverse-lookup-refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          keyword_ids: targetKeywordIds
+        }),
+      });
+
+      const result = await response.json();
+      const totalTime = Date.now() - startTime;
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to refresh reverse lookup');
+      }
+
+      console.log(`✅ Reverse lookup refresh completed in ${totalTime}ms`);
+      console.log('📊 Result:', result);
+
+      alert(`✅ Reverse lookup refresh completed!\n\n` +
+            `📊 Keywords processed: ${targetKeywordIds.length}\n` +
+            `⏱️  Processing time: ${(totalTime / 1000).toFixed(1)}s\n` +
+            `🔍 Updated: ${result.updated || 0} cached values\n\n` +
+            `The reverse lookup cache has been updated.`);
+      
+      // Refresh the table data to show updated cached values
+      setTimeout(() => {
+        fetchData();
+      }, 1000);
+
+    } catch (error) {
+      console.error('❌ Failed to refresh reverse lookup:', error);
+      alert(`Failed to refresh reverse lookup: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setReverseLookupRefreshing(false);
     }
   };
 
@@ -915,10 +1071,16 @@ export default function KeywordsHubTable({
 
     // Special handling for reverse lookup column
     if (column.key === 'reverse_lookup') {
+      const cachedIds = item.cached_cncglub_ids;
       return (
-        <div className="px-2 py-1 text-xs text-gray-400">
-          {/* Placeholder - awaiting instructions for actual data */}
-          --
+        <div className="px-2 py-1 text-xs">
+          {cachedIds ? (
+            <span className="text-blue-600 font-medium">
+              {cachedIds.replace(/,/g, '/')}
+            </span>
+          ) : (
+            <span className="text-gray-400 italic">not cached</span>
+          )}
         </div>
       );
     }
@@ -1128,6 +1290,33 @@ export default function KeywordsHubTable({
                 }`}
               >
                 {bulkRefreshing ? 'Processing...' : 'Refresh Metrics'}
+              </button>
+
+              {/* Only Refresh Blanks Button */}
+              <button
+                onClick={bulkRefreshBlanks}
+                disabled={blankRefreshing || bulkRefreshing}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  blankRefreshing || bulkRefreshing
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
+              >
+                {blankRefreshing ? 'Processing...' : 'only refresh blanks'}
+              </button>
+
+              {/* Reverse Lookup Refresh Button */}
+              <button
+                onClick={bulkRefreshReverseLookup}
+                disabled={reverseLookupRefreshing || bulkRefreshing || blankRefreshing}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  reverseLookupRefreshing || bulkRefreshing || blankRefreshing
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
+                title={selectedRows.size > 0 ? `Refresh reverse lookup for ${selectedRows.size} selected keywords` : `Refresh reverse lookup for ${paginatedData.length} visible keywords`}
+              >
+                {reverseLookupRefreshing ? 'Processing...' : 'refresh reverse lookup'}
               </button>
               
             </div>
