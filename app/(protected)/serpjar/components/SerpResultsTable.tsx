@@ -69,6 +69,9 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
   
   // Fetch data
   useEffect(() => {
+    // Clear current data before fetching new data
+    setData([]);
+    setError(null);
     fetchData();
   }, [keywordId]);
   
@@ -82,7 +85,9 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
         : '/api/zhe_serp_results';
       
       console.log(`Fetching SERP results from: ${apiUrl}`);
-      const response = await fetch(apiUrl);
+      const response = await fetch(apiUrl, {
+        cache: 'no-store'  // Prevent caching
+      });
       const result = await response.json();
 
       if (!response.ok) {
@@ -549,6 +554,11 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
               {keywordId && (
                 <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
                   Filtered by keyword_id: {keywordId}
+                </span>
+              )}
+              {keywordId && filteredAndSortedData.length === 0 && (
+                <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-md text-xs font-medium">
+                  No results for this keyword
                 </span>
               )}
               {selectedRows.size > 0 && ` (${selectedRows.size} selected)`}

@@ -35,6 +35,8 @@ export default function SerpjarClient() {
       if (!isNaN(id)) {
         setKeywordId(id);
       }
+    } else {
+      setKeywordId(null);
     }
     setLoading(false);
   }, [searchParams]);
@@ -199,7 +201,7 @@ export default function SerpjarClient() {
 
       {/* Main Content - Full Width SerpResultsTable */}
       <div className="flex-1 overflow-hidden">
-        <SerpResultsTable keywordId={keywordId} keywordData={keywordData} />
+        <SerpResultsTable key={keywordId} keywordId={keywordId} keywordData={keywordData} />
       </div>
 
       {/* First Warning Modal */}
