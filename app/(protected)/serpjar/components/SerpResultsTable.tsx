@@ -37,8 +37,8 @@ export default function SerpResultsTable({ keywordId, keywordData }: SerpResults
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [sortField, setSortField] = useState<keyof SerpResult>(keywordId ? 'rank_absolute' : 'created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(keywordId ? 'asc' : 'desc');
+  const [sortField, setSortField] = useState<keyof SerpResult>('rank_in_group');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
