@@ -30,6 +30,11 @@ export default function DriggsmanClient() {
     ColumnPaginationControls: () => JSX.Element;
   } | null>(null);
 
+  // Button states moved from DriggsmanTable
+  const [showVerificationColumn, setShowVerificationColumn] = useState(false);
+  const [showCompetitorSites, setShowCompetitorSites] = useState(false);
+  const [sitesCount, setSitesCount] = useState(0);
+
   useEffect(() => {
     if (!user) {
       router.push('/login');
@@ -77,12 +82,35 @@ export default function DriggsmanClient() {
         <div>
           <DrenjariButtonBarDriggsmanLinks />
         </div>
+
+        {/* Verification and Competitor Buttons */}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setShowVerificationColumn(!showVerificationColumn)}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              showVerificationColumn ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+            }`}
+          >
+            show verification column
+          </button>
+          <button
+            onClick={() => setShowCompetitorSites(!showCompetitorSites)}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              showCompetitorSites ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+            }`}
+          >
+            show competitor sites
+          </button>
+        </div>
       </div>
 
       {/* Pagination and Search Controls */}
       {paginationControls && (
         <div className="px-6 py-2 bg-white border-b">
           <div className="flex items-center space-x-6">
+            <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded text-sm">
+              {sitesCount} sites loaded
+            </span>
             <div className="flex items-center">
               {paginationControls.PaginationControls()}
             </div>
@@ -95,7 +123,12 @@ export default function DriggsmanClient() {
 
       {/* Main Content - Full Width DriggsmanTable */}
       <div className="flex-1 overflow-hidden">
-        <DriggsmanTable onControlsRender={setPaginationControls} />
+        <DriggsmanTable 
+          onControlsRender={setPaginationControls}
+          showVerificationColumn={showVerificationColumn}
+          showCompetitorSites={showCompetitorSites}
+          onSitesCountChange={setSitesCount}
+        />
       </div>
     </div>
   );

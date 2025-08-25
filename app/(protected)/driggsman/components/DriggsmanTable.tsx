@@ -132,9 +132,17 @@ interface DriggsmanTableProps {
     PaginationControls: () => JSX.Element;
     ColumnPaginationControls: () => JSX.Element;
   }) => void;
+  showVerificationColumn?: boolean;
+  showCompetitorSites?: boolean;
+  onSitesCountChange?: (count: number) => void;
 }
 
-export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps) {
+export default function DriggsmanTable({ 
+  onControlsRender,
+  showVerificationColumn = false,
+  showCompetitorSites = false,
+  onSitesCountChange
+}: DriggsmanTableProps) {
   const [sites, setSites] = useState<SitesprenSite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -157,6 +165,7 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
   const [manualSiteInput, setManualSiteInput] = useState('');
   const [manualSites, setManualSites] = useState<string[]>([]);
   const [allSites, setAllSites] = useState<SitesprenSite[]>([]); // Store all fetched sites
+  const [showPillbox, setShowPillbox] = useState(true); // Control pillbox visibility
   
   // Call platform dropdown states
   const [callPlatforms, setCallPlatforms] = useState<CallPlatform[]>([]);
@@ -184,11 +193,6 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
     initialTab: 'inputs_v1' | 'inputs_v2' | 'inputs_v3';
   } | null>(null);
   
-  // Verification column toggle
-  const [showVerificationColumn, setShowVerificationColumn] = useState(false);
-  
-  // Competitor sites toggle
-  const [showCompetitorSites, setShowCompetitorSites] = useState(false);
   
   // Rain chamber states
   const [activeRainChamber, setActiveRainChamber] = useState(false);
@@ -200,6 +204,7 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
   const [tagCounts, setTagCounts] = useState<Map<number, number>>(new Map());
   
   // Filtering mechanism states
+  const [useFogFilter, setUseFogFilter] = useState(true); // Default to true (unfiltered view)
   const [useDaylightFilter, setUseDaylightFilter] = useState(false);
   const [useRainFilter, setUseRainFilter] = useState(false);
   const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
@@ -296,7 +301,6 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
     { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
     { key: 'updated_at', type: 'timestamp', label: 'updated_at', group: 'system' },
     { key: 'fk_users_id', type: 'text', label: 'fk_users_id', group: 'system' },
-    { key: 'sitespren_base', type: 'text', label: 'sitespren_base', group: 'domain' },
     { key: 'true_root_domain', type: 'text', label: 'true_root_domain', group: 'domain' },
     { key: 'full_subdomain', type: 'text', label: 'full_subdomain', group: 'domain' },
     { key: 'webproperty_type', type: 'text', label: 'webproperty_type', group: 'domain' },
@@ -341,16 +345,38 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
     
     // Handle new activefilterchamber parameter
     if (activeFilterChamber === 'daylight') {
+      setUseFogFilter(false);
       setUseDaylightFilter(true);
       setUseRainFilter(false);
       setActiveRainChamber(false);
     } else if (activeFilterChamber === 'rain') {
+      setUseFogFilter(false);
       setUseRainFilter(true);
       setUseDaylightFilter(false);
       setActiveRainChamber(true);
+    } else if (activeFilterChamber === 'fog') {
+      setUseFogFilter(true);
+      setUseDaylightFilter(false);
+      setUseRainFilter(false);
+      setActiveRainChamber(false);
+    } else {
+      // If absent or invalid, default to fog chamber (don't update URL here to avoid loop)
+      setUseFogFilter(true);
+      setUseDaylightFilter(false);
+      setUseRainFilter(false);
+      setActiveRainChamber(false);
     }
-    // If absent or invalid, neither is selected (existing default behavior)
   }, [searchParams]);
+
+  // Set default URL parameter on initial load if not present
+  useEffect(() => {
+    // Only check searchParams on mount, don't re-run when it changes
+    if (typeof window !== 'undefined' && !window.location.search.includes('activefilterchamber')) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('activefilterchamber', 'fog');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []); // Empty dependency array - only run once on mount
 
   // Fetch sites data and re-filter when manual sites change
   useEffect(() => {
@@ -425,6 +451,13 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
       });
     }
   }, [onControlsRender, searchTerm, currentPage, itemsPerPage, columnsPerPage, currentColumnPage]);
+  
+  // Update parent with sites count
+  useEffect(() => {
+    if (onSitesCountChange) {
+      onSitesCountChange(sites.length);
+    }
+  }, [sites.length, onSitesCountChange]);
   
   const fetchSites = async () => {
     try {
@@ -829,7 +862,7 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
   };
 
   // Helper function to update URL parameters with proper ordering
-  const updateURL = (chamber: 'daylight' | 'rain' | null = null, sites: string[] = []) => {
+  const updateURL = (chamber: 'fog' | 'daylight' | 'rain' | null = null, sites: string[] = []) => {
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       
@@ -851,48 +884,55 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
   };
 
   // Helper function to update only activefilterchamber while preserving sitesentered order
-  const updateActiveChamberURL = (chamber: 'daylight' | 'rain' | null) => {
-    const currentSites = manualSites.length > 0 ? manualSites : [];
-    updateURL(chamber, currentSites);
+  const updateActiveChamberURL = (chamber: 'fog' | 'daylight' | 'rain' | null) => {
+    // Preserve existing sitesentered parameter from URL, not just from manualSites state
+    const existingSitesParam = searchParams?.get('sitesentered');
+    const existingSites = existingSitesParam ? existingSitesParam.split(',').filter(site => site.trim()) : [];
+    
+    // Use existing sites from URL if they exist, otherwise use current manualSites
+    const sitesToPreserve = existingSites.length > 0 ? existingSites : (manualSites.length > 0 ? manualSites : []);
+    
+    updateURL(chamber, sitesToPreserve);
   };
 
   // Checkbox filter handlers
-  const handleDaylightFilterChange = (checked: boolean) => {
-    setUseDaylightFilter(checked);
-    if (checked) {
-      setUseRainFilter(false);
-      setActiveRainChamber(false);
-      // Restore stored manual sites
-      if (storedManualSites.length > 0) {
-        setManualSites(storedManualSites);
-      }
-      // Update URL
-      updateActiveChamberURL('daylight');
-    } else {
-      // No filtering - show all sites
-      setManualSites([]);
-      updateActiveChamberURL(null);
-    }
+  const handleFogFilterChange = () => {
+    // Always activate fog filter when clicked
+    setUseFogFilter(true);
+    setUseDaylightFilter(false);
+    setUseRainFilter(false);
+    setActiveRainChamber(false);
+    setManualSites([]);
+    updateActiveChamberURL('fog');
   };
 
-  const handleRainFilterChange = (checked: boolean) => {
-    setUseRainFilter(checked);
-    if (checked) {
-      setUseDaylightFilter(false);
-      // Don't clear storedManualSites, just hide them from current view
-      setManualSites([]);
-      // If a tag is selected, activate rain chamber
-      if (selectedTagId) {
-        setActiveRainChamber(true);
-      }
-      // Update URL
-      updateActiveChamberURL('rain');
-    } else {
-      // No filtering - show all sites
-      setActiveRainChamber(false);
-      setManualSites([]);
-      updateActiveChamberURL(null);
+  const handleDaylightFilterChange = () => {
+    // Always activate daylight filter when clicked
+    setUseFogFilter(false);
+    setUseDaylightFilter(true);
+    setUseRainFilter(false);
+    setActiveRainChamber(false);
+    // Restore stored manual sites
+    if (storedManualSites.length > 0) {
+      setManualSites(storedManualSites);
     }
+    // Update URL
+    updateActiveChamberURL('daylight');
+  };
+
+  const handleRainFilterChange = () => {
+    // Always activate rain filter when clicked
+    setUseFogFilter(false);
+    setUseDaylightFilter(false);
+    setUseRainFilter(true);
+    // Don't clear storedManualSites, just hide them from current view
+    setManualSites([]);
+    // If a tag is selected, activate rain chamber
+    if (selectedTagId) {
+      setActiveRainChamber(true);
+    }
+    // Update URL
+    updateActiveChamberURL('rain');
   };
 
   const handleManualSiteSubmit = () => {
@@ -1509,28 +1549,6 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
 
   return (
     <div className="px-6 py-4">
-      <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-        </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setShowVerificationColumn(!showVerificationColumn)}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              showVerificationColumn ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            show verification column
-          </button>
-          <button
-            onClick={() => setShowCompetitorSites(!showCompetitorSites)}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              showCompetitorSites ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            show competitor sites
-          </button>
-        </div>
-      </div>
 
       {/* Debug Info */}
       {sites.length === 0 && !loading && (
@@ -1558,40 +1576,75 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
               {selectedFields.size} fields selected
             </span>
           )}
-          <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded text-sm">
-            {sites.length} sites loaded
-          </span>
+        </div>
+      </div>
+
+      {/* Fog Chamber */}
+      <div className={`fog-chamber mb-4 border border-gray-700 rounded-lg ${(useDaylightFilter || useRainFilter) ? 'opacity-50' : ''}`}>
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center mb-3">
+            <div className="font-bold text-sm text-gray-800">fog_chamber</div>
+            <input
+              type="checkbox"
+              checked={useFogFilter}
+              onChange={handleFogFilterChange}
+              className="ml-3 w-4 h-4"
+              style={{ width: '16px', height: '16px' }}
+            />
+            <span className="ml-2 text-sm text-gray-600">Use to filter</span>
+          </div>
         </div>
       </div>
 
       {/* Daylight Chamber */}
-      <div className={`daylight-chamber mb-4 border border-gray-700 rounded-lg ${useRainFilter ? 'opacity-50 pointer-events-none' : ''}`}>
-        <div className="p-4 bg-gray-50">
+      <div className={`daylight-chamber mb-4 border border-gray-700 rounded-lg ${(useRainFilter || useFogFilter) ? 'opacity-50' : ''}`}>
+        <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-3">
             <div className="font-bold text-sm text-gray-800">daylight_chamber</div>
             <input
               type="checkbox"
               checked={useDaylightFilter}
-              onChange={(e) => handleDaylightFilterChange(e.target.checked)}
+              onChange={handleDaylightFilterChange}
               className="ml-3 w-4 h-4"
               style={{ width: '16px', height: '16px' }}
             />
             <span className="ml-2 text-sm text-gray-600">Use to filter</span>
             
             {/* Manual Site Input - inline */}
-            <span className="ml-8 text-sm font-bold text-gray-700">enter sites manually</span>
+            <div className={`ml-8 flex items-center ${(useRainFilter || useFogFilter) ? 'pointer-events-none' : ''}`}>
+              <div className="relative group">
+                <svg 
+                  className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                  />
+                </svg>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-xs text-white bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                  Separate sites with spaces, commas, or line breaks. Sites will be matched against your database.
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                </div>
+              </div>
+              <span className="ml-2 text-sm font-bold text-gray-700">enter sites manually</span>
+            </div>
             <input
               type="text"
               value={manualSiteInput}
               onChange={(e) => setManualSiteInput(e.target.value)}
               onKeyPress={handleManualSiteKeyPress}
               placeholder="dogs.com, cats.com facebook.com/group example.net"
-              className="ml-3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className={`ml-3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${(useRainFilter || useFogFilter) ? 'pointer-events-none' : ''}`}
               style={{ width: '700px' }}
             />
             <button
               onClick={handleManualSiteSubmit}
-              className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+              className={`ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium ${(useRainFilter || useFogFilter) ? 'pointer-events-none' : ''}`}
             >
               Submit
             </button>
@@ -1603,14 +1656,19 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
                 Clear All
               </button>
             )}
+            {manualSites.length > 0 && (
+              <button
+                onClick={() => setShowPillbox(!showPillbox)}
+                className="ml-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
+              >
+                {showPillbox ? 'hide pillbox' : 'show pillbox'}
+              </button>
+            )}
           </div>
-          <p className="mt-1 text-xs text-gray-500">
-            Separate sites with spaces, commas, or line breaks. Sites will be matched against your database.
-          </p>
         </div>
 
         {/* Currently Entered Sites Display */}
-        {manualSites.length > 0 && (
+        {manualSites.length > 0 && showPillbox && (
           <div>
             <div className="text-sm font-medium text-gray-700 mb-2">
               Currently viewing sites ({manualSites.length}):
@@ -1640,29 +1698,26 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
       </div>
 
       {/* Rain Chamber */}
-      <div className={`rain-chamber mb-4 border border-gray-700 rounded-lg ${activeRainChamber ? 'border-blue-500 bg-blue-50' : ''}`}>
-        <div className="p-4 bg-gray-50">
+      <div className={`rain-chamber mb-4 border border-gray-700 rounded-lg ${activeRainChamber ? 'border-blue-500 bg-blue-50' : ''} ${(useDaylightFilter || useFogFilter) ? 'opacity-50' : ''}`}>
+        <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-3">
             <div className="font-bold text-sm text-gray-800">rain_chamber</div>
             <input
               type="checkbox"
               checked={useRainFilter}
-              onChange={(e) => handleRainFilterChange(e.target.checked)}
+              onChange={handleRainFilterChange}
               className="ml-3 w-4 h-4"
               style={{ width: '16px', height: '16px' }}
             />
             <span className="ml-2 text-sm text-gray-600">Use to filter</span>
-          </div>
-          
-          {/* Sitespren Tags Dropdown */}
-          <div className="mb-4">
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              select from sitespren_tags
-            </label>
-            <div className="relative">
+            
+            {/* Inline Tags Dropdown */}
+            <span className="ml-8 text-sm font-bold text-gray-700">select from sitespren_tags</span>
+            <div className={`ml-3 relative inline-block ${(useDaylightFilter || useFogFilter) ? 'pointer-events-none' : ''}`}>
               <button
                 onClick={() => setTagsDropdownOpen(!tagsDropdownOpen)}
-                className="w-full px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                style={{ width: '300px' }}
               >
                 {selectedTagId ? 
                   sitesprenTags.find(tag => tag.tag_id === selectedTagId)?.tag_name || 'Select a tag'
@@ -1723,14 +1778,12 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
                 </div>
               )}
             </div>
-          </div>
-          
-          {/* Submit Button */}
-          <div className="mb-4">
+            
+            {/* Inline Submit Button */}
             <button
               onClick={handleRainChamberSubmit}
               disabled={!selectedTagId}
-              className={`px-4 py-2 rounded font-medium transition-colors ${
+              className={`ml-3 px-4 py-2 rounded font-medium transition-colors text-sm ${
                 selectedTagId 
                   ? 'bg-blue-600 text-white hover:bg-blue-700' 
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
