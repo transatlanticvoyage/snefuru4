@@ -44,7 +44,25 @@ interface SitesprenSite {
   driggs_phone1_platform_id: number | null;
   driggs_cgig_id: number | null;
   driggs_citations_done: boolean | null;
+  driggs_social_profiles_done: boolean | null;
   driggs_special_note_for_ai_tool: string | null;
+  driggs_hours: string | null;
+  driggs_owner_name: string | null;
+  driggs_short_descr: string | null;
+  driggs_long_descr: string | null;
+  driggs_year_opened: number | null;
+  driggs_employees_qty: number | null;
+  driggs_keywords: string | null;
+  driggs_category: string | null;
+  driggs_address_species_note: string | null;
+  driggs_payment_methods: string | null;
+  driggs_social_media_links: string | null;
+  driggs_street_1: string | null;
+  driggs_street_2: string | null;
+  driggs_state_code: string | null;
+  driggs_zip: string | null;
+  driggs_state_full: string | null;
+  driggs_country: string | null;
   driggs_revenue_goal: number | null;
   ns_full: string | null;
   ip_address: string | null;
@@ -238,20 +256,39 @@ export default function DriggsmanTable() {
     type: string; 
     label: string;
     group?: string;
+    placeholder?: string;
   }> = [
     { key: 'driggs_revenue_goal', type: 'number', label: 'driggs_revenue_goal', group: 'business' },
     { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
     { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
     { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
     { key: 'driggs_address_species_id', type: 'address_species_dropdown', label: 'driggs_address_species_id', group: 'contact' },
+    { key: 'driggs_street_1', type: 'text', label: 'driggs_street_1', group: 'contact', placeholder: '' },
+    { key: 'driggs_street_2', type: 'text', label: 'driggs_street_2', group: 'contact', placeholder: '' },
+    { key: 'driggs_state_code', type: 'text', label: 'driggs_state_code', group: 'contact', placeholder: '' },
+    { key: 'driggs_zip', type: 'text', label: 'driggs_zip', group: 'contact', placeholder: '' },
+    { key: 'driggs_state_full', type: 'text', label: 'driggs_state_full', group: 'contact', placeholder: '' },
+    { key: 'driggs_country', type: 'text', label: 'driggs_country', group: 'contact', placeholder: 'United States' },
     { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
     { key: 'driggs_citations_done', type: 'boolean', label: 'driggs_citations_done', group: 'contact' },
+    { key: 'driggs_social_profiles_done', type: 'boolean', label: 'driggs_social_profiles_done', group: 'contact' },
     { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
     { key: 'driggs_city', type: 'text', label: 'driggs_city', group: 'business' },
     { key: 'driggs_brand_name', type: 'text', label: 'driggs_brand_name', group: 'business' },
     { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
     { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
     { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
+    { key: 'driggs_hours', type: 'text', label: 'driggs_hours', group: 'business', placeholder: 'Open 24 hours' },
+    { key: 'driggs_owner_name', type: 'text', label: 'driggs_owner_name', group: 'business', placeholder: 'Brian Ansley' },
+    { key: 'driggs_short_descr', type: 'text', label: 'driggs_short_descr', group: 'business', placeholder: '' },
+    { key: 'driggs_long_descr', type: 'text', label: 'driggs_long_descr', group: 'business', placeholder: '' },
+    { key: 'driggs_year_opened', type: 'number', label: 'driggs_year_opened', group: 'business', placeholder: '2024' },
+    { key: 'driggs_employees_qty', type: 'number', label: 'driggs_employees_qty', group: 'business', placeholder: '6' },
+    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
+    { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
+    { key: 'driggs_address_species_note', type: 'text', label: 'driggs_address_species_note', group: 'contact', placeholder: '' },
+    { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
+    { key: 'driggs_social_media_links', type: 'text', label: 'driggs_social_media_links', group: 'contact', placeholder: '' },
     { key: 'id', type: 'text', label: 'id', group: 'system' },
     { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
     { key: 'updated_at', type: 'timestamp', label: 'updated_at', group: 'system' },
@@ -692,6 +729,9 @@ export default function DriggsmanTable() {
       // Process value based on type
       if (fieldDef?.type === 'boolean') {
         processedValue = editingValue === 'true';
+      } else if (fieldDef?.type === 'number') {
+        // Convert to number, or null if empty/invalid
+        processedValue = editingValue === '' ? null : (isNaN(Number(editingValue)) ? null : Number(editingValue));
       } else if (field === 'driggs_phone_1') {
         // Normalize phone number for storage
         processedValue = normalizePhoneNumber(editingValue);
@@ -1920,11 +1960,15 @@ export default function DriggsmanTable() {
                   } ${
                     field.key === 'driggs_address_species_id' ? 'border-b-4 border-b-black' : ''
                   } ${
+                    field.key === 'driggs_country' ? 'border-b-4 border-b-black' : ''
+                  } ${
                     field.key === 'driggs_cgig_id' ? 'border-b-4 border-b-black' : ''
                   } ${
                     field.key === 'driggs_industry' ? 'border-t-4 border-t-black' : ''
                   } ${
                     field.key === 'driggs_special_note_for_ai_tool' ? 'border-b-4 border-b-black' : ''
+                  } ${
+                    field.key === 'driggs_social_media_links' ? 'border-b-4 border-b-black' : ''
                   }`}
                 >
                   {/* Field selection checkbox */}
@@ -2455,6 +2499,7 @@ export default function DriggsmanTable() {
                                       setEditingValue('');
                                     }
                                   }}
+                                  placeholder={fieldDefinitions.find(f => f.key === field.key)?.placeholder || ''}
                                   className={`w-full px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
                                     editingValue ? 'bg-[#cfebf9]' : ''
                                   }`}
@@ -2503,6 +2548,7 @@ export default function DriggsmanTable() {
                                         setEditingValue('');
                                       }
                                     }}
+                                    placeholder={fieldDefinitions.find(f => f.key === field.key)?.placeholder || ''}
                                     className="w-full pl-6 pr-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                                     style={{fontFamily: 'Arial, sans-serif', fontSize: '18px'}}
                                     autoFocus
@@ -2521,6 +2567,7 @@ export default function DriggsmanTable() {
                                       setEditingValue('');
                                     }
                                   }}
+                                  placeholder={fieldDefinitions.find(f => f.key === field.key)?.placeholder || ''}
                                   className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                                   autoFocus
                                 />
