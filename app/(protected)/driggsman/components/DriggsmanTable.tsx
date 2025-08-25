@@ -2337,6 +2337,11 @@ export default function DriggsmanTable({
               {/* Additional header row with driggspack buttons */}
               <tr className="border-b border-gray-300">
                 <td className="w-12 h-8 border-r border-gray-300"></td>
+                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
                 <td className="w-64 h-8 border-r border-gray-300"></td>
                 {paginatedSites.map((site, index) => (
                   <td
@@ -2375,6 +2380,23 @@ export default function DriggsmanTable({
                       className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                     />
                   </div>
+                </th>
+                
+                {/* New dp columns */}
+                <th className="border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>
+                  <span style={{ lineHeight: '0.8', fontSize: '10px' }} dangerouslySetInnerHTML={{ __html: 'd<br>p<br>1' }} />
+                </th>
+                <th className="border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>
+                  <span style={{ lineHeight: '0.8', fontSize: '10px' }} dangerouslySetInnerHTML={{ __html: 'd<br>p<br>2' }} />
+                </th>
+                <th className="border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>
+                  <span style={{ lineHeight: '0.8', fontSize: '10px' }} dangerouslySetInnerHTML={{ __html: 'd<br>p<br>3' }} />
+                </th>
+                <th className="border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>
+                  <span style={{ lineHeight: '0.8', fontSize: '10px' }} dangerouslySetInnerHTML={{ __html: 'd<br>p<br>4' }} />
+                </th>
+                <th className="border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>
+                  <span style={{ lineHeight: '0.8', fontSize: '10px' }} dangerouslySetInnerHTML={{ __html: 'm<br>r<br>k' }} />
                 </th>
                 
                 {/* Field name column */}
@@ -2416,6 +2438,16 @@ export default function DriggsmanTable({
                     field.key === 'driggs_special_note_for_ai_tool' ? 'border-b-4 border-b-black' : ''
                   } ${
                     field.key === 'driggs_social_media_links' ? 'border-b-4 border-b-black' : ''
+                  } ${
+                    field.key === 'phone_section_separator' ? 'border-t-4 border-t-black' : ''
+                  } ${
+                    field.key === 'address_section_separator' ? 'border-t-4 border-t-black' : ''
+                  } ${
+                    field.key === 'backlinks_section_separator' ? 'border-t-4 border-t-black' : ''
+                  } ${
+                    field.key === 'basics_section_separator' ? 'border-t-4 border-t-black' : ''
+                  } ${
+                    field.key === 'misc_section_separator' ? 'border-t-4 border-t-black' : ''
                   }`}
                 >
                   {/* Field selection checkbox */}
@@ -2436,6 +2468,53 @@ export default function DriggsmanTable({
                         />
                       )}
                     </div>
+                  </td>
+
+                  {/* New dp columns */}
+                  <td className="border-r border-gray-300" style={{ 
+                    padding: '0', 
+                    margin: '0', 
+                    width: '10px', 
+                    minWidth: '10px', 
+                    maxWidth: '10px',
+                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : 'transparent'
+                  }}>
+                  </td>
+                  <td className="border-r border-gray-300" style={{ 
+                    padding: '0', 
+                    margin: '0', 
+                    width: '10px', 
+                    minWidth: '10px', 
+                    maxWidth: '10px',
+                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : 'transparent'
+                  }}>
+                  </td>
+                  <td className="border-r border-gray-300" style={{ 
+                    padding: '0', 
+                    margin: '0', 
+                    width: '10px', 
+                    minWidth: '10px', 
+                    maxWidth: '10px',
+                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : 'transparent'
+                  }}>
+                  </td>
+                  <td className="border-r border-gray-300" style={{ 
+                    padding: '0', 
+                    margin: '0', 
+                    width: '10px', 
+                    minWidth: '10px', 
+                    maxWidth: '10px',
+                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : 'transparent'
+                  }}>
+                  </td>
+                  <td className="border-r border-gray-300" style={{ 
+                    padding: '0', 
+                    margin: '0', 
+                    width: '10px', 
+                    minWidth: '10px', 
+                    maxWidth: '10px',
+                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : (field.key === 'driggs_social_media_links' ? '#dddddd' : (field.key === 'driggs_special_note_for_ai_tool' ? '#f9d5ce' : 'transparent'))
+                  }}>
                   </td>
 
                   {/* Field name */}
