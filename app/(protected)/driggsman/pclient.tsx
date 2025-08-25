@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import DriggsmanTable from './components/DriggsmanTable';
@@ -19,6 +19,14 @@ const DrenjariButtonBarDriggsmanLinks = dynamic(
 export default function DriggsmanClient() {
   const { user } = useAuth();
   const router = useRouter();
+  const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(() => {
+    // Initialize from localStorage with default as false (hidden)
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('driggsman-header-visible');
+      return saved === null ? false : saved === 'true';
+    }
+    return false;
+  });
 
   useEffect(() => {
     if (!user) {
@@ -26,6 +34,23 @@ export default function DriggsmanClient() {
       return;
     }
   }, [user, router]);
+
+  // Save header visibility state to localStorage and update body class
+  useEffect(() => {
+    localStorage.setItem('driggsman-header-visible', isHeaderVisible.toString());
+    
+    // Add/remove class on body to hide main header
+    if (isHeaderVisible) {
+      document.body.classList.remove('driggsman-hide-main-header');
+    } else {
+      document.body.classList.add('driggsman-hide-main-header');
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('driggsman-hide-main-header');
+    };
+  }, [isHeaderVisible]);
 
   if (!user) {
     return (
@@ -37,20 +62,14 @@ export default function DriggsmanClient() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Driggs Manager 
-              <span className="text-xl font-normal text-gray-600 ml-3">Phone Numbers, Addresses, and Citations</span>
-            </h1>
-          </div>
-          <div className="text-right">
-            <div className="text-sm text-gray-500">Site Field Management</div>
-            <div className="text-xs text-gray-400">Cross-reference all site fields</div>
-          </div>
-        </div>
+      {/* Hide/Show Header Button */}
+      <div className="px-6 py-2 bg-gray-50">
+        <button
+          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+        >
+          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+        </button>
       </div>
 
       {/* Navigation Components */}

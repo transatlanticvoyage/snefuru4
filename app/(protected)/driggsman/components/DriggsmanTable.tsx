@@ -1536,9 +1536,6 @@ export default function DriggsmanTable() {
 
   return (
     <div className="px-6 py-4">
-      {/* Drenjari Navigation Links */}
-      <DrenjariButtonBarDriggsmanLinks />
-      
       {/* Nubra Tableface Kite with Control Buttons */}
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">

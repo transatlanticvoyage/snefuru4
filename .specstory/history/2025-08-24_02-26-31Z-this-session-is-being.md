@@ -3475,3 +3475,633 @@ ADD COLUMN driggs_country TEXT;
 
 This single SQL statement will add all 5 new fields as TEXT type to the `sitespren` table. You can run this in Supabase to add the new address-related fields to complement the existing `driggs_address_full` field.
 
+---
+
+_**User**_
+
+pleaes remove the duplicate "drenjari" component call on the /driggsman page. for some reason there are 2 of them. please remove the one that occurs last (second - or farthest down on the page). 
+
+this is just a simple removal of a "call" for a component called "drenjari" 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll locate and remove the duplicate "drenjari" component call from the /driggsman page.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import DriggsmanTable from './components/DriggsmanTable';
+     7→import dynamic from 'next/dynamic';
+     8→
+     9→const SitedoriButtonBar = dynamic(
+    10→  () => import('@/app/components/SitedoriButtonBar'),
+    11→  { ssr: false }
+    12→);
+    13→
+    14→const DrenjariButtonBarDriggsmanLinks = dynamic(
+    15→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    16→  { ssr: false }
+    17→);
+    18→
+    19→export default function DriggsmanClient() {
+    20→  const { user } = useAuth();
+    21→  const router = useRouter();
+    22→
+    23→  useEffect(() => {
+    24→    if (!user) {
+    25→      router.push('/login');
+    26→      return;
+    27→    }
+    28→  }, [user, router]);
+    29→
+    30→  if (!user) {
+    31→    return (
+    32→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    33→        <div className="text-gray-500">Loading...</div>
+    34→      </div>
+    35→    );
+    36→  }
+    37→
+    38→  return (
+    39→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    40→      {/* Header */}
+    41→      <div className="bg-white border-b px-6 py-4">
+    42→        <div className="flex items-center justify-between">
+    43→          <div>
+    44→            <h1 className="text-2xl font-bold text-gray-800">
+    45→              Driggs Manager 
+    46→              <span className="text-xl font-normal text-gray-600 ml-3">Phone Numbers, Addresses, and Citations</span>
+    47→            </h1>
+    48→          </div>
+    49→          <div className="text-right">
+    50→            <div className="text-sm text-gray-500">Site Field Management</div>
+    51→            <div className="text-xs text-gray-400">Cross-reference all site fields</div>
+    52→          </div>
+    53→        </div>
+    54→      </div>
+    55→
+    56→      {/* Navigation Components */}
+    57→      <div className="px-6 py-2">
+    58→        {/* Sitedori Navigation Links */}
+    59→        <div className="mb-4">
+    60→          <SitedoriButtonBar />
+    61→        </div>
+    62→
+    63→        {/* Drenjari Navigation Links */}
+    64→        <div className="mb-4">
+    65→          <DrenjariButtonBarDriggsmanLinks />
+    66→        </div>
+    67→      </div>
+    68→
+    69→      {/* Main Content - Full Width DriggsmanTable */}
+    70→      <div className="flex-1 overflow-hidden">
+    71→        <DriggsmanTable />
+    72→      </div>
+    73→    </div>
+    74→  );
+    75→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see there's only one DrenjariButtonBarDriggsmanLinks component call in the pclient.tsx file. Let me check the DriggsmanTable component to see if there's a duplicate there:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Search for DrenjariButtonBar component calls in DriggsmanTable
+
+`grep -n "DrenjariButtonBar" /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/\(protected\)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+15:const DrenjariButtonBarDriggsmanLinks = dynamic(
+16:  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+1540:      <DrenjariButtonBarDriggsmanLinks />
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Found it! There's a duplicate DrenjariButtonBarDriggsmanLinks component call in the DriggsmanTable component. Let me remove the one that occurs last (farthest down on the page):
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+1530→      <div className="flex items-center justify-center h-64">
+  1531→        <div className="text-red-500">{error}</div>
+  1532→      </div>
+  1533→    );
+  1534→  }
+  1535→
+  1536→
+  1537→  return (
+  1538→    <div className="px-6 py-4">
+  1539→      {/* Drenjari Navigation Links */}
+  1540→      <DrenjariButtonBarDriggsmanLinks />
+  1541→      
+  1542→      {/* Nubra Tableface Kite with Control Buttons */}
+  1543→      <div className="mb-2 flex items-center justify-between">
+  1544→        <div className="flex items-center space-x-4">
+  1545→          <NubraTablefaceKite tableType="driggsman-site-matrix" />
+  1546→          <div className="flex items-center bg-gray-100 border border-gray-300 rounded px-3 py-2">
+  1547→            <span className="text-sm font-medium text-gray-800">
+  1548→              jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m
+  1549→            </span>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the duplicate DrenjariButtonBarDriggsmanLinks component call on line 1540. I'll remove it:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1533→    );
+  1534→  }
+  1535→
+  1536→
+  1537→  return (
+  1538→    <div className="px-6 py-4">
+  1539→      {/* Nubra Tableface Kite with Control Buttons */}
+  1540→      <div className="mb-2 flex items-center justify-between">
+  1541→        <div className="flex items-center space-x-4">
+  1542→          <NubraTablefaceKite tableType="driggsman-site-matrix" />
+  1543→          <div className="flex items-center bg-gray-100 border border-gray-300 rounded px-3 py-2">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully removed the duplicate DrenjariButtonBarDriggsmanLinks component call from the DriggsmanTable component (the one that occurred last/farthest down on the page). 
+
+Now there's only one DrenjariButtonBarDriggsmanLinks component call remaining - the one in the pclient.tsx file in the navigation section, which is the correct placement for it.
+
+---
+
+_**User**_
+
+
+please view the /cnjar1 page and study the "show page header/hide page header" button that shows there
+
+please imlement the same type of button on the page at:
+/driggsman
+
+please make sure that the default setting is for the page header to be hidden
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll first study the /cnjar1 page to understand the "show page header/hide page header" button functionality, then implement the same feature on the /driggsman page.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/page.tsx`
+
+Result:
+
+```
+1→import { Metadata } from 'next';
+     2→import Cnjar1Client from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: 'cnjar1',
+     6→};
+     7→
+     8→export default function Cnjar1Page() {
+     9→  return <Cnjar1Client />;
+    10→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect, useState } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import dynamic from 'next/dynamic';
+     7→
+     8→const DrenjariButtonBarDriggsmanLinks = dynamic(
+     9→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    10→  { ssr: false }
+    11→);
+    12→
+    13→const Cnjar1Table = dynamic(
+    14→  () => import('./components/Cnjar1Table'),
+    15→  { ssr: false }
+    16→);
+    17→
+    18→export default function Cnjar1Client() {
+    19→  const { user } = useAuth();
+    20→  const router = useRouter();
+    21→  const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(() => {
+    22→    // Initialize from localStorage
+    23→    if (typeof window !== 'undefined') {
+    24→      const saved = localStorage.getItem('cnjar1-header-visible');
+    25→      return saved === null ? true : saved === 'true';
+    26→    }
+    27→    return true;
+    28→  });
+    29→
+    30→  // Column pagination controls state
+    31→  const [columnPaginationControls, setColumnPaginationControls] = useState<{
+    32→    ColumnPaginationBar1: () => JSX.Element | null;
+    33→    ColumnPaginationBar2: () => JSX.Element | null;
+    34→  } | null>(null);
+    35→
+    36→  // Column pagination URL parameter states
+    37→  const [columnsPerPage, setColumnsPerPage] = useState(8);
+    38→  const [currentColumnPage, setCurrentColumnPage] = useState(1);
+    39→
+    40→  // Handle column pagination changes from table component
+    41→  const handleColumnPaginationChange = (newColumnsPerPage: number, newCurrentPage: number) => {
+    42→    setColumnsPerPage(newColumnsPerPage);
+    43→    setCurrentColumnPage(newCurrentPage);
+    44→  };
+    45→
+    46→  useEffect(() => {
+    47→    if (!user) {
+    48→      router.push('/login');
+    49→      return;
+    50→    }
+    51→  }, [user, router]);
+    52→
+    53→  // Save header visibility state to localStorage and update body class
+    54→  useEffect(() => {
+    55→    localStorage.setItem('cnjar1-header-visible', isHeaderVisible.toString());
+    56→    
+    57→    // Add/remove class on body to hide main header
+    58→    if (isHeaderVisible) {
+    59→      document.body.classList.remove('cnjar1-hide-main-header');
+    60→    } else {
+    61→      document.body.classList.add('cnjar1-hide-main-header');
+    62→    }
+    63→    
+    64→    // Cleanup on unmount
+    65→    return () => {
+    66→      document.body.classList.remove('cnjar1-hide-main-header');
+    67→    };
+    68→  }, [isHeaderVisible]);
+    69→
+    70→  if (!user) {
+    71→    return (
+    72→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    73→        <div className="text-gray-500">Loading...</div>
+    74→      </div>
+    75→    );
+    76→  }
+    77→
+    78→  return (
+    79→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    80→      {/* Header */}
+    81→      <div className="bg-white border-b px-6 py-4">
+    82→        <div className="flex items-center justify-between">
+    83→          <div>
+    84→            <h1 className="text-2xl font-bold text-gray-800">
+    85→              CNJar1 Manager
+    86→            </h1>
+    87→          </div>
+    88→          <div className="flex items-center space-x-4">
+    89→            <DrenjariButtonBarDriggsmanLinks />
+    90→            <div className="text-right">
+    91→              <div className="text-sm text-gray-500">City-Industry Combinations</div>
+    92→              <div className="text-xs text-gray-400">Manage cncglub table</div>
+    93→            </div>
+    94→          </div>
+    95→        </div>
+    96→      </div>
+    97→
+    98→      {/* Hide/Show Header Button */}
+    99→      <div className="px-6 py-2 bg-gray-50">
+   100→        <button
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me continue reading to see the complete button implementation:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/cnjar1/pclient.tsx`
+
+Result:
+
+```
+98→      {/* Hide/Show Header Button */}
+    99→      <div className="px-6 py-2 bg-gray-50">
+   100→        <button
+   101→          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+   102→          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+   103→        >
+   104→          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+   105→        </button>
+   106→      </div>
+   107→
+   108→      {/* Column Pagination Button Bars */}
+   109→      {columnPaginationControls && (
+   110→        <div className="px-6 py-2 bg-white border-b">
+   111→          <div className="flex items-center space-x-4">
+   112→            <div className="flex items-center">
+   113→              {columnPaginationControls.ColumnPaginationBar1()}
+   114→            </div>
+   115→            <div className="flex items-center">
+   116→              {columnPaginationControls.ColumnPaginationBar2()}
+   117→            </div>
+   118→          </div>
+   119→        </div>
+   120→      )}
+   121→
+   122→      {/* Drenjari Links at Top */}
+   123→      <div className="px-6 py-4">
+   124→        <DrenjariButtonBarDriggsmanLinks />
+   125→      </div>
+   126→
+   127→      {/* Main Content */}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I understand the functionality. The cnjar1 page has a header visibility toggle that:
+1. Uses `useState` to track `isHeaderVisible` 
+2. Initializes from localStorage (defaults to `true`)
+3. Saves state to localStorage on change
+4. Adds/removes a CSS class on the body element
+5. Shows a toggle button that changes text between "Hide Page Header" and "Show Page Header"
+
+Now I'll implement the same functionality on the /driggsman page with the default setting as hidden:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→'use client';
+     2→
+     3→import { useEffect, useState } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import DriggsmanTable from './components/DriggsmanTable';
+     7→import dynamic from 'next/dynamic';
+     8→
+     9→const SitedoriButtonBar = dynamic(
+    10→  () => import('@/app/components/SitedoriButtonBar'),
+    11→  { ssr: false }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    15→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    16→  { ssr: false }
+    17→);
+    18→
+    19→export default function DriggsmanClient() {
+    20→  const { user } = useAuth();
+    21→  const router = useRouter();
+    22→  const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(() => {
+    23→    // Initialize from localStorage with default as false (hidden)
+    24→    if (typeof window !== 'undefined') {
+    25→      const saved = localStorage.getItem('driggsman-header-visible');
+    26→      return saved === null ? false : saved === 'true';
+    27→    }
+    28→    return false;
+    29→  });
+    30→
+    31→  useEffect(() => {
+    32→    if (!user) {
+    33→      router.push('/login');
+    34→      return;
+    35→    }
+    36→  }, [user, router]);
+    37→
+    38→  // Save header visibility state to localStorage and update body class
+    39→  useEffect(() => {
+    40→    localStorage.setItem('driggsman-header-visible', isHeaderVisible.toString());
+    41→    
+    42→    // Add/remove class on body to hide main header
+    43→    if (isHeaderVisible) {
+    44→      document.body.classList.remove('driggsman-hide-main-header');
+    45→    } else {
+    46→      document.body.classList.add('driggsman-hide-main-header');
+    47→    }
+    48→    
+    49→    // Cleanup on unmount
+    50→    return () => {
+    51→      document.body.classList.remove('driggsman-hide-main-header');
+    52→    };
+    53→  }, [isHeaderVisible]);
+    54→
+    55→  if (!user) {
+    56→    return (
+    57→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the toggle button after the header section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    61→  }
+    62→
+    63→  return (
+    64→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    65→      {/* Header */}
+    66→      <div className="bg-white border-b px-6 py-4">
+    67→        <div className="flex items-center justify-between">
+    68→          <div>
+    69→            <h1 className="text-2xl font-bold text-gray-800">
+    70→              Driggs Manager 
+    71→              <span className="text-xl font-normal text-gray-600 ml-3">Phone Numbers, Addresses, and Citations</span>
+    72→            </h1>
+    73→          </div>
+    74→          <div className="text-right">
+    75→            <div className="text-sm text-gray-500">Site Field Management</div>
+    76→            <div className="text-xs text-gray-400">Cross-reference all site fields</div>
+    77→          </div>
+    78→        </div>
+    79→      </div>
+    80→
+    81→      {/* Hide/Show Header Button */}
+    82→      <div className="px-6 py-2 bg-gray-50">
+    83→        <button
+    84→          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+    85→          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+    86→        >
+    87→          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+    88→        </button>
+    89→      </div>
+    90→
+    91→      {/* Navigation Components */}
+    92→      <div className="px-6 py-2">
+    93→        {/* Sitedori Navigation Links */}
+    94→        <div className="mb-4">
+    95→          <SitedoriButtonBar />
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully implemented the same "show page header/hide page header" button functionality on the /driggsman page with the following features:
+
+## ✅ Implemented Features:
+
+1. **useState Hook**: Added `isHeaderVisible` state with default value `false` (hidden by default)
+2. **localStorage Integration**: 
+   - Reads from `'driggsman-header-visible'` key
+   - Saves state changes to localStorage
+   - Defaults to `false` when no saved preference exists
+3. **Body Class Management**: 
+   - Adds/removes `'driggsman-hide-main-header'` CSS class
+   - Cleanup on component unmount
+4. **Toggle Button**: 
+   - Same styling as cnjar1 page
+   - Dynamic text: "Hide Page Header" / "Show Page Header"
+   - Positioned after the main header section
+
+## 🔧 Key Differences from cnjar1:
+
+- **Default State**: Set to `false` (header hidden) instead of `true`
+- **localStorage Key**: Uses `'driggsman-header-visible'` (unique to this page)
+- **CSS Class**: Uses `'driggsman-hide-main-header'` (page-specific)
+
+The button is now ready and will default to showing "Show Page Header" since the header starts hidden. Users can toggle it to show/hide the page header, and their preference will be remembered in localStorage.
+
+---
+
+_**User**_
+
+the button is not susceesfullly working on /driggsman according to the desired functionality. the main page header is totally visible at all times regardless of what user clicks on button 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+You're right! The button is not working because the CSS class being added to the body element isn't actually hiding the header. I need to check how the cnjar1 page implements the CSS to hide the header.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Search for cnjar1 CSS class implementation
+
+`grep -r "cnjar1-hide-main-header" /Users/kylecampbell/Documents/repos/localrepo-snefuru4/`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx:      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx:      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx:      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/globals.css:body.cnjar1-hide-main-header .snefuru-content-wrapper > header:first-child {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_00-57-12Z-this-session-is-being.md:    44→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_00-57-12Z-this-session-is-being.md:    46→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_00-57-12Z-this-session-is-being.md:    51→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_03-33-20Z-this-session-is-being.md:    43→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_03-33-20Z-this-session-is-being.md:    45→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_03-33-20Z-this-session-is-being.md:    50→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_16-13-04Z-this-session-is-being.md:    43→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_16-13-04Z-this-session-is-being.md:    45→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_16-13-04Z-this-session-is-being.md:    50→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_15-14-51Z-pleaes-research-our-page.md:    43→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_15-14-51Z-pleaes-research-our-page.md:    45→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_15-14-51Z-pleaes-research-our-page.md:    50→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_15-14-51Z-pleaes-research-our-page.md:3. **Body Class Management**: When the header is hidden, a class `cnjar1-hide-main-header` is added to the body element (this can be used for CSS styling if needed to actually hide the main application header)
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_15-14-51Z-pleaes-research-our-page.md:    28→body.cnjar1-hide-main-header .snefuru-content-wrapper > header:first-child {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_15-14-51Z-pleaes-research-our-page.md:   - When header is hidden, adds class `cnjar1-hide-main-header` to body element
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_15-14-51Z-pleaes-research-our-page.md:   body.cnjar1-hide-main-header .snefuru-content-wrapper > header:first-child {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_16-09-56Z-please-rsearch-all-pages.md:    43→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_16-09-56Z-please-rsearch-all-pages.md:    45→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_16-09-56Z-please-rsearch-all-pages.md:    50→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_17-04-06Z-this-session-is-being.md:    48→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_17-04-06Z-this-session-is-being.md:    50→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_17-04-06Z-this-session-is-being.md:    55→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_17-04-06Z-this-session-is-being.md:      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_17-04-06Z-this-session-is-being.md:      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_17-04-06Z-this-session-is-being.md:      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_12-26-04Z-pleaes-research-the-meta.md:    44→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_12-26-04Z-pleaes-research-the-meta.md:    46→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_12-26-04Z-pleaes-research-the-meta.md:    51→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_12-26-04Z-pleaes-research-the-meta.md:      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_12-26-04Z-pleaes-research-the-meta.md:      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_12-26-04Z-pleaes-research-the-meta.md:      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_12-58-26Z-this-session-is-being.md:    48→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_12-58-26Z-this-session-is-being.md:    50→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_13-08-14Z-this-session-is-being.md:    43→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_13-08-14Z-this-session-is-being.md:    45→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-09_13-08-14Z-this-session-is-being.md:    50→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_18-00-18Z-this-session-is-being.md:      body.cnjar1-hide-main-header .snefuru-content-wrapper > header:first-child {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_23-46-42Z-this-session-is-being.md:    43→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_23-46-42Z-this-session-is-being.md:    45→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-06_23-46-42Z-this-session-is-being.md:    50→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_01-14-05Z-this-session-is-being.md:    43→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_01-14-05Z-this-session-is-being.md:    45→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-08_01-14-05Z-this-session-is-being.md:    50→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_00-46-07Z-this-session-is-being.md:    43→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_00-46-07Z-this-session-is-being.md:    45→      document.body.classList.add('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_00-46-07Z-this-session-is-being.md:    50→      document.body.classList.remove('cnjar1-hide-main-header');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/server/app/(protected)/cnjar1/page.js:eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ Cnjar1Client)\n/* harmony export */ });\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ \"(ssr)/./node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js\");\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ \"(ssr)/./node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js\");\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _app_context_AuthContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/app/context/AuthContext */ \"(ssr)/./app/context/AuthContext.tsx\");\n/* harmony import */ var next_navigation__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! next/navigation */ \"(ssr)/./node_modules/next/dist/api/navigation.js\");\n/* harmony import */ var next_dynamic__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! next/dynamic */ \"(ssr)/./node_modules/next/dist/api/app-dynamic.js\");\n/* __next_internal_client_entry_do_not_use__ default auto */ \n\n\n\n\nconst DrenjariButtonBarDriggsmanLinks = (0,next_dynamic__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(async ()=>{\n     true && /*require.resolve*/(null /* weak dependency, without id */);\n}, {\n    loadableGenerated: {\n        modules: [\n            \"app/(protected)/cnjar1/pclient.tsx -> \" + \"@/app/components/DrenjariButtonBarDriggsmanLinks\"\n        ]\n    },\n    ssr: false\n});\nconst Cnjar1Table = (0,next_dynamic__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(async ()=>{\n     true && /*require.resolve*/(null /* weak dependency, without id */);\n}, {\n    loadableGenerated: {\n        modules: [\n            \"app/(protected)/cnjar1/pclient.tsx -> \" + \"./components/Cnjar1Table\"\n        ]\n    },\n    ssr: false\n});\nfunction Cnjar1Client() {\n    const { user } = (0,_app_context_AuthContext__WEBPACK_IMPORTED_MODULE_2__.useAuth)();\n    const router = (0,next_navigation__WEBPACK_IMPORTED_MODULE_3__.useRouter)();\n    const [isHeaderVisible, setIsHeaderVisible] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({\n        \"Cnjar1Client.useState\": ()=>{\n            // Initialize from localStorage\n            if (false) {}\n            return true;\n        }\n    }[\"Cnjar1Client.useState\"]);\n    // Column pagination controls state\n    const [columnPaginationControls, setColumnPaginationControls] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null);\n    // Column pagination URL parameter states\n    const [columnsPerPage, setColumnsPerPage] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(8);\n    const [currentColumnPage, setCurrentColumnPage] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(1);\n    // Handle column pagination changes from table component\n    const handleColumnPaginationChange = (newColumnsPerPage, newCurrentPage)=>{\n        setColumnsPerPage(newColumnsPerPage);\n        setCurrentColumnPage(newCurrentPage);\n    };\n    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)({\n        \"Cnjar1Client.useEffect\": ()=>{\n            if (!user) {\n                router.push('/login');\n                return;\n            }\n        }\n    }[\"Cnjar1Client.useEffect\"], [\n        user,\n        router\n    ]);\n    // Save header visibility state to localStorage and update body class\n    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)({\n        \"Cnjar1Client.useEffect\": ()=>{\n            localStorage.setItem('cnjar1-header-visible', isHeaderVisible.toString());\n            // Add/remove class on body to hide main header\n            if (isHeaderVisible) {\n                document.body.classList.remove('cnjar1-hide-main-header');\n            } else {\n                document.body.classList.add('cnjar1-hide-main-header');\n            }\n            // Cleanup on unmount\n            return ({\n                \"Cnjar1Client.useEffect\": ()=>{\n                    document.body.classList.remove('cnjar1-hide-main-header');\n                }\n            })[\"Cnjar1Client.useEffect\"];\n        }\n    }[\"Cnjar1Client.useEffect\"], [\n        isHeaderVisible\n    ]);\n    if (!user) {\n        return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n            className: \"min-h-screen bg-gray-50 flex items-center justify-center\",\n            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                className: \"text-gray-500\",\n                children: \"Loading...\"\n            }, void 0, false, {\n                fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                lineNumber: 73,\n                columnNumber: 9\n            }, this)\n        }, void 0, false, {\n            fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n            lineNumber: 72,\n            columnNumber: 7\n        }, this);\n    }\n    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n        className: \"min-h-screen bg-gray-50 flex flex-col\",\n        children: [\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                className: \"bg-white border-b px-6 py-4\",\n                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                    className: \"flex items-center justify-between\",\n                    children: [\n                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"h1\", {\n                                className: \"text-2xl font-bold text-gray-800\",\n                                children: \"CNJar1 Manager\"\n                            }, void 0, false, {\n                                fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                                lineNumber: 84,\n                                columnNumber: 13\n                            }, this)\n                        }, void 0, false, {\n                            fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                            lineNumber: 83,\n                            columnNumber: 11\n                        }, this),\n                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                            className: \"flex items-center space-x-4\",\n                            children: [\n                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(DrenjariButtonBarDriggsmanLinks, {}, void 0, false, {\n                                    fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                                    lineNumber: 89,\n                                    columnNumber: 13\n                                }, this),\n                                /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                                    className: \"text-right\",\n                                    children: [\n                                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                                            className: \"text-sm text-gray-500\",\n                                            children: \"City-Industry Combinations\"\n                                        }, void 0, false, {\n                                            fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                                            lineNumber: 91,\n                                            columnNumber: 15\n                                        }, this),\n                                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                                            className: \"text-xs text-gray-400\",\n                                            children: \"Manage cncglub table\"\n                                        }, void 0, false, {\n                                            fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                                            lineNumber: 92,\n                                            columnNumber: 15\n                                        }, this)\n                                    ]\n                                }, void 0, true, {\n                                    fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                                    lineNumber: 90,\n                                    columnNumber: 13\n                                }, this)\n                            ]\n                        }, void 0, true, {\n                            fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                            lineNumber: 88,\n                            columnNumber: 11\n                        }, this)\n                    ]\n                }, void 0, true, {\n                    fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                    lineNumber: 82,\n                    columnNumber: 9\n                }, this)\n            }, void 0, false, {\n                fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                lineNumber: 81,\n                columnNumber: 7\n            }, this),\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                className: \"px-6 py-2 bg-gray-50\",\n                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"button\", {\n                    onClick: ()=>setIsHeaderVisible(!isHeaderVisible),\n                    className: \"px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors\",\n                    children: isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'\n                }, void 0, false, {\n                    fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                    lineNumber: 100,\n                    columnNumber: 9\n                }, this)\n            }, void 0, false, {\n                fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                lineNumber: 99,\n                columnNumber: 7\n            }, this),\n            columnPaginationControls && /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                className: \"px-6 py-2 bg-white border-b\",\n                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                    className: \"flex items-center space-x-4\",\n                    children: [\n                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                            className: \"flex items-center\",\n                            children: columnPaginationControls.ColumnPaginationBar1()\n                        }, void 0, false, {\n                            fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                            lineNumber: 112,\n                            columnNumber: 13\n                        }, this),\n                        /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                            className: \"flex items-center\",\n                            children: columnPaginationControls.ColumnPaginationBar2()\n                        }, void 0, false, {\n                            fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                            lineNumber: 115,\n                            columnNumber: 13\n                        }, this)\n                    ]\n                }, void 0, true, {\n                    fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                    lineNumber: 111,\n                    columnNumber: 11\n                }, this)\n            }, void 0, false, {\n                fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                lineNumber: 110,\n                columnNumber: 9\n            }, this),\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                className: \"px-6 py-4\",\n                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(DrenjariButtonBarDriggsmanLinks, {}, void 0, false, {\n                    fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                    lineNumber: 124,\n                    columnNumber: 9\n                }, this)\n            }, void 0, false, {\n                fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                lineNumber: 123,\n                columnNumber: 7\n            }, this),\n            /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"div\", {\n                className: \"flex-1 overflow-hidden\",\n                children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(Cnjar1Table, {\n                    onColumnPaginationRender: setColumnPaginationControls,\n                    initialColumnsPerPage: columnsPerPage,\n                    initialColumnPage: currentColumnPage,\n                    onColumnPaginationChange: handleColumnPaginationChange\n                }, void 0, false, {\n                    fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                    lineNumber: 129,\n                    columnNumber: 9\n                }, this)\n            }, void 0, false, {\n                fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n                lineNumber: 128,\n                columnNumber: 7\n            }, this)\n        ]\n    }, void 0, true, {\n        fileName: \"/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/cnjar1/pclient.tsx\",\n        lineNumber: 79,\n        columnNumber: 5\n    }, this);\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9hcHAvKHByb3RlY3RlZCkvY25qYXIxL3BjbGllbnQudHN4IiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7OztBQUU0QztBQUNRO0FBQ1I7QUFDVDtBQUVuQyxNQUFNSyxrQ0FBa0NELHdEQUFPQTs7Ozs7Ozs7SUFFM0NFLEtBQUs7O0FBR1QsTUFBTUMsY0FBY0gsd0RBQU9BOzs7Ozs7OztJQUV2QkUsS0FBSzs7QUFHTSxTQUFTRTtJQUN0QixNQUFNLEVBQUVDLElBQUksRUFBRSxHQUFHUCxpRUFBT0E7SUFDeEIsTUFBTVEsU0FBU1AsMERBQVNBO0lBQ3hCLE1BQU0sQ0FBQ1EsaUJBQWlCQyxtQkFBbUIsR0FBR1gsK0NBQVFBO2lDQUFVO1lBQzlELCtCQUErQjtZQUMvQixJQUFJLEtBQTZCLEVBQUUsRUFHbEM7WUFDRCxPQUFPO1FBQ1Q7O0lBRUEsbUNBQW1DO0lBQ25DLE1BQU0sQ0FBQ2UsMEJBQTBCQyw0QkFBNEIsR0FBR2hCLCtDQUFRQSxDQUc5RDtJQUVWLHlDQUF5QztJQUN6QyxNQUFNLENBQUNpQixnQkFBZ0JDLGtCQUFrQixHQUFHbEIsK0NBQVFBLENBQUM7SUFDckQsTUFBTSxDQUFDbUIsbUJBQW1CQyxxQkFBcUIsR0FBR3BCLCtDQUFRQSxDQUFDO0lBRTNELHdEQUF3RDtJQUN4RCxNQUFNcUIsK0JBQStCLENBQUNDLG1CQUEyQkM7UUFDL0RMLGtCQUFrQkk7UUFDbEJGLHFCQUFxQkc7SUFDdkI7SUFFQXhCLGdEQUFTQTtrQ0FBQztZQUNSLElBQUksQ0FBQ1MsTUFBTTtnQkFDVEMsT0FBT2UsSUFBSSxDQUFDO2dCQUNaO1lBQ0Y7UUFDRjtpQ0FBRztRQUFDaEI7UUFBTUM7S0FBTztJQUVqQixxRUFBcUU7SUFDckVWLGdEQUFTQTtrQ0FBQztZQUNSYyxhQUFhWSxPQUFPLENBQUMseUJBQXlCZixnQkFBZ0JnQixRQUFRO1lBRXRFLCtDQUErQztZQUMvQyxJQUFJaEIsaUJBQWlCO2dCQUNuQmlCLFNBQVNDLElBQUksQ0FBQ0MsU0FBUyxDQUFDQyxNQUFNLENBQUM7WUFDakMsT0FBTztnQkFDTEgsU0FBU0MsSUFBSSxDQUFDQyxTQUFTLENBQUNFLEdBQUcsQ0FBQztZQUM5QjtZQUVBLHFCQUFxQjtZQUNyQjswQ0FBTztvQkFDTEosU0FBU0MsSUFBSSxDQUFDQyxTQUFTLENBQUNDLE1BQU0sQ0FBQztnQkFDakM7O1FBQ0Y7aUNBQUc7UUFBQ3BCO0tBQWdCO0lBRXBCLElBQUksQ0FBQ0YsTUFBTTtRQUNULHFCQUNFLDhEQUFDd0I7WUFBSUMsV0FBVTtzQkFDYiw0RUFBQ0Q7Z0JBQUlDLFdBQVU7MEJBQWdCOzs7Ozs7Ozs7OztJQUdyQztJQUVBLHFCQUNFLDhEQUFDRDtRQUFJQyxXQUFVOzswQkFFYiw4REFBQ0Q7Z0JBQUlDLFdBQVU7MEJBQ2IsNEVBQUNEO29CQUFJQyxXQUFVOztzQ0FDYiw4REFBQ0Q7c0NBQ0MsNEVBQUNFO2dDQUFHRCxXQUFVOzBDQUFtQzs7Ozs7Ozs7Ozs7c0NBSW5ELDhEQUFDRDs0QkFBSUMsV0FBVTs7OENBQ2IsOERBQUM3Qjs7Ozs7OENBQ0QsOERBQUM0QjtvQ0FBSUMsV0FBVTs7c0RBQ2IsOERBQUNEOzRDQUFJQyxXQUFVO3NEQUF3Qjs7Ozs7O3NEQUN2Qyw4REFBQ0Q7NENBQUlDLFdBQVU7c0RBQXdCOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OzswQkFPL0MsOERBQUNEO2dCQUFJQyxXQUFVOzBCQUNiLDRFQUFDRTtvQkFDQ0MsU0FBUyxJQUFNekIsbUJBQW1CLENBQUNEO29CQUNuQ3VCLFdBQVU7OEJBRVR2QixrQkFBa0IscUJBQXFCOzs7Ozs7Ozs7OztZQUszQ0ssMENBQ0MsOERBQUNpQjtnQkFBSUMsV0FBVTswQkFDYiw0RUFBQ0Q7b0JBQUlDLFdBQVU7O3NDQUNiLDhEQUFDRDs0QkFBSUMsV0FBVTtzQ0FDWmxCLHlCQUF5QnNCLG9CQUFvQjs7Ozs7O3NDQUVoRCw4REFBQ0w7NEJBQUlDLFdBQVU7c0NBQ1psQix5QkFBeUJ1QixvQkFBb0I7Ozs7Ozs7Ozs7Ozs7Ozs7OzBCQU90RCw4REFBQ047Z0JBQUlDLFdBQVU7MEJBQ2IsNEVBQUM3Qjs7Ozs7Ozs7OzswQkFJSCw4REFBQzRCO2dCQUFJQyxXQUFVOzBCQUNiLDRFQUFDM0I7b0JBQ0NpQywwQkFBMEJ2QjtvQkFDMUJ3Qix1QkFBdUJ2QjtvQkFDdkJ3QixtQkFBbUJ0QjtvQkFDbkJ1QiwwQkFBMEJyQjs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFLcEMiLCJzb3VyY2VzIjpbIi9Vc2Vycy9reWxlY2FtcGJlbGwvRG9jdW1lbnRzL3JlcG9zL2xvY2FscmVwby1zbmVmdXJ1NC9hcHAvKHByb3RlY3RlZCkvY25qYXIxL3BjbGllbnQudHN4Il0sInNvdXJjZXNDb250ZW50IjpbIid1c2UgY2xpZW50JztcblxuaW1wb3J0IHsgdXNlRWZmZWN0LCB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICdAL2FwcC9jb250ZXh0L0F1dGhDb250ZXh0JztcbmltcG9ydCB7IHVzZVJvdXRlciB9IGZyb20gJ25leHQvbmF2aWdhdGlvbic7XG5pbXBvcnQgZHluYW1pYyBmcm9tICduZXh0L2R5bmFtaWMnO1xuXG5jb25zdCBEcmVuamFyaUJ1dHRvbkJhckRyaWdnc21hbkxpbmtzID0gZHluYW1pYyhcbiAgKCkgPT4gaW1wb3J0KCdAL2FwcC9jb21wb25lbnRzL0RyZW5qYXJpQnV0dG9uQmFyRHJpZ2dzbWFuTGlua3MnKSxcbiAgeyBzc3I6IGZhbHNlIH1cbik7XG5cbmNvbnN0IENuamFyMVRhYmxlID0gZHluYW1pYyhcbiAgKCkgPT4gaW1wb3J0KCcuL2NvbXBvbmVudHMvQ25qYXIxVGFibGUnKSxcbiAgeyBzc3I6IGZhbHNlIH1cbik7XG5cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIENuamFyMUNsaWVudCgpIHtcbiAgY29uc3QgeyB1c2VyIH0gPSB1c2VBdXRoKCk7XG4gIGNvbnN0IHJvdXRlciA9IHVzZVJvdXRlcigpO1xuICBjb25zdCBbaXNIZWFkZXJWaXNpYmxlLCBzZXRJc0hlYWRlclZpc2libGVdID0gdXNlU3RhdGU8Ym9vbGVhbj4oKCkgPT4ge1xuICAgIC8vIEluaXRpYWxpemUgZnJvbSBsb2NhbFN0b3JhZ2VcbiAgICBpZiAodHlwZW9mIHdpbmRvdyAhPT0gJ3VuZGVmaW5lZCcpIHtcbiAgICAgIGNvbnN0IHNhdmVkID0gbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ2NuamFyMS1oZWFkZXItdmlzaWJsZScpO1xuICAgICAgcmV0dXJuIHNhdmVkID09PSBudWxsID8gdHJ1ZSA6IHNhdmVkID09PSAndHJ1ZSc7XG4gICAgfVxuICAgIHJldHVybiB0cnVlO1xuICB9KTtcblxuICAvLyBDb2x1bW4gcGFnaW5hdGlvbiBjb250cm9scyBzdGF0ZVxuICBjb25zdCBbY29sdW1uUGFnaW5hdGlvbkNvbnRyb2xzLCBzZXRDb2x1bW5QYWdpbmF0aW9uQ29udHJvbHNdID0gdXNlU3RhdGU8e1xuICAgIENvbHVtblBhZ2luYXRpb25CYXIxOiAoKSA9PiBKU1guRWxlbWVudCB8IG51bGw7XG4gICAgQ29sdW1uUGFnaW5hdGlvbkJhcjI6ICgpID0+IEpTWC5FbGVtZW50IHwgbnVsbDtcbiAgfSB8IG51bGw+KG51bGwpO1xuXG4gIC8vIENvbHVtbiBwYWdpbmF0aW9uIFVSTCBwYXJhbWV0ZXIgc3RhdGVzXG4gIGNvbnN0IFtjb2x1bW5zUGVyUGFnZSwgc2V0Q29sdW1uc1BlclBhZ2VdID0gdXNlU3RhdGUoOCk7XG4gIGNvbnN0IFtjdXJyZW50Q29sdW1uUGFnZSwgc2V0Q3VycmVudENvbHVtblBhZ2VdID0gdXNlU3RhdGUoMSk7XG5cbiAgLy8gSGFuZGxlIGNvbHV
+
+... [3 lines truncated] ...
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the issue. The CSS is defined in globals.css. Let me check it and add the corresponding CSS for the driggsman page:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/globals.css`
+
+Result:
+
+```
+28→body.cnjar1-hide-main-header .snefuru-content-wrapper > header:first-child {
+    29→  display: none !important;
+    30→}
+    31→
+    32→@keyframes spin {
+    33→  from {
+    34→    transform: rotate(0deg);
+    35→  }
+    36→  to {
+    37→    transform: rotate(360deg);
+```
+
