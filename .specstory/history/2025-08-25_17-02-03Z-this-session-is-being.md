@@ -2795,3 +2795,103 @@ Perfect! I've successfully fixed the main issue. Here's what was resolved:
 
 The page should now work properly without the React key duplication errors that were causing performance issues and console spam. The fog chamber functionality and URL parameter handling should work as intended.
 
+---
+
+_**User**_
+
+we now have another issue:
+
+currently user must actively click on the current checkbox of a filter chamber to "unselect it" before selecting another one
+
+this is incorrect. user should be able to click on the checkbox of another chamber filter to select it whenever they want (with 1 click) and then the system should immeidately switch to that option 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Fix chamber filter checkbox behavior - allow single click to switch between chambers instead of requiring deselection first
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+You're absolutely right! The current behavior requires users to first uncheck the current chamber before checking another one, which is not user-friendly. Users should be able to click any chamber checkbox to immediately switch to that chamber.
+
+Let me find and fix the chamber checkbox handlers to automatically switch between chambers with a single click:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:  const handleFogFilterChange = (checked: boolean) => {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    setUseFogFilter(checked);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    if (checked) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      // Fog chamber represents unfiltered view - turn off other filters
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setUseDaylightFilter(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setUseRainFilter(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setActiveRainChamber(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setManualSites([]);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      updateActiveChamberURL('fog');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    }
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-  };
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:  const handleDaylightFilterChange = (checked: boolean) => {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    setUseDaylightFilter(checked);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    if (checked) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setUseFogFilter(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setUseRainFilter(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setActiveRainChamber(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      // Restore stored manual sites
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      if (storedManualSites.length > 0) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-        setManualSites(storedManualSites);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      }
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      // Update URL
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      updateActiveChamberURL('daylight');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    } else {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      // No filtering - show all sites, activate fog filter
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setUseFogFilter(true);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setManualSites([]);
+--
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:  const handleRainFilterChange = (checked: boolean) => {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    setUseRainFilter(checked);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    if (checked) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setUseFogFilter(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setUseDaylightFilter(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      // Don't clear storedManualSites, just hide them from current view
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setManualSites([]);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      // If a tag is selected, activate rain chamber
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      if (selectedTagId) {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-        setActiveRainChamber(true);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      }
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      // Update URL
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      updateActiveChamberURL('rain');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-    } else {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      // No filtering - show all sites, activate fog filter
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-      setUseFogFilter(true);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see the issue. The current handlers rely on the `checked` parameter from the checkbox, which means if a chamber is already selected, clicking it again will uncheck it. Instead, we need to modify these handlers to always activate the selected chamber regardless of the checkbox state.
+
+Let me fix this by changing the handlers to always activate the selected chamber:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **MultiEdit** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+Applied 3 edits to /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:
+1. Replaced "  const handleFogFilterChange = (checked: boolean)..." with "  const handleFogFilterChange = () => {
+    // Alw..."
+2. Replaced "  const handleDaylightFilterChange = (checked: boo..." with "  const handleDaylightFilterChange = () => {
+    /..."
+3. Replaced "  const handleRainFilterChange = (checked: boolean..." with "  const handleRainFilterChange = () => {
+    // Al..."
+```
+

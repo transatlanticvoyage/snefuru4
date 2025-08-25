@@ -185,7 +185,6 @@ export default function DriggsmanTable({
   // 2. Encoded: ?penja=9284jsiweu294824 (short but requires mapping)
   // 3. Base64: ?state=eyJ0YWciOiJ0YWduYW1lIn0= (middle ground)
   // 4. Hybrid: Use simple for <5 sites, encoded for larger selections
-  const [selectedSiteIds, setSelectedSiteIds] = useState<Set<string>>(new Set());
   
   // Inputs expand editor states
   const [inputsExpandPopup, setInputsExpandPopup] = useState<{ 
@@ -202,6 +201,12 @@ export default function DriggsmanTable({
   const [taggedSites, setTaggedSites] = useState<SitesprenSite[]>([]);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
   const [tagCounts, setTagCounts] = useState<Map<number, number>>(new Map());
+  
+  // Search popup states
+  const [searchPopupOpen, setSearchPopupOpen] = useState(false);
+  const [searchSites, setSearchSites] = useState<SitesprenSite[]>([]);
+  const [selectedSiteIds, setSelectedSiteIds] = useState<Set<string>>(new Set());
+  const [isExternalFilter, setIsExternalFilter] = useState(false);
   
   // Filtering mechanism states
   const [useFogFilter, setUseFogFilter] = useState(true); // Default to true (unfiltered view)
@@ -458,6 +463,13 @@ export default function DriggsmanTable({
       onSitesCountChange(sites.length);
     }
   }, [sites.length, onSitesCountChange]);
+
+  // Fetch search sites when popup opens
+  useEffect(() => {
+    if (searchPopupOpen) {
+      fetchSearchSites();
+    }
+  }, [searchPopupOpen]);
   
   const fetchSites = async () => {
     try {
@@ -933,6 +945,65 @@ export default function DriggsmanTable({
     }
     // Update URL
     updateActiveChamberURL('rain');
+  };
+
+  // Search popup functions
+  const fetchSearchSites = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+
+      // Get internal user ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+
+      if (userError || !userData) return;
+
+      // Fetch sites for this user
+      const { data: sitesData, error: sitesError } = await supabase
+        .from('sitespren')
+        .select('sitespren_base, is_external, is_internal, created_at, fk_address_species_id, sitespren_id')
+        .eq('fk_user_id', userData.id)
+        .order('created_at', { ascending: false });
+
+      if (sitesError) {
+        console.error('Error fetching search sites:', sitesError);
+        return;
+      }
+
+      setSearchSites(sitesData || []);
+    } catch (err) {
+      console.error('Error in fetchSearchSites:', err);
+    }
+  };
+
+  const handleSearchSiteSelect = (siteId: string) => {
+    const newSelected = new Set(selectedSiteIds);
+    if (newSelected.has(siteId)) {
+      newSelected.delete(siteId);
+    } else {
+      newSelected.add(siteId);
+    }
+    setSelectedSiteIds(newSelected);
+  };
+
+  const handleEnterSelectedSites = () => {
+    const selectedSites = searchSites
+      .filter(site => selectedSiteIds.has(site.sitespren_id.toString()))
+      .map(site => site.sitespren_base)
+      .join(' ');
+    
+    setManualSiteInput(selectedSites);
+    setSearchPopupOpen(false);
+    setSelectedSiteIds(new Set());
+  };
+
+  const getFilteredSearchSites = () => {
+    if (!isExternalFilter) return searchSites;
+    return searchSites.filter(site => site.is_external === true);
   };
 
   const handleManualSiteSubmit = () => {
@@ -1549,6 +1620,97 @@ export default function DriggsmanTable({
 
   return (
     <div className="px-6 py-4">
+      {/* Search Popup */}
+      {searchPopupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 pt-20">
+          <div className="bg-white rounded-lg shadow-xl w-[600px] h-[600px] flex flex-col">
+            {/* Popup Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Search Sites</h2>
+              <button
+                onClick={() => {
+                  setSearchPopupOpen(false);
+                  setSelectedSiteIds(new Set());
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Controls */}
+            <div className="p-4 border-b bg-gray-50 flex items-center justify-between">
+              <button
+                onClick={handleEnterSelectedSites}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                disabled={selectedSiteIds.size === 0}
+              >
+                enter selected sites
+              </button>
+              
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-bold">is_external</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isExternalFilter}
+                    onChange={(e) => setIsExternalFilter(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            </div>
+
+            {/* Sites Table */}
+            <div className="flex-1 overflow-auto p-4">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">select</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">sitespren_base</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">is_external</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">is_internal</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">created_at</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">fk_address_species_id</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">sitespren_id</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {getFilteredSearchSites().map((site) => (
+                      <tr key={site.sitespren_id} className="hover:bg-gray-50">
+                        <td className="px-2 py-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedSiteIds.has(site.sitespren_id.toString())}
+                            onChange={() => handleSearchSiteSelect(site.sitespren_id.toString())}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                        </td>
+                        <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[150px]">{site.sitespren_base || '-'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900">{site.is_external ? 'true' : 'false'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900">{site.is_internal ? 'true' : 'false'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900">{site.created_at ? new Date(site.created_at).toLocaleDateString() : '-'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900">{site.fk_address_species_id || '-'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900">{site.sitespren_id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                {getFilteredSearchSites().length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    {isExternalFilter ? 'No external sites found' : 'No sites found'}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Debug Info */}
       {sites.length === 0 && !loading && (
@@ -1632,6 +1794,14 @@ export default function DriggsmanTable({
                 </div>
               </div>
               <span className="ml-2 text-sm font-bold text-gray-700">enter sites manually</span>
+              
+              {/* Search Button */}
+              <button
+                onClick={() => setSearchPopupOpen(true)}
+                className="ml-3 px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                search
+              </button>
             </div>
             <input
               type="text"
