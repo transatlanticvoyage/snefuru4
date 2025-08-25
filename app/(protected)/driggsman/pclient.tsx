@@ -24,6 +24,12 @@ export default function DriggsmanClient() {
     return false;
   });
 
+  // Controls state for pagination and search
+  const [paginationControls, setPaginationControls] = useState<{
+    PaginationControls: () => JSX.Element;
+    ColumnPaginationControls: () => JSX.Element;
+  } | null>(null);
+
   useEffect(() => {
     if (!user) {
       router.push('/login');
@@ -58,27 +64,38 @@ export default function DriggsmanClient() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Hide/Show Header Button */}
-      <div className="px-6 py-2 bg-gray-50">
+      {/* Hide/Show Header Button and Navigation */}
+      <div className="px-6 py-2 bg-gray-50 flex items-center space-x-4">
         <button
           onClick={() => setIsHeaderVisible(!isHeaderVisible)}
           className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
         >
           {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
         </button>
-      </div>
-
-      {/* Navigation Components */}
-      <div className="px-6 py-2">
+        
         {/* Drenjari Navigation Links */}
-        <div className="mb-4">
+        <div>
           <DrenjariButtonBarDriggsmanLinks />
         </div>
       </div>
 
+      {/* Pagination and Search Controls */}
+      {paginationControls && (
+        <div className="px-6 py-2 bg-white border-b">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center">
+              {paginationControls.PaginationControls()}
+            </div>
+            <div className="flex items-center">
+              {paginationControls.ColumnPaginationControls()}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content - Full Width DriggsmanTable */}
       <div className="flex-1 overflow-hidden">
-        <DriggsmanTable />
+        <DriggsmanTable onControlsRender={setPaginationControls} />
       </div>
     </div>
   );

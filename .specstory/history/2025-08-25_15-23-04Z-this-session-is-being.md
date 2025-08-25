@@ -3693,3 +3693,658 @@ _**Agent (claude-sonnet-4-20250514)**_
 - [X] 🌡️ Add visual separator row with 'phone section' text above driggs_phone1_platform_id
 
 
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ **Successfully added the "phone section" visual separator row!**
+
+**Changes implemented:**
+
+1. **Added field definition** - Added `phone_section_separator` with `type: 'section_header'` and `label: 'phone section'` positioned above `driggs_phone1_platform_id`
+
+2. **Updated TypeScript interface** - Added `phone_section_separator?: string` as optional field to the `SitesprenSite` interface
+
+3. **Prevented editing** - Added logic to `handleCellClick` to prevent editing of `section_header` type fields
+
+4. **Added special rendering** - Created special rendering logic for `section_header` type that displays:
+   - Bold text with the label ("phone section")
+   - Gray background (`bg-gray-100`)
+   - No cursor pointer (not clickable)
+   - Consistent width and borders
+
+5. **Updated onClick protection** - Modified both onClick handlers to exclude `section_header` types from click events
+
+**Result:** 
+The table now shows a visually distinct gray row with bold "**phone section**" text positioned directly above the `driggs_phone1_platform_id` row. This creates a clear visual separation and helps organize the table into logical sections without being tied to any database field.
+
+---
+
+_**User**_
+
+pleae move this ui row in the table driggs_address_species_note to now be directly under the address species id ui row 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Move driggs_address_species_note row to be directly under driggs_address_species_id
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to move `driggs_address_species_note` from its current position to be directly below `driggs_address_species_id`. Let me first find where both fields are currently positioned:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+driggs_site_type_purpose: string | null;
+  driggs_email_1: string | null;
+  driggs_address_full: string | null;
+  driggs_address_species_id: number | null;
+  driggs_phone_1: string | null;
+  driggs_phone1_platform_id: number | null;
+  driggs_cgig_id: number | null;
+--
+  driggs_employees_qty: number | null;
+  driggs_keywords: string | null;
+  driggs_category: string | null;
+  driggs_address_species_note: string | null;
+  driggs_payment_methods: string | null;
+  driggs_social_media_links: string | null;
+  driggs_street_1: string | null;
+--
+    { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
+    { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
+    { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
+    { key: 'driggs_address_species_id', type: 'address_species_dropdown', label: 'driggs_address_species_id', group: 'contact' },
+    { key: 'driggs_street_1', type: 'text', label: 'driggs_street_1', group: 'contact', placeholder: '' },
+    { key: 'driggs_street_2', type: 'text', label: 'driggs_street_2', group: 'contact', placeholder: '' },
+    { key: 'driggs_state_code', type: 'text', label: 'driggs_state_code', group: 'contact', placeholder: '' },
+--
+    { key: 'driggs_employees_qty', type: 'number', label: 'driggs_employees_qty', group: 'business', placeholder: '6' },
+    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
+    { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
+    { key: 'driggs_address_species_note', type: 'text', label: 'driggs_address_species_note', group: 'contact', placeholder: '' },
+    { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
+    { key: 'driggs_social_media_links', type: 'text', label: 'driggs_social_media_links', group: 'contact', placeholder: '' },
+    { key: 'id', type: 'text', label: 'id', group: 'system' },
+--
+      const { data, error } = await supabase
+        .from('sitespren')
+        .update({ driggs_address_species_id: speciesId })
+        .eq('id', siteId)
+        .eq('fk_users_id', userData.id)
+        .select('id, driggs_address_species_id');
+      if (error) {
+        console.error('Supabase update error:', error);
+--
+      // Update local data
+      setSites(sites.map(site => 
+        site.id === siteId ? { ...site, driggs_address_species_id: speciesId } : site
+      ));
+      setAddressSpeciesDropdownOpen(null);
+--
+                  className={`hover:bg-gray-50 ${
+                    field.key === 'driggs_phone_1' ? 'border-b-4 border-b-black' : ''
+                  } ${
+                    field.key === 'driggs_address_species_id' ? 'border-b-4 border-b-black' : ''
+                  } ${
+                    field.key === 'driggs_country' ? 'border-b-4 border-b-black' : ''
+                  } ${
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see that:
+- `driggs_address_species_id` is currently positioned after `driggs_address_full` and before `driggs_street_1`
+- `driggs_address_species_note` is currently positioned after `driggs_category` and before `driggs_payment_methods`
+
+I need to:
+1. Remove `driggs_address_species_note` from its current position
+2. Add it right after `driggs_address_species_id`
+
+First, let me remove it from its current position:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   287→    { key: 'driggs_long_descr', type: 'text', label: 'driggs_long_descr', group: 'business', placeholder: '' },
+   288→    { key: 'driggs_year_opened', type: 'number', label: 'driggs_year_opened', group: 'business', placeholder: '2024' },
+   289→    { key: 'driggs_employees_qty', type: 'number', label: 'driggs_employees_qty', group: 'business', placeholder: '6' },
+   290→    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
+   291→    { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
+   292→    { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
+   293→    { key: 'driggs_social_media_links', type: 'text', label: 'driggs_social_media_links', group: 'contact', placeholder: '' },
+   294→    { key: 'id', type: 'text', label: 'id', group: 'system' },
+   295→    { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
+   296→    { key: 'updated_at', type: 'timestamp', label: 'updated_at', group: 'system' },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add `driggs_address_species_note` right after `driggs_address_species_id`:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   265→    { key: 'phone_section_separator', type: 'section_header', label: 'phone section', group: 'separator' },
+   266→    { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
+   267→    { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
+   268→    { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
+   269→    { key: 'driggs_address_species_id', type: 'address_species_dropdown', label: 'driggs_address_species_id', group: 'contact' },
+   270→    { key: 'driggs_address_species_note', type: 'text', label: 'driggs_address_species_note', group: 'contact', placeholder: '' },
+   271→    { key: 'driggs_street_1', type: 'text', label: 'driggs_street_1', group: 'contact', placeholder: '' },
+   272→    { key: 'driggs_street_2', type: 'text', label: 'driggs_street_2', group: 'contact', placeholder: '' },
+   273→    { key: 'driggs_state_code', type: 'text', label: 'driggs_state_code', group: 'contact', placeholder: '' },
+   274→    { key: 'driggs_zip', type: 'text', label: 'driggs_zip', group: 'contact', placeholder: '' },
+   275→    { key: 'driggs_state_full', type: 'text', label: 'driggs_state_full', group: 'contact', placeholder: '' },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Move driggs_address_species_note row to be directly under driggs_address_species_id
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ **Successfully moved driggs_address_species_note directly below driggs_address_species_id!**
+
+**Changes made:**
+1. **Removed** `driggs_address_species_note` from its previous position (after `driggs_category`)
+2. **Added** `driggs_address_species_note` directly below `driggs_address_species_id`
+
+**New positioning in the address section:**
+1. `driggs_address_full`
+2. `driggs_address_species_id` (dropdown)
+3. **`driggs_address_species_note`** ← moved here
+4. `driggs_street_1`
+5. `driggs_street_2` 
+6. `driggs_state_code`
+7. `driggs_zip`
+8. `driggs_state_full`
+9. `driggs_country`
+
+This creates a logical flow where the address species selection is immediately followed by any notes about that address species, keeping all related address information grouped together in the contact section.
+
+---
+
+_**User**_
+
+please update the phone section ui row so that all table cells in this ui row have the gray br color. including in the checkbox and and "field name" columns. then please also remove the checkbox itself from that column, in this row 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Update phone section row to have gray background on all columns and remove checkbox
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to modify the phone section visual separator to:
+1. Apply gray background to the checkbox column and field name column (not just the site value columns)
+2. Remove the checkbox from the checkbox column for this row
+
+Let me find where the checkbox column is rendered and add special handling for section_header type:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+))}
+              </tr>
+              
+              {/* Main header row with column identifiers */}
+              <tr>
+                {/* Field selection checkbox */}
+                <th 
+                  className="w-12 px-2 py-3 text-left cursor-pointer hover:bg-gray-100 border-r border-gray-300"
+                  onClick={handleSelectAllFields}
+                >
+                  <div className="flex items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedFields.size === paginatedFields.length && paginatedFields.length > 0}
+                      onChange={() => {}}
+                      className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
+                  </div>
+                </th>
+                
+                {/* Field name column */}
+--
+                    field.key === 'driggs_special_note_for_ai_tool' ? 'border-b-4 border-b-black' : ''
+                  } ${
+                    field.key === 'driggs_social_media_links' ? 'border-b-4 border-b-black' : ''
+                  }`}
+                >
+                  {/* Field selection checkbox */}
+                  <td 
+                    className="w-12 px-2 py-2 cursor-pointer border-r border-gray-300"
+                    onClick={() => handleFieldSelect(field.key)}
+                  >
+                    <div className="flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedFields.has(field.key)}
+                        onChange={() => {}}
+                        className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                      />
+                    </div>
+                  </td>
+                  {/* Field name */}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found the checkbox column. Now I need to add special handling for section_header type. Let me update the checkbox column to have gray background and no checkbox for section headers:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1975→                  } ${
+  1976→                    field.key === 'driggs_social_media_links' ? 'border-b-4 border-b-black' : ''
+  1977→                  }`}
+  1978→                >
+  1979→                  {/* Field selection checkbox */}
+  1980→                  <td 
+  1981→                    className={`w-12 px-2 py-2 border-r border-gray-300 ${
+  1982→                      field.type === 'section_header' ? 'bg-gray-100' : 'cursor-pointer'
+  1983→                    }`}
+  1984→                    onClick={() => field.type !== 'section_header' && handleFieldSelect(field.key)}
+  1985→                  >
+  1986→                    <div className="flex items-center justify-center">
+  1987→                      {field.type !== 'section_header' && (
+  1988→                        <input
+  1989→                          type="checkbox"
+  1990→                          checked={selectedFields.has(field.key)}
+  1991→                          onChange={() => {}}
+  1992→                          className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+  1993→                        />
+  1994→                      )}
+  1995→                    </div>
+  1996→                  </td>
+  1997→
+  1998→                  {/* Field name */}
+  1999→                  <td className="px-3 py-2 text-sm font-medium text-gray-900 w-64 border-r border-gray-300">
+  2000→                    <span>{field.label}</span>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the "Field name" column to also have gray background for section headers:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1994→                      )}
+  1995→                    </div>
+  1996→                  </td>
+  1997→
+  1998→                  {/* Field name */}
+  1999→                  <td className={`px-3 py-2 text-sm font-medium w-64 border-r border-gray-300 ${
+  2000→                    field.type === 'section_header' ? 'bg-gray-100 font-bold text-gray-700' : 'text-gray-900'
+  2001→                  }`}>
+  2002→                    <span>{field.label}</span>
+  2003→                  </td>
+  2004→
+  2005→                  {/* Site value cells */}
+  2006→                  {paginatedSites.map((site, index) => {
+  2007→                    const value = site[field.key];
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Update phone section row to have gray background on all columns and remove checkbox
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ **Successfully updated the phone section visual separator row!**
+
+**Changes implemented:**
+
+1. **Checkbox column updates:**
+   - Added gray background (`bg-gray-100`) for section_header rows
+   - Removed cursor pointer styling for section_header rows
+   - **Completely removed the checkbox input** for section_header rows (now shows empty space)
+   - Disabled click functionality for section_header rows
+
+2. **Field name column updates:**
+   - Added gray background (`bg-gray-100`) for section_header rows
+   - Enhanced text styling with bold and gray text color (`font-bold text-gray-700`) for section headers
+   - Kept regular styling (`text-gray-900`) for non-section-header rows
+
+3. **Site value columns:**
+   - Already had gray background from previous implementation
+
+**Result:** The "phone section" row now has a consistent gray background (`bg-gray-100`) across **all columns** (checkbox, field name, and all site value columns), and the checkbox has been completely removed from that row. The row now serves as a clear visual separator with bold "**phone section**" text spanning the entire width of the table with consistent gray styling.
+
+---
+
+_**User**_
+
+pleae remove the box that says "nubra tableface" on this page at /driggsman . also please remove the entire element box that says "jenmava ..." 
+
+please remove the sitedori component call also on /driggsman page 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Remove NubraTablefaceKite box, jenmava element box, and SitedoriButtonBar component from /driggsman page
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to remove three things from the /driggsman page:
+1. The NubraTablefaceKite component
+2. The jenmava element box
+3. The SitedoriButtonBar component call
+
+Let me first look at the DriggsmanTable component to find these elements:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
+const NubraTablefaceKite = dynamic(
+  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+  { ssr: false }
+);
+const DrenjariButtonBarDriggsmanLinks = dynamic(
+  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+  { ssr: false }
+);
+interface SitesprenSite {
+  id: string;
+--
+  return (
+    <div className="px-6 py-4">
+      {/* Nubra Tableface Kite with Control Buttons */}
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <NubraTablefaceKite tableType="driggsman-site-matrix" />
+          <div className="flex items-center bg-gray-100 border border-gray-300 rounded px-3 py-2">
+            <span className="text-sm font-medium text-gray-800">
+              jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m
+            </span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText('jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m');
+              }}
+              className="ml-3 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+              title="Copy to clipboard"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I found both the NubraTablefaceKite component and the jenmava element box. Let me remove the entire div containing both:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Error:
+
+```
+<tool_use_error>String to replace not found in file.
+String:       {/* Nubra Tableface Kite with Control Buttons */}
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <NubraTablefaceKite tableType="driggsman-site-matrix" />
+          <div className="flex items-center bg-gray-100 border border-gray-300 rounded px-3 py-2">
+            <span className="text-sm font-medium text-gray-800">
+              jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m
+            </span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText('jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m');
+              }}
+              className="ml-3 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+              title="Copy to clipboard"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </div></tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me get more exact context around this element:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+return (
+    <div className="px-6 py-4">
+      {/* Nubra Tableface Kite with Control Buttons */}
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <NubraTablefaceKite tableType="driggsman-site-matrix" />
+          <div className="flex items-center bg-gray-100 border border-gray-300 rounded px-3 py-2">
+            <span className="text-sm font-medium text-gray-800">
+              jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m
+            </span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText('jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m');
+              }}
+              className="ml-3 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+              title="Copy to clipboard"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setShowVerificationColumn(!showVerificationColumn)}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              showVerificationColumn ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+            }`}
+          >
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me try with the exact indentation and formatting:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1580→
+  1581→
+  1582→  return (
+  1583→    <div className="px-6 py-4">
+  1584→      <div className="mb-2 flex items-center justify-between">
+  1585→        <div className="flex items-center space-x-4">
+  1586→        </div>
+  1587→        <div className="flex items-center space-x-2">
+  1588→          <button
+  1589→            onClick={() => setShowVerificationColumn(!showVerificationColumn)}
+  1590→            className={`px-3 py-1 text-sm rounded transition-colors ${
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to remove the NubraTablefaceKite import since it's no longer used:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     6→import { useRouter, useSearchParams } from 'next/navigation';
+     7→import Link from 'next/link';
+     8→import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
+     9→
+    10→const DrenjariButtonBarDriggsmanLinks = dynamic(
+    11→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    12→  { ssr: false }
+    13→);
+    14→
+    15→interface SitesprenSite {
+    16→  id: string;
+    17→  created_at: string;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to remove the SitedoriButtonBar component. Let me check if it's being used in the pclient.tsx file:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect, useState } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import DriggsmanTable from './components/DriggsmanTable';
+     7→import dynamic from 'next/dynamic';
+     8→
+     9→const SitedoriButtonBar = dynamic(
+    10→  () => import('@/app/components/SitedoriButtonBar'),
+    11→  { ssr: false }
+    12→);
+    13→
+    14→const DrenjariButtonBarDriggsmanLinks = dynamic(
+    15→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    16→  { ssr: false }
+    17→);
+    18→
+    19→export default function DriggsmanClient() {
+    20→  const { user } = useAuth();
+    21→  const router = useRouter();
+    22→  const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(() => {
+    23→    // Initialize from localStorage with default as false (hidden)
+    24→    if (typeof window !== 'undefined') {
+    25→      const saved = localStorage.getItem('driggsman-header-visible');
+    26→      return saved === null ? false : saved === 'true';
+    27→    }
+    28→    return false;
+    29→  });
+    30→
+    31→  useEffect(() => {
+    32→    if (!user) {
+    33→      router.push('/login');
+    34→      return;
+    35→    }
+    36→  }, [user, router]);
+    37→
+    38→  // Save header visibility state to localStorage and update body class
+    39→  useEffect(() => {
+    40→    localStorage.setItem('driggsman-header-visible', isHeaderVisible.toString());
+    41→    
+    42→    // Add/remove class on body to hide main header
+    43→    if (isHeaderVisible) {
+    44→      document.body.classList.remove('driggsman-hide-main-header');
+    45→    } else {
+    46→      document.body.classList.add('driggsman-hide-main-header');
+    47→    }
+    48→    
+    49→    // Cleanup on unmount
+    50→    return () => {
+    51→      document.body.classList.remove('driggsman-hide-main-header');
+    52→    };
+    53→  }, [isHeaderVisible]);
+    54→
+    55→  if (!user) {
+    56→    return (
+    57→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    58→        <div className="text-gray-500">Loading...</div>
+    59→      </div>
+    60→    );
+    61→  }
+    62→
+    63→  return (
+    64→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    65→      {/* Hide/Show Header Button */}
+    66→      <div className="px-6 py-2 bg-gray-50">
+    67→        <button
+    68→          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+    69→          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+    70→        >
+    71→          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+    72→        </button>
+    73→      </div>
+    74→
+    75→      {/* Navigation Components */}
+    76→      <div className="px-6 py-2">
+    77→        {/* Sitedori Navigation Links */}
+    78→        <div className="mb-4">
+    79→          <SitedoriButtonBar />
+    80→        </div>
+    81→
+    82→        {/* Drenjari Navigation Links */}
+    83→        <div className="mb-4">
+    84→          <DrenjariButtonBarDriggsmanLinks />
+    85→        </div>
+    86→      </div>
+    87→
+    88→      {/* Main Content - Full Width DriggsmanTable */}
+    89→      <div className="flex-1 overflow-hidden">
+    90→        <DriggsmanTable />
+    91→      </div>
+    92→    </div>
+    93→  );
+    94→}
+```
+

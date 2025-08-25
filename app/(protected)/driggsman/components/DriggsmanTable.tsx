@@ -127,7 +127,14 @@ interface SitesprenTag {
 
 type SitesprenField = keyof SitesprenSite;
 
-export default function DriggsmanTable() {
+interface DriggsmanTableProps {
+  onControlsRender?: (controls: {
+    PaginationControls: () => JSX.Element;
+    ColumnPaginationControls: () => JSX.Element;
+  }) => void;
+}
+
+export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps = {}) {
   const [sites, setSites] = useState<SitesprenSite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -145,8 +152,6 @@ export default function DriggsmanTable() {
   const [editingValue, setEditingValue] = useState<string>('');
   
   // Modal states
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [formData, setFormData] = useState<Partial<SitesprenSite>>({});
   
   // Manual site entry states
   const [manualSiteInput, setManualSiteInput] = useState('');
@@ -410,6 +415,16 @@ export default function DriggsmanTable() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [platformDropdownOpen, cgigDropdownOpen, addressSpeciesDropdownOpen, tagsDropdownOpen]);
+
+  // Pass controls to parent for external rendering
+  useEffect(() => {
+    if (onControlsRender) {
+      onControlsRender({
+        PaginationControls,
+        ColumnPaginationControls
+      });
+    }
+  }, [onControlsRender, searchTerm, currentPage, itemsPerPage, totalFieldPages, columnsPerPage, currentColumnPage, totalPages]);
   
   const fetchSites = async () => {
     try {
@@ -804,88 +819,6 @@ export default function DriggsmanTable() {
     }
   };
 
-  // Create new site
-  const handleCreateInline = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) throw new Error('User not authenticated');
-
-      // Get internal user ID
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-
-      if (userError || !userData) throw new Error('User not found');
-      
-      const newSite = {
-        fk_users_id: userData.id,
-        sitespren_base: 'newsite.com',
-        true_root_domain: 'newsite.com',
-        webproperty_type: 'website',
-        is_wp_site: false
-      };
-
-      const { data: createdData, error } = await supabase
-        .from('sitespren')
-        .insert([newSite])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setSites([createdData, ...sites]);
-      
-      // Start editing the sitespren_base of the new site
-      setTimeout(() => {
-        handleCellClick('sitespren_base', createdData.id, createdData.sitespren_base);
-      }, 100);
-    } catch (err) {
-      console.error('Error creating site:', err);
-      alert('Failed to create new site');
-    }
-  };
-
-  const handleCreatePopup = () => {
-    setFormData({
-      sitespren_base: '',
-      true_root_domain: '',
-      webproperty_type: 'website',
-      is_wp_site: false
-    });
-    setIsCreateModalOpen(true);
-  };
-
-  const handleCreateSubmit = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) throw new Error('User not authenticated');
-
-      // Get internal user ID
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-
-      if (userError || !userData) throw new Error('User not found');
-      
-      const { data: createdData, error } = await supabase
-        .from('sitespren')
-        .insert([{ ...formData, fk_users_id: userData.id }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setSites([createdData, ...sites]);
-      setIsCreateModalOpen(false);
-    } catch (err) {
-      console.error('Error creating site:', err);
-      alert('Failed to create site');
-    }
-  };
 
   // Manual site entry functions
   const parseManualSites = (input: string): string[] => {
@@ -1617,21 +1550,9 @@ export default function DriggsmanTable() {
         </div>
       )}
 
-      {/* Top Controls */}
+      {/* Top Status */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-2">
-          <button
-            onClick={handleCreateInline}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-          >
-            Create New (Inline)
-          </button>
-          <button
-            onClick={handleCreatePopup}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          >
-            Create New (Popup)
-          </button>
           {selectedFields.size > 0 && (
             <span className="px-4 py-2 bg-gray-200 text-gray-700 rounded">
               {selectedFields.size} fields selected
@@ -1640,10 +1561,6 @@ export default function DriggsmanTable() {
           <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded text-sm">
             {sites.length} sites loaded
           </span>
-        </div>
-        <div className="flex flex-col space-y-2">
-          <PaginationControls />
-          <ColumnPaginationControls />
         </div>
       </div>
 
@@ -2612,77 +2529,6 @@ export default function DriggsmanTable() {
         </div>
       </div>
 
-      {/* Create Modal */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Create New Site</h2>
-            
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Site Base</label>
-                <input
-                  type="text"
-                  value={formData.sitespren_base || ''}
-                  onChange={(e) => setFormData({ ...formData, sitespren_base: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="example.com"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Root Domain</label>
-                <input
-                  type="text"
-                  value={formData.true_root_domain || ''}
-                  onChange={(e) => setFormData({ ...formData, true_root_domain: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="example.com"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
-                <input
-                  type="text"
-                  value={formData.webproperty_type || ''}
-                  onChange={(e) => setFormData({ ...formData, webproperty_type: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="website"
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="is_wp_site"
-                  checked={formData.is_wp_site || false}
-                  onChange={(e) => setFormData({ ...formData, is_wp_site: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                />
-                <label htmlFor="is_wp_site" className="text-sm font-medium text-gray-700">
-                  WordPress Site
-                </label>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateSubmit}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-              >
-                Create Site
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Inputs Expand Editor */}
       <InputsExpandEditor
