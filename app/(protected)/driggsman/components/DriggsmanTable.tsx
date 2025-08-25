@@ -2345,7 +2345,7 @@ export default function DriggsmanTable({
                       index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
                     }`}
                   >
-                    <div className="flex items-center justify-center h-full space-x-1">
+                    <div className="flex items-center justify-start h-full space-x-1">
                       <button className="px-2 py-1 bg-gray-200 text-gray-600 rounded" style={{ fontSize: '14px' }}>
                         driggspack1
                       </button>
@@ -2405,7 +2405,7 @@ export default function DriggsmanTable({
                   className={`hover:bg-gray-50 ${
                     field.key === 'driggs_phone_1' ? 'border-b-4 border-b-black' : ''
                   } ${
-                    field.key === 'driggs_address_species_id' ? 'border-b-4 border-b-black' : ''
+                    field.key === 'driggs_address_species_note' ? 'border-b-4 border-b-black' : ''
                   } ${
                     field.key === 'driggs_country' ? 'border-b-4 border-b-black' : ''
                   } ${
