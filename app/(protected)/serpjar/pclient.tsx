@@ -14,7 +14,18 @@ export default function SerpjarClient() {
   const supabase = createClientComponentClient();
   
   const [keywordId, setKeywordId] = useState<number | null>(null);
-  const [keywordData, setKeywordData] = useState<{keyword_id: number, keyword_datum: string} | null>(null);
+  const [keywordData, setKeywordData] = useState<{
+    keyword_id: number, 
+    keyword_datum: string,
+    search_volume: number | null,
+    cpc: number | null,
+    competition: string | null,
+    competition_index: number | null,
+    low_top_of_page_bid: number | null,
+    high_top_of_page_bid: number | null,
+    cached_cncglub_ids: string | null,
+    tags?: Array<{ tag_id: number; tag_name: string }>
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [f400Loading, setF400Loading] = useState(false);
   const [completeLoading, setCompleteLoading] = useState(false);
@@ -53,16 +64,41 @@ export default function SerpjarClient() {
       try {
         const { data, error } = await supabase
           .from('keywordshub')
-          .select('keyword_id, keyword_datum')
+          .select('keyword_id, keyword_datum, search_volume, cpc, competition, competition_index, low_top_of_page_bid, high_top_of_page_bid, cached_cncglub_ids')
           .eq('keyword_id', keywordId)
           .single();
 
         if (error) {
           console.error('Error fetching keyword data:', error);
           setKeywordData(null);
-        } else {
-          setKeywordData(data);
+          return;
         }
+
+        // Fetch tags for this keyword
+        const { data: tagRelations, error: tagError } = await supabase
+          .from('keywordshub_tag_relations')
+          .select(`
+            keywordshub_tags (
+              tag_id,
+              tag_name
+            )
+          `)
+          .eq('fk_keyword_id', keywordId);
+
+        if (tagError) {
+          console.error('Error fetching tags:', tagError);
+        }
+
+        // Process tags
+        const tags = tagRelations?.map(relation => ({
+          tag_id: relation.keywordshub_tags.tag_id,
+          tag_name: relation.keywordshub_tags.tag_name
+        })) || [];
+
+        setKeywordData({
+          ...data,
+          tags
+        });
       } catch (err) {
         console.error('Failed to fetch keyword data:', err);
         setKeywordData(null);
@@ -264,20 +300,71 @@ export default function SerpjarClient() {
           <table className="border-collapse" style={{ border: '1px solid #4a5568' }}>
             <thead>
               <tr className="bg-gray-200">
-                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>1</th>
-                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>2</th>
-                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>3</th>
-                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>4</th>
-                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>5</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>keyword_id</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>keyword_datum</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>search_volume</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>cpc</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>competition</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>competition_index</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>low_top_of_page_bid</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>high_top_of_page_bid</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>tags</th>
+                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>cached_cncglub_ids</th>
               </tr>
             </thead>
             <tbody>
               <tr className="bg-white">
-                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
-                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
-                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
-                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
-                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.keyword_id || ''}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.keyword_datum || ''}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.search_volume ? keywordData.search_volume.toLocaleString() : ''}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.cpc || ''}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.competition || ''}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.competition_index || ''}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.low_top_of_page_bid || ''}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.high_top_of_page_bid || ''}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.tags && keywordData.tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {keywordData.tags.map((tag) => (
+                        <div
+                          key={tag.tag_id}
+                          className="inline-flex px-2 py-1 rounded-full text-xs font-medium"
+                          style={{ backgroundColor: '#ffffe0', color: '#333' }}
+                          title={`Tag ID: ${tag.tag_id}`}
+                        >
+                          ({tag.tag_id}) - {tag.tag_name}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-gray-400">No tags</span>
+                  )}
+                </td>
+                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+                  {keywordData?.cached_cncglub_ids ? (
+                    <span className="text-blue-600 font-medium">
+                      {keywordData.cached_cncglub_ids.replace(/,/g, '/')}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 italic">not cached</span>
+                  )}
+                </td>
               </tr>
             </tbody>
           </table>

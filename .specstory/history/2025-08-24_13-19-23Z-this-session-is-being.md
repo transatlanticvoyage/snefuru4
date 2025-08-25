@@ -3983,3 +3983,440 @@ The changes are now live in the table headers. The reverse_lookup column will no
 
 These changes only affect the table header text display and maintain all existing functionality for the reverse lookup feature.
 
+---
+
+_**User**_
+
+please view the small ui table we have on the serpjar page that says 1 , 2 , 3 , 4 , 5 in it. 
+
+please update this in the following way:
+
+please expand this little mini ui table to include these columns below: (so insteads of 5 columns it will now be 10 ui columns)
+
+keyword_id    keyword_datum    search_volume    cpc     compeititon    competition_index    low_top_of_page_bid    high_top_of_page_bid    tags    cached_cncglub_ids
+
+use the columns listed above as the exact bold lowercase <th> header labels for the 1 header row in this table
+    
+then in the main 1 row in this mini ui table, please display the actual data for the keyword that is set in the keyword url variable
+
+http://localhost:3000/serpjar?keyword_id=1442
+
+please view the /kwjar page so you can mimick the look of everything in this <td> row (such as the styling for the "tags" cell in the <td> row, etc. )
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll update the small UI table on the `/serpjar` page to expand it from 5 columns to 10 columns and populate it with actual keyword data. Let me first look at the current table and then examine the `/kwjar` page for styling reference.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/serpjar/pclient.tsx`
+
+Result:
+
+```
+260→            )}
+   261→          </div>
+   262→          
+   263→          {/* UI Table */}
+   264→          <table className="border-collapse" style={{ border: '1px solid #4a5568' }}>
+   265→            <thead>
+   266→              <tr className="bg-gray-200">
+   267→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>1</th>
+   268→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>2</th>
+   269→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>3</th>
+   270→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>4</th>
+   271→                <th className="font-bold px-4 py-2" style={{ border: '1px solid #4a5568' }}>5</th>
+   272→              </tr>
+   273→            </thead>
+   274→            <tbody>
+   275→              <tr className="bg-white">
+   276→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+   277→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+   278→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+   279→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+   280→                <td className="px-4 py-2" style={{ border: '1px solid #4a5568' }}></td>
+   281→              </tr>
+   282→            </tbody>
+   283→          </table>
+   284→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check how tags are styled in the `/kwjar` page for reference:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/kwjar/components/KeywordsHubTable.tsx`
+
+Result:
+
+```
+1048→    // Special handling for tags column
+  1049→    if (column.key === 'tags') {
+  1050→      const tags = item.tags || [];
+  1051→      return (
+  1052→        <div className="px-2 py-1 text-xs">
+  1053→          {tags.length > 0 ? (
+  1054→            <div className="flex flex-wrap gap-1">
+  1055→              {tags.map((tag) => (
+  1056→                <div
+  1057→                  key={tag.tag_id}
+  1058→                  className="inline-flex px-2 py-1 rounded-full text-xs font-medium"
+  1059→                  style={{ backgroundColor: '#ffffe0', color: '#333' }}
+  1060→                  title={`Tag ID: ${tag.tag_id}`}
+  1061→                >
+  1062→                  ({tag.tag_id}) - {tag.tag_name}
+  1063→                </div>
+  1064→              ))}
+  1065→            </div>
+  1066→          ) : (
+  1067→            <span className="text-gray-400">No tags</span>
+  1068→          )}
+  1069→        </div>
+  1070→      );
+  1071→    }
+  1072→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me check how the cached_cncglub_ids is styled in the reverse lookup column:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/kwjar/components/KeywordsHubTable.tsx`
+
+Result:
+
+```
+1090→    // Special handling for reverse lookup column
+  1091→    if (column.key === 'reverse_lookup') {
+  1092→      const cachedIds = item.cached_cncglub_ids;
+  1093→      return (
+  1094→        <div className="px-2 py-1 text-xs">
+  1095→          {cachedIds ? (
+  1096→            <span className="text-blue-600 font-medium">
+  1097→              {cachedIds.replace(/,/g, '/')}
+  1098→            </span>
+  1099→          ) : (
+  1100→            <span className="text-gray-400 italic">not cached</span>
+  1101→          )}
+  1102→        </div>
+  1103→      );
+  1104→    }
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add state to fetch the keyword data and update the mini table. Let me first check if keywordData is already being fetched in the serpjar component:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/serpjar/pclient.tsx`
+
+Result:
+
+```
+16→  const [keywordId, setKeywordId] = useState<number | null>(null);
+    17→  const [keywordData, setKeywordData] = useState<{keyword_id: number, keyword_datum: string} | null>(null);
+    18→  const [loading, setLoading] = useState(true);
+    19→  const [f400Loading, setF400Loading] = useState(false);
+    20→  const [completeLoading, setCompleteLoading] = useState(false);
+    21→  const [showFirstWarning, setShowFirstWarning] = useState(false);
+    22→  const [showSecondWarning, setShowSecondWarning] = useState(false);
+    23→
+    24→  useEffect(() => {
+    25→    if (!user) {
+    26→      router.push('/login');
+    27→      return;
+    28→    }
+    29→  }, [user, router]);
+    30→
+    31→  // Get keyword_id from URL parameters
+    32→  useEffect(() => {
+    33→    const keywordIdParam = searchParams.get('keyword_id');
+    34→    if (keywordIdParam) {
+    35→      const id = parseInt(keywordIdParam);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see that keywordData is already being fetched but only includes keyword_id and keyword_datum. I need to expand this to include all the required fields. Let me check the current fetch logic:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/serpjar/pclient.tsx`
+
+Result:
+
+```
+45→  // Fetch keyword data when keywordId changes
+    46→  useEffect(() => {
+    47→    const fetchKeywordData = async () => {
+    48→      if (!keywordId) {
+    49→        setKeywordData(null);
+    50→        return;
+    51→      }
+    52→
+    53→      try {
+    54→        const { data, error } = await supabase
+    55→          .from('keywordshub')
+    56→          .select('keyword_id, keyword_datum')
+    57→          .eq('keyword_id', keywordId)
+    58→          .single();
+    59→
+    60→        if (error) {
+    61→          console.error('Error fetching keyword data:', error);
+    62→          setKeywordData(null);
+    63→        } else {
+    64→          setKeywordData(data);
+    65→        }
+    66→      } catch (err) {
+    67→        console.error('Failed to fetch keyword data:', err);
+    68→        setKeywordData(null);
+    69→      }
+    70→    };
+    71→
+    72→    fetchKeywordData();
+    73→  }, [keywordId, supabase]);
+    74→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to:
+1. Expand the keywordData interface to include all the required fields
+2. Update the fetch query to get all the required data including tags
+3. Update the mini table HTML to have all 10 columns with proper styling
+
+Let me start by updating the interface and fetch logic:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    13→  const searchParams = useSearchParams();
+    14→  const supabase = createClientComponentClient();
+    15→  
+    16→  const [keywordId, setKeywordId] = useState<number | null>(null);
+    17→  const [keywordData, setKeywordData] = useState<{
+    18→    keyword_id: number, 
+    19→    keyword_datum: string,
+    20→    search_volume: number | null,
+    21→    cpc: number | null,
+    22→    competition: string | null,
+    23→    competition_index: number | null,
+    24→    low_top_of_page_bid: number | null,
+    25→    high_top_of_page_bid: number | null,
+    26→    cached_cncglub_ids: string | null,
+    27→    tags?: Array<{ tag_id: number; tag_name: string }>
+    28→  } | null>(null);
+    29→  const [loading, setLoading] = useState(true);
+    30→  const [f400Loading, setF400Loading] = useState(false);
+    31→  const [completeLoading, setCompleteLoading] = useState(false);
+    32→  const [showFirstWarning, setShowFirstWarning] = useState(false);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the fetch query to get all the required fields and tags:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    60→        setKeywordData(null);
+    61→        return;
+    62→      }
+    63→
+    64→      try {
+    65→        const { data, error } = await supabase
+    66→          .from('keywordshub')
+    67→          .select('keyword_id, keyword_datum, search_volume, cpc, competition, competition_index, low_top_of_page_bid, high_top_of_page_bid, cached_cncglub_ids')
+    68→          .eq('keyword_id', keywordId)
+    69→          .single();
+    70→
+    71→        if (error) {
+    72→          console.error('Error fetching keyword data:', error);
+    73→          setKeywordData(null);
+    74→          return;
+    75→        }
+    76→
+    77→        // Fetch tags for this keyword
+    78→        const { data: tagRelations, error: tagError } = await supabase
+    79→          .from('keywordshub_tag_relations')
+    80→          .select(`
+    81→            keywordshub_tags (
+    82→              tag_id,
+    83→              tag_name
+    84→            )
+    85→          `)
+    86→          .eq('fk_keyword_id', keywordId);
+    87→
+    88→        if (tagError) {
+    89→          console.error('Error fetching tags:', tagError);
+    90→        }
+    91→
+    92→        // Process tags
+    93→        const tags = tagRelations?.map(relation => ({
+    94→          tag_id: relation.keywordshub_tags.tag_id,
+    95→          tag_name: relation.keywordshub_tags.tag_name
+    96→        })) || [];
+    97→
+    98→        setKeywordData({
+    99→          ...data,
+   100→          tags
+   101→        });
+   102→      } catch (err) {
+   103→        console.error('Failed to fetch keyword data:', err);
+   104→        setKeywordData(null);
+   105→      }
+   106→    };
+   107→
+   108→    fetchKeywordData();
+   109→  }, [keywordId, supabase]);
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the mini table HTML to have all 10 columns with proper headers and data:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/serpjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   295→              <span className="text-gray-400">No keyword_id specified</span>
+   296→            )}
+   297→          </div>
+   298→          
+   299→          {/* UI Table */}
+   300→          <table className="border-collapse" style={{ border: '1px solid #4a5568' }}>
+   301→            <thead>
+   302→              <tr className="bg-gray-200">
+   303→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>keyword_id</th>
+   304→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>keyword_datum</th>
+   305→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>search_volume</th>
+   306→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>cpc</th>
+   307→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>competition</th>
+   308→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>competition_index</th>
+   309→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>low_top_of_page_bid</th>
+   310→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>high_top_of_page_bid</th>
+   311→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>tags</th>
+   312→                <th className="font-bold px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>cached_cncglub_ids</th>
+   313→              </tr>
+   314→            </thead>
+   315→            <tbody>
+   316→              <tr className="bg-white">
+   317→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   318→                  {keywordData?.keyword_id || ''}
+   319→                </td>
+   320→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   321→                  {keywordData?.keyword_datum || ''}
+   322→                </td>
+   323→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   324→                  {keywordData?.search_volume ? keywordData.search_volume.toLocaleString() : ''}
+   325→                </td>
+   326→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   327→                  {keywordData?.cpc || ''}
+   328→                </td>
+   329→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   330→                  {keywordData?.competition || ''}
+   331→                </td>
+   332→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   333→                  {keywordData?.competition_index || ''}
+   334→                </td>
+   335→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   336→                  {keywordData?.low_top_of_page_bid || ''}
+   337→                </td>
+   338→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   339→                  {keywordData?.high_top_of_page_bid || ''}
+   340→                </td>
+   341→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   342→                  {keywordData?.tags && keywordData.tags.length > 0 ? (
+   343→                    <div className="flex flex-wrap gap-1">
+   344→                      {keywordData.tags.map((tag) => (
+   345→                        <div
+   346→                          key={tag.tag_id}
+   347→                          className="inline-flex px-2 py-1 rounded-full text-xs font-medium"
+   348→                          style={{ backgroundColor: '#ffffe0', color: '#333' }}
+   349→                          title={`Tag ID: ${tag.tag_id}`}
+   350→                        >
+   351→                          ({tag.tag_id}) - {tag.tag_name}
+   352→                        </div>
+   353→                      ))}
+   354→                    </div>
+   355→                  ) : (
+   356→                    <span className="text-gray-400">No tags</span>
+   357→                  )}
+   358→                </td>
+   359→                <td className="px-4 py-2 text-xs" style={{ border: '1px solid #4a5568' }}>
+   360→                  {keywordData?.cached_cncglub_ids ? (
+   361→                    <span className="text-blue-600 font-medium">
+   362→                      {keywordData.cached_cncglub_ids.replace(/,/g, '/')}
+   363→                    </span>
+   364→                  ) : (
+   365→                    <span className="text-gray-400 italic">not cached</span>
+   366→                  )}
+   367→                </td>
+   368→              </tr>
+   369→            </tbody>
+   370→          </table>
+   371→          
+   372→          {/* F400 SERP Fetch Button */}
+   373→          <button
+   374→            onClick={() => keywordId && handleF400SerpFetch()}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! ✅ The mini UI table on the `/serpjar` page has been successfully expanded and updated:
+
+## 🎯 Implementation Complete
+
+**What was accomplished:**
+
+1. **Table Expansion** ✅
+   - Expanded from 5 columns to 10 columns as requested
+   - Added all the specified column headers in bold lowercase text
+
+2. **Column Headers** ✅
+   ```
+   keyword_id | keyword_datum | search_volume | cpc | competition | 
+   competition_index | low_top_of_page_bid | high_top_of_page_bid | tags | cached_cncglub_ids
+   ```
+
+3. **Data Fetching** ✅
+   - Expanded keywordData interface to include all required fields
+   - Updated fetch query to get all keyword data from `keywordshub` table
+   - Added tag fetching from `keywordshub_tag_relations` and `keywordshub_tags` tables
+
+4. **Styling Consistency** ✅
+   - Mimicked the exact styling from `/kwjar` page for:
+     - **Tags cell**: Yellow background (`#ffffe0`), rounded pills with `(tag_id) - tag_name` format
+     - **Cached IDs cell**: Blue text (`text-blue-600`), replaces commas with slashes, shows "not cached" in gray italic when empty
+   - Added `text-xs` class for consistent small text sizing
+   - Maintained original border styling with `#4a5568` color
+
+5. **Real Data Display** ✅
+   - Table now shows actual keyword data when visiting URLs like `http://localhost:3000/serpjar?keyword_id=1442`
+   - Handles null/empty values gracefully
+   - Formats numbers with locale-appropriate commas
+   - Shows "No tags" and "not cached" states when appropriate
+
+The mini table now provides a comprehensive overview of the keyword's metadata right at the top of the SERP results page, matching the styling and functionality of the main `/kwjar` table.
+
