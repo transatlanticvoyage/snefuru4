@@ -7,11 +7,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
 
-const NubraTablefaceKite = dynamic(
-  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
-  { ssr: false }
-);
-
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
   { ssr: false }
@@ -81,6 +76,7 @@ interface SitesprenSite {
   is_aff: boolean | null;
   is_other1: boolean | null;
   is_other2: boolean | null;
+  phone_section_separator?: string; // Visual separator only
 }
 
 interface CallPlatform {
@@ -258,11 +254,15 @@ export default function DriggsmanTable() {
     group?: string;
     placeholder?: string;
   }> = [
+    { key: 'sitespren_base', type: 'readonly', label: 'sitespren_base', group: 'domain' },
+    { key: 'driggs_brand_name', type: 'text', label: 'driggs_brand_name', group: 'business' },
     { key: 'driggs_revenue_goal', type: 'number', label: 'driggs_revenue_goal', group: 'business' },
+    { key: 'phone_section_separator', type: 'section_header', label: 'phone section', group: 'separator' },
     { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
     { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
-    { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
     { key: 'driggs_address_species_id', type: 'address_species_dropdown', label: 'driggs_address_species_id', group: 'contact' },
+    { key: 'driggs_address_species_note', type: 'text', label: 'driggs_address_species_note', group: 'contact', placeholder: '' },
+    { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
     { key: 'driggs_street_1', type: 'text', label: 'driggs_street_1', group: 'contact', placeholder: '' },
     { key: 'driggs_street_2', type: 'text', label: 'driggs_street_2', group: 'contact', placeholder: '' },
     { key: 'driggs_state_code', type: 'text', label: 'driggs_state_code', group: 'contact', placeholder: '' },
@@ -274,7 +274,6 @@ export default function DriggsmanTable() {
     { key: 'driggs_social_profiles_done', type: 'boolean', label: 'driggs_social_profiles_done', group: 'contact' },
     { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
     { key: 'driggs_city', type: 'text', label: 'driggs_city', group: 'business' },
-    { key: 'driggs_brand_name', type: 'text', label: 'driggs_brand_name', group: 'business' },
     { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
     { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
     { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
@@ -286,7 +285,6 @@ export default function DriggsmanTable() {
     { key: 'driggs_employees_qty', type: 'number', label: 'driggs_employees_qty', group: 'business', placeholder: '6' },
     { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
     { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
-    { key: 'driggs_address_species_note', type: 'text', label: 'driggs_address_species_note', group: 'contact', placeholder: '' },
     { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
     { key: 'driggs_social_media_links', type: 'text', label: 'driggs_social_media_links', group: 'contact', placeholder: '' },
     { key: 'id', type: 'text', label: 'id', group: 'system' },
@@ -706,6 +704,8 @@ export default function DriggsmanTable() {
   const handleCellClick = (field: string, siteId: string, value: any) => {
     const fieldDef = fieldDefinitions.find(f => f.key === field);
     if (fieldDef?.type === 'boolean') return; // Don't edit booleans via click
+    if (fieldDef?.type === 'readonly') return; // Don't edit readonly fields
+    if (fieldDef?.type === 'section_header') return; // Don't edit section headers
     
     setEditingCell({ field, siteId });
     
@@ -1576,24 +1576,8 @@ export default function DriggsmanTable() {
 
   return (
     <div className="px-6 py-4">
-      {/* Nubra Tableface Kite with Control Buttons */}
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <NubraTablefaceKite tableType="driggsman-site-matrix" />
-          <div className="flex items-center bg-gray-100 border border-gray-300 rounded px-3 py-2">
-            <span className="text-sm font-medium text-gray-800">
-              jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m
-            </span>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText('jenmava: 100 sites = $7,500 USD/m -- 133 = $10,000 USD/m');
-              }}
-              className="ml-3 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
-              title="Copy to clipboard"
-            >
-              Copy
-            </button>
-          </div>
         </div>
         <div className="flex items-center space-x-2">
           <button
@@ -1689,7 +1673,8 @@ export default function DriggsmanTable() {
               onChange={(e) => setManualSiteInput(e.target.value)}
               onKeyPress={handleManualSiteKeyPress}
               placeholder="dogs.com, cats.com facebook.com/group example.net"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              style={{ width: '700px' }}
             />
             <button
               onClick={handleManualSiteSubmit}
@@ -1973,21 +1958,27 @@ export default function DriggsmanTable() {
                 >
                   {/* Field selection checkbox */}
                   <td 
-                    className="w-12 px-2 py-2 cursor-pointer border-r border-gray-300"
-                    onClick={() => handleFieldSelect(field.key)}
+                    className={`w-12 px-2 py-2 border-r border-gray-300 ${
+                      field.type === 'section_header' ? 'bg-gray-100' : 'cursor-pointer'
+                    }`}
+                    onClick={() => field.type !== 'section_header' && handleFieldSelect(field.key)}
                   >
                     <div className="flex items-center justify-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedFields.has(field.key)}
-                        onChange={() => {}}
-                        className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                      />
+                      {field.type !== 'section_header' && (
+                        <input
+                          type="checkbox"
+                          checked={selectedFields.has(field.key)}
+                          onChange={() => {}}
+                          className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                      )}
                     </div>
                   </td>
 
                   {/* Field name */}
-                  <td className="px-3 py-2 text-sm font-medium text-gray-900 w-64 border-r border-gray-300">
+                  <td className={`px-3 py-2 text-sm font-medium w-64 border-r border-gray-300 ${
+                    field.type === 'section_header' ? 'bg-gray-100 font-bold text-gray-700' : 'text-gray-900'
+                  }`}>
                     <span>{field.label}</span>
                   </td>
 
@@ -1996,6 +1987,19 @@ export default function DriggsmanTable() {
                     const value = site[field.key];
                     const isEditing = editingCell?.field === field.key && editingCell?.siteId === site.id;
                     const isDropdownOpen = platformDropdownOpen?.field === field.key && platformDropdownOpen?.siteId === site.id;
+
+                    if (field.type === 'section_header') {
+                      return (
+                        <td 
+                          key={`${field.key}-${site.id}`} 
+                          className={`px-3 py-2 text-sm font-bold text-gray-700 bg-gray-100 w-48 ${
+                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                          }`}
+                        >
+                          {field.label}
+                        </td>
+                      );
+                    }
 
                     if (field.type === 'boolean') {
                       return (
@@ -2473,17 +2477,17 @@ export default function DriggsmanTable() {
                       <td
                         key={`${field.key}-${site.id}`}
                         className={`px-3 py-2 text-sm text-gray-900 ${
-                          field.key === 'driggs_phone_1' ? 'w-80' : 'cursor-pointer w-48'
+                          field.key === 'driggs_phone_1' ? 'w-80' : (fieldDefinitions.find(f => f.key === field.key)?.type === 'readonly' || fieldDefinitions.find(f => f.key === field.key)?.type === 'section_header' ? 'w-48' : 'cursor-pointer w-48')
                         } ${
                           index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
                         }`}
-                        onClick={() => field.key !== 'driggs_phone_1' && !isEditing && handleCellClick(field.key, site.id, value)}
+                        onClick={() => field.key !== 'driggs_phone_1' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'readonly' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'section_header' && !isEditing && handleCellClick(field.key, site.id, value)}
                       >
                         {field.key === 'driggs_phone_1' ? (
                           <div className="flex items-center space-x-1">
                             <div 
-                              className="cursor-pointer"
-                              onClick={() => !isEditing && handleCellClick(field.key, site.id, value)}
+                              className={fieldDefinitions.find(f => f.key === field.key)?.type === 'readonly' || fieldDefinitions.find(f => f.key === field.key)?.type === 'section_header' ? '' : 'cursor-pointer'}
+                              onClick={() => fieldDefinitions.find(f => f.key === field.key)?.type !== 'readonly' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'section_header' && !isEditing && handleCellClick(field.key, site.id, value)}
                               style={{ width: '180px' }}
                             >
                               {isEditing ? (

@@ -6,10 +6,6 @@ import { useRouter } from 'next/navigation';
 import DriggsmanTable from './components/DriggsmanTable';
 import dynamic from 'next/dynamic';
 
-const SitedoriButtonBar = dynamic(
-  () => import('@/app/components/SitedoriButtonBar'),
-  { ssr: false }
-);
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
@@ -74,11 +70,6 @@ export default function DriggsmanClient() {
 
       {/* Navigation Components */}
       <div className="px-6 py-2">
-        {/* Sitedori Navigation Links */}
-        <div className="mb-4">
-          <SitedoriButtonBar />
-        </div>
-
         {/* Drenjari Navigation Links */}
         <div className="mb-4">
           <DrenjariButtonBarDriggsmanLinks />
