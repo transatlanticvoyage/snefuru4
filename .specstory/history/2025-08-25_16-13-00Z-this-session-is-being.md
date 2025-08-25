@@ -320,3 +320,876 @@ The column order is now:
 
 The `driggs_address_full` UI column has been repositioned to appear after the species note row as requested.
 
+---
+
+_**User**_
+
+please change this <input> element under "enter sites manually" to now have a hard width setting of 700 px 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Change input element under 'enter sites manually' to have hard width of 700px
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1667:            enter sites manually
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+1660→              style={{ width: '16px', height: '16px' }}
+  1661→            />
+  1662→            <span className="ml-2 text-sm text-gray-600">Use to filter</span>
+  1663→          </div>
+  1664→        {/* Manual Site Input */}
+  1665→        <div className="mb-3">
+  1666→          <label className="block text-sm font-bold text-gray-700 mb-2">
+  1667→            enter sites manually
+  1668→          </label>
+  1669→          <div className="flex items-center space-x-2">
+  1670→            <input
+  1671→              type="text"
+  1672→              value={manualSiteInput}
+  1673→              onChange={(e) => setManualSiteInput(e.target.value)}
+  1674→              onKeyPress={handleManualSiteKeyPress}
+  1675→              placeholder="dogs.com, cats.com facebook.com/group example.net"
+  1676→              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+  1677→            />
+  1678→            <button
+  1679→              onClick={handleManualSiteSubmit}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the input element at line 1670-1677. I need to change the `className` from `flex-1` (which makes it flexible width) to a fixed width of 700px:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1666→          <label className="block text-sm font-bold text-gray-700 mb-2">
+  1667→            enter sites manually
+  1668→          </label>
+  1669→          <div className="flex items-center space-x-2">
+  1670→            <input
+  1671→              type="text"
+  1672→              value={manualSiteInput}
+  1673→              onChange={(e) => setManualSiteInput(e.target.value)}
+  1674→              onKeyPress={handleManualSiteKeyPress}
+  1675→              placeholder="dogs.com, cats.com facebook.com/group example.net"
+  1676→              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+  1677→              style={{ width: '700px' }}
+  1678→            />
+  1679→            <button
+  1680→              onClick={handleManualSiteSubmit}
+  1681→              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+  1682→            >
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Change input element under 'enter sites manually' to have hard width of 700px
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ Successfully updated the input element under "enter sites manually" in DriggsmanTable.tsx:1670-1677
+
+Changes made:
+- Removed `flex-1` from the className (which made it flexible width)
+- Added `style={{ width: '700px' }}` to set a hard width of 700 pixels
+
+The input field now has a fixed width of 700px instead of expanding to fill available space.
+
+---
+
+_**User**_
+
+pleaes remove these buttons from /driggsman and any associated fucntianltiy since we dont use them for anything 
+
+Create New (Inline)
+Create New (Popup)
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Remove 'Create New (Inline)' and 'Create New (Popup)' buttons and associated functionality from /driggsman
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1627:            Create New (Inline)
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1633:            Create New (Popup)
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+1620→      {/* Top Controls */}
+  1621→      <div className="flex justify-between items-center mb-4">
+  1622→        <div className="flex space-x-2">
+  1623→          <button
+  1624→            onClick={handleCreateInline}
+  1625→            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+  1626→          >
+  1627→            Create New (Inline)
+  1628→          </button>
+  1629→          <button
+  1630→            onClick={handleCreatePopup}
+  1631→            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+  1632→          >
+  1633→            Create New (Popup)
+  1634→          </button>
+  1635→          {selectedFields.size > 0 && (
+  1636→            <span className="px-4 py-2 bg-gray-200 text-gray-700 rounded">
+  1637→              {selectedFields.size} fields selected
+  1638→            </span>
+  1639→          )}
+  1640→          <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded text-sm">
+  1641→            {sites.length} sites loaded
+  1642→          </span>
+  1643→        </div>
+  1644→        <div className="flex flex-col space-y-2">
+  1645→          <PaginationControls />
+  1646→          <ColumnPaginationControls />
+  1647→        </div>
+  1648→      </div>
+  1649→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to find the associated functions `handleCreateInline` and `handleCreatePopup` to remove them as well:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:808:  const handleCreateInline = async () => {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:850:  const handleCreatePopup = () => {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1624:            onClick={handleCreateInline}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1630:            onClick={handleCreatePopup}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me read the function definitions:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+800→      ));
+   801→    } catch (err) {
+   802→      console.error('Error toggling boolean:', err);
+   803→      alert('Failed to update');
+   804→    }
+   805→  };
+   806→
+   807→  // Create new site
+   808→  const handleCreateInline = async () => {
+   809→    try {
+   810→      const { data: { user } } = await supabase.auth.getUser();
+   811→      if (!user?.id) throw new Error('User not authenticated');
+   812→
+   813→      // Get internal user ID
+   814→      const { data: userData, error: userError } = await supabase
+   815→        .from('users')
+   816→        .select('id')
+   817→        .eq('auth_id', user.id)
+   818→        .single();
+   819→
+   820→      if (userError || !userData) throw new Error('User not found');
+   821→      
+   822→      const newSite = {
+   823→        fk_users_id: userData.id,
+   824→        sitespren_base: 'newsite.com',
+   825→        true_root_domain: 'newsite.com',
+   826→        webproperty_type: 'website',
+   827→        is_wp_site: false
+   828→      };
+   829→
+   830→      const { data: createdData, error } = await supabase
+   831→        .from('sitespren')
+   832→        .insert([newSite])
+   833→        .select()
+   834→        .single();
+   835→
+   836→      if (error) throw error;
+   837→
+   838→      setSites([createdData, ...sites]);
+   839→      
+   840→      // Start editing the sitespren_base of the new site
+   841→      setTimeout(() => {
+   842→        handleCellClick('sitespren_base', createdData.id, createdData.sitespren_base);
+   843→      }, 100);
+   844→    } catch (err) {
+   845→      console.error('Error creating site:', err);
+   846→      alert('Failed to create new site');
+   847→    }
+   848→  };
+   849→
+   850→  const handleCreatePopup = () => {
+   851→    setFormData({
+   852→      sitespren_base: '',
+   853→      true_root_domain: '',
+   854→      webproperty_type: 'website',
+   855→      is_wp_site: false
+   856→    });
+   857→    setIsCreateModalOpen(true);
+   858→  };
+   859→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to check if `isCreateModalOpen` and `formData` states are used elsewhere or only for these popup functions:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:148:  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:857:    setIsCreateModalOpen(true);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:883:      setIsCreateModalOpen(false);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2616:      {isCreateModalOpen && (
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2671:                onClick={() => setIsCreateModalOpen(false)}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:149:  const [formData, setFormData] = useState<Partial<SitesprenSite>>({});
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:851:    setFormData({
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:876:        .insert([{ ...formData, fk_users_id: userData.id }])
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2626:                  value={formData.sitespren_base || ''}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2627:                  onChange={(e) => setFormData({ ...formData, sitespren_base: e.target.value })}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2637:                  value={formData.true_root_domain || ''}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2638:                  onChange={(e) => setFormData({ ...formData, true_root_domain: e.target.value })}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2648:                  value={formData.webproperty_type || ''}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2649:                  onChange={(e) => setFormData({ ...formData, webproperty_type: e.target.value })}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2659:                  checked={formData.is_wp_site || false}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me also check for the handleCreateSubmit function that's likely associated with the popup modal:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:860:  const handleCreateSubmit = async () => {
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2677:                onClick={handleCreateSubmit}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+860→  const handleCreateSubmit = async () => {
+   861→    try {
+   862→      const { data: { user } } = await supabase.auth.getUser();
+   863→      if (!user?.id) throw new Error('User not authenticated');
+   864→
+   865→      // Get internal user ID
+   866→      const { data: userData, error: userError } = await supabase
+   867→        .from('users')
+   868→        .select('id')
+   869→        .eq('auth_id', user.id)
+   870→        .single();
+   871→
+   872→      if (userError || !userData) throw new Error('User not found');
+   873→      
+   874→      const { data: createdData, error } = await supabase
+   875→        .from('sitespren')
+   876→        .insert([{ ...formData, fk_users_id: userData.id }])
+   877→        .select()
+   878→        .single();
+   879→
+   880→      if (error) throw error;
+   881→
+   882→      setSites([createdData, ...sites]);
+   883→      setIsCreateModalOpen(false);
+   884→    } catch (err) {
+   885→      console.error('Error creating site:', err);
+   886→      alert('Failed to create site');
+   887→    }
+   888→  };
+   889→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me find the modal JSX to remove it as well:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2610→          <PaginationControls />
+  2611→          <ColumnPaginationControls />
+  2612→        </div>
+  2613→      </div>
+  2614→
+  2615→      {/* Create Modal */}
+  2616→      {isCreateModalOpen && (
+  2617→        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  2618→          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+  2619→            <h2 className="text-xl font-bold mb-4">Create New Site</h2>
+  2620→            
+  2621→            <div className="grid grid-cols-1 gap-4">
+  2622→              <div>
+  2623→                <label className="block text-sm font-medium text-gray-700 mb-1">Site Base</label>
+  2624→                <input
+  2625→                  type="text"
+  2626→                  value={formData.sitespren_base || ''}
+  2627→                  onChange={(e) => setFormData({ ...formData, sitespren_base: e.target.value })}
+  2628→                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+  2629→                  placeholder="example.com"
+  2630→                />
+  2631→              </div>
+  2632→              
+  2633→              <div>
+  2634→                <label className="block text-sm font-medium text-gray-700 mb-1">Root Domain</label>
+  2635→                <input
+  2636→                  type="text"
+  2637→                  value={formData.true_root_domain || ''}
+  2638→                  onChange={(e) => setFormData({ ...formData, true_root_domain: e.target.value })}
+  2639→                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+  2640→                  placeholder="example.com"
+  2641→                />
+  2642→              </div>
+  2643→              
+  2644→              <div>
+  2645→                <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+  2646→                <input
+  2647→                  type="text"
+  2648→                  value={formData.webproperty_type || ''}
+  2649→                  onChange={(e) => setFormData({ ...formData, webproperty_type: e.target.value })}
+  2650→                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+  2651→                  placeholder="website"
+  2652→                />
+  2653→              </div>
+  2654→
+  2655→              <div className="flex items-center space-x-2">
+  2656→                <input
+  2657→                  type="checkbox"
+  2658→                  id="is_wp_site"
+  2659→                  checked={formData.is_wp_site || false}
+  2660→                  onChange={(e) => setFormData({ ...formData, is_wp_site: e.target.checked })}
+  2661→                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+  2662→                />
+  2663→                <label htmlFor="is_wp_site" className="text-sm font-medium text-gray-700">
+  2664→                  WordPress Site
+  2665→                </label>
+  2666→              </div>
+  2667→            </div>
+  2668→
+  2669→            <div className="mt-6 flex justify-end space-x-3">
+  2670→              <button
+  2671→                onClick={() => setIsCreateModalOpen(false)}
+  2672→                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+  2673→              >
+  2674→                Cancel
+  2675→              </button>
+  2676→              <button
+  2677→                onClick={handleCreateSubmit}
+  2678→                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+  2679→              >
+  2680→                Create Site
+  2681→              </button>
+  2682→            </div>
+  2683→          </div>
+  2684→        </div>
+  2685→      )}
+  2686→
+  2687→      {/* Inputs Expand Editor */}
+  2688→      <InputsExpandEditor
+  2689→        isOpen={!!inputsExpandPopup}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll remove all the Create New functionality step by step:
+
+1. First, remove the buttons:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  1618→      )}
+  1619→
+  1620→      {/* Top Controls */}
+  1621→      <div className="flex justify-between items-center mb-4">
+  1622→        <div className="flex space-x-2">
+  1623→          {selectedFields.size > 0 && (
+  1624→            <span className="px-4 py-2 bg-gray-200 text-gray-700 rounded">
+  1625→              {selectedFields.size} fields selected
+  1626→            </span>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+2. Remove the state variables:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   144→  const [editingCell, setEditingCell] = useState<{ field: string; siteId: string } | null>(null);
+   145→  const [editingValue, setEditingValue] = useState<string>('');
+   146→  
+   147→  // Modal states
+   148→  
+   149→  // Manual site entry states
+   150→  const [manualSiteInput, setManualSiteInput] = useState('');
+   151→  const [manualSites, setManualSites] = useState<string[]>([]);
+   152→  const [allSites, setAllSites] = useState<SitesprenSite[]>([]); // Store all fetched sites
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+3. Remove the functions:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   801→      alert('Failed to update');
+   802→    }
+   803→  };
+   804→
+   805→
+   806→  // Manual site entry functions
+   807→  const parseManualSites = (input: string): string[] => {
+   808→    return input
+   809→      .split(/[\s,\n]+/) // Split by spaces, commas, or newlines
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+4. Remove the Create Modal JSX:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  2515→          <ColumnPaginationControls />
+  2516→        </div>
+  2517→      </div>
+  2518→
+  2519→
+  2520→      {/* Inputs Expand Editor */}
+  2521→      <InputsExpandEditor
+  2522→        isOpen={!!inputsExpandPopup}
+  2523→        cgigId={inputsExpandPopup?.cgigId || 0}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Remove 'Create New (Inline)' and 'Create New (Popup)' buttons and associated functionality from /driggsman
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ Successfully removed all Create New functionality from /driggsman:
+
+**Removed components:**
+1. **Create New (Inline) button** - Removed from DriggsmanTable.tsx:1623-1628
+2. **Create New (Popup) button** - Removed from DriggsmanTable.tsx:1629-1634
+
+**Removed associated functionality:**
+1. **State variables** - Removed `isCreateModalOpen` and `formData` from DriggsmanTable.tsx:148-149
+2. **Functions** - Removed `handleCreateInline`, `handleCreatePopup`, and `handleCreateSubmit` functions (lines 808-888)
+3. **Create Modal JSX** - Removed entire modal component (lines 2615-2685)
+
+The /driggsman page now has a cleaner interface without the unused Create New functionality, while preserving all other existing features like the field selection, pagination controls, and manual site entry.
+
+---
+
+_**User**_
+
+please move the drenjari compoenent on the page to now appear to the right of the "Show Page Header" buton. currently its appearing below it 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Move DrenjariButtonBarDriggsmanLinks component to appear to the right of the 'Show Page Header' button
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/pclient.tsx`
+
+Result:
+
+```
+60→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    61→      {/* Hide/Show Header Button */}
+    62→      <div className="px-6 py-2 bg-gray-50">
+    63→        <button
+    64→          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+    65→          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+    66→        >
+    67→          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+    68→        </button>
+    69→      </div>
+    70→
+    71→      {/* Navigation Components */}
+    72→      <div className="px-6 py-2">
+    73→        {/* Drenjari Navigation Links */}
+    74→        <div className="mb-4">
+    75→          <DrenjariButtonBarDriggsmanLinks />
+    76→        </div>
+    77→      </div>
+    78→
+    79→      {/* Main Content - Full Width DriggsmanTable */}
+    80→      <div className="flex-1 overflow-hidden">
+    81→        <DriggsmanTable />
+    82→      </div>
+    83→    </div>
+    84→  );
+    85→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the current layout. The "Show Page Header" button is in a separate div (lines 62-69), and the DrenjariButtonBarDriggsmanLinks component is in another div below it (lines 71-77). I need to move the DrenjariButtonBarDriggsmanLinks component to be on the same line as the "Show Page Header" button, positioned to the right.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    57→  }
+    58→
+    59→  return (
+    60→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    61→      {/* Hide/Show Header Button and Navigation */}
+    62→      <div className="px-6 py-2 bg-gray-50 flex items-center justify-between">
+    63→        <button
+    64→          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+    65→          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+    66→        >
+    67→          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+    68→        </button>
+    69→        
+    70→        {/* Drenjari Navigation Links */}
+    71→        <div>
+    72→          <DrenjariButtonBarDriggsmanLinks />
+    73→        </div>
+    74→      </div>
+    75→
+    76→      {/* Main Content - Full Width DriggsmanTable */}
+    77→      <div className="flex-1 overflow-hidden">
+    78→        <DriggsmanTable />
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Move DrenjariButtonBarDriggsmanLinks component to appear to the right of the 'Show Page Header' button
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ Successfully moved the DrenjariButtonBarDriggsmanLinks component in `/driggsman/pclient.tsx:62-74`
+
+**Changes made:**
+- Combined the two separate divs into one flex container
+- Added `flex items-center justify-between` classes to create a horizontal layout
+- Positioned the "Show Page Header" button on the left
+- Positioned the DrenjariButtonBarDriggsmanLinks component on the right
+- Maintained the same background styling (`bg-gray-50`) and padding
+
+The DrenjariButtonBarDriggsmanLinks component now appears to the right of the "Show Page Header" button on the same horizontal line instead of below it.
+
+---
+
+_**User**_
+
+pleaes move the drenjari so it appears more left justified (closer to the show page heder button). currenlty it seems to be right justified on the page 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Move DrenjariButtonBarDriggsmanLinks component to be left-justified closer to the Show Page Header button
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+    57→  }
+    58→
+    59→  return (
+    60→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    61→      {/* Hide/Show Header Button and Navigation */}
+    62→      <div className="px-6 py-2 bg-gray-50 flex items-center space-x-4">
+    63→        <button
+    64→          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+    65→          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+    66→        >
+    67→          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+    68→        </button>
+    69→        
+    70→        {/* Drenjari Navigation Links */}
+    71→        <div>
+    72→          <DrenjariButtonBarDriggsmanLinks />
+    73→        </div>
+    74→      </div>
+    75→
+    76→      {/* Main Content - Full Width DriggsmanTable */}
+    77→      <div className="flex-1 overflow-hidden">
+    78→        <DriggsmanTable />
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Move DrenjariButtonBarDriggsmanLinks component to be left-justified closer to the Show Page Header button
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ Successfully repositioned the DrenjariButtonBarDriggsmanLinks component to be left-justified in `/driggsman/pclient.tsx:62`
+
+**Change made:**
+- Replaced `justify-between` with `space-x-4` in the flex container
+- This changes the layout from "space between items" (which pushed the DrenjariButtonBarDriggsmanLinks to the far right) to "space between adjacent items" with a 4-unit gap
+- The DrenjariButtonBarDriggsmanLinks component now appears closer to the "Show Page Header" button with consistent spacing, both left-aligned
+
+The Drenjari component now sits closer to the Show Page Header button instead of being pushed to the far right edge of the page.
+
+---
+
+_**User**_
+
+please move the controls for the row pagination, column pagination(sites per view, etc.), and the search box to be left justified on the page and appear directly below the "show page header" button and drenjari component 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Move row pagination, column pagination, and search box controls to be left-justified below the header controls
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to find where these controls are currently located in the DriggsmanTable component and understand their structure.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1192:  const PaginationControls = () => (
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1301:  const ColumnPaginationControls = () => (
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1549:          <PaginationControls />
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1550:          <ColumnPaginationControls />
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2514:          <PaginationControls />
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2515:          <ColumnPaginationControls />
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:6:import { useRouter, useSearchParams } from 'next/navigation';
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:134:  const [searchTerm, setSearchTerm] = useState('');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:202:  const searchParams = useSearchParams();
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:325:    const sitesEnteredParam = searchParams?.get('sitesentered');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:326:    const activeFilterChamber = searchParams?.get('activefilterchamber');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:346:  }, [searchParams]);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:663:  // Filter fields based on search
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:666:      if (!searchTerm) return true;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:667:      return field.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:668:             field.group?.toLowerCase().includes(searchTerm.toLowerCase());
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me look at the current structure where these controls appear:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+1540→            <span className="px-4 py-2 bg-gray-200 text-gray-700 rounded">
+  1541→              {selectedFields.size} fields selected
+  1542→            </span>
+  1543→          )}
+  1544→          <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded text-sm">
+  1545→            {sites.length} sites loaded
+  1546→          </span>
+  1547→        </div>
+  1548→        <div className="flex flex-col space-y-2">
+  1549→          <PaginationControls />
+  1550→          <ColumnPaginationControls />
+  1551→        </div>
+  1552→      </div>
+  1553→
+  1554→      {/* Daylight Chamber */}
+  1555→      <div className={`daylight-chamber mb-4 border border-gray-700 rounded-lg ${useRainFilter ? 'opacity-50 pointer-events-none' : ''}`}>
+  1556→        <div className="p-4 bg-gray-50">
+  1557→          <div className="flex items-center mb-3">
+  1558→            <div className="font-bold text-sm text-gray-800">daylight_chamber</div>
+  1559→            <input
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me also find the search box:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:134:  const [searchTerm, setSearchTerm] = useState('');
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:666:      if (!searchTerm) return true;
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:667:      return field.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:668:             field.group?.toLowerCase().includes(searchTerm.toLowerCase());
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:670:  }, [searchTerm]);
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1283:          value={searchTerm}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1284:          onChange={(e) => setSearchTerm(e.target.value)}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1290:          onClick={() => setSearchTerm('')}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+1280→      <div className="flex items-center">
+  1281→        <input
+  1282→          type="text"
+  1283→          value={searchTerm}
+  1284→          onChange={(e) => setSearchTerm(e.target.value)}
+  1285→          placeholder="Search fields..."
+  1286→          className="px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+  1287→          style={{ height: '38px' }}
+  1288→        />
+  1289→        <button
+  1290→          onClick={() => setSearchTerm('')}
+  1291→          className="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border border-yellow-400 rounded-r-md text-sm transition-colors duration-150"
+  1292→          style={{ height: '38px' }}
+  1293→        >
+  1294→          CL
+  1295→        </button>
+  1296→      </div>
+  1297→    </div>
+  1298→  );
+  1299→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me find where this search component is being used in the JSX:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:1285:          placeholder="Search fields..."
+```
+

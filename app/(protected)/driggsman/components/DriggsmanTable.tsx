@@ -134,7 +134,7 @@ interface DriggsmanTableProps {
   }) => void;
 }
 
-export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps = {}) {
+export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps) {
   const [sites, setSites] = useState<SitesprenSite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -424,7 +424,7 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
         ColumnPaginationControls
       });
     }
-  }, [onControlsRender, searchTerm, currentPage, itemsPerPage, totalFieldPages, columnsPerPage, currentColumnPage, totalPages]);
+  }, [onControlsRender, searchTerm, currentPage, itemsPerPage, columnsPerPage, currentColumnPage]);
   
   const fetchSites = async () => {
     try {
@@ -1577,32 +1577,28 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
               style={{ width: '16px', height: '16px' }}
             />
             <span className="ml-2 text-sm text-gray-600">Use to filter</span>
-          </div>
-        {/* Manual Site Input */}
-        <div className="mb-3">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            enter sites manually
-          </label>
-          <div className="flex items-center space-x-2">
+            
+            {/* Manual Site Input - inline */}
+            <span className="ml-8 text-sm font-bold text-gray-700">enter sites manually</span>
             <input
               type="text"
               value={manualSiteInput}
               onChange={(e) => setManualSiteInput(e.target.value)}
               onKeyPress={handleManualSiteKeyPress}
               placeholder="dogs.com, cats.com facebook.com/group example.net"
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className="ml-3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               style={{ width: '700px' }}
             />
             <button
               onClick={handleManualSiteSubmit}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+              className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
             >
               Submit
             </button>
             {manualSites.length > 0 && (
               <button
                 onClick={clearAllManualSites}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+                className="ml-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
               >
                 Clear All
               </button>
@@ -1641,7 +1637,6 @@ export default function DriggsmanTable({ onControlsRender }: DriggsmanTableProps
             </div>
           </div>
         )}
-        </div>
       </div>
 
       {/* Rain Chamber */}
