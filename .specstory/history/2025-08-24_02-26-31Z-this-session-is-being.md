@@ -3108,3 +3108,370 @@ Perfect! I've successfully created the `/rankjar` page with the following:
 
 The page is now ready and waiting for the full SEO ranking functionality to be implemented when you're ready to move forward with the database schema and UI implementation!
 
+---
+
+_**User**_
+
+pleae rename the RankjarClient.tsx page to be named pclient.tsx . 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll rename the RankjarClient.tsx file to pclient.tsx and update the import in page.tsx accordingly.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Bash** Rename RankjarClient.tsx to pclient.tsx
+
+`mv /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/\(protected\)/rankjar/RankjarClient.tsx /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/\(protected\)/rankjar/pclient.tsx`
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/rankjar/page.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→import RankjarClient from './pclient';
+     2→
+     3→export default function RankjarPage() {
+     4→  return <RankjarClient />;
+     5→}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Done! I've successfully:
+
+1. ✅ Renamed `RankjarClient.tsx` to `pclient.tsx` 
+2. ✅ Updated the import in `page.tsx` to reference the new filename
+
+The `/rankjar` page will continue to work exactly the same, now using the `pclient.tsx` naming convention consistent with your other pages.
+
+---
+
+_**User**_
+
+please study the page at /driggsman and store basic info about its functionality in your memory. do not make any changes to anything. then give me the sql to do the following:
+
+create new field:
+driggs_state_code
+text
+
+and another field:
+driggs_state_full
+text
+
+then i will run the sql in supabase 
+
+
+also create these in field text type please
+
+driggs_street1
+driggs_street2
+driggs_country
+
+give me sql for all these fields and i will run it
+
+
+we are adding these fields to the db table sitespren
+
+
+please wait for subsequent prompts to incoporate these into the ui (i must give you more detailed instructions)
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll study the /driggsman page first to understand its functionality, then provide the SQL for adding the new fields.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/page.tsx`
+
+Result:
+
+```
+1→import { Metadata } from 'next';
+     2→import DriggsmanClient from './pclient';
+     3→
+     4→export const metadata: Metadata = {
+     5→  title: '/driggsman',
+     6→};
+     7→
+     8→export default function DriggsmanPage() {
+     9→  return <DriggsmanClient />;
+    10→}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import DriggsmanTable from './components/DriggsmanTable';
+     7→import dynamic from 'next/dynamic';
+     8→
+     9→const SitedoriButtonBar = dynamic(
+    10→  () => import('@/app/components/SitedoriButtonBar'),
+    11→  { ssr: false }
+    12→);
+    13→
+    14→const DrenjariButtonBarDriggsmanLinks = dynamic(
+    15→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    16→  { ssr: false }
+    17→);
+    18→
+    19→export default function DriggsmanClient() {
+    20→  const { user } = useAuth();
+    21→  const router = useRouter();
+    22→
+    23→  useEffect(() => {
+    24→    if (!user) {
+    25→      router.push('/login');
+    26→      return;
+    27→    }
+    28→  }, [user, router]);
+    29→
+    30→  if (!user) {
+    31→    return (
+    32→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    33→        <div className="text-gray-500">Loading...</div>
+    34→      </div>
+    35→    );
+    36→  }
+    37→
+    38→  return (
+    39→    <div className="min-h-screen bg-gray-50 flex flex-col">
+    40→      {/* Header */}
+    41→      <div className="bg-white border-b px-6 py-4">
+    42→        <div className="flex items-center justify-between">
+    43→          <div>
+    44→            <h1 className="text-2xl font-bold text-gray-800">
+    45→              Driggs Manager 
+    46→              <span className="text-xl font-normal text-gray-600 ml-3">Phone Numbers, Addresses, and Citations</span>
+    47→            </h1>
+    48→          </div>
+    49→          <div className="text-right">
+    50→            <div className="text-sm text-gray-500">Site Field Management</div>
+    51→            <div className="text-xs text-gray-400">Cross-reference all site fields</div>
+    52→          </div>
+    53→        </div>
+    54→      </div>
+    55→
+    56→      {/* Navigation Components */}
+    57→      <div className="px-6 py-2">
+    58→        {/* Sitedori Navigation Links */}
+    59→        <div className="mb-4">
+    60→          <SitedoriButtonBar />
+    61→        </div>
+    62→
+    63→        {/* Drenjari Navigation Links */}
+    64→        <div className="mb-4">
+    65→          <DrenjariButtonBarDriggsmanLinks />
+    66→        </div>
+    67→      </div>
+    68→
+    69→      {/* Main Content - Full Width DriggsmanTable */}
+    70→      <div className="flex-1 overflow-hidden">
+    71→        <DriggsmanTable />
+    72→      </div>
+    73→    </div>
+    74→  );
+    75→}
+```
+
+_**Agent**_
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useState, useEffect, useMemo } from 'react';
+     4→import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+     5→import dynamic from 'next/dynamic';
+     6→import { useRouter, useSearchParams } from 'next/navigation';
+     7→import Link from 'next/link';
+     8→import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
+     9→
+    10→const NubraTablefaceKite = dynamic(
+    11→  () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
+    12→  { ssr: false }
+    13→);
+    14→
+    15→const DrenjariButtonBarDriggsmanLinks = dynamic(
+    16→  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
+    17→  { ssr: false }
+    18→);
+    19→
+    20→interface SitesprenSite {
+    21→  id: string;
+    22→  created_at: string;
+    23→  sitespren_base: string | null;
+    24→  true_root_domain: string | null;
+    25→  full_subdomain: string | null;
+    26→  webproperty_type: string | null;
+    27→  fk_users_id: string;
+    28→  updated_at: string;
+    29→  wpuser1: string | null;
+    30→  wppass1: string | null;
+    31→  wp_plugin_installed1: boolean | null;
+    32→  wp_plugin_connected2: boolean | null;
+    33→  fk_domreg_hostaccount: string | null;
+    34→  is_wp_site: boolean | null;
+    35→  wp_rest_app_pass: string | null;
+    36→  driggs_industry: string | null;
+    37→  driggs_city: string | null;
+    38→  driggs_brand_name: string | null;
+    39→  driggs_site_type_purpose: string | null;
+    40→  driggs_email_1: string | null;
+    41→  driggs_address_full: string | null;
+    42→  driggs_address_species_id: number | null;
+    43→  driggs_phone_1: string | null;
+    44→  driggs_phone1_platform_id: number | null;
+    45→  driggs_cgig_id: number | null;
+    46→  driggs_citations_done: boolean | null;
+    47→  driggs_special_note_for_ai_tool: string | null;
+    48→  driggs_revenue_goal: number | null;
+    49→  ns_full: string | null;
+    50→  ip_address: string | null;
+    51→  is_starred1: string | null;
+    52→  icon_name: string | null;
+    53→  icon_color: string | null;
+    54→  is_bulldozer: boolean | null;
+    55→  is_competitor: boolean | null;
+    56→  is_external: boolean | null;
+    57→  is_internal: boolean | null;
+    58→  is_ppx: boolean | null;
+    59→  is_ms: boolean | null;
+    60→  is_wayback_rebuild: boolean | null;
+    61→  is_naked_wp_build: boolean | null;
+    62→  is_rnr: boolean | null;
+    63→  is_aff: boolean | null;
+    64→  is_other1: boolean | null;
+    65→  is_other2: boolean | null;
+    66→}
+    67→
+    68→interface CallPlatform {
+    69→  platform_id: number;
+    70→  platform_name: string;
+    71→  platform_url: string | null;
+    72→  api_endpoint: string | null;
+    73→  api_key_encrypted: string | null;
+    74→  is_active: boolean;
+    75→  user_id: string;
+    76→  created_at: string;
+    77→  updated_at: string;
+    78→}
+    79→
+    80→interface AddressSpecies {
+    81→  aspecies_id: number;
+    82→  aspecies_name: string | null;
+    83→  aspecies_code: string | null;
+    84→  address_format: string | null;
+    85→  country_code: string | null;
+    86→  is_active: boolean | null;
+    87→  created_at: string;
+    88→  updated_at: string | null;
+    89→}
+    90→
+    91→interface CitationGig {
+    92→  cgig_id: number;
+    93→  cgig_title: string;
+    94→  seller_name: string;
+    95→  marketplace: string;
+    96→  base_price: number;
+    97→  currency: string;
+    98→  cgig_url: string;
+    99→  citations_included: number;
+   100→  is_active: boolean;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me continue studying the DriggsmanTable functionality:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Find driggs_ field references in DriggsmanTable
+
+`grep -n "driggs_" /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/\(protected\)/driggsman/components/DriggsmanTable.tsx | head -20`
+
+Result:
+
+```
+36:  driggs_industry: string | null;
+37:  driggs_city: string | null;
+38:  driggs_brand_name: string | null;
+39:  driggs_site_type_purpose: string | null;
+40:  driggs_email_1: string | null;
+41:  driggs_address_full: string | null;
+42:  driggs_address_species_id: number | null;
+43:  driggs_phone_1: string | null;
+44:  driggs_phone1_platform_id: number | null;
+45:  driggs_cgig_id: number | null;
+46:  driggs_citations_done: boolean | null;
+47:  driggs_special_note_for_ai_tool: string | null;
+48:  driggs_revenue_goal: number | null;
+242:    { key: 'driggs_revenue_goal', type: 'number', label: 'driggs_revenue_goal', group: 'business' },
+243:    { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
+244:    { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
+245:    { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
+246:    { key: 'driggs_address_species_id', type: 'address_species_dropdown', label: 'driggs_address_species_id', group: 'contact' },
+247:    { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
+248:    { key: 'driggs_citations_done', type: 'boolean', label: 'driggs_citations_done', group: 'contact' },
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## 📋 /driggsman Page Functionality Summary
+
+**Stored in Memory:**
+
+### **Purpose:** 
+Driggs Manager - Manages phone numbers, addresses, and citations for sites in the `sitespren` table.
+
+### **Key Features:**
+- **Site Field Management**: Cross-reference all site fields
+- **Business Info Tracking**: Industry, city, brand name, site purpose, revenue goals
+- **Contact Management**: Email, phone numbers, full addresses with address species
+- **Citation Management**: Citation gigs, citation completion status
+- **Platform Integration**: Phone platform IDs for call tracking
+- **Site Categorization**: Multiple boolean flags for site types
+
+### **Current Driggs Fields in sitespren:**
+- `driggs_industry`, `driggs_city`, `driggs_brand_name`, `driggs_site_type_purpose`
+- `driggs_email_1`, `driggs_address_full`, `driggs_address_species_id`  
+- `driggs_phone_1`, `driggs_phone1_platform_id`, `driggs_cgig_id`
+- `driggs_citations_done`, `driggs_special_note_for_ai_tool`, `driggs_revenue_goal`
+
+---
+
+## 🏗️ SQL to Add New Fields to `sitespren` Table
+
+```sql
+-- Add new address and location fields to sitespren table
+ALTER TABLE sitespren 
+ADD COLUMN driggs_state_code TEXT,
+ADD COLUMN driggs_state_full TEXT,
+ADD COLUMN driggs_street1 TEXT,
+ADD COLUMN driggs_street2 TEXT,
+ADD COLUMN driggs_country TEXT;
+```
+
+This single SQL statement will add all 5 new fields as TEXT type to the `sitespren` table. You can run this in Supabase to add the new address-related fields to complement the existing `driggs_address_full` field.
+
