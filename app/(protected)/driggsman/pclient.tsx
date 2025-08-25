@@ -70,7 +70,7 @@ export default function DriggsmanClient() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Hide/Show Header Button and Navigation */}
-      <div className="px-6 py-2 bg-gray-50 flex items-center space-x-4">
+      <div className="px-6 py-1 bg-gray-50 flex items-center space-x-4">
         <button
           onClick={() => setIsHeaderVisible(!isHeaderVisible)}
           className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
@@ -103,12 +103,11 @@ export default function DriggsmanClient() {
           </button>
         </div>
       </div>
-
       {/* Pagination and Search Controls */}
       {paginationControls && (
-        <div className="px-6 py-2 bg-white border-b">
+        <div className="px-6 py-1 bg-white border-b">
           <div className="flex items-center space-x-6">
-            <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded text-sm">
+            <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded text-sm">
               {sitesCount} sites loaded
             </span>
             <div className="flex items-center">

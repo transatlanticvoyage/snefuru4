@@ -207,11 +207,20 @@ export default function DriggsmanTable({
   const [searchSites, setSearchSites] = useState<SitesprenSite[]>([]);
   const [selectedSiteIds, setSelectedSiteIds] = useState<Set<string>>(new Set());
   const [isExternalFilter, setIsExternalFilter] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Search popup pagination states
+  const [searchCurrentPage, setSearchCurrentPage] = useState(1);
+  const [searchItemsPerPage, setSearchItemsPerPage] = useState(10);
   
   // Filtering mechanism states
   const [useFogFilter, setUseFogFilter] = useState(true); // Default to true (unfiltered view)
   const [useDaylightFilter, setUseDaylightFilter] = useState(false);
   const [useRainFilter, setUseRainFilter] = useState(false);
+  
+  // Horizontal tabs state
+  const [activeTab, setActiveTab] = useState(1);
+  const [showChamberBoxes, setShowChamberBoxes] = useState(true); // Visibility toggle for chamber boxes
   const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
   
   const supabase = createClientComponentClient();
@@ -275,20 +284,23 @@ export default function DriggsmanTable({
     { key: 'phone_section_separator', type: 'section_header', label: 'phone section', group: 'separator' },
     { key: 'driggs_phone1_platform_id', type: 'platform_dropdown', label: 'driggs_phone1_platform_id', group: 'contact' },
     { key: 'driggs_phone_1', type: 'text', label: 'driggs_phone_1', group: 'contact' },
+    { key: 'address_section_separator', type: 'section_header', label: 'address section', group: 'separator' },
     { key: 'driggs_address_species_id', type: 'address_species_dropdown', label: 'driggs_address_species_id', group: 'contact' },
     { key: 'driggs_address_species_note', type: 'text', label: 'driggs_address_species_note', group: 'contact', placeholder: '' },
     { key: 'driggs_address_full', type: 'text', label: 'driggs_address_full', group: 'contact' },
     { key: 'driggs_street_1', type: 'text', label: 'driggs_street_1', group: 'contact', placeholder: '' },
     { key: 'driggs_street_2', type: 'text', label: 'driggs_street_2', group: 'contact', placeholder: '' },
+    { key: 'driggs_city', type: 'text', label: 'driggs_city', group: 'business' },
     { key: 'driggs_state_code', type: 'text', label: 'driggs_state_code', group: 'contact', placeholder: '' },
     { key: 'driggs_zip', type: 'text', label: 'driggs_zip', group: 'contact', placeholder: '' },
     { key: 'driggs_state_full', type: 'text', label: 'driggs_state_full', group: 'contact', placeholder: '' },
     { key: 'driggs_country', type: 'text', label: 'driggs_country', group: 'contact', placeholder: 'United States' },
+    { key: 'backlinks_section_separator', type: 'section_header', label: 'backlinks', group: 'separator' },
     { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
     { key: 'driggs_citations_done', type: 'boolean', label: 'driggs_citations_done', group: 'contact' },
     { key: 'driggs_social_profiles_done', type: 'boolean', label: 'driggs_social_profiles_done', group: 'contact' },
+    { key: 'basics_section_separator', type: 'section_header', label: 'basics', group: 'separator' },
     { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
-    { key: 'driggs_city', type: 'text', label: 'driggs_city', group: 'business' },
     { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
     { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
     { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
@@ -302,6 +314,7 @@ export default function DriggsmanTable({
     { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
     { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
     { key: 'driggs_social_media_links', type: 'text', label: 'driggs_social_media_links', group: 'contact', placeholder: '' },
+    { key: 'misc_section_separator', type: 'section_header', label: 'misc section', group: 'separator' },
     { key: 'id', type: 'text', label: 'id', group: 'system' },
     { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
     { key: 'updated_at', type: 'timestamp', label: 'updated_at', group: 'system' },
@@ -466,8 +479,12 @@ export default function DriggsmanTable({
 
   // Fetch search sites when popup opens
   useEffect(() => {
+    console.log('🔍 Search popup useEffect triggered. searchPopupOpen:', searchPopupOpen);
     if (searchPopupOpen) {
+      console.log('✅ Search popup is open, calling fetchSearchSites...');
       fetchSearchSites();
+    } else {
+      console.log('❌ Search popup is closed, not calling fetchSearchSites');
     }
   }, [searchPopupOpen]);
   
@@ -950,33 +967,36 @@ export default function DriggsmanTable({
   // Search popup functions
   const fetchSearchSites = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) return;
+      console.log('🔄 Starting fetchSearchSites...');
+      
+      // Use the mock user ID directly since we're in development mode
+      const mockUserId = 'a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64';
+      console.log('✅ Using hardcoded user ID for development:', mockUserId);
 
-      // Get internal user ID
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-
-      if (userError || !userData) return;
+      // Skip user lookup and use the direct internal user ID for development
+      const internalUserId = mockUserId; // This is already the internal user ID from database
+      console.log('✅ Using internal user ID directly:', internalUserId);
 
       // Fetch sites for this user
       const { data: sitesData, error: sitesError } = await supabase
         .from('sitespren')
-        .select('sitespren_base, is_external, is_internal, created_at, fk_address_species_id, sitespren_id')
-        .eq('fk_user_id', userData.id)
+        .select('sitespren_base, is_external, is_internal, created_at, driggs_address_species_id, id')
+        .eq('fk_users_id', internalUserId)
         .order('created_at', { ascending: false });
 
       if (sitesError) {
-        console.error('Error fetching search sites:', sitesError);
+        console.error('❌ Error fetching search sites:', sitesError);
         return;
+      }
+
+      console.log('✅ Fetched', sitesData?.length || 0, 'sites from sitespren table');
+      if (sitesData && sitesData.length > 0) {
+        console.log('📋 Sample sites:', sitesData.slice(0, 3).map(s => s.sitespren_base));
       }
 
       setSearchSites(sitesData || []);
     } catch (err) {
-      console.error('Error in fetchSearchSites:', err);
+      console.error('💥 Error in fetchSearchSites:', err);
     }
   };
 
@@ -992,19 +1012,39 @@ export default function DriggsmanTable({
 
   const handleEnterSelectedSites = () => {
     const selectedSites = searchSites
-      .filter(site => selectedSiteIds.has(site.sitespren_id.toString()))
+      .filter(site => selectedSiteIds.has(site.id.toString()))
       .map(site => site.sitespren_base)
       .join(' ');
     
     setManualSiteInput(selectedSites);
     setSearchPopupOpen(false);
     setSelectedSiteIds(new Set());
+    setSearchQuery('');
   };
 
   const getFilteredSearchSites = () => {
-    if (!isExternalFilter) return searchSites;
-    return searchSites.filter(site => site.is_external === true);
+    let filtered = searchSites;
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(site => 
+        site.sitespren_base?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Filter by external flag
+    if (isExternalFilter) {
+      filtered = filtered.filter(site => site.is_external === true);
+    }
+    
+    return filtered;
   };
+
+  // Pagination for search results
+  const totalSearchPages = Math.ceil(getFilteredSearchSites().length / (searchItemsPerPage === -1 ? getFilteredSearchSites().length : searchItemsPerPage));
+  const paginatedSearchSites = searchItemsPerPage === -1 
+    ? getFilteredSearchSites() 
+    : getFilteredSearchSites().slice((searchCurrentPage - 1) * searchItemsPerPage, searchCurrentPage * searchItemsPerPage);
 
   const handleManualSiteSubmit = () => {
     const sites = parseManualSites(manualSiteInput);
@@ -1425,6 +1465,115 @@ export default function DriggsmanTable({
     </div>
   );
 
+  // Search popup pagination controls
+  const SearchPaginationControls = () => (
+    <div className="flex items-center space-x-4">
+      {/* Items per page */}
+      <div className="flex items-center">
+        <span className="text-sm text-gray-600 mr-2">Rows:</span>
+        <div className="inline-flex" role="group">
+          {[10, 20, 50, 100, 200, 500, -1].map((value, index) => (
+            <button
+              key={value}
+              onClick={() => {
+                setSearchItemsPerPage(value);
+                setSearchCurrentPage(1);
+              }}
+              className={`
+                px-3 py-2 text-sm font-medium border border-gray-300
+                ${searchItemsPerPage === value ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 hover:bg-gray-100'}
+                ${index === 0 ? 'rounded-l-md' : ''}
+                ${index === 6 ? 'rounded-r-md' : ''}
+                ${index > 0 ? 'border-l-0' : ''}
+                transition-colors duration-150
+              `}
+              style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+            >
+              {value === -1 ? 'All' : value}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Page selector */}
+      <div className="flex items-center">
+        <span className="text-sm text-gray-600 mr-2">Page:</span>
+        <div className="inline-flex" role="group">
+          <button
+            onClick={() => setSearchCurrentPage(Math.max(1, searchCurrentPage - 1))}
+            disabled={searchCurrentPage === 1}
+            className={`
+              px-3 py-2 text-sm font-medium border border-gray-300 rounded-l-md
+              ${searchCurrentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}
+              transition-colors duration-150
+            `}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            ←
+          </button>
+          {Array.from({ length: Math.min(5, totalSearchPages) }, (_, i) => {
+            let pageNum;
+            if (totalSearchPages <= 5) {
+              pageNum = i + 1;
+            } else if (searchCurrentPage <= 3) {
+              pageNum = i + 1;
+            } else if (searchCurrentPage >= totalSearchPages - 2) {
+              pageNum = totalSearchPages - 4 + i;
+            } else {
+              pageNum = searchCurrentPage - 2 + i;
+            }
+            
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setSearchCurrentPage(pageNum)}
+                className={`
+                  px-3 py-2 text-sm font-medium border border-gray-300 border-l-0
+                  ${searchCurrentPage === pageNum ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 hover:bg-gray-100'}
+                  transition-colors duration-150
+                `}
+                style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setSearchCurrentPage(Math.min(totalSearchPages, searchCurrentPage + 1))}
+            disabled={searchCurrentPage === totalSearchPages}
+            className={`
+              px-3 py-2 text-sm font-medium border border-gray-300 border-l-0 rounded-r-md
+              ${searchCurrentPage === totalSearchPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}
+              transition-colors duration-150
+            `}
+            style={{ fontSize: '14px', paddingTop: '10px', paddingBottom: '10px' }}
+          >
+            →
+          </button>
+        </div>
+      </div>
+
+      {/* Search box for search popup */}
+      <div className="flex items-center">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search sites..."
+          className="px-3 py-2 border border-gray-300 rounded-l-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          style={{ height: '38px' }}
+        />
+        <button
+          onClick={() => setSearchQuery('')}
+          className="px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border border-yellow-400 rounded-r-md text-sm transition-colors duration-150"
+          style={{ height: '38px' }}
+        >
+          CL
+        </button>
+      </div>
+    </div>
+  );
+
   // Column pagination controls
   const ColumnPaginationControls = () => (
     <div className="flex items-center space-x-4">
@@ -1622,15 +1771,28 @@ export default function DriggsmanTable({
     <div className="px-6 py-4">
       {/* Search Popup */}
       {searchPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 pt-20">
-          <div className="bg-white rounded-lg shadow-xl w-[600px] h-[600px] flex flex-col">
+        <div className="fixed inset-0 flex items-start justify-center z-50 pt-20 pointer-events-none">
+          <div className="bg-white rounded-lg shadow-xl w-[600px] h-[600px] flex flex-col pointer-events-auto">
             {/* Popup Header */}
             <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-semibold">Search Sites</h2>
+              <div className="flex items-center space-x-4 flex-1">
+                <h2 className="text-lg font-semibold">Search Sites</h2>
+                <div className="flex-1 max-w-md">
+                  <input
+                    type="text"
+                    placeholder="Search sites..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    autoFocus
+                  />
+                </div>
+              </div>
               <button
                 onClick={() => {
                   setSearchPopupOpen(false);
                   setSelectedSiteIds(new Set());
+                  setSearchQuery('');
                 }}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -1664,38 +1826,43 @@ export default function DriggsmanTable({
               </div>
             </div>
 
+            {/* Top Search Pagination Controls */}
+            <div className="p-4 border-b bg-gray-50">
+              <SearchPaginationControls />
+            </div>
+
             {/* Sites Table */}
             <div className="flex-1 overflow-auto p-4">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full border-collapse border border-gray-400">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">select</th>
-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">sitespren_base</th>
-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">is_external</th>
-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">is_internal</th>
-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">created_at</th>
-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">fk_address_species_id</th>
-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase">sitespren_id</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">select</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">sitespren_base</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">is_external</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">is_internal</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">created_at</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">driggs_address_species_id</th>
+                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">id</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {getFilteredSearchSites().map((site) => (
-                      <tr key={site.sitespren_id} className="hover:bg-gray-50">
-                        <td className="px-2 py-2">
+                  <tbody className="bg-white">
+                    {paginatedSearchSites.map((site) => (
+                      <tr key={site.id} className="hover:bg-gray-50">
+                        <td className="px-2 py-2 border border-gray-400">
                           <input
                             type="checkbox"
-                            checked={selectedSiteIds.has(site.sitespren_id.toString())}
-                            onChange={() => handleSearchSiteSelect(site.sitespren_id.toString())}
+                            checked={selectedSiteIds.has(site.id.toString())}
+                            onChange={() => handleSearchSiteSelect(site.id.toString())}
                             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                           />
                         </td>
-                        <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[150px]">{site.sitespren_base || '-'}</td>
-                        <td className="px-2 py-2 text-sm text-gray-900">{site.is_external ? 'true' : 'false'}</td>
-                        <td className="px-2 py-2 text-sm text-gray-900">{site.is_internal ? 'true' : 'false'}</td>
-                        <td className="px-2 py-2 text-sm text-gray-900">{site.created_at ? new Date(site.created_at).toLocaleDateString() : '-'}</td>
-                        <td className="px-2 py-2 text-sm text-gray-900">{site.fk_address_species_id || '-'}</td>
-                        <td className="px-2 py-2 text-sm text-gray-900">{site.sitespren_id}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[150px] border border-gray-400">{site.sitespren_base || '-'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900 border border-gray-400">{site.is_external ? 'true' : 'false'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900 border border-gray-400">{site.is_internal ? 'true' : 'false'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900 border border-gray-400">{site.created_at ? new Date(site.created_at).toLocaleDateString() : '-'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900 border border-gray-400">{site.driggs_address_species_id || '-'}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900 border border-gray-400">{site.id}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1706,6 +1873,16 @@ export default function DriggsmanTable({
                     {isExternalFilter ? 'No external sites found' : 'No sites found'}
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Bottom Search Pagination Controls */}
+            <div className="p-4 border-t bg-gray-50">
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-gray-600">
+                  Showing {paginatedSearchSites.length} of {getFilteredSearchSites().length} sites
+                </div>
+                <SearchPaginationControls />
               </div>
             </div>
           </div>
@@ -1731,7 +1908,7 @@ export default function DriggsmanTable({
       )}
 
       {/* Top Status */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center">
         <div className="flex space-x-2">
           {selectedFields.size > 0 && (
             <span className="px-4 py-2 bg-gray-200 text-gray-700 rounded">
@@ -1741,8 +1918,138 @@ export default function DriggsmanTable({
         </div>
       </div>
 
+      {/* Horizontal Tabs */}
+      <div className="mb-4">
+        <div className="border-b border-gray-200">
+          <div className="flex space-x-0">
+            {/* fog_chamber tab */}
+            <button
+              onClick={() => setActiveTab(1)}
+              className={`px-6 py-3 text-sm font-medium border-b-2 border-l border-t border-r transition-colors ${
+                activeTab === 1
+                  ? 'border-b-blue-600 border-l-gray-400 border-t-gray-400 border-r-gray-400 text-blue-600 bg-blue-50'
+                  : 'border-b-transparent border-l-gray-400 border-t-gray-400 border-r-gray-400 text-gray-500 hover:text-gray-700 hover:border-b-gray-300'
+              }`}
+              style={{ borderLeftColor: '#d5d5d5', borderTopColor: '#d5d5d5', borderRightColor: '#d5d5d5' }}
+            >
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={useFogFilter}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (e.target.checked) {
+                      handleFogFilterChange();
+                    }
+                  }}
+                  className="w-4 h-4"
+                />
+                <span>fog_chamber</span>
+              </div>
+            </button>
+            
+            {/* daylight_chamber tab */}
+            <button
+              onClick={() => setActiveTab(2)}
+              className={`px-6 py-3 text-sm font-medium border-b-2 border-t border-l border-r transition-colors -ml-px ${
+                activeTab === 2
+                  ? 'border-b-blue-600 border-t-gray-400 border-l-gray-400 border-r-gray-400 text-blue-600 bg-blue-50'
+                  : 'border-b-transparent border-t-gray-400 border-l-gray-400 border-r-gray-400 text-gray-500 hover:text-gray-700 hover:border-b-gray-300'
+              }`}
+              style={{ borderTopColor: '#d5d5d5', borderLeftColor: '#d5d5d5', borderRightColor: '#d5d5d5' }}
+            >
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={useDaylightFilter}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (e.target.checked) {
+                      handleDaylightFilterChange();
+                    }
+                  }}
+                  className="w-4 h-4"
+                />
+                <span>daylight_chamber</span>
+              </div>
+            </button>
+            
+            {/* rain_chamber tab */}
+            <button
+              onClick={() => setActiveTab(3)}
+              className={`px-6 py-3 text-sm font-medium border-b-2 border-t border-l border-r transition-colors -ml-px ${
+                activeTab === 3
+                  ? 'border-b-blue-600 border-t-gray-400 border-l-gray-400 border-r-gray-400 text-blue-600 bg-blue-50'
+                  : 'border-b-transparent border-t-gray-400 border-l-gray-400 border-r-gray-400 text-gray-500 hover:text-gray-700 hover:border-b-gray-300'
+              }`}
+              style={{ borderTopColor: '#d5d5d5', borderLeftColor: '#d5d5d5', borderRightColor: '#d5d5d5' }}
+            >
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={useRainFilter}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (e.target.checked) {
+                      handleRainFilterChange();
+                    }
+                  }}
+                  className="w-4 h-4"
+                />
+                <span>rain_chamber</span>
+              </div>
+            </button>
+            
+            {/* Show Main Chamber Boxes toggle (tab 4) */}
+            <button
+              onClick={() => setActiveTab(4)}
+              className={`px-6 py-3 text-sm font-medium border-b-2 border-t border-l border-r transition-colors ${
+                activeTab === 4
+                  ? 'border-b-blue-600 border-t-gray-400 border-l-gray-400 border-r-gray-400 text-blue-600 bg-blue-50'
+                  : 'border-b-transparent border-t-gray-400 border-l-gray-400 border-r-gray-400 text-gray-500 hover:text-gray-700 hover:border-b-gray-300'
+              }`}
+              style={{ borderTopColor: '#d5d5d5', borderLeftColor: '#d5d5d5', borderRightColor: '#d5d5d5' }}
+            >
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={showChamberBoxes}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    setShowChamberBoxes(e.target.checked);
+                  }}
+                  className="w-4 h-4"
+                />
+                <span>Show Main Chamber Boxes</span>
+              </div>
+            </button>
+            
+            {/* Keep original tabs 5, 6, 7, and 8 */}
+            {[5, 6, 7, 8].map((tabNumber, index) => (
+              <button
+                key={tabNumber}
+                onClick={() => setActiveTab(tabNumber)}
+                className={`px-6 py-3 text-sm font-medium border-b-2 border-t border-l border-r transition-colors -ml-px ${
+                  activeTab === tabNumber
+                    ? 'border-b-blue-600 border-t-gray-400 border-l-gray-400 border-r-gray-400 text-blue-600 bg-blue-50'
+                    : 'border-b-transparent border-t-gray-400 border-l-gray-400 border-r-gray-400 text-gray-500 hover:text-gray-700 hover:border-b-gray-300'
+                }`}
+                style={{ 
+                  borderTopColor: '#d5d5d5',
+                  borderLeftColor: '#d5d5d5',
+                  borderRightColor: '#d5d5d5'
+                }}
+              >
+                tab {tabNumber}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Fog Chamber */}
-      <div className={`fog-chamber mb-4 border border-gray-700 rounded-lg ${(useDaylightFilter || useRainFilter) ? 'opacity-50' : ''}`}>
+      {activeTab === 1 && showChamberBoxes && (
+        <div className={`fog-chamber border border-gray-700 rounded-lg ${(useDaylightFilter || useRainFilter) ? 'opacity-50' : ''}`}>
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-3">
             <div className="font-bold text-sm text-gray-800">fog_chamber</div>
@@ -1756,10 +2063,12 @@ export default function DriggsmanTable({
             <span className="ml-2 text-sm text-gray-600">Use to filter</span>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Daylight Chamber */}
-      <div className={`daylight-chamber mb-4 border border-gray-700 rounded-lg ${(useRainFilter || useFogFilter) ? 'opacity-50' : ''}`}>
+      {activeTab === 2 && showChamberBoxes && (
+        <div className={`daylight-chamber border border-gray-700 rounded-lg ${(useRainFilter || useFogFilter) ? 'opacity-50' : ''}`}>
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-3">
             <div className="font-bold text-sm text-gray-800">daylight_chamber</div>
@@ -1797,7 +2106,10 @@ export default function DriggsmanTable({
               
               {/* Search Button */}
               <button
-                onClick={() => setSearchPopupOpen(true)}
+                onClick={() => {
+                  console.log('🔍 Search button clicked, opening popup...');
+                  setSearchPopupOpen(true);
+                }}
                 className="ml-3 px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
               >
                 search
@@ -1865,10 +2177,12 @@ export default function DriggsmanTable({
             </div>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {/* Rain Chamber */}
-      <div className={`rain-chamber mb-4 border border-gray-700 rounded-lg ${activeRainChamber ? 'border-blue-500 bg-blue-50' : ''} ${(useDaylightFilter || useFogFilter) ? 'opacity-50' : ''}`}>
+      {activeTab === 3 && showChamberBoxes && (
+        <div className={`rain-chamber border border-gray-700 rounded-lg ${activeRainChamber ? 'border-blue-500 bg-blue-50' : ''} ${(useDaylightFilter || useFogFilter) ? 'opacity-50' : ''}`}>
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-3">
             <div className="font-bold text-sm text-gray-800">rain_chamber</div>
@@ -2012,24 +2326,37 @@ export default function DriggsmanTable({
             </div>
           )}
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Matrix Table */}
       <div className="border border-gray-300 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-300">
             <thead className="bg-gray-50">
-              {/* Additional header row - empty for now */}
+              {/* Additional header row with driggspack buttons */}
               <tr className="border-b border-gray-300">
                 <td className="w-12 h-8 border-r border-gray-300"></td>
                 <td className="w-64 h-8 border-r border-gray-300"></td>
                 {paginatedSites.map((site, index) => (
                   <td
                     key={`empty-${site.id}`}
-                    className={`h-8 ${
+                    className={`h-8 px-2 ${
                       index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
                     }`}
-                  ></td>
+                  >
+                    <div className="flex items-center justify-center h-full space-x-1">
+                      <button className="px-2 py-1 bg-gray-200 text-gray-600 rounded" style={{ fontSize: '14px' }}>
+                        driggspack1
+                      </button>
+                      <button className="px-2 py-1 bg-gray-200 text-gray-600 rounded" style={{ fontSize: '14px' }}>
+                        driggspack2
+                      </button>
+                      <button className="px-2 py-1 bg-gray-200 text-gray-600 rounded" style={{ fontSize: '14px' }}>
+                        driggspack3
+                      </button>
+                    </div>
+                  </td>
                 ))}
               </tr>
               
@@ -2094,8 +2421,9 @@ export default function DriggsmanTable({
                   {/* Field selection checkbox */}
                   <td 
                     className={`w-12 px-2 py-2 border-r border-gray-300 ${
-                      field.type === 'section_header' ? 'bg-gray-100' : 'cursor-pointer'
+                      field.type === 'section_header' ? (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '' : 'bg-gray-100') : 'cursor-pointer'
                     }`}
+                    style={field.type === 'section_header' && (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? { backgroundColor: '#dddddd' } : {}}
                     onClick={() => field.type !== 'section_header' && handleFieldSelect(field.key)}
                   >
                     <div className="flex items-center justify-center">
@@ -2112,8 +2440,9 @@ export default function DriggsmanTable({
 
                   {/* Field name */}
                   <td className={`px-3 py-2 text-sm font-medium w-64 border-r border-gray-300 ${
-                    field.type === 'section_header' ? 'bg-gray-100 font-bold text-gray-700' : 'text-gray-900'
-                  }`}>
+                    field.type === 'section_header' ? (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? 'font-bold' : 'bg-gray-100 font-bold') : 'text-gray-900'
+                  }`}
+                  style={field.type === 'section_header' && (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? { backgroundColor: '#dddddd', color: '#111827' } : {}}>
                     <span>{field.label}</span>
                   </td>
 
@@ -2127,9 +2456,12 @@ export default function DriggsmanTable({
                       return (
                         <td 
                           key={`${field.key}-${site.id}`} 
-                          className={`px-3 py-2 text-sm font-bold text-gray-700 bg-gray-100 w-48 ${
+                          className={`px-3 py-2 text-sm font-bold text-gray-900 w-48 ${
+                            field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '' : 'bg-gray-100'
+                          } ${
                             index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
                           }`}
+                          style={field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? { backgroundColor: '#dddddd' } : {}}
                         >
                           {field.label}
                         </td>
