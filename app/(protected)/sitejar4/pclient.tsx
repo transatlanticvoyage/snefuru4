@@ -1622,7 +1622,7 @@ http://www.drogs.com`}
         onTagsUpdate={handleTagsUpdate}
         isExternalFilter={isExternalFilter}
         onIsExternalFilterChange={handleIsExternalFilterChange}
-        // chambersVisible={chambersVisible}
+        chambersVisible={chambersVisible}
       />
     </div>
   );

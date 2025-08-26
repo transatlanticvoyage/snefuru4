@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
+import { useOrgEntities } from '../hooks/useOrgEntities';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
@@ -66,6 +67,38 @@ interface ReddjarTableProps {
   onSelectionChange?: (selectedRows: Set<number>) => void;
   commentableFilter?: 'all' | 'yes' | 'no';
   scrapeStatusFilter?: 'all' | 'success' | 'failed';
+  onTagsUpdate?: (tagsData: {
+    tags: any[];
+    selectedTags: Set<string>;
+    tagsFeedback: {type: 'success' | 'error' | 'info', message: string} | null;
+    functions: {
+      handleCreateTag: () => Promise<void>;
+      handleUpdateTag: () => Promise<void>;
+      handleDeleteTag: (tagId: string) => Promise<void>;
+      handleAddUrlsToTag: () => Promise<void>;
+      handleTagSelection: (tagId: string, isSelected: boolean) => void;
+      startEditingTag: (tag: any) => void;
+      cancelEditingTag: () => void;
+    };
+    formData: {
+      newTagName: string;
+      setNewTagName: (name: string) => void;
+      newTagOrder: number;
+      setNewTagOrder: (order: number) => void;
+      editingTagId: string | null;
+      editingTagName: string;
+      setEditingTagName: (name: string) => void;
+      editingTagOrder: number;
+      setEditingTagOrder: (order: number) => void;
+    };
+    loadingStates: {
+      isCreatingTag: boolean;
+      isUpdatingTag: boolean;
+      isDeletingTag: Set<string>;
+      isAddingUrlsToTag: boolean;
+    };
+  }) => void;
+  userInternalId?: string;
 }
 
 export default function ReddjarTable({ 
@@ -73,8 +106,10 @@ export default function ReddjarTable({
   selectedRows = new Set(), 
   onSelectionChange,
   commentableFilter = 'all',
-  scrapeStatusFilter = 'all'
-}: ReddjarTableProps = {}) {
+  scrapeStatusFilter = 'all',
+  onTagsUpdate,
+  userInternalId
+}: ReddjarTableProps) {
   const [data, setData] = useState<RedditUrl[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +120,7 @@ export default function ReddjarTable({
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Column pagination states
-  const [columnsPerPage, setColumnsPerPage] = useState(8); // Show 8 columns at a time
+  const [columnsPerPage, setColumnsPerPage] = useState(15); // Show 15 columns at a time (increased to accommodate org entity columns)
   const [currentColumnPage, setCurrentColumnPage] = useState(1);
   
   // Modal states
@@ -99,6 +134,23 @@ export default function ReddjarTable({
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [outboundLinks, setOutboundLinks] = useState<Record<number, OutboundLink[]>>({});
   const [loadingLinks, setLoadingLinks] = useState<Set<number>>(new Set());
+  
+  // Org entities hook
+  const { orgEntities, toggleEntity, hasEntity, loading: orgEntitiesLoading } = useOrgEntities();
+  
+  // Tags management state
+  const [tags, setTags] = useState<any[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const [newTagName, setNewTagName] = useState('');
+  const [newTagOrder, setNewTagOrder] = useState(0);
+  const [editingTagId, setEditingTagId] = useState<string | null>(null);
+  const [editingTagName, setEditingTagName] = useState('');
+  const [editingTagOrder, setEditingTagOrder] = useState(0);
+  const [isCreatingTag, setIsCreatingTag] = useState(false);
+  const [isUpdatingTag, setIsUpdatingTag] = useState(false);
+  const [isDeletingTag, setIsDeletingTag] = useState<Set<string>>(new Set());
+  const [isAddingUrlsToTag, setIsAddingUrlsToTag] = useState(false);
+  const [tagsFeedback, setTagsFeedback] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
   
   // Form data for creating/editing
   const [formData, setFormData] = useState({
@@ -130,15 +182,21 @@ export default function ReddjarTable({
   
   // Column definitions with proper grouping and widths
   const columns: Array<{ 
-    key: keyof RedditUrl; 
+    key: keyof RedditUrl | 'separator1' | 'org_starred' | 'org_flagged' | 'org_squared' | 'org_circled' | 'org_triangled'; 
     type: string; 
     width: string; 
     group?: string; 
-    separator?: 'right';
+    separator?: 'right' | 'vertical';
     label: string;
   }> = [
     { key: 'url_id', type: 'integer', width: '80px', label: 'url_id' },
     { key: 'is_starred', type: 'boolean', width: '60px', label: '⭐' },
+    { key: 'separator1' as any, type: 'separator', width: '3px', label: '', separator: 'vertical' },
+    { key: 'org_starred' as any, type: 'org_entity', width: '20px', label: '1' },
+    { key: 'org_flagged' as any, type: 'org_entity', width: '20px', label: '2' },
+    { key: 'org_squared' as any, type: 'org_entity', width: '20px', label: '3' },
+    { key: 'org_circled' as any, type: 'org_entity', width: '20px', label: '4' },
+    { key: 'org_triangled' as any, type: 'org_entity', width: '20px', label: '5' },
     { key: 'url_datum', type: 'text', width: '280px', label: 'url_datum' },
     { key: 'is_commentable', type: 'boolean', width: '90px', label: 'is_commentable' },
     { key: 'is_commentable_scraped_at', type: 'timestamp', width: '160px', label: 'is_commentable_scraped_at' },
@@ -353,6 +411,50 @@ export default function ReddjarTable({
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Fetch tags when component mounts or userInternalId changes
+  useEffect(() => {
+    if (userInternalId) {
+      fetchTags();
+    }
+  }, [userInternalId]);
+
+  // Update parent component with tags data whenever tags state changes
+  useEffect(() => {
+    if (onTagsUpdate) {
+      onTagsUpdate({
+        tags,
+        selectedTags,
+        tagsFeedback,
+        functions: {
+          handleCreateTag,
+          handleUpdateTag,
+          handleDeleteTag,
+          handleAddUrlsToTag,
+          handleTagSelection,
+          startEditingTag,
+          cancelEditingTag,
+        },
+        formData: {
+          newTagName,
+          setNewTagName,
+          newTagOrder,
+          setNewTagOrder,
+          editingTagId,
+          editingTagName,
+          setEditingTagName,
+          editingTagOrder,
+          setEditingTagOrder,
+        },
+        loadingStates: {
+          isCreatingTag,
+          isUpdatingTag,
+          isDeletingTag,
+          isAddingUrlsToTag,
+        },
+      });
+    }
+  }, [tags, selectedTags, tagsFeedback, newTagName, newTagOrder, editingTagId, editingTagName, editingTagOrder, isCreatingTag, isUpdatingTag, isDeletingTag, isAddingUrlsToTag, onTagsUpdate]);
   
   const fetchData = async () => {
     try {
@@ -802,6 +904,242 @@ export default function ReddjarTable({
       fetchOutboundLinks(urlId);
     }
     setExpandedRows(newExpanded);
+  };
+
+  // Tags management functions
+  const fetchTags = async () => {
+    if (!userInternalId) return;
+
+    try {
+      const response = await fetch(`/api/redditurlsvat_tags?user_internal_id=${userInternalId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setTags(result.data || []);
+      } else {
+        console.error('Error fetching tags:', result.error);
+      }
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  };
+
+  const handleCreateTag = async () => {
+    if (!newTagName.trim() || !userInternalId) return;
+
+    setIsCreatingTag(true);
+    setTagsFeedback(null);
+
+    try {
+      const response = await fetch('/api/redditurlsvat_tags', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tag_name: newTagName.trim(),
+          tag_order: newTagOrder,
+          user_internal_id: userInternalId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTagsFeedback({
+          type: 'success',
+          message: 'Tag created successfully'
+        });
+        setNewTagName('');
+        setNewTagOrder(0);
+        await fetchTags();
+      } else {
+        setTagsFeedback({
+          type: 'error',
+          message: result.error || 'Failed to create tag'
+        });
+      }
+    } catch (error) {
+      console.error('Error creating tag:', error);
+      setTagsFeedback({
+        type: 'error',
+        message: 'Network error occurred'
+      });
+    } finally {
+      setIsCreatingTag(false);
+      setTimeout(() => setTagsFeedback(null), 5000);
+    }
+  };
+
+  const handleUpdateTag = async () => {
+    if (!editingTagId || !editingTagName.trim()) return;
+
+    setIsUpdatingTag(true);
+    setTagsFeedback(null);
+
+    try {
+      const response = await fetch('/api/redditurlsvat_tags', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tag_id: editingTagId,
+          tag_name: editingTagName.trim(),
+          tag_order: editingTagOrder
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTagsFeedback({
+          type: 'success',
+          message: 'Tag updated successfully'
+        });
+        setEditingTagId(null);
+        setEditingTagName('');
+        setEditingTagOrder(0);
+        await fetchTags();
+      } else {
+        setTagsFeedback({
+          type: 'error',
+          message: result.error || 'Failed to update tag'
+        });
+      }
+    } catch (error) {
+      console.error('Error updating tag:', error);
+      setTagsFeedback({
+        type: 'error',
+        message: 'Network error occurred'
+      });
+    } finally {
+      setIsUpdatingTag(false);
+      setTimeout(() => setTagsFeedback(null), 5000);
+    }
+  };
+
+  const handleDeleteTag = async (tagId: string) => {
+    if (!tagId) return;
+
+    setIsDeletingTag(prev => new Set([...prev, tagId]));
+    setTagsFeedback(null);
+
+    try {
+      const response = await fetch('/api/redditurlsvat_tags', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tag_id: tagId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTagsFeedback({
+          type: 'success',
+          message: 'Tag deleted successfully'
+        });
+        await fetchTags();
+      } else {
+        setTagsFeedback({
+          type: 'error',
+          message: result.error || 'Failed to delete tag'
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting tag:', error);
+      setTagsFeedback({
+        type: 'error',
+        message: 'Network error occurred'
+      });
+    } finally {
+      setIsDeletingTag(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(tagId);
+        return newSet;
+      });
+      setTimeout(() => setTagsFeedback(null), 5000);
+    }
+  };
+
+  const handleAddUrlsToTag = async () => {
+    if (selectedTags.size === 0 || selectedRows.size === 0) {
+      setTagsFeedback({
+        type: 'error',
+        message: 'Please select both URLs and a tag'
+      });
+      setTimeout(() => setTagsFeedback(null), 5000);
+      return;
+    }
+
+    setIsAddingUrlsToTag(true);
+    setTagsFeedback(null);
+
+    try {
+      const response = await fetch('/api/redditurlsvat_tags_relations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tag_id: Array.from(selectedTags)[0], // Use first selected tag
+          url_ids: Array.from(selectedRows)
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setTagsFeedback({
+          type: 'success',
+          message: `Added ${result.addedCount} URL(s) to tag. ${result.skippedCount || 0} already existed.`
+        });
+      } else {
+        setTagsFeedback({
+          type: 'error',
+          message: result.error || 'Failed to add URLs to tag'
+        });
+      }
+    } catch (error) {
+      console.error('Error adding URLs to tag:', error);
+      setTagsFeedback({
+        type: 'error',
+        message: 'Network error occurred'
+      });
+    } finally {
+      setIsAddingUrlsToTag(false);
+      setTimeout(() => setTagsFeedback(null), 5000);
+    }
+  };
+
+  const handleTagSelection = (tagId: string, isSelected: boolean) => {
+    setSelectedTags(prev => {
+      const newSet = new Set(prev);
+      if (isSelected) {
+        // Allow only one tag to be selected at a time for now
+        newSet.clear();
+        newSet.add(tagId);
+      } else {
+        newSet.delete(tagId);
+      }
+      return newSet;
+    });
+  };
+
+  const startEditingTag = (tag: any) => {
+    setEditingTagId(tag.tag_id);
+    setEditingTagName(tag.tag_name);
+    setEditingTagOrder(tag.tag_order || 0);
+  };
+
+  const cancelEditingTag = () => {
+    setEditingTagId(null);
+    setEditingTagName('');
+    setEditingTagOrder(0);
   };
 
   // Render cell content
@@ -1254,6 +1592,91 @@ export default function ReddjarTable({
                 {visibleColumns.map((column, index) => {
                   const isReadOnly = column.key === 'url_id' || column.key === 'created_at' || column.key === 'count_obls';
                   const hasRightSeparator = column.separator === 'right';
+                  const isVerticalSeparator = column.separator === 'vertical';
+                  const isOrgEntity = column.type === 'org_entity';
+                  const isGlobalStar = column.key === 'is_starred';
+                  
+                  // Handle vertical separator
+                  if (isVerticalSeparator) {
+                    return (
+                      <th
+                        key={column.key}
+                        className="border-l-2 border-r-2 border-black bg-black"
+                        style={{ width: '3px', padding: 0, minWidth: '3px', maxWidth: '3px' }}
+                      >
+                      </th>
+                    );
+                  }
+                  
+                  // Handle org entity columns
+                  if (isOrgEntity) {
+                    const entityIcons = {
+                      'org_starred': '⭐',
+                      'org_flagged': '🚩',
+                      'org_squared': '⬜',
+                      'org_circled': '⭕',
+                      'org_triangled': '🔺'
+                    };
+                    const entityLabels = {
+                      'org_starred': 'star',
+                      'org_flagged': 'flag',
+                      'org_squared': 'sqr',
+                      'org_circled': 'cir',
+                      'org_triangled': 'tri'
+                    };
+                    
+                    return (
+                      <th
+                        key={column.key}
+                        className="text-center border border-gray-200"
+                        style={{ 
+                          width: '20px', 
+                          padding: '2px',
+                          minWidth: '20px',
+                          maxWidth: '20px',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        <div className="flex flex-col items-center justify-center">
+                          <span style={{ fontSize: '10px', fontWeight: 'bold' }}>{column.label}</span>
+                          <span style={{ fontSize: '12px' }}>{entityIcons[column.key as keyof typeof entityIcons]}</span>
+                          <span style={{ fontSize: '8px' }}>{entityLabels[column.key as keyof typeof entityLabels]}</span>
+                        </div>
+                      </th>
+                    );
+                  }
+                  
+                  // Special handling for global star column
+                  if (isGlobalStar) {
+                    return (
+                      <th
+                        key={column.key}
+                        className="text-center cursor-pointer hover:bg-gray-100 border border-gray-200 px-2 py-1"
+                        style={{ 
+                          whiteSpace: 'nowrap'
+                        }}
+                        onClick={() => handleSort(column.key)}
+                      >
+                        <div className="flex flex-col items-center justify-center">
+                          <span style={{ fontSize: '14px', fontWeight: 'bold', color: 'black' }}>glob</span>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            className="text-red-600"
+                          >
+                            <path
+                              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                              fill="currentColor"
+                              stroke="currentColor"
+                              strokeWidth="1"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                      </th>
+                    );
+                  }
                   
                   return (
                     <th
@@ -1335,6 +1758,69 @@ export default function ReddjarTable({
                     </td>
                     {visibleColumns.map((column, index) => {
                       const hasRightSeparator = column.separator === 'right';
+                      const isVerticalSeparator = column.separator === 'vertical';
+                      const isOrgEntity = column.type === 'org_entity';
+                      
+                      // Handle vertical separator
+                      if (isVerticalSeparator) {
+                        return (
+                          <td
+                            key={column.key}
+                            className="border-l-2 border-r-2 border-black bg-black"
+                            style={{ width: '3px', padding: 0, minWidth: '3px', maxWidth: '3px' }}
+                          >
+                          </td>
+                        );
+                      }
+                      
+                      // Handle org entity columns
+                      if (isOrgEntity) {
+                        const entityIcons = {
+                          'org_starred': '⭐',
+                          'org_flagged': '🚩',
+                          'org_squared': '⬜',
+                          'org_circled': '⭕',
+                          'org_triangled': '🔺'
+                        };
+                        
+                        const entityTypeMap = {
+                          'org_starred': 'is_starred' as const,
+                          'org_flagged': 'is_flagged' as const,
+                          'org_squared': 'is_squared' as const,
+                          'org_circled': 'is_circled' as const,
+                          'org_triangled': 'is_triangled' as const
+                        };
+                        
+                        const entityType = entityTypeMap[column.key as keyof typeof entityTypeMap];
+                        const isActive = hasEntity(item.url_id, entityType);
+                        
+                        return (
+                          <td
+                            key={column.key}
+                            className="text-center border border-gray-200 cursor-pointer hover:bg-gray-100"
+                            style={{ 
+                              width: '20px', 
+                              padding: '2px',
+                              minWidth: '20px',
+                              maxWidth: '20px',
+                              whiteSpace: 'nowrap'
+                            }}
+                            onClick={() => {
+                              toggleEntity(item.url_id, entityType);
+                            }}
+                          >
+                            <div className="flex items-center justify-center">
+                              <span style={{ 
+                                fontSize: '12px', 
+                                opacity: isActive ? 1 : 0.3,
+                                transition: 'opacity 0.2s ease'
+                              }}>
+                                {entityIcons[column.key as keyof typeof entityIcons]}
+                              </span>
+                            </div>
+                          </td>
+                        );
+                      }
                       
                       return (
                         <td

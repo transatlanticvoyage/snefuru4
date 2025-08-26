@@ -182,7 +182,7 @@ export default function DriggsmanTable({
   const [manualSites, setManualSites] = useState<string[]>([]);
   const [allSites, setAllSites] = useState<SitesprenSite[]>([]); // Store all fetched sites
   const [showPillbox, setShowPillbox] = useState(true); // Control pillbox visibility
-  const [showRecents, setShowRecents] = useState(false); // Control recents visibility
+  const [showRecents, setShowRecents] = useState(true); // Control recents visibility
   const [recentEntries, setRecentEntries] = useState<RecentEntry[]>([]); // Recent daylight chamber settings
   
   // Call platform dropdown states
@@ -2367,9 +2367,6 @@ export default function DriggsmanTable({
         {/* Recents Area */}
         {showRecents && (
           <div className="relative border border-black p-4 mb-4">
-            <div className="absolute top-1 left-2 text-sm font-medium text-gray-900 bg-white px-1">
-              recents_box
-            </div>
             <div className="mt-4">
               <div className="text-base font-bold mb-2" style={{fontSize: '16px'}}>
                 recents_box

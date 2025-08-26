@@ -85,6 +85,10 @@ interface SitesprenTableProps {
       isAddingSitesToTag: boolean;
     };
   }) => void;
+  chambersVisible?: {
+    yupik: boolean;
+    chepno: boolean;
+  };
 }
 
 type SortField = keyof SitesprenRecord;
@@ -128,7 +132,7 @@ const allColumns = [
   'is_flylocal'        // 35
 ];
 
-export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate }: SitesprenTableProps) {
+export default function SitesprenTable({ data, userId, userInternalId, onSelectionChange, onDataUpdate, searchTerm: externalSearchTerm, onSearchChange: externalOnSearchChange, totalUnfilteredCount, isExternalFilter, onIsExternalFilterChange, onTagsUpdate, chambersVisible }: SitesprenTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -2606,7 +2610,8 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
         </div>
       </div>
 
-      {/* Site Gadgets Section */}
+      {/* Site Gadgets Section - Chepno Chamber */}
+      {chambersVisible?.chepno !== false && (
         <div className="bg-white p-4 rounded-lg shadow border">
           <h3 className="text-lg font-bold text-gray-800 mb-4">site_gadgets_chepno</h3>
         
@@ -2753,7 +2758,7 @@ export default function SitesprenTable({ data, userId, userInternalId, onSelecti
             )}
           </div>
         </div>
-      </div> {/* End of flex container for Essex and Chepno */}
+      )}
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
