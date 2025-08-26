@@ -1,0 +1,11 @@
+/*
+Theme Name: Tregnar Test
+Description: Simple test theme to debug WordPress theme detection
+Version: 1.0
+Author: Test
+*/
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+}

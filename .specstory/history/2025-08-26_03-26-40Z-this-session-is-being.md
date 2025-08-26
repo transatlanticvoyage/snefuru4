@@ -221,3 +221,710 @@ The implementation includes:
 - NubraTablefaceKite integration
 - Consistent styling matching `/filejar` patterns
 
+---
+
+_**User**_
+
+below this text on reddjar page: "Reddit URLs Jar", please place a new button that says:
+/medjar
+
+please make it a link that user can click on to open that page
+then pleaes creaet a link after that, in a separate button, that says:
+/amazonjar
+
+then please view the zhedori component for inspiration (grep for it). please create a new component called:
+redditdori
+
+please make this a central component that can be dynamically called into any page
+
+please make it contain the 2 links we just created above. then repalce the new hard coded links we created on the /reddjar page with a "call" of the redditdori central component itself
+
+then please create a new page at /amazonjar 
+
+leave the ui blank until future prompts on this apge 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [ ] 🌡️ Add /medjar button link to reddjar page
+- [ ] 🌡️ Add /amazonjar button link to reddjar page
+- [ ] 🌡️ Find and analyze zhedori component for inspiration
+- [ ] 🌡️ Create redditdori central component
+- [ ] 🌡️ Replace hardcoded links on reddjar with redditdori component
+- [ ] 🌡️ Create new page at /amazonjar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me first find the reddjar page and then look for the zhedori component for inspiration.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/api/reddjar/route.ts
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/page.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/pclient.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/components/ReddjarTable.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep**
+
+Result:
+
+```
+Found 14 files
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.git/logs/refs/heads/main
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.git/logs/HEAD
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-24_02-26-31Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-24_13-19-23Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/ZhedoriButtonBar.tsx
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_16-44-12Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_16-13-04Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_12-26-04Z-pleaes-research-the-meta.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-23_03-47-22Z-please-analyze-the-kwjar.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_22-08-13Z-pleae-view-my-most.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_20-19-46Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_12-58-26Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-22_00-46-07Z-this-session-is-being.md
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.specstory/history/2025-08-21_22-07-28Z-this-session-is-being.md
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/components/ZhedoriButtonBar.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import Link from 'next/link';
+     4→
+     5→export default function ZhedoriButtonBar() {
+     6→  return (
+     7→    <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-3 py-1 mb-4">
+     8→      <div className="flex items-center">
+     9→        <span className="text-sm font-bold text-black mr-4">zhedori</span>
+    10→        <div className="flex items-center">
+    11→          <Link
+    12→            href="/kwjar"
+    13→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-l transition-colors -mr-px"
+    14→          >
+    15→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/kwjar</span>
+    16→          </Link>
+    17→          <Link
+    18→            href="/dfslocr"
+    19→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    20→          >
+    21→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/dfslocr</span>
+    22→          </Link>
+    23→          <Link
+    24→            href="/kwtagzar"
+    25→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    26→          >
+    27→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/kwtagzar</span>
+    28→          </Link>
+    29→          <Link
+    30→            href="/serpjar"
+    31→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    32→          >
+    33→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/serpjar</span>
+    34→          </Link>
+    35→          <Link
+    36→            href="/zhefetchjar"
+    37→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    38→          >
+    39→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/zhefetchjar</span>
+    40→          </Link>
+    41→          <Link
+    42→            href="/fabric"
+    43→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    44→          >
+    45→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/fabric</span>
+    46→          </Link>
+    47→          <Link
+    48→            href="/rankjar"
+    49→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+    50→          >
+    51→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/rankjar</span>
+    52→          </Link>
+    53→        </div>
+    54→      </div>
+    55→    </div>
+    56→  );
+    57→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [ ] 🌡️ Add /medjar button link to reddjar page
+- [ ] 🌡️ Add /amazonjar button link to reddjar page
+- [X] 🌡️ Find and analyze zhedori component for inspiration
+- [⚡] 🌡️ Create redditdori central component
+- [ ] 🌡️ Replace hardcoded links on reddjar with redditdori component
+- [ ] 🌡️ Create new page at /amazonjar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me read the reddjar pclient to see where to add the buttons initially:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/reddjar/pclient.tsx`
+
+Result:
+
+```
+1→'use client';
+     2→
+     3→import { useEffect, useState } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import ReddjarTable from './components/ReddjarTable';
+     7→
+     8→export default function ReddjarClient() {
+     9→  const { user } = useAuth();
+    10→  const router = useRouter();
+    11→  const [columnPaginationControls, setColumnPaginationControls] = useState<{
+    12→    ColumnPaginationBar1: () => JSX.Element | null;
+    13→    ColumnPaginationBar2: () => JSX.Element | null;
+    14→  } | null>(null);
+    15→  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    16→  const [isScrapingLinks, setIsScrapingLinks] = useState(false);
+    17→  const [isScrapingCommentable, setIsScrapingCommentable] = useState(false);
+    18→  const [commentableFilter, setCommentableFilter] = useState<'all' | 'yes' | 'no'>('all');
+    19→  const [scrapeStatusFilter, setScrapeStatusFilter] = useState<'all' | 'success' | 'failed'>('all');
+    20→
+    21→  const handleScrapeLinks = async () => {
+    22→    if (selectedRows.size === 0) {
+    23→      alert('Please select at least one Reddit URL to scrape');
+    24→      return;
+    25→    }
+    26→
+    27→    setIsScrapingLinks(true);
+    28→    try {
+    29→      console.log('Scraping links for selected rows:', Array.from(selectedRows));
+    30→      
+    31→      const response = await fetch('/api/reddit-scraper', {
+    32→        method: 'POST',
+    33→        headers: {
+    34→          'Content-Type': 'application/json',
+    35→        },
+    36→        body: JSON.stringify({
+    37→          selectedUrlIds: Array.from(selectedRows)
+    38→        }),
+    39→      });
+    40→
+    41→      if (!response.ok) {
+    42→        throw new Error(`HTTP error! status: ${response.status}`);
+    43→      }
+    44→
+    45→      const result = await response.json();
+    46→      
+    47→      // Show results summary
+    48→      const successful = result.results.filter((r: any) => r.success).length;
+    49→      const totalLinks = result.results.reduce((sum: number, r: any) => sum + r.links_found, 0);
+    50→      
+    51→      alert(`Scraping completed!\n\nSuccessful: ${successful}/${result.results.length} URLs\nTotal links found: ${totalLinks}\n\nNote: Check browser console for detailed debug output.\nRefresh page manually to see updated table data.`);
+    52→      
+    53→      // Don't auto-refresh so user can see console debug output
+    54→      // window.location.reload();
+    55→      
+    56→    } catch (error) {
+    57→      console.error('Error scraping links:', error);
+    58→      alert('Error occurred while scraping links: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    59→    } finally {
+    60→      setIsScrapingLinks(false);
+    61→    }
+    62→  };
+    63→
+    64→  const handleScrapeCommentable = async () => {
+    65→    if (selectedRows.size === 0) {
+    66→      alert('Please select at least one Reddit URL to check commentability');
+    67→      return;
+    68→    }
+    69→
+    70→    setIsScrapingCommentable(true);
+    71→    try {
+    72→      console.log('🚀 CLIENT: Checking commentability for selected rows:', Array.from(selectedRows));
+    73→      
+    74→      console.log('📡 CLIENT: Making API call to /api/reddit-commentable-scraper');
+    75→      const response = await fetch('/api/reddit-commentable-scraper', {
+    76→        method: 'POST',
+    77→        headers: {
+    78→          'Content-Type': 'application/json',
+    79→        },
+    80→        body: JSON.stringify({
+    81→          selectedUrlIds: Array.from(selectedRows)
+    82→        }),
+    83→      });
+    84→
+    85→      console.log('📨 CLIENT: API response received:', {
+    86→        status: response.status,
+    87→        statusText: response.statusText,
+    88→        ok: response.ok,
+    89→        url: response.url
+    90→      });
+    91→
+    92→      if (!response.ok) {
+    93→        console.error('❌ CLIENT: API response not ok:', response.status, response.statusText);
+    94→        const errorText = await response.text();
+    95→        console.error('❌ CLIENT: Error response body:', errorText);
+    96→        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+    97→      }
+    98→
+    99→      console.log('🔄 CLIENT: Parsing JSON response...');
+   100→      const result = await response.json();
+   101→      console.log('📊 CLIENT: Parsed API result:', result);
+   102→      
+   103→      // Show results summary
+   104→      const successful = result.results.filter((r: any) => r.success).length;
+   105→      const openThreads = result.results.filter((r: any) => r.success && r.is_commentable === true).length;
+   106→      const closedThreads = result.results.filter((r: any) => r.success && r.is_commentable === false).length;
+   107→      
+   108→      alert(`Commentability check completed!\n\nSuccessful: ${successful}/${result.results.length} URLs\nOpen for comments: ${openThreads}\nClosed: ${closedThreads}\n\nNote: Check browser console for detailed debug output.\nRefresh page manually to see updated table data.`);
+   109→      
+   110→      // Don't auto-refresh so user can see console debug output
+   111→      // window.location.reload();
+   112→      
+   113→    } catch (error) {
+   114→      console.error('Error checking commentability:', error);
+   115→      alert('Error occurred while checking commentability: ' + (error instanceof Error ? error.message : 'Unknown error'));
+   116→    } finally {
+   117→      setIsScrapingCommentable(false);
+   118→    }
+   119→  };
+   120→
+   121→  useEffect(() => {
+   122→    if (!user) {
+   123→      router.push('/login');
+   124→      return;
+   125→    }
+   126→  }, [user, router]);
+   127→
+   128→  if (!user) {
+   129→    return (
+   130→      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+   131→        <div className="text-gray-500">Loading...</div>
+   132→      </div>
+   133→    );
+   134→  }
+   135→
+   136→  return (
+   137→    <div className="min-h-screen bg-gray-50 flex flex-col">
+   138→      {/* Header */}
+   139→      <div className="bg-white border-b px-6 py-4">
+   140→        <div className="flex items-center justify-between">
+   141→          <div className="flex items-center space-x-6">
+   142→            <h1 className="text-2xl font-bold text-gray-800">Reddit URLs Jar</h1>
+   143→            
+   144→            {/* Column Pagination Button Bars */}
+   145→            {columnPaginationControls && (
+   146→              <>
+   147→                <div className="flex items-center">
+   148→                  {columnPaginationControls.ColumnPaginationBar1()}
+   149→                </div>
+   150→                <div className="flex items-center">
+   151→                  {columnPaginationControls.ColumnPaginationBar2()}
+   152→                </div>
+   153→              </>
+   154→            )}
+   155→            
+   156→            {/* Scrape Links Button */}
+   157→            <div className="flex items-center space-x-2">
+   158→              <button
+   159→                onClick={handleScrapeLinks}
+   160→                disabled={isScrapingLinks || isScrapingCommentable || selectedRows.size === 0}
+   161→                className={`px-4 py-2 text-sm font-medium rounded-md border transition-colors ${
+   162→                  isScrapingLinks || isScrapingCommentable || selectedRows.size === 0
+   163→                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+   164→                    : 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600'
+   165→                }`}
+   166→              >
+   167→                {isScrapingLinks ? 'Scraping...' : 'scrape links'}
+   168→              </button>
+   169→              
+   170→              <button
+   171→                onClick={handleScrapeCommentable}
+   172→                disabled={isScrapingCommentable || isScrapingLinks || selectedRows.size === 0}
+   173→                className={`px-4 py-2 text-sm font-medium rounded-md border transition-colors ${
+   174→                  isScrapingCommentable || isScrapingLinks || selectedRows.size === 0
+   175→                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+   176→                    : 'bg-green-500 text-white border-green-500 hover:bg-green-600 hover:border-green-600'
+   177→                }`}
+   178→              >
+   179→                {isScrapingCommentable ? 'Checking...' : 'scrape is_commentable'}
+   180→              </button>
+   181→            </div>
+   182→            
+   183→            {/* is_commentable Filter */}
+   184→            <div className="flex flex-col items-center">
+   185→              <div className="text-black font-bold mb-1" style={{ fontSize: '16px' }}>
+   186→                is_commentable
+   187→              </div>
+   188→              <select
+   189→                value={commentableFilter}
+   190→                onChange={(e) => setCommentableFilter(e.target.value as 'all' | 'yes' | 'no')}
+   191→                className="px-3 py-2 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+   192→              >
+   193→                <option value="all">all</option>
+   194→                <option value="yes">yes</option>
+   195→                <option value="no">no</option>
+   196→              </select>
+   197→            </div>
+   198→            
+   199→            {/* is_commentable_scrape_status Filter */}
+   200→            <div className="flex flex-col items-center">
+   201→              <div className="text-black font-bold mb-1" style={{ fontSize: '16px' }}>
+   202→                is_commentable_scrape_status
+   203→              </div>
+   204→              <select
+   205→                value={scrapeStatusFilter}
+   206→                onChange={(e) => setScrapeStatusFilter(e.target.value as 'all' | 'success' | 'failed')}
+   207→                className="px-3 py-2 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+   208→              >
+   209→                <option value="all">All</option>
+   210→                <option value="success">Success</option>
+   211→                <option value="failed">Failed</option>
+   212→              </select>
+   213→            </div>
+   214→          </div>
+   215→          <div className="text-right">
+   216→            <div className="text-sm text-gray-500">Table: redditurlsvat</div>
+   217→            <div className="text-xs text-gray-400">Reddit SEO Tracking</div>
+   218→          </div>
+   219→        </div>
+   220→      </div>
+   221→
+   222→      {/* Main Content - Full Width ReddjarTable */}
+   223→      <div className="flex-1 overflow-hidden">
+   224→        <ReddjarTable 
+   225→          onColumnPaginationRender={setColumnPaginationControls}
+   226→          selectedRows={selectedRows}
+   227→          onSelectionChange={setSelectedRows}
+   228→          commentableFilter={commentableFilter}
+   229→          scrapeStatusFilter={scrapeStatusFilter}
+   230→        />
+   231→      </div>
+   232→    </div>
+   233→  );
+   234→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I'll create the redditdori component based on the zhedori pattern, then update the reddjar page to use it. Let me create the redditdori component first:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import Link from 'next/link';
+
+export default function RedditdoriButtonBar() {
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-3 py-1 mb-4">
+      <div className="flex items-center">
+        <span className="text-sm font-bold text-black mr-4">redditdori</span>
+        <div className="flex items-center">
+          <Link
+            href="/medjar"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-l transition-colors -mr-px"
+          >
+            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/medjar</span>
+          </Link>
+          <Link
+            href="/amazonjar"
+            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+          >
+            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/amazonjar</span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/RedditdoriButtonBar.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [ ] 🌡️ Add /medjar button link to reddjar page
+- [ ] 🌡️ Add /amazonjar button link to reddjar page
+- [X] 🌡️ Find and analyze zhedori component for inspiration
+- [X] 🌡️ Create redditdori central component
+- [⚡] 🌡️ Replace hardcoded links on reddjar with redditdori component
+- [ ] 🌡️ Create new page at /amazonjar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the RedditdoriButtonBar to the reddjar page. I'll add it right after the "Reddit URLs Jar" title:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     1→'use client';
+     2→
+     3→import { useEffect, useState } from 'react';
+     4→import { useAuth } from '@/app/context/AuthContext';
+     5→import { useRouter } from 'next/navigation';
+     6→import ReddjarTable from './components/ReddjarTable';
+     7→import RedditdoriButtonBar from '@/app/components/RedditdoriButtonBar';
+     8→
+     9→export default function ReddjarClient() {
+    10→  const { user } = useAuth();
+    11→  const router = useRouter();
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   219→          </div>
+   220→        </div>
+   221→      </div>
+   222→
+   223→      {/* RedditdoriButtonBar */}
+   224→      <div className="px-6">
+   225→        <RedditdoriButtonBar />
+   226→      </div>
+   227→
+   228→      {/* Main Content - Full Width ReddjarTable */}
+   229→      <div className="flex-1 overflow-hidden">
+   230→        <ReddjarTable 
+   231→          onColumnPaginationRender={setColumnPaginationControls}
+   232→          selectedRows={selectedRows}
+   233→          onSelectionChange={setSelectedRows}
+   234→          commentableFilter={commentableFilter}
+   235→          scrapeStatusFilter={scrapeStatusFilter}
+   236→        />
+   237→      </div>
+   238→    </div>
+   239→  );
+   240→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add /medjar button link to reddjar page
+- [X] 🌡️ Add /amazonjar button link to reddjar page
+- [X] 🌡️ Find and analyze zhedori component for inspiration
+- [X] 🌡️ Create redditdori central component
+- [X] 🌡️ Replace hardcoded links on reddjar with redditdori component
+- [⚡] 🌡️ Create new page at /amazonjar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me create the /amazonjar page with blank UI. I'll create the necessary files:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Bash** Create amazonjar directory
+
+`mkdir -p /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/\(protected\)/amazonjar`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+import { Metadata } from 'next';
+import AmazonjarClient from './pclient';
+
+export const metadata: Metadata = {
+  title: '/amazonjar',
+};
+
+export default function AmazonjarPage() {
+  return <AmazonjarClient />;
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/amazonjar/page.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
+
+export default function AmazonjarClient() {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-6">
+        {/* Blank UI - awaiting further instructions */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Amazonjar</h1>
+          <p className="text-gray-600">Page ready for implementation...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/amazonjar/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add /medjar button link to reddjar page
+- [X] 🌡️ Add /amazonjar button link to reddjar page
+- [X] 🌡️ Find and analyze zhedori component for inspiration
+- [X] 🌡️ Create redditdori central component
+- [X] 🌡️ Replace hardcoded links on reddjar with redditdori component
+- [X] 🌡️ Create new page at /amazonjar
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have completed all the requested tasks:
+
+✅ **Completed Tasks:**
+
+1. **Created RedditdoriButtonBar component** - A central reusable component at `/app/components/RedditdoriButtonBar.tsx` with two navigation buttons:
+   - `/medjar` button (rounded-l)
+   - `/amazonjar` button (rounded-r)
+
+2. **Updated reddjar page** - Added the RedditdoriButtonBar component below the "Reddit URLs Jar" title in `/app/(protected)/reddjar/pclient.tsx:224-226`
+
+3. **Created /amazonjar page** - New page with:
+   - `/app/(protected)/amazonjar/page.tsx` - Main page entry point
+   - `/app/(protected)/amazonjar/pclient.tsx` - Client component with blank UI ready for future implementation
+
+The RedditdoriButtonBar follows the same styling pattern as ZhedoriButtonBar, making it a consistent central navigation component that can be dynamically imported into any page. The buttons are styled with hover states and proper border connectivity for a cohesive appearance.
+
+Both navigation buttons are now functional - users can click them to navigate between `/medjar` and `/amazonjar` pages directly from the `/reddjar` page.
+
+---
+
+_**User**_
+
+please update the redditdori component to now list a link to /reddjar as its first link . so it will have 3 links now in total
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add /reddjar link as first link in redditdori component
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/components/RedditdoriButtonBar.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+     6→  return (
+     7→    <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-3 py-1 mb-4">
+     8→      <div className="flex items-center">
+     9→        <span className="text-sm font-bold text-black mr-4">redditdori</span>
+    10→        <div className="flex items-center">
+    11→          <Link
+    12→            href="/reddjar"
+    13→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-l transition-colors -mr-px"
+    14→          >
+    15→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/reddjar</span>
+    16→          </Link>
+    17→          <Link
+    18→            href="/medjar"
+    19→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
+    20→          >
+    21→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/medjar</span>
+    22→          </Link>
+    23→          <Link
+    24→            href="/amazonjar"
+    25→            className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
+    26→          >
+    27→            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/amazonjar</span>
+    28→          </Link>
+    29→        </div>
+    30→      </div>
+    31→    </div>
+    32→  );
+    33→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add /reddjar link as first link in redditdori component
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+✅ **Updated successfully!** 
+
+The RedditdoriButtonBar component now has 3 links in total:
+
+1. **/reddjar** (first link with rounded-l styling)
+2. **/medjar** (middle link with standard styling)  
+3. **/amazonjar** (last link with rounded-r styling)
+
+The styling has been properly updated so the first button has `rounded-l`, the middle button has no border radius, and the last button has `rounded-r` to maintain the connected button bar appearance.
+

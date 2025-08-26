@@ -1,0 +1,626 @@
+/*
+Theme Name: Tregnar SaaS
+Theme URI: https://tregnar.com
+Author: Tregnar Team
+Author URI: https://tregnar.com
+Description: Modern SaaS theme for Tregnar website management platform with Elementor support. Features responsive design, gradient styling, and professional layouts optimized for SaaS businesses.
+Requires at least: 5.0
+Tested up to: 6.7
+Requires PHP: 7.4
+Version: 1.0.0
+License: GPL v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: tregnar-saas
+Tags: saas, business, elementor, responsive, modern, custom-header, custom-logo, featured-images, flexible-header, custom-colors
+*/
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #3B82F6;
+    --primary-dark: #1E40AF;
+    --secondary-color: #10B981;
+    --accent-color: #F59E0B;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --text-light: #9CA3AF;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F9FAFB;
+    --bg-dark: #111827;
+    --border-color: #E5E7EB;
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+}
+
+h1 { font-size: clamp(2.5rem, 5vw, 4rem); }
+h2 { font-size: clamp(2rem, 4vw, 3rem); }
+h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1.125rem; }
+
+p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: 100vh;
+    background: 
+        /* Main dark space background with nebula-like color variations */
+        radial-gradient(ellipse at 20% 30%, rgba(30, 41, 91, 0.4) 0%, transparent 40%),
+        radial-gradient(ellipse at 80% 20%, rgba(45, 55, 120, 0.3) 0%, transparent 35%),
+        radial-gradient(ellipse at 60% 80%, rgba(25, 35, 85, 0.25) 0%, transparent 45%),
+        /* Small planets scattered naturally */
+        radial-gradient(circle at 85% 15%, rgba(156, 163, 175, 0.8) 0px, rgba(156, 163, 175, 0.6) 1px, transparent 2px),
+        radial-gradient(circle at 15% 80%, rgba(239, 68, 68, 0.6) 0px, rgba(239, 68, 68, 0.4) 2px, transparent 3px),
+        radial-gradient(circle at 75% 70%, rgba(34, 197, 94, 0.5) 0px, rgba(34, 197, 94, 0.3) 1.5px, transparent 2.5px),
+        radial-gradient(circle at 25% 25%, rgba(251, 191, 36, 0.5) 0px, rgba(251, 191, 36, 0.3) 1px, transparent 2px),
+        /* Stars layer 1 - brighter stars */
+        radial-gradient(circle at 12% 45%, rgba(255, 255, 255, 0.9) 0px, rgba(255, 255, 255, 0.7) 0.5px, transparent 1px),
+        radial-gradient(circle at 89% 67%, rgba(255, 255, 255, 0.8) 0px, rgba(255, 255, 255, 0.6) 0.5px, transparent 1px),
+        radial-gradient(circle at 45% 12%, rgba(255, 255, 255, 0.7) 0px, rgba(255, 255, 255, 0.5) 0.5px, transparent 1px),
+        radial-gradient(circle at 67% 89%, rgba(255, 255, 255, 0.9) 0px, rgba(255, 255, 255, 0.7) 0.5px, transparent 1px),
+        radial-gradient(circle at 23% 78%, rgba(255, 255, 255, 0.6) 0px, rgba(255, 255, 255, 0.4) 0.5px, transparent 1px),
+        radial-gradient(circle at 78% 23%, rgba(255, 255, 255, 0.8) 0px, rgba(255, 255, 255, 0.6) 0.5px, transparent 1px),
+        radial-gradient(circle at 34% 56%, rgba(255, 255, 255, 0.7) 0px, rgba(255, 255, 255, 0.5) 0.5px, transparent 1px),
+        radial-gradient(circle at 56% 34%, rgba(255, 255, 255, 0.9) 0px, rgba(255, 255, 255, 0.7) 0.5px, transparent 1px),
+        /* Stars layer 2 - fainter distant stars */
+        radial-gradient(circle at 91% 45%, rgba(255, 255, 255, 0.5) 0px, rgba(255, 255, 255, 0.3) 0.3px, transparent 0.8px),
+        radial-gradient(circle at 9% 23%, rgba(255, 255, 255, 0.6) 0px, rgba(255, 255, 255, 0.4) 0.3px, transparent 0.8px),
+        radial-gradient(circle at 67% 78%, rgba(255, 255, 255, 0.4) 0px, rgba(255, 255, 255, 0.2) 0.3px, transparent 0.8px),
+        radial-gradient(circle at 33% 91%, rgba(255, 255, 255, 0.7) 0px, rgba(255, 255, 255, 0.5) 0.3px, transparent 0.8px),
+        radial-gradient(circle at 78% 12%, rgba(255, 255, 255, 0.5) 0px, rgba(255, 255, 255, 0.3) 0.3px, transparent 0.8px),
+        radial-gradient(circle at 22% 67%, rgba(255, 255, 255, 0.8) 0px, rgba(255, 255, 255, 0.6) 0.3px, transparent 0.8px),
+        radial-gradient(circle at 45% 89%, rgba(255, 255, 255, 0.6) 0px, rgba(255, 255, 255, 0.4) 0.3px, transparent 0.8px),
+        radial-gradient(circle at 89% 34%, rgba(255, 255, 255, 0.4) 0px, rgba(255, 255, 255, 0.2) 0.3px, transparent 0.8px),
+        /* Additional scattered faint stars */
+        radial-gradient(circle at 18% 65%, rgba(255, 255, 255, 0.3) 0px, rgba(255, 255, 255, 0.1) 0.2px, transparent 0.6px),
+        radial-gradient(circle at 82% 35%, rgba(255, 255, 255, 0.4) 0px, rgba(255, 255, 255, 0.2) 0.2px, transparent 0.6px),
+        radial-gradient(circle at 55% 85%, rgba(255, 255, 255, 0.3) 0px, rgba(255, 255, 255, 0.1) 0.2px, transparent 0.6px),
+        radial-gradient(circle at 25% 15%, rgba(255, 255, 255, 0.5) 0px, rgba(255, 255, 255, 0.3) 0.2px, transparent 0.6px),
+        /* NEW LARGER STARS LAYER - 2x to 3.5x size */
+        radial-gradient(circle at 8% 32%, rgba(255, 255, 255, 1) 0px, rgba(255, 255, 255, 0.8) 1px, transparent 1.5px),
+        radial-gradient(circle at 42% 8%, rgba(255, 255, 255, 0.95) 0px, rgba(255, 255, 255, 0.75) 1.2px, transparent 1.8px),
+        radial-gradient(circle at 73% 42%, rgba(255, 255, 255, 0.9) 0px, rgba(255, 255, 255, 0.7) 1.5px, transparent 2px),
+        radial-gradient(circle at 28% 62%, rgba(255, 255, 255, 1) 0px, rgba(255, 255, 255, 0.8) 1.3px, transparent 1.75px),
+        radial-gradient(circle at 95% 28%, rgba(255, 255, 255, 0.85) 0px, rgba(255, 255, 255, 0.65) 1.1px, transparent 1.6px),
+        radial-gradient(circle at 61% 73%, rgba(255, 255, 255, 0.95) 0px, rgba(255, 255, 255, 0.75) 1.4px, transparent 1.9px),
+        radial-gradient(circle at 14% 95%, rgba(255, 255, 255, 0.9) 0px, rgba(255, 255, 255, 0.7) 1.2px, transparent 1.7px),
+        radial-gradient(circle at 87% 82%, rgba(255, 255, 255, 1) 0px, rgba(255, 255, 255, 0.8) 1.6px, transparent 2.1px),
+        radial-gradient(circle at 52% 47%, rgba(255, 255, 255, 0.88) 0px, rgba(255, 255, 255, 0.68) 1.3px, transparent 1.8px),
+        radial-gradient(circle at 36% 88%, rgba(255, 255, 255, 0.92) 0px, rgba(255, 255, 255, 0.72) 1.5px, transparent 2px),
+        /* MORE LARGER STARS - different positions */
+        radial-gradient(circle at 5% 58%, rgba(255, 255, 255, 0.9) 0px, rgba(255, 255, 255, 0.7) 1.1px, transparent 1.6px),
+        radial-gradient(circle at 48% 28%, rgba(255, 255, 255, 0.95) 0px, rgba(255, 255, 255, 0.75) 1.4px, transparent 1.9px),
+        radial-gradient(circle at 71% 5%, rgba(255, 255, 255, 0.85) 0px, rgba(255, 255, 255, 0.65) 1.2px, transparent 1.7px),
+        radial-gradient(circle at 92% 61%, rgba(255, 255, 255, 1) 0px, rgba(255, 255, 255, 0.8) 1.5px, transparent 2px),
+        radial-gradient(circle at 19% 38%, rgba(255, 255, 255, 0.88) 0px, rgba(255, 255, 255, 0.68) 1.3px, transparent 1.8px),
+        radial-gradient(circle at 64% 18%, rgba(255, 255, 255, 0.92) 0px, rgba(255, 255, 255, 0.72) 1.6px, transparent 2.1px),
+        radial-gradient(circle at 38% 71%, rgba(255, 255, 255, 0.9) 0px, rgba(255, 255, 255, 0.7) 1.2px, transparent 1.7px),
+        radial-gradient(circle at 81% 48%, rgba(255, 255, 255, 0.95) 0px, rgba(255, 255, 255, 0.75) 1.5px, transparent 2px),
+        radial-gradient(circle at 11% 85%, rgba(255, 255, 255, 0.85) 0px, rgba(255, 255, 255, 0.65) 1.3px, transparent 1.8px),
+        radial-gradient(circle at 58% 92%, rgba(255, 255, 255, 1) 0px, rgba(255, 255, 255, 0.8) 1.4px, transparent 1.9px),
+        /* EXTRA BRIGHT LARGER STARS */
+        radial-gradient(circle at 31% 19%, rgba(255, 255, 255, 0.96) 0px, rgba(255, 255, 255, 0.76) 1.7px, transparent 2.3px),
+        radial-gradient(circle at 76% 58%, rgba(255, 255, 255, 0.98) 0px, rgba(255, 255, 255, 0.78) 1.8px, transparent 2.4px),
+        radial-gradient(circle at 43% 95%, rgba(255, 255, 255, 0.94) 0px, rgba(255, 255, 255, 0.74) 1.6px, transparent 2.2px),
+        radial-gradient(circle at 96% 38%, rgba(255, 255, 255, 0.97) 0px, rgba(255, 255, 255, 0.77) 1.75px, transparent 2.35px),
+        /* Main dark space gradient base */
+        linear-gradient(135deg, 
+            rgba(15, 23, 42, 1) 0%,
+            rgba(30, 41, 91, 0.95) 25%,
+            rgba(17, 24, 39, 1) 50%,
+            rgba(31, 41, 55, 0.98) 75%,
+            rgba(15, 23, 42, 1) 100%
+        );
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* Subtle twinkling stars overlay */
+        radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.8) 0px, transparent 1px),
+        radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.6) 0px, transparent 1px),
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.7) 0px, transparent 1px),
+        radial-gradient(circle at 90% 20%, rgba(255, 255, 255, 0.5) 0px, transparent 1px);
+    animation: twinkle 4s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+/* Twinkling star animation */
+@keyframes twinkle {
+    0% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+}
+
+.hero-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 120px 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.hero-text {
+    color: white;
+}
+
+.hero-title {
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 40px;
+    max-width: 600px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-features {
+    margin-bottom: 40px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.feature-item svg {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.cta-primary, .cta-secondary {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 160px;
+    text-align: center;
+}
+
+.cta-primary {
+    background: white;
+    color: var(--primary-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.cta-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Hero Video */
+.hero-video {
+    position: relative;
+}
+
+.video-container {
+    position: relative;
+    aspect-ratio: 16/9;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.video-placeholder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1));
+}
+
+.video-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+}
+
+.play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.play-button:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Features Section */
+.features-section {
+    padding: 120px 0;
+    background: var(--bg-secondary);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 80px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section-header h2 {
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    margin-bottom: 24px;
+    color: var(--text-primary);
+}
+
+.section-header p {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px;
+}
+
+.feature-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+}
+
+.feature-icon {
+    margin-bottom: 24px;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Use Cases Section */
+.use-cases-section {
+    padding: 120px 0;
+    background: white;
+}
+
+.use-cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+}
+
+.use-case-card {
+    background: var(--bg-secondary);
+    padding: 32px;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.use-case-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    background: white;
+}
+
+.use-case-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.use-case-card p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+}
+
+.use-case-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 120px 0;
+    background: var(--bg-dark);
+    color: white;
+    text-align: center;
+}
+
+.cta-content h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 24px;
+}
+
+.cta-content p {
+    font-size: 1.25rem;
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-section .cta-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.cta-section .cta-primary:hover {
+    background: var(--primary-dark);
+}
+
+.cta-section .cta-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.cta-section .cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 60px;
+        text-align: center;
+    }
+    
+    .hero-container {
+        padding: 80px 24px;
+    }
+    
+    .features-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 32px;
+    }
+    
+    .use-cases-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-container {
+        padding: 60px 16px;
+    }
+    
+    .container {
+        padding: 0 16px;
+    }
+    
+    .features-section,
+    .use-cases-section,
+    .cta-section {
+        padding: 80px 0;
+    }
+    
+    .section-header {
+        margin-bottom: 60px;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .feature-card {
+        padding: 32px 24px;
+    }
+    
+    .use-case-card {
+        padding: 24px;
+    }
+    
+    .hero-cta {
+        justify-content: center;
+    }
+    
+    .cta-primary, .cta-secondary {
+        padding: 14px 24px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .section-header h2 {
+        font-size: 2rem;
+    }
+    
+    .feature-card {
+        padding: 24px 20px;
+    }
+    
+    .use-case-card {
+        padding: 20px;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-primary, .cta-secondary {
+        width: 200px;
+    }
+}
+
+/* Animation and Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feature-card,
+.use-case-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-primary: #F9FAFB;
+        --text-secondary: #D1D5DB;
+        --bg-primary: #111827;
+        --bg-secondary: #1F2937;
+        --border-color: #374151;
+    }
+}
