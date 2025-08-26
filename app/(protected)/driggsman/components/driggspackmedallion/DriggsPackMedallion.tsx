@@ -50,7 +50,44 @@ const DriggsPackMedallion: React.FC<DriggsPackMedallionProps> = ({
   return (
     <table className="border-collapse" style={{ fontSize: '14px' }}>
       <tbody>
-        {/* Top row - zz1/zz2/zz3 */}
+        {/* Medallion icon row - always the same regardless of driggspackNumber */}
+        <tr>
+          <td className="px-2 py-1 text-center border">
+            <div className="flex items-center justify-center">
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-gray-600"
+              >
+                <circle 
+                  cx="12" 
+                  cy="12" 
+                  r="10" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  fill="currentColor"
+                />
+                <circle 
+                  cx="12" 
+                  cy="12" 
+                  r="6" 
+                  fill="white"
+                />
+                <circle 
+                  cx="12" 
+                  cy="12" 
+                  r="3" 
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+          </td>
+        </tr>
+        
+        {/* Second row - zz1/zz2/zz3 */}
         <tr>
           <td 
             className="px-2 py-1 bg-gray-100 text-gray-600 text-center border cursor-pointer hover:bg-gray-200" 

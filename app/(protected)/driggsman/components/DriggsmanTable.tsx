@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
 import DriggsPackMedallion from './driggspackmedallion/DriggsPackMedallion';
+import Chatdori from '@/app/components/Chatdori';
+import DriggsActionsFeedback from '@/app/components/DriggsActionsFeedback';
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
@@ -180,6 +182,15 @@ export default function DriggsmanTable({
   // Citation gig dropdown states
   const [citationGigs, setCitationGigs] = useState<CitationGig[]>([]);
   const [cgigDropdownOpen, setCgigDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+  // Copy feedback states
+  const [showCopyFeedback, setShowCopyFeedback] = useState(false);
+  const [copyFeedbackMessage, setCopyFeedbackMessage] = useState('');
+
+  // Handle copy feedback completion
+  const handleCopyFeedbackComplete = () => {
+    setShowCopyFeedback(false);
+    setCopyFeedbackMessage('');
+  };
   
   // Address species dropdown states
   const [addressSpecies, setAddressSpecies] = useState<AddressSpecies[]>([]);
@@ -301,11 +312,11 @@ export default function DriggsmanTable({
     { key: 'driggs_zip', type: 'text', label: 'driggs_zip', group: 'contact', placeholder: '' },
     { key: 'driggs_state_full', type: 'text', label: 'driggs_state_full', group: 'contact', placeholder: '' },
     { key: 'driggs_country', type: 'text', label: 'driggs_country', group: 'contact', placeholder: 'United States' },
-    { key: 'backlinks_section_separator', type: 'section_header', label: 'backlinks', group: 'separator' },
+    { key: 'backlinks_section_separator', type: 'section_header', label: 'backlinks section', group: 'separator' },
     { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
     { key: 'driggs_citations_done', type: 'boolean', label: 'driggs_citations_done', group: 'contact' },
     { key: 'driggs_social_profiles_done', type: 'boolean', label: 'driggs_social_profiles_done', group: 'contact' },
-    { key: 'basics_section_separator', type: 'section_header', label: 'basics', group: 'separator' },
+    { key: 'basics_section_separator', type: 'section_header', label: 'basics section', group: 'separator' },
     { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
     { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
     { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
@@ -798,6 +809,65 @@ export default function DriggsmanTable({
 
   const closeDriggspackPopup = () => {
     setDriggspackPopup(null);
+  };
+
+  // Handle getting sitespren DB fields and copying to clipboard
+  const handleGetSitesprenFields = async () => {
+    try {
+      // Fetch a single record from sitespren to get all column names
+      const { data, error } = await supabase
+        .from('sitespren')
+        .select('*')
+        .limit(1);
+
+      if (error) {
+        console.error('Error fetching sitespren fields:', error);
+        setCopyFeedbackMessage('Failed to fetch sitespren fields: ' + error.message);
+        setShowCopyFeedback(true);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Get all column names from the first record
+        const columnNames = Object.keys(data[0]);
+        const columnList = columnNames.join('\n');
+
+        // Copy to clipboard
+        await navigator.clipboard.writeText(columnList);
+        
+        // Show success message
+        setCopyFeedbackMessage(`${columnNames.length} sitespren database field names successfully copied`);
+        setShowCopyFeedback(true);
+        console.log('Sitespren fields copied to clipboard:', columnNames);
+      } else {
+        alert('No data found in sitespren table to extract field names');
+      }
+    } catch (err) {
+      console.error('Error copying sitespren fields:', err);
+      setCopyFeedbackMessage('Failed to copy sitespren fields to clipboard: ' + (err as Error).message);
+      setShowCopyFeedback(true);
+    }
+  };
+
+  // Handle getting driggsman display field names in order
+  const handleGetDriggsmanDisplayFields = async () => {
+    try {
+      // Get all field labels from fieldDefinitions in order
+      const fieldLabels = fieldDefinitions.map(field => field.label);
+      const fieldList = fieldLabels.join('\n');
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(fieldList);
+      
+      // Show success message
+      setCopyFeedbackMessage(`${fieldLabels.length} driggsman display field names successfully copied`);
+      setShowCopyFeedback(true);
+      console.log('Driggsman display fields copied to clipboard:', fieldLabels);
+    } catch (err) {
+      console.error('Error copying driggsman display fields:', err);
+      setCopyFeedbackMessage('Failed to copy driggsman display fields to clipboard: ' + (err as Error).message);
+      setShowCopyFeedback(true);
+    }
   };
 
   // Handle click outside popup to close
@@ -2475,48 +2545,14 @@ export default function DriggsmanTable({
                       <div className="truncate">
                         {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
                       </div>
-                      <div className="text-center">stat1</div>
                     </th>
-                    {/* Status column */}
+                    {/* Status column - FIRST ROW with stat1 */}
                     <th
                       key={`${site.id}-status`}
                       className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
                       style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                     >
-                    </th>
-                  </>
-                ))}
-              </tr>
-              
-              {/* Second header row */}
-              <tr>
-                {/* Empty cells for checkbox and dp columns */}
-                <th className="border-r border-gray-300"></th>
-                <th className="border-r border-gray-300"></th>
-                <th className="border-r border-gray-300"></th>
-                <th className="border-r border-gray-300"></th>
-                <th className="border-r border-gray-300"></th>
-                <th className="border-r border-gray-300"></th>
-                
-                {/* Empty cell for field name column */}
-                <th className="px-3 py-3 border-r border-gray-300"></th>
-
-                {/* Site columns with paired status columns - second row */}
-                {paginatedSites.map((site, index) => (
-                  <>
-                    {/* Empty domain column */}
-                    <th
-                      key={`${site.id}-row2`}
-                      className="px-3 py-3 border-r border-gray-300"
-                    >
-                    </th>
-                    {/* Status column with sharn1 */}
-                    <th
-                      key={`${site.id}-status-row2`}
-                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
-                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
-                    >
-                      <div>sharn1</div>
+                      <div>stat1</div>
                     </th>
                   </>
                 ))}
@@ -3369,18 +3405,54 @@ export default function DriggsmanTable({
             
             {/* Popup Content */}
             <div className="p-4 h-full overflow-auto">
-              <h2 className="text-base font-bold text-gray-900">
-                {driggspackPopup.type}
-              </h2>
-              
-              {/* DriggsPackMedallion for this popup instance */}
-              <div className="mb-6">
-                <DriggsPackMedallion 
-                  driggspackNumber={driggspackPopup.type === 'zz1' ? 1 : driggspackPopup.type === 'zz2' ? 2 : 3}
-                  siteId={driggspackPopup.siteId}
-                  onZzClick={handleDriggspackClick}
-                />
+              {/* Top section with title, medallion, and chatdori (for zz3 only) */}
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-start space-x-4">
+                  <h2 className="text-base font-bold text-gray-900">
+                    {driggspackPopup.type}
+                  </h2>
+                  
+                  {/* DriggsPackMedallion for this popup instance */}
+                  <div>
+                    <DriggsPackMedallion 
+                      driggspackNumber={driggspackPopup.type === 'zz1' ? 1 : driggspackPopup.type === 'zz2' ? 2 : 3}
+                      siteId={driggspackPopup.siteId}
+                      onZzClick={handleDriggspackClick}
+                    />
+                  </div>
+                </div>
+                
+                {/* Chatdori component - only for zz3 popup */}
+                {driggspackPopup.type === 'zz3' && (
+                  <div>
+                    <Chatdori />
+                  </div>
+                )}
               </div>
+              
+              {/* Get sitespren DB fields button - only for zz3 popup */}
+              {driggspackPopup.type === 'zz3' && (
+                <div className="mb-6">
+                  <button
+                    onClick={handleGetSitesprenFields}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors font-medium"
+                  >
+                    get all sitespren db fields
+                  </button>
+                </div>
+              )}
+
+              {/* Get driggsman display fields button - only for zz3 popup */}
+              {driggspackPopup.type === 'zz3' && (
+                <div className="mb-6">
+                  <button
+                    onClick={handleGetDriggsmanDisplayFields}
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors font-medium"
+                  >
+                    get all fields in order from /driggsman display
+                  </button>
+                </div>
+              )}
               
               {/* /dpackjar Navigation Button */}
               <div className="mb-6">
@@ -3420,6 +3492,13 @@ export default function DriggsmanTable({
         initialTab={inputsExpandPopup?.initialTab || 'inputs_v1'}
         onSave={handleInputsExpandSave}
         onClose={handleInputsExpandClose}
+      />
+
+      {/* Copy Actions Feedback */}
+      <DriggsActionsFeedback
+        isVisible={showCopyFeedback}
+        message={copyFeedbackMessage}
+        onComplete={handleCopyFeedbackComplete}
       />
     </div>
   );
