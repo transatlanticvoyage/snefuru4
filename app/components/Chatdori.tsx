@@ -12,7 +12,10 @@ export default function Chatdori() {
             rel="noopener noreferrer"
             className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-l transition-colors -mr-px"
           >
-            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">chatgpt</span>
+            <div className="flex items-center">
+              <img src="/icons/chatgpt.svg" className="w-4 h-4 mr-1" alt="ChatGPT" />
+              <span className="text-sm font-medium text-gray-700 hover:text-blue-700">chatgpt</span>
+            </div>
           </a>
           <a
             href="https://claude.ai"
@@ -20,7 +23,10 @@ export default function Chatdori() {
             rel="noopener noreferrer"
             className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
           >
-            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">claude</span>
+            <div className="flex items-center">
+              <img src="/icons/claude.ico" className="w-4 h-4 mr-1" alt="Claude" />
+              <span className="text-sm font-medium text-gray-700 hover:text-blue-700">claude</span>
+            </div>
           </a>
           <a
             href="https://grok.com"
@@ -28,7 +34,10 @@ export default function Chatdori() {
             rel="noopener noreferrer"
             className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
           >
-            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">grok</span>
+            <div className="flex items-center">
+              <img src="/icons/grok.png" className="w-4 h-4 mr-1" alt="Grok" />
+              <span className="text-sm font-medium text-gray-700 hover:text-blue-700">grok</span>
+            </div>
           </a>
           <a
             href="https://gemini.google.com"
@@ -36,7 +45,10 @@ export default function Chatdori() {
             rel="noopener noreferrer"
             className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 transition-colors -mr-px"
           >
-            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">gemini</span>
+            <div className="flex items-center">
+              <img src="/icons/gemini.svg" className="w-4 h-4 mr-1" alt="Gemini" />
+              <span className="text-sm font-medium text-gray-700 hover:text-blue-700">gemini</span>
+            </div>
           </a>
           <a
             href="https://www.perplexity.ai"
@@ -44,7 +56,10 @@ export default function Chatdori() {
             rel="noopener noreferrer"
             className="px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-r transition-colors"
           >
-            <span className="text-sm font-medium text-gray-700 hover:text-blue-700">perplexity</span>
+            <div className="flex items-center">
+              <img src="/icons/perplexity.ico" className="w-4 h-4 mr-1" alt="Perplexity" />
+              <span className="text-sm font-medium text-gray-700 hover:text-blue-700">perplexity</span>
+            </div>
           </a>
         </div>
       </div>

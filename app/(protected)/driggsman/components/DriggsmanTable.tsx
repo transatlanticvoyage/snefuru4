@@ -128,6 +128,14 @@ interface SitesprenTag {
   fk_user_id: string;
 }
 
+interface RecentEntry {
+  id: string;
+  timeLastUsed: string;
+  sitesEntered: string[];
+  count: number;
+  settings: string;
+}
+
 type SitesprenField = keyof SitesprenSite;
 
 interface DriggsmanTableProps {
@@ -174,6 +182,8 @@ export default function DriggsmanTable({
   const [manualSites, setManualSites] = useState<string[]>([]);
   const [allSites, setAllSites] = useState<SitesprenSite[]>([]); // Store all fetched sites
   const [showPillbox, setShowPillbox] = useState(true); // Control pillbox visibility
+  const [showRecents, setShowRecents] = useState(false); // Control recents visibility
+  const [recentEntries, setRecentEntries] = useState<RecentEntry[]>([]); // Recent daylight chamber settings
   
   // Call platform dropdown states
   const [callPlatforms, setCallPlatforms] = useState<CallPlatform[]>([]);
@@ -486,6 +496,57 @@ export default function DriggsmanTable({
       });
     }
   }, [onControlsRender, searchTerm, currentPage, itemsPerPage, columnsPerPage, currentColumnPage]);
+
+  // Local storage functions for recents
+  const loadRecentEntries = (): RecentEntry[] => {
+    try {
+      const stored = localStorage.getItem('driggsman_recent_entries');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Error loading recent entries from localStorage:', error);
+      return [];
+    }
+  };
+
+  const saveRecentEntries = (entries: RecentEntry[]) => {
+    try {
+      localStorage.setItem('driggsman_recent_entries', JSON.stringify(entries));
+    } catch (error) {
+      console.error('Error saving recent entries to localStorage:', error);
+    }
+  };
+
+  const addRecentEntry = (sitesEntered: string[]) => {
+    if (sitesEntered.length === 0) return;
+
+    const newEntry: RecentEntry = {
+      id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timeLastUsed: new Date().toISOString(),
+      sitesEntered: [...sitesEntered],
+      count: sitesEntered.length,
+      settings: `Daylight Chamber - ${sitesEntered.length} sites`
+    };
+
+    const updatedEntries = [newEntry, ...recentEntries.filter(entry => 
+      JSON.stringify(entry.sitesEntered.sort()) !== JSON.stringify(sitesEntered.sort())
+    )].slice(0, 20); // Keep only 20 most recent
+
+    setRecentEntries(updatedEntries);
+    saveRecentEntries(updatedEntries);
+  };
+
+  // Load recent entries on component mount
+  useEffect(() => {
+    const entries = loadRecentEntries();
+    setRecentEntries(entries);
+  }, []);
+
+  // Add to recents when manual sites change
+  useEffect(() => {
+    if (manualSites.length > 0) {
+      addRecentEntry(manualSites);
+    }
+  }, [manualSites]);
   
   // Update parent with sites count
   useEffect(() => {
@@ -2262,13 +2323,22 @@ export default function DriggsmanTable({
                 {showPillbox ? 'hide pillbox' : 'show pillbox'}
               </button>
             )}
+            <button
+              onClick={() => setShowRecents(!showRecents)}
+              className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              {showRecents ? 'hide recents' : 'show recents'}
+            </button>
           </div>
         </div>
 
-        {/* Currently Entered Sites Display */}
+        {/* Currently Entered Sites Display - Pillbox Area */}
         {manualSites.length > 0 && showPillbox && (
-          <div>
-            <div className="text-sm font-medium text-gray-700 mb-2">
+          <div className="relative border border-black p-4 mb-4">
+            <div className="absolute top-1 left-2 text-sm font-medium text-gray-900 bg-white px-1">
+              pillbox area
+            </div>
+            <div className="text-sm font-medium text-gray-700 mb-2 mt-2">
               Currently viewing sites ({manualSites.length}):
             </div>
             <div className="flex flex-wrap gap-2">
@@ -2290,6 +2360,72 @@ export default function DriggsmanTable({
             </div>
             <div className="mt-2 text-xs text-gray-500">
               Showing {sites.length} matching sites from your database out of {allSites.length} total sites.
+            </div>
+          </div>
+        )}
+
+        {/* Recents Area */}
+        {showRecents && (
+          <div className="relative border border-black p-4 mb-4">
+            <div className="absolute top-1 left-2 text-sm font-medium text-gray-900 bg-white px-1">
+              recents_box
+            </div>
+            <div className="mt-4">
+              <div className="text-base font-bold mb-2" style={{fontSize: '16px'}}>
+                recents_box
+              </div>
+              <div className="text-sm text-gray-600 mb-3">
+                local storage
+              </div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full border border-gray-300">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Time Last Used</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Sites Entered</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Count</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Settings</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white">
+                    {recentEntries.length === 0 ? (
+                      <tr>
+                        <td className="px-3 py-2 text-sm text-gray-500 border-b border-gray-200 text-center" colSpan={4}>
+                          no recents currently stored
+                        </td>
+                      </tr>
+                    ) : (
+                      recentEntries.map((entry, index) => (
+                        <tr key={entry.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
+                            {new Date(entry.timeLastUsed).toLocaleString()}
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
+                            <div className="flex flex-wrap gap-1">
+                              {entry.sitesEntered.slice(0, 3).map((site, siteIndex) => (
+                                <span key={siteIndex} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                  {site}
+                                </span>
+                              ))}
+                              {entry.sitesEntered.length > 3 && (
+                                <span className="text-xs text-gray-500">
+                                  +{entry.sitesEntered.length - 3} more
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
+                            {entry.count}
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
+                            {entry.settings}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -2539,11 +2675,14 @@ export default function DriggsmanTable({
                     {/* Domain column */}
                     <th
                       key={site.id}
-                      className="px-3 py-3 text-left text-xs font-bold text-gray-900 w-48 border-r border-gray-300"
+                      className="px-3 py-3 text-left w-48 border-r border-gray-300"
                       title={site.sitespren_base || site.id}
                     >
-                      <div className="truncate">
-                        {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
+                      <div className="truncate" style={{ fontSize: '18px', lineHeight: '1.2' }}>
+                        <div style={{ fontWeight: 'normal' }}>domain_column_for:</div>
+                        <div style={{ fontWeight: 'bold' }}>
+                          {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
+                        </div>
                       </div>
                     </th>
                     {/* Status column - FIRST ROW with stat1 */}
