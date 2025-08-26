@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -157,6 +157,11 @@ export default function DriggsmanTable({
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ field: string; siteId: string } | null>(null);
+  const [driggspackPopup, setDriggspackPopup] = useState<{
+    type: 'zz1' | 'zz2' | 'zz3';
+    position: { top: number; left: number };
+    siteId: string;
+  } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
   
   // Modal states
@@ -303,7 +308,6 @@ export default function DriggsmanTable({
     { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
     { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
     { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
-    { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
     { key: 'driggs_hours', type: 'text', label: 'driggs_hours', group: 'business', placeholder: 'Open 24 hours' },
     { key: 'driggs_owner_name', type: 'text', label: 'driggs_owner_name', group: 'business', placeholder: 'Brian Ansley' },
     { key: 'driggs_short_descr', type: 'text', label: 'driggs_short_descr', group: 'business', placeholder: '' },
@@ -313,6 +317,7 @@ export default function DriggsmanTable({
     { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
     { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
     { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
+    { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
     { key: 'driggs_social_media_links', type: 'text', label: 'driggs_social_media_links', group: 'contact', placeholder: '' },
     { key: 'misc_section_separator', type: 'section_header', label: 'misc section', group: 'separator' },
     { key: 'id', type: 'text', label: 'id', group: 'system' },
@@ -776,6 +781,46 @@ export default function DriggsmanTable({
     }
     setSelectedFields(newSelected);
   };
+
+  // Handle driggspack popup
+  const handleDriggspackClick = (event: React.MouseEvent, type: 'zz1' | 'zz2' | 'zz3', siteId: string) => {
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    setDriggspackPopup({
+      type,
+      position: {
+        top: rect.top,
+        left: rect.right
+      },
+      siteId
+    });
+  };
+
+  const closeDriggspackPopup = () => {
+    setDriggspackPopup(null);
+  };
+
+  // Handle click outside popup to close
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (driggspackPopup) {
+        const target = event.target as HTMLElement;
+        const popupElement = document.querySelector('[data-driggspack-popup]');
+        
+        // Close if clicking outside the popup
+        if (popupElement && !popupElement.contains(target)) {
+          closeDriggspackPopup();
+        }
+      }
+    };
+
+    if (driggspackPopup) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [driggspackPopup]);
 
   // Handle inline editing
   const handleCellClick = (field: string, siteId: string, value: any) => {
@@ -2332,7 +2377,7 @@ export default function DriggsmanTable({
       {/* Matrix Table */}
       <div className="border border-gray-300 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-300">
+          <table className="divide-y divide-gray-300" style={{ width: 'auto', tableLayout: 'auto' }}>
             <thead className="bg-gray-50">
               {/* Additional header row with driggspack buttons */}
               <tr className="border-b border-gray-300">
@@ -2342,7 +2387,7 @@ export default function DriggsmanTable({
                 <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
                 <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
                 <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
-                <td className="w-64 h-8 border-r border-gray-300"></td>
+                <td className="h-8 border-r border-gray-300"></td>
                 {paginatedSites.map((site, index) => (
                   <td
                     key={`empty-${site.id}`}
@@ -2351,15 +2396,57 @@ export default function DriggsmanTable({
                     }`}
                   >
                     <div className="flex items-center justify-start h-full space-x-1">
-                      <button className="px-2 py-1 bg-gray-200 text-gray-600 rounded" style={{ fontSize: '14px' }}>
-                        driggspack1
-                      </button>
-                      <button className="px-2 py-1 bg-gray-200 text-gray-600 rounded" style={{ fontSize: '14px' }}>
-                        driggspack2
-                      </button>
-                      <button className="px-2 py-1 bg-gray-200 text-gray-600 rounded" style={{ fontSize: '14px' }}>
-                        driggspack3
-                      </button>
+                      <table className="border-collapse" style={{ fontSize: '14px' }}>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-100 text-gray-600 text-center border cursor-pointer hover:bg-gray-200" onClick={(e) => handleDriggspackClick(e, 'zz1', site.id)}>
+                            zz1
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-150 text-gray-600 text-center border cursor-pointer hover:bg-gray-250" onClick={() => console.log('driggspack1-middle', site.id)}>
+                            full1 (for ref)
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-200 text-gray-600 text-center border cursor-pointer hover:bg-gray-300" onClick={() => console.log('driggspack1', site.id)}>
+                            driggspack1
+                          </td>
+                        </tr>
+                      </table>
+                      <table className="border-collapse" style={{ fontSize: '14px' }}>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-100 text-gray-600 text-center border cursor-pointer hover:bg-gray-200" onClick={(e) => handleDriggspackClick(e, 'zz2', site.id)}>
+                            zz2
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-150 text-gray-600 text-center border cursor-pointer hover:bg-gray-250" onClick={() => console.log('driggspack2-middle', site.id)}>
+                            for citations
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-200 text-gray-600 text-center border cursor-pointer hover:bg-gray-300" onClick={() => console.log('driggspack2', site.id)}>
+                            driggspack2
+                          </td>
+                        </tr>
+                      </table>
+                      <table className="border-collapse" style={{ fontSize: '14px' }}>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-100 text-gray-600 text-center border cursor-pointer hover:bg-gray-200" onClick={(e) => handleDriggspackClick(e, 'zz3', site.id)}>
+                            zz3
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-150 text-gray-600 text-center border cursor-pointer hover:bg-gray-250" onClick={() => console.log('driggspack3-middle', site.id)}>
+                            for chat with ai
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="px-2 py-1 bg-gray-200 text-gray-600 text-center border cursor-pointer hover:bg-gray-300" onClick={() => console.log('driggspack3', site.id)}>
+                            driggspack3
+                          </td>
+                        </tr>
+                      </table>
                     </div>
                   </td>
                 ))}
@@ -2400,7 +2487,7 @@ export default function DriggsmanTable({
                 </th>
                 
                 {/* Field name column */}
-                <th className="px-3 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider w-64 border-r border-gray-300">
+                <th className="px-3 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-r border-gray-300">
                   field name
                 </th>
 
@@ -2434,8 +2521,6 @@ export default function DriggsmanTable({
                     field.key === 'driggs_cgig_id' ? 'border-b-4 border-b-black' : ''
                   } ${
                     field.key === 'driggs_industry' ? 'border-t-4 border-t-black' : ''
-                  } ${
-                    field.key === 'driggs_special_note_for_ai_tool' ? 'border-b-4 border-b-black' : ''
                   } ${
                     field.key === 'driggs_social_media_links' ? 'border-b-4 border-b-black' : ''
                   } ${
@@ -2513,12 +2598,12 @@ export default function DriggsmanTable({
                     width: '10px', 
                     minWidth: '10px', 
                     maxWidth: '10px',
-                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : (field.key === 'driggs_social_media_links' ? '#dddddd' : (field.key === 'driggs_special_note_for_ai_tool' ? '#f9d5ce' : 'transparent'))
+                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : (field.key === 'driggs_social_media_links' || field.key === 'driggs_special_note_for_ai_tool' ? '#dddddd' : (field.key === 'driggs_short_descr' || field.key === 'driggs_long_descr' ? '#fff7a1' : (['id', 'created_at', 'updated_at', 'fk_users_id', 'true_root_domain', 'full_subdomain', 'webproperty_type', 'ns_full', 'ip_address', 'is_wp_site', 'wpuser1', 'wppass1', 'wp_plugin_installed1', 'wp_plugin_connected2', 'wp_rest_app_pass', 'fk_domreg_hostaccount', 'is_starred1', 'icon_name', 'icon_color', 'is_bulldozer', 'is_competitor', 'is_external', 'is_internal', 'is_ppx', 'is_ms', 'is_wayback_rebuild', 'is_naked_wp_build', 'is_rnr', 'is_aff', 'is_other1', 'is_other2', 'is_flylocal'].includes(field.key) ? '#dfdfdf' : 'transparent')))
                   }}>
                   </td>
 
                   {/* Field name */}
-                  <td className={`px-3 py-2 text-sm font-medium w-64 border-r border-gray-300 ${
+                  <td className={`px-3 py-2 text-sm font-medium border-r border-gray-300 ${
                     field.type === 'section_header' ? (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? 'font-bold' : 'bg-gray-100 font-bold') : 'text-gray-900'
                   }`}
                   style={field.type === 'section_header' && (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? { backgroundColor: '#dddddd', color: '#111827' } : {}}>
@@ -3158,6 +3243,42 @@ export default function DriggsmanTable({
         </div>
       </div>
 
+
+      {/* Driggspack Popup */}
+      {driggspackPopup && (
+        <div
+            data-driggspack-popup
+            className="fixed z-50 bg-white shadow-2xl border border-gray-300"
+            style={{
+              top: 0,
+              left: driggspackPopup.position.left + 10, // 10px gap for the triangle
+              width: '840px',
+              height: '100vh'
+            }}
+          >
+            {/* Triangular Connector (Caret/Arrow) */}
+            <div
+              className="absolute bg-white border-l border-t border-gray-300"
+              style={{
+                left: '-6px',
+                top: driggspackPopup.position.top + 'px',
+                width: '12px',
+                height: '12px',
+                transform: 'rotate(-45deg)',
+                borderRight: 'none',
+                borderBottom: 'none'
+              }}
+            ></div>
+            
+            {/* Popup Content */}
+            <div className="p-4 h-full overflow-auto">
+              <h2 className="text-base font-bold text-gray-900">
+                {driggspackPopup.type}
+              </h2>
+              {/* Additional content will be added here later */}
+            </div>
+        </div>
+      )}
 
       {/* Inputs Expand Editor */}
       <InputsExpandEditor

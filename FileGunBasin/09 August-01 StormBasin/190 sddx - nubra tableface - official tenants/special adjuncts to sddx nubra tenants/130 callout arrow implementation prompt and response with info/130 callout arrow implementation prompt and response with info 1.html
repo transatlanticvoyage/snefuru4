@@ -1,0 +1,60 @@
+> we need a popup that is custom and special. when user clicks on the zz1, zz2, zz3 cells, a
+  popup should open extending to the right from the exact point that they clicked on (not
+  exact point - but i meant "exact cell" that they clicked on)
+
+  there should be a triangular looking ui element visually "joining" the table cell that they
+   clicked on. this triangular piece should basically come to a point as it contacts the
+  right edge of the table cell they clicked on. this triangle piece should exten horizontally
+   for 10 px before the left edge of the popup begins.please also let me know what this kind
+  of triangular ui element is known as. its purpose is to visually join the popup to the
+  element that its triggered from. the poopup itself should be 100% the height of the user's
+  browser and 840 px wide
+
+  in the popup right now, do not put any content, other than a piece of text at the top left
+  in 16 px bold that says zz1 or zz2 or zz3 (depending on which popup version it is - there
+  will be 3 different versions right now (1 for each driggspack))
+==========================================================
+
+Perfect! I have successfully implemented the custom popup system with the triangular
+  connector. Here's a summary of what I've created:
+
+  Custom Popup Implementation Summary
+
+  What is the triangular UI element called?
+
+  The triangular element is commonly called a "callout arrow", "pointer", "caret", or
+  "tooltip arrow". In UI/UX design, this pattern is used to create visual continuity between
+  a trigger element and its associated popup/tooltip.
+
+  Implementation Features:
+
+  1. State Management:
+	- Added driggspackPopup state to track which popup is open, its position, and associated
+  site ID
+	- Includes popup type ('zz1', 'zz2', 'zz3'), position coordinates, and site ID
+  2. Click Handlers:
+	- Updated all three zz1/zz2/zz3 cells to use handleDriggspackClick(e, type, siteId)
+	- Captures the exact cell position using getBoundingClientRect()
+	- Positions popup to extend from the right edge of the clicked cell
+  3. Popup Structure:
+	- Backdrop: Semi-transparent overlay that closes popup when clicked
+	- Main Container: Fixed positioned popup (840px wide, 100% height)
+	- Triangular Connector: Positioned 10px to the left of the popup, visually connecting to
+  the clicked cell
+	- Content Area: Scrollable content area with 16px bold header showing the popup type
+  4. Positioning:
+	- Popup appears exactly at the vertical position of the clicked cell
+	- Extends horizontally 10px from the right edge of the cell (for the triangle)
+	- Triangle is a rotated square with borders creating the pointed appearance
+  5. Styling:
+	- Clean white background with shadow and border
+	- Triangle matches the popup's border styling
+	- Responsive height (100% of browser viewport)
+	- Z-index layering for proper stacking
+  6. Interaction:
+	- Click on zz1/zz2/zz3 opens respective popup
+	- Click on backdrop closes popup
+	- Each popup displays its corresponding identifier (zz1, zz2, or zz3)
+
+  The implementation provides a professional-looking popup system with visual connection to
+  the trigger elements, ready for additional content to be added to each popup variant.
