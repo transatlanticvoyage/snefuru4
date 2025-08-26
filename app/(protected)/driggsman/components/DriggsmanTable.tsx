@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
+import DriggsPackMedallion from './driggspackmedallion/DriggsPackMedallion';
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
@@ -306,6 +307,8 @@ export default function DriggsmanTable({
     { key: 'driggs_social_profiles_done', type: 'boolean', label: 'driggs_social_profiles_done', group: 'contact' },
     { key: 'basics_section_separator', type: 'section_header', label: 'basics', group: 'separator' },
     { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
+    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
+    { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
     { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
     { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
     { key: 'driggs_hours', type: 'text', label: 'driggs_hours', group: 'business', placeholder: 'Open 24 hours' },
@@ -314,8 +317,6 @@ export default function DriggsmanTable({
     { key: 'driggs_long_descr', type: 'text', label: 'driggs_long_descr', group: 'business', placeholder: '' },
     { key: 'driggs_year_opened', type: 'number', label: 'driggs_year_opened', group: 'business', placeholder: '2024' },
     { key: 'driggs_employees_qty', type: 'number', label: 'driggs_employees_qty', group: 'business', placeholder: '6' },
-    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
-    { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
     { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
     { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
     { key: 'driggs_social_media_links', type: 'text', label: 'driggs_social_media_links', group: 'contact', placeholder: '' },
@@ -2389,66 +2390,39 @@ export default function DriggsmanTable({
                 <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
                 <td className="h-8 border-r border-gray-300"></td>
                 {paginatedSites.map((site, index) => (
-                  <td
-                    key={`empty-${site.id}`}
-                    className={`h-8 px-2 ${
-                      index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                    }`}
-                  >
-                    <div className="flex items-center justify-start h-full space-x-1">
-                      <table className="border-collapse" style={{ fontSize: '14px' }}>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-100 text-gray-600 text-center border cursor-pointer hover:bg-gray-200" onClick={(e) => handleDriggspackClick(e, 'zz1', site.id)}>
-                            zz1
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-150 text-gray-600 text-center border cursor-pointer hover:bg-gray-250" onClick={() => console.log('driggspack1-middle', site.id)}>
-                            full1 (for ref)
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-200 text-gray-600 text-center border cursor-pointer hover:bg-gray-300" onClick={() => console.log('driggspack1', site.id)}>
-                            driggspack1
-                          </td>
-                        </tr>
-                      </table>
-                      <table className="border-collapse" style={{ fontSize: '14px' }}>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-100 text-gray-600 text-center border cursor-pointer hover:bg-gray-200" onClick={(e) => handleDriggspackClick(e, 'zz2', site.id)}>
-                            zz2
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-150 text-gray-600 text-center border cursor-pointer hover:bg-gray-250" onClick={() => console.log('driggspack2-middle', site.id)}>
-                            for citations
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-200 text-gray-600 text-center border cursor-pointer hover:bg-gray-300" onClick={() => console.log('driggspack2', site.id)}>
-                            driggspack2
-                          </td>
-                        </tr>
-                      </table>
-                      <table className="border-collapse" style={{ fontSize: '14px' }}>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-100 text-gray-600 text-center border cursor-pointer hover:bg-gray-200" onClick={(e) => handleDriggspackClick(e, 'zz3', site.id)}>
-                            zz3
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-150 text-gray-600 text-center border cursor-pointer hover:bg-gray-250" onClick={() => console.log('driggspack3-middle', site.id)}>
-                            for chat with ai
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-2 py-1 bg-gray-200 text-gray-600 text-center border cursor-pointer hover:bg-gray-300" onClick={() => console.log('driggspack3', site.id)}>
-                            driggspack3
-                          </td>
-                        </tr>
-                      </table>
-                    </div>
-                  </td>
+                  <>
+                    <td
+                      key={`empty-${site.id}`}
+                      className="h-8 px-2 border-r border-gray-300"
+                    >
+                      <div className="flex items-center justify-start h-full space-x-1">
+                        <DriggsPackMedallion 
+                          driggspackNumber={1}
+                          siteId={site.id}
+                          onZzClick={handleDriggspackClick}
+                        />
+                        <DriggsPackMedallion 
+                          driggspackNumber={2}
+                          siteId={site.id}
+                          onZzClick={handleDriggspackClick}
+                        />
+                        <DriggsPackMedallion 
+                          driggspackNumber={3}
+                          siteId={site.id}
+                          onZzClick={handleDriggspackClick}
+                        />
+                      </div>
+                    </td>
+                    {/* Empty status column for medallion row */}
+                    <td 
+                      key={`empty-status-${site.id}`}
+                      className={`h-8 ${
+                        index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                      }`}
+                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+                    >
+                    </td>
+                  </>
                 ))}
               </tr>
               
@@ -2491,19 +2465,66 @@ export default function DriggsmanTable({
                   field name
                 </th>
 
-                {/* Site columns */}
+                {/* Site columns with paired status columns */}
                 {paginatedSites.map((site, index) => (
-                  <th
-                    key={site.id}
-                    className={`px-3 py-3 text-left text-xs font-bold text-gray-900 w-48 ${
-                      index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                    }`}
-                    title={site.sitespren_base || site.id}
-                  >
-                    <div className="truncate">
-                      {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
-                    </div>
-                  </th>
+                  <>
+                    {/* Domain column */}
+                    <th
+                      key={site.id}
+                      className="px-3 py-3 text-left text-xs font-bold text-gray-900 w-48 border-r border-gray-300"
+                      title={site.sitespren_base || site.id}
+                    >
+                      <div className="truncate">
+                        {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
+                      </div>
+                    </th>
+                    {/* Status column */}
+                    <th
+                      key={`${site.id}-status`}
+                      className={`px-1 py-3 text-center text-xs font-bold text-gray-900 ${
+                        index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                      }`}
+                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+                    >
+                      <div>stat1</div>
+                    </th>
+                  </>
+                ))}
+              </tr>
+              
+              {/* Second header row */}
+              <tr>
+                {/* Empty cells for checkbox and dp columns */}
+                <th className="border-r border-gray-300"></th>
+                <th className="border-r border-gray-300"></th>
+                <th className="border-r border-gray-300"></th>
+                <th className="border-r border-gray-300"></th>
+                <th className="border-r border-gray-300"></th>
+                <th className="border-r border-gray-300"></th>
+                
+                {/* Empty cell for field name column */}
+                <th className="px-3 py-3 border-r border-gray-300"></th>
+
+                {/* Site columns with paired status columns - second row */}
+                {paginatedSites.map((site, index) => (
+                  <>
+                    {/* Empty domain column */}
+                    <th
+                      key={`${site.id}-row2`}
+                      className="px-3 py-3 border-r border-gray-300"
+                    >
+                    </th>
+                    {/* Status column with sharn1 */}
+                    <th
+                      key={`${site.id}-status-row2`}
+                      className={`px-1 py-3 text-center text-xs font-bold text-gray-900 ${
+                        index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                      }`}
+                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+                    >
+                      <div>sharn1</div>
+                    </th>
+                  </>
                 ))}
               </tr>
             </thead>
@@ -2615,52 +2636,77 @@ export default function DriggsmanTable({
                     const value = site[field.key];
                     const isEditing = editingCell?.field === field.key && editingCell?.siteId === site.id;
                     const isDropdownOpen = platformDropdownOpen?.field === field.key && platformDropdownOpen?.siteId === site.id;
+                    const hasValue = value !== null && value !== undefined && value !== '';
 
                     if (field.type === 'section_header') {
                       return (
-                        <td 
-                          key={`${field.key}-${site.id}`} 
-                          className={`px-3 py-2 text-sm font-bold text-gray-900 w-48 ${
-                            field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '' : 'bg-gray-100'
-                          } ${
-                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                          }`}
-                          style={field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? { backgroundColor: '#dddddd' } : {}}
-                        >
-                          {field.label}
-                        </td>
+                        <>
+                          <td 
+                            key={`${field.key}-${site.id}`} 
+                            className={`px-3 py-2 text-sm font-bold text-gray-900 w-48 border-r border-gray-300 ${
+                              field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '' : 'bg-gray-100'
+                            }`}
+                            style={field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? { backgroundColor: '#dddddd' } : {}}
+                          >
+                            {field.label}
+                          </td>
+                          {/* Status column for section headers */}
+                          <td 
+                            key={`${field.key}-${site.id}-status`}
+                            className={`px-1 py-2 text-center ${
+                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                            }`}
+                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+                          >
+                          </td>
+                        </>
                       );
                     }
 
                     if (field.type === 'boolean') {
                       return (
-                        <td 
-                          key={`${field.key}-${site.id}`} 
-                          className={`px-3 py-2 text-sm text-gray-900 w-48 ${
-                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                          }`}
-                        >
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={!!value}
-                              onChange={() => handleBooleanToggle(field.key, site.id, !!value)}
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                          </label>
-                        </td>
+                        <>
+                          <td 
+                            key={`${field.key}-${site.id}`} 
+                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
+                          >
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={!!value}
+                                onChange={() => handleBooleanToggle(field.key, site.id, !!value)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                          </td>
+                          {/* Status column for boolean fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-status`}
+                            className={`px-1 py-2 text-center ${
+                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                            }`}
+                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+                          >
+                            <div className="flex items-center justify-center">
+                              {hasValue ? (
+                                <span className="text-green-600 font-bold text-lg">✓</span>
+                              ) : (
+                                <span className="text-red-600 font-bold text-lg">✗</span>
+                              )}
+                            </div>
+                          </td>
+                        </>
                       );
                     }
 
                     if (field.type === 'platform_dropdown') {
                       return (
-                        <td
-                          key={`${field.key}-${site.id}`}
-                          className={`px-3 py-2 text-sm text-gray-900 relative w-80 ${
-                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                          }`}
-                        >
+                        <>
+                          <td
+                            key={`${field.key}-${site.id}`}
+                            className="px-3 py-2 text-sm text-gray-900 relative w-80 border-r border-gray-300"
+                          >
                           <div className="flex items-center space-x-1">
                             <button
                               onClick={() => handlePlatformDropdownClick(field.key, site.id)}
@@ -2766,19 +2812,35 @@ export default function DriggsmanTable({
                               </div>
                             </div>
                           )}
-                        </td>
+                          </td>
+                          {/* Status column for platform_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-status`}
+                            className={`px-1 py-2 text-center ${
+                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                            }`}
+                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+                          >
+                            <div className="flex items-center justify-center">
+                              {hasValue ? (
+                                <span className="text-green-600 font-bold text-lg">✓</span>
+                              ) : (
+                                <span className="text-red-600 font-bold text-lg">✗</span>
+                              )}
+                            </div>
+                          </td>
+                        </>
                       );
                     }
 
                     if (field.type === 'address_species_dropdown') {
                       const isAddressSpeciesDropdownOpen = addressSpeciesDropdownOpen?.field === field.key && addressSpeciesDropdownOpen?.siteId === site.id;
                       return (
-                        <td
-                          key={`${field.key}-${site.id}`}
-                          className={`px-3 py-2 text-sm text-gray-900 relative w-96 ${
-                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                          }`}
-                        >
+                        <>
+                          <td
+                            key={`${field.key}-${site.id}`}
+                            className="px-3 py-2 text-sm text-gray-900 relative w-96 border-r border-gray-300"
+                          >
                           <div className="flex items-center space-x-1">
                             <button
                               onClick={() => handleAddressSpeciesDropdownClick(field.key, site.id)}
@@ -2880,19 +2942,35 @@ export default function DriggsmanTable({
                               </div>
                             </div>
                           )}
-                        </td>
+                          </td>
+                          {/* Status column for address_species_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-status`}
+                            className={`px-1 py-2 text-center ${
+                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                            }`}
+                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+                          >
+                            <div className="flex items-center justify-center">
+                              {hasValue ? (
+                                <span className="text-green-600 font-bold text-lg">✓</span>
+                              ) : (
+                                <span className="text-red-600 font-bold text-lg">✗</span>
+                              )}
+                            </div>
+                          </td>
+                        </>
                       );
                     }
 
                     if (field.type === 'cgig_dropdown') {
                       const isCgigDropdownOpen = cgigDropdownOpen?.field === field.key && cgigDropdownOpen?.siteId === site.id;
                       return (
-                        <td
-                          key={`${field.key}-${site.id}`}
-                          className={`px-3 py-2 text-sm text-gray-900 relative w-96 ${
-                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                          }`}
-                        >
+                        <>
+                          <td
+                            key={`${field.key}-${site.id}`}
+                            className="px-3 py-2 text-sm text-gray-900 relative w-96 border-r border-gray-300"
+                          >
                           <div className="flex items-center space-x-1">
                             <button
                               onClick={() => handleCgigDropdownClick(field.key, site.id)}
@@ -3100,20 +3178,38 @@ export default function DriggsmanTable({
                               </div>
                             </div>
                           )}
-                        </td>
+                          </td>
+                          {/* Status column for cgig_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-status`}
+                            className={`px-1 py-2 text-center ${
+                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                            }`}
+                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+                          >
+                            <div className="flex items-center justify-center">
+                              {hasValue ? (
+                                <span className="text-green-600 font-bold text-lg">✓</span>
+                              ) : (
+                                <span className="text-red-600 font-bold text-lg">✗</span>
+                              )}
+                            </div>
+                          </td>
+                        </>
                       );
                     }
 
                     return (
-                      <td
-                        key={`${field.key}-${site.id}`}
-                        className={`px-3 py-2 text-sm text-gray-900 ${
-                          field.key === 'driggs_phone_1' ? 'w-80' : (fieldDefinitions.find(f => f.key === field.key)?.type === 'readonly' || fieldDefinitions.find(f => f.key === field.key)?.type === 'section_header' ? 'w-48' : 'cursor-pointer w-48')
-                        } ${
-                          index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                        }`}
-                        onClick={() => field.key !== 'driggs_phone_1' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'readonly' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'section_header' && !isEditing && handleCellClick(field.key, site.id, value)}
-                      >
+                      <>
+                        <td
+                          key={`${field.key}-${site.id}`}
+                          className={`px-3 py-2 text-sm text-gray-900 border-r border-gray-300 ${
+                            field.key === 'driggs_phone_1' ? 'w-80' : (fieldDefinitions.find(f => f.key === field.key)?.type === 'readonly' || fieldDefinitions.find(f => f.key === field.key)?.type === 'section_header' ? 'w-48' : 'cursor-pointer w-48')
+                          } ${
+                            field.key === 'driggs_brand_name' && isEditing ? 'border-2 border-blue-500' : ''
+                          }`}
+                          onClick={() => field.key !== 'driggs_phone_1' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'readonly' && fieldDefinitions.find(f => f.key === field.key)?.type !== 'section_header' && !isEditing && handleCellClick(field.key, site.id, value)}
+                        >
                         {field.key === 'driggs_phone_1' ? (
                           <div className="flex items-center space-x-1">
                             <div 
@@ -3203,7 +3299,9 @@ export default function DriggsmanTable({
                                     }
                                   }}
                                   placeholder={fieldDefinitions.find(f => f.key === field.key)?.placeholder || ''}
-                                  className="w-full px-2 py-1 border border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                  className={`w-full px-2 py-1 rounded focus:outline-none focus:ring-1 ${
+                                    field.key === 'driggs_brand_name' ? 'border-none focus:ring-0' : 'border border-blue-500 focus:ring-blue-500'
+                                  }`}
                                   autoFocus
                                 />
                               )
@@ -3218,7 +3316,24 @@ export default function DriggsmanTable({
                             )}
                           </>
                         )}
-                      </td>
+                        </td>
+                        {/* Status column for default fields */}
+                        <td 
+                          key={`${field.key}-${site.id}-status`}
+                          className={`px-1 py-2 text-center ${
+                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
+                          }`}
+                          style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+                        >
+                          <div className="flex items-center justify-center">
+                            {hasValue ? (
+                              <span className="text-green-600 font-bold text-lg">✓</span>
+                            ) : (
+                              <span className="text-red-600 font-bold text-lg">✗</span>
+                            )}
+                          </div>
+                        </td>
+                      </>
                     );
                   })}
                 </tr>
@@ -3275,6 +3390,42 @@ export default function DriggsmanTable({
               <h2 className="text-base font-bold text-gray-900">
                 {driggspackPopup.type}
               </h2>
+              
+              {/* DriggsPackMedallion for this popup instance */}
+              <div className="mb-6">
+                <DriggsPackMedallion 
+                  driggspackNumber={driggspackPopup.type === 'zz1' ? 1 : driggspackPopup.type === 'zz2' ? 2 : 3}
+                  siteId={driggspackPopup.siteId}
+                  onZzClick={handleDriggspackClick}
+                />
+              </div>
+              
+              {/* /dpackjar Navigation Button */}
+              <div className="mb-6">
+                <Link 
+                  href="/dpackjar" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-4 py-2 bg-gray-200 hover:bg-gray-300 transition-colors rounded cursor-pointer"
+                  style={{ fontSize: '16px' }}
+                  onMouseDown={(e) => {
+                    // Force open in new tab regardless of click type
+                    if (e.button === 1) { // Middle click
+                      e.preventDefault();
+                      window.open('/dpackjar', '_blank', 'noopener,noreferrer');
+                    }
+                  }}
+                  onClick={(e) => {
+                    // For regular left click, let the Link component handle it with target="_blank"
+                    // But we can also force it if needed
+                    e.preventDefault();
+                    window.open('/dpackjar', '_blank', 'noopener,noreferrer');
+                  }}
+                >
+                  /dpackjar
+                </Link>
+              </div>
+              
               {/* Additional content will be added here later */}
             </div>
         </div>

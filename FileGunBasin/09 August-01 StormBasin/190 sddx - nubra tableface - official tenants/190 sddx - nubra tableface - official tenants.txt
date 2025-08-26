@@ -50,10 +50,15 @@ we also must add an additional button beyond this that says "Create new (inline)
 ==========================================================
 
 for our page at
-/kwtagzar
+/medjar
 
 please create a ui table that displays every db column from the db table:
-keywordshub_tags
+medium_posts
+
+
+//////////////////////////////////////////////////////////
+
+IMPORTANT NOTE: please make sure to only display db rows from the main db table of medium_posts for the user id of the currently logged-in user (which is held in field medium_posts.user_id
 
 
 //////////////////////////////////////////////////////////

@@ -2250,3 +2250,713 @@ Now when users click on the zz1, zz2, or zz3 cells, the popup opens without any 
 
 **Note:** Since there's no backdrop to click for closing the popup, you may want to consider adding a close button or implementing click-outside-popup logic later if needed, but for now the popup appears cleanly without any screen coverage.
 
+---
+
+_**User**_
+
+please alter the actual main popup area so that it is 100% of the height of the user's browser 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [⚡] 🌡️ Make popup container use 100% browser height
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3224→      {/* Driggspack Popup */}
+  3225→      {driggspackPopup && (
+  3226→        <div
+  3227→            className="fixed z-50 bg-white shadow-2xl border border-gray-300"
+  3228→            style={{
+  3229→              top: 0,
+  3230→              left: driggspackPopup.position.left + 10, // 10px gap for the triangle
+  3231→              width: '840px',
+  3232→              height: '100vh'
+  3233→            }}
+  3234→          >
+  3235→            {/* Triangular Connector (Caret/Arrow) */}
+  3236→            <div
+  3237→              className="absolute bg-white border-l border-t border-gray-300"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully modified the popup to use 100% of the browser height.
+
+## Summary of Changes
+
+**Updated Popup Positioning:**
+- **Changed `top` position**: From `driggspackPopup.position.top` to `0` - now the popup starts at the very top of the browser window
+- **Maintained `left` position**: Still positioned relative to the clicked cell with the 10px gap for the triangular connector
+- **Confirmed full height**: `height: '100vh'` ensures the popup uses the full viewport height
+- **Removed redundant `maxHeight`**: No longer needed since we're using `100vh` directly
+
+**Result:**
+The popup now spans the entire height of the user's browser window from top to bottom, while still maintaining its 840px width and proper horizontal positioning relative to the clicked zz1/zz2/zz3 cell. The triangular connector will still point to the appropriate cell, but the popup itself extends across the full browser height for maximum content area.
+
+This creates a full-height sidebar-style popup that provides plenty of space for content while maintaining the visual connection to the trigger element through the triangular connector.
+
+---
+
+_**User**_
+
+please adjust the callout arrow/caret so that it is aligned with the source element that the user clicked on (which in this case is the zz* table cell) 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+- [⚡] 🌡️ Align triangular caret with clicked zz* table cell position
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+- [X] 🌡️ Align triangular caret with clicked zz* table cell position
+
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3231→              width: '840px',
+  3232→              height: '100vh'
+  3233→            }}
+  3234→          >
+  3235→            {/* Triangular Connector (Caret/Arrow) */}
+  3236→            <div
+  3237→              className="absolute bg-white border-l border-t border-gray-300"
+  3238→              style={{
+  3239→                left: '-6px',
+  3240→                top: driggspackPopup.position.top + 'px',
+  3241→                width: '12px',
+  3242→                height: '12px',
+  3243→                transform: 'rotate(-45deg)',
+  3244→                borderRight: 'none',
+  3245→                borderBottom: 'none'
+  3246→              }}
+  3247→            ></div>
+  3248→            
+  3249→            {/* Popup Content */}
+  3250→            <div className="p-4 h-full overflow-auto">
+  3251→              <h2 className="text-base font-bold text-gray-900">
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully aligned the triangular caret with the clicked zz* table cell.
+
+## Summary of Changes
+
+**Updated Triangular Caret Positioning:**
+- **Changed `top` position**: From static `'10px'` to `driggspackPopup.position.top + 'px'`
+- **Maintained all other properties**: Left position, size, rotation, and styling remain the same
+
+**How It Works:**
+1. When user clicks on a zz1/zz2/zz3 cell, the `handleDriggspackClick` function captures the exact position using `getBoundingClientRect()`
+2. The popup container now spans full browser height (`top: 0, height: 100vh`)
+3. The triangular caret is positioned at the exact vertical position of the clicked cell (`top: driggspackPopup.position.top`)
+4. This creates a perfect visual connection between the clicked cell and the popup
+
+**Result:**
+Now when users click on any zz1/zz2/zz3 cell, the triangular connector (caret/arrow) will point directly to that specific cell, regardless of where it appears vertically on the page. The popup spans the full browser height while the arrow maintains precise alignment with the trigger element, creating a clean and intuitive visual connection.
+
+---
+
+_**User**_
+
+if user clicks anywhere off of these popups, it should close the popup. 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+- [X] 🌡️ Align triangular caret with clicked zz* table cell position
+- [⚡] 🌡️ Add click outside to close popup functionality
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+- [X] 🌡️ Align triangular caret with clicked zz* table cell position
+- [X] 🌡️ Add click outside to close popup functionality
+
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   794→      siteId
+   795→    });
+   796→  };
+   797→
+   798→  const closeDriggspackPopup = () => {
+   799→    setDriggspackPopup(null);
+   800→  };
+   801→
+   802→  // Handle click outside popup to close
+   803→  useEffect(() => {
+   804→    const handleClickOutside = (event: MouseEvent) => {
+   805→      if (driggspackPopup) {
+   806→        const target = event.target as HTMLElement;
+   807→        const popupElement = document.querySelector('[data-driggspack-popup]');
+   808→        
+   809→        // Close if clicking outside the popup
+   810→        if (popupElement && !popupElement.contains(target)) {
+   811→          closeDriggspackPopup();
+   812→        }
+   813→      }
+   814→    };
+   815→
+   816→    if (driggspackPopup) {
+   817→      document.addEventListener('mousedown', handleClickOutside);
+   818→    }
+   819→
+   820→    return () => {
+   821→      document.removeEventListener('mousedown', handleClickOutside);
+   822→    };
+   823→  }, [driggspackPopup]);
+   824→
+   825→  // Handle inline editing
+   826→  const handleCellClick = (field: string, siteId: string, value: any) => {
+   827→    const fieldDef = fieldDefinitions.find(f => f.key === field);
+```
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3245→
+  3246→
+  3247→      {/* Driggspack Popup */}
+  3248→      {driggspackPopup && (
+  3249→        <div
+  3250→            data-driggspack-popup
+  3251→            className="fixed z-50 bg-white shadow-2xl border border-gray-300"
+  3252→            style={{
+  3253→              top: 0,
+  3254→              left: driggspackPopup.position.left + 10, // 10px gap for the triangle
+  3255→              width: '840px',
+  3256→              height: '100vh'
+  3257→            }}
+  3258→          >
+  3259→            {/* Triangular Connector (Caret/Arrow) */}
+  3260→            <div
+  3261→              className="absolute bg-white border-l border-t border-gray-300"
+  3262→              style={{
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully implemented the click-outside-to-close functionality for the driggspack popup.
+
+## Summary of Changes
+
+**Added Click Outside Detection:**
+
+1. **Data Attribute**: Added `data-driggspack-popup` to the popup container for easy DOM selection
+2. **useEffect Hook**: Created a click outside detection system that:
+   - Listens for `mousedown` events when popup is open
+   - Checks if the click target is outside the popup container
+   - Automatically closes the popup if clicked outside
+   - Properly cleans up event listeners when component unmounts or popup closes
+
+**How It Works:**
+
+1. **Event Listener Registration**: When `driggspackPopup` state is not null (popup is open), the effect adds a `mousedown` event listener to the document
+2. **Click Detection**: On any click, it checks if the clicked element is contained within the popup using `popupElement.contains(target)`
+3. **Auto-Close**: If the click is outside the popup, it calls `closeDriggspackPopup()` to close the popup
+4. **Cleanup**: When the popup closes or component unmounts, the event listener is properly removed
+
+**User Experience:**
+- ✅ **Click zz1/zz2/zz3**: Opens the popup with triangular connector
+- ✅ **Click inside popup**: Popup remains open (normal interaction)
+- ✅ **Click anywhere outside popup**: Popup automatically closes
+- ✅ **Clean event handling**: No memory leaks or orphaned listeners
+
+This provides an intuitive user experience where users can easily dismiss the popup by clicking anywhere else on the page, while still allowing normal interaction within the popup area.
+
+---
+
+_**User**_
+
+    please create sql that i can run in supabase to do the following            
+    create new db table            
+    driggs_packs            
+                
+                
+dpack_id    dpack_datum    dpack_note    created_at    updated_at
+serial    text    text        
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Here's the SQL to create the `driggs_packs` table in Supabase:
+
+```sql
+CREATE TABLE driggs_packs (
+    dpack_id SERIAL PRIMARY KEY,
+    dpack_datum TEXT,
+    dpack_note TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create an updated_at trigger function if it doesn't exist
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Create trigger to automatically update updated_at on row changes
+CREATE TRIGGER update_driggs_packs_updated_at
+    BEFORE UPDATE ON driggs_packs
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+```
+
+This SQL will:
+
+1. **Create the table** with the specified columns:
+   - `dpack_id`: Serial (auto-incrementing) primary key
+   - `dpack_datum`: Text field for data
+   - `dpack_note`: Text field for notes
+   - `created_at`: Timestamp that defaults to current time
+   - `updated_at`: Timestamp that defaults to current time
+
+2. **Create/update the trigger function** that automatically updates the `updated_at` field
+
+3. **Create the trigger** that fires on UPDATE operations to keep `updated_at` current
+
+You can run this directly in the Supabase SQL editor, and it will create the table with automatic timestamp management.
+
+---
+
+_**User**_
+
+please create new page at /dpackjar
+
+leave ui blank until further instructions 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+- [X] 🌡️ Align triangular caret with clicked zz* table cell position
+- [X] 🌡️ Add click outside to close popup functionality
+- [⚡] 🌡️ Create new /dpackjar page with blank UI
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+import { Metadata } from 'next';
+import DpackjarClient from './pclient';
+
+export const metadata: Metadata = {
+  title: '/dpackjar',
+};
+
+export default function DpackjarPage() {
+  return <DpackjarClient />;
+}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```tsx
+'use client';
+
+import { useEffect } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
+
+export default function DpackjarClient() {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* UI will be added here per further instructions */}
+    </div>
+  );
+}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+- [X] 🌡️ Align triangular caret with clicked zz* table cell position
+- [X] 🌡️ Add click outside to close popup functionality
+- [X] 🌡️ Create new /dpackjar page with blank UI
+
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/dpackjar/page.tsx
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/dpackjar/pclient.tsx
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I have successfully created the new `/dpackjar` page with a blank UI as requested.
+
+## Files Created:
+
+### 1. `/app/(protected)/dpackjar/page.tsx`
+- Server component that exports metadata and renders the client component
+- Sets page title to '/dpackjar'
+- Follows the same pattern as existing pages in the app
+
+### 2. `/app/(protected)/dpackjar/pclient.tsx`
+- Client component with authentication protection
+- Uses the `useAuth` hook to ensure user is logged in
+- Redirects to `/login` if user is not authenticated
+- Shows loading state while checking authentication
+- Contains a blank gray background container ready for future UI additions
+
+## Key Features:
+- ✅ **Authentication Protected**: Only logged-in users can access
+- ✅ **Consistent Structure**: Follows the same pattern as other protected pages
+- ✅ **Clean Blank State**: Ready for future UI implementation
+- ✅ **TypeScript**: Fully typed components
+- ✅ **Responsive**: Uses Tailwind classes for consistent styling
+
+The page is now accessible at `/dpackjar` and ready for further UI development as per your instructions.
+
+---
+
+_**User**_
+
+please move the ui row on /driggsman's main table grid by the name of : driggs_keywords to now be directly below the driggs_industry ui row
+
+then move the driggs_category row to be direclty below the driggs keywords row 
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+- [X] 🌡️ Align triangular caret with clicked zz* table cell position
+- [X] 🌡️ Add click outside to close popup functionality
+- [X] 🌡️ Create new /dpackjar page with blank UI
+- [⚡] 🌡️ Reorder driggs_keywords and driggs_category rows in field definitions
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **MultiEdit** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Find the main UI table element and remove full-width styling
+- [X] 🌡️ Remove fixed w-64 width from field name column to enable content-based sizing
+- [X] 🌡️ Add background color #dfdfdf to mrk column for all rows below misc section
+- [X] 🌡️ Change short descr and long descr background color from #e8e854 to #fff7a1
+- [X] 🌡️ Move driggs_special_note_for_ai_tool row to be above driggs_social_media_links row
+- [X] 🌡️ Remove black separator below special note for ai tool row
+- [X] 🌡️ Change special note for ai tool mrk cell bg color to match social media links
+- [X] 🌡️ Convert driggspack buttons to use nested table structure with 2 rows and 1 column
+- [X] 🌡️ Add middle row to each driggspack table with specified text
+- [X] 🌡️ Create custom popup component with triangular connector for zz1/zz2/zz3 clicks
+- [X] 🌡️ Remove black backdrop overlay from driggspack popup
+- [X] 🌡️ Make popup container use 100% browser height
+- [X] 🌡️ Align triangular caret with clicked zz* table cell position
+- [X] 🌡️ Add click outside to close popup functionality
+- [X] 🌡️ Create new /dpackjar page with blank UI
+- [X] 🌡️ Reorder driggs_keywords and driggs_category rows in field definitions
+
+
+Result:
+
+```
+300→    { key: 'driggs_zip', type: 'text', label: 'driggs_zip', group: 'contact', placeholder: '' },
+   301→    { key: 'driggs_state_full', type: 'text', label: 'driggs_state_full', group: 'contact', placeholder: '' },
+   302→    { key: 'driggs_country', type: 'text', label: 'driggs_country', group: 'contact', placeholder: 'United States' },
+   303→    { key: 'backlinks_section_separator', type: 'section_header', label: 'backlinks', group: 'separator' },
+   304→    { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
+   305→    { key: 'driggs_citations_done', type: 'boolean', label: 'driggs_citations_done', group: 'contact' },
+   306→    { key: 'driggs_social_profiles_done', type: 'boolean', label: 'driggs_social_profiles_done', group: 'contact' },
+   307→    { key: 'basics_section_separator', type: 'section_header', label: 'basics', group: 'separator' },
+   308→    { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
+   309→    { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
+   310→    { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
+   311→    { key: 'driggs_hours', type: 'text', label: 'driggs_hours', group: 'business', placeholder: 'Open 24 hours' },
+   312→    { key: 'driggs_owner_name', type: 'text', label: 'driggs_owner_name', group: 'business', placeholder: 'Brian Ansley' },
+   313→    { key: 'driggs_short_descr', type: 'text', label: 'driggs_short_descr', group: 'business', placeholder: '' },
+   314→    { key: 'driggs_long_descr', type: 'text', label: 'driggs_long_descr', group: 'business', placeholder: '' },
+   315→    { key: 'driggs_year_opened', type: 'number', label: 'driggs_year_opened', group: 'business', placeholder: '2024' },
+   316→    { key: 'driggs_employees_qty', type: 'number', label: 'driggs_employees_qty', group: 'business', placeholder: '6' },
+   317→    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
+   318→    { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
+   319→    { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
+   320→    { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
+   321→    { key: 'driggs_social_media_links', type: 'text', label: 'driggs_social_media_links', group: 'contact', placeholder: '' },
+   322→    { key: 'misc_section_separator', type: 'section_header', label: 'misc section', group: 'separator' },
+   323→    { key: 'id', type: 'text', label: 'id', group: 'system' },
+   324→    { key: 'created_at', type: 'timestamp', label: 'created_at', group: 'system' },
+```
+
+Result:
+
+```
+No matches found
+```
+
+Result:
+
+```
+49-  driggs_employees_qty: number | null;
+50-  driggs_keywords: string | null;
+51:  driggs_category: string | null;
+52-  driggs_address_species_note: string | null;
+53-  driggs_payment_methods: string | null;
+--
+316-    { key: 'driggs_employees_qty', type: 'number', label: 'driggs_employees_qty', group: 'business', placeholder: '6' },
+317-    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
+318:    { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
+319-    { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
+320-    { key: 'driggs_special_note_for_ai_tool', type: 'text', label: 'driggs_special_note_for_ai_tool', group: 'meta' },
+```
+
+Result:
+
+```
+48-  driggs_year_opened: number | null;
+49-  driggs_employees_qty: number | null;
+50:  driggs_keywords: string | null;
+51-  driggs_category: string | null;
+52-  driggs_address_species_note: string | null;
+--
+315-    { key: 'driggs_year_opened', type: 'number', label: 'driggs_year_opened', group: 'business', placeholder: '2024' },
+316-    { key: 'driggs_employees_qty', type: 'number', label: 'driggs_employees_qty', group: 'business', placeholder: '6' },
+317:    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
+318-    { key: 'driggs_category', type: 'text', label: 'driggs_category', group: 'business', placeholder: 'tree service' },
+319-    { key: 'driggs_payment_methods', type: 'text', label: 'driggs_payment_methods', group: 'business', placeholder: 'credit cards, cash, checks' },
+```
+
+Result:
+
+```
+29-  is_wp_site: boolean | null;
+30-  wp_rest_app_pass: string | null;
+31:  driggs_industry: string | null;
+32-  driggs_city: string | null;
+33-  driggs_brand_name: string | null;
+34-  driggs_site_type_purpose: string | null;
+35-  driggs_email_1: string | null;
+36-  driggs_address_full: string | null;
+--
+306-    { key: 'driggs_social_profiles_done', type: 'boolean', label: 'driggs_social_profiles_done', group: 'contact' },
+307-    { key: 'basics_section_separator', type: 'section_header', label: 'basics', group: 'separator' },
+308:    { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
+309-    { key: 'driggs_site_type_purpose', type: 'text', label: 'driggs_site_type_purpose', group: 'business' },
+310-    { key: 'driggs_email_1', type: 'text', label: 'driggs_email_1', group: 'contact' },
+311-    { key: 'driggs_hours', type: 'text', label: 'driggs_hours', group: 'business', placeholder: 'Open 24 hours' },
+312-    { key: 'driggs_owner_name', type: 'text', label: 'driggs_owner_name', group: 'business', placeholder: 'Brian Ansley' },
+313-    { key: 'driggs_short_descr', type: 'text', label: 'driggs_short_descr', group: 'business', placeholder: '' },
+--
+2521-                    field.key === 'driggs_cgig_id' ? 'border-b-4 border-b-black' : ''
+2522-                  } ${
+2523:                    field.key === 'driggs_industry' ? 'border-t-4 border-t-black' : ''
+2524-                  } ${
+2525-                    field.key === 'driggs_social_media_links' ? 'border-b-4 border-b-black' : ''
+2526-                  } ${
+2527-                    field.key === 'phone_section_separator' ? 'border-t-4 border-t-black' : ''
+2528-                  } ${
+```
+
+Result:
+
+```
+Applied 2 edits to /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:
+1. Replaced "    { key: 'driggs_industry', type: 'text', label:..." with "    { key: 'driggs_industry', type: 'text', label:..."
+2. Replaced "    { key: 'driggs_employees_qty', type: 'number',..." with "    { key: 'driggs_employees_qty', type: 'number',..."
+```
+

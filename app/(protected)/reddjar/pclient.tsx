@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import ReddjarTable from './components/ReddjarTable';
+import RedditdoriButtonBar from '@/app/components/RedditdoriButtonBar';
 
 export default function ReddjarClient() {
   const { user } = useAuth();
@@ -217,6 +218,11 @@ export default function ReddjarClient() {
             <div className="text-xs text-gray-400">Reddit SEO Tracking</div>
           </div>
         </div>
+      </div>
+
+      {/* RedditdoriButtonBar */}
+      <div className="px-6">
+        <RedditdoriButtonBar />
       </div>
 
       {/* Main Content - Full Width ReddjarTable */}
