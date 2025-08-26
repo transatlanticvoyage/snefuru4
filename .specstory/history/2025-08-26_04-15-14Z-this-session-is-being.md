@@ -1565,3 +1565,1332 @@ The combination creates a **realistic depth of field** effect, making your celes
 
 The night sky now has that perfect balance of subtle distant stars and prominent bright stars that make it feel truly cosmic and immersive. 🌌
 
+---
+
+_**User**_
+
+please add a signup page that features a pricing table with 3 tiers . the pricing table must somehow be dynmically managed behind the scenes where i can fill out different domain qty limits, etc. and have everything pulled into the pricing table template
+
+by table - i might not mean an actual table. im not sure what the best term is - what i mean is something that looks like 3 vertical towers etc each with different info (maybe 5 different pieces of info on each plan) etc 
+
+then also make another page called /pricing_table/ which features an actual plain table with our info for each of the 3 plans
+
+fill it out with dummy info now for each plan, then i will edit it 
+
+
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Install Elementor plugin for tregnar-com
+- [X] 🌡️ Create modern SaaS homepage with hero section for video
+- [X] 🌡️ Set up site title and branding
+- [X] 🌡️ Debug theme detection issue in WordPress
+- [X] 🌡️ Create celestial dark night sky background for hero section
+- [X] 🌡️ Double star density with larger new stars
+- [⚡] 🌡️ Create signup page with pricing cards
+- [ ] 🌡️ Create pricing table page with comparison table
+- [ ] 🌡️ Add dynamic pricing management system
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Perfect! I'll create:
+1. A **signup page** with 3 pricing cards (vertical towers)
+2. A **pricing_table page** with a comparison table
+3. A **dynamic management system** using WordPress custom options
+
+Let me start by creating the pricing management system in functions.php:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `/Users/kylecampbell/Local Sites/tregnar-com/app/public/wp-content/themes/tregnar-saas/functions.php`
+
+Result:
+
+```
+240→    // You can add custom post types here if needed for the SaaS features
+   241→    // Example: Features, Testimonials, Case Studies, etc.
+   242→}
+   243→add_action('init', 'tregnar_custom_post_types');
+   244→?>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Local Sites/tregnar-com/app/public/wp-content/themes/tregnar-saas/functions.php has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   234→    remove_action('admin_print_styles', 'print_emoji_styles');
+   235→}
+   236→add_action('init', 'tregnar_saas_performance');
+   237→
+   238→// Custom post types for better organization (if needed)
+   239→function tregnar_custom_post_types() {
+   240→    // You can add custom post types here if needed for the SaaS features
+   241→    // Example: Features, Testimonials, Case Studies, etc.
+   242→}
+   243→add_action('init', 'tregnar_custom_post_types');
+   244→
+   245→// Tregnar Pricing Management System
+   246→function tregnar_pricing_init() {
+   247→    // Set default pricing data if not exists
+   248→    $default_pricing = array(
+   249→        'starter' => array(
+   250→            'name' => 'Starter',
+   251→            'price' => '49',
+   252→            'period' => '/month',
+   253→            'description' => 'Perfect for getting started with bulk website management',
+   254→            'domains_limit' => '10',
+   255→            'monthly_visits' => '50,000',
+   256→            'storage' => '10 GB',
+   257→            'support' => 'Email Support',
+   258→            'api_access' => 'Basic API',
+   259→            'features' => array(
+   260→                '✓ Up to 10 WordPress Sites',
+   261→                '✓ Basic Analytics Dashboard',
+   262→                '✓ Automated Backups',
+   263→                '✓ SSL Certificates',
+   264→                '✓ Email Support'
+   265→            ),
+   266→            'button_text' => 'Start Free Trial',
+   267→            'button_url' => '#',
+   268→            'highlighted' => false
+   269→        ),
+   270→        'professional' => array(
+   271→            'name' => 'Professional',
+   272→            'price' => '149',
+   273→            'period' => '/month',
+   274→            'description' => 'Ideal for growing agencies and marketers',
+   275→            'domains_limit' => '50',
+   276→            'monthly_visits' => '500,000',
+   277→            'storage' => '100 GB',
+   278→            'support' => 'Priority Support',
+   279→            'api_access' => 'Full API Access',
+   280→            'features' => array(
+   281→                '✓ Up to 50 WordPress Sites',
+   282→                '✓ Advanced Analytics & SEO Tools',
+   283→                '✓ Reddit Scraping & Keywords',
+   284→                '✓ White-label Options',
+   285→                '✓ Priority Email & Chat Support'
+   286→            ),
+   287→            'button_text' => 'Start Free Trial',
+   288→            'button_url' => '#',
+   289→            'highlighted' => true
+   290→        ),
+   291→        'enterprise' => array(
+   292→            'name' => 'Enterprise',
+   293→            'price' => '499',
+   294→            'period' => '/month',
+   295→            'description' => 'For large-scale operations and teams',
+   296→            'domains_limit' => 'Unlimited',
+   297→            'monthly_visits' => 'Unlimited',
+   298→            'storage' => '1 TB',
+   299→            'support' => 'Dedicated Support',
+   300→            'api_access' => 'Custom Integration',
+   301→            'features' => array(
+   302→                '✓ Unlimited WordPress Sites',
+   303→                '✓ Custom Integrations',
+   304→                '✓ Dedicated Account Manager',
+   305→                '✓ SLA Guarantee',
+   306→                '✓ 24/7 Phone & Priority Support'
+   307→            ),
+   308→            'button_text' => 'Contact Sales',
+   309→            'button_url' => '#',
+   310→            'highlighted' => false
+   311→        )
+   312→    );
+   313→    
+   314→    if (!get_option('tregnar_pricing_plans')) {
+   315→        add_option('tregnar_pricing_plans', $default_pricing);
+   316→    }
+   317→}
+   318→add_action('init', 'tregnar_pricing_init');
+   319→
+   320→// Function to get pricing plans
+   321→function tregnar_get_pricing_plans() {
+   322→    return get_option('tregnar_pricing_plans', array());
+   323→}
+   324→
+   325→// Add admin menu for pricing management
+   326→function tregnar_pricing_admin_menu() {
+   327→    add_theme_page(
+   328→        'Pricing Plans',
+   329→        'Pricing Plans',
+   330→        'manage_options',
+   331→        'tregnar-pricing',
+   332→        'tregnar_pricing_admin_page'
+   333→    );
+   334→}
+   335→add_action('admin_menu', 'tregnar_pricing_admin_menu');
+   336→
+   337→// Admin page for managing pricing
+   338→function tregnar_pricing_admin_page() {
+   339→    if (isset($_POST['save_pricing'])) {
+   340→        $pricing = array();
+   341→        $plans = array('starter', 'professional', 'enterprise');
+   342→        
+   343→        foreach ($plans as $plan) {
+   344→            $pricing[$plan] = array(
+   345→                'name' => sanitize_text_field($_POST[$plan . '_name']),
+   346→                'price' => sanitize_text_field($_POST[$plan . '_price']),
+   347→                'period' => sanitize_text_field($_POST[$plan . '_period']),
+   348→                'description' => sanitize_text_field($_POST[$plan . '_description']),
+   349→                'domains_limit' => sanitize_text_field($_POST[$plan . '_domains_limit']),
+   350→                'monthly_visits' => sanitize_text_field($_POST[$plan . '_monthly_visits']),
+   351→                'storage' => sanitize_text_field($_POST[$plan . '_storage']),
+   352→                'support' => sanitize_text_field($_POST[$plan . '_support']),
+   353→                'api_access' => sanitize_text_field($_POST[$plan . '_api_access']),
+   354→                'features' => array_map('sanitize_text_field', explode("\n", $_POST[$plan . '_features'])),
+   355→                'button_text' => sanitize_text_field($_POST[$plan . '_button_text']),
+   356→                'button_url' => esc_url_raw($_POST[$plan . '_button_url']),
+   357→                'highlighted' => isset($_POST[$plan . '_highlighted'])
+   358→            );
+   359→        }
+   360→        
+   361→        update_option('tregnar_pricing_plans', $pricing);
+   362→        echo '<div class="notice notice-success"><p>Pricing plans updated successfully!</p></div>';
+   363→    }
+   364→    
+   365→    $pricing = tregnar_get_pricing_plans();
+   366→    ?>
+   367→    <div class="wrap">
+   368→        <h1>Tregnar Pricing Plans Management</h1>
+   369→        <form method="post">
+   370→            <?php foreach (array('starter', 'professional', 'enterprise') as $plan): ?>
+   371→                <h2><?php echo ucfirst($plan); ?> Plan</h2>
+   372→                <table class="form-table">
+   373→                    <tr>
+   374→                        <th><label for="<?php echo $plan; ?>_name">Plan Name</label></th>
+   375→                        <td><input type="text" name="<?php echo $plan; ?>_name" value="<?php echo esc_attr($pricing[$plan]['name']); ?>" class="regular-text" /></td>
+   376→                    </tr>
+   377→                    <tr>
+   378→                        <th><label for="<?php echo $plan; ?>_price">Price</label></th>
+   379→                        <td><input type="text" name="<?php echo $plan; ?>_price" value="<?php echo esc_attr($pricing[$plan]['price']); ?>" class="small-text" /></td>
+   380→                    </tr>
+   381→                    <tr>
+   382→                        <th><label for="<?php echo $plan; ?>_period">Period</label></th>
+   383→                        <td><input type="text" name="<?php echo $plan; ?>_period" value="<?php echo esc_attr($pricing[$plan]['period']); ?>" class="small-text" /></td>
+   384→                    </tr>
+   385→                    <tr>
+   386→                        <th><label for="<?php echo $plan; ?>_description">Description</label></th>
+   387→                        <td><input type="text" name="<?php echo $plan; ?>_description" value="<?php echo esc_attr($pricing[$plan]['description']); ?>" class="large-text" /></td>
+   388→                    </tr>
+   389→                    <tr>
+   390→                        <th><label for="<?php echo $plan; ?>_domains_limit">Domains Limit</label></th>
+   391→                        <td><input type="text" name="<?php echo $plan; ?>_domains_limit" value="<?php echo esc_attr($pricing[$plan]['domains_limit']); ?>" class="regular-text" /></td>
+   392→                    </tr>
+   393→                    <tr>
+   394→                        <th><label for="<?php echo $plan; ?>_monthly_visits">Monthly Visits</label></th>
+   395→                        <td><input type="text" name="<?php echo $plan; ?>_monthly_visits" value="<?php echo esc_attr($pricing[$plan]['monthly_visits']); ?>" class="regular-text" /></td>
+   396→                    </tr>
+   397→                    <tr>
+   398→                        <th><label for="<?php echo $plan; ?>_storage">Storage</label></th>
+   399→                        <td><input type="text" name="<?php echo $plan; ?>_storage" value="<?php echo esc_attr($pricing[$plan]['storage']); ?>" class="regular-text" /></td>
+   400→                    </tr>
+   401→                    <tr>
+   402→                        <th><label for="<?php echo $plan; ?>_support">Support Level</label></th>
+   403→                        <td><input type="text" name="<?php echo $plan; ?>_support" value="<?php echo esc_attr($pricing[$plan]['support']); ?>" class="regular-text" /></td>
+   404→                    </tr>
+   405→                    <tr>
+   406→                        <th><label for="<?php echo $plan; ?>_api_access">API Access</label></th>
+   407→                        <td><input type="text" name="<?php echo $plan; ?>_api_access" value="<?php echo esc_attr($pricing[$plan]['api_access']); ?>" class="regular-text" /></td>
+   408→                    </tr>
+   409→                    <tr>
+   410→                        <th><label for="<?php echo $plan; ?>_features">Features (one per line)</label></th>
+   411→                        <td><textarea name="<?php echo $plan; ?>_features" rows="5" class="large-text"><?php echo esc_textarea(implode("\n", $pricing[$plan]['features'])); ?></textarea></td>
+   412→                    </tr>
+   413→                    <tr>
+   414→                        <th><label for="<?php echo $plan; ?>_button_text">Button Text</label></th>
+   415→                        <td><input type="text" name="<?php echo $plan; ?>_button_text" value="<?php echo esc_attr($pricing[$plan]['button_text']); ?>" class="regular-text" /></td>
+   416→                    </tr>
+   417→                    <tr>
+   418→                        <th><label for="<?php echo $plan; ?>_button_url">Button URL</label></th>
+   419→                        <td><input type="url" name="<?php echo $plan; ?>_button_url" value="<?php echo esc_url($pricing[$plan]['button_url']); ?>" class="regular-text" /></td>
+   420→                    </tr>
+   421→                    <tr>
+   422→                        <th><label for="<?php echo $plan; ?>_highlighted">Highlight this plan?</label></th>
+   423→                        <td><input type="checkbox" name="<?php echo $plan; ?>_highlighted" <?php checked($pricing[$plan]['highlighted']); ?> /></td>
+   424→                    </tr>
+   425→                </table>
+   426→                <hr>
+   427→            <?php endforeach; ?>
+   428→            <p class="submit">
+   429→                <input type="submit" name="save_pricing" class="button-primary" value="Save All Pricing Plans" />
+   430→            </p>
+   431→        </form>
+   432→    </div>
+   433→    <?php
+   434→}
+   435→?>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let's create the signup page with pricing cards:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Write**
+
+```php
+<?php
+/**
+ * Template Name: Signup Page
+ * Description: Signup page with pricing cards
+ */
+
+get_header();
+
+// Get pricing plans from database
+$pricing_plans = tregnar_get_pricing_plans();
+?>
+
+<div class="signup-page">
+    <section class="pricing-hero">
+        <div class="container">
+            <div class="pricing-header">
+                <h1 class="pricing-title">Choose Your Tregnar Plan</h1>
+                <p class="pricing-subtitle">Scale your website portfolio with the perfect plan for your needs</p>
+                <div class="billing-toggle">
+                    <span class="billing-option active">Monthly Billing</span>
+                    <label class="switch">
+                        <input type="checkbox" id="billing-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="billing-option">Annual Billing <span class="save-badge">Save 20%</span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing-cards">
+        <div class="container">
+            <div class="pricing-grid">
+                <?php foreach ($pricing_plans as $key => $plan): ?>
+                <div class="pricing-card <?php echo $plan['highlighted'] ? 'highlighted' : ''; ?>">
+                    <?php if ($plan['highlighted']): ?>
+                    <div class="popular-badge">Most Popular</div>
+                    <?php endif; ?>
+                    
+                    <div class="card-header">
+                        <h3 class="plan-name"><?php echo esc_html($plan['name']); ?></h3>
+                        <p class="plan-description"><?php echo esc_html($plan['description']); ?></p>
+                    </div>
+                    
+                    <div class="card-pricing">
+                        <span class="currency">$</span>
+                        <span class="price" data-monthly="<?php echo esc_attr($plan['price']); ?>" 
+                              data-annual="<?php echo esc_attr(round($plan['price'] * 12 * 0.8 / 12)); ?>">
+                            <?php echo esc_html($plan['price']); ?>
+                        </span>
+                        <span class="period"><?php echo esc_html($plan['period']); ?></span>
+                    </div>
+                    
+                    <div class="card-specs">
+                        <div class="spec-item">
+                            <span class="spec-icon">🌐</span>
+                            <div class="spec-details">
+                                <span class="spec-value"><?php echo esc_html($plan['domains_limit']); ?></span>
+                                <span class="spec-label">WordPress Sites</span>
+                            </div>
+                        </div>
+                        
+                        <div class="spec-item">
+                            <span class="spec-icon">👁️</span>
+                            <div class="spec-details">
+                                <span class="spec-value"><?php echo esc_html($plan['monthly_visits']); ?></span>
+                                <span class="spec-label">Monthly Visits</span>
+                            </div>
+                        </div>
+                        
+                        <div class="spec-item">
+                            <span class="spec-icon">💾</span>
+                            <div class="spec-details">
+                                <span class="spec-value"><?php echo esc_html($plan['storage']); ?></span>
+                                <span class="spec-label">Storage</span>
+                            </div>
+                        </div>
+                        
+                        <div class="spec-item">
+                            <span class="spec-icon">🚀</span>
+                            <div class="spec-details">
+                                <span class="spec-value"><?php echo esc_html($plan['api_access']); ?></span>
+                                <span class="spec-label">API Access</span>
+                            </div>
+                        </div>
+                        
+                        <div class="spec-item">
+                            <span class="spec-icon">🛡️</span>
+                            <div class="spec-details">
+                                <span class="spec-value"><?php echo esc_html($plan['support']); ?></span>
+                                <span class="spec-label">Support</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-features">
+                        <ul class="features-list">
+                            <?php foreach ($plan['features'] as $feature): ?>
+                            <li><?php echo esc_html($feature); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                    
+                    <div class="card-action">
+                        <a href="<?php echo esc_url($plan['button_url']); ?>" 
+                           class="btn-signup <?php echo $plan['highlighted'] ? 'btn-primary' : 'btn-outline'; ?>">
+                            <?php echo esc_html($plan['button_text']); ?>
+                        </a>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing-faq">
+        <div class="container">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>Can I change plans anytime?</h3>
+                    <p>Yes! You can upgrade or downgrade your plan at any time. Changes take effect at the next billing cycle.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What payment methods do you accept?</h3>
+                    <p>We accept all major credit cards, PayPal, and wire transfers for Enterprise plans.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Is there a setup fee?</h3>
+                    <p>No setup fees! Start your free trial today and only pay when you're ready to commit.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What happens when I hit my site limit?</h3>
+                    <p>You'll receive a notification to upgrade. We never shut down your sites unexpectedly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+/* Signup Page Styles */
+.signup-page {
+    padding-top: 80px;
+    background: linear-gradient(180deg, 
+        rgba(15, 23, 42, 1) 0%,
+        rgba(30, 41, 91, 0.95) 50%,
+        rgba(17, 24, 39, 1) 100%
+    );
+    min-height: 100vh;
+}
+
+.pricing-hero {
+    padding: 80px 0 60px;
+    text-align: center;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.pricing-header {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.pricing-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pricing-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 40px;
+}
+
+/* Billing Toggle */
+.billing-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.billing-option {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.billing-option.active {
+    color: white;
+}
+
+.save-badge {
+    background: #10B981;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #3B82F6;
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px);
+}
+
+/* Pricing Cards */
+.pricing-cards {
+    padding: 60px 0 100px;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    align-items: start;
+}
+
+.pricing-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 40px 32px;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.pricing-card.highlighted {
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px solid #3B82F6;
+    transform: scale(1.05);
+}
+
+.popular-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    color: white;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.plan-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.plan-description {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+.card-pricing {
+    text-align: center;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.currency {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-right: 4px;
+}
+
+.price {
+    font-size: 48px;
+    font-weight: 800;
+    color: white;
+}
+
+.period {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-left: 8px;
+}
+
+.card-specs {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 24px 0;
+    margin-bottom: 24px;
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.spec-item:last-child {
+    margin-bottom: 0;
+}
+
+.spec-icon {
+    font-size: 20px;
+}
+
+.spec-details {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.spec-value {
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.spec-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.card-features {
+    margin-bottom: 32px;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.features-list li {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.features-list li:last-child {
+    border-bottom: none;
+}
+
+.card-action {
+    text-align: center;
+}
+
+.btn-signup {
+    display: inline-block;
+    width: 100%;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+.btn-outline {
+    background: transparent;
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* FAQ Section */
+.pricing-faq {
+    padding: 80px 0;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.faq-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 48px;
+}
+
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+}
+
+.faq-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 24px;
+    border-radius: 12px;
+}
+
+.faq-item h3 {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.faq-item p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .pricing-card.highlighted {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 768px) {
+    .pricing-title {
+        font-size: 2.5rem;
+    }
+    
+    .faq-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pricing-card {
+        padding: 32px 24px;
+    }
+}
+</style>
+
+<script>
+// Billing toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('billing-toggle');
+    const prices = document.querySelectorAll('.price');
+    const periods = document.querySelectorAll('.period');
+    
+    toggle.addEventListener('change', function() {
+        prices.forEach(price => {
+            const monthly = price.dataset.monthly;
+            const annual = price.dataset.annual;
+            
+            if (toggle.checked) {
+                price.textContent = annual;
+            } else {
+                price.textContent = monthly;
+            }
+        });
+        
+        periods.forEach(period => {
+            if (toggle.checked) {
+                period.textContent = '/month';
+                period.innerHTML = period.textContent + '<small> (billed annually)</small>';
+            } else {
+                period.textContent = '/month';
+            }
+        });
+    });
+});
+</script>
+
+<?php get_footer(); ?>
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Local Sites/tregnar-com/app/public/wp-content/themes/tregnar-saas/page-signup.php
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let's create the pricing table comparison page:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Write**
+
+```php
+<?php
+/**
+ * Template Name: Pricing Table
+ * Description: Pricing comparison table page
+ */
+
+get_header();
+
+// Get pricing plans from database
+$pricing_plans = tregnar_get_pricing_plans();
+?>
+
+<div class="pricing-table-page">
+    <section class="table-hero">
+        <div class="container">
+            <div class="table-header">
+                <h1 class="table-title">Compare All Plans</h1>
+                <p class="table-subtitle">Detailed comparison of all Tregnar features across plans</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="comparison-table-section">
+        <div class="container">
+            <div class="table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th class="feature-col">Features</th>
+                            <?php foreach ($pricing_plans as $plan): ?>
+                            <th class="plan-col <?php echo $plan['highlighted'] ? 'highlighted' : ''; ?>">
+                                <div class="plan-header">
+                                    <?php if ($plan['highlighted']): ?>
+                                    <span class="recommended">Recommended</span>
+                                    <?php endif; ?>
+                                    <h3><?php echo esc_html($plan['name']); ?></h3>
+                                    <div class="plan-price">
+                                        <span class="price">$<?php echo esc_html($plan['price']); ?></span>
+                                        <span class="period"><?php echo esc_html($plan['period']); ?></span>
+                                    </div>
+                                    <a href="<?php echo esc_url($plan['button_url']); ?>" class="table-btn">
+                                        <?php echo esc_html($plan['button_text']); ?>
+                                    </a>
+                                </div>
+                            </th>
+                            <?php endforeach; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Core Features -->
+                        <tr class="section-header">
+                            <td colspan="4">Core Features</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">WordPress Sites</td>
+                            <?php foreach ($pricing_plans as $plan): ?>
+                            <td class="<?php echo $plan['highlighted'] ? 'highlighted' : ''; ?>">
+                                <strong><?php echo esc_html($plan['domains_limit']); ?></strong>
+                            </td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Monthly Visits</td>
+                            <?php foreach ($pricing_plans as $plan): ?>
+                            <td class="<?php echo $plan['highlighted'] ? 'highlighted' : ''; ?>">
+                                <?php echo esc_html($plan['monthly_visits']); ?>
+                            </td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Storage Space</td>
+                            <?php foreach ($pricing_plans as $plan): ?>
+                            <td class="<?php echo $plan['highlighted'] ? 'highlighted' : ''; ?>">
+                                <?php echo esc_html($plan['storage']); ?>
+                            </td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Bandwidth</td>
+                            <td>100 GB</td>
+                            <td class="highlighted">500 GB</td>
+                            <td>Unlimited</td>
+                        </tr>
+                        
+                        <!-- Management Tools -->
+                        <tr class="section-header">
+                            <td colspan="4">Management Tools</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Bulk Site Management</td>
+                            <td><span class="check">✓</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">One-Click Updates</td>
+                            <td><span class="check">✓</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Automated Backups</td>
+                            <td>Daily</td>
+                            <td class="highlighted">Hourly</td>
+                            <td>Real-time</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Staging Environments</td>
+                            <td><span class="cross">✗</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        
+                        <!-- SEO & Marketing -->
+                        <tr class="section-header">
+                            <td colspan="4">SEO & Marketing Tools</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Keyword Research</td>
+                            <td>Basic</td>
+                            <td class="highlighted">Advanced</td>
+                            <td>Enterprise</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Reddit Scraping</td>
+                            <td><span class="cross">✗</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Local Market Research</td>
+                            <td><span class="cross">✗</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Rank Tracking</td>
+                            <td>10 keywords</td>
+                            <td class="highlighted">500 keywords</td>
+                            <td>Unlimited</td>
+                        </tr>
+                        
+                        <!-- Support & Services -->
+                        <tr class="section-header">
+                            <td colspan="4">Support & Services</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Support Type</td>
+                            <?php foreach ($pricing_plans as $plan): ?>
+                            <td class="<?php echo $plan['highlighted'] ? 'highlighted' : ''; ?>">
+                                <?php echo esc_html($plan['support']); ?>
+                            </td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Response Time</td>
+                            <td>48 hours</td>
+                            <td class="highlighted">4 hours</td>
+                            <td>30 minutes</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">API Access</td>
+                            <?php foreach ($pricing_plans as $plan): ?>
+                            <td class="<?php echo $plan['highlighted'] ? 'highlighted' : ''; ?>">
+                                <?php echo esc_html($plan['api_access']); ?>
+                            </td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">White Label</td>
+                            <td><span class="cross">✗</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        
+                        <!-- Advanced Features -->
+                        <tr class="section-header">
+                            <td colspan="4">Advanced Features</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Custom Domain</td>
+                            <td><span class="check">✓</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">SSL Certificates</td>
+                            <td><span class="check">✓</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">CDN Integration</td>
+                            <td><span class="cross">✗</span></td>
+                            <td class="highlighted"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Team Members</td>
+                            <td>1</td>
+                            <td class="highlighted">5</td>
+                            <td>Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Custom Integrations</td>
+                            <td><span class="cross">✗</span></td>
+                            <td class="highlighted">Limited</td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="table-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Get Started?</h2>
+                <p>Join thousands of marketers managing their website portfolios with Tregnar</p>
+                <div class="cta-buttons">
+                    <a href="/signup" class="btn-primary">View Pricing Cards</a>
+                    <a href="#" class="btn-secondary">Talk to Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+/* Pricing Table Page Styles */
+.pricing-table-page {
+    padding-top: 80px;
+    background: #0F172A;
+    min-height: 100vh;
+}
+
+.table-hero {
+    background: linear-gradient(180deg, 
+        rgba(15, 23, 42, 1) 0%,
+        rgba(30, 41, 91, 0.95) 50%,
+        rgba(17, 24, 39, 1) 100%
+    );
+    padding: 80px 0 60px;
+    text-align: center;
+}
+
+.table-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.table-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Comparison Table */
+.comparison-table-section {
+    padding: 60px 0;
+}
+
+.table-wrapper {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.comparison-table thead {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.comparison-table th {
+    padding: 24px;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    vertical-align: top;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.plan-col {
+    text-align: center;
+    width: 22%;
+}
+
+.feature-col {
+    width: 34%;
+}
+
+.plan-header h3 {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.plan-price {
+    margin-bottom: 16px;
+}
+
+.plan-price .price {
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.plan-price .period {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.recommended {
+    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.table-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.table-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.highlighted .table-btn {
+    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    border-color: #3B82F6;
+}
+
+.comparison-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comparison-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.section-header td {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3B82F6;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 24px;
+    border: none;
+}
+
+.comparison-table td {
+    padding: 16px 24px;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+}
+
+.feature-name {
+    text-align: left !important;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+td.highlighted {
+    background: rgba(59, 130, 246, 0.05);
+    position: relative;
+}
+
+th.highlighted {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.check {
+    color: #10B981;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.cross {
+    color: #EF4444;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* CTA Section */
+.table-cta {
+    padding: 80px 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(30, 64, 175, 0.1));
+    text-align: center;
+}
+
+.cta-content h2 {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.cta-content p {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 32px;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .comparison-table {
+        font-size: 14px;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+        padding: 12px;
+    }
+    
+    .plan-price .price {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        overflow-x: auto;
+    }
+    
+    .comparison-table {
+        min-width: 700px;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+
+<?php get_footer(); ?>
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Local Sites/tregnar-com/app/public/wp-content/themes/tregnar-saas/page-pricing-table.php
+```
+

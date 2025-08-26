@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -2416,9 +2416,7 @@ export default function DriggsmanTable({
                     {/* Empty status column for medallion row */}
                     <td 
                       key={`empty-status-${site.id}`}
-                      className={`h-8 ${
-                        index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                      }`}
+                      className="h-8 border-r border-gray-300"
                       style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                     >
                     </td>
@@ -2477,16 +2475,14 @@ export default function DriggsmanTable({
                       <div className="truncate">
                         {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
                       </div>
+                      <div className="text-center">stat1</div>
                     </th>
                     {/* Status column */}
                     <th
                       key={`${site.id}-status`}
-                      className={`px-1 py-3 text-center text-xs font-bold text-gray-900 ${
-                        index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                      }`}
+                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
                       style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                     >
-                      <div>stat1</div>
                     </th>
                   </>
                 ))}
@@ -2517,9 +2513,7 @@ export default function DriggsmanTable({
                     {/* Status column with sharn1 */}
                     <th
                       key={`${site.id}-status-row2`}
-                      className={`px-1 py-3 text-center text-xs font-bold text-gray-900 ${
-                        index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                      }`}
+                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
                       style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                     >
                       <div>sharn1</div>
@@ -2653,9 +2647,7 @@ export default function DriggsmanTable({
                           {/* Status column for section headers */}
                           <td 
                             key={`${field.key}-${site.id}-status`}
-                            className={`px-1 py-2 text-center ${
-                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                            }`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
                             style={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
                           >
                           </td>
@@ -2683,9 +2675,7 @@ export default function DriggsmanTable({
                           {/* Status column for boolean fields */}
                           <td 
                             key={`${field.key}-${site.id}-status`}
-                            className={`px-1 py-2 text-center ${
-                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                            }`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
                             style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                           >
                             <div className="flex items-center justify-center">
@@ -2816,9 +2806,7 @@ export default function DriggsmanTable({
                           {/* Status column for platform_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-status`}
-                            className={`px-1 py-2 text-center ${
-                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                            }`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
                             style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                           >
                             <div className="flex items-center justify-center">
@@ -2946,9 +2934,7 @@ export default function DriggsmanTable({
                           {/* Status column for address_species_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-status`}
-                            className={`px-1 py-2 text-center ${
-                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                            }`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
                             style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                           >
                             <div className="flex items-center justify-center">
@@ -3182,9 +3168,7 @@ export default function DriggsmanTable({
                           {/* Status column for cgig_dropdown fields */}
                           <td 
                             key={`${field.key}-${site.id}-status`}
-                            className={`px-1 py-2 text-center ${
-                              index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                            }`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
                             style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                           >
                             <div className="flex items-center justify-center">
@@ -3320,9 +3304,7 @@ export default function DriggsmanTable({
                         {/* Status column for default fields */}
                         <td 
                           key={`${field.key}-${site.id}-status`}
-                          className={`px-1 py-2 text-center ${
-                            index < paginatedSites.length - 1 ? 'border-r border-gray-300' : ''
-                          }`}
+                          className="px-1 py-2 text-center border-r border-gray-300"
                           style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                         >
                           <div className="flex items-center justify-center">

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import dynamic from 'next/dynamic';
+import DriggsPacksExpandEditor from '@/app/components/shared/DriggsPacksExpandEditor';
 
 const NubraTablefaceKite = dynamic(
   () => import('@/app/utils/nubra-tableface-kite').then(mod => ({ default: mod.NubraTablefaceKite })),
@@ -36,6 +37,9 @@ export default function DriggsPacksTable() {
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
+  
+  // Expand popup states
+  const [expandPopup, setExpandPopup] = useState<{ dpackId: number } | null>(null);
   
   // Form data for creating/editing
   const [formData, setFormData] = useState({
@@ -309,6 +313,44 @@ export default function DriggsPacksTable() {
     setEditingValue('');
   };
 
+  // Handle expand popup
+  const handleExpandClick = (dpackId: number) => {
+    console.log(`Opening driggs packs editor for dpack_id ${dpackId}`);
+    setExpandPopup({ dpackId });
+  };
+
+  const handleExpandSave = async (dpackId: number, newValue: string) => {
+    if (!expandPopup) return;
+
+    try {
+      const { error } = await supabase
+        .from('driggs_packs')
+        .update({ 
+          dpack_datum: newValue,
+          updated_at: new Date().toISOString()
+        })
+        .eq('dpack_id', dpackId);
+
+      if (error) throw error;
+
+      // Update local data
+      setData(data.map(item => 
+        item.dpack_id === dpackId ? { 
+          ...item, 
+          dpack_datum: newValue,
+          updated_at: new Date().toISOString()
+        } : item
+      ));
+    } catch (error) {
+      console.error('Error saving driggs pack:', error);
+      throw error;
+    }
+  };
+
+  const handleExpandClose = () => {
+    setExpandPopup(null);
+  };
+
   // Handle form submission for popup modal
   const handleCreateSubmit = async () => {
     try {
@@ -479,6 +521,45 @@ export default function DriggsPacksTable() {
                   const isEditing = editingCell?.id === record.dpack_id && editingCell?.field === field;
                   const isReadonly = field === 'dpack_id' || field === 'created_at' || field === 'updated_at';
                   
+                  // Special handling for dpack_datum column
+                  if (field === 'dpack_datum') {
+                    return (
+                      <td key={field} className="px-6 py-4 text-sm text-gray-900">
+                        <div className="flex items-center space-x-2">
+                          <div className="truncate flex-1">
+                            {isEditing ? (
+                              <input
+                                type="text"
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onBlur={handleCellSave}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleCellSave();
+                                  if (e.key === 'Escape') handleCellCancel();
+                                }}
+                                className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                autoFocus
+                              />
+                            ) : (
+                              <div 
+                                className="cursor-pointer hover:bg-yellow-50 p-1 rounded"
+                                onClick={() => handleCellClick(record.dpack_id, field, value)}
+                              >
+                                {value ? value.toString().substring(0, 10) + (value.toString().length > 10 ? '...' : '') : 'Click to edit'}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => handleExpandClick(record.dpack_id)}
+                            className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-xs rounded transition-colors"
+                          >
+                            expand
+                          </button>
+                        </div>
+                      </td>
+                    );
+                  }
+                  
                   return (
                     <td
                       key={field}
@@ -526,6 +607,14 @@ export default function DriggsPacksTable() {
           </div>
         </div>
       </div>
+
+      {/* Expand Popup Modal */}
+      <DriggsPacksExpandEditor
+        isOpen={!!expandPopup}
+        initialDpackId={expandPopup?.dpackId || 1}
+        onSave={handleExpandSave}
+        onClose={handleExpandClose}
+      />
 
       {/* Create Modal */}
       {isCreateModalOpen && (
