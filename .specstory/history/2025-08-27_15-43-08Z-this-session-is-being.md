@@ -1048,3 +1048,465 @@ The buttons are now positioned in the nav stuff chamber below the Drenjari compo
 
 **Result:** Both buttons are now cleanly organized within the nav stuff chamber alongside the Drenjari navigation component, accessible only when tab 5 ("nav stuff") is active and chamber boxes are shown.
 
+---
+
+_**User**_
+
+pleae add an icon above the text vacuum of a vacuum. make the icon solid dark gray
+
+make an icon and add it above the text scraper of a scraping implement in solid dark grey icon 
+
+im obvioisly referring to the 2 cells in the botom-most header row in the table
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add vacuum icon above 'vacuum' text in table header
+- [ ] 🌡️ Add scraper icon above 'zarpscrape' text in table header
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll add icons for both the vacuum and zarpscrape columns in the table header. Let me first find where these headers are defined:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+8-import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
+9-import DriggsPackMedallion from './driggspackmedallion/DriggsPackMedallion';
+10:import VacuumMedallion from './vacuummedallion/VacuumMedallion';
+11-import ZarpoMedallion from './zarpomedallion/ZarpoMedallion';
+12-import Chatdori from '@/app/components/Chatdori';
+--
+147-}
+148-
+149:interface VacuumData {
+150:  vacuum_id: string;
+151-  fk_sitespren_id: string;
+152-  fk_users_id: string;
+--
+193-}
+194-
+195:// Helper component for vacuum/zarpscrape cell display
+196:const VacuumZarpscrapeCell = ({ 
+197-  value, 
+198-  fieldKey, 
+--
+439-  const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
+440-  
+441:  // Vacuum and Zarpscrapes states
+442:  const [vacuumData, setVacuumData] = useState<Map<string, VacuumData>>(new Map());
+443-  const [zarpscrapesData, setZarpscrapesData] = useState<Map<string, ZarpscrapeData>>(new Map());
+444-  
+--
+633-    fetchSites();
+634-    fetchSitesprenTags(); // Tags are needed for filtering
+635:    fetchVacuumData();
+636-    fetchZarpscrapesData();
+637-    fetchExcludeFromWpData();
+--
+849-  };
+850-
+851:  // Fetch vacuum data for all sites
+852:  const fetchVacuumData = async () => {
+853-    try {
+854-      const { data: { user } } = await supabase.auth.getUser();
+--
+864-      if (!userData) return;
+865-      
+866:      const { data: vacuums, error } = await supabase
+867:        .from('sitespren_vacuums')
+868-        .select('*')
+869-        .eq('fk_users_id', userData.id);
+870-      
+871-      if (error) {
+872:        console.error('Error fetching vacuum data:', error);
+873-        return;
+874-      }
+875-      
+876:      // Store vacuum data in a Map for quick lookup by site ID
+877:      const vacuumMap = new Map<string, VacuumData>();
+878:      vacuums?.forEach(vacuum => {
+879:        vacuumMap.set(vacuum.fk_sitespren_id, vacuum);
+880-      });
+881:      setVacuumData(vacuumMap);
+882-    } catch (err) {
+883:      console.error('Error in fetchVacuumData:', err);
+884-    }
+885-  };
+--
+1103-  };
+1104-
+1105:  // Function to delete (set to null) a vacuum field
+1106:  const deleteVacuumField = async (siteId: string, fieldKey: string) => {
+1107-    try {
+1108-      const { data: { user } } = await supabase.auth.getUser();
+--
+1117-      if (!userData) return;
+1118-      
+1119:      // Check if vacuum record exists
+1120:      const existingVacuum = vacuumData.get(siteId);
+1121-      
+1122:      if (existingVacuum) {
+1123-        // Update existing record - set field to null
+1124-        const { error } = await supabase
+1125:          .from('sitespren_vacuums')
+1126-          .update({ [fieldKey]: null })
+1127:          .eq('vacuum_id', existingVacuum.vacuum_id);
+1128-        
+1129-        if (error) {
+1130:          console.error('Error deleting vacuum field:', error);
+1131-          return;
+1132-        }
+1133-        
+1134-        // Update local state
+1135:        const updatedVacuum = { ...existingVacuum, [fieldKey]: null };
+1136:        setVacuumData(prev => new Map(prev).set(siteId, updatedVacuum));
+1137-      }
+1138-    } catch (err) {
+1139:      console.error('Error in deleteVacuumField:', err);
+1140-    }
+1141-  };
+--
+1412-  };
+1413-
+1414:  // Handle vacuum medallion interactions (simplified handlers)
+1415:  const handleVacuumMedallionClick = (medallionType: string, siteId: string) => {
+1416:    console.log('Vacuum medallion clicked:', medallionType, siteId);
+1417-  };
+1418-
+1419:  const handleVacuumFiller1aClick = (actionType: string, siteId: string) => {
+1420:    console.log('Vacuum filler1a clicked:', actionType, siteId);
+1421-  };
+1422-
+1423:  const handleVacuumFiller1bClick = (actionType: string, siteId: string) => {
+1424:    console.log('Vacuum filler1b clicked:', actionType, siteId);
+1425-  };
+1426-
+--
+3439-                    >
+3440-                    </td>
+3441:                    {/* Vacuum medallion column */}
+3442-                    <td 
+3443:                      key={`vacuum-medallion-${site.id}`}
+3444-                      className="h-8 border-r border-gray-300 p-1"
+3445-                    >
+3446-                      <div className="flex items-center justify-center h-full">
+3447:                        <VacuumMedallion 
+3448-                          siteId={site.id}
+3449:                          onMedallionClick={handleVacuumMedallionClick}
+3450:                          onFiller1aClick={handleVacuumFiller1aClick}
+3451:                          onFiller1bClick={handleVacuumFiller1bClick}
+3452-                        />
+3453-                      </div>
+--
+3809-                      </TooltipHeader>
+3810-                    </th>
+3811:                    {/* Vacuum column */}
+3812-                    <th
+3813:                      key={`${site.id}-vacuum`}
+3814-                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+3815-                    >
+3816:                      <div>**vacuum**</div>
+3817-                    </th>
+3818-                    {/* Scraper column */}
+--
+3978-                          >
+3979-                          </td>
+3980:                          {/* Vacuum column for section headers */}
+3981-                          <td 
+3982:                            key={`${field.key}-${site.id}-vacuum`}
+3983-                            className="px-1 py-2 text-center border-r border-gray-300"
+3984-                            style={{ backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+--
+4125-                            }}
+4126-                          />
+4127:                          {/* Vacuum column for boolean fields */}
+4128-                          <td 
+4129:                            key={`${field.key}-${site.id}-vacuum`}
+4130-                            className="px-1 py-2 text-center border-r border-gray-300"
+4131-                          >
+4132:                            <VacuumZarpscrapeCell
+4133:                              value={vacuumData.get(site.id)?.[field.key]}
+4134-                              fieldKey={field.key}
+4135-                              siteId={site.id}
+4136:                              onDelete={deleteVacuumField}
+4137-                              isBoolean={true}
+4138-                            />
+--
+4144-                            style={{ borderRight: '3px solid black' }}
+4145-                          >
+4146:                            <VacuumZarpscrapeCell
+4147-                              value={zarpscrapesData.get(site.id)?.[field.key]}
+4148-                              fieldKey={field.key}
+--
+4386-                            }}
+4387-                          />
+4388:                          {/* Vacuum column for platform_dropdown fields */}
+4389-                          <td 
+4390:                            key={`${field.key}-${site.id}-vacuum`}
+4391-                            className="px-1 py-2 text-center border-r border-gray-300"
+4392-                          >
+4393:                            <VacuumZarpscrapeCell
+4394:                              value={vacuumData.get(site.id)?.[field.key]}
+4395-                              fieldKey={field.key}
+4396-                              siteId={site.id}
+4397:                              onDelete={deleteVacuumField}
+4398-                            />
+4399-                          </td>
+--
+4404-                            style={{ borderRight: '3px solid black' }}
+4405-                          >
+4406:                            <VacuumZarpscrapeCell
+4407-                              value={zarpscrapesData.get(site.id)?.[field.key]}
+4408-                              fieldKey={field.key}
+--
+4642-                            }}
+4643-                          />
+4644:                          {/* Vacuum column for address_species_dropdown fields */}
+4645-                          <td 
+4646:                            key={`${field.key}-${site.id}-vacuum`}
+4647-                            className="px-1 py-2 text-center border-r border-gray-300"
+4648-                          >
+4649:                            <VacuumZarpscrapeCell
+4650:                              value={vacuumData.get(site.id)?.[field.key]}
+4651-                              fieldKey={field.key}
+4652-                              siteId={site.id}
+4653:                              onDelete={deleteVacuumField}
+4654-                            />
+4655-                          </td>
+--
+4660-                            style={{ borderRight: '3px solid black' }}
+4661-                          >
+4662:                            <VacuumZarpscrapeCell
+4663-                              value={zarpscrapesData.get(site.id)?.[field.key]}
+4664-                              fieldKey={field.key}
+--
+5004-                            }}
+5005-                          />
+5006:                          {/* Vacuum column for cgig_dropdown fields */}
+5007-                          <td 
+5008:                            key={`${field.key}-${site.id}-vacuum`}
+5009-                            className="px-1 py-2 text-center border-r border-gray-300"
+5010-                          >
+5011:                            <VacuumZarpscrapeCell
+5012:                              value={vacuumData.get(site.id)?.[field.key]}
+5013-                              fieldKey={field.key}
+5014-                              siteId={site.id}
+5015:                              onDelete={deleteVacuumField}
+5016-                            />
+5017-                          </td>
+--
+5022-                            style={{ borderRight: '3px solid black' }}
+5023-                          >
+5024:                            <VacuumZarpscrapeCell
+5025-                              value={zarpscrapesData.get(site.id)?.[field.key]}
+5026-                              fieldKey={field.key}
+--
+5257-                          }}
+5258-                        />
+5259:                        {/* Vacuum column for default fields */}
+5260-                        <td 
+5261:                          key={`${field.key}-${site.id}-vacuum`}
+5262-                          className="px-1 py-2 text-center border-r border-gray-300"
+5263-                        >
+--
+5274-                          style={{ borderRight: '3px solid black' }}
+5275-                        >
+5276:                          <VacuumZarpscrapeCell
+5277-                            value={zarpscrapesData.get(site.id)?.[field.key]}
+5278-                            fieldKey={field.key}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me find the exact header where I need to add the icons:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3810→                    </th>
+  3811→                    {/* Vacuum column */}
+  3812→                    <th
+  3813→                      key={`${site.id}-vacuum`}
+  3814→                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+  3815→                    >
+  3816→                      <div>**vacuum**</div>
+  3817→                    </th>
+  3818→                    {/* Scraper column */}
+  3819→                    <th
+  3820→                      key={`${site.id}-scraper`}
+  3821→                      className="px-1 py-3 text-center text-xs font-bold text-gray-900"
+  3822→                      style={{ borderRight: '3px solid black' }}
+  3823→                    >
+  3824→                      <div>**scraper**</div>
+  3825→                    </th>
+  3826→                  </>
+  3827→                ))}
+  3828→              </tr>
+  3829→            </thead>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update both the vacuum and scraper (zarpscrape) headers to include icons. Let me update them:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3807→                          e<br/>x<br/>f<br/>e
+  3808→                        </div>
+  3809→                      </TooltipHeader>
+  3810→                    </th>
+  3811→                    {/* Vacuum column */}
+  3812→                    <th
+  3813→                      key={`${site.id}-vacuum`}
+  3814→                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+  3815→                    >
+  3816→                      <div className="flex flex-col items-center justify-center">
+  3817→                        {/* Vacuum Icon */}
+  3818→                        <svg
+  3819→                          width="20"
+  3820→                          height="20"
+  3821→                          viewBox="0 0 24 24"
+  3822→                          fill="#4B5563"
+  3823→                          xmlns="http://www.w3.org/2000/svg"
+  3824→                          className="mb-1"
+  3825→                        >
+  3826→                          <path d="M23 15v4c0 1.1-.9 2-2 2h-1v-6h3zm-4 0v6h-4v-6h4zm-5 0v6h-4v-6h4zm-5 0v6H8c-1.1 0-2-.9-2-2v-4h3zm-6-2c-.55 0-1-.45-1-1s.45-1 1-1h2.03c.25-1.67 1.67-2.96 3.4-2.96.56 0 1.08.14 1.54.38l5.12-5.12c.37-.38.88-.59 1.41-.59.78 0 1.5.63 1.5 1.41 0 .53-.21 1.04-.59 1.41L11.29 10.63c.24.46.38.98.38 1.54 0 1.73-1.29 3.15-2.96 3.4V13H3zm8.43-7.41c.2-.2.51-.2.71 0s.2.51 0 .71l-3.54 3.54c-.2.2-.51.2-.71 0s-.2-.51 0-.71l3.54-3.54z"/>
+  3827→                        </svg>
+  3828→                        <div>**vacuum**</div>
+  3829→                      </div>
+  3830→                    </th>
+  3831→                    {/* Scraper column */}
+  3832→                    <th
+  3833→                      key={`${site.id}-scraper`}
+  3834→                      className="px-1 py-3 text-center text-xs font-bold text-gray-900"
+  3835→                      style={{ borderRight: '3px solid black' }}
+  3836→                    >
+  3837→                      <div className="flex flex-col items-center justify-center">
+  3838→                        {/* Scraper Icon */}
+  3839→                        <svg
+  3840→                          width="20"
+  3841→                          height="20"
+  3842→                          viewBox="0 0 24 24"
+  3843→                          fill="#4B5563"
+  3844→                          xmlns="http://www.w3.org/2000/svg"
+  3845→                          className="mb-1"
+  3846→                        >
+  3847→                          <path d="M1 12l3-3v2h13.5c.5 0 1-.2 1.3-.6l5.5-6.4c.1-.1.2-.3.2-.5 0-.4-.3-.7-.7-.7-.2 0-.3.1-.4.2L18.2 9H4v2H1v1zm6.5 1L2 19.4c-.1.1-.2.3-.2.5 0 .4.3.7.7.7.2 0 .3-.1.4-.2L8.2 14H22v-2H7.5c-.2 0-.5.1-.7.3-.3.2-.4.5-.3.7z"/>
+  3848→                        </svg>
+  3849→                        <div>**scraper**</div>
+  3850→                      </div>
+  3851→                    </th>
+  3852→                  </>
+  3853→                ))}
+  3854→              </tr>
+  3855→            </thead>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me update the todo list to mark both tasks as completed:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Add vacuum icon above 'vacuum' text in table header
+- [X] 🌡️ Add scraper icon above 'zarpscrape' text in table header
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+## ✅ Task Completed: Added Icons to Table Headers
+
+**What I accomplished:**
+
+Successfully added dark gray solid icons above both the **vacuum** and **zarpscrape** (scraper) column headers in the bottom-most header row of the table.
+
+### **Implementation Details:**
+
+1. **Vacuum Column Icon** (lines 3818-3827):
+   - Added a vacuum cleaner SVG icon
+   - Solid dark gray color (`fill="#4B5563"`)
+   - 20x20 pixel size
+   - Positioned above the `**vacuum**` text with proper spacing (`mb-1`)
+
+2. **Scraper Column Icon** (lines 3839-3848):
+   - Added a scraping tool/blade SVG icon
+   - Solid dark gray color (`fill="#4B5563"`)
+   - 20x20 pixel size
+   - Positioned above the `**scraper**` text with proper spacing (`mb-1`)
+
+### **Visual Structure:**
+Both headers now display as:
+```
+[Icon]
+**text**
+```
+
+The icons are wrapped in a flex container (`flex flex-col items-center justify-center`) to ensure proper centering and vertical alignment above their respective text labels.
+
+### **Color Specification:**
+- Used `#4B5563` which is Tailwind's `gray-600` - a solid dark gray color as requested
+- Icons are fully filled (solid) rather than outlined
+
+The icons provide clear visual distinction for these special columns in the table header, making it easier for users to identify the vacuum and scraper functionality columns at a glance.
+
+---
+
+_**User**_
+
+please study the "sites per view" area of the screen. please research the system to understand how it works and then make the following new implementation. please add these new options to the "sites per view" button bar:
+1
+2
+
+make the default setting always be "1" now as well 
+
+
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Study 'sites per view' area to understand how it works
+- [ ] 🌡️ Add options '1' and '2' to sites per view button bar
+- [ ] 🌡️ Make default setting '1' for sites per view
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me search for the "sites per view" functionality in the code:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-2356-  const ColumnPaginationControls = () => (
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-2357-    <div className="flex items-center space-x-4">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-2358-      <div className="flex items-center">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:2359:        <span className="text-sm text-gray-600 mr-2">Sites per view:</span>
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-2360-        <div className="inline-flex" role="group">
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-2361-          {[5, 10, 15, 20].map((value, index) => (
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx-2362-            <button
+```
+

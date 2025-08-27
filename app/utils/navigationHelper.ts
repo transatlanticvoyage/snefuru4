@@ -292,7 +292,9 @@ export const createNavigationStructure = (navItems: NavItem[]) => {
     { name: 'sitejar4', path: '/sitejar4' },
     { name: 'gconjar1', path: '/gconjar1' },
     { name: 'nwjar1', path: '/nwjar1' },
-    { name: 'reddjar', path: '/reddjar' }
+    { name: 'reddjar', path: '/reddjar' },
+    { name: 'haccjar2', path: '/haccjar2' },
+    { name: 'cdnjar', path: '/cdnjar' }
   ];
 
   // Debug logging

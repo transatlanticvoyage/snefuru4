@@ -19,19 +19,55 @@ export class SitesglubFetcher {
     try {
       console.log(`Fetching ns_full for domain: ${domain}`);
       
-      // Simulate API call to fetch nameserver data
-      // In a real implementation, this would call an external service like DNS lookup
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2 second delay
+      // Real DNS lookup using DNS over HTTPS (DoH) service
+      let nsData = '';
       
-      // Mock data - in real implementation, replace with actual DNS lookup
-      const mockNsData = `ns1.${domain.split('.')[1]}.com, ns2.${domain.split('.')[1]}.com`;
+      try {
+        console.log(`[DEBUG] Starting DNS lookup for: ${domain}`);
+        // Use Cloudflare's DNS over HTTPS service
+        const response = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=NS`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/dns-json'
+          }
+        });
+        
+        console.log(`[DEBUG] DNS response status: ${response.status}`);
+        
+        if (response.ok) {
+          const dnsResult = await response.json();
+          console.log(`[DEBUG] DNS result:`, dnsResult);
+          
+          if (dnsResult.Answer && dnsResult.Answer.length > 0) {
+            // Extract nameservers from the response
+            const nameservers = dnsResult.Answer
+              .filter((record: any) => record.type === 2) // NS records have type 2
+              .map((record: any) => record.data.replace(/\.$/, '')) // Remove trailing dot
+              .join(', ');
+            
+            console.log(`[DEBUG] Extracted nameservers: ${nameservers}`);
+            nsData = nameservers;
+          } else {
+            console.warn(`No NS records found for domain: ${domain}`);
+            console.log(`[DEBUG] dnsResult.Answer:`, dnsResult.Answer);
+            nsData = 'No nameservers found';
+          }
+        } else {
+          console.warn(`DNS lookup failed for ${domain}, status: ${response.status}`);
+          nsData = 'DNS lookup failed';
+        }
+      } catch (dnsError) {
+        console.error('DNS lookup error:', dnsError);
+        // Fallback to a more generic error message
+        nsData = 'DNS lookup unavailable';
+      }
       
       // Insert or update the sitesglub record
       const { data, error } = await supabase
         .from('sitesglub')
         .upsert({
           sitesglub_base: domain,
-          ns_full: mockNsData,
+          ns_full: nsData,
           updated_at: new Date().toISOString()
         }, { 
           onConflict: 'sitesglub_base',
@@ -59,19 +95,49 @@ export class SitesglubFetcher {
     try {
       console.log(`Fetching ip_address for domain: ${domain}`);
       
-      // Simulate API call to fetch IP address
-      // In a real implementation, this would call a DNS resolution service
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate 1.5 second delay
+      // Real DNS lookup using DNS over HTTPS (DoH) service
+      let ipData = '';
       
-      // Mock data - in real implementation, replace with actual IP lookup
-      const mockIpData = `${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
+      try {
+        // Use Cloudflare's DNS over HTTPS service for A records
+        const response = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=A`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/dns-json'
+          }
+        });
+        
+        if (response.ok) {
+          const dnsResult = await response.json();
+          
+          if (dnsResult.Answer && dnsResult.Answer.length > 0) {
+            // Extract IP addresses from the response
+            const ipAddresses = dnsResult.Answer
+              .filter((record: any) => record.type === 1) // A records have type 1
+              .map((record: any) => record.data)
+              .join(', ');
+            
+            ipData = ipAddresses;
+          } else {
+            console.warn(`No A records found for domain: ${domain}`);
+            ipData = 'No IP address found';
+          }
+        } else {
+          console.warn(`DNS lookup failed for ${domain}, status: ${response.status}`);
+          ipData = 'DNS lookup failed';
+        }
+      } catch (dnsError) {
+        console.error('DNS lookup error:', dnsError);
+        // Fallback to a more generic error message
+        ipData = 'DNS lookup unavailable';
+      }
       
       // Insert or update the sitesglub record
       const { data, error } = await supabase
         .from('sitesglub')
         .upsert({
           sitesglub_base: domain,
-          ip_address: mockIpData,
+          ip_address: ipData,
           updated_at: new Date().toISOString()
         }, { 
           onConflict: 'sitesglub_base',

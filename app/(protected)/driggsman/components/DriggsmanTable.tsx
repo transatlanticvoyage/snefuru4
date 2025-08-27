@@ -614,9 +614,9 @@ export default function DriggsmanTable({
       setUseRainFilter(false);
       setActiveRainChamber(false);
     } else {
-      // If absent or invalid, default to fog chamber (don't update URL here to avoid loop)
-      setUseFogFilter(true);
-      setUseDaylightFilter(false);
+      // If absent or invalid, default to daylight chamber (don't update URL here to avoid loop)
+      setUseFogFilter(false);
+      setUseDaylightFilter(true);
       setUseRainFilter(false);
       setActiveRainChamber(false);
     }
@@ -627,7 +627,7 @@ export default function DriggsmanTable({
     // Only check searchParams on mount, don't re-run when it changes
     if (typeof window !== 'undefined' && !window.location.search.includes('activefilterchamber')) {
       const url = new URL(window.location.href);
-      url.searchParams.set('activefilterchamber', 'fog');
+      url.searchParams.set('activefilterchamber', 'daylight');
       window.history.replaceState({}, '', url.toString());
     }
   }, []); // Empty dependency array - only run once on mount
@@ -3029,7 +3029,30 @@ export default function DriggsmanTable({
                 </div>
               ))}
             </div>
-            <div className="mt-2 text-xs text-gray-500">
+            
+            {/* Verification and Competitor Buttons - moved here for compact layout */}
+            <div className="mt-2 mb-2">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => onShowVerificationColumnChange?.(!showVerificationColumn)}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    showVerificationColumn ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  show verification column
+                </button>
+                <button
+                  onClick={() => onShowCompetitorSitesChange?.(!showCompetitorSites)}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    showCompetitorSites ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  show competitor sites
+                </button>
+              </div>
+            </div>
+            
+            <div className="text-xs text-gray-500">
               Showing {sites.length} matching sites from your database out of {allSites.length} total sites.
             </div>
           </div>
@@ -3289,27 +3312,6 @@ export default function DriggsmanTable({
               <DrenjariButtonBarDriggsmanLinks />
             </div>
             
-            {/* Verification and Competitor Buttons */}
-            <div className="mt-4">
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => onShowVerificationColumnChange?.(!showVerificationColumn)}
-                  className={`px-3 py-1 text-sm rounded transition-colors ${
-                    showVerificationColumn ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
-                  }`}
-                >
-                  show verification column
-                </button>
-                <button
-                  onClick={() => onShowCompetitorSitesChange?.(!showCompetitorSites)}
-                  className={`px-3 py-1 text-sm rounded transition-colors ${
-                    showCompetitorSites ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
-                  }`}
-                >
-                  show competitor sites
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}
@@ -3343,7 +3345,7 @@ export default function DriggsmanTable({
                           right: '0',
                           top: '0',
                           bottom: '0',
-                          width: '350px',
+                          width: '410px',
                           border: '1px solid black',
                           backgroundColor: 'white',
                           zIndex: 1,
@@ -3466,11 +3468,11 @@ export default function DriggsmanTable({
                               <tr>
                                 <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>4a</td>
                                 <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>dom reg acct</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center', fontSize: '10px' }}>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'left', fontSize: '10px', minWidth: '200px' }}>
                                   {(() => {
                                     if (!site.fk_domreg_hostaccount) {
                                       return (
-                                        <div className="flex items-center justify-center gap-1">
+                                        <div className="flex items-center justify-between w-full">
                                           <span className="text-gray-400">No registrar set</span>
                                           <button
                                             onClick={() => {
@@ -3491,12 +3493,14 @@ export default function DriggsmanTable({
                                     
                                     if (registrarInfo) {
                                       return (
-                                        <div className="flex flex-col items-center gap-1">
-                                          <div className="text-xs font-medium text-gray-900">
-                                            {registrarInfo.company_name}
-                                          </div>
-                                          <div className="text-xs text-gray-500">
-                                            {registrarInfo.username}
+                                        <div className="flex items-center justify-between w-full">
+                                          <div className="flex items-center gap-1">
+                                            <span className="text-xs font-medium text-gray-900">
+                                              {registrarInfo.company_name}
+                                            </span>
+                                            <span className="text-xs text-gray-500">
+                                              {registrarInfo.username}
+                                            </span>
                                           </div>
                                           <div className="flex gap-1">
                                             {registrarInfo.portal_url && (
@@ -3527,7 +3531,7 @@ export default function DriggsmanTable({
 
                                     // Fallback if registrar ID exists but not found in allHostAccounts
                                     return (
-                                      <div className="flex items-center justify-center gap-1">
+                                      <div className="flex items-center justify-between w-full">
                                         <span className="text-xs text-gray-400">Unknown registrar</span>
                                         <button
                                           onClick={() => {
@@ -3550,7 +3554,7 @@ export default function DriggsmanTable({
                       </div>
                       
                       {/* Original medallion content - positioned to preserve appearance */}
-                      <div className="flex items-center justify-start h-full space-x-1" style={{ position: 'relative', zIndex: 2, marginRight: '370px' }}>
+                      <div className="flex items-center justify-start h-full space-x-1" style={{ position: 'relative', zIndex: 2, marginRight: '430px' }}>
                         <DriggsPackMedallion 
                           driggspackNumber={1}
                           siteId={site.id}
@@ -3679,7 +3683,7 @@ export default function DriggsmanTable({
                           right: '0',
                           top: '0',
                           bottom: '0',
-                          width: '350px',
+                          width: '410px',
                           border: '1px solid black',
                           backgroundColor: 'white',
                           zIndex: 10,
@@ -3879,7 +3883,7 @@ export default function DriggsmanTable({
                                 
                                 {/* DG - Driggsman link */}
                                 <a
-                                  href={`/driggsman?sitesentered=${encodeURIComponent(domain)}`}
+                                  href={`/driggsman?sitesentered=${encodeURIComponent(domain)}&activefilterchamber=daylight&showmainchamberboxes=no`}
                                   onClick={(e) => e.stopPropagation()}
                                   style={{...baseButtonStyle, backgroundColor: '#8b5cf6'}}
                                   title="Open Driggsman"
@@ -3910,7 +3914,8 @@ export default function DriggsmanTable({
                           lineHeight: '1.2',
                           padding: '12px',
                           position: 'relative',
-                          zIndex: 2
+                          zIndex: 2,
+                          marginRight: '430px'
                         }}
                       >
                         <div style={{ fontWeight: 'normal' }}>domain_column_for:</div>
