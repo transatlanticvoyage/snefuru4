@@ -285,69 +285,25 @@ const CheckboxCell = ({
   onChange: (siteId: string, fieldKey: string, checked: boolean) => void; 
 }) => {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Prevent ALL event propagation and bubbling
-    e.stopPropagation();
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    
-    // Call the onChange function directly
-    onChange(siteId, fieldKey, !checked);
-  };
-
-  // Completely prevent any interaction propagation
-  const handleCellInteraction = (e: React.SyntheticEvent) => {
-    e.stopPropagation();
-    e.stopImmediatePropagation();
+    onChange(siteId, fieldKey, e.target.checked);
   };
 
   return (
     <td 
-      // Use a unique class to specifically target this cell type
-      className="driggsman-checkbox-cell text-center border-r border-gray-300"
+      className="text-center border-r border-gray-300"
       style={{ 
         width: '12px', 
         minWidth: '12px', 
         maxWidth: '12px', 
-        padding: '1px',
-        // Force specific background color with !important equivalent via inline style
-        backgroundColor: checked ? '#dbeafe !important' : '#ffffff !important',
-        // Completely isolate this cell from parent styling
-        isolation: 'isolate',
-        contain: 'style', // CSS containment for style isolation
-        // Prevent any inheritance
-        backgroundClip: 'padding-box',
-        // Override any potential parent background colors
-        backgroundImage: 'none',
-        // Ensure position context
-        position: 'relative'
+        padding: '1px' 
       }}
-      // Prevent all possible event types from propagating
-      onClick={handleCellInteraction}
-      onMouseDown={handleCellInteraction}
-      onMouseUp={handleCellInteraction}
-      onMouseEnter={handleCellInteraction}
-      onMouseLeave={handleCellInteraction}
-      onFocus={handleCellInteraction}
-      onBlur={handleCellInteraction}
     >
       <input
         type="checkbox"
         checked={checked}
         onChange={handleCheckboxChange}
-        className="w-3 h-3 cursor-pointer"
-        style={{ 
-          transform: 'scale(0.8)',
-          zIndex: '10',
-          position: 'relative',
-          // Ensure checkbox doesn't affect parent elements
-          isolation: 'isolate'
-        }}
-        // Prevent all checkbox events from affecting parents
-        onFocus={handleCellInteraction}
-        onBlur={handleCellInteraction}
-        onMouseEnter={handleCellInteraction}
-        onMouseLeave={handleCellInteraction}
-        onClick={handleCellInteraction}
+        className="w-3 h-3"
+        style={{ transform: 'scale(0.8)' }}
       />
     </td>
   );

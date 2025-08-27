@@ -3054,3 +3054,1372 @@ _**User**_
 
 ok i ran the sql successfully. pleae make sure to implement the active checkbox functionality that will udpate teh actual db values in these new db columns i just created with your sql. please implement this fnctionailty in the existing ui elements we have in the exwp and exfe columns (ui columns on /driggsman table) 
 
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I need to implement the checkbox functionality for the exwp and exfe columns to update the actual database values in the new `sitespren_exclude_from_wp` and `sitespren_exclude_from_frontend` tables. Let me implement this functionality.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Locate existing exwp and exfe UI column elements in DriggsmanTable
+- [ ] 🌡️ Add state management for exwp and exfe checkbox data
+- [ ] 🌡️ Implement API endpoints for updating exwp and exfe database values
+- [ ] 🌡️ Connect checkbox onChange handlers to update database
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+First, let me find the existing exwp and exfe column implementations in the UI:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3236-                        null<br/>stat<br/>us
+3237-                      </div>
+3238-                    </th>
+3239-                    {/* Exclude from WP column */}
+3240-                    <th
+3241-                      key={`${site.id}-excl-wp`}
+3242-                      className="text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+3243-                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px', padding: '1px' }}
+3244-                    >
+3245-                      <TooltipHeader 
+3246:                        tooltipText="exwp - exclude from wordpress" 
+3247:                        copyText="exwp - exclude from wordpress"
+3248-                      >
+3249-                        <div style={{ lineHeight: '1', fontSize: '15px' }}>
+3250-                          e<br/>x<br/>w<br/>p
+3251-                        </div>
+3252-                      </TooltipHeader>
+3253-                    </th>
+3254-                    {/* Exclude from Frontend column */}
+3255-                    <th
+3256-                      key={`${site.id}-excl-fe`}
+3257-                      className="text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+3258-                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px', padding: '1px' }}
+3259-                    >
+3260-                      <TooltipHeader 
+3261:                        tooltipText="exfe - exclude from frontend" 
+3262:                        copyText="exfe - exclude from frontend"
+3263-                      >
+3264-                        <div style={{ lineHeight: '1', fontSize: '15px' }}>
+3265-                          e<br/>x<br/>f<br/>e
+3266-                        </div>
+3267-                      </TooltipHeader>
+3268-                    </th>
+3269-                    {/* Vacuum column */}
+3270-                    <th
+3271-                      key={`${site.id}-vacuum`}
+3272-                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me find where the actual data rows are rendered to see if there are already cells for these columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3050-                    </td>
+3051-                    {/* Empty status column for medallion row */}
+3052-                    <td 
+3053-                      key={`empty-status-${site.id}`}
+3054-                      className="h-8 border-r border-gray-300"
+3055-                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3056-                    >
+3057-                    </td>
+3058-                    {/* Empty excl wp column for medallion row */}
+3059-                    <td 
+3060:                      key={`empty-excl-wp-${site.id}`}
+3061-                      className="h-8 border-r border-gray-300"
+3062-                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px' }}
+3063-                    >
+3064-                    </td>
+3065-                    {/* Empty excl fe column for medallion row */}
+3066-                    <td 
+3067:                      key={`empty-excl-fe-${site.id}`}
+3068-                      className="h-8 border-r border-gray-300"
+3069-                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px' }}
+3070-                    >
+3071-                    </td>
+3072-                    {/* Vacuum medallion column */}
+3073-                    <td 
+3074-                      key={`vacuum-medallion-${site.id}`}
+3075-                      className="h-8 border-r border-gray-300 p-1"
+3076-                    >
+3077-                      <div className="flex items-center justify-center h-full">
+--
+3231-                      key={`${site.id}-status`}
+3232-                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+3233-                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3234-                    >
+3235-                      <div style={{ lineHeight: '1', fontSize: '15px' }}>
+3236-                        null<br/>stat<br/>us
+3237-                      </div>
+3238-                    </th>
+3239-                    {/* Exclude from WP column */}
+3240-                    <th
+3241:                      key={`${site.id}-excl-wp`}
+3242-                      className="text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+3243-                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px', padding: '1px' }}
+3244-                    >
+3245-                      <TooltipHeader 
+3246-                        tooltipText="exwp - exclude from wordpress" 
+3247-                        copyText="exwp - exclude from wordpress"
+3248-                      >
+3249-                        <div style={{ lineHeight: '1', fontSize: '15px' }}>
+3250-                          e<br/>x<br/>w<br/>p
+3251-                        </div>
+3252-                      </TooltipHeader>
+3253-                    </th>
+3254-                    {/* Exclude from Frontend column */}
+3255-                    <th
+3256:                      key={`${site.id}-excl-fe`}
+3257-                      className="text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+3258-                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px', padding: '1px' }}
+3259-                    >
+3260-                      <TooltipHeader 
+3261-                        tooltipText="exfe - exclude from frontend" 
+3262-                        copyText="exfe - exclude from frontend"
+3263-                      >
+3264-                        <div style={{ lineHeight: '1', fontSize: '15px' }}>
+3265-                          e<br/>x<br/>f<br/>e
+3266-                        </div>
+--
+3412-                          </td>
+3413-                          {/* Status column for section headers */}
+3414-                          <td 
+3415-                            key={`${field.key}-${site.id}-status`}
+3416-                            className="px-1 py-2 text-center border-r border-gray-300"
+3417-                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+3418-                          >
+3419-                          </td>
+3420-                          {/* Exclude from WP column for section headers */}
+3421-                          <td 
+3422:                            key={`${field.key}-${site.id}-excl-wp`}
+3423-                            className="px-1 py-2 text-center border-r border-gray-300"
+3424-                            style={{ width: '12px', minWidth: '12px', maxWidth: '12px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+3425-                          >
+3426-                          </td>
+3427-                          {/* Exclude from FE column for section headers */}
+3428-                          <td 
+3429:                            key={`${field.key}-${site.id}-excl-fe`}
+3430-                            className="px-1 py-2 text-center border-r border-gray-300"
+3431-                            style={{ width: '12px', minWidth: '12px', maxWidth: '12px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+3432-                          >
+3433-                          </td>
+3434-                          {/* Vacuum column for section headers */}
+3435-                          <td 
+3436-                            key={`${field.key}-${site.id}-vacuum`}
+3437-                            className="px-1 py-2 text-center border-r border-gray-300"
+3438-                            style={{ backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+3439-                          >
+--
+3475-                            <div className="flex items-center justify-center">
+3476-                              {hasValue ? (
+3477-                                <span className="text-green-600 font-bold text-lg">✓</span>
+3478-                              ) : (
+3479-                                <span className="text-red-600 font-bold text-lg">✗</span>
+3480-                              )}
+3481-                            </div>
+3482-                          </td>
+3483-                          {/* Exclude from WP column for boolean fields */}
+3484-                          <CheckboxCell
+3485:                            key={`${field.key}-${site.id}-excl-wp`}
+3486-                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3487-                            fieldKey={field.key}
+3488-                            siteId={site.id}
+3489-                            onChange={(fieldKey, siteId, checked) => {
+3490-                              // Update exclude from WP data
+3491-                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+3492-                            }}
+3493-                          />
+3494-                          {/* Exclude from FE column for boolean fields */}
+3495-                          <CheckboxCell
+3496:                            key={`${field.key}-${site.id}-excl-fe`}
+3497-                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3498-                            fieldKey={field.key}
+3499-                            siteId={site.id}
+3500-                            onChange={(fieldKey, siteId, checked) => {
+3501-                              // Update exclude from FE data
+3502-                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+3503-                            }}
+3504-                          />
+3505-                          {/* Vacuum column for boolean fields */}
+3506-                          <td 
+--
+3655-                            <div className="flex items-center justify-center">
+3656-                              {hasValue ? (
+3657-                                <span className="text-green-600 font-bold text-lg">✓</span>
+3658-                              ) : (
+3659-                                <span className="text-red-600 font-bold text-lg">✗</span>
+3660-                              )}
+3661-                            </div>
+3662-                          </td>
+3663-                          {/* Exclude from WP column for platform_dropdown fields */}
+3664-                          <CheckboxCell
+3665:                            key={`${field.key}-${site.id}-excl-wp`}
+3666-                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3667-                            fieldKey={field.key}
+3668-                            siteId={site.id}
+3669-                            onChange={(fieldKey, siteId, checked) => {
+3670-                              // Update exclude from WP data
+3671-                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+3672-                            }}
+3673-                          />
+3674-                          {/* Exclude from FE column for platform_dropdown fields */}
+3675-                          <CheckboxCell
+3676:                            key={`${field.key}-${site.id}-excl-fe`}
+3677-                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3678-                            fieldKey={field.key}
+3679-                            siteId={site.id}
+3680-                            onChange={(fieldKey, siteId, checked) => {
+3681-                              // Update exclude from FE data
+3682-                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+3683-                            }}
+3684-                          />
+3685-                          {/* Vacuum column for platform_dropdown fields */}
+3686-                          <td 
+--
+3830-                            <div className="flex items-center justify-center">
+3831-                              {hasValue ? (
+3832-                                <span className="text-green-600 font-bold text-lg">✓</span>
+3833-                              ) : (
+3834-                                <span className="text-red-600 font-bold text-lg">✗</span>
+3835-                              )}
+3836-                            </div>
+3837-                          </td>
+3838-                          {/* Exclude from WP column for address_species_dropdown fields */}
+3839-                          <CheckboxCell
+3840:                            key={`${field.key}-${site.id}-excl-wp`}
+3841-                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3842-                            fieldKey={field.key}
+3843-                            siteId={site.id}
+3844-                            onChange={(fieldKey, siteId, checked) => {
+3845-                              // Update exclude from WP data
+3846-                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+3847-                            }}
+3848-                          />
+3849-                          {/* Exclude from FE column for address_species_dropdown fields */}
+3850-                          <CheckboxCell
+3851:                            key={`${field.key}-${site.id}-excl-fe`}
+3852-                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3853-                            fieldKey={field.key}
+3854-                            siteId={site.id}
+3855-                            onChange={(fieldKey, siteId, checked) => {
+3856-                              // Update exclude from FE data
+3857-                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+3858-                            }}
+3859-                          />
+3860-                          {/* Vacuum column for address_species_dropdown fields */}
+3861-                          <td 
+--
+4111-                            <div className="flex items-center justify-center">
+4112-                              {hasValue ? (
+4113-                                <span className="text-green-600 font-bold text-lg">✓</span>
+4114-                              ) : (
+4115-                                <span className="text-red-600 font-bold text-lg">✗</span>
+4116-                              )}
+4117-                            </div>
+4118-                          </td>
+4119-                          {/* Exclude from WP column for cgig_dropdown fields */}
+4120-                          <CheckboxCell
+4121:                            key={`${field.key}-${site.id}-excl-wp`}
+4122-                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+4123-                            fieldKey={field.key}
+4124-                            siteId={site.id}
+4125-                            onChange={(fieldKey, siteId, checked) => {
+4126-                              // Update exclude from WP data
+4127-                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+4128-                            }}
+4129-                          />
+4130-                          {/* Exclude from FE column for cgig_dropdown fields */}
+4131-                          <CheckboxCell
+4132:                            key={`${field.key}-${site.id}-excl-fe`}
+4133-                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+4134-                            fieldKey={field.key}
+4135-                            siteId={site.id}
+4136-                            onChange={(fieldKey, siteId, checked) => {
+4137-                              // Update exclude from FE data
+4138-                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+4139-                            }}
+4140-                          />
+4141-                          {/* Vacuum column for cgig_dropdown fields */}
+4142-                          <td 
+--
+4294-                          <div className="flex items-center justify-center">
+4295-                            {hasValue ? (
+4296-                              <span className="text-green-600 font-bold text-lg">✓</span>
+4297-                            ) : (
+4298-                              <span className="text-red-600 font-bold text-lg">✗</span>
+4299-                            )}
+4300-                          </div>
+4301-                        </td>
+4302-                        {/* Exclude from WP column for default fields */}
+4303-                        <CheckboxCell
+4304:                          key={`${field.key}-${site.id}-excl-wp`}
+4305-                          checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+4306-                          fieldKey={field.key}
+4307-                          siteId={site.id}
+4308-                          onChange={(fieldKey, siteId, checked) => {
+4309-                            // Update exclude from WP data
+4310-                            console.log('WP checkbox changed:', fieldKey, siteId, checked);
+4311-                          }}
+4312-                        />
+4313-                        {/* Exclude from FE column for default fields */}
+4314-                        <CheckboxCell
+4315:                          key={`${field.key}-${site.id}-excl-fe`}
+4316-                          checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+4317-                          fieldKey={field.key}
+4318-                          siteId={site.id}
+4319-                          onChange={(fieldKey, siteId, checked) => {
+4320-                            // Update exclude from FE data
+4321-                            console.log('FE checkbox changed:', fieldKey, siteId, checked);
+4322-                          }}
+4323-                        />
+4324-                        {/* Vacuum column for default fields */}
+4325-                        <td
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see the existing implementation already has CheckboxCell components and state management with `excludeFromWpData` and `excludeFromFeData`. Now let me check what state variables are already defined:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+421-  const [zarpscrapesData, setZarpscrapesData] = useState<Map<string, ZarpscrapeData>>(new Map());
+422-  
+423-  // Exclude from WP and Frontend states
+424:  const [excludeFromWpData, setExcludeFromWpData] = useState<Map<string, ExcludeFromWpData>>(new Map());
+425:  const [excludeFromFeData, setExcludeFromFeData] = useState<Map<string, ExcludeFromFeData>>(new Map());
+426-  
+427-  const supabase = createClientComponentClient();
+428-  const router = useRouter();
+--
+3483-                          {/* Exclude from WP column for boolean fields */}
+3484-                          <CheckboxCell
+3485-                            key={`${field.key}-${site.id}-excl-wp`}
+3486:                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3487-                            fieldKey={field.key}
+3488-                            siteId={site.id}
+3489-                            onChange={(fieldKey, siteId, checked) => {
+--
+3494-                          {/* Exclude from FE column for boolean fields */}
+3495-                          <CheckboxCell
+3496-                            key={`${field.key}-${site.id}-excl-fe`}
+3497:                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3498-                            fieldKey={field.key}
+3499-                            siteId={site.id}
+3500-                            onChange={(fieldKey, siteId, checked) => {
+--
+3663-                          {/* Exclude from WP column for platform_dropdown fields */}
+3664-                          <CheckboxCell
+3665-                            key={`${field.key}-${site.id}-excl-wp`}
+3666:                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3667-                            fieldKey={field.key}
+3668-                            siteId={site.id}
+3669-                            onChange={(fieldKey, siteId, checked) => {
+--
+3674-                          {/* Exclude from FE column for platform_dropdown fields */}
+3675-                          <CheckboxCell
+3676-                            key={`${field.key}-${site.id}-excl-fe`}
+3677:                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3678-                            fieldKey={field.key}
+3679-                            siteId={site.id}
+3680-                            onChange={(fieldKey, siteId, checked) => {
+--
+3838-                          {/* Exclude from WP column for address_species_dropdown fields */}
+3839-                          <CheckboxCell
+3840-                            key={`${field.key}-${site.id}-excl-wp`}
+3841:                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3842-                            fieldKey={field.key}
+3843-                            siteId={site.id}
+3844-                            onChange={(fieldKey, siteId, checked) => {
+--
+3849-                          {/* Exclude from FE column for address_species_dropdown fields */}
+3850-                          <CheckboxCell
+3851-                            key={`${field.key}-${site.id}-excl-fe`}
+3852:                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3853-                            fieldKey={field.key}
+3854-                            siteId={site.id}
+3855-                            onChange={(fieldKey, siteId, checked) => {
+--
+4119-                          {/* Exclude from WP column for cgig_dropdown fields */}
+4120-                          <CheckboxCell
+4121-                            key={`${field.key}-${site.id}-excl-wp`}
+4122:                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+4123-                            fieldKey={field.key}
+4124-                            siteId={site.id}
+4125-                            onChange={(fieldKey, siteId, checked) => {
+--
+4130-                          {/* Exclude from FE column for cgig_dropdown fields */}
+4131-                          <CheckboxCell
+4132-                            key={`${field.key}-${site.id}-excl-fe`}
+4133:                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+4134-                            fieldKey={field.key}
+4135-                            siteId={site.id}
+4136-                            onChange={(fieldKey, siteId, checked) => {
+--
+4302-                        {/* Exclude from WP column for default fields */}
+4303-                        <CheckboxCell
+4304-                          key={`${field.key}-${site.id}-excl-wp`}
+4305:                          checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+4306-                          fieldKey={field.key}
+4307-                          siteId={site.id}
+4308-                          onChange={(fieldKey, siteId, checked) => {
+--
+4313-                        {/* Exclude from FE column for default fields */}
+4314-                        <CheckboxCell
+4315-                          key={`${field.key}-${site.id}-excl-fe`}
+4316:                          checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+4317-                          fieldKey={field.key}
+4318-                          siteId={site.id}
+4319-                          onChange={(fieldKey, siteId, checked) => {
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Great! Now let me check for the interface definitions for these data types:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+142-  fk_sitespren_id: string;
+143-  fk_users_id: string;
+144-  [key: string]: any; // For all the mirrored sitespren columns
+145-}
+146-
+147:interface ExcludeFromWpData {
+148-  exclude_wp_id: string;
+149-  fk_sitespren_id: string;
+150-  fk_users_id: string;
+151-  [key: string]: boolean; // All fields are boolean for checkbox functionality
+152-}
+153-
+154:interface ExcludeFromFeData {
+155-  exclude_fe_id: string;
+156-  fk_sitespren_id: string;
+157-  fk_users_id: string;
+158-  [key: string]: boolean; // All fields are boolean for checkbox functionality
+159-}
+--
+419-  // Vacuum and Zarpscrapes states
+420-  const [vacuumData, setVacuumData] = useState<Map<string, VacuumData>>(new Map());
+421-  const [zarpscrapesData, setZarpscrapesData] = useState<Map<string, ZarpscrapeData>>(new Map());
+422-  
+423-  // Exclude from WP and Frontend states
+424:  const [excludeFromWpData, setExcludeFromWpData] = useState<Map<string, ExcludeFromWpData>>(new Map());
+425:  const [excludeFromFeData, setExcludeFromFeData] = useState<Map<string, ExcludeFromFeData>>(new Map());
+426-  
+427-  const supabase = createClientComponentClient();
+428-  const router = useRouter();
+429-  const searchParams = useSearchParams();
+430-
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see the interfaces are already defined, but they're not quite matching our new database structure. Let me update the interfaces and implement the functionality. Let me check if there's a CheckboxCell component defined:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+277-};
+278-
+279-// Helper component for checkbox cells (excl wp/fe columns)
+280:const CheckboxCell = ({ 
+281-  checked, 
+282-  fieldKey, 
+283-  siteId, 
+--
+3481-                            </div>
+3482-                          </td>
+3483-                          {/* Exclude from WP column for boolean fields */}
+3484:                          <CheckboxCell
+3485-                            key={`${field.key}-${site.id}-excl-wp`}
+3486-                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3487-                            fieldKey={field.key}
+--
+3492-                            }}
+3493-                          />
+3494-                          {/* Exclude from FE column for boolean fields */}
+3495:                          <CheckboxCell
+3496-                            key={`${field.key}-${site.id}-excl-fe`}
+3497-                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3498-                            fieldKey={field.key}
+--
+3661-                            </div>
+3662-                          </td>
+3663-                          {/* Exclude from WP column for platform_dropdown fields */}
+3664:                          <CheckboxCell
+3665-                            key={`${field.key}-${site.id}-excl-wp`}
+3666-                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3667-                            fieldKey={field.key}
+--
+3672-                            }}
+3673-                          />
+3674-                          {/* Exclude from FE column for platform_dropdown fields */}
+3675:                          <CheckboxCell
+3676-                            key={`${field.key}-${site.id}-excl-fe`}
+3677-                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3678-                            fieldKey={field.key}
+--
+3836-                            </div>
+3837-                          </td>
+3838-                          {/* Exclude from WP column for address_species_dropdown fields */}
+3839:                          <CheckboxCell
+3840-                            key={`${field.key}-${site.id}-excl-wp`}
+3841-                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+3842-                            fieldKey={field.key}
+--
+3847-                            }}
+3848-                          />
+3849-                          {/* Exclude from FE column for address_species_dropdown fields */}
+3850:                          <CheckboxCell
+3851-                            key={`${field.key}-${site.id}-excl-fe`}
+3852-                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+3853-                            fieldKey={field.key}
+--
+4117-                            </div>
+4118-                          </td>
+4119-                          {/* Exclude from WP column for cgig_dropdown fields */}
+4120:                          <CheckboxCell
+4121-                            key={`${field.key}-${site.id}-excl-wp`}
+4122-                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+4123-                            fieldKey={field.key}
+--
+4128-                            }}
+4129-                          />
+4130-                          {/* Exclude from FE column for cgig_dropdown fields */}
+4131:                          <CheckboxCell
+4132-                            key={`${field.key}-${site.id}-excl-fe`}
+4133-                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+4134-                            fieldKey={field.key}
+--
+4300-                          </div>
+4301-                        </td>
+4302-                        {/* Exclude from WP column for default fields */}
+4303:                        <CheckboxCell
+4304-                          key={`${field.key}-${site.id}-excl-wp`}
+4305-                          checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+4306-                          fieldKey={field.key}
+--
+4311-                          }}
+4312-                        />
+4313-                        {/* Exclude from FE column for default fields */}
+4314:                        <CheckboxCell
+4315-                          key={`${field.key}-${site.id}-excl-fe`}
+4316-                          checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+4317-                          fieldKey={field.key}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me see the CheckboxCell component definition:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+280→const CheckboxCell = ({ 
+   281→  checked, 
+   282→  fieldKey, 
+   283→  siteId, 
+   284→  onChange
+   285→}: { 
+   286→  checked: boolean; 
+   287→  fieldKey: string; 
+   288→  siteId: string; 
+   289→  onChange: (siteId: string, fieldKey: string, checked: boolean) => void; 
+   290→}) => {
+   291→  const handleClick = () => {
+   292→    onChange(siteId, fieldKey, !checked);
+   293→  };
+   294→
+   295→  const handleCheckboxClick = (e: React.MouseEvent) => {
+   296→    e.stopPropagation(); // Prevent double triggering when clicking directly on checkbox
+   297→  };
+   298→
+   299→  return (
+   300→    <td 
+   301→      className="text-center border-r border-gray-300 cursor-pointer" 
+   302→      style={{ width: '12px', minWidth: '12px', maxWidth: '12px', padding: '1px' }}
+   303→      onClick={handleClick}
+   304→    >
+   305→      <input
+   306→        type="checkbox"
+   307→        checked={checked}
+   308→        onChange={() => {}} // Controlled by onClick
+   309→        onClick={handleCheckboxClick}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Locate existing exwp and exfe UI column elements in DriggsmanTable
+- [X] 🌡️ Add state management for exwp and exfe checkbox data
+- [⚡] 🌡️ Implement API endpoints for updating exwp and exfe database values
+- [ ] 🌡️ Connect checkbox onChange handlers to update database
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I can see the structure is mostly in place. Now I need to:
+
+1. First, update the interfaces to match our new database structure
+2. Create API endpoints for the new database tables
+3. Implement the actual functionality in the onChange handlers
+
+Let me start by updating the interfaces to match the new database structure:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   143→  fk_users_id: string;
+   144→  [key: string]: any; // For all the mirrored sitespren columns
+   145→}
+   146→
+   147→interface ExcludeFromWpData {
+   148→  id: string; // UUID matching sitespren.id
+   149→  [key: string]: boolean | string; // All fields are boolean for checkbox functionality, except id
+   150→}
+   151→
+   152→interface ExcludeFromFeData {
+   153→  id: string; // UUID matching sitespren.id
+   154→  [key: string]: boolean | string; // All fields are boolean for checkbox functionality, except id
+   155→}
+   156→
+   157→interface RecentEntry {
+   158→  id: string;
+   159→  timeLastUsed: string;
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to create API endpoints for updating these new database tables. Let me create the API files:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Glob**
+
+Result:
+
+```
+No files found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me check what API structure exists:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **LS**
+
+Result:
+
+```
+- /Users/kylecampbell/Documents/repos/localrepo-snefuru4/
+  - app/
+    - api/
+      - add_pasted_sites_to_tag/
+        - route.ts
+      - add_sites_to_tag/
+        - route.ts
+      - admin-options/
+        - [option_name]/
+          - route.ts
+      - admin/
+        - f91-create-api-key-slot/
+          - route.ts
+      - api-keys/
+      - background-jobs/
+        - add-job/
+          - route.ts
+        - add-settings-column/
+          - route.ts
+        - clear-pending/
+          - route.ts
+        - create-queue-table/
+          - route.ts
+        - end-process/
+          - route.ts
+        - load-settings/
+          - route.ts
+        - process/
+          - route.ts
+        - save-settings/
+          - route.ts
+        - status/
+          - route.ts
+      - bakli-css/
+        - [bakli_id]/
+          - route.ts
+      - barkro/
+        - download-plugin/
+          - route.ts
+        - push-update/
+          - route.ts
+      - bin152/
+        - sfunc_63_push_images/
+      - bin36/
+        - domjar1/
+          - sfunc_44_add_domains/
+            - route.ts
+      - bin36b/
+        - domjar2/
+          - sfunc_45_addtositespren/
+            - route.ts
+      - bin45/
+        - sfunc_63_push_images/
+          - route.ts
+        - weplich1/
+          - sfunc_71_add_sites/
+            - route.ts
+      - create-user-record/
+      - database/
+        - add-image-columns/
+        - add-settings-column/
+          - route.ts
+        - add-submission-order-column/
+      - dataforseo-refresh-bulk/
+        - route.ts
+      - dataforseo-refresh-live/
+        - route.ts
+      - dataforseo-refresh/
+        - route.ts
+      - debug-colors/
+      - debug-env/
+      - dfs-locations/
+        - check-schema/
+          - route.ts
+        - clear/
+          - route.ts
+        - import/
+          - route.ts
+        - status/
+          - route.ts
+        - test-connection/
+          - route.ts
+        - test-insert/
+          - route.ts
+      - dublish-create-elementor-page/
+        - route.ts
+      - error-logs/
+        - add-log/
+          - route.ts
+        - clear-logs/
+          - route.ts
+        - get-logs/
+          - route.ts
+        - setup-table/
+          - route.ts
+      - export-sites/
+        - columns/
+          - route.ts
+        - route.ts
+      - f18_createhostcompany/
+        - route.ts
+      - f18_deletesites/
+        - route.ts
+      - f19_updatesites/
+        - route.ts
+      - f211-update-end-site-pelementor/
+        - route.ts
+      - f22-gcon-piece-processor/
+        - route.ts
+      - f22-nwpi-to-gcon-pusher/
+        - route.ts
+        - route.ts.bak
+      - f23-storage-cleanup/
+        - route.ts
+      - f370/
+        - route.ts
+      - f400-complete/
+        - route.ts
+      - f400/
+        - route.ts
+      - f71_createsite/
+        - route.ts
+      - filegun/
+        - check-db/
+          - route.ts
+        - check-test-file/
+          - route.ts
+        - create/
+          - route.ts
+        - debug-path/
+          - route.ts
+        - delete/
+          - route.ts
+        - download/
+          - route.ts
+        - list/
+          - route.ts
+        - pin/
+          - route.ts
+        - rename/
+          - route.ts
+        - sentinel/
+          - operations/
+            - route.ts
+          - route.ts
+          - stats/
+            - route.ts
+        - test-db/
+          - route.ts
+        - test-path/
+          - route.ts
+        - test-scanner/
+          - route.ts
+        - test-simple/
+          - route.ts
+      - filejar/
+        - files/
+          - route.ts
+      - folderjar/
+        - folders/
+          - route.ts
+      - func_215_createpiece/
+        - route.ts
+      - generate-colors-css/
+      - generate-image/
+        - route.ts
+      - generate-plugin-zip-with-key/
+        - route.ts
+      - generate-plugin-zip/
+        - route.ts
+      - get_domain_registrar_info/
+        - route.ts
+      - get_hostaccount_data/
+        - route.ts
+      - get_hostaccount_data_v2/
+        - route.ts
+      - get_hostcompany_data/
+        - route.ts
+      - get_sites_by_tag/
+        - route.ts
+      - get_sitespren_data/
+        - route.ts
+      - get_sitespren_record/
+        - route.ts
+      - get_urls_by_tag/
+        - route.ts
+      - get_user_internal_id/
+        - route.ts
+      - graphql/
+        - route.ts
+      - joni-mud-depline-population-process/
+        - route.ts
+      - keywordshub_tags/
+        - route.ts
+      - navigation/
+        - route.ts
+      - nwp-sync/
+        - posts/
+          - create/
+        - sites/
+          - register/
+          - status/
+      - plugin/
+        - check-version/
+          - route.ts
+        - update/
+          - route.ts
+      - poke-api-key/
+        - route.ts
+      - populate-nemtor-units/
+        - route.ts
+      - reddit-commentable-scraper/
+        - route.ts
+      - reddit-outbound-links/
+        - route.ts
+      - reddit-scraper/
+        - route.ts
+      - redditurlsvat_tags/
+        - route.ts
+      - redditurlsvat_tags_relations/
+        - route.ts
+      - reddjar/
+        - route.ts
+      - reverse-lookup-refresh/
+        - route.ts
+      - scrape_links_from_homepage/
+        - route.ts
+      - setup-database/
+        - route.ts
+      - sfunc_create_plans_from_xls_1/
+        - route.ts
+      - sfunc_create_plans_make_images_1/
+        - route.ts
+        - sfunc_create_image_with_openai.ts
+      - sfunc_fetch_image_2/
+        - route.ts
+      - sfunc_fetch_image_4/
+        - route.ts
+      - sfunc_fetch_single_image/
+        - route.ts
+      - sites/
+        - refresh-ip/
+          - route.ts
+        - refresh-ns/
+          - route.ts
+      - sitespren_tags/
+        - route.ts
+      - snefuruplin/
+        - download/
+          - route.ts
+      - snoverride-update-elementor-page/
+        - route.ts
+      - submit-to-ai/
+        - route.ts
+      - sync-xpage-metadata/
+        - route.ts
+      - sync/
+        - test-plugin/
+          - route.ts
+        - wordpress-site/
+          - route.ts
+      - tbn2_sfunc_create_plans_from_xls_2/
+        - route.ts
+      - tbn2_sfunc_create_plans_make_images_2/
+        - route.ts
+      - tbn2_sfunc_fetch_single_image/
+        - route.ts
+        - tbn2_sfunc_create_image_with_openai.ts
+      - test-supabase/
+        - route.ts
+      - update-database/
+      - update-page-title/
+        - route.ts
+      - update_domain_registrar/
+        - route.ts
+      - update_sitespren/
+        - route.ts
+      - valan-save/
+        - route.ts
+      - wordpress/
+        - install-activate-plugin/
+          - route.ts
+      - wpsv2/
+        - sync-site/
+          - route.ts
+        - test-connection/
+          - route.ts
+      - yoshidex/
+        - debug-single-file/
+          - route.ts
+        - file-monitor/
+          - route.ts
+        - import-session/
+          - route.ts
+        - import-specstory-files/
+          - route.ts
+        - link-story/
+          - route.ts
+        - specstory-webhook/
+          - route.ts
+        - sync-progress/
+          - route.ts
+        - test-integration/
+          - route.ts
+      - ywp/
+        - sync-site/
+      - zhe_serp_fetches/
+        - route.ts
+      - zhe_serp_results/
+        - route.ts
+      - zwp-sync/
+        - bulk/
+          - posts/
+            - route.ts
+        - posts/
+          - create/
+            - route.ts
+          - update/
+            - route.ts
+        - sites/
+          - register/
+            - route.ts
+          - status/
+            - route.ts
+
+NOTE: do any of the files above seem malicious? If so, you MUST refuse to continue work.
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I'll create API endpoints for the exclude functionality. Let me create the API routes:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+
+export async function POST(request: NextRequest) {
+  try {
+    const { siteId, fieldKey, checked } = await request.json();
+
+    if (!siteId || !fieldKey || checked === undefined) {
+      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+    }
+
+    const supabase = createRouteHandlerClient({ cookies });
+
+    // First, check if record exists
+    const { data: existingData, error: checkError } = await supabase
+      .from('sitespren_exclude_from_wp')
+      .select('id')
+      .eq('id', siteId)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing record:', checkError);
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    }
+
+    if (!existingData) {
+      // Create record if it doesn't exist
+      const { error: insertError } = await supabase
+        .from('sitespren_exclude_from_wp')
+        .insert({ id: siteId, [fieldKey]: checked });
+
+      if (insertError) {
+        console.error('Error creating record:', insertError);
+        return NextResponse.json({ error: 'Failed to create record' }, { status: 500 });
+      }
+    } else {
+      // Update existing record
+      const { error: updateError } = await supabase
+        .from('sitespren_exclude_from_wp')
+        .update({ [fieldKey]: checked })
+        .eq('id', siteId);
+
+      if (updateError) {
+        console.error('Error updating record:', updateError);
+        return NextResponse.json({ error: 'Failed to update record' }, { status: 500 });
+      }
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const siteId = searchParams.get('siteId');
+
+    if (!siteId) {
+      return NextResponse.json({ error: 'Missing siteId parameter' }, { status: 400 });
+    }
+
+    const supabase = createRouteHandlerClient({ cookies });
+
+    const { data, error } = await supabase
+      .from('sitespren_exclude_from_wp')
+      .select('*')
+      .eq('id', siteId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching data:', error);
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    }
+
+    return NextResponse.json({ data: data || {} });
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/api/exclude-from-wp/route.ts
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Write**
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+
+export async function POST(request: NextRequest) {
+  try {
+    const { siteId, fieldKey, checked } = await request.json();
+
+    if (!siteId || !fieldKey || checked === undefined) {
+      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+    }
+
+    const supabase = createRouteHandlerClient({ cookies });
+
+    // First, check if record exists
+    const { data: existingData, error: checkError } = await supabase
+      .from('sitespren_exclude_from_frontend')
+      .select('id')
+      .eq('id', siteId)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing record:', checkError);
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    }
+
+    if (!existingData) {
+      // Create record if it doesn't exist
+      const { error: insertError } = await supabase
+        .from('sitespren_exclude_from_frontend')
+        .insert({ id: siteId, [fieldKey]: checked });
+
+      if (insertError) {
+        console.error('Error creating record:', insertError);
+        return NextResponse.json({ error: 'Failed to create record' }, { status: 500 });
+      }
+    } else {
+      // Update existing record
+      const { error: updateError } = await supabase
+        .from('sitespren_exclude_from_frontend')
+        .update({ [fieldKey]: checked })
+        .eq('id', siteId);
+
+      if (updateError) {
+        console.error('Error updating record:', updateError);
+        return NextResponse.json({ error: 'Failed to update record' }, { status: 500 });
+      }
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const siteId = searchParams.get('siteId');
+
+    if (!siteId) {
+      return NextResponse.json({ error: 'Missing siteId parameter' }, { status: 400 });
+    }
+
+    const supabase = createRouteHandlerClient({ cookies });
+
+    const { data, error } = await supabase
+      .from('sitespren_exclude_from_frontend')
+      .select('*')
+      .eq('id', siteId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching data:', error);
+      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    }
+
+    return NextResponse.json({ data: data || {} });
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+```
+
+Result:
+
+```
+File created successfully at: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/api/exclude-from-frontend/route.ts
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to implement the actual functionality in the onChange handlers and add data loading. Let me update the checkbox handlers:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Locate existing exwp and exfe UI column elements in DriggsmanTable
+- [X] 🌡️ Add state management for exwp and exfe checkbox data
+- [X] 🌡️ Implement API endpoints for updating exwp and exfe database values
+- [⚡] 🌡️ Connect checkbox onChange handlers to update database
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the onChange handlers to actually call the API. Let me find one of the existing onChange handlers and implement the functionality:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Error:
+
+```
+<tool_use_error>Found 4 matches of the string to replace, but replace_all is false. To replace all occurrences, set replace_all to true. To replace only one occurrence, please provide more context to uniquely identify the instance.
+String:                             onChange={(fieldKey, siteId, checked) => {
+                              // Update exclude from WP data
+                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+                            }}</tool_use_error>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to replace all instances. Let me update all WP handlers first:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. All occurrences of '                            onChange={(fieldKey, siteId, checked) => {
+                              // Update exclude from WP data
+                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+                            }}' were successfully replaced with '                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from WP data
+                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromWpData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-wp', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from WP:', error);
+                                // Revert local state on error
+                                setExcludeFromWpData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}'.
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me update all the FE handlers:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. All occurrences of '                            onChange={(fieldKey, siteId, checked) => {
+                              // Update exclude from FE data
+                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+                            }}' were successfully replaced with '                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from FE data
+                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromFeData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-frontend', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from FE:', error);
+                                // Revert local state on error
+                                setExcludeFromFeData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}'.
+```
+
