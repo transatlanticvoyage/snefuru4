@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import ProfilePictureUpload from '@/app/components/profile/ProfilePictureUpload';
+import AvatarDisplay from '@/app/components/profile/AvatarDisplay';
 
 type Profile = {
   id: string;
@@ -16,6 +18,9 @@ type UserSettings = {
   id: string;
   email: string;
   sidebar_menu_active: boolean;
+  avatar_url?: string | null;
+  avatar_filename?: string | null;
+  avatar_uploaded_at?: string | null;
 };
 
 export default function ProfileClient() {
@@ -38,7 +43,7 @@ export default function ProfileClient() {
         // Only fetch user settings from users table (no profiles table)
         const { data: userData, error: userError } = await supabaseClient
           .from('users')
-          .select('id, email, sidebar_menu_active')
+          .select('id, email, sidebar_menu_active, avatar_url, avatar_filename, avatar_uploaded_at')
           .eq('auth_id', user.id)
           .single();
 
@@ -109,6 +114,49 @@ export default function ProfileClient() {
     }
   };
 
+  const handleAvatarUploadSuccess = async (newAvatarUrl: string) => {
+    // Update local state immediately for better UX
+    setUserSettings(prev => prev ? { ...prev, avatar_url: newAvatarUrl } : null);
+    
+    // Optionally refetch user data to ensure consistency
+    if (user) {
+      const { data: userData } = await supabaseClient
+        .from('users')
+        .select('id, email, sidebar_menu_active, avatar_url, avatar_filename, avatar_uploaded_at')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (userData) {
+        setUserSettings(userData);
+      }
+    }
+  };
+
+  const handleAvatarDelete = async () => {
+    try {
+      const response = await fetch('/api/profile/avatar-delete', {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Delete failed');
+      }
+
+      // Update local state
+      setUserSettings(prev => prev ? { 
+        ...prev, 
+        avatar_url: null, 
+        avatar_filename: null,
+        avatar_uploaded_at: null
+      } : null);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete avatar');
+    }
+  };
+
   if (loading) {
     return (
       <div className="py-6">
@@ -124,6 +172,38 @@ export default function ProfileClient() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl font-semibold text-gray-900 mb-6">Profile Settings</h1>
         
+        {/* Profile Picture Section */}
+        <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Picture</h3>
+            
+            <div className="flex items-start space-x-6">
+              <div className="flex-shrink-0">
+                <AvatarDisplay 
+                  avatarUrl={userSettings?.avatar_url}
+                  email={user?.email}
+                  size="xl"
+                  showDeleteButton={!!userSettings?.avatar_url}
+                  onDelete={handleAvatarDelete}
+                />
+              </div>
+              
+              <div className="flex-grow">
+                <ProfilePictureUpload 
+                  onUploadSuccess={handleAvatarUploadSuccess}
+                  currentAvatarUrl={userSettings?.avatar_url}
+                />
+                
+                {userSettings?.avatar_uploaded_at && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Last updated: {new Date(userSettings.avatar_uploaded_at).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <form onSubmit={handleSaveProfile}>

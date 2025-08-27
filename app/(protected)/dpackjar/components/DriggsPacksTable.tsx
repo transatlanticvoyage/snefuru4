@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useAuth } from '@/app/context/AuthContext';
 import dynamic from 'next/dynamic';
 import DriggsPacksExpandEditor from '@/app/components/shared/DriggsPacksExpandEditor';
 
@@ -14,11 +15,16 @@ interface DriggsPacksRecord {
   dpack_id: number;
   dpack_datum: string | null;
   dpack_note: string | null;
+  dpack_realm: string | null;
+  dpack_name: string | null;
+  dpack_description: string | null;
+  user_id_created_by: string | null;
   created_at: string;
   updated_at: string | null;
 }
 
 export default function DriggsPacksTable() {
+  const { user } = useAuth();
   const [data, setData] = useState<DriggsPacksRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +50,10 @@ export default function DriggsPacksTable() {
   // Form data for creating/editing
   const [formData, setFormData] = useState({
     dpack_datum: '',
-    dpack_note: ''
+    dpack_note: '',
+    dpack_realm: '',
+    dpack_name: '',
+    dpack_description: ''
   });
 
   const supabase = createClientComponentClient();
@@ -57,7 +66,7 @@ export default function DriggsPacksTable() {
       
       const { data: fetchedData, error } = await supabase
         .from('driggs_packs')
-        .select('*')
+        .select('dpack_id, dpack_datum, dpack_note, dpack_realm, dpack_name, dpack_description, user_id_created_by, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -68,6 +77,15 @@ export default function DriggsPacksTable() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Permission check function for editing records
+  const canEditRecord = (record: DriggsPacksRecord): boolean => {
+    // Admin users can edit everything
+    if (user?.is_admin) return true;
+    
+    // Non-admin users can only edit "personal" realm records they created
+    return record.dpack_realm === 'personal' && record.user_id_created_by === user?.id;
   };
 
   useEffect(() => {
@@ -248,7 +266,11 @@ export default function DriggsPacksTable() {
         .from('driggs_packs')
         .insert([{
           dpack_datum: 'New Record',
-          dpack_note: 'Enter note...'
+          dpack_note: 'Enter note...',
+          dpack_realm: user?.is_admin ? 'adminpublic' : 'personal',
+          dpack_name: null,
+          dpack_description: null,
+          user_id_created_by: user?.id || null
         }])
         .select('*')
         .single();
@@ -270,6 +292,12 @@ export default function DriggsPacksTable() {
   // Handle inline editing
   const handleCellClick = (id: number, field: string, value: any) => {
     if (field === 'dpack_id' || field === 'created_at' || field === 'updated_at') return;
+    
+    // Check permissions before allowing edit
+    const record = data.find(r => r.dpack_id === id);
+    if (!record || !canEditRecord(record)) {
+      return; // Don't allow editing if user lacks permission
+    }
     
     setEditingCell({ id, field });
     setEditingValue(value || '');
@@ -319,16 +347,25 @@ export default function DriggsPacksTable() {
     setExpandPopup({ dpackId });
   };
 
-  const handleExpandSave = async (dpackId: number, newValue: string) => {
+  const handleExpandSave = async (dpackId: number, field: 'dpack_datum' | 'dpack_note' | 'dpack_realm' | 'dpack_name' | 'dpack_description', value: string) => {
     if (!expandPopup) return;
 
+    // Check permissions before allowing save
+    const record = data.find(r => r.dpack_id === dpackId);
+    if (!record || !canEditRecord(record)) {
+      alert('You do not have permission to edit this record.');
+      return;
+    }
+
     try {
+      const updateData = {
+        [field]: value,
+        updated_at: new Date().toISOString()
+      };
+
       const { error } = await supabase
         .from('driggs_packs')
-        .update({ 
-          dpack_datum: newValue,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('dpack_id', dpackId);
 
       if (error) throw error;
@@ -337,7 +374,7 @@ export default function DriggsPacksTable() {
       setData(data.map(item => 
         item.dpack_id === dpackId ? { 
           ...item, 
-          dpack_datum: newValue,
+          [field]: value,
           updated_at: new Date().toISOString()
         } : item
       ));
@@ -354,9 +391,17 @@ export default function DriggsPacksTable() {
   // Handle form submission for popup modal
   const handleCreateSubmit = async () => {
     try {
+      // Set default realm based on user permissions
+      const defaultRealm = user?.is_admin ? 'adminpublic' : 'personal';
+      const finalRealm = formData.dpack_realm.trim() || defaultRealm;
+      
       const insertData = {
         dpack_datum: formData.dpack_datum.trim() || null,
-        dpack_note: formData.dpack_note.trim() || null
+        dpack_note: formData.dpack_note.trim() || null,
+        dpack_realm: finalRealm,
+        dpack_name: formData.dpack_name.trim() || null,
+        dpack_description: formData.dpack_description.trim() || null,
+        user_id_created_by: user?.id || null
       };
       
       const { error: insertError } = await supabase
@@ -378,7 +423,10 @@ export default function DriggsPacksTable() {
   const resetForm = () => {
     setFormData({
       dpack_datum: '',
-      dpack_note: ''
+      dpack_note: '',
+      dpack_realm: '',
+      dpack_name: '',
+      dpack_description: ''
     });
   };
 
@@ -478,7 +526,7 @@ export default function DriggsPacksTable() {
               </th>
               
               {/* Data columns */}
-              {['dpack_id', 'dpack_datum', 'dpack_note', 'created_at', 'updated_at'].map(field => (
+              {['dpack_id', 'dpack_datum', 'dpack_note', 'dpack_realm', 'dpack_name', 'dpack_description', 'created_at', 'updated_at'].map(field => (
                 <th
                   key={field}
                   onClick={() => handleSort(field as keyof DriggsPacksRecord)}
@@ -498,8 +546,14 @@ export default function DriggsPacksTable() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentData.map((record) => (
-              <tr key={record.dpack_id} className="hover:bg-gray-50">
+            {currentData.map((record) => {
+              const canEdit = canEditRecord(record);
+              return (
+              <tr 
+                key={record.dpack_id} 
+                className={`hover:bg-gray-50 ${!canEdit ? 'opacity-60 bg-gray-25' : ''}`}
+                title={!canEdit ? 'Read-only: Admin permissions required' : ''}
+              >
                 {/* Checkbox */}
                 <td 
                   className="w-8 px-3 py-4 cursor-pointer"
@@ -593,7 +647,8 @@ export default function DriggsPacksTable() {
                   );
                 })}
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>
@@ -646,6 +701,42 @@ export default function DriggsPacksTable() {
                 <textarea
                   value={formData.dpack_note}
                   onChange={(e) => setFormData(prev => ({ ...prev, dpack_note: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Realm
+                </label>
+                <input
+                  type="text"
+                  value={formData.dpack_realm}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dpack_realm: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.dpack_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dpack_name: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={formData.dpack_description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dpack_description: e.target.value }))}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />

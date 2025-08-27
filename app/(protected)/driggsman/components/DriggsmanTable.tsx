@@ -3317,6 +3317,16 @@ export default function DriggsmanTable({
               <DrenjariButtonBarDriggsmanLinks />
             </div>
             
+            {/* Standalone Planchjar Button */}
+            <div className="mt-4">
+              <Link
+                href="/planchjar"
+                className="inline-block px-2 py-1 text-center bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded transition-colors"
+              >
+                <span className="text-sm font-medium text-gray-700 hover:text-blue-700">/planchjar</span>
+              </Link>
+            </div>
+            
           </div>
         </div>
       )}
