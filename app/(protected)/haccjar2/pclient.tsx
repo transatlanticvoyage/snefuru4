@@ -90,7 +90,7 @@ export default function Haccjar2Client() {
 
   if (!user) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="w-full p-4">
         <div className="text-center">
           <p>Please sign in to manage your host account.</p>
         </div>
@@ -100,7 +100,7 @@ export default function Haccjar2Client() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="w-full p-4">
         <div className="text-center">
           <p>Loading host account data...</p>
         </div>
@@ -110,7 +110,7 @@ export default function Haccjar2Client() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="w-full p-4">
         <div className="text-center text-red-600">
           <p>Error: {error}</p>
         </div>
@@ -119,7 +119,7 @@ export default function Haccjar2Client() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="w-full p-4">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Host Accounts Management V2</h1>
         <p className="text-gray-600">

@@ -2466,7 +2466,7 @@ export default function DriggsmanTable({
           >
             ←
           </button>
-          {Array.from({ length: Math.min(5, totalColumnPages) }, (_, i) => {
+          {Array.from({ length: Math.max(1, Math.min(5, totalColumnPages)) }, (_, i) => {
             let pageNum;
             if (totalColumnPages <= 5) {
               pageNum = i + 1;
@@ -3030,7 +3030,7 @@ export default function DriggsmanTable({
               ))}
             </div>
             
-            {/* Verification and Competitor Buttons - moved here for compact layout */}
+            {/* Verification and Competitor Buttons - restored to original location */}
             <div className="mt-2 mb-2">
               <div className="flex items-center space-x-4">
                 <button

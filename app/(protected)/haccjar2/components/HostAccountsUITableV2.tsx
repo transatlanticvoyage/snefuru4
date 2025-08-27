@@ -37,6 +37,8 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [sortField, setSortField] = useState<SortField>('id');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [selectedHostAccounts, setSelectedHostAccounts] = useState<Set<string>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -103,6 +105,34 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
     } else {
       setSortField(field);
       setSortOrder('asc');
+    }
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = (checked: boolean) => {
+    setSelectAll(checked);
+    if (checked) {
+      const allIds = new Set(paginatedData.map(item => item.id));
+      setSelectedHostAccounts(allIds);
+    } else {
+      setSelectedHostAccounts(new Set());
+    }
+  };
+
+  // Handle individual checkbox
+  const handleSelectHostAccount = (hostAccountId: string, checked: boolean) => {
+    const newSelected = new Set(selectedHostAccounts);
+    if (checked) {
+      newSelected.add(hostAccountId);
+    } else {
+      newSelected.delete(hostAccountId);
+      setSelectAll(false);
+    }
+    setSelectedHostAccounts(newSelected);
+    
+    // Check if all visible items are selected
+    if (newSelected.size === paginatedData.length && paginatedData.every(item => newSelected.has(item.id))) {
+      setSelectAll(true);
     }
   };
 
@@ -175,6 +205,18 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                 </th>
                 {/* Separator column */}
                 <th className="px-2 bg-gray-200"></th>
+                {/* Checkbox column */}
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="ml-2">(checkbox)</span>
+                  </div>
+                </th>
                 {/* Host Account columns on the right */}
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
@@ -241,6 +283,15 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
                   </td>
                   {/* Separator column */}
                   <td className="px-2 bg-gray-200"></td>
+                  {/* Checkbox column */}
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedHostAccounts.has(item.id)}
+                      onChange={(e) => handleSelectHostAccount(item.id, e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </td>
                   {/* Host Account columns */}
                   <td className="px-4 py-2 whitespace-nowrap text-gray-900 text-xs">
                     {truncateText(item.id, 8)}...
@@ -264,7 +315,7 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
               ))}
               {paginatedData.length === 0 && (
                 <tr>
-                  <td colSpan={15} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={16} className="px-4 py-8 text-center text-gray-500">
                     No host accounts found
                   </td>
                 </tr>

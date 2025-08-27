@@ -65,20 +65,50 @@ export default function DriggsmanClient() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Hide/Show Header Button and Navigation */}
-      <div className="px-6 py-1 bg-gray-50 flex items-center space-x-4">
-        <button
-          onClick={() => setIsHeaderVisible(!isHeaderVisible)}
-          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
-        >
-          {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
-        </button>
-
-      </div>
       {/* Pagination and Search Controls */}
       {paginationControls && (
         <div className="px-6 py-1 bg-white border-b">
           <div className="flex items-center space-x-6">
+            {/* Andromeda Logo */}
+            <div 
+              className="text-white font-bold text-xl bg-black rounded flex items-center justify-center"
+              style={{
+                width: '200px',
+                height: '50px',
+                backgroundImage: `
+                  radial-gradient(1px 1px at 25px 12px, #722F37, transparent),
+                  radial-gradient(2px 2px at 65px 8px, #808080, transparent),
+                  radial-gradient(1px 1px at 110px 18px, #FFD700, transparent),
+                  radial-gradient(2px 2px at 35px 28px, #ADD8E6, transparent),
+                  radial-gradient(1px 1px at 85px 35px, #722F37, transparent),
+                  radial-gradient(3px 3px at 145px 15px, #808080, transparent),
+                  radial-gradient(1px 1px at 55px 42px, #FFD700, transparent),
+                  radial-gradient(2px 2px at 15px 38px, #ADD8E6, transparent),
+                  radial-gradient(1px 1px at 125px 45px, #722F37, transparent),
+                  radial-gradient(2px 2px at 75px 6px, #808080, transparent),
+                  radial-gradient(4px 4px at 165px 25px, #FFD700, transparent),
+                  radial-gradient(1px 1px at 45px 18px, #ADD8E6, transparent),
+                  radial-gradient(2px 2px at 95px 48px, #722F37, transparent),
+                  radial-gradient(1px 1px at 185px 35px, #808080, transparent),
+                  radial-gradient(3px 3px at 155px 8px, #FFD700, transparent),
+                  radial-gradient(1px 1px at 115px 28px, #ADD8E6, transparent),
+                  radial-gradient(2px 2px at 175px 42px, #722F37, transparent),
+                  radial-gradient(1px 1px at 5px 25px, #808080, transparent)
+                `,
+                backgroundSize: '200px 50px',
+                fontSize: '20px',
+                lineHeight: '1'
+              }}
+            >
+              Andromeda
+            </div>
+            {/* Show Page Header Button - moved here as requested */}
+            <button
+              onClick={() => setIsHeaderVisible(!isHeaderVisible)}
+              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+            >
+              {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
+            </button>
             <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded text-sm">
               {sitesCount} sites loaded
             </span>

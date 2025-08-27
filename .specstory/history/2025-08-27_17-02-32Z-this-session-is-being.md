@@ -736,3 +736,653 @@ Both DG buttons now include:
 
 The changes are live and ready to test!
 
+---
+
+_**User**_
+
+pleae investigate why on /driggsman, after user updates the dom reg host account in the tundra table, the 2 left-most ui columns in the tundra table go blank (no text values show). and then third column just says something like "porkbun.com". 
+
+the 2 first columns in this row should never change their contents. 
+
+in the third row . please show both db values like:
+porkbun.com parkway
+
+with a space between them inside the cell
+
+then also show the 2 buttons in the cell to the right of those 2 direct db value pulls of "porkbun.com parkway" (example)
+
+so user must still see the button to "update dom reg host account" (the button that trigers the popup) and the button to open theassociated host company login url in a new tab 
+
+these 2 buttons must never disappear from view 
+
+please also widen the tundra and reindeer boxes by 60 px to make room to widen the tundra table a bit to accomodate this 
+
+
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll investigate the tundra table issue on the driggsman page and fix the blank columns problem. Let me start by examining the tundra table structure.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Fix tundra table column display issues after dom reg host account updates
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman`
+
+Result:
+
+```
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:3340:                        className="tundra_box"
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:3368:                            {/* Rolling hills/tundra landscape */}
+/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx:3388:                            tundra_box_div
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me find the tundra table section to examine its structure:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3340→                        className="tundra_box"
+  3341→                        style={{
+  3342→                          position: 'absolute',
+  3343→                          right: '0',
+  3344→                          top: '0',
+  3345→                          bottom: '0',
+  3346→                          width: '350px',
+  3347→                          border: '1px solid black',
+  3348→                          backgroundColor: 'white',
+  3349→                          zIndex: 1,
+  3350→                          padding: '0'
+  3351→                        }}
+  3352→                      >
+  3353→                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'absolute', top: '4px', left: '4px' }}>
+  3354→                          {/* Tundra landscape SVG icon */}
+  3355→                          <svg 
+  3356→                            width="24" 
+  3357→                            height="24" 
+  3358→                            viewBox="0 0 24 24" 
+  3359→                            fill="none" 
+  3360→                            xmlns="http://www.w3.org/2000/svg"
+  3361→                            style={{ color: 'black' }}
+  3362→                          >
+  3363→                            {/* Tundra ground/horizon */}
+  3364→                            <path 
+  3365→                              d="M2 18h20v4H2z" 
+  3366→                              fill="currentColor"
+  3367→                            />
+  3368→                            {/* Rolling hills/tundra landscape */}
+  3369→                            <path 
+  3370→                              d="M2 18c3-2 7-3 10 0s7-2 10 0v-2c-3 2-7 3-10 0s-7 2-10 0z" 
+  3371→                              fill="currentColor"
+  3372→                              opacity="0.7"
+  3373→                            />
+  3374→                            {/* Northern lights/aurora effect */}
+  3375→                            <path 
+  3376→                              d="M4 8c2 1 4-1 6 0s4-1 6 0s4-1 6 0M5 5c2 1 4-1 6 0s4-1 6 0s3-1 5 0" 
+  3377→                              stroke="currentColor" 
+  3378→                              strokeWidth="1.5" 
+  3379→                              strokeLinecap="round"
+  3380→                              opacity="0.8"
+  3381→                            />
+  3382→                            {/* Sparse vegetation dots */}
+  3383→                            <circle cx="6" cy="16" r="1" fill="currentColor" opacity="0.6"/>
+  3384→                            <circle cx="12" cy="17" r="0.8" fill="currentColor" opacity="0.6"/>
+  3385→                            <circle cx="18" cy="16" r="1.2" fill="currentColor" opacity="0.6"/>
+  3386→                          </svg>
+  3387→                          <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
+  3388→                            tundra_box_div
+  3389→                          </span>
+  3390→                        </div>
+  3391→                        
+  3392→                        {/* 3x3 Table */}
+  3393→                        <div style={{ position: 'absolute', top: '35px', left: '4px', right: '4px' }}>
+  3394→                          <table style={{
+  3395→                            border: '1px solid #d1d5db',
+  3396→                            borderCollapse: 'collapse',
+  3397→                            width: '100%',
+  3398→                            fontSize: '12px'
+  3399→                          }}>
+  3400→                            <tbody>
+  3401→                              <tr>
+  3402→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1a</td>
+  3403→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1b</td>
+  3404→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1c</td>
+  3405→                              </tr>
+  3406→                              <tr>
+  3407→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>2a</td>
+  3408→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>sitesglub.ns_full</td>
+  3409→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>
+  3410→                                  {(() => {
+  3411→                                    if (!site.sitespren_base) return 'NULL';
+  3412→                                    
+  3413→                                    const isLoading = sitesglubLoading.get(site.sitespren_base)?.has('ns_full');
+  3414→                                    const value = sitesglubData.get(site.sitespren_base)?.ns_full;
+  3415→                                    
+  3416→                                    if (isLoading) {
+  3417→                                      return (
+  3418→                                        <div className="flex items-center justify-center">
+  3419→                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+  3420→                                        </div>
+  3421→                                      );
+  3422→                                    }
+  3423→                                    
+  3424→                                    return (
+  3425→                                      <button
+  3426→                                        className="hover:bg-gray-100 cursor-pointer min-w-0 text-center bg-transparent border-0 p-0 m-0"
+  3427→                                        onClick={() => fetchSitesglubMetric(site.sitespren_base!, 'ns_full')}
+  3428→                                        title="Click to refresh ns_full data"
+  3429→                                      >
+  3430→                                        {value || 'NULL'}
+  3431→                                      </button>
+  3432→                                    );
+  3433→                                  })()}
+  3434→                                </td>
+  3435→                              </tr>
+  3436→                              <tr>
+  3437→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3a</td>
+  3438→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>sitesglub.ip_address</td>
+  3439→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me continue reading to find the dom reg host account row and the buttons:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3440→                                  {(() => {
+  3441→                                    if (!site.sitespren_base) return 'NULL';
+  3442→                                    
+  3443→                                    const isLoading = sitesglubLoading.get(site.sitespren_base)?.has('ip_address');
+  3444→                                    const value = sitesglubData.get(site.sitespren_base)?.ip_address;
+  3445→                                    
+  3446→                                    if (isLoading) {
+  3447→                                      return (
+  3448→                                        <div className="flex items-center justify-center">
+  3449→                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+  3450→                                        </div>
+  3451→                                      );
+  3452→                                    }
+  3453→                                    
+  3454→                                    return (
+  3455→                                      <button
+  3456→                                        className="hover:bg-gray-100 cursor-pointer min-w-0 text-center bg-transparent border-0 p-0 m-0"
+  3457→                                        onClick={() => fetchSitesglubMetric(site.sitespren_base!, 'ip_address')}
+  3458→                                        title="Click to refresh ip_address data"
+  3459→                                      >
+  3460→                                        {value || 'NULL'}
+  3461→                                      </button>
+  3462→                                    );
+  3463→                                  })()}
+  3464→                                </td>
+  3465→                              </tr>
+  3466→                              <tr>
+  3467→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>4a</td>
+  3468→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>dom reg acct</td>
+  3469→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center', fontSize: '10px' }}>
+  3470→                                  {(() => {
+  3471→                                    if (!site.fk_domreg_hostaccount) {
+  3472→                                      return (
+  3473→                                        <div className="flex items-center justify-center gap-1">
+  3474→                                          <span className="text-gray-400">No registrar set</span>
+  3475→                                          <button
+  3476→                                            onClick={() => {
+  3477→                                              setRegistrarPopupOpen(site.id);
+  3478→                                              fetchHostAccountsForPopup();
+  3479→                                            }}
+  3480→                                            className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+  3481→                                            title="Set host account"
+  3482→                                          >
+  3483→                                            ⚙️
+  3484→                                          </button>
+  3485→                                        </div>
+  3486→                                      );
+  3487→                                    }
+  3488→
+  3489→                                    // Find the registrar info from allHostAccounts
+  3490→                                    const registrarInfo = allHostAccounts.find(acc => acc.host_account_id === site.fk_domreg_hostaccount);
+  3491→                                    
+  3492→                                    if (registrarInfo) {
+  3493→                                      return (
+  3494→                                        <div className="flex flex-col items-center gap-1">
+  3495→                                          <div className="text-xs font-medium text-gray-900">
+  3496→                                            {registrarInfo.company_name}
+  3497→                                          </div>
+  3498→                                          <div className="text-xs text-gray-500">
+  3499→                                            {registrarInfo.username}
+  3500→                                          </div>
+  3501→                                          <div className="flex gap-1">
+  3502→                                            {registrarInfo.portal_url && (
+  3503→                                              <a
+  3504→                                                href={registrarInfo.portal_url}
+  3505→                                                target="_blank"
+  3506→                                                rel="noopener noreferrer"
+  3507→                                                className="text-xs px-1 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700"
+  3508→                                                title="Open portal"
+  3509→                                              >
+  3510→                                                🔗
+  3511→                                              </a>
+  3512→                                            )}
+  3513→                                            <button
+  3514→                                              onClick={() => {
+  3515→                                                setRegistrarPopupOpen(site.id);
+  3516→                                                fetchHostAccountsForPopup();
+  3517→                                              }}
+  3518→                                              className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+  3519→                                              title="Change host account"
+  3520→                                            >
+  3521→                                              ⚙️
+  3522→                                            </button>
+  3523→                                          </div>
+  3524→                                        </div>
+  3525→                                      );
+  3526→                                    }
+  3527→
+  3528→                                    // Fallback if registrar ID exists but not found in allHostAccounts
+  3529→                                    return (
+  3530→                                      <div className="flex items-center justify-center gap-1">
+  3531→                                        <span className="text-xs text-gray-400">Unknown registrar</span>
+  3532→                                        <button
+  3533→                                          onClick={() => {
+  3534→                                            setRegistrarPopupOpen(site.id);
+  3535→                                            fetchHostAccountsForPopup();
+  3536→                                          }}
+  3537→                                          className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+  3538→                                          title="Change host account"
+  3539→                                        >
+  3540→                                          ⚙️
+  3541→                                        </button>
+  3542→                                      </div>
+  3543→                                    );
+  3544→                                  })()}
+  3545→                                </td>
+  3546→                              </tr>
+  3547→                            </tbody>
+  3548→                          </table>
+  3549→                        </div>
+  3550→                      </div>
+  3551→                      
+  3552→                      {/* Original medallion content - positioned to preserve appearance */}
+  3553→                      <div className="flex items-center justify-start h-full space-x-1" style={{ position: 'relative', zIndex: 2, marginRight: '370px' }}>
+  3554→                        <DriggsPackMedallion 
+  3555→                          driggspackNumber={1}
+  3556→                          siteId={site.id}
+  3557→                          onZzClick={handleDriggspackClick}
+  3558→                        />
+  3559→                        <DriggsPackMedallion 
+  3560→                          driggspackNumber={2}
+  3561→                          siteId={site.id}
+  3562→                          onZzClick={handleDriggspackClick}
+  3563→                        />
+  3564→                        <DriggsPackMedallion 
+  3565→                          driggspackNumber={3}
+  3566→                          siteId={site.id}
+  3567→                          onZzClick={handleDriggspackClick}
+  3568→                        />
+  3569→                      </div>
+  3570→                    </td>
+  3571→                    {/* Empty status column for medallion row */}
+  3572→                    <td 
+  3573→                      key={`empty-status-${site.id}`}
+  3574→                      className="h-8 border-r border-gray-300"
+  3575→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3576→                    >
+  3577→                    </td>
+  3578→                    {/* Empty excl wp column for medallion row */}
+  3579→                    <td 
+  3580→                      key={`empty-excl-wp-${site.id}`}
+  3581→                      className="h-8 border-r border-gray-300"
+  3582→                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px' }}
+  3583→                    >
+  3584→                    </td>
+  3585→                    {/* Empty excl fe column for medallion row */}
+  3586→                    <td 
+  3587→                      key={`empty-excl-fe-${site.id}`}
+  3588→                      className="h-8 border-r border-gray-300"
+  3589→                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px' }}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I can see the issue! Let me examine the table structure more closely. The problem appears to be in the 4th row (dom reg acct) where there's complex conditional rendering. I notice that the first two columns have hardcoded text "4a" and "dom reg acct" but there might be an issue with how they're being rendered.
+
+Let me also check the tundra box width and widen it as requested:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3336→                      style={{ minWidth: '600px', width: '600px' }}
+  3337→                    >
+  3338→                      {/* Tundra box - positioned on right */}
+  3339→                      <div 
+  3340→                        className="tundra_box"
+  3341→                        style={{
+  3342→                          position: 'absolute',
+  3343→                          right: '0',
+  3344→                          top: '0',
+  3345→                          bottom: '0',
+  3346→                          width: '410px',
+  3347→                          border: '1px solid black',
+  3348→                          backgroundColor: 'white',
+  3349→                          zIndex: 1,
+  3350→                          padding: '0'
+  3351→                        }}
+  3352→                      >
+  3353→                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'absolute', top: '4px', left: '4px' }}>
+  3354→                          {/* Tundra landscape SVG icon */}
+  3355→                          <svg
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me also widen the reindeer box and update the margin accordingly:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3676→                        className="reindeer_box"
+  3677→                        style={{
+  3678→                          position: 'absolute',
+  3679→                          right: '0',
+  3680→                          top: '0',
+  3681→                          bottom: '0',
+  3682→                          width: '350px',
+  3683→                          border: '1px solid black',
+  3684→                          backgroundColor: 'white',
+  3685→                          zIndex: 10,
+  3686→                          padding: '0',
+  3687→                          pointerEvents: 'auto'
+  3688→                        }}
+  3689→                        onClick={(e) => e.stopPropagation()}
+  3690→                      >
+  3691→                        {/* Logo at top left */}
+  3692→                        <div style={{ position: 'absolute', top: '4px', left: '4px' }}>
+  3693→                          <svg 
+  3694→                            width="24" 
+  3695→                            height="24"
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3672→                      style={{ padding: '0', minWidth: '600px', width: '600px' }}
+  3673→                    >
+  3674→                      {/* Reindeer box - positioned on right */}
+  3675→                      <div 
+  3676→                        className="reindeer_box"
+  3677→                        style={{
+  3678→                          position: 'absolute',
+  3679→                          right: '0',
+  3680→                          top: '0',
+  3681→                          bottom: '0',
+  3682→                          width: '410px',
+  3683→                          border: '1px solid black',
+  3684→                          backgroundColor: 'white',
+  3685→                          zIndex: 10,
+  3686→                          padding: '0',
+  3687→                          pointerEvents: 'auto'
+  3688→                        }}
+  3689→                        onClick={(e) => e.stopPropagation()}
+  3690→                      >
+  3691→                        {/* Logo at top left */}
+  3692→                        <div style={{ position: 'absolute', top: '4px', left: '4px' }}>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to update the margin for the content to accommodate the wider boxes. Let me find where the margin is set:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3552→                      {/* Original medallion content - positioned to preserve appearance */}
+  3553→                      <div className="flex items-center justify-start h-full space-x-1" style={{ position: 'relative', zIndex: 2, marginRight: '370px' }}>
+  3554→                        <DriggsPackMedallion 
+  3555→                          driggspackNumber={1}
+  3556→                          siteId={site.id}
+  3557→                          onZzClick={handleDriggspackClick}
+  3558→                        />
+  3559→                        <DriggsPackMedallion 
+  3560→                          driggspackNumber={2}
+  3561→                          siteId={site.id}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3549→                        </div>
+  3550→                      </div>
+  3551→                      
+  3552→                      {/* Original medallion content - positioned to preserve appearance */}
+  3553→                      <div className="flex items-center justify-start h-full space-x-1" style={{ position: 'relative', zIndex: 2, marginRight: '430px' }}>
+  3554→                        <DriggsPackMedallion 
+  3555→                          driggspackNumber={1}
+  3556→                          siteId={site.id}
+  3557→                          onZzClick={handleDriggspackClick}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me also check and update the reindeer box margin:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman`
+
+Result:
+
+```
+No matches found
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me find the reindeer box margin:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3905→                      {/* Original content - positioned to preserve appearance */}
+  3906→                      <div 
+  3907→                        className="truncate" 
+  3908→                        style={{ 
+  3909→                          fontSize: '18px', 
+  3910→                          lineHeight: '1.2',
+  3911→                          padding: '12px',
+  3912→                          position: 'relative',
+  3913→                          zIndex: 2
+  3914→                        }}
+  3915→                      >
+  3916→                        <div style={{ fontWeight: 'normal' }}>domain_column_for:</div>
+  3917→                        <div style={{ fontWeight: 'bold' }}>
+  3918→                          {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
+  3919→                        </div>
+  3920→                      </div>
+  3921→                    </th>
+  3922→                    {/* Status column - FIRST ROW with stat1 */}
+  3923→                    <th
+  3924→                      key={`${site.id}-status`}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I notice that the reindeer box content doesn't seem to have a margin adjustment. Let me update it to accommodate the wider box:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3902→                        </div>
+  3903→                      </div>
+  3904→                      
+  3905→                      {/* Original content - positioned to preserve appearance */}
+  3906→                      <div 
+  3907→                        className="truncate" 
+  3908→                        style={{ 
+  3909→                          fontSize: '18px', 
+  3910→                          lineHeight: '1.2',
+  3911→                          padding: '12px',
+  3912→                          position: 'relative',
+  3913→                          zIndex: 2,
+  3914→                          marginRight: '430px'
+  3915→                        }}
+  3916→                      >
+  3917→                        <div style={{ fontWeight: 'normal' }}>domain_column_for:</div>
+  3918→                        <div style={{ fontWeight: 'bold' }}>
+  3919→                          {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
+  3920→                        </div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me fix the main issue with the dom reg account row. I need to modify the display to show the values on a single line with space between them, and ensure the buttons are always visible. Let me examine and fix the dom reg account row:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3462→                                    );
+  3463→                                  })()}
+  3464→                                </td>
+  3465→                              </tr>
+  3466→                              <tr>
+  3467→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>4a</td>
+  3468→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>dom reg acct</td>
+  3469→                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'left', fontSize: '10px', minWidth: '200px' }}>
+  3470→                                  {(() => {
+  3471→                                    if (!site.fk_domreg_hostaccount) {
+  3472→                                      return (
+  3473→                                        <div className="flex items-center justify-between w-full">
+  3474→                                          <span className="text-gray-400">No registrar set</span>
+  3475→                                          <button
+  3476→                                            onClick={() => {
+  3477→                                              setRegistrarPopupOpen(site.id);
+  3478→                                              fetchHostAccountsForPopup();
+  3479→                                            }}
+  3480→                                            className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+  3481→                                            title="Set host account"
+  3482→                                          >
+  3483→                                            ⚙️
+  3484→                                          </button>
+  3485→                                        </div>
+  3486→                                      );
+  3487→                                    }
+  3488→
+  3489→                                    // Find the registrar info from allHostAccounts
+  3490→                                    const registrarInfo = allHostAccounts.find(acc => acc.host_account_id === site.fk_domreg_hostaccount);
+  3491→                                    
+  3492→                                    if (registrarInfo) {
+  3493→                                      return (
+  3494→                                        <div className="flex items-center justify-between w-full">
+  3495→                                          <div className="flex items-center gap-1">
+  3496→                                            <span className="text-xs font-medium text-gray-900">
+  3497→                                              {registrarInfo.company_name}
+  3498→                                            </span>
+  3499→                                            <span className="text-xs text-gray-500">
+  3500→                                              {registrarInfo.username}
+  3501→                                            </span>
+  3502→                                          </div>
+  3503→                                          <div className="flex gap-1">
+  3504→                                            {registrarInfo.portal_url && (
+  3505→                                              <a
+  3506→                                                href={registrarInfo.portal_url}
+  3507→                                                target="_blank"
+  3508→                                                rel="noopener noreferrer"
+  3509→                                                className="text-xs px-1 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700"
+  3510→                                                title="Open portal"
+  3511→                                              >
+  3512→                                                🔗
+  3513→                                              </a>
+  3514→                                            )}
+  3515→                                            <button
+  3516→                                              onClick={() => {
+  3517→                                                setRegistrarPopupOpen(site.id);
+  3518→                                                fetchHostAccountsForPopup();
+  3519→                                              }}
+  3520→                                              className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+  3521→                                              title="Change host account"
+  3522→                                            >
+  3523→                                              ⚙️
+  3524→                                            </button>
+  3525→                                          </div>
+  3526→                                        </div>
+  3527→                                      );
+  3528→                                    }
+  3529→
+  3530→                                    // Fallback if registrar ID exists but not found in allHostAccounts
+  3531→                                    return (
+  3532→                                      <div className="flex items-center justify-between w-full">
+  3533→                                        <span className="text-xs text-gray-400">Unknown registrar</span>
+  3534→                                        <button
+  3535→                                          onClick={() => {
+  3536→                                            setRegistrarPopupOpen(site.id);
+  3537→                                            fetchHostAccountsForPopup();
+  3538→                                          }}
+  3539→                                          className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+  3540→                                          title="Change host account"
+  3541→                                        >
+  3542→                                          ⚙️
+  3543→                                        </button>
+  3544→                                      </div>
+  3545→                                    );
+  3546→                                  })()}
+  3547→                                </td>
+  3548→                              </tr>
+  3549→                            </tbody>
+  3550→                          </table>
+  3551→                        </div>
+  3552→                      </div>
+```
+
