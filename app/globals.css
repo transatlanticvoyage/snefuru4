@@ -152,3 +152,18 @@ body {
   line-height: 1.2 !important;
   margin: 0 !important;
 }
+
+/* Prevent row-level styling when driggsman checkbox cells are checked */
+tr:has(.driggsman-checkbox-cell input:checked) {
+  background-color: inherit !important;
+  background-image: none !important;
+}
+
+/* Ensure only checkbox cells themselves get blue backgrounds */
+.driggsman-checkbox-cell {
+  background-color: inherit !important;
+}
+
+.driggsman-checkbox-cell[style*="background-color: #dbeafe"] {
+  background-color: #dbeafe !important;
+}

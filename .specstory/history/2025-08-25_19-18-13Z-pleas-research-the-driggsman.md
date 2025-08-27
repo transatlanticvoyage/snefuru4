@@ -1288,3 +1288,2777 @@ Heavy Supabase integration for fetching sites, tags, and related lookup data wit
 
 This page appears to be a comprehensive site management dashboard for business/local SEO purposes, allowing users to view, edit, filter, and categorize website properties with extensive business metadata.
 
+---
+
+_**User**_
+
+pleaes view the domain columns system (the paired system where each domain column has a stat1 column to track the status or null / not null status of many fields. store this in your memory and just confirm to me that you understand we have a paired column system. i want to expand this to be a quadruple column system 
+
+where each domain column set (per domain) comes with 4 columns. 
+
+the next 2 columns will be named:
+
+vacuum
+scraper
+
+respectively
+
+so the system will look like this:
+domain column
+stat1
+vacuum
+scraper
+
+pleaes add the new piece of bold text for each respective column in the bottom-most table row that alreaedy exists inside the <thead> area. leave the top-row in the thead blank in these columns (this is the row that holds the driggspack medallions - just so you know what im referncing) 
+
+for the main <td> in the table body for tehse new columns, pleaes place a textbox for every ui row that contains a text box in the "domain column" column. thhese text boxes / inputs will not hook up to the db nor will they have any funtioanlity right now. we will implement db stuff later in future prompts. we must create special db structures to do this. 
+
+so please add the ui elements for now so we no longer have a "paired column" system, but a quadruple column system (per domain). 
+
+then please suggest the sql (which will take multiple prompts to finalize) to create a set of other db tables that will hold info that corresponds to the db columns in sitespren , for a single domain entitty and user account ( the currently logged in user)
+
+so i think we need:
+
+sitespren_vacuum
+sitespren_zarpo_scraper
+
+then we need to somehow create db columns in these 2 new db tables that have the exact same db column names as the columns in sitespren 
+
+plus each of the 2 new tables needs an fk db column like:
+fk_sitespren_id
+
+to track the relationship to the specific sitespren db row that it is related to 
+
+recap: please go ahead and implement the ui instructions above and then suggest the sql and we will work on it before finlzaing it, putting it in supabase, and integrating it with the ui
+
+---
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I'll help you expand the paired column system to a quadruple column system by adding the "vacuum" and "scraper" columns, then suggest the SQL for the new database tables.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Add vacuum and scraper columns to expand paired system to quadruple
+- [ ] 🌡️ Suggest SQL for sitespren_vacuum and sitespren_zarpo_scraper tables
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+First, let me examine the current table structure to understand the domain column system. Let me find where the table headers and body are defined:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2015:                  <thead className="bg-gray-50">
+2016-                    <tr>
+2017-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">select</th>
+2018-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">sitespren_base</th>
+2019-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">is_external</th>
+2020-                      <th className="px-2 py-3 text-left text-xs font-bold text-gray-900 uppercase border border-gray-400">is_internal</th>
+--
+2379:                  <thead className="bg-gray-50">
+2380-                    <tr>
+2381-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Time Last Used</th>
+2382-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Sites Entered</th>
+2383-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Count</th>
+2384-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Settings</th>
+--
+2476:                            <thead className="bg-gray-50 sticky top-0">
+2477-                              <tr>
+2478-                                <th className="px-2 py-1 text-left font-medium text-gray-700">tag_id</th>
+2479-                                <th className="px-2 py-1 text-left font-medium text-gray-700">tag_name</th>
+2480-                                <th className="px-2 py-1 text-left font-medium text-gray-700">tag_order</th>
+2481-                                <th className="px-2 py-1 text-left font-medium text-gray-700">
+--
+2585:            <thead className="bg-gray-50">
+2586-              {/* Additional header row with driggspack buttons */}
+2587-              <tr className="border-b border-gray-300">
+2588-                <td className="w-12 h-8 border-r border-gray-300"></td>
+2589-                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+2590-                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+--
+2934:                                        <thead className="bg-gray-50 sticky top-0">
+2935-                                          <tr>
+2936-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Name</th>
+2937-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">URL</th>
+2938-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">API</th>
+2939-                                          </tr>
+--
+3055:                                        <thead className="bg-gray-50 sticky top-0">
+3056-                                          <tr>
+3057-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Name</th>
+3058-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Code</th>
+3059-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Country</th>
+3060-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Format</th>
+--
+3289:                                        <thead className="bg-gray-50 sticky top-0">
+3290-                                          <tr>
+3291-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Title</th>
+3292-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Seller</th>
+3293-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Price</th>
+3294-                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Citations</th>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+I need to find the main Matrix Table structure. Let me search for the main table that has the domain columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2581:      {/* Matrix Table */}
+2582-      <div className="border border-gray-300 rounded-lg overflow-hidden">
+2583-        <div className="overflow-x-auto">
+2584-          <table className="divide-y divide-gray-300" style={{ width: 'auto', tableLayout: 'auto' }}>
+2585-            <thead className="bg-gray-50">
+2586-              {/* Additional header row with driggspack buttons */}
+2587-              <tr className="border-b border-gray-300">
+2588-                <td className="w-12 h-8 border-r border-gray-300"></td>
+2589-                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+2590-                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+2591-                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+--
+2595:                {paginatedSites.map((site, index) => (
+2596-                  <>
+2597-                    <td
+2598-                      key={`empty-${site.id}`}
+2599-                      className="h-8 px-2 border-r border-gray-300"
+2600-                    >
+2601-                      <div className="flex items-center justify-start h-full space-x-1">
+2602-                        <DriggsPackMedallion 
+2603-                          driggspackNumber={1}
+2604-                          siteId={site.id}
+2605-                          onZzClick={handleDriggspackClick}
+--
+2670:                {paginatedSites.map((site, index) => (
+2671-                  <>
+2672-                    {/* Domain column */}
+2673-                    <th
+2674-                      key={site.id}
+2675-                      className="px-3 py-3 text-left w-48 border-r border-gray-300"
+2676-                      title={site.sitespren_base || site.id}
+2677-                    >
+2678-                      <div className="truncate" style={{ fontSize: '18px', lineHeight: '1.2' }}>
+2679-                        <div style={{ fontWeight: 'normal' }}>domain_column_for:</div>
+2680-                        <div style={{ fontWeight: 'bold' }}>
+--
+2801:                  {paginatedSites.map((site, index) => {
+2802-                    const value = site[field.key];
+2803-                    const isEditing = editingCell?.field === field.key && editingCell?.siteId === site.id;
+2804-                    const isDropdownOpen = platformDropdownOpen?.field === field.key && platformDropdownOpen?.siteId === site.id;
+2805-                    const hasValue = value !== null && value !== undefined && value !== '';
+2806-
+2807-                    if (field.type === 'section_header') {
+2808-                      return (
+2809-                        <>
+2810-                          <td 
+2811-                            key={`${field.key}-${site.id}`}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me find the stat1 columns and understand the structure better:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2685:                    {/* Status column - FIRST ROW with stat1 */}
+2686-                    <th
+2687-                      key={`${site.id}-status`}
+2688-                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+--
+2691:                      <div>stat1</div>
+2692-                    </th>
+2693-                  </>
+2694-                ))}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I can see the structure. Let me read more of the table to understand how it's organized and find where I need to add the new columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2670→                {paginatedSites.map((site, index) => (
+  2671→                  <>
+  2672→                    {/* Domain column */}
+  2673→                    <th
+  2674→                      key={site.id}
+  2675→                      className="px-3 py-3 text-left w-48 border-r border-gray-300"
+  2676→                      title={site.sitespren_base || site.id}
+  2677→                    >
+  2678→                      <div className="truncate" style={{ fontSize: '18px', lineHeight: '1.2' }}>
+  2679→                        <div style={{ fontWeight: 'normal' }}>domain_column_for:</div>
+  2680→                        <div style={{ fontWeight: 'bold' }}>
+  2681→                          {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
+  2682→                        </div>
+  2683→                      </div>
+  2684→                    </th>
+  2685→                    {/* Status column - FIRST ROW with stat1 */}
+  2686→                    <th
+  2687→                      key={`${site.id}-status`}
+  2688→                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+  2689→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2690→                    >
+  2691→                      <div>stat1</div>
+  2692→                    </th>
+  2693→                  </>
+  2694→                ))}
+  2695→              </tr>
+  2696→            </thead>
+  2697→            <tbody className="bg-white divide-y divide-gray-200">
+  2698→              {paginatedFields.map((field) => (
+  2699→                <tr 
+  2700→                  key={field.key} 
+  2701→                  className={`hover:bg-gray-50 ${
+  2702→                    field.key === 'driggs_phone_1' ? 'border-b-4 border-b-black' : ''
+  2703→                  } ${
+  2704→                    field.key === 'driggs_address_species_note' ? 'border-b-4 border-b-black' : ''
+  2705→                  } ${
+  2706→                    field.key === 'driggs_country' ? 'border-b-4 border-b-black' : ''
+  2707→                  } ${
+  2708→                    field.key === 'driggs_cgig_id' ? 'border-b-4 border-b-black' : ''
+  2709→                  } ${
+  2710→                    field.key === 'driggs_industry' ? 'border-t-4 border-t-black' : ''
+  2711→                  } ${
+  2712→                    field.key === 'driggs_social_media_links' ? 'border-b-4 border-b-black' : ''
+  2713→                  } ${
+  2714→                    field.key === 'phone_section_separator' ? 'border-t-4 border-t-black' : ''
+  2715→                  } ${
+  2716→                    field.key === 'address_section_separator' ? 'border-t-4 border-t-black' : ''
+  2717→                  } ${
+  2718→                    field.key === 'backlinks_section_separator' ? 'border-t-4 border-t-black' : ''
+  2719→                  } ${
+  2720→                    field.key === 'basics_section_separator' ? 'border-t-4 border-t-black' : ''
+  2721→                  } ${
+  2722→                    field.key === 'misc_section_separator' ? 'border-t-4 border-t-black' : ''
+  2723→                  }`}
+  2724→                >
+  2725→                  {/* Field selection checkbox */}
+  2726→                  <td 
+  2727→                    className={`w-12 px-2 py-2 border-r border-gray-300 ${
+  2728→                      field.type === 'section_header' ? (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '' : 'bg-gray-100') : 'cursor-pointer'
+  2729→                    }`}
+  2730→                    style={field.type === 'section_header' && (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? { backgroundColor: '#dddddd' } : {}}
+  2731→                    onClick={() => field.type !== 'section_header' && handleFieldSelect(field.key)}
+  2732→                  >
+  2733→                    <div className="flex items-center justify-center">
+  2734→                      {field.type !== 'section_header' && (
+  2735→                        <input
+  2736→                          type="checkbox"
+  2737→                          checked={selectedFields.has(field.key)}
+  2738→                          onChange={() => {}}
+  2739→                          className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+  2740→                        />
+  2741→                      )}
+  2742→                    </div>
+  2743→                  </td>
+  2744→
+  2745→                  {/* New dp columns */}
+  2746→                  <td className="border-r border-gray-300" style={{ 
+  2747→                    padding: '0', 
+  2748→                    margin: '0', 
+  2749→                    width: '10px', 
+  2750→                    minWidth: '10px', 
+  2751→                    maxWidth: '10px',
+  2752→                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : 'transparent'
+  2753→                  }}>
+  2754→                  </td>
+  2755→                  <td className="border-r border-gray-300" style={{ 
+  2756→                    padding: '0', 
+  2757→                    margin: '0', 
+  2758→                    width: '10px', 
+  2759→                    minWidth: '10px', 
+  2760→                    maxWidth: '10px',
+  2761→                    backgroundColor: (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? '#dddddd' : 'transparent'
+  2762→                  }}>
+  2763→                  </td>
+  2764→                  <td className="border-r border-gray-300" style={{ 
+  2765→                    padding: '0', 
+  2766→                    margin: '0', 
+  2767→                    width: '10px', 
+  2768→                    minWidth: '10px', 
+  2769→                    maxWidth: '10px',
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me continue reading to see how the site columns are structured:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2800→                  {/* Site value cells */}
+  2801→                  {paginatedSites.map((site, index) => {
+  2802→                    const value = site[field.key];
+  2803→                    const isEditing = editingCell?.field === field.key && editingCell?.siteId === site.id;
+  2804→                    const isDropdownOpen = platformDropdownOpen?.field === field.key && platformDropdownOpen?.siteId === site.id;
+  2805→                    const hasValue = value !== null && value !== undefined && value !== '';
+  2806→
+  2807→                    if (field.type === 'section_header') {
+  2808→                      return (
+  2809→                        <>
+  2810→                          <td 
+  2811→                            key={`${field.key}-${site.id}`} 
+  2812→                            className={`px-3 py-2 text-sm font-bold text-gray-900 w-48 border-r border-gray-300 ${
+  2813→                              field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '' : 'bg-gray-100'
+  2814→                            }`}
+  2815→                            style={field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? { backgroundColor: '#dddddd' } : {}}
+  2816→                          >
+  2817→                            {field.label}
+  2818→                          </td>
+  2819→                          {/* Status column for section headers */}
+  2820→                          <td 
+  2821→                            key={`${field.key}-${site.id}-status`}
+  2822→                            className="px-1 py-2 text-center border-r border-gray-300"
+  2823→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+  2824→                          >
+  2825→                          </td>
+  2826→                        </>
+  2827→                      );
+  2828→                    }
+  2829→
+  2830→                    if (field.type === 'boolean') {
+  2831→                      return (
+  2832→                        <>
+  2833→                          <td 
+  2834→                            key={`${field.key}-${site.id}`} 
+  2835→                            className="px-3 py-2 text-sm text-gray-900 w-48 border-r border-gray-300"
+  2836→                          >
+  2837→                            <label className="relative inline-flex items-center cursor-pointer">
+  2838→                              <input
+  2839→                                type="checkbox"
+  2840→                                checked={!!value}
+  2841→                                onChange={() => handleBooleanToggle(field.key, site.id, !!value)}
+  2842→                                className="sr-only peer"
+  2843→                              />
+  2844→                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+  2845→                            </label>
+  2846→                          </td>
+  2847→                          {/* Status column for boolean fields */}
+  2848→                          <td 
+  2849→                            key={`${field.key}-${site.id}-status`}
+  2850→                            className="px-1 py-2 text-center border-r border-gray-300"
+  2851→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2852→                          >
+  2853→                            <div className="flex items-center justify-center">
+  2854→                              {hasValue ? (
+  2855→                                <span className="text-green-600 font-bold text-lg">✓</span>
+  2856→                              ) : (
+  2857→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  2858→                              )}
+  2859→                            </div>
+  2860→                          </td>
+  2861→                        </>
+  2862→                      );
+  2863→                    }
+  2864→
+  2865→                    if (field.type === 'platform_dropdown') {
+  2866→                      return (
+  2867→                        <>
+  2868→                          <td
+  2869→                            key={`${field.key}-${site.id}`}
+  2870→                            className="px-3 py-2 text-sm text-gray-900 relative w-80 border-r border-gray-300"
+  2871→                          >
+  2872→                          <div className="flex items-center space-x-1">
+  2873→                            <button
+  2874→                              onClick={() => handlePlatformDropdownClick(field.key, site.id)}
+  2875→                              className={`px-2 py-1 text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+  2876→                                !value || getPlatformName(value as number) === 'None' 
+  2877→                                  ? 'bg-gray-50 hover:bg-gray-100 text-gray-900' 
+  2878→                                  : ''
+  2879→                              }`}
+  2880→                              style={{
+  2881→                                width: '180px',
+  2882→                                ...(value && getPlatformName(value as number) !== 'None'
+  2883→                                  ? { 
+  2884→                                      backgroundColor: '#2c7633',
+  2885→                                      color: '#fff',
+  2886→                                      fontWeight: 'bold'
+  2887→                                    }
+  2888→                                  : {})
+  2889→                              }}
+  2890→                            >
+  2891→                              <div className="flex items-center justify-between">
+  2892→                                <span className="truncate">{getPlatformName(value as number)}</span>
+  2893→                                <span className="ml-1">▼</span>
+  2894→                              </div>
+  2895→                            </button>
+  2896→                            
+  2897→                            {/* Square buttons 1-5 */}
+  2898→                            <div className="flex space-x-1">
+  2899→                              {[1, 2, 3, 4, 5].map((num) => (
+  2900→                                <button
+  2901→                                  key={num}
+  2902→                                  onClick={() => {
+  2903→                                    // TODO: Add functionality later
+  2904→                                    console.log(`Button ${num} clicked for site ${site.id}`);
+  2905→                                  }}
+  2906→                                  className="w-8 h-8 bg-gray-200 hover:bg-gray-300 border border-gray-400 rounded text-xs font-medium text-gray-700 flex items-center justify-center transition-colors"
+  2907→                                >
+  2908→                                  {num}
+  2909→                                </button>
+  2910→                              ))}
+  2911→                            </div>
+  2912→                          </div>
+  2913→
+  2914→                          {/* Dropdown Menu */}
+  2915→                          {isDropdownOpen && (
+  2916→                            <div className="absolute top-full left-0 mt-1 w-96 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+  2917→                              <div className="p-3">
+  2918→                                <div className="text-xs font-medium text-gray-700 mb-2">Select Call Platform:</div>
+  2919→                                
+  2920→                                {/* None Option */}
+  2921→                                <button
+  2922→                                  onClick={() => handlePlatformSelect(site.id, null)}
+  2923→                                  className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded mb-1"
+  2924→                                >
+  2925→                                  <div className="font-medium text-gray-600">None</div>
+  2926→                                  <div className="text-xs text-gray-500">No platform assigned</div>
+  2927→                                </button>
+  2928→
+  2929→                                {/* Platform Table */}
+  2930→                                {callPlatforms.length > 0 ? (
+  2931→                                  <div className="border border-gray-200 rounded">
+  2932→                                    <div className="max-h-64 overflow-y-auto">
+  2933→                                      <table className="w-full text-xs">
+  2934→                                        <thead className="bg-gray-50 sticky top-0">
+  2935→                                          <tr>
+  2936→                                            <th className="px-2 py-1 text-left font-medium text-gray-700">Name</th>
+  2937→                                            <th className="px-2 py-1 text-left font-medium text-gray-700">URL</th>
+  2938→                                            <th className="px-2 py-1 text-left font-medium text-gray-700">API</th>
+  2939→                                          </tr>
+  2940→                                        </thead>
+  2941→                                        <tbody>
+  2942→                                          {callPlatforms.map((platform) => (
+  2943→                                            <tr
+  2944→                                              key={platform.platform_id}
+  2945→                                              className="hover:bg-blue-50 cursor-pointer border-t border-gray-100"
+  2946→                                              onClick={() => handlePlatformSelect(site.id, platform.platform_id)}
+  2947→                                            >
+  2948→                                              <td className="px-2 py-2">
+  2949→                                                <div className="font-medium text-gray-900">{platform.platform_name}</div>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I understand the structure. I can see that each site gets a domain column and a stat1 column. I need to add the "vacuum" and "scraper" columns to the header and then to each cell in the table body. Let me make the changes:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  2681→                          {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
+  2682→                        </div>
+  2683→                      </div>
+  2684→                    </th>
+  2685→                    {/* Status column - FIRST ROW with stat1 */}
+  2686→                    <th
+  2687→                      key={`${site.id}-status`}
+  2688→                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+  2689→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2690→                    >
+  2691→                      <div>**stat1**</div>
+  2692→                    </th>
+  2693→                    {/* Vacuum column */}
+  2694→                    <th
+  2695→                      key={`${site.id}-vacuum`}
+  2696→                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+  2697→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2698→                    >
+  2699→                      <div>**vacuum**</div>
+  2700→                    </th>
+  2701→                    {/* Scraper column */}
+  2702→                    <th
+  2703→                      key={`${site.id}-scraper`}
+  2704→                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+  2705→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2706→                    >
+  2707→                      <div>**scraper**</div>
+  2708→                    </th>
+  2709→                  </>
+  2710→                ))}
+  2711→              </tr>
+  2712→            </thead>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to find the section where the empty cells are added in the top header row (where the driggspack medallions are) and add the corresponding empty cells for the new columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2590→                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+  2591→                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+  2592→                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+  2593→                <td className="h-8 border-r border-gray-300" style={{ padding: '0', margin: '0', width: '10px', minWidth: '10px', maxWidth: '10px' }}>-</td>
+  2594→                <td className="h-8 border-r border-gray-300"></td>
+  2595→                {paginatedSites.map((site, index) => (
+  2596→                  <>
+  2597→                    <td
+  2598→                      key={`empty-${site.id}`}
+  2599→                      className="h-8 px-2 border-r border-gray-300"
+  2600→                    >
+  2601→                      <div className="flex items-center justify-start h-full space-x-1">
+  2602→                        <DriggsPackMedallion 
+  2603→                          driggspackNumber={1}
+  2604→                          siteId={site.id}
+  2605→                          onZzClick={handleDriggspackClick}
+  2606→                        />
+  2607→                        <DriggsPackMedallion 
+  2608→                          driggspackNumber={2}
+  2609→                          siteId={site.id}
+  2610→                          onZzClick={handleDriggspackClick}
+  2611→                        />
+  2612→                        <DriggsPackMedallion 
+  2613→                          driggspackNumber={3}
+  2614→                          siteId={site.id}
+  2615→                          onZzClick={handleDriggspackClick}
+  2616→                        />
+  2617→                      </div>
+  2618→                    </td>
+  2619→                    {/* Empty status column for medallion row */}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me continue reading to see the status column:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2619→                    {/* Empty status column for medallion row */}
+  2620→                    <td 
+  2621→                      key={`empty-status-${site.id}`}
+  2622→                      className="h-8 border-r border-gray-300"
+  2623→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2624→                    >
+  2625→                    </td>
+  2626→                  </>
+  2627→                ))}
+  2628→              </tr>
+  2629→              
+  2630→              {/* Main header row with column identifiers */}
+  2631→              <tr>
+  2632→                {/* Field selection checkbox */}
+  2633→                <th 
+  2634→                  className="w-12 px-2 py-3 text-left cursor-pointer hover:bg-gray-100 border-r border-gray-300"
+  2635→                  onClick={handleSelectAllFields}
+  2636→                >
+  2637→                  <div className="flex items-center justify-center">
+  2638→                    <input
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the empty cells for the vacuum and scraper columns in the medallion row:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  2615→                          onZzClick={handleDriggspackClick}
+  2616→                        />
+  2617→                      </div>
+  2618→                    </td>
+  2619→                    {/* Empty status column for medallion row */}
+  2620→                    <td 
+  2621→                      key={`empty-status-${site.id}`}
+  2622→                      className="h-8 border-r border-gray-300"
+  2623→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2624→                    >
+  2625→                    </td>
+  2626→                    {/* Empty vacuum column for medallion row */}
+  2627→                    <td 
+  2628→                      key={`empty-vacuum-${site.id}`}
+  2629→                      className="h-8 border-r border-gray-300"
+  2630→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2631→                    >
+  2632→                    </td>
+  2633→                    {/* Empty scraper column for medallion row */}
+  2634→                    <td 
+  2635→                      key={`empty-scraper-${site.id}`}
+  2636→                      className="h-8 border-r border-gray-300"
+  2637→                      style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2638→                    >
+  2639→                    </td>
+  2640→                  </>
+  2641→                ))}
+  2642→              </tr>
+  2643→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the vacuum and scraper columns to all the table body cells. Let me find where the status columns are added for section headers and add the vacuum and scraper columns:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  2845→                            style={field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? { backgroundColor: '#dddddd' } : {}}
+  2846→                          >
+  2847→                            {field.label}
+  2848→                          </td>
+  2849→                          {/* Status column for section headers */}
+  2850→                          <td 
+  2851→                            key={`${field.key}-${site.id}-status`}
+  2852→                            className="px-1 py-2 text-center border-r border-gray-300"
+  2853→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+  2854→                          >
+  2855→                          </td>
+  2856→                          {/* Vacuum column for section headers */}
+  2857→                          <td 
+  2858→                            key={`${field.key}-${site.id}-vacuum`}
+  2859→                            className="px-1 py-2 text-center border-r border-gray-300"
+  2860→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+  2861→                          >
+  2862→                          </td>
+  2863→                          {/* Scraper column for section headers */}
+  2864→                          <td 
+  2865→                            key={`${field.key}-${site.id}-scraper`}
+  2866→                            className="px-1 py-2 text-center border-r border-gray-300"
+  2867→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+  2868→                          >
+  2869→                          </td>
+  2870→                        </>
+  2871→                      );
+  2872→                    }
+  2873→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the vacuum and scraper columns for boolean fields:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  2887→                              />
+  2888→                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+  2889→                            </label>
+  2890→                          </td>
+  2891→                          {/* Status column for boolean fields */}
+  2892→                          <td 
+  2893→                            key={`${field.key}-${site.id}-status`}
+  2894→                            className="px-1 py-2 text-center border-r border-gray-300"
+  2895→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2896→                          >
+  2897→                            <div className="flex items-center justify-center">
+  2898→                              {hasValue ? (
+  2899→                                <span className="text-green-600 font-bold text-lg">✓</span>
+  2900→                              ) : (
+  2901→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  2902→                              )}
+  2903→                            </div>
+  2904→                          </td>
+  2905→                          {/* Vacuum column for boolean fields */}
+  2906→                          <td 
+  2907→                            key={`${field.key}-${site.id}-vacuum`}
+  2908→                            className="px-1 py-2 text-center border-r border-gray-300"
+  2909→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2910→                          >
+  2911→                            <input
+  2912→                              type="text"
+  2913→                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  2914→                              placeholder=""
+  2915→                            />
+  2916→                          </td>
+  2917→                          {/* Scraper column for boolean fields */}
+  2918→                          <td 
+  2919→                            key={`${field.key}-${site.id}-scraper`}
+  2920→                            className="px-1 py-2 text-center border-r border-gray-300"
+  2921→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  2922→                          >
+  2923→                            <input
+  2924→                              type="text"
+  2925→                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  2926→                              placeholder=""
+  2927→                            />
+  2928→                          </td>
+  2929→                        </>
+  2930→                      );
+  2931→                    }
+  2932→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to continue finding all the other field types and add vacuum and scraper columns to them. Let me look for the platform_dropdown field type (which I saw earlier) and add the columns there:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3010→                                          {callPlatforms.map((platform) => (
+  3011→                                            <tr
+  3012→                                              key={platform.platform_id}
+  3013→                                              className="hover:bg-blue-50 cursor-pointer border-t border-gray-100"
+  3014→                                              onClick={() => handlePlatformSelect(site.id, platform.platform_id)}
+  3015→                                            >
+  3016→                                              <td className="px-2 py-2">
+  3017→                                                <div className="font-medium text-gray-900">{platform.platform_name}</div>
+  3018→                                                <div className="text-gray-500">ID: {platform.platform_id}</div>
+  3019→                                              </td>
+  3020→                                              <td className="px-2 py-2">
+  3021→                                                <div className="truncate max-w-24" title={platform.platform_url || ''}>
+  3022→                                                  {platform.platform_url || '-'}
+  3023→                                                </div>
+  3024→                                              </td>
+  3025→                                              <td className="px-2 py-2">
+  3026→                                                <div className="truncate max-w-24" title={platform.api_endpoint || ''}>
+  3027→                                                  {platform.api_endpoint || '-'}
+  3028→                                                </div>
+  3029→                                              </td>
+  3030→                                            </tr>
+  3031→                                          ))}
+  3032→                                        </tbody>
+  3033→                                      </table>
+  3034→                                    </div>
+  3035→                                  </div>
+  3036→                                ) : (
+  3037→                                  <div className="text-center py-4 text-gray-500">
+  3038→                                    <div>No call platforms found</div>
+  3039→                                    <div className="text-xs mt-1">Add platforms in /callplatjar</div>
+  3040→                                  </div>
+  3041→                                )}
+  3042→                              </div>
+  3043→                            </div>
+  3044→                          )}
+  3045→                          </td>
+  3046→                          {/* Status column for platform_dropdown fields */}
+  3047→                          <td 
+  3048→                            key={`${field.key}-${site.id}-status`}
+  3049→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3050→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3051→                          >
+  3052→                            <div className="flex items-center justify-center">
+  3053→                              {hasValue ? (
+  3054→                                <span className="text-green-600 font-bold text-lg">✓</span>
+  3055→                              ) : (
+  3056→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  3057→                              )}
+  3058→                            </div>
+  3059→                          </td>
+  3060→                        </>
+  3061→                      );
+  3062→                    }
+  3063→
+  3064→                    if (field.type === 'address_species_dropdown') {
+  3065→                      const isAddressSpeciesDropdownOpen = addressSpeciesDropdownOpen?.field === field.key && addressSpeciesDropdownOpen?.siteId === site.id;
+  3066→                      return (
+  3067→                        <>
+  3068→                          <td
+  3069→                            key={`${field.key}-${site.id}`}
+  3070→                            className="px-3 py-2 text-sm text-gray-900 relative w-96 border-r border-gray-300"
+  3071→                          >
+  3072→                          <div className="flex items-center space-x-1">
+  3073→                            <button
+  3074→                              onClick={() => handleAddressSpeciesDropdownClick(field.key, site.id)}
+  3075→                              className={`px-2 py-1 text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+  3076→                                !value || getAddressSpeciesName(value as number) === 'None' 
+  3077→                                  ? 'bg-gray-50 hover:bg-gray-100 text-gray-900' 
+  3078→                                  : ''
+  3079→                              }`}
+  3080→                              style={{
+  3081→                                width: '400px',
+  3082→                                ...(value && getAddressSpeciesName(value as number) !== 'None'
+  3083→                                  ? { 
+  3084→                                      backgroundColor: '#dbeafe',
+  3085→                                      color: '#1d1d1d',
+  3086→                                      fontWeight: 'bold'
+  3087→                                    }
+  3088→                                  : {})
+  3089→                              }}
+  3090→                            >
+  3091→                              <div className="flex items-center justify-between">
+  3092→                                <span className="truncate">
+  3093→                                  {value && getAddressSpeciesName(value as number) !== 'None' 
+  3094→                                    ? getAddressSpeciesDetails(value as number)
+  3095→                                    : getAddressSpeciesName(value as number)
+  3096→                                  }
+  3097→                                </span>
+  3098→                                <span className="ml-1">▼</span>
+  3099→                              </div>
+  3100→                            </button>
+  3101→                          </div>
+  3102→
+  3103→                          {/* Address Species Dropdown Menu */}
+  3104→                          {isAddressSpeciesDropdownOpen && (
+  3105→                            <div className="absolute top-full left-0 mt-1 w-96 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+  3106→                              <div className="p-3">
+  3107→                                <div className="text-sm font-medium text-gray-700 mb-2">Select Address Species</div>
+  3108→                                
+  3109→                                {/* None Option */}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Let me add the vacuum and scraper columns for the platform_dropdown field type:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3042→                              </div>
+  3043→                            </div>
+  3044→                          )}
+  3045→                          </td>
+  3046→                          {/* Status column for platform_dropdown fields */}
+  3047→                          <td 
+  3048→                            key={`${field.key}-${site.id}-status`}
+  3049→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3050→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3051→                          >
+  3052→                            <div className="flex items-center justify-center">
+  3053→                              {hasValue ? (
+  3054→                                <span className="text-green-600 font-bold text-lg">✓</span>
+  3055→                              ) : (
+  3056→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  3057→                              )}
+  3058→                            </div>
+  3059→                          </td>
+  3060→                          {/* Vacuum column for platform_dropdown fields */}
+  3061→                          <td 
+  3062→                            key={`${field.key}-${site.id}-vacuum`}
+  3063→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3064→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3065→                          >
+  3066→                            <input
+  3067→                              type="text"
+  3068→                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  3069→                              placeholder=""
+  3070→                            />
+  3071→                          </td>
+  3072→                          {/* Scraper column for platform_dropdown fields */}
+  3073→                          <td 
+  3074→                            key={`${field.key}-${site.id}-scraper`}
+  3075→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3076→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3077→                          >
+  3078→                            <input
+  3079→                              type="text"
+  3080→                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  3081→                              placeholder=""
+  3082→                            />
+  3083→                          </td>
+  3084→                        </>
+  3085→                      );
+  3086→                    }
+  3087→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me continue reading to find the address_species_dropdown field type and add the vacuum and scraper columns there:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3198:                          {/* Status column for address_species_dropdown fields */}
+3199-                          <td 
+3200-                            key={`${field.key}-${site.id}-status`}
+3201-                            className="px-1 py-2 text-center border-r border-gray-300"
+3202-                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3203-                          >
+3204-                            <div className="flex items-center justify-center">
+3205-                              {hasValue ? (
+3206-                                <span className="text-green-600 font-bold text-lg">✓</span>
+3207-                              ) : (
+3208-                                <span className="text-red-600 font-bold text-lg">✗</span>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3194→                              </div>
+  3195→                            </div>
+  3196→                          )}
+  3197→                          </td>
+  3198→                          {/* Status column for address_species_dropdown fields */}
+  3199→                          <td 
+  3200→                            key={`${field.key}-${site.id}-status`}
+  3201→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3202→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3203→                          >
+  3204→                            <div className="flex items-center justify-center">
+  3205→                              {hasValue ? (
+  3206→                                <span className="text-green-600 font-bold text-lg">✓</span>
+  3207→                              ) : (
+  3208→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  3209→                              )}
+  3210→                            </div>
+  3211→                          </td>
+  3212→                          {/* Vacuum column for address_species_dropdown fields */}
+  3213→                          <td 
+  3214→                            key={`${field.key}-${site.id}-vacuum`}
+  3215→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3216→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3217→                          >
+  3218→                            <input
+  3219→                              type="text"
+  3220→                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  3221→                              placeholder=""
+  3222→                            />
+  3223→                          </td>
+  3224→                          {/* Scraper column for address_species_dropdown fields */}
+  3225→                          <td 
+  3226→                            key={`${field.key}-${site.id}-scraper`}
+  3227→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3228→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3229→                          >
+  3230→                            <input
+  3231→                              type="text"
+  3232→                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  3233→                              placeholder=""
+  3234→                            />
+  3235→                          </td>
+  3236→                        </>
+  3237→                      );
+  3238→                    }
+  3239→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to find the default case or other field types (like text inputs). Let me search for those:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3592:                        {/* Status column for default fields */}
+3593-                        <td 
+3594-                          key={`${field.key}-${site.id}-status`}
+3595-                          className="px-1 py-2 text-center border-r border-gray-300"
+3596-                          style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3597-                        >
+3598-                          <div className="flex items-center justify-center">
+3599-                            {hasValue ? (
+3600-                              <span className="text-green-600 font-bold text-lg">✓</span>
+3601-                            ) : (
+3602-                              <span className="text-red-600 font-bold text-lg">✗</span>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Let me also find the cgig_dropdown field type (since I saw citation gigs mentioned in the component):
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+326:    { key: 'driggs_cgig_id', type: 'cgig_dropdown', label: 'driggs_cgig_id', group: 'contact' },
+327-    { key: 'driggs_citations_done', type: 'boolean', label: 'driggs_citations_done', group: 'contact' },
+328-    { key: 'driggs_social_profiles_done', type: 'boolean', label: 'driggs_social_profiles_done', group: 'contact' },
+329-    { key: 'basics_section_separator', type: 'section_header', label: 'basics section', group: 'separator' },
+330-    { key: 'driggs_industry', type: 'text', label: 'driggs_industry', group: 'business' },
+331-    { key: 'driggs_keywords', type: 'text', label: 'driggs_keywords', group: 'business', placeholder: 'tree service, tree removal ann arbor, stump grinding' },
+--
+3240:                    if (field.type === 'cgig_dropdown') {
+3241-                      const isCgigDropdownOpen = cgigDropdownOpen?.field === field.key && cgigDropdownOpen?.siteId === site.id;
+3242-                      return (
+3243-                        <>
+3244-                          <td
+3245-                            key={`${field.key}-${site.id}`}
+--
+3456:                          {/* Status column for cgig_dropdown fields */}
+3457-                          <td 
+3458-                            key={`${field.key}-${site.id}-status`}
+3459-                            className="px-1 py-2 text-center border-r border-gray-300"
+3460-                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3461-                          >
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the vacuum and scraper columns for cgig_dropdown fields:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3456→                          {/* Status column for cgig_dropdown fields */}
+  3457→                          <td 
+  3458→                            key={`${field.key}-${site.id}-status`}
+  3459→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3460→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3461→                          >
+  3462→                            <div className="flex items-center justify-center">
+  3463→                              {hasValue ? (
+  3464→                                <span className="text-green-600 font-bold text-lg">✓</span>
+  3465→                              ) : (
+  3466→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  3467→                              )}
+  3468→                            </div>
+  3469→                          </td>
+  3470→                        </>
+  3471→                      );
+  3472→                    }
+  3473→
+  3474→                    return (
+  3475→                      <>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3452→                              </div>
+  3453→                            </div>
+  3454→                          )}
+  3455→                          </td>
+  3456→                          {/* Status column for cgig_dropdown fields */}
+  3457→                          <td 
+  3458→                            key={`${field.key}-${site.id}-status`}
+  3459→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3460→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3461→                          >
+  3462→                            <div className="flex items-center justify-center">
+  3463→                              {hasValue ? (
+  3464→                                <span className="text-green-600 font-bold text-lg">✓</span>
+  3465→                              ) : (
+  3466→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  3467→                              )}
+  3468→                            </div>
+  3469→                          </td>
+  3470→                          {/* Vacuum column for cgig_dropdown fields */}
+  3471→                          <td 
+  3472→                            key={`${field.key}-${site.id}-vacuum`}
+  3473→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3474→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3475→                          >
+  3476→                            <input
+  3477→                              type="text"
+  3478→                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  3479→                              placeholder=""
+  3480→                            />
+  3481→                          </td>
+  3482→                          {/* Scraper column for cgig_dropdown fields */}
+  3483→                          <td 
+  3484→                            key={`${field.key}-${site.id}-scraper`}
+  3485→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3486→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3487→                          >
+  3488→                            <input
+  3489→                              type="text"
+  3490→                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  3491→                              placeholder=""
+  3492→                            />
+  3493→                          </td>
+  3494→                        </>
+  3495→                      );
+  3496→                    }
+  3497→
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now let me add the vacuum and scraper columns for the default/text field types:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3612→                            )}
+  3613→                          </>
+  3614→                        )}
+  3615→                        </td>
+  3616→                        {/* Status column for default fields */}
+  3617→                        <td 
+  3618→                          key={`${field.key}-${site.id}-status`}
+  3619→                          className="px-1 py-2 text-center border-r border-gray-300"
+  3620→                          style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3621→                        >
+  3622→                          <div className="flex items-center justify-center">
+  3623→                            {hasValue ? (
+  3624→                              <span className="text-green-600 font-bold text-lg">✓</span>
+  3625→                            ) : (
+  3626→                              <span className="text-red-600 font-bold text-lg">✗</span>
+  3627→                            )}
+  3628→                          </div>
+  3629→                        </td>
+  3630→                        {/* Vacuum column for default fields */}
+  3631→                        <td 
+  3632→                          key={`${field.key}-${site.id}-vacuum`}
+  3633→                          className="px-1 py-2 text-center border-r border-gray-300"
+  3634→                          style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3635→                        >
+  3636→                          <input
+  3637→                            type="text"
+  3638→                            className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  3639→                            placeholder=""
+  3640→                          />
+  3641→                        </td>
+  3642→                        {/* Scraper column for default fields */}
+  3643→                        <td 
+  3644→                          key={`${field.key}-${site.id}-scraper`}
+  3645→                          className="px-1 py-2 text-center border-r border-gray-300"
+  3646→                          style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3647→                        >
+  3648→                          <input
+  3649→                            type="text"
+  3650→                            className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+  3651→                            placeholder=""
+  3652→                          />
+  3653→                        </td>
+  3654→                      </>
+  3655→                    );
+  3656→                  })}
+  3657→                </tr>
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! Now I've successfully added the vacuum and scraper columns to all the field types in the table. Let me update the todo list:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add vacuum and scraper columns to expand paired system to quadruple
+- [⚡] 🌡️ Suggest SQL for sitespren_vacuum and sitespren_zarpo_scraper tables
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+## UI Implementation Complete ✅
+
+I've successfully expanded the paired column system to a quadruple column system! Here's what I implemented:
+
+**Header Changes:**
+- Added **vacuum** and **scraper** column headers with bold text
+- Left the top medallion row empty for these columns (as requested)
+- Each domain now has: `domain_column` → `**stat1**` → `**vacuum**` → `**scraper**`
+
+**Table Body Changes:**
+- Added text input boxes for vacuum and scraper columns in all field types:
+  - Section headers
+  - Boolean fields  
+  - Platform dropdowns
+  - Address species dropdowns
+  - Citation gig dropdowns
+  - Default/text fields
+
+**Input Specifications:**
+- Small text boxes (50px width) matching the stat1 column style
+- Basic styling with border and focus states
+- No database integration or functionality yet (as requested)
+- Placeholder-ready for future implementation
+
+---
+
+## SQL Database Structure Suggestions
+
+Now for the database tables to support the vacuum and scraper functionality:
+
+### **Table 1: sitespren_vacuum**
+```sql
+CREATE TABLE sitespren_vacuum (
+    vacuum_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    fk_sitespren_id UUID NOT NULL REFERENCES sitespren(id) ON DELETE CASCADE,
+    fk_users_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    -- Mirror ALL sitespren columns for vacuum data
+    sitespren_base TEXT,
+    true_root_domain TEXT,
+    full_subdomain TEXT,
+    webproperty_type TEXT,
+    wpuser1 TEXT,
+    wppass1 TEXT,
+    wp_plugin_installed1 BOOLEAN,
+    wp_plugin_connected2 BOOLEAN,
+    fk_domreg_hostaccount TEXT,
+    is_wp_site BOOLEAN,
+    wp_rest_app_pass TEXT,
+    driggs_industry TEXT,
+    driggs_city TEXT,
+    driggs_brand_name TEXT,
+    driggs_site_type_purpose TEXT,
+    driggs_email_1 TEXT,
+    driggs_address_full TEXT,
+    driggs_address_species_id INTEGER,
+    driggs_phone_1 TEXT,
+    driggs_phone1_platform_id INTEGER,
+    driggs_cgig_id INTEGER,
+    driggs_citations_done BOOLEAN,
+    driggs_social_profiles_done BOOLEAN,
+    driggs_special_note_for_ai_tool TEXT,
+    driggs_hours TEXT,
+    driggs_owner_name TEXT,
+    driggs_short_descr TEXT,
+    driggs_long_descr TEXT,
+    driggs_year_opened INTEGER,
+    driggs_employees_qty INTEGER,
+    driggs_keywords TEXT,
+    driggs_category TEXT,
+    driggs_address_species_note TEXT,
+    driggs_payment_methods TEXT,
+    driggs_social_media_links TEXT,
+    driggs_street_1 TEXT,
+    driggs_street_2 TEXT,
+    driggs_state_code TEXT,
+    driggs_zip TEXT,
+    driggs_state_full TEXT,
+    driggs_country TEXT,
+    driggs_revenue_goal INTEGER,
+    ns_full TEXT,
+    ip_address TEXT,
+    is_starred1 TEXT,
+    icon_name TEXT,
+    icon_color TEXT,
+    is_bulldozer BOOLEAN,
+    is_competitor BOOLEAN,
+    is_external BOOLEAN,
+    is_internal BOOLEAN,
+    is_ppx BOOLEAN,
+    is_ms BOOLEAN,
+    is_wayback_rebuild BOOLEAN,
+    is_naked_wp_build BOOLEAN,
+    is_rnr BOOLEAN,
+    is_aff BOOLEAN,
+    is_other1 BOOLEAN,
+    is_other2 BOOLEAN,
+    
+    -- Create unique constraint
+    UNIQUE(fk_sitespren_id, fk_users_id)
+);
+```
+
+### **Table 2: sitespren_zarpo_scraper**
+```sql
+CREATE TABLE sitespren_zarpo_scraper (
+    scraper_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    fk_sitespren_id UUID NOT NULL REFERENCES sitespren(id) ON DELETE CASCADE,
+    fk_users_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    -- Mirror ALL sitespren columns for scraper data
+    sitespren_base TEXT,
+    true_root_domain TEXT,
+    full_subdomain TEXT,
+    webproperty_type TEXT,
+    wpuser1 TEXT,
+    wppass1 TEXT,
+    wp_plugin_installed1 BOOLEAN,
+    wp_plugin_connected2 BOOLEAN,
+    fk_domreg_hostaccount TEXT,
+    is_wp_site BOOLEAN,
+    wp_rest_app_pass TEXT,
+    driggs_industry TEXT,
+    driggs_city TEXT,
+    driggs_brand_name TEXT,
+    driggs_site_type_purpose TEXT,
+    driggs_email_1 TEXT,
+    driggs_address_full TEXT,
+    driggs_address_species_id INTEGER,
+    driggs_phone_1 TEXT,
+    driggs_phone1_platform_id INTEGER,
+    driggs_cgig_id INTEGER,
+    driggs_citations_done BOOLEAN,
+    driggs_social_profiles_done BOOLEAN,
+    driggs_special_note_for_ai_tool TEXT,
+    driggs_hours TEXT,
+    driggs_owner_name TEXT,
+    driggs_short_descr TEXT,
+    driggs_long_descr TEXT,
+    driggs_year_opened INTEGER,
+    driggs_employees_qty INTEGER,
+    driggs_keywords TEXT,
+    driggs_category TEXT,
+    driggs_address_species_note TEXT,
+    driggs_payment_methods TEXT,
+    driggs_social_media_links TEXT,
+    driggs_street_1 TEXT,
+    driggs_street_2 TEXT,
+    driggs_state_code TEXT,
+    driggs_zip TEXT,
+    driggs_state_full TEXT,
+    driggs_country TEXT,
+    driggs_revenue_goal INTEGER,
+    ns_full TEXT,
+    ip_address TEXT,
+    is_starred1 TEXT,
+    icon_name TEXT,
+    icon_color TEXT,
+    is_bulldozer BOOLEAN,
+    is_competitor BOOLEAN,
+    is_external BOOLEAN,
+    is_internal BOOLEAN,
+    is_ppx BOOLEAN,
+    is_ms BOOLEAN,
+    is_wayback_rebuild BOOLEAN,
+    is_naked_wp_build BOOLEAN,
+    is_rnr BOOLEAN,
+    is_aff BOOLEAN,
+    is_other1 BOOLEAN,
+    is_other2 BOOLEAN,
+    
+    -- Create unique constraint
+    UNIQUE(fk_sitespren_id, fk_users_id)
+);
+```
+
+### **Additional Indexes for Performance**
+```sql
+-- Indexes for sitespren_vacuum
+CREATE INDEX idx_sitespren_vacuum_fk_sitespren_id ON sitespren_vacuum(fk_sitespren_id);
+CREATE INDEX idx_sitespren_vacuum_fk_users_id ON sitespren_vacuum(fk_users_id);
+CREATE INDEX idx_sitespren_vacuum_updated_at ON sitespren_vacuum(updated_at);
+
+-- Indexes for sitespren_zarpo_scraper  
+CREATE INDEX idx_sitespren_zarpo_scraper_fk_sitespren_id ON sitespren_zarpo_scraper(fk_sitespren_id);
+CREATE INDEX idx_sitespren_zarpo_scraper_fk_users_id ON sitespren_zarpo_scraper(fk_users_id);
+CREATE INDEX idx_sitespren_zarpo_scraper_updated_at ON sitespren_zarpo_scraper(updated_at);
+```
+
+### **Key Design Features:**
+
+1. **Complete Column Mirroring**: Both tables have identical columns to `sitespren`
+2. **Foreign Key Relationships**: Link back to specific sitespren records and users
+3. **User Isolation**: Each user gets their own vacuum/scraper data per site
+4. **Unique Constraints**: Prevents duplicate entries per site/user combination
+5. **Cascading Deletes**: Clean up when sitespren records or users are deleted
+6. **Performance Indexes**: Fast lookups by site, user, and update time
+7. **Timestamp Tracking**: Audit trail for when data was created/modified
+
+This structure allows each user to have their own vacuum and scraper data sets that correspond exactly to the sitespren table structure, supporting the quadruple column system you requested.
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Add vacuum and scraper columns to expand paired system to quadruple
+- [X] 🌡️ Suggest SQL for sitespren_vacuum and sitespren_zarpo_scraper tables
+
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Perfect! I've successfully:
+
+✅ **Expanded the paired system to quadruple columns** - Each domain now has 4 columns: domain, **stat1**, **vacuum**, **scraper**
+
+✅ **Added UI elements** - Text input boxes in vacuum and scraper columns for all field types (no functionality yet, as requested)
+
+✅ **Suggested complete SQL structure** - Two new tables (`sitespren_vacuum` and `sitespren_zarpo_scraper`) that mirror all sitespren columns with proper foreign key relationships
+
+The system is now ready for you to review the SQL suggestions and move forward with creating the database tables in Supabase and then integrating the functionality in future prompts!
+
+---
+
+_**User**_
+
+sitespren_zarpscrapes
+sitespren_vacuums
+
+pleae rename the tables to these and re-issue the schema 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll rename the tables as requested and provide the updated SQL schema:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Rename tables and re-issue SQL schema with corrected names
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+## Updated SQL Database Structure with Corrected Table Names
+
+### **Table 1: sitespren_vacuums**
+```sql
+CREATE TABLE sitespren_vacuums (
+    vacuum_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    fk_sitespren_id UUID NOT NULL REFERENCES sitespren(id) ON DELETE CASCADE,
+    fk_users_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    -- Mirror ALL sitespren columns for vacuum data
+    sitespren_base TEXT,
+    true_root_domain TEXT,
+    full_subdomain TEXT,
+    webproperty_type TEXT,
+    wpuser1 TEXT,
+    wppass1 TEXT,
+    wp_plugin_installed1 BOOLEAN,
+    wp_plugin_connected2 BOOLEAN,
+    fk_domreg_hostaccount TEXT,
+    is_wp_site BOOLEAN,
+    wp_rest_app_pass TEXT,
+    driggs_industry TEXT,
+    driggs_city TEXT,
+    driggs_brand_name TEXT,
+    driggs_site_type_purpose TEXT,
+    driggs_email_1 TEXT,
+    driggs_address_full TEXT,
+    driggs_address_species_id INTEGER,
+    driggs_phone_1 TEXT,
+    driggs_phone1_platform_id INTEGER,
+    driggs_cgig_id INTEGER,
+    driggs_citations_done BOOLEAN,
+    driggs_social_profiles_done BOOLEAN,
+    driggs_special_note_for_ai_tool TEXT,
+    driggs_hours TEXT,
+    driggs_owner_name TEXT,
+    driggs_short_descr TEXT,
+    driggs_long_descr TEXT,
+    driggs_year_opened INTEGER,
+    driggs_employees_qty INTEGER,
+    driggs_keywords TEXT,
+    driggs_category TEXT,
+    driggs_address_species_note TEXT,
+    driggs_payment_methods TEXT,
+    driggs_social_media_links TEXT,
+    driggs_street_1 TEXT,
+    driggs_street_2 TEXT,
+    driggs_state_code TEXT,
+    driggs_zip TEXT,
+    driggs_state_full TEXT,
+    driggs_country TEXT,
+    driggs_revenue_goal INTEGER,
+    ns_full TEXT,
+    ip_address TEXT,
+    is_starred1 TEXT,
+    icon_name TEXT,
+    icon_color TEXT,
+    is_bulldozer BOOLEAN,
+    is_competitor BOOLEAN,
+    is_external BOOLEAN,
+    is_internal BOOLEAN,
+    is_ppx BOOLEAN,
+    is_ms BOOLEAN,
+    is_wayback_rebuild BOOLEAN,
+    is_naked_wp_build BOOLEAN,
+    is_rnr BOOLEAN,
+    is_aff BOOLEAN,
+    is_other1 BOOLEAN,
+    is_other2 BOOLEAN,
+    
+    -- Create unique constraint
+    UNIQUE(fk_sitespren_id, fk_users_id)
+);
+```
+
+### **Table 2: sitespren_zarpscrapes**
+```sql
+CREATE TABLE sitespren_zarpscrapes (
+    scraper_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    fk_sitespren_id UUID NOT NULL REFERENCES sitespren(id) ON DELETE CASCADE,
+    fk_users_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    -- Mirror ALL sitespren columns for scraper data
+    sitespren_base TEXT,
+    true_root_domain TEXT,
+    full_subdomain TEXT,
+    webproperty_type TEXT,
+    wpuser1 TEXT,
+    wppass1 TEXT,
+    wp_plugin_installed1 BOOLEAN,
+    wp_plugin_connected2 BOOLEAN,
+    fk_domreg_hostaccount TEXT,
+    is_wp_site BOOLEAN,
+    wp_rest_app_pass TEXT,
+    driggs_industry TEXT,
+    driggs_city TEXT,
+    driggs_brand_name TEXT,
+    driggs_site_type_purpose TEXT,
+    driggs_email_1 TEXT,
+    driggs_address_full TEXT,
+    driggs_address_species_id INTEGER,
+    driggs_phone_1 TEXT,
+    driggs_phone1_platform_id INTEGER,
+    driggs_cgig_id INTEGER,
+    driggs_citations_done BOOLEAN,
+    driggs_social_profiles_done BOOLEAN,
+    driggs_special_note_for_ai_tool TEXT,
+    driggs_hours TEXT,
+    driggs_owner_name TEXT,
+    driggs_short_descr TEXT,
+    driggs_long_descr TEXT,
+    driggs_year_opened INTEGER,
+    driggs_employees_qty INTEGER,
+    driggs_keywords TEXT,
+    driggs_category TEXT,
+    driggs_address_species_note TEXT,
+    driggs_payment_methods TEXT,
+    driggs_social_media_links TEXT,
+    driggs_street_1 TEXT,
+    driggs_street_2 TEXT,
+    driggs_state_code TEXT,
+    driggs_zip TEXT,
+    driggs_state_full TEXT,
+    driggs_country TEXT,
+    driggs_revenue_goal INTEGER,
+    ns_full TEXT,
+    ip_address TEXT,
+    is_starred1 TEXT,
+    icon_name TEXT,
+    icon_color TEXT,
+    is_bulldozer BOOLEAN,
+    is_competitor BOOLEAN,
+    is_external BOOLEAN,
+    is_internal BOOLEAN,
+    is_ppx BOOLEAN,
+    is_ms BOOLEAN,
+    is_wayback_rebuild BOOLEAN,
+    is_naked_wp_build BOOLEAN,
+    is_rnr BOOLEAN,
+    is_aff BOOLEAN,
+    is_other1 BOOLEAN,
+    is_other2 BOOLEAN,
+    
+    -- Create unique constraint
+    UNIQUE(fk_sitespren_id, fk_users_id)
+);
+```
+
+### **Additional Indexes for Performance**
+```sql
+-- Indexes for sitespren_vacuums
+CREATE INDEX idx_sitespren_vacuums_fk_sitespren_id ON sitespren_vacuums(fk_sitespren_id);
+CREATE INDEX idx_sitespren_vacuums_fk_users_id ON sitespren_vacuums(fk_users_id);
+CREATE INDEX idx_sitespren_vacuums_updated_at ON sitespren_vacuums(updated_at);
+
+-- Indexes for sitespren_zarpscrapes
+CREATE INDEX idx_sitespren_zarpscrapes_fk_sitespren_id ON sitespren_zarpscrapes(fk_sitespren_id);
+CREATE INDEX idx_sitespren_zarpscrapes_fk_users_id ON sitespren_zarpscrapes(fk_users_id);
+CREATE INDEX idx_sitespren_zarpscrapes_updated_at ON sitespren_zarpscrapes(updated_at);
+```
+
+### **Row-Level Security (RLS) Policies**
+```sql
+-- Enable RLS on both tables
+ALTER TABLE sitespren_vacuums ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sitespren_zarpscrapes ENABLE ROW LEVEL SECURITY;
+
+-- Policies for sitespren_vacuums
+CREATE POLICY "Users can view own vacuum data" ON sitespren_vacuums
+    FOR SELECT USING (auth.uid() = fk_users_id);
+
+CREATE POLICY "Users can insert own vacuum data" ON sitespren_vacuums
+    FOR INSERT WITH CHECK (auth.uid() = fk_users_id);
+
+CREATE POLICY "Users can update own vacuum data" ON sitespren_vacuums
+    FOR UPDATE USING (auth.uid() = fk_users_id);
+
+CREATE POLICY "Users can delete own vacuum data" ON sitespren_vacuums
+    FOR DELETE USING (auth.uid() = fk_users_id);
+
+-- Policies for sitespren_zarpscrapes
+CREATE POLICY "Users can view own zarpscrape data" ON sitespren_zarpscrapes
+    FOR SELECT USING (auth.uid() = fk_users_id);
+
+CREATE POLICY "Users can insert own zarpscrape data" ON sitespren_zarpscrapes
+    FOR INSERT WITH CHECK (auth.uid() = fk_users_id);
+
+CREATE POLICY "Users can update own zarpscrape data" ON sitespren_zarpscrapes
+    FOR UPDATE USING (auth.uid() = fk_users_id);
+
+CREATE POLICY "Users can delete own zarpscrape data" ON sitespren_zarpscrapes
+    FOR DELETE USING (auth.uid() = fk_users_id);
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [X] 🌡️ Rename tables and re-issue SQL schema with corrected names
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+## Updated Schema Complete ✅
+
+The tables have been renamed to:
+- **`sitespren_vacuums`** (instead of sitespren_vacuum)
+- **`sitespren_zarpscrapes`** (instead of sitespren_zarpo_scraper)
+
+I've also included Row-Level Security (RLS) policies to ensure users can only access their own vacuum and zarpscrape data, which is important for data isolation in a multi-user environment.
+
+The schema is now ready to be executed in your Supabase SQL editor!
+
+---
+
+_**User**_
+
+i ran the sql. please implement the db functional integration to the interface elements we just created in the new 4-column system per domain column set on /driggsman
+
+the user should not be able to edit any of the info in the vacuum or zarposcrapes fields, but they can delete and make null any text fields, integer fields, etc. 
+
+in future, we will integrate a system to "pull" from other sources (scraping a wp site's frontend directly for zarposcrapes and pulling from the db fields in the wp db intself inside the snefuruplin wp plugin where it is installed on the associated sitespren_base site. ) and store the fetched values in these fields. user cant edit - but they can delete to null if they want and save the new db values as being empty . 
+
+this is how both of the vacuum and scraper ui columns should work 
+
+---
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+I'll implement the database integration for the vacuum and zarpscrapes columns with read-only display and delete-to-null functionality.
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Implement database integration for vacuum and zarpscrapes columns
+- [ ] 🌡️ Add read-only display with delete functionality for vacuum/zarpscrapes fields
+- [ ] 🌡️ Create fetch and save functions for vacuum/zarpscrapes data
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+First, I need to add the state and types for the vacuum and zarpscrapes data, then add the fetching functions and integrate them into the UI. Let me start by updating the interfaces and adding the necessary state:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+100→  aspecies_code: string | null;
+   101→  address_format: string | null;
+   102→  country_code: string | null;
+   103→  is_active: boolean | null;
+   104→  created_at: string;
+   105→  updated_at: string | null;
+   106→}
+   107→
+   108→interface CitationGig {
+   109→  cgig_id: number;
+   110→  cgig_title: string;
+   111→  seller_name: string;
+   112→  marketplace: string;
+   113→  base_price: number;
+   114→  currency: string;
+   115→  cgig_url: string;
+   116→  citations_included: number;
+   117→  is_active: boolean;
+   118→  user_id: string;
+   119→  inputs_v1: string | null;
+   120→  inputs_v2: string | null;
+   121→  inputs_v3: string | null;
+   122→}
+   123→
+   124→interface SitesprenTag {
+   125→  tag_id: number;
+   126→  tag_name: string;
+   127→  tag_order: number;
+   128→  fk_user_id: string;
+   129→}
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me add the interfaces for vacuum and zarpscrapes data:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   120→  inputs_v2: string | null;
+   121→  inputs_v3: string | null;
+   122→}
+   123→
+   124→interface SitesprenTag {
+   125→  tag_id: number;
+   126→  tag_name: string;
+   127→  tag_order: number;
+   128→  fk_user_id: string;
+   129→}
+   130→
+   131→interface VacuumData {
+   132→  vacuum_id: string;
+   133→  fk_sitespren_id: string;
+   134→  fk_users_id: string;
+   135→  [key: string]: any; // For all the mirrored sitespren columns
+   136→}
+   137→
+   138→interface ZarpscrapeData {
+   139→  scraper_id: string;
+   140→  fk_sitespren_id: string;
+   141→  fk_users_id: string;
+   142→  [key: string]: any; // For all the mirrored sitespren columns
+   143→}
+   144→
+   145→interface RecentEntry {
+   146→  id: string;
+   147→  timeLastUsed: string;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me find where the state variables are defined and add states for vacuum and zarpscrapes data:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+220→  const [addressSpecies, setAddressSpecies] = useState<AddressSpecies[]>([]);
+   221→  const [addressSpeciesDropdownOpen, setAddressSpeciesDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+   222→  
+   223→  // Selected sites for table filtering
+   224→  // TODO: Implement URL state persistence using one of these approaches:
+   225→  // 1. Simple: ?selected=site1,site2,site3 (readable but can get long)
+   226→  // 2. Encoded: ?penja=9284jsiweu294824 (short but requires mapping)
+   227→  // 3. Base64: ?state=eyJ0YWciOiJ0YWduYW1lIn0= (middle ground)
+   228→  // 4. Hybrid: Use simple for <5 sites, encoded for larger selections
+   229→  
+   230→  // Inputs expand editor states
+   231→  const [inputsExpandPopup, setInputsExpandPopup] = useState<{ 
+   232→    cgigId: number; 
+   233→    initialTab: 'inputs_v1' | 'inputs_v2' | 'inputs_v3';
+   234→  } | null>(null);
+   235→  
+   236→  
+   237→  // Rain chamber states
+   238→  const [activeRainChamber, setActiveRainChamber] = useState(false);
+   239→  const [sitesprenTags, setSitesprenTags] = useState<SitesprenTag[]>([]);
+   240→  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
+   241→  const [tagsDropdownOpen, setTagsDropdownOpen] = useState(false);
+   242→  const [taggedSites, setTaggedSites] = useState<SitesprenSite[]>([]);
+   243→  const [userInternalId, setUserInternalId] = useState<string | null>(null);
+   244→  const [tagCounts, setTagCounts] = useState<Map<number, number>>(new Map());
+   245→  
+   246→  // Search popup states
+   247→  const [searchPopupOpen, setSearchPopupOpen] = useState(false);
+   248→  const [searchSites, setSearchSites] = useState<SitesprenSite[]>([]);
+   249→  const [selectedSiteIds, setSelectedSiteIds] = useState<Set<string>>(new Set());
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Error:
+
+```
+<tool_use_error>String to replace not found in file.
+String:   // Filtering mechanism states
+  const [useFogFilter, setUseFogFilter] = useState(true); // Default to true (unfiltered view)
+  const [useDaylightFilter, setUseDaylightFilter] = useState(false);
+  const [useRainFilter, setUseRainFilter] = useState(false);
+  const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
+  
+  const supabase = createClientComponentClient();</tool_use_error>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me search for the exact location:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+258:  const [useFogFilter, setUseFogFilter] = useState(true); // Default to true (unfiltered view)
+259-  const [useDaylightFilter, setUseDaylightFilter] = useState(false);
+260-  const [useRainFilter, setUseRainFilter] = useState(false);
+--
+267:  const supabase = createClientComponentClient();
+268-  const router = useRouter();
+269-  const searchParams = useSearchParams();
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Error:
+
+```
+<tool_use_error>String to replace not found in file.
+String:   const [useFogFilter, setUseFogFilter] = useState(true); // Default to true (unfiltered view)
+  const [useDaylightFilter, setUseDaylightFilter] = useState(false);
+  const [useRainFilter, setUseRainFilter] = useState(false);
+  const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
+  
+  const supabase = createClientComponentClient();</tool_use_error>
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me read that exact area to see the formatting:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+256→  
+   257→  // Filtering mechanism states
+   258→  const [useFogFilter, setUseFogFilter] = useState(true); // Default to true (unfiltered view)
+   259→  const [useDaylightFilter, setUseDaylightFilter] = useState(false);
+   260→  const [useRainFilter, setUseRainFilter] = useState(false);
+   261→  
+   262→  // Horizontal tabs state
+   263→  const [activeTab, setActiveTab] = useState(1);
+   264→  const [showChamberBoxes, setShowChamberBoxes] = useState(true); // Visibility toggle for chamber boxes
+   265→  const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
+   266→  
+   267→  const supabase = createClientComponentClient();
+   268→  const router = useRouter();
+   269→  const searchParams = useSearchParams();
+   270→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I can add the state correctly:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   261→  
+   262→  // Horizontal tabs state
+   263→  const [activeTab, setActiveTab] = useState(1);
+   264→  const [showChamberBoxes, setShowChamberBoxes] = useState(true); // Visibility toggle for chamber boxes
+   265→  const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
+   266→  
+   267→  // Vacuum and Zarpscrapes states
+   268→  const [vacuumData, setVacuumData] = useState<Map<string, VacuumData>>(new Map());
+   269→  const [zarpscrapesData, setZarpscrapesData] = useState<Map<string, ZarpscrapeData>>(new Map());
+   270→  
+   271→  const supabase = createClientComponentClient();
+   272→  const router = useRouter();
+   273→  const searchParams = useSearchParams();
+   274→
+   275→  // Site selection functions
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me find where the fetchSites function is and add functions to fetch vacuum and zarpscrapes data:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+525→      return [];
+   526→    }
+   527→  };
+   528→
+   529→  const saveRecentEntries = (entries: RecentEntry[]) => {
+   530→    try {
+   531→      localStorage.setItem('driggsman_recent_entries', JSON.stringify(entries));
+   532→    } catch (error) {
+   533→      console.error('Error saving recent entries to localStorage:', error);
+   534→    }
+   535→  };
+   536→
+   537→  const addRecentEntry = (sitesEntered: string[]) => {
+   538→    if (sitesEntered.length === 0) return;
+   539→
+   540→    const newEntry: RecentEntry = {
+   541→      id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+   542→      timeLastUsed: new Date().toISOString(),
+   543→      sitesEntered: [...sitesEntered],
+   544→      count: sitesEntered.length,
+   545→      settings: `Daylight Chamber - ${sitesEntered.length} sites`
+   546→    };
+   547→
+   548→    const updatedEntries = [newEntry, ...recentEntries.filter(entry => 
+   549→      JSON.stringify(entry.sitesEntered.sort()) !== JSON.stringify(sitesEntered.sort())
+   550→    )].slice(0, 20); // Keep only 20 most recent
+   551→
+   552→    setRecentEntries(updatedEntries);
+   553→    saveRecentEntries(updatedEntries);
+   554→  };
+   555→
+   556→  // Load recent entries on component mount
+   557→  useEffect(() => {
+   558→    const entries = loadRecentEntries();
+   559→    setRecentEntries(entries);
+   560→  }, []);
+   561→
+   562→  // Add to recents when manual sites change
+   563→  useEffect(() => {
+   564→    if (manualSites.length > 0) {
+   565→      addRecentEntry(manualSites);
+   566→    }
+   567→  }, [manualSites]);
+   568→  
+   569→  // Update parent with sites count
+   570→  useEffect(() => {
+   571→    if (onSitesCountChange) {
+   572→      onSitesCountChange(sites.length);
+   573→    }
+   574→  }, [sites.length, onSitesCountChange]);
+   575→
+   576→  // Fetch search sites when popup opens
+   577→  useEffect(() => {
+   578→    console.log('🔍 Search popup useEffect triggered. searchPopupOpen:', searchPopupOpen);
+   579→    if (searchPopupOpen) {
+   580→      console.log('✅ Search popup is open, calling fetchSearchSites...');
+   581→      fetchSearchSites();
+   582→    } else {
+   583→      console.log('❌ Search popup is closed, not calling fetchSearchSites');
+   584→    }
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me find and look at the fetchSites function to understand how it works:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+586→  
+   587→  const fetchSites = async () => {
+   588→    try {
+   589→      setLoading(true);
+   590→      const { data: { user } } = await supabase.auth.getUser();
+   591→      
+   592→      if (!user?.id) {
+   593→        setError('User not authenticated');
+   594→        setLoading(false);
+   595→        return;
+   596→      }
+   597→
+   598→      console.log('Supabase auth user ID:', user.id);
+   599→      
+   600→      // First get the internal user ID from users table (same as /sitejar4)
+   601→      const { data: userData, error: userError } = await supabase
+   602→        .from('users')
+   603→        .select('id')
+   604→        .eq('auth_id', user.id)
+   605→        .single();
+   606→
+   607→      if (userError || !userData) {
+   608→        console.error('User lookup error:', userError);
+   609→        setError('User not found in users table');
+   610→        setLoading(false);
+   611→        return;
+   612→      }
+   613→
+   614→      const userInternalId = userData.id;
+   615→      console.log('Internal user ID:', userInternalId);
+   616→      
+   617→      // Now get user's sites using the internal user ID
+   618→      const { data: sitesData, error: fetchError } = await supabase
+   619→        .from('sitespren')
+   620→        .select('*')
+   621→        .eq('fk_users_id', userInternalId)
+   622→        .order('created_at', { ascending: false });
+   623→        
+   624→      console.log('Sites found for internal user ID:', sitesData?.length || 0);
+   625→      
+   626→      if (sitesData && sitesData.length > 0) {
+   627→        console.log('First site data:', sitesData[0]);
+   628→        console.log('Site has these driggs fields populated:', 
+   629→          Object.keys(sitesData[0]).filter(key => key.startsWith('driggs_') && sitesData[0][key])
+   630→        );
+   631→      }
+   632→        
+   633→      if (fetchError) {
+   634→        console.error('Fetch error:', fetchError);
+   635→        throw fetchError;
+   636→      }
+   637→      
+   638→      setAllSites(sitesData || []); // Store all sites
+   639→      
+   640→      // Filter sites based on manual entries or show all
+   641→      if (manualSites.length > 0) {
+   642→        const filteredSites = sitesData?.filter(site => 
+   643→          manualSites.some(manualSite => 
+   644→            site.sitespren_base?.toLowerCase().includes(manualSite.toLowerCase()) ||
+   645→            site.true_root_domain?.toLowerCase().includes(manualSite.toLowerCase())
+   646→          )
+   647→        ) || [];
+   648→        setSites(filteredSites);
+   649→      } else {
+   650→        setSites(sitesData || []);
+   651→      }
+   652→    } catch (err) {
+   653→      console.error('Error fetching sites:', err);
+   654→      setError('Failed to fetch sites: ' + (err as any).message);
+   655→    } finally {
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me add the functions to fetch vacuum and zarpscrapes data. I'll add them after the fetchSites function:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+655→    } finally {
+   656→      setLoading(false);
+   657→    }
+   658→  };
+   659→
+   660→  // Fetch call platforms
+   661→  const fetchCallPlatforms = async () => {
+   662→    try {
+   663→      const { data: { user } } = await supabase.auth.getUser();
+   664→      if (!user?.id) return;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   654→      setError('Failed to fetch sites: ' + (err as any).message);
+   655→    } finally {
+   656→      setLoading(false);
+   657→    }
+   658→  };
+   659→
+   660→  // Fetch vacuum data for all sites
+   661→  const fetchVacuumData = async () => {
+   662→    try {
+   663→      const { data: { user } } = await supabase.auth.getUser();
+   664→      if (!user?.id) return;
+   665→      
+   666→      // Get the internal user ID
+   667→      const { data: userData } = await supabase
+   668→        .from('users')
+   669→        .select('id')
+   670→        .eq('auth_id', user.id)
+   671→        .single();
+   672→      
+   673→      if (!userData) return;
+   674→      
+   675→      const { data: vacuums, error } = await supabase
+   676→        .from('sitespren_vacuums')
+   677→        .select('*')
+   678→        .eq('fk_users_id', userData.id);
+   679→      
+   680→      if (error) {
+   681→        console.error('Error fetching vacuum data:', error);
+   682→        return;
+   683→      }
+   684→      
+   685→      // Store vacuum data in a Map for quick lookup by site ID
+   686→      const vacuumMap = new Map<string, VacuumData>();
+   687→      vacuums?.forEach(vacuum => {
+   688→        vacuumMap.set(vacuum.fk_sitespren_id, vacuum);
+   689→      });
+   690→      setVacuumData(vacuumMap);
+   691→    } catch (err) {
+   692→      console.error('Error in fetchVacuumData:', err);
+   693→    }
+   694→  };
+   695→
+   696→  // Fetch zarpscrapes data for all sites
+   697→  const fetchZarpscrapesData = async () => {
+   698→    try {
+   699→      const { data: { user } } = await supabase.auth.getUser();
+   700→      if (!user?.id) return;
+   701→      
+   702→      // Get the internal user ID
+   703→      const { data: userData } = await supabase
+   704→        .from('users')
+   705→        .select('id')
+   706→        .eq('auth_id', user.id)
+   707→        .single();
+   708→      
+   709→      if (!userData) return;
+   710→      
+   711→      const { data: zarpscrapes, error } = await supabase
+   712→        .from('sitespren_zarpscrapes')
+   713→        .select('*')
+   714→        .eq('fk_users_id', userData.id);
+   715→      
+   716→      if (error) {
+   717→        console.error('Error fetching zarpscrapes data:', error);
+   718→        return;
+   719→      }
+   720→      
+   721→      // Store zarpscrapes data in a Map for quick lookup by site ID
+   722→      const zarpscrapesMap = new Map<string, ZarpscrapeData>();
+   723→      zarpscrapes?.forEach(zarpscrape => {
+   724→        zarpscrapesMap.set(zarpscrape.fk_sitespren_id, zarpscrape);
+   725→      });
+   726→      setZarpscrapesData(zarpscrapesMap);
+   727→    } catch (err) {
+   728→      console.error('Error in fetchZarpscrapesData:', err);
+   729→    }
+   730→  };
+   731→
+   732→  // Function to delete (set to null) a vacuum field
+   733→  const deleteVacuumField = async (siteId: string, fieldKey: string) => {
+   734→    try {
+   735→      const { data: { user } } = await supabase.auth.getUser();
+   736→      if (!user?.id) return;
+   737→      
+   738→      const { data: userData } = await supabase
+   739→        .from('users')
+   740→        .select('id')
+   741→        .eq('auth_id', user.id)
+   742→        .single();
+   743→      
+   744→      if (!userData) return;
+   745→      
+   746→      // Check if vacuum record exists
+   747→      const existingVacuum = vacuumData.get(siteId);
+   748→      
+   749→      if (existingVacuum) {
+   750→        // Update existing record - set field to null
+   751→        const { error } = await supabase
+   752→          .from('sitespren_vacuums')
+   753→          .update({ [fieldKey]: null })
+   754→          .eq('vacuum_id', existingVacuum.vacuum_id);
+   755→        
+   756→        if (error) {
+   757→          console.error('Error deleting vacuum field:', error);
+   758→          return;
+   759→        }
+   760→        
+   761→        // Update local state
+   762→        const updatedVacuum = { ...existingVacuum, [fieldKey]: null };
+   763→        setVacuumData(prev => new Map(prev).set(siteId, updatedVacuum));
+   764→      }
+   765→    } catch (err) {
+   766→      console.error('Error in deleteVacuumField:', err);
+   767→    }
+   768→  };
+   769→
+   770→  // Function to delete (set to null) a zarpscrape field
+   771→  const deleteZarpscrapeField = async (siteId: string, fieldKey: string) => {
+   772→    try {
+   773→      const { data: { user } } = await supabase.auth.getUser();
+   774→      if (!user?.id) return;
+   775→      
+   776→      const { data: userData } = await supabase
+   777→        .from('users')
+   778→        .select('id')
+   779→        .eq('auth_id', user.id)
+   780→        .single();
+   781→      
+   782→      if (!userData) return;
+   783→      
+   784→      // Check if zarpscrape record exists
+   785→      const existingZarpscrape = zarpscrapesData.get(siteId);
+   786→      
+   787→      if (existingZarpscrape) {
+   788→        // Update existing record - set field to null
+   789→        const { error } = await supabase
+   790→          .from('sitespren_zarpscrapes')
+   791→          .update({ [fieldKey]: null })
+   792→          .eq('scraper_id', existingZarpscrape.scraper_id);
+   793→        
+   794→        if (error) {
+   795→          console.error('Error deleting zarpscrape field:', error);
+   796→          return;
+   797→        }
+   798→        
+   799→        // Update local state
+   800→        const updatedZarpscrape = { ...existingZarpscrape, [fieldKey]: null };
+   801→        setZarpscrapesData(prev => new Map(prev).set(siteId, updatedZarpscrape));
+   802→      }
+   803→    } catch (err) {
+   804→      console.error('Error in deleteZarpscrapeField:', err);
+   805→    }
+   806→  };
+   807→
+   808→  // Fetch call platforms
+   809→  const fetchCallPlatforms = async () => {
+   810→    try {
+   811→      const { data: { user } } = await supabase.auth.getUser();
+   812→      if (!user?.id) return;
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me update the TodoWrite and find where to call these fetch functions in the useEffect:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+**Agent task list:**
+- [⚡] 🌡️ Implement database integration for vacuum and zarpscrapes columns
+- [⚡] 🌡️ Add read-only display with delete functionality for vacuum/zarpscrapes fields
+- [X] 🌡️ Create fetch and save functions for vacuum/zarpscrapes data
+
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me find the useEffect that calls fetchSites and add our new fetch functions:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+447:    fetchCallPlatforms();
+448:    fetchCitationGigs();
+449-    fetchAddressSpecies();
+450-    fetchSitesprenTags();
+451-  }, []);
+--
+809:  const fetchCallPlatforms = async () => {
+810-    try {
+811-      const { data: { user } } = await supabase.auth.getUser();
+812-      if (!user?.id) return;
+--
+837:      console.error('Error in fetchCallPlatforms:', err);
+838-    }
+839-  };
+840-
+--
+842:  const fetchCitationGigs = async () => {
+843-    try {
+844-      const { data: { user } } = await supabase.auth.getUser();
+845-      if (!user?.id) return;
+--
+873:      console.error('Error in fetchCitationGigs:', err);
+874-    }
+875-  };
+876-
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+444→  // Fetch sites data and re-filter when manual sites change
+   445→  useEffect(() => {
+   446→    fetchSites();
+   447→    fetchCallPlatforms();
+   448→    fetchCitationGigs();
+   449→    fetchAddressSpecies();
+   450→    fetchSitesprenTags();
+   451→  }, []);
+   452→
+   453→  // Re-filter sites when manual sites change or filtering states change
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   440→      window.history.replaceState({}, '', url.toString());
+   441→    }
+   442→  }, []); // Empty dependency array - only run once on mount
+   443→
+   444→  // Fetch sites data and re-filter when manual sites change
+   445→  useEffect(() => {
+   446→    fetchSites();
+   447→    fetchCallPlatforms();
+   448→    fetchCitationGigs();
+   449→    fetchAddressSpecies();
+   450→    fetchSitesprenTags();
+   451→    fetchVacuumData();
+   452→    fetchZarpscrapesData();
+   453→  }, []);
+   454→
+   455→  // Re-filter sites when manual sites change or filtering states change
+   456→  useEffect(() => {
+   457→    console.log('Filtering effect triggered:', {
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update the UI components in the table to display the vacuum and zarpscrapes data with delete functionality. Let me find where we added the text inputs and replace them with proper read-only displays:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Read** `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+2905→                  } ${
+  2906→                    field.key === 'driggs_cgig_id' ? 'border-b-4 border-b-black' : ''
+  2907→                  } ${
+  2908→                    field.key === 'driggs_industry' ? 'border-t-4 border-t-black' : ''
+  2909→                  } ${
+  2910→                    field.key === 'driggs_social_media_links' ? 'border-b-4 border-b-black' : ''
+  2911→                  } ${
+  2912→                    field.key === 'phone_section_separator' ? 'border-t-4 border-t-black' : ''
+  2913→                  } ${
+  2914→                    field.key === 'address_section_separator' ? 'border-t-4 border-t-black' : ''
+  2915→                  } ${
+  2916→                    field.key === 'backlinks_section_separator' ? 'border-t-4 border-t-black' : ''
+  2917→                  } ${
+  2918→                    field.key === 'basics_section_separator' ? 'border-t-4 border-t-black' : ''
+  2919→                  } ${
+  2920→                    field.key === 'misc_section_separator' ? 'border-t-4 border-t-black' : ''
+  2921→                  }`}
+  2922→                >
+  2923→                  {/* Field selection checkbox */}
+  2924→                  <td 
+  2925→                    className={`w-12 px-2 py-2 border-r border-gray-300 ${
+  2926→                      field.type === 'section_header' ? (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '' : 'bg-gray-100') : 'cursor-pointer'
+  2927→                    }`}
+  2928→                    style={field.type === 'section_header' && (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? { backgroundColor: '#dddddd' } : {}}
+  2929→                    onClick={() => field.type !== 'section_header' && handleFieldSelect(field.key)}
+  2930→                  >
+  2931→                    <div className="flex items-center justify-center">
+  2932→                      {field.type !== 'section_header' && (
+  2933→                        <input
+  2934→                          type="checkbox"
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Let me search for where we added the vacuum and scraper text inputs for boolean fields first:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3073:                          {/* Vacuum column for boolean fields */}
+3074-                          <td 
+3075-                            key={`${field.key}-${site.id}-vacuum`}
+3076-                            className="px-1 py-2 text-center border-r border-gray-300"
+3077-                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3078-                          >
+3079-                            <input
+3080-                              type="text"
+3081-                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+3082-                              placeholder=""
+3083-                            />
+3084-                          </td>
+3085-                          {/* Scraper column for boolean fields */}
+3086-                          <td 
+3087-                            key={`${field.key}-${site.id}-scraper`}
+3088-                            className="px-1 py-2 text-center border-r border-gray-300"
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me replace all the vacuum and scraper text inputs with the proper display and delete functionality. Let me start with boolean fields:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3069→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  3070→                              )}
+  3071→                            </div>
+  3072→                          </td>
+  3073→                          {/* Vacuum column for boolean fields */}
+  3074→                          <td 
+  3075→                            key={`${field.key}-${site.id}-vacuum`}
+  3076→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3077→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3078→                          >
+  3079→                            {(() => {
+  3080→                              const vacuumValue = vacuumData.get(site.id)?.[field.key];
+  3081→                              if (vacuumValue !== undefined && vacuumValue !== null) {
+  3082→                                return (
+  3083→                                  <div className="flex items-center justify-center space-x-1">
+  3084→                                    <span className="text-xs text-gray-700" title={String(vacuumValue)}>
+  3085→                                      {vacuumValue ? '✓' : '✗'}
+  3086→                                    </span>
+  3087→                                    <button
+  3088→                                      onClick={() => deleteVacuumField(site.id, field.key)}
+  3089→                                      className="text-red-500 hover:text-red-700 text-xs"
+  3090→                                      title="Delete value"
+  3091→                                    >
+  3092→                                      ×
+  3093→                                    </button>
+  3094→                                  </div>
+  3095→                                );
+  3096→                              }
+  3097→                              return <span className="text-xs text-gray-400">-</span>;
+  3098→                            })()}
+  3099→                          </td>
+  3100→                          {/* Scraper column for boolean fields */}
+  3101→                          <td 
+  3102→                            key={`${field.key}-${site.id}-scraper`}
+  3103→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3104→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3105→                          >
+  3106→                            {(() => {
+  3107→                              const zarpscrapeValue = zarpscrapesData.get(site.id)?.[field.key];
+  3108→                              if (zarpscrapeValue !== undefined && zarpscrapeValue !== null) {
+  3109→                                return (
+  3110→                                  <div className="flex items-center justify-center space-x-1">
+  3111→                                    <span className="text-xs text-gray-700" title={String(zarpscrapeValue)}>
+  3112→                                      {zarpscrapeValue ? '✓' : '✗'}
+  3113→                                    </span>
+  3114→                                    <button
+  3115→                                      onClick={() => deleteZarpscrapeField(site.id, field.key)}
+  3116→                                      className="text-red-500 hover:text-red-700 text-xs"
+  3117→                                      title="Delete value"
+  3118→                                    >
+  3119→                                      ×
+  3120→                                    </button>
+  3121→                                  </div>
+  3122→                                );
+  3123→                              }
+  3124→                              return <span className="text-xs text-gray-400">-</span>;
+  3125→                            })()}
+  3126→                          </td>
+  3127→                        </>
+  3128→                      );
+  3129→                    }
+  3130→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me create a helper component to reuse for all field types. Let me add it before we use it in multiple places:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   161→  showCompetitorSites?: boolean;
+   162→  onSitesCountChange?: (count: number) => void;
+   163→}
+   164→
+   165→// Helper component for vacuum/zarpscrape cell display
+   166→const VacuumZarpscrapeCell = ({ 
+   167→  value, 
+   168→  fieldKey, 
+   169→  siteId, 
+   170→  onDelete,
+   171→  isBoolean = false 
+   172→}: { 
+   173→  value: any; 
+   174→  fieldKey: string; 
+   175→  siteId: string; 
+   176→  onDelete: (siteId: string, fieldKey: string) => void;
+   177→  isBoolean?: boolean;
+   178→}) => {
+   179→  if (value !== undefined && value !== null) {
+   180→    let displayValue = '';
+   181→    
+   182→    if (isBoolean) {
+   183→      displayValue = value ? '✓' : '✗';
+   184→    } else if (typeof value === 'string') {
+   185→      // Truncate long strings
+   186→      displayValue = value.length > 6 ? value.substring(0, 6) + '...' : value;
+   187→    } else {
+   188→      displayValue = String(value);
+   189→    }
+   190→    
+   191→    return (
+   192→      <div className="flex items-center justify-center space-x-1">
+   193→        <span 
+   194→          className="text-xs text-gray-700 truncate max-w-[30px]" 
+   195→          title={String(value)}
+   196→        >
+   197→          {displayValue}
+   198→        </span>
+   199→        <button
+   200→          onClick={() => onDelete(siteId, fieldKey)}
+   201→          className="text-red-500 hover:text-red-700 text-xs"
+   202→          title="Delete value"
+   203→        >
+   204→          ×
+   205→        </button>
+   206→      </div>
+   207→    );
+   208→  }
+   209→  return <span className="text-xs text-gray-400">-</span>;
+   210→};
+   211→
+   212→export default function DriggsmanTable({ 
+   213→  onControlsRender,
+   214→  showVerificationColumn = false,
+   215→  showCompetitorSites = false,
+   216→  onSitesCountChange
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me update the boolean fields section to use the helper component:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3116→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  3117→                              )}
+  3118→                            </div>
+  3119→                          </td>
+  3120→                          {/* Vacuum column for boolean fields */}
+  3121→                          <td 
+  3122→                            key={`${field.key}-${site.id}-vacuum`}
+  3123→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3124→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3125→                          >
+  3126→                            <VacuumZarpscrapeCell
+  3127→                              value={vacuumData.get(site.id)?.[field.key]}
+  3128→                              fieldKey={field.key}
+  3129→                              siteId={site.id}
+  3130→                              onDelete={deleteVacuumField}
+  3131→                              isBoolean={true}
+  3132→                            />
+  3133→                          </td>
+  3134→                          {/* Scraper column for boolean fields */}
+  3135→                          <td 
+  3136→                            key={`${field.key}-${site.id}-scraper`}
+  3137→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3138→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3139→                          >
+  3140→                            <VacuumZarpscrapeCell
+  3141→                              value={zarpscrapesData.get(site.id)?.[field.key]}
+  3142→                              fieldKey={field.key}
+  3143→                              siteId={site.id}
+  3144→                              onDelete={deleteZarpscrapeField}
+  3145→                              isBoolean={true}
+  3146→                            />
+  3147→                          </td>
+  3148→                        </>
+  3149→                      );
+  3150→                    }
+  3151→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to update all the other field types. Let me update the platform_dropdown fields:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+  3275→                                <span className="text-red-600 font-bold text-lg">✗</span>
+  3276→                              )}
+  3277→                            </div>
+  3278→                          </td>
+  3279→                          {/* Vacuum column for platform_dropdown fields */}
+  3280→                          <td 
+  3281→                            key={`${field.key}-${site.id}-vacuum`}
+  3282→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3283→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3284→                          >
+  3285→                            <VacuumZarpscrapeCell
+  3286→                              value={vacuumData.get(site.id)?.[field.key]}
+  3287→                              fieldKey={field.key}
+  3288→                              siteId={site.id}
+  3289→                              onDelete={deleteVacuumField}
+  3290→                            />
+  3291→                          </td>
+  3292→                          {/* Scraper column for platform_dropdown fields */}
+  3293→                          <td 
+  3294→                            key={`${field.key}-${site.id}-scraper`}
+  3295→                            className="px-1 py-2 text-center border-r border-gray-300"
+  3296→                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+  3297→                          >
+  3298→                            <VacuumZarpscrapeCell
+  3299→                              value={zarpscrapesData.get(site.id)?.[field.key]}
+  3300→                              fieldKey={field.key}
+  3301→                              siteId={site.id}
+  3302→                              onDelete={deleteZarpscrapeField}
+  3303→                            />
+  3304→                          </td>
+  3305→                        </>
+  3306→                      );
+  3307→                    }
+  3308→
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now let me update the address_species_dropdown, cgig_dropdown, and default field types. Let me use a more efficient approach with replace_all:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/driggsman/components/DriggsmanTable.tsx has been updated. All occurrences of '                            <input
+                              type="text"
+                              className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              placeholder=""
+                            />' were successfully replaced with '                            <VacuumZarpscrapeCell
+                              value={vacuumData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteVacuumField}
+                            />'.
+```
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Now I need to handle the zarpscrape columns. Let me check if there are any remaining text inputs for the scraper columns:
+
+_**Agent (claude-opus-4-1-20250805)**_
+
+Tool use: **Grep** path `./app/(protected)/driggsman/components/DriggsmanTable.tsx`
+
+Result:
+
+```
+3446:                          {/* Scraper column for address_species_dropdown fields */}
+3447-                          <td 
+3448-                            key={`${field.key}-${site.id}-scraper`}
+3449-                            className="px-1 py-2 text-center border-r border-gray-300"
+3450-                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3451-                          >
+3452-                            <VacuumZarpscrapeCell
+3453-                              value={vacuumData.get(site.id)?.[field.key]}
+3454-                              fieldKey={field.key}
+3455-                              siteId={site.id}
+3456-                              onDelete={deleteVacuumField}
+--
+3706:                          {/* Scraper column for cgig_dropdown fields */}
+3707-                          <td 
+3708-                            key={`${field.key}-${site.id}-scraper`}
+3709-                            className="px-1 py-2 text-center border-r border-gray-300"
+3710-                            style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3711-                          >
+3712-                            <VacuumZarpscrapeCell
+3713-                              value={vacuumData.get(site.id)?.[field.key]}
+3714-                              fieldKey={field.key}
+3715-                              siteId={site.id}
+3716-                              onDelete={deleteVacuumField}
+--
+3867:                        {/* Scraper column for default fields */}
+3868-                        <td 
+3869-                          key={`${field.key}-${site.id}-scraper`}
+3870-                          className="px-1 py-2 text-center border-r border-gray-300"
+3871-                          style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
+3872-                        >
+3873-                          <input
+3874-                            type="text"
+3875-                            className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+3876-                            placeholder=""
+3877-                          />
+```
+

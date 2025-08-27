@@ -3981,3 +3981,310 @@ The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/
    342→      {/* Header */}
 ```
 
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the functions popup button to the header and add the popup modal. Let me add the button to the header section:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   340→  return (
+   341→    <div className="min-h-screen bg-gray-50 flex flex-col">
+   342→      {/* Header */}
+   343→      <div className="bg-white border-b px-6 py-4">
+   344→        <div className="flex items-center justify-between">
+   345→          <div className="flex items-center space-x-6">
+   346→            <h1 className="text-2xl font-bold text-gray-800">Reddit URLs Jar</h1>
+   347→
+   348→            {/* Functions Popup Button - styled like /nwjar1 */}
+   349→            <button
+   350→              onClick={handlePopupOpen}
+   351→              className="font-bold text-white rounded"
+   352→              style={{
+   353→                backgroundColor: '#800000', // maroon color
+   354→                fontSize: '20px',
+   355→                paddingLeft: '14px',
+   356→                paddingRight: '14px',
+   357→                paddingTop: '10px',
+   358→                paddingBottom: '10px'
+   359→              }}
+   360→            >
+   361→              functions popup
+   362→            </button>
+   363→            
+   364→            {/* Column Pagination Button Bars */}
+   365→            {columnPaginationControls && (
+   366→              <>
+   367→                <div className="flex items-center">
+   368→                  {columnPaginationControls.ColumnPaginationBar1()}
+   369→                </div>
+   370→                <div className="flex items-center">
+   371→                  {columnPaginationControls.ColumnPaginationBar2()}
+   372→                </div>
+   373→              </>
+   374→            )}
+   375→            
+   376→            {/* Scrape Links Button */}
+   377→            <div className="flex items-center space-x-2">
+   378→              <button
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Now I need to add the popup modal after the main content section. Let me find the end of the component and add it there:
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+Tool use: **Edit**
+
+Result:
+
+```
+The file /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/reddjar/pclient.tsx has been updated. Here's the result of running `cat -n` on a snippet of the edited file:
+   443→      <div className="px-6">
+   444→        <RedditdoriButtonBar />
+   445→      </div>
+   446→
+   447→      {/* Main Content - Full Width ReddjarTable */}
+   448→      <div className="flex-1 overflow-hidden">
+   449→        <ReddjarTable 
+   450→          onColumnPaginationRender={setColumnPaginationControls}
+   451→          selectedRows={selectedRows}
+   452→          onSelectionChange={setSelectedRows}
+   453→          commentableFilter={commentableFilter}
+   454→          scrapeStatusFilter={scrapeStatusFilter}
+   455→        />
+   456→      </div>
+   457→
+   458→      {/* FPopup1 Modal - Same pattern as /nwjar1 */}
+   459→      {isPopupOpen && (
+   460→        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+   461→          <div className="bg-white w-full h-full max-w-[95vw] max-h-[95vh] rounded-lg shadow-xl relative overflow-hidden">
+   462→            {/* uelbar37 header bar */}
+   463→            <div 
+   464→              className="absolute top-0 left-0 right-0 flex items-center px-4"
+   465→              style={{ 
+   466→                height: '50px',
+   467→                backgroundColor: uelBar37Colors.bg,
+   468→                color: uelBar37Colors.text
+   469→              }}
+   470→            >
+   471→              <span className="font-semibold">BROWSER URL</span>
+   472→              
+   473→              {/* Vertical separator */}
+   474→              <div 
+   475→                className="bg-gray-600"
+   476→                style={{
+   477→                  width: '3px',
+   478→                  height: '100%',
+   479→                  marginLeft: '30px',
+   480→                  marginRight: '30px'
+   481→                }}
+   482→              />
+   483→              
+   484→              <span className="font-mono text-sm overflow-hidden whitespace-nowrap text-ellipsis flex-1">
+   485→                {currentUrl}
+   486→              </span>
+   487→
+   488→              {/* Copy buttons in uelbar37 - positioned to the left of close button */}
+   489→              <button
+   490→                onClick={() => {
+   491→                  navigator.clipboard.writeText(currentUrl);
+   492→                }}
+   493→                className="bg-gray-600 text-white font-bold flex items-center justify-center hover:bg-gray-700 transition-colors"
+   494→                style={{
+   495→                  width: '80px',
+   496→                  height: '50px',
+   497→                  marginRight: '0px',
+   498→                  fontSize: '10px',
+   499→                  flexDirection: 'column',
+   500→                  gap: '2px'
+   501→                }}
+   502→                title="Copy Full URL"
+   503→              >
+   504→                <div>COPY URL</div>
+   505→              </button>
+   506→            </div>
+   507→            
+   508→            {/* uelbar38 header bar */}
+   509→            <div 
+   510→              className="absolute left-0 right-0 flex items-center px-4"
+   511→              style={{ 
+   512→                top: '50px',
+   513→                height: '50px',
+   514→                backgroundColor: uelBarColors.bg,
+   515→                color: uelBarColors.text
+   516→              }}
+   517→            >
+   518→              <span className="font-semibold">uelbar38</span>
+   519→              
+   520→              {/* Vertical separator */}
+   521→              <div 
+   522→                className="bg-gray-600"
+   523→                style={{
+   524→                  width: '3px',
+   525→                  height: '100%',
+   526→                  marginLeft: '30px',
+   527→                  marginRight: '30px'
+   528→                }}
+   529→              />
+   530→              
+   531→              <span className="font-bold">{window.location.pathname}</span>
+   532→              <div 
+   533→                className="ml-4 flex items-center kz101 cursor-pointer"
+   534→                style={{
+   535→                  color: uelBarColors.text,
+   536→                  padding: '8px',
+   537→                  border: '1px solid black',
+   538→                  fontSize: '16px'
+   539→                }}
+   540→                onClick={handleKz101Click}
+   541→              >
+   542→                <input
+   543→                  type="checkbox"
+   544→                  className="mr-2 pointer-events-none"
+   545→                  checked={kz101Checked}
+   546→                  readOnly
+   547→                  style={{
+   548→                    width: '18px',
+   549→                    height: '18px'
+   550→                  }}
+   551→                />
+   552→                Use Your Current Selection From Table | {selectedRows.size} rows
+   553→              </div>
+   554→              <div 
+   555→                className="flex items-center kz102 font-bold"
+   556→                style={{
+   557→                  color: uelBarColors.text,
+   558→                  padding: '8px',
+   559→                  border: '1px solid black',
+   560→                  fontSize: '16px'
+   561→                }}
+   562→              >
+   563→                OR
+   564→              </div>
+   565→              <div 
+   566→                className="flex items-center kz103 cursor-pointer"
+   567→                style={{
+   568→                  color: uelBarColors.text,
+   569→                  padding: '8px',
+   570→                  border: '1px solid black',
+   571→                  fontSize: '16px'
+   572→                }}
+   573→                onClick={handleKz103Click}
+   574→              >
+   575→                <input
+   576→                  type="checkbox"
+   577→                  className="mr-2 pointer-events-none"
+   578→                  checked={kz103Checked}
+   579→                  readOnly
+   580→                  style={{
+   581→                    width: '18px',
+   582→                    height: '18px'
+   583→                  }}
+   584→                />
+   585→                Select All Items In Current Pagination
+   586→              </div>
+   587→              
+   588→              {/* Close button in header - spans both bars */}
+   589→              <button
+   590→                onClick={handlePopupClose}
+   591→                className="absolute right-0 top-0 bg-gray-400 text-gray-800 font-bold flex items-center justify-center hover:bg-gray-500 transition-colors"
+   592→                style={{
+   593→                  width: '260px',
+   594→                  height: '100px', // Spans both 50px bars
+   595→                  border: '2px solid #4a4a4a',
+   596→                  fontSize: '14px',
+   597→                  flexDirection: 'column',
+   598→                  gap: '4px'
+   599→                }}
+   600→              >
+   601→                <div style={{ fontSize: '20px' }}>×</div>
+   602→                <div style={{ fontSize: '12px', lineHeight: '12px', textAlign: 'center' }}>
+   603→                  CLOSE<br/>POPUP
+   604→                </div>
+   605→              </button>
+   606→            </div>
+   607→            
+   608→            {/* Popup content - adjusted to start below both headers */}
+   609→            <div className="h-full" style={{ paddingTop: '100px' }}>
+   610→              {/* Tab Navigation */}
+   611→              <div className="border-b border-gray-200 bg-gray-50">
+   612→                <nav className="flex">
+   613→                  {['ptab1', 'ptab2', 'ptab3', 'ptab4', 'ptab5', 'ptab6', 'ptab7'].map((tab) => (
+   614→                    <button
+   615→                      key={tab}
+   616→                      onClick={() => handleTabChange(tab)}
+   617→                      className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+   618→                        activePopupTab === tab
+   619→                          ? 'border-blue-500 text-blue-600 bg-white'
+   620→                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+   621→                      }`}
+   622→                    >
+   623→                      {tab}
+   624→                    </button>
+   625→                  ))}
+   626→                </nav>
+   627→              </div>
+   628→              
+   629→              {/* Tab Content - All tabs are blank as requested */}
+   630→              <div className="p-8 h-full overflow-auto">
+   631→                {activePopupTab === 'ptab1' && (
+   632→                  <div>
+   633→                    <p className="text-gray-500">ptab1 content area - currently blank</p>
+   634→                  </div>
+   635→                )}
+   636→                {activePopupTab === 'ptab2' && (
+   637→                  <div>
+   638→                    <p className="text-gray-500">ptab2 content area - currently blank</p>
+   639→                  </div>
+   640→                )}
+   641→                {activePopupTab === 'ptab3' && (
+   642→                  <div>
+   643→                    <p className="text-gray-500">ptab3 content area - currently blank</p>
+   644→                  </div>
+   645→                )}
+   646→                {activePopupTab === 'ptab4' && (
+   647→                  <div>
+   648→                    <p className="text-gray-500">ptab4 content area - currently blank</p>
+   649→                  </div>
+   650→                )}
+   651→                {activePopupTab === 'ptab5' && (
+   652→                  <div>
+   653→                    <p className="text-gray-500">ptab5 content area - currently blank</p>
+   654→                  </div>
+   655→                )}
+   656→                {activePopupTab === 'ptab6' && (
+   657→                  <div>
+   658→                    <p className="text-gray-500">ptab6 content area - currently blank</p>
+   659→                  </div>
+   660→                )}
+   661→                {activePopupTab === 'ptab7' && (
+   662→                  <div>
+   663→                    <p className="text-gray-500">ptab7 content area - currently blank</p>
+   664→                  </div>
+   665→                )}
+   666→              </div>
+   667→            </div>
+   668→          </div>
+   669→        </div>
+   670→      )}
+   671→    </div>
+   672→  );
+   673→}
+```
+
+_**Agent (claude-sonnet-4-20250514)**_
+
+**Agent task list:**
+- [X] 🌡️ Implement FPopup1 system for /reddjar page
+- [X] 🌡️ Configure popup with dual header bars and 7-tab navigation
+- [X] 🌡️ Add popup trigger button to ReddjarTable
+- [⚡] 🌡️ Test popup functionality and URL persistence
+
+

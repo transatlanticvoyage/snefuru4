@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import InputsExpandEditor from '@/app/components/shared/InputsExpandEditor';
 import DriggsPackMedallion from './driggspackmedallion/DriggsPackMedallion';
+import VacuumMedallion from './vacuummedallion/VacuumMedallion';
+import ZarpoMedallion from './zarpomedallion/ZarpoMedallion';
 import Chatdori from '@/app/components/Chatdori';
 import DriggsActionsFeedback from '@/app/components/DriggsActionsFeedback';
 
@@ -128,6 +130,30 @@ interface SitesprenTag {
   fk_user_id: string;
 }
 
+interface VacuumData {
+  vacuum_id: string;
+  fk_sitespren_id: string;
+  fk_users_id: string;
+  [key: string]: any; // For all the mirrored sitespren columns
+}
+
+interface ZarpscrapeData {
+  scraper_id: string;
+  fk_sitespren_id: string;
+  fk_users_id: string;
+  [key: string]: any; // For all the mirrored sitespren columns
+}
+
+interface ExcludeFromWpData {
+  id: string; // UUID matching sitespren.id
+  [key: string]: boolean | string; // All fields are boolean for checkbox functionality, except id
+}
+
+interface ExcludeFromFeData {
+  id: string; // UUID matching sitespren.id
+  [key: string]: boolean | string; // All fields are boolean for checkbox functionality, except id
+}
+
 interface RecentEntry {
   id: string;
   timeLastUsed: string;
@@ -147,6 +173,185 @@ interface DriggsmanTableProps {
   showCompetitorSites?: boolean;
   onSitesCountChange?: (count: number) => void;
 }
+
+// Helper component for vacuum/zarpscrape cell display
+const VacuumZarpscrapeCell = ({ 
+  value, 
+  fieldKey, 
+  siteId, 
+  onDelete,
+  isBoolean = false 
+}: { 
+  value: any; 
+  fieldKey: string; 
+  siteId: string; 
+  onDelete: (siteId: string, fieldKey: string) => void;
+  isBoolean?: boolean;
+}) => {
+  if (value !== undefined && value !== null) {
+    let displayValue = '';
+    
+    if (isBoolean) {
+      displayValue = value ? '✓' : '✗';
+    } else if (typeof value === 'string') {
+      // Truncate long strings
+      displayValue = value.length > 6 ? value.substring(0, 6) + '...' : value;
+    } else {
+      displayValue = String(value);
+    }
+    
+    return (
+      <div className="flex items-center justify-center space-x-1">
+        <span 
+          className="text-xs text-gray-700 truncate max-w-[30px]" 
+          title={String(value)}
+        >
+          {displayValue}
+        </span>
+        <button
+          onClick={() => onDelete(siteId, fieldKey)}
+          className="text-red-500 hover:text-red-700 text-xs"
+          title="Delete value"
+        >
+          ×
+        </button>
+      </div>
+    );
+  }
+  return <span className="text-xs text-gray-400">-</span>;
+};
+
+// Tooltip component for exclusion column headers
+const TooltipHeader = ({ 
+  children, 
+  tooltipText, 
+  copyText 
+}: { 
+  children: React.ReactNode; 
+  tooltipText: string; 
+  copyText: string; 
+}) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState('');
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(copyText);
+      setCopyFeedback('Copied!');
+      setTimeout(() => setCopyFeedback(''), 1000);
+    } catch (err) {
+      setCopyFeedback('Failed to copy');
+      setTimeout(() => setCopyFeedback(''), 1000);
+    }
+  };
+
+  return (
+    <div 
+      className="relative"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      {children}
+      {showTooltip && (
+        <div className="absolute z-50 p-2 bg-black text-white text-xs rounded shadow-lg -top-16 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+          <div>{tooltipText}</div>
+          <div className="mt-2 flex items-center space-x-2">
+            <button
+              onClick={handleCopy}
+              className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+            >
+              Copy
+            </button>
+            {copyFeedback && (
+              <span className="text-green-400 text-xs">{copyFeedback}</span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Helper component for checkbox cells (excl wp/fe columns)
+const CheckboxCell = ({ 
+  checked, 
+  fieldKey, 
+  siteId, 
+  onChange
+}: { 
+  checked: boolean; 
+  fieldKey: string; 
+  siteId: string; 
+  onChange: (siteId: string, fieldKey: string, checked: boolean) => void; 
+}) => {
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Prevent ALL event propagation and bubbling
+    e.stopPropagation();
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    
+    // Call the onChange function directly
+    onChange(siteId, fieldKey, !checked);
+  };
+
+  // Completely prevent any interaction propagation
+  const handleCellInteraction = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  };
+
+  return (
+    <td 
+      // Use a unique class to specifically target this cell type
+      className="driggsman-checkbox-cell text-center border-r border-gray-300"
+      style={{ 
+        width: '12px', 
+        minWidth: '12px', 
+        maxWidth: '12px', 
+        padding: '1px',
+        // Force specific background color with !important equivalent via inline style
+        backgroundColor: checked ? '#dbeafe !important' : '#ffffff !important',
+        // Completely isolate this cell from parent styling
+        isolation: 'isolate',
+        contain: 'style', // CSS containment for style isolation
+        // Prevent any inheritance
+        backgroundClip: 'padding-box',
+        // Override any potential parent background colors
+        backgroundImage: 'none',
+        // Ensure position context
+        position: 'relative'
+      }}
+      // Prevent all possible event types from propagating
+      onClick={handleCellInteraction}
+      onMouseDown={handleCellInteraction}
+      onMouseUp={handleCellInteraction}
+      onMouseEnter={handleCellInteraction}
+      onMouseLeave={handleCellInteraction}
+      onFocus={handleCellInteraction}
+      onBlur={handleCellInteraction}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={handleCheckboxChange}
+        className="w-3 h-3 cursor-pointer"
+        style={{ 
+          transform: 'scale(0.8)',
+          zIndex: '10',
+          position: 'relative',
+          // Ensure checkbox doesn't affect parent elements
+          isolation: 'isolate'
+        }}
+        // Prevent all checkbox events from affecting parents
+        onFocus={handleCellInteraction}
+        onBlur={handleCellInteraction}
+        onMouseEnter={handleCellInteraction}
+        onMouseLeave={handleCellInteraction}
+        onClick={handleCellInteraction}
+      />
+    </td>
+  );
+};
 
 export default function DriggsmanTable({ 
   onControlsRender,
@@ -249,6 +454,14 @@ export default function DriggsmanTable({
   const [activeTab, setActiveTab] = useState(1);
   const [showChamberBoxes, setShowChamberBoxes] = useState(true); // Visibility toggle for chamber boxes
   const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
+  
+  // Vacuum and Zarpscrapes states
+  const [vacuumData, setVacuumData] = useState<Map<string, VacuumData>>(new Map());
+  const [zarpscrapesData, setZarpscrapesData] = useState<Map<string, ZarpscrapeData>>(new Map());
+  
+  // Exclude from WP and Frontend states
+  const [excludeFromWpData, setExcludeFromWpData] = useState<Map<string, ExcludeFromWpData>>(new Map());
+  const [excludeFromFeData, setExcludeFromFeData] = useState<Map<string, ExcludeFromFeData>>(new Map());
   
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -430,6 +643,10 @@ export default function DriggsmanTable({
     fetchCitationGigs();
     fetchAddressSpecies();
     fetchSitesprenTags();
+    fetchVacuumData();
+    fetchZarpscrapesData();
+    fetchExcludeFromWpData();
+    fetchExcludeFromFeData();
   }, []);
 
   // Re-filter sites when manual sites change or filtering states change
@@ -636,6 +853,244 @@ export default function DriggsmanTable({
       setError('Failed to fetch sites: ' + (err as any).message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch vacuum data for all sites
+  const fetchVacuumData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+      
+      // Get the internal user ID
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (!userData) return;
+      
+      const { data: vacuums, error } = await supabase
+        .from('sitespren_vacuums')
+        .select('*')
+        .eq('fk_users_id', userData.id);
+      
+      if (error) {
+        console.error('Error fetching vacuum data:', error);
+        return;
+      }
+      
+      // Store vacuum data in a Map for quick lookup by site ID
+      const vacuumMap = new Map<string, VacuumData>();
+      vacuums?.forEach(vacuum => {
+        vacuumMap.set(vacuum.fk_sitespren_id, vacuum);
+      });
+      setVacuumData(vacuumMap);
+    } catch (err) {
+      console.error('Error in fetchVacuumData:', err);
+    }
+  };
+
+  // Fetch zarpscrapes data for all sites
+  const fetchZarpscrapesData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+      
+      // Get the internal user ID
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (!userData) return;
+      
+      const { data: zarpscrapes, error } = await supabase
+        .from('sitespren_zarpscrapes')
+        .select('*')
+        .eq('fk_users_id', userData.id);
+      
+      if (error) {
+        console.error('Error fetching zarpscrapes data:', error);
+        return;
+      }
+      
+      // Store zarpscrapes data in a Map for quick lookup by site ID
+      const zarpscrapesMap = new Map<string, ZarpscrapeData>();
+      zarpscrapes?.forEach(zarpscrape => {
+        zarpscrapesMap.set(zarpscrape.fk_sitespren_id, zarpscrape);
+      });
+      setZarpscrapesData(zarpscrapesMap);
+    } catch (err) {
+      console.error('Error in fetchZarpscrapesData:', err);
+    }
+  };
+
+  const fetchExcludeFromWpData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+      
+      // Get the internal user ID
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (!userData) return;
+      
+      // Get all exclusion data for this user's sites
+      const { data: userSites } = await supabase
+        .from('sitespren')
+        .select('id')
+        .eq('fk_users_id', userData.id);
+        
+      if (!userSites || userSites.length === 0) return;
+      
+      const siteIds = userSites.map(site => site.id);
+      
+      const { data: exclusions, error } = await supabase
+        .from('sitespren_exclude_from_wp')
+        .select('*')
+        .in('id', siteIds);
+      
+      if (error) {
+        console.error('Error fetching exclude from wp data:', error);
+        return;
+      }
+      
+      // Store exclusion data in a Map for quick lookup by site ID
+      const exclusionsMap = new Map<string, ExcludeFromWpData>();
+      exclusions?.forEach(exclusion => {
+        exclusionsMap.set(exclusion.id, exclusion);
+      });
+      setExcludeFromWpData(exclusionsMap);
+    } catch (err) {
+      console.error('Error in fetchExcludeFromWpData:', err);
+    }
+  };
+
+  const fetchExcludeFromFeData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+      
+      // Get the internal user ID
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (!userData) return;
+      
+      // Get all exclusion data for this user's sites
+      const { data: userSites } = await supabase
+        .from('sitespren')
+        .select('id')
+        .eq('fk_users_id', userData.id);
+        
+      if (!userSites || userSites.length === 0) return;
+      
+      const siteIds = userSites.map(site => site.id);
+      
+      const { data: exclusions, error } = await supabase
+        .from('sitespren_exclude_from_frontend')
+        .select('*')
+        .in('id', siteIds);
+      
+      if (error) {
+        console.error('Error fetching exclude from frontend data:', error);
+        return;
+      }
+      
+      // Store exclusion data in a Map for quick lookup by site ID
+      const exclusionsMap = new Map<string, ExcludeFromFeData>();
+      exclusions?.forEach(exclusion => {
+        exclusionsMap.set(exclusion.id, exclusion);
+      });
+      setExcludeFromFeData(exclusionsMap);
+    } catch (err) {
+      console.error('Error in fetchExcludeFromFeData:', err);
+    }
+  };
+
+  // Function to delete (set to null) a vacuum field
+  const deleteVacuumField = async (siteId: string, fieldKey: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+      
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (!userData) return;
+      
+      // Check if vacuum record exists
+      const existingVacuum = vacuumData.get(siteId);
+      
+      if (existingVacuum) {
+        // Update existing record - set field to null
+        const { error } = await supabase
+          .from('sitespren_vacuums')
+          .update({ [fieldKey]: null })
+          .eq('vacuum_id', existingVacuum.vacuum_id);
+        
+        if (error) {
+          console.error('Error deleting vacuum field:', error);
+          return;
+        }
+        
+        // Update local state
+        const updatedVacuum = { ...existingVacuum, [fieldKey]: null };
+        setVacuumData(prev => new Map(prev).set(siteId, updatedVacuum));
+      }
+    } catch (err) {
+      console.error('Error in deleteVacuumField:', err);
+    }
+  };
+
+  // Function to delete (set to null) a zarpscrape field
+  const deleteZarpscrapeField = async (siteId: string, fieldKey: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return;
+      
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single();
+      
+      if (!userData) return;
+      
+      // Check if zarpscrape record exists
+      const existingZarpscrape = zarpscrapesData.get(siteId);
+      
+      if (existingZarpscrape) {
+        // Update existing record - set field to null
+        const { error } = await supabase
+          .from('sitespren_zarpscrapes')
+          .update({ [fieldKey]: null })
+          .eq('scraper_id', existingZarpscrape.scraper_id);
+        
+        if (error) {
+          console.error('Error deleting zarpscrape field:', error);
+          return;
+        }
+        
+        // Update local state
+        const updatedZarpscrape = { ...existingZarpscrape, [fieldKey]: null };
+        setZarpscrapesData(prev => new Map(prev).set(siteId, updatedZarpscrape));
+      }
+    } catch (err) {
+      console.error('Error in deleteZarpscrapeField:', err);
     }
   };
 
@@ -870,6 +1325,44 @@ export default function DriggsmanTable({
 
   const closeDriggspackPopup = () => {
     setDriggspackPopup(null);
+  };
+
+  // Handle vacuum medallion interactions (simplified handlers)
+  const handleVacuumMedallionClick = (medallionType: string, siteId: string) => {
+    console.log('Vacuum medallion clicked:', medallionType, siteId);
+  };
+
+  const handleVacuumFiller1aClick = (actionType: string, siteId: string) => {
+    console.log('Vacuum filler1a clicked:', actionType, siteId);
+  };
+
+  const handleVacuumFiller1bClick = (actionType: string, siteId: string) => {
+    console.log('Vacuum filler1b clicked:', actionType, siteId);
+  };
+
+  // Handle zarpo medallion interactions (simplified handlers)  
+  const handleZarpoMedallionClick = (medallionType: string, siteId: string) => {
+    console.log('Zarpo medallion clicked:', medallionType, siteId);
+  };
+
+  const handleZarpoFiller1aClick = (actionType: string, siteId: string) => {
+    console.log('Zarpo filler1a clicked:', actionType, siteId);
+  };
+
+  const handleZarpoFiller1bClick = (actionType: string, siteId: string) => {
+    console.log('Zarpo filler1b clicked:', actionType, siteId);
+  };
+
+  // Handle exclude from WP checkbox changes
+  const handleExcludeFromWpChange = (siteId: string, fieldKey: string, checked: boolean) => {
+    console.log('Exclude from WP checkbox changed:', siteId, fieldKey, checked);
+    // TODO: Update database when schema is implemented
+  };
+
+  // Handle exclude from FE checkbox changes  
+  const handleExcludeFromFeChange = (siteId: string, fieldKey: string, checked: boolean) => {
+    console.log('Exclude from FE checkbox changed:', siteId, fieldKey, checked);
+    // TODO: Update database when schema is implemented
   };
 
   // Handle getting sitespren DB fields and copying to clipboard
@@ -2379,6 +2872,7 @@ export default function DriggsmanTable({
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Time Last Used</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Link To Open</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Sites Entered</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Count</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Settings</th>
@@ -2387,7 +2881,7 @@ export default function DriggsmanTable({
                   <tbody className="bg-white">
                     {recentEntries.length === 0 ? (
                       <tr>
-                        <td className="px-3 py-2 text-sm text-gray-500 border-b border-gray-200 text-center" colSpan={4}>
+                        <td className="px-3 py-2 text-sm text-gray-500 border-b border-gray-200 text-center" colSpan={5}>
                           no recents currently stored
                         </td>
                       </tr>
@@ -2396,6 +2890,16 @@ export default function DriggsmanTable({
                         <tr key={entry.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                           <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
                             {new Date(entry.timeLastUsed).toLocaleString()}
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
+                            <a
+                              href={`/driggsman?sites=${encodeURIComponent(entry.sitesEntered.join(','))}`}
+                              className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Open Config
+                            </a>
                           </td>
                           <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
                             <div className="flex flex-wrap gap-1">
@@ -2596,9 +3100,68 @@ export default function DriggsmanTable({
                   <>
                     <td
                       key={`empty-${site.id}`}
-                      className="h-8 px-2 border-r border-gray-300"
+                      className="h-8 px-2 border-r border-gray-300 relative"
+                      style={{ minWidth: '600px', width: '600px' }}
                     >
-                      <div className="flex items-center justify-start h-full space-x-1">
+                      {/* Tundra box - positioned on right */}
+                      <div 
+                        className="tundra_box"
+                        style={{
+                          position: 'absolute',
+                          right: '0',
+                          top: '0',
+                          bottom: '0',
+                          width: '350px',
+                          border: '1px solid black',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: 'white',
+                          zIndex: 1
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {/* Tundra landscape SVG icon */}
+                          <svg 
+                            width="24" 
+                            height="24" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            xmlns="http://www.w3.org/2000/svg"
+                            style={{ color: 'black' }}
+                          >
+                            {/* Tundra ground/horizon */}
+                            <path 
+                              d="M2 18h20v4H2z" 
+                              fill="currentColor"
+                            />
+                            {/* Rolling hills/tundra landscape */}
+                            <path 
+                              d="M2 18c3-2 7-3 10 0s7-2 10 0v-2c-3 2-7 3-10 0s-7 2-10 0z" 
+                              fill="currentColor"
+                              opacity="0.7"
+                            />
+                            {/* Northern lights/aurora effect */}
+                            <path 
+                              d="M4 8c2 1 4-1 6 0s4-1 6 0s4-1 6 0M5 5c2 1 4-1 6 0s4-1 6 0s3-1 5 0" 
+                              stroke="currentColor" 
+                              strokeWidth="1.5" 
+                              strokeLinecap="round"
+                              opacity="0.8"
+                            />
+                            {/* Sparse vegetation dots */}
+                            <circle cx="6" cy="16" r="1" fill="currentColor" opacity="0.6"/>
+                            <circle cx="12" cy="17" r="0.8" fill="currentColor" opacity="0.6"/>
+                            <circle cx="18" cy="16" r="1.2" fill="currentColor" opacity="0.6"/>
+                          </svg>
+                          <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
+                            tundra_box_div
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Original medallion content - positioned to preserve appearance */}
+                      <div className="flex items-center justify-start h-full space-x-1" style={{ position: 'relative', zIndex: 2, marginRight: '370px' }}>
                         <DriggsPackMedallion 
                           driggspackNumber={1}
                           siteId={site.id}
@@ -2622,6 +3185,49 @@ export default function DriggsmanTable({
                       className="h-8 border-r border-gray-300"
                       style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                     >
+                    </td>
+                    {/* Empty excl wp column for medallion row */}
+                    <td 
+                      key={`empty-excl-wp-${site.id}`}
+                      className="h-8 border-r border-gray-300"
+                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px' }}
+                    >
+                    </td>
+                    {/* Empty excl fe column for medallion row */}
+                    <td 
+                      key={`empty-excl-fe-${site.id}`}
+                      className="h-8 border-r border-gray-300"
+                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px' }}
+                    >
+                    </td>
+                    {/* Vacuum medallion column */}
+                    <td 
+                      key={`vacuum-medallion-${site.id}`}
+                      className="h-8 border-r border-gray-300 p-1"
+                    >
+                      <div className="flex items-center justify-center h-full">
+                        <VacuumMedallion 
+                          siteId={site.id}
+                          onMedallionClick={handleVacuumMedallionClick}
+                          onFiller1aClick={handleVacuumFiller1aClick}
+                          onFiller1bClick={handleVacuumFiller1bClick}
+                        />
+                      </div>
+                    </td>
+                    {/* Zarpo scraper medallion column */}
+                    <td 
+                      key={`zarpo-medallion-${site.id}`}
+                      className="h-8 p-1"
+                      style={{ borderRight: '3px solid black' }}
+                    >
+                      <div className="flex items-center justify-center h-full">
+                        <ZarpoMedallion 
+                          siteId={site.id}
+                          onMedallionClick={handleZarpoMedallionClick}
+                          onFiller1aClick={handleZarpoFiller1aClick}
+                          onFiller1bClick={handleZarpoFiller1bClick}
+                        />
+                      </div>
                     </td>
                   </>
                 ))}
@@ -2662,7 +3268,7 @@ export default function DriggsmanTable({
                 </th>
                 
                 {/* Field name column */}
-                <th className="px-3 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-r border-gray-300">
+                <th className="px-3 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider" style={{ borderRight: '2px solid black' }}>
                   field name
                 </th>
 
@@ -2672,10 +3278,79 @@ export default function DriggsmanTable({
                     {/* Domain column */}
                     <th
                       key={site.id}
-                      className="px-3 py-3 text-left w-48 border-r border-gray-300"
+                      className="text-left border-r border-gray-300 relative"
                       title={site.sitespren_base || site.id}
+                      style={{ padding: '0', minWidth: '600px', width: '600px' }}
                     >
-                      <div className="truncate" style={{ fontSize: '18px', lineHeight: '1.2' }}>
+                      {/* Reindeer box - positioned on right */}
+                      <div 
+                        className="reindeer_box"
+                        style={{
+                          position: 'absolute',
+                          right: '0',
+                          top: '0',
+                          bottom: '0',
+                          width: '350px',
+                          border: '1px solid black',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: 'white',
+                          zIndex: 1
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {/* Reindeer head and antlers SVG icon */}
+                          <svg 
+                            width="24" 
+                            height="24" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            xmlns="http://www.w3.org/2000/svg"
+                            style={{ color: 'black' }}
+                          >
+                            {/* Antlers */}
+                            <path 
+                              d="M8 7L6 5M8 7L7 9M8 7L10 6M16 7L18 5M16 7L17 9M16 7L14 6" 
+                              stroke="currentColor" 
+                              strokeWidth="1.5" 
+                              strokeLinecap="round"
+                            />
+                            {/* Head */}
+                            <ellipse 
+                              cx="12" 
+                              cy="14" 
+                              rx="5" 
+                              ry="6" 
+                              fill="currentColor"
+                            />
+                            {/* Eyes */}
+                            <circle cx="10" cy="12" r="1" fill="white"/>
+                            <circle cx="14" cy="12" r="1" fill="white"/>
+                            {/* Nose */}
+                            <circle cx="12" cy="16" r="1.5" fill="white"/>
+                          </svg>
+                          <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
+                            reindeer_box_div
+                          </span>
+                          <div style={{ fontSize: '14px', fontWeight: 'normal', color: 'black', marginTop: '8px' }}>
+                            sitesglub.nameserver_field1<br/>
+                            sitesglub.ip_address
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Original content - positioned to preserve appearance */}
+                      <div 
+                        className="truncate" 
+                        style={{ 
+                          fontSize: '18px', 
+                          lineHeight: '1.2',
+                          padding: '12px',
+                          position: 'relative',
+                          zIndex: 2
+                        }}
+                      >
                         <div style={{ fontWeight: 'normal' }}>domain_column_for:</div>
                         <div style={{ fontWeight: 'bold' }}>
                           {(site.sitespren_base || `site ${site.id.slice(0, 8)}`).toLowerCase()}
@@ -2688,7 +3363,54 @@ export default function DriggsmanTable({
                       className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
                       style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }}
                     >
-                      <div>stat1</div>
+                      <div style={{ lineHeight: '1', fontSize: '15px' }}>
+                        null<br/>stat<br/>us
+                      </div>
+                    </th>
+                    {/* Exclude from WP column */}
+                    <th
+                      key={`${site.id}-excl-wp`}
+                      className="text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px', padding: '1px' }}
+                    >
+                      <TooltipHeader 
+                        tooltipText="exwp - exclude from wordpress" 
+                        copyText="exwp - exclude from wordpress"
+                      >
+                        <div style={{ lineHeight: '1', fontSize: '15px' }}>
+                          e<br/>x<br/>w<br/>p
+                        </div>
+                      </TooltipHeader>
+                    </th>
+                    {/* Exclude from Frontend column */}
+                    <th
+                      key={`${site.id}-excl-fe`}
+                      className="text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+                      style={{ width: '12px', minWidth: '12px', maxWidth: '12px', padding: '1px' }}
+                    >
+                      <TooltipHeader 
+                        tooltipText="exfe - exclude from frontend" 
+                        copyText="exfe - exclude from frontend"
+                      >
+                        <div style={{ lineHeight: '1', fontSize: '15px' }}>
+                          e<br/>x<br/>f<br/>e
+                        </div>
+                      </TooltipHeader>
+                    </th>
+                    {/* Vacuum column */}
+                    <th
+                      key={`${site.id}-vacuum`}
+                      className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
+                    >
+                      <div>**vacuum**</div>
+                    </th>
+                    {/* Scraper column */}
+                    <th
+                      key={`${site.id}-scraper`}
+                      className="px-1 py-3 text-center text-xs font-bold text-gray-900"
+                      style={{ borderRight: '3px solid black' }}
+                    >
+                      <div>**scraper**</div>
                     </th>
                   </>
                 ))}
@@ -2721,6 +3443,10 @@ export default function DriggsmanTable({
                   } ${
                     field.key === 'misc_section_separator' ? 'border-t-4 border-t-black' : ''
                   }`}
+                  style={{
+                    // Prevent any checkbox interactions from affecting row background
+                    backgroundColor: 'inherit'
+                  }}
                 >
                   {/* Field selection checkbox */}
                   <td 
@@ -2790,10 +3516,13 @@ export default function DriggsmanTable({
                   </td>
 
                   {/* Field name */}
-                  <td className={`px-3 py-2 text-sm font-medium border-r border-gray-300 ${
+                  <td className={`px-3 py-2 text-sm font-medium ${
                     field.type === 'section_header' ? (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? 'font-bold' : 'bg-gray-100 font-bold') : 'text-gray-900'
                   }`}
-                  style={field.type === 'section_header' && (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? { backgroundColor: '#dddddd', color: '#111827' } : {}}>
+                  style={{ 
+                    borderRight: '2px solid black',
+                    ...(field.type === 'section_header' && (field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator') ? { backgroundColor: '#dddddd', color: '#111827' } : {})
+                  }}>
                     <span>{field.label}</span>
                   </td>
 
@@ -2821,6 +3550,34 @@ export default function DriggsmanTable({
                             key={`${field.key}-${site.id}-status`}
                             className="px-1 py-2 text-center border-r border-gray-300"
                             style={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+                          >
+                          </td>
+                          {/* Exclude from WP column for section headers */}
+                          <td 
+                            key={`${field.key}-${site.id}-excl-wp`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
+                            style={{ width: '12px', minWidth: '12px', maxWidth: '12px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+                          >
+                          </td>
+                          {/* Exclude from FE column for section headers */}
+                          <td 
+                            key={`${field.key}-${site.id}-excl-fe`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
+                            style={{ width: '12px', minWidth: '12px', maxWidth: '12px', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+                          >
+                          </td>
+                          {/* Vacuum column for section headers */}
+                          <td 
+                            key={`${field.key}-${site.id}-vacuum`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
+                            style={{ backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
+                          >
+                          </td>
+                          {/* Scraper column for section headers */}
+                          <td 
+                            key={`${field.key}-${site.id}-scraper`}
+                            className="px-1 py-2 text-center"
+                            style={{ borderRight: '3px solid black', backgroundColor: field.key === 'phone_section_separator' || field.key === 'address_section_separator' || field.key === 'backlinks_section_separator' || field.key === 'basics_section_separator' || field.key === 'misc_section_separator' ? '#dddddd' : '' }}
                           >
                           </td>
                         </>
@@ -2857,6 +3614,131 @@ export default function DriggsmanTable({
                                 <span className="text-red-600 font-bold text-lg">✗</span>
                               )}
                             </div>
+                          </td>
+                          {/* Exclude from WP column for boolean fields */}
+                          <CheckboxCell
+                            key={`${field.key}-${site.id}-excl-wp`}
+                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from WP data
+                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromWpData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-wp', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from WP:', error);
+                                // Revert local state on error
+                                setExcludeFromWpData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}
+                          />
+                          {/* Exclude from FE column for boolean fields */}
+                          <CheckboxCell
+                            key={`${field.key}-${site.id}-excl-fe`}
+                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from FE data
+                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromFeData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-frontend', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from FE:', error);
+                                // Revert local state on error
+                                setExcludeFromFeData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}
+                          />
+                          {/* Vacuum column for boolean fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-vacuum`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
+                          >
+                            <VacuumZarpscrapeCell
+                              value={vacuumData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteVacuumField}
+                              isBoolean={true}
+                            />
+                          </td>
+                          {/* Scraper column for boolean fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-scraper`}
+                            className="px-1 py-2 text-center"
+                            style={{ borderRight: '3px solid black' }}
+                          >
+                            <VacuumZarpscrapeCell
+                              value={zarpscrapesData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteZarpscrapeField}
+                              isBoolean={true}
+                            />
                           </td>
                         </>
                       );
@@ -2989,6 +3871,129 @@ export default function DriggsmanTable({
                               )}
                             </div>
                           </td>
+                          {/* Exclude from WP column for platform_dropdown fields */}
+                          <CheckboxCell
+                            key={`${field.key}-${site.id}-excl-wp`}
+                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from WP data
+                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromWpData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-wp', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from WP:', error);
+                                // Revert local state on error
+                                setExcludeFromWpData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}
+                          />
+                          {/* Exclude from FE column for platform_dropdown fields */}
+                          <CheckboxCell
+                            key={`${field.key}-${site.id}-excl-fe`}
+                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from FE data
+                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromFeData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-frontend', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from FE:', error);
+                                // Revert local state on error
+                                setExcludeFromFeData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}
+                          />
+                          {/* Vacuum column for platform_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-vacuum`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
+                          >
+                            <VacuumZarpscrapeCell
+                              value={vacuumData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteVacuumField}
+                            />
+                          </td>
+                          {/* Scraper column for platform_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-scraper`}
+                            className="px-1 py-2 text-center"
+                            style={{ borderRight: '3px solid black' }}
+                          >
+                            <VacuumZarpscrapeCell
+                              value={zarpscrapesData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteZarpscrapeField}
+                            />
+                          </td>
                         </>
                       );
                     }
@@ -3116,6 +4121,129 @@ export default function DriggsmanTable({
                                 <span className="text-red-600 font-bold text-lg">✗</span>
                               )}
                             </div>
+                          </td>
+                          {/* Exclude from WP column for address_species_dropdown fields */}
+                          <CheckboxCell
+                            key={`${field.key}-${site.id}-excl-wp`}
+                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from WP data
+                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromWpData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-wp', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from WP:', error);
+                                // Revert local state on error
+                                setExcludeFromWpData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}
+                          />
+                          {/* Exclude from FE column for address_species_dropdown fields */}
+                          <CheckboxCell
+                            key={`${field.key}-${site.id}-excl-fe`}
+                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from FE data
+                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromFeData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-frontend', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from FE:', error);
+                                // Revert local state on error
+                                setExcludeFromFeData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}
+                          />
+                          {/* Vacuum column for address_species_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-vacuum`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
+                          >
+                            <VacuumZarpscrapeCell
+                              value={vacuumData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteVacuumField}
+                            />
+                          </td>
+                          {/* Scraper column for address_species_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-scraper`}
+                            className="px-1 py-2 text-center"
+                            style={{ borderRight: '3px solid black' }}
+                          >
+                            <VacuumZarpscrapeCell
+                              value={zarpscrapesData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteZarpscrapeField}
+                            />
                           </td>
                         </>
                       );
@@ -3351,6 +4479,129 @@ export default function DriggsmanTable({
                               )}
                             </div>
                           </td>
+                          {/* Exclude from WP column for cgig_dropdown fields */}
+                          <CheckboxCell
+                            key={`${field.key}-${site.id}-excl-wp`}
+                            checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from WP data
+                              console.log('WP checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromWpData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-wp', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from WP:', error);
+                                // Revert local state on error
+                                setExcludeFromWpData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}
+                          />
+                          {/* Exclude from FE column for cgig_dropdown fields */}
+                          <CheckboxCell
+                            key={`${field.key}-${site.id}-excl-fe`}
+                            checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onChange={async (siteId, fieldKey, checked) => {
+                              // Update exclude from FE data
+                              console.log('FE checkbox changed:', fieldKey, siteId, checked);
+                              
+                              // Update local state immediately for responsive UI
+                              setExcludeFromFeData(prev => {
+                                const newMap = new Map(prev);
+                                const siteData = newMap.get(siteId) || { id: siteId };
+                                siteData[fieldKey] = checked;
+                                newMap.set(siteId, siteData);
+                                return newMap;
+                              });
+
+                              // Update database
+                              try {
+                                const response = await fetch('/api/exclude-from-frontend', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    siteId,
+                                    fieldKey,
+                                    checked
+                                  }),
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error('Failed to update database');
+                                }
+                              } catch (error) {
+                                console.error('Error updating exclude from FE:', error);
+                                // Revert local state on error
+                                setExcludeFromFeData(prev => {
+                                  const newMap = new Map(prev);
+                                  const siteData = newMap.get(siteId) || { id: siteId };
+                                  siteData[fieldKey] = !checked;
+                                  newMap.set(siteId, siteData);
+                                  return newMap;
+                                });
+                              }
+                            }}
+                          />
+                          {/* Vacuum column for cgig_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-vacuum`}
+                            className="px-1 py-2 text-center border-r border-gray-300"
+                          >
+                            <VacuumZarpscrapeCell
+                              value={vacuumData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteVacuumField}
+                            />
+                          </td>
+                          {/* Scraper column for cgig_dropdown fields */}
+                          <td 
+                            key={`${field.key}-${site.id}-scraper`}
+                            className="px-1 py-2 text-center"
+                            style={{ borderRight: '3px solid black' }}
+                          >
+                            <VacuumZarpscrapeCell
+                              value={zarpscrapesData.get(site.id)?.[field.key]}
+                              fieldKey={field.key}
+                              siteId={site.id}
+                              onDelete={deleteZarpscrapeField}
+                            />
+                          </td>
                         </>
                       );
                     }
@@ -3486,6 +4737,122 @@ export default function DriggsmanTable({
                               <span className="text-red-600 font-bold text-lg">✗</span>
                             )}
                           </div>
+                        </td>
+                        {/* Exclude from WP column for default fields */}
+                        <CheckboxCell
+                          key={`${field.key}-${site.id}-excl-wp`}
+                          checked={excludeFromWpData.get(site.id)?.[field.key] || false}
+                          fieldKey={field.key}
+                          siteId={site.id}
+                          onChange={async (siteId, fieldKey, checked) => {
+                            // Update exclude from WP data
+                            console.log('WP checkbox changed:', fieldKey, siteId, checked);
+                            
+                            // Update local state immediately for responsive UI
+                            setExcludeFromWpData(prev => {
+                              const newMap = new Map(prev);
+                              const existingData = newMap.get(siteId) || { id: siteId };
+                              newMap.set(siteId, { ...existingData, [fieldKey]: checked });
+                              return newMap;
+                            });
+                            
+                            try {
+                              const response = await fetch('/api/exclude-from-wp', {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                  siteId,
+                                  fieldKey,
+                                  checked
+                                })
+                              });
+                              
+                              if (!response.ok) {
+                                throw new Error('Failed to update WP exclusion');
+                              }
+                            } catch (error) {
+                              console.error('Error updating WP exclusion:', error);
+                              // Rollback local state on error
+                              setExcludeFromWpData(prev => {
+                                const newMap = new Map(prev);
+                                const existingData = newMap.get(siteId) || { id: siteId };
+                                newMap.set(siteId, { ...existingData, [fieldKey]: !checked });
+                                return newMap;
+                              });
+                            }
+                          }}
+                        />
+                        {/* Exclude from FE column for default fields */}
+                        <CheckboxCell
+                          key={`${field.key}-${site.id}-excl-fe`}
+                          checked={excludeFromFeData.get(site.id)?.[field.key] || false}
+                          fieldKey={field.key}
+                          siteId={site.id}
+                          onChange={async (siteId, fieldKey, checked) => {
+                            // Update exclude from FE data
+                            console.log('FE checkbox changed:', fieldKey, siteId, checked);
+                            
+                            // Update local state immediately for responsive UI
+                            setExcludeFromFeData(prev => {
+                              const newMap = new Map(prev);
+                              const existingData = newMap.get(siteId) || { id: siteId };
+                              newMap.set(siteId, { ...existingData, [fieldKey]: checked });
+                              return newMap;
+                            });
+                            
+                            try {
+                              const response = await fetch('/api/exclude-from-frontend', {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                  siteId,
+                                  fieldKey,
+                                  checked
+                                })
+                              });
+                              
+                              if (!response.ok) {
+                                throw new Error('Failed to update FE exclusion');
+                              }
+                            } catch (error) {
+                              console.error('Error updating FE exclusion:', error);
+                              // Rollback local state on error
+                              setExcludeFromFeData(prev => {
+                                const newMap = new Map(prev);
+                                const existingData = newMap.get(siteId) || { id: siteId };
+                                newMap.set(siteId, { ...existingData, [fieldKey]: !checked });
+                                return newMap;
+                              });
+                            }
+                          }}
+                        />
+                        {/* Vacuum column for default fields */}
+                        <td 
+                          key={`${field.key}-${site.id}-vacuum`}
+                          className="px-1 py-2 text-center border-r border-gray-300"
+                        >
+                          <input
+                            type="text"
+                            className="w-full h-6 px-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            placeholder=""
+                          />
+                        </td>
+                        {/* Scraper column for default fields */}
+                        <td 
+                          key={`${field.key}-${site.id}-scraper`}
+                          className="px-1 py-2 text-center"
+                          style={{ borderRight: '3px solid black' }}
+                        >
+                          <VacuumZarpscrapeCell
+                            value={zarpscrapesData.get(site.id)?.[field.key]}
+                            fieldKey={field.key}
+                            siteId={site.id}
+                            onDelete={deleteZarpscrapeField}
+                          />
                         </td>
                       </>
                     );

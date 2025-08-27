@@ -1,0 +1,2304 @@
+
+> nextjs@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.3.2
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.50.23:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1989ms
+ ○ Compiling /sitejar4 ...
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2240:1]
+ [2m2237[0m |   };
+ [2m2238[0m | 
+ [2m2239[0m |   return (
+ [2m2240[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2241[0m |       {/* SQL View Info */}
+ [2m2242[0m |       <div className="flex items-start space-x-4">
+ [2m2243[0m |         <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px'}}>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2240:1]
+ [2m2237[0m |   };
+ [2m2238[0m | 
+ [2m2239[0m |   return (
+ [2m2240[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2241[0m |       {/* SQL View Info */}
+ [2m2242[0m |       <div className="flex items-start space-x-4">
+ [2m2243[0m |         <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px'}}>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2240:1]
+ [2m2237[0m |   };
+ [2m2238[0m | 
+ [2m2239[0m |   return (
+ [2m2240[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2241[0m |       {/* SQL View Info */}
+ [2m2242[0m |       <div className="flex items-start space-x-4">
+ [2m2243[0m |         <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px'}}>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ HEAD /sitejar4 500 in 13944ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Expression expected
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2258:1]
+ [2m2255[0m | 
+ [2m2256[0m |       </div>
+ [2m2257[0m |       
+ [2m2258[0m |       {/* Search and Filters */}
+      : [35;1m                               ^[0m
+ [2m2259[0m |       <div className="bg-white p-4 rounded-lg shadow">
+ [2m2260[0m |         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+ [2m2261[0m |           <div className="md:col-span-2">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Expression expected
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2258:1]
+ [2m2255[0m | 
+ [2m2256[0m |       </div>
+ [2m2257[0m |       
+ [2m2258[0m |       {/* Search and Filters */}
+      : [35;1m                               ^[0m
+ [2m2259[0m |       <div className="bg-white p-4 rounded-lg shadow">
+ [2m2260[0m |         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+ [2m2261[0m |           <div className="md:col-span-2">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Expression expected
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2258:1]
+ [2m2255[0m | 
+ [2m2256[0m |       </div>
+ [2m2257[0m |       
+ [2m2258[0m |       {/* Search and Filters */}
+      : [35;1m                               ^[0m
+ [2m2259[0m |       <div className="bg-white p-4 rounded-lg shadow">
+ [2m2260[0m |         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+ [2m2261[0m |           <div className="md:col-span-2">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Expression expected
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2258:1]
+ [2m2255[0m | 
+ [2m2256[0m |       </div>
+ [2m2257[0m |       
+ [2m2258[0m |       {/* Search and Filters */}
+      : [35;1m                               ^[0m
+ [2m2259[0m |       <div className="bg-white p-4 rounded-lg shadow">
+ [2m2260[0m |         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+ [2m2261[0m |           <div className="md:col-span-2">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ HEAD /sitejar4 500 in 1764ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Expression expected
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2262:1]
+ [2m2259[0m | 
+ [2m2260[0m |       </div>
+ [2m2261[0m |       
+ [2m2262[0m |       {/* Search and Filters */}
+      : [35;1m                               ^[0m
+ [2m2263[0m |       <div className="bg-white p-4 rounded-lg shadow">
+ [2m2264[0m |         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+ [2m2265[0m |           <div className="md:col-span-2">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Expression expected
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2262:1]
+ [2m2259[0m | 
+ [2m2260[0m |       </div>
+ [2m2261[0m |       
+ [2m2262[0m |       {/* Search and Filters */}
+      : [35;1m                               ^[0m
+ [2m2263[0m |       <div className="bg-white p-4 rounded-lg shadow">
+ [2m2264[0m |         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+ [2m2265[0m |           <div className="md:col-span-2">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ HEAD /sitejar4 500 in 154ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Expression expected
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2245:1]
+ [2m2242[0m |     </div>
+ [2m2243[0m |   );
+ [2m2244[0m | }
+ [2m2245[0m |         <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px'}}>
+      : [35;1m                                                                                   ^[0m
+ [2m2246[0m |           <div className="text-xs font-semibold text-gray-700 mb-1">SQL View Info</div>
+ [2m2247[0m |           <div className="text-xs text-gray-600">
+ [2m2248[0m |             <div>view name: sitespren_large_view_1</div>
+      `----
+  [31mx[0m Expected ';', '}' or <eof>
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2245:1]
+ [2m2242[0m |         </div>
+ [2m2243[0m |       );
+ [2m2244[0m |     }
+ [2m2245[0m | [35;1m,[0m[35;1m-[0m[35;1m>[0m         <div className="bg-gray-100 p-3 rounded-lg border" style={{width: '130px'}}>
+ [2m2246[0m | [35;1m|[0m             <div className="text-xs font-semibold text-gray-700 mb-1">SQL View Info</div>
+ [2m2247[0m | [35;1m|[0m[35;1m-[0m[35;1m>[0m           <div className="text-xs text-gray-600">
+      : [35;1m`[0m[35;1m---[0m[33;1m               ^^^^^^^^^[0m
+      : [35;1m`[0m[35;1m---[0m[35;1m-[0m [35;1mThis is the expression part of an expression statement[0m
+ [2m2248[0m |                 <div>view name: sitespren_large_view_1</div>
+ [2m2249[0m |                 <div># columns: {allColumns.length}</div>
+ [2m2250[0m |               </div>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/server-development/10.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/server-development/10.pack.gz'
+ ✓ Compiled /_error in 5.8s (801 modules)
+ ✓ Compiled /sitejar4 in 275ms (696 modules)
+ HEAD /sitejar4 200 in 837ms
+ ○ Compiling /_error ...
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ HEAD /sitejar4 500 in 1888ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ HEAD /sitejar4 500 in 1288ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ HEAD /sitejar4 500 in 55ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ GET /sitejar4 500 in 2094ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2310:1]
+ [2m2307[0m |   };
+ [2m2308[0m | 
+ [2m2309[0m |   return (
+ [2m2310[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2311[0m |       {/* Column Template and View Control System */}
+ [2m2312[0m |       <div className="flex items-start space-x-4">
+ [2m2313[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ GET /sitejar4 500 in 523ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2281:1]
+ [2m2278[0m |   };
+ [2m2279[0m | 
+ [2m2280[0m |   return (
+ [2m2281[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2282[0m |       {/* Column Template and View Control System */}
+ [2m2283[0m |       <div className="flex items-start space-x-4">
+ [2m2284[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ GET /sitejar4 500 in 370ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2281:1]
+ [2m2278[0m |   };
+ [2m2279[0m | 
+ [2m2280[0m |   return (
+ [2m2281[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2282[0m |       {/* Column Template and View Control System */}
+ [2m2283[0m |       <div className="flex items-start space-x-4">
+ [2m2284[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2281:1]
+ [2m2278[0m |   };
+ [2m2279[0m | 
+ [2m2280[0m |   return (
+ [2m2281[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2282[0m |       {/* Column Template and View Control System */}
+ [2m2283[0m |       <div className="flex items-start space-x-4">
+ [2m2284[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2281:1]
+ [2m2278[0m |   };
+ [2m2279[0m | 
+ [2m2280[0m |   return (
+ [2m2281[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2282[0m |       {/* Column Template and View Control System */}
+ [2m2283[0m |       <div className="flex items-start space-x-4">
+ [2m2284[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ GET /sitejar4 500 in 2900ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2281:1]
+ [2m2278[0m |   };
+ [2m2279[0m | 
+ [2m2280[0m |   return (
+ [2m2281[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2282[0m |       {/* Column Template and View Control System */}
+ [2m2283[0m |       <div className="flex items-start space-x-4">
+ [2m2284[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ✓ Compiled /_error in 5.7s (748 modules)
+ ✓ Compiled in 5.8s (748 modules)
+ ○ Compiling /sitejar4 ...
+ ✓ Compiled /sitejar4 in 729ms (697 modules)
+ GET /sitejar4 200 in 1434ms
+ GET /sitejar4 200 in 881ms
+ ✓ Compiled in 15.4s (1445 modules)
+ ✓ Compiled in 4.8s (802 modules)
+ ✓ Compiled in 5.1s (748 modules)
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ○ Compiling /_error ...
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ GET /sitejar4 500 in 1432ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ GET /sitejar4 500 in 1864ms
+ ✓ Compiled /_error in 6.8s (1489 modules)
+ GET /sitejar4 200 in 2004ms
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ⨯ ./app/(protected)/sitejar4/components/SitesprenTable.tsx
+Error:   [31mx[0m Unexpected token `div`. Expected jsx identifier
+      ,-[[36;1;4m/Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)/sitejar4/components/SitesprenTable.tsx[0m:2311:1]
+ [2m2308[0m |   };
+ [2m2309[0m | 
+ [2m2310[0m |   return (
+ [2m2311[0m |     <div className="space-y-4">
+      : [35;1m     ^^^[0m
+ [2m2312[0m |       {/* Column Template and View Control System */}
+ [2m2313[0m |       <div className="flex items-start space-x-4">
+ [2m2314[0m |         {/* SQL View Info */}
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/(protected)/sitejar4/components/SitesprenTable.tsx
+./app/(protected)/sitejar4/pclient.tsx
+ ✓ Compiled in 7.5s (748 modules)
+ ✓ Compiled in 9.6s (748 modules)
+ ○ Compiling /sitejar4 ...
+ ✓ Compiled /sitejar4 in 756ms (697 modules)
+ GET /sitejar4?is_external=show 200 in 1298ms
+ ○ Compiling /api/navigation ...
+ ✓ Compiled /medjar in 2.2s (713 modules)
+ ✓ Compiled in 1375ms (740 modules)
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+ GET /favicon.ico 200 in 5553ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 5359ms
+ GET /api/navigation 200 in 6038ms
+ ○ Compiling /_not-found ...
+ GET /medjar 200 in 4740ms
+Found sitespren records: 170
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done'
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'cef388d2-959b-4f8c-a7de-edc4d79e3812', is_external: false }
+]
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ ✓ Compiled /icon.png in 2.1s (811 modules)
+ ✓ Compiled (813 modules)
+ GET /favicon.ico 200 in 2211ms
+ GET /icon.png?a0133dec90ab15bc 200 in 2687ms
+ GET /medjar 200 in 330ms
+ GET /favicon.ico 200 in 39ms
+ ✓ Compiled in 7.8s (754 modules)
+ GET /medjar 200 in 86ms
+ GET /favicon.ico 200 in 56ms
+ GET /favicon.ico 200 in 116ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ GET /api/navigation 200 in 287ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ GET /api/navigation 200 in 109ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ GET /api/navigation 200 in 69ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ GET /api/navigation 200 in 122ms
+ ✓ Compiled in 5.8s (754 modules)
+ GET /medjar 200 in 170ms
+ GET /favicon.ico 200 in 50ms
+ GET /favicon.ico 200 in 118ms
+ ✓ Compiled in 6.2s (754 modules)
+ GET /medjar 200 in 222ms
+ GET /favicon.ico 200 in 88ms
+ GET /favicon.ico 200 in 34ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/1.pack.gz_' -> '/Users/kylecampbell/Documents/repos/localrepo-snefuru4/.next/cache/webpack/client-development/1.pack.gz'
+ ✓ Compiled in 4.6s (754 modules)
+ GET /medjar 200 in 152ms
+ GET /favicon.ico 200 in 49ms
+ GET /favicon.ico 200 in 34ms
+ ✓ Compiled in 5.5s (754 modules)
+ GET /medjar 200 in 218ms
+ GET /favicon.ico 200 in 4444ms
+ GET /favicon.ico 200 in 609ms
+ ✓ Compiled in 5.5s (754 modules)
+ GET /medjar 200 in 213ms
+ GET /favicon.ico 200 in 77ms
+ GET /favicon.ico 200 in 35ms
+ ✓ Compiled in 5.6s (754 modules)
+ GET /medjar 200 in 162ms
+ GET /favicon.ico 200 in 37ms
+ GET /favicon.ico 200 in 88ms
+ ✓ Compiled in 5.7s (754 modules)
+ GET /medjar 200 in 87ms
+ GET /favicon.ico 200 in 50ms
+ GET /favicon.ico 200 in 22ms
+ ✓ Compiled in 5.8s (754 modules)
+ GET /medjar 200 in 79ms
+ GET /favicon.ico 200 in 39ms
+ GET /favicon.ico 200 in 128ms
+ GET /sitejar4?is_external=show 200 in 76ms
+ GET /favicon.ico 404 in 26ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+ GET /favicon.ico 404 in 60ms
+ GET /favicon.ico 404 in 34ms
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ GET /api/navigation 200 in 204ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ GET /api/navigation 200 in 379ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+ ○ Compiling /_error ...
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ GET /api/navigation 200 in 84ms
+API: Starting navigation request...
+API: Current working directory: /Users/kylecampbell/Documents/repos/localrepo-snefuru4
+API: App directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app
+API: Protected directory path: /Users/kylecampbell/Documents/repos/localrepo-snefuru4/app/(protected)
+API: Calling getNavigation...
+API: Navigation items received: [
+  { name: 'A', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'B', children: [ [Object], [Object], [Object] ] },
+  { name: 'c', children: [ [Object] ] },
+  {
+    name: 'C',
+    children: [
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object], [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'D',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  {
+    name: 'F',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'gconjar1', path: '/gconjar1' },
+  { name: 'H', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'indusjar', path: '/indusjar' },
+  { name: 'J', children: [ [Object], [Object] ] },
+  {
+    name: 'K',
+    children: [ [Object], [Object], [Object], [Object], [Object] ]
+  },
+  {
+    name: 'M',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'N', children: [ [Object], [Object], [Object], [Object] ] },
+  {
+    name: 'navgroup6',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ]
+  },
+  { name: 'obi', path: '/admin/obi' },
+  { name: 'P', children: [ [Object], [Object], [Object] ] },
+  {
+    name: 'R',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'S',
+    children: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object]
+    ]
+  },
+  {
+    name: 'T',
+    children: [ [Object], [Object], [Object], [Object], [Object], [Object] ]
+  },
+  { name: 'U', children: [ [Object], [Object], [Object], [Object] ] },
+  { name: 'valan', path: '/valan' },
+  { name: 'W', children: [ [Object], [Object] ] },
+  { name: 'xpagesmanager1', path: '/admin/xpagesmanager1' },
+  { name: 'Y', children: [ [Object], [Object] ] },
+  { name: 'Z', children: [ [Object], [Object], [Object], [Object] ] }
+]
+ GET /api/navigation 200 in 49ms
+Found sitespren records: 170
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done'
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'cef388d2-959b-4f8c-a7de-edc4d79e3812', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 411ms
+Fetching sitespren data for user: a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64
+Found sitespren records: 170
+First record keys: [
+  'created_at',
+  'sitespren_base',
+  'true_root_domain',
+  'full_subdomain',
+  'webproperty_type',
+  'fk_users_id',
+  'updated_at',
+  'wpuser1',
+  'wppass1',
+  'wp_plugin_installed1',
+  'wp_plugin_connected2',
+  'fk_domreg_hostaccount',
+  'is_wp_site',
+  'id',
+  'wp_rest_app_pass',
+  'driggs_industry',
+  'driggs_city',
+  'driggs_brand_name',
+  'driggs_site_type_purpose',
+  'driggs_email_1',
+  'driggs_address_full',
+  'driggs_phone_1',
+  'driggs_special_note_for_ai_tool',
+  'ns_full',
+  'ip_address',
+  'is_starred1',
+  'icon_name',
+  'icon_color',
+  'is_bulldozer',
+  'driggs_phone1_platform_id',
+  'driggs_cgig_id',
+  'driggs_revenue_goal',
+  'driggs_address_species_id',
+  'is_competitor',
+  'is_external',
+  'is_internal',
+  'is_ppx',
+  'is_ms',
+  'is_wayback_rebuild',
+  'is_naked_wp_build',
+  'is_rnr',
+  'is_aff',
+  'is_other1',
+  'is_other2',
+  'driggs_citations_done',
+  'is_flylocal',
+  'driggs_logo_url',
+  'driggs_hours',
+  'driggs_owner_name',
+  'driggs_short_descr',
+  'driggs_long_descr',
+  'driggs_year_opened',
+  'driggs_employees_qty',
+  'driggs_keywords',
+  'driggs_category',
+  'driggs_address_species_note',
+  'driggs_payment_methods',
+  'driggs_social_media_links',
+  'driggs_street_1',
+  'driggs_street_2',
+  'driggs_state_code',
+  'driggs_zip',
+  'driggs_state_full',
+  'driggs_country',
+  'driggs_social_profiles_done'
+]
+Has is_external column: true
+Has is_internal column: true
+Sample is_external values: [
+  { id: 'c9d39d72-fc18-4b1f-80dc-315750eef7aa', is_external: false },
+  { id: '02385fc4-6fa1-4533-a3ab-9966fce1d8ce', is_external: false },
+  { id: 'cef388d2-959b-4f8c-a7de-edc4d79e3812', is_external: false }
+]
+ GET /api/get_sitespren_data?user_internal_id=a8febfdb-1fba-4f2a-b8ac-da4b4a2ddc64 200 in 202ms
+ GET /icon.png?a0133dec90ab15bc 404 in 1773358ms
+ GET /sitejar4?is_external=show 200 in 57ms
+[?25h
