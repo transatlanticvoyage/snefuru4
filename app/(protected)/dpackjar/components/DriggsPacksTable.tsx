@@ -457,14 +457,14 @@ export default function DriggsPacksTable() {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
+        <table className="min-w-full bg-white" style={{ borderCollapse: 'collapse' }}>
           <thead className="bg-gray-50">
             <tr>
               {/* Checkbox column */}
               <th 
                 className="w-8 px-3 py-3 text-left cursor-pointer hover:bg-gray-100"
                 onClick={handleSelectAll}
-                style={{ width: '20px', height: '20px' }}
+                style={{ width: '20px', height: '20px', border: '1px solid gray' }}
               >
                 <div className="w-5 h-5 flex items-center justify-center">
                   <input
@@ -482,7 +482,8 @@ export default function DriggsPacksTable() {
                 <th
                   key={field}
                   onClick={() => handleSort(field as keyof DriggsPacksRecord)}
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100 border-b border-gray-200"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  style={{ border: '1px solid gray' }}
                 >
                   <div className="flex items-center space-x-1">
                     <span>{field}</span>
@@ -503,7 +504,7 @@ export default function DriggsPacksTable() {
                 <td 
                   className="w-8 px-3 py-4 cursor-pointer"
                   onClick={() => handleSelectRow(record.dpack_id)}
-                  style={{ width: '20px' }}
+                  style={{ width: '20px', border: '1px solid gray' }}
                 >
                   <div className="w-5 h-5 flex items-center justify-center">
                     <input
@@ -524,7 +525,7 @@ export default function DriggsPacksTable() {
                   // Special handling for dpack_datum column
                   if (field === 'dpack_datum') {
                     return (
-                      <td key={field} className="px-6 py-4 text-sm text-gray-900">
+                      <td key={field} className="px-6 py-4 text-sm text-gray-900" style={{ border: '1px solid gray' }}>
                         <div className="flex items-center space-x-2">
                           <div className="truncate flex-1">
                             {isEditing ? (
@@ -565,6 +566,7 @@ export default function DriggsPacksTable() {
                       key={field}
                       className={`px-6 py-4 text-sm ${isReadonly ? 'text-gray-500' : 'text-gray-900 cursor-pointer hover:bg-gray-50'}`}
                       onClick={() => !isReadonly && handleCellClick(record.dpack_id, field, value)}
+                      style={{ border: '1px solid gray' }}
                     >
                       {isEditing ? (
                         <input
