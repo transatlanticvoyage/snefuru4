@@ -315,6 +315,7 @@ export default function DriggsmanTable({
   showCompetitorSites = false,
   onSitesCountChange
 }: DriggsmanTableProps) {
+  const searchParams = useSearchParams();
   const [sites, setSites] = useState<SitesprenSite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -349,10 +350,14 @@ export default function DriggsmanTable({
   // Call platform dropdown states
   const [callPlatforms, setCallPlatforms] = useState<CallPlatform[]>([]);
   const [platformDropdownOpen, setPlatformDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+  const [platformsLoaded, setPlatformsLoaded] = useState(false);
+  const [platformsLoading, setPlatformsLoading] = useState(false);
   
   // Citation gig dropdown states
   const [citationGigs, setCitationGigs] = useState<CitationGig[]>([]);
   const [cgigDropdownOpen, setCgigDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+  const [citationGigsLoaded, setCitationGigsLoaded] = useState(false);
+  const [citationGigsLoading, setCitationGigsLoading] = useState(false);
   // Copy feedback states
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
   const [copyFeedbackMessage, setCopyFeedbackMessage] = useState('');
@@ -366,6 +371,8 @@ export default function DriggsmanTable({
   // Address species dropdown states
   const [addressSpecies, setAddressSpecies] = useState<AddressSpecies[]>([]);
   const [addressSpeciesDropdownOpen, setAddressSpeciesDropdownOpen] = useState<{ field: string; siteId: string } | null>(null);
+  const [addressSpeciesLoaded, setAddressSpeciesLoaded] = useState(false);
+  const [addressSpeciesLoading, setAddressSpeciesLoading] = useState(false);
   
   // Selected sites for table filtering
   // TODO: Implement URL state persistence using one of these approaches:
@@ -421,7 +428,6 @@ export default function DriggsmanTable({
   
   const supabase = createClientComponentClient();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   // Site selection functions
   const toggleSiteSelection = (siteId: string) => {
@@ -549,12 +555,20 @@ export default function DriggsmanTable({
   useEffect(() => {
     const sitesEnteredParam = searchParams?.get('sitesentered');
     const activeFilterChamber = searchParams?.get('activefilterchamber');
+    const showMainChamberBoxes = searchParams?.get('showmainchamberboxes');
     
     // Handle sites parameter (existing code)
     if (sitesEnteredParam) {
       const sitesFromUrl = sitesEnteredParam.split(',').map(s => s.trim()).filter(s => s);
       setManualSites(sitesFromUrl);
       setManualSiteInput(sitesFromUrl.join(', '));
+    }
+    
+    // Handle showmainchamberboxes parameter
+    if (showMainChamberBoxes === 'yes') {
+      setShowChamberBoxes(true);
+    } else if (showMainChamberBoxes === 'no') {
+      setShowChamberBoxes(false);
     }
     
     // Handle new activefilterchamber parameter
@@ -592,17 +606,16 @@ export default function DriggsmanTable({
     }
   }, []); // Empty dependency array - only run once on mount
 
-  // Fetch sites data and re-filter when manual sites change
+  // Fetch only essential data on initial load - dropdowns loaded lazily on demand
   useEffect(() => {
     fetchSites();
-    fetchCallPlatforms();
-    fetchCitationGigs();
-    fetchAddressSpecies();
-    fetchSitesprenTags();
+    fetchSitesprenTags(); // Tags are needed for filtering
     fetchVacuumData();
     fetchZarpscrapesData();
     fetchExcludeFromWpData();
     fetchExcludeFromFeData();
+    // Removed: fetchCallPlatforms(), fetchCitationGigs(), fetchAddressSpecies()
+    // These will be loaded lazily when dropdown is first opened
   }, []);
 
   // Re-filter sites when manual sites change or filtering states change
@@ -1709,11 +1722,19 @@ export default function DriggsmanTable({
   };
 
   // Platform dropdown functions
-  const handlePlatformDropdownClick = (field: string, siteId: string) => {
+  const handlePlatformDropdownClick = async (field: string, siteId: string) => {
     if (platformDropdownOpen?.field === field && platformDropdownOpen?.siteId === siteId) {
       setPlatformDropdownOpen(null);
     } else {
       setPlatformDropdownOpen({ field, siteId });
+      
+      // Load platforms lazily on first dropdown open
+      if (!platformsLoaded && !platformsLoading) {
+        setPlatformsLoading(true);
+        await fetchCallPlatforms();
+        setPlatformsLoaded(true);
+        setPlatformsLoading(false);
+      }
     }
   };
 
@@ -1812,7 +1833,7 @@ export default function DriggsmanTable({
     return `${name} (${code}) - ${country}`;
   };
 
-  const handleAddressSpeciesDropdownClick = (field: string, siteId: string) => {
+  const handleAddressSpeciesDropdownClick = async (field: string, siteId: string) => {
     if (addressSpeciesDropdownOpen?.field === field && addressSpeciesDropdownOpen?.siteId === siteId) {
       setAddressSpeciesDropdownOpen(null);
     } else {
@@ -1820,6 +1841,14 @@ export default function DriggsmanTable({
       // Close other dropdowns if open
       setPlatformDropdownOpen(null);
       setCgigDropdownOpen(null);
+      
+      // Load address species lazily on first dropdown open
+      if (!addressSpeciesLoaded && !addressSpeciesLoading) {
+        setAddressSpeciesLoading(true);
+        await fetchAddressSpecies();
+        setAddressSpeciesLoaded(true);
+        setAddressSpeciesLoading(false);
+      }
     }
   };
 
@@ -1865,13 +1894,21 @@ export default function DriggsmanTable({
     }
   };
 
-  const handleCgigDropdownClick = (field: string, siteId: string) => {
+  const handleCgigDropdownClick = async (field: string, siteId: string) => {
     if (cgigDropdownOpen?.field === field && cgigDropdownOpen?.siteId === siteId) {
       setCgigDropdownOpen(null);
     } else {
       setCgigDropdownOpen({ field, siteId });
       // Close platform dropdown if open
       setPlatformDropdownOpen(null);
+      
+      // Load citation gigs lazily on first dropdown open
+      if (!citationGigsLoaded && !citationGigsLoading) {
+        setCitationGigsLoading(true);
+        await fetchCitationGigs();
+        setCitationGigsLoaded(true);
+        setCitationGigsLoading(false);
+      }
     }
   };
 
@@ -2675,7 +2712,7 @@ export default function DriggsmanTable({
 
       {/* Fog Chamber */}
       {activeTab === 1 && showChamberBoxes && (
-        <div className={`fog-chamber border border-gray-700 rounded-lg ${(useDaylightFilter || useRainFilter) ? 'opacity-50' : ''}`}>
+        <div className="fog-chamber border border-gray-700 rounded-lg">
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-3">
             <div className="font-bold text-sm text-gray-800">fog_chamber</div>
@@ -2694,7 +2731,7 @@ export default function DriggsmanTable({
 
       {/* Daylight Chamber */}
       {activeTab === 2 && showChamberBoxes && (
-        <div className={`daylight-chamber border border-gray-700 rounded-lg ${(useRainFilter || useFogFilter) ? 'opacity-50' : ''}`}>
+        <div className="daylight-chamber border border-gray-700 rounded-lg">
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-3">
             <div className="font-bold text-sm text-gray-800">daylight_chamber</div>
@@ -2708,7 +2745,7 @@ export default function DriggsmanTable({
             <span className="ml-2 text-sm text-gray-600">Use to filter</span>
             
             {/* Manual Site Input - inline */}
-            <div className={`ml-8 flex items-center ${(useRainFilter || useFogFilter) ? 'pointer-events-none' : ''}`}>
+            <div className="ml-8 flex items-center">
               <div className="relative group">
                 <svg 
                   className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" 
@@ -2747,12 +2784,12 @@ export default function DriggsmanTable({
               onChange={(e) => setManualSiteInput(e.target.value)}
               onKeyPress={handleManualSiteKeyPress}
               placeholder="dogs.com, cats.com facebook.com/group example.net"
-              className={`ml-3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${(useRainFilter || useFogFilter) ? 'pointer-events-none' : ''}`}
+              className="ml-3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               style={{ width: '700px' }}
             />
             <button
               onClick={handleManualSiteSubmit}
-              className={`ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium ${(useRainFilter || useFogFilter) ? 'pointer-events-none' : ''}`}
+              className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
             >
               Submit
             </button>
@@ -2829,6 +2866,8 @@ export default function DriggsmanTable({
                     <tr>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Time Last Used</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Link To Open</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Open w/ Yes Show Main Chamber Boxes</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Open w/ No Show Main Chamber Boxes</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Sites Entered</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Count</th>
                       <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 border-b border-gray-300">Settings</th>
@@ -2837,7 +2876,7 @@ export default function DriggsmanTable({
                   <tbody className="bg-white">
                     {recentEntries.length === 0 ? (
                       <tr>
-                        <td className="px-3 py-2 text-sm text-gray-500 border-b border-gray-200 text-center" colSpan={5}>
+                        <td className="px-3 py-2 text-sm text-gray-500 border-b border-gray-200 text-center" colSpan={7}>
                           no recents currently stored
                         </td>
                       </tr>
@@ -2849,12 +2888,26 @@ export default function DriggsmanTable({
                           </td>
                           <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
                             <a
-                              href={`/driggsman?sites=${encodeURIComponent(entry.sitesEntered.join(','))}`}
+                              href={`/driggsman?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight`}
                               className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200"
-                              target="_blank"
-                              rel="noopener noreferrer"
                             >
-                              Open Config
+                              Open Configuration Link
+                            </a>
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
+                            <a
+                              href={`/driggsman?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight&showmainchamberboxes=yes`}
+                              className="inline-flex items-center px-3 py-1 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded hover:bg-green-100 hover:text-green-700 transition-colors duration-200"
+                            >
+                              Open w/ Yes
+                            </a>
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
+                            <a
+                              href={`/driggsman?sitesentered=${encodeURIComponent(entry.sitesEntered.join(','))}&activefilterchamber=daylight&showmainchamberboxes=no`}
+                              className="inline-flex items-center px-3 py-1 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
+                            >
+                              Open w/ No
                             </a>
                           </td>
                           <td className="px-3 py-2 text-sm text-gray-900 border-b border-gray-200">
@@ -2891,7 +2944,7 @@ export default function DriggsmanTable({
 
       {/* Rain Chamber */}
       {activeTab === 3 && showChamberBoxes && (
-        <div className={`rain-chamber border border-gray-700 rounded-lg ${activeRainChamber ? 'border-blue-500 bg-blue-50' : ''} ${(useDaylightFilter || useFogFilter) ? 'opacity-50' : ''}`}>
+        <div className={`rain-chamber border border-gray-700 rounded-lg ${activeRainChamber ? 'border-blue-500 bg-blue-50' : ''}`}>
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-3">
             <div className="font-bold text-sm text-gray-800">rain_chamber</div>
@@ -2906,7 +2959,7 @@ export default function DriggsmanTable({
             
             {/* Inline Tags Dropdown */}
             <span className="ml-8 text-sm font-bold text-gray-700">select from sitespren_tags</span>
-            <div className={`ml-3 relative inline-block ${(useDaylightFilter || useFogFilter) ? 'pointer-events-none' : ''}`}>
+            <div className="ml-3 relative inline-block">
               <button
                 onClick={() => setTagsDropdownOpen(!tagsDropdownOpen)}
                 className="px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -3069,14 +3122,12 @@ export default function DriggsmanTable({
                           bottom: '0',
                           width: '350px',
                           border: '1px solid black',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
                           backgroundColor: 'white',
-                          zIndex: 1
+                          zIndex: 1,
+                          padding: '0'
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'absolute', top: '4px', left: '4px' }}>
                           {/* Tundra landscape SVG icon */}
                           <svg 
                             width="24" 
@@ -3113,6 +3164,34 @@ export default function DriggsmanTable({
                           <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
                             tundra_box_div
                           </span>
+                        </div>
+                        
+                        {/* 3x3 Table */}
+                        <div style={{ position: 'absolute', top: '35px', left: '4px', right: '4px' }}>
+                          <table style={{
+                            border: '1px solid #d1d5db',
+                            borderCollapse: 'collapse',
+                            width: '100%',
+                            fontSize: '12px'
+                          }}>
+                            <tbody>
+                              <tr>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1a</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1b</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>1c</td>
+                              </tr>
+                              <tr>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>2a</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>glub.ns</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>2c</td>
+                              </tr>
+                              <tr>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3a</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3b</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3c</td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
                       </div>
                       
@@ -3248,15 +3327,15 @@ export default function DriggsmanTable({
                           bottom: '0',
                           width: '350px',
                           border: '1px solid black',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
                           backgroundColor: 'white',
-                          zIndex: 1
+                          zIndex: 10,
+                          padding: '0',
+                          pointerEvents: 'auto'
                         }}
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          {/* Reindeer head and antlers SVG icon */}
+                        {/* Logo at top left */}
+                        <div style={{ position: 'absolute', top: '4px', left: '4px' }}>
                           <svg 
                             width="24" 
                             height="24" 
@@ -3286,13 +3365,186 @@ export default function DriggsmanTable({
                             {/* Nose */}
                             <circle cx="12" cy="16" r="1.5" fill="white"/>
                           </svg>
-                          <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'black' }}>
-                            reindeer_box_div
-                          </span>
-                          <div style={{ fontSize: '14px', fontWeight: 'normal', color: 'black', marginTop: '8px' }}>
-                            sitesglub.nameserver_field1<br/>
-                            sitesglub.ip_address
-                          </div>
+                        </div>
+                        
+                        {/* Tool buttons container */}
+                        <div style={{ 
+                          position: 'absolute', 
+                          top: '4px', 
+                          left: '32px', 
+                          right: '4px', 
+                          bottom: '4px',
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          alignContent: 'flex-start',
+                          gap: '2px',
+                          pointerEvents: 'auto',
+                          zIndex: 11
+                        }}>
+                          {/* Individual View button - wider than others */}
+                          <a 
+                            href={`/sitnivid?site=${encodeURIComponent(site.sitespren_base || '')}`}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '11px',
+                              border: 'none',
+                              borderRadius: '3px',
+                              backgroundColor: '#2563eb',
+                              cursor: 'pointer',
+                              minWidth: '80px',
+                              height: '24px',
+                              textDecoration: 'none',
+                              color: 'white',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              position: 'relative',
+                              zIndex: 12
+                            }}
+                          >
+                            Individual View
+                          </a>
+                          
+                          {/* Tool buttons - matching sitejar4 functionality */}
+                          {(() => {
+                            const domain = site.sitespren_base || site.id;
+                            const baseButtonStyle = {
+                              padding: '2px 4px',
+                              fontSize: '11px',
+                              border: 'none',
+                              borderRadius: '3px',
+                              cursor: 'pointer',
+                              minWidth: '24px',
+                              height: '24px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              textDecoration: 'none',
+                              color: 'white',
+                              position: 'relative',
+                              zIndex: 12
+                            };
+                            
+                            return (
+                              <>
+                                {/* WP - WordPress Admin */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(`https://${domain}/wp-admin/`, '_blank');
+                                  }}
+                                  style={{...baseButtonStyle, backgroundColor: '#059669'}}
+                                  title="Open WP Admin"
+                                >
+                                  WP
+                                </button>
+                                
+                                {/* Site - Open website */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(`https://${domain}`, '_blank');
+                                  }}
+                                  style={{...baseButtonStyle, backgroundColor: '#7c3aed'}}
+                                  title="Open Site"
+                                >
+                                  Site
+                                </button>
+                                
+                                {/* 📋 - Copy domain to clipboard */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(domain);
+                                  }}
+                                  style={{...baseButtonStyle, backgroundColor: '#4b5563'}}
+                                  title="Copy domain to clipboard"
+                                >
+                                  📋
+                                </button>
+                                
+                                {/* G - Google site search */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(`https://www.google.com/search?q=site%3A${encodeURIComponent(domain)}`, '_blank');
+                                  }}
+                                  style={{...baseButtonStyle, backgroundColor: '#dc2626'}}
+                                  title="Google site: search"
+                                >
+                                  G
+                                </button>
+                                
+                                {/* 👁 - View backlinks (toggle expanded row) */}
+                                <button
+                                  onClick={() => console.log(`View backlinks for ${domain}`)}
+                                  style={{...baseButtonStyle, backgroundColor: '#059669'}}
+                                  title="View backlinks"
+                                >
+                                  👁
+                                </button>
+                                
+                                {/* ✏️ - Edit row */}
+                                <button
+                                  onClick={() => console.log(`Edit ${domain}`)}
+                                  style={{...baseButtonStyle, backgroundColor: '#ea580c'}}
+                                  title="Edit row"
+                                >
+                                  ✏️
+                                </button>
+                                
+                                {/* L - Scrape links */}
+                                <button
+                                  onClick={() => console.log(`Scrape links from ${domain}`)}
+                                  style={{...baseButtonStyle, backgroundColor: '#4f46e5'}}
+                                  title="Scrape outbound links from homepage"
+                                >
+                                  L
+                                </button>
+                                
+                                {/* NW - NW Jar link */}
+                                <a
+                                  href={`/nwjar1?coltemp=option1&sitebase=${encodeURIComponent(domain)}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{...baseButtonStyle, backgroundColor: '#3b82f6'}}
+                                  title="Open NW Jar"
+                                >
+                                  NW
+                                </a>
+                                
+                                {/* GC - GC Jar link */}
+                                <a
+                                  href={`/gconjar1?coltemp=option1&sitebase=${encodeURIComponent(domain)}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{...baseButtonStyle, backgroundColor: '#14b8a6'}}
+                                  title="Open GC Jar"
+                                >
+                                  GC
+                                </a>
+                                
+                                {/* DG - Driggsman link */}
+                                <a
+                                  href={`/driggsman?sitesentered=${encodeURIComponent(domain)}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{...baseButtonStyle, backgroundColor: '#8b5cf6'}}
+                                  title="Open Driggsman"
+                                >
+                                  DG
+                                </a>
+                                
+                                {/* IN - Sitejar4 individual view */}
+                                <a
+                                  href={`/sitejar4?sitesentered=${encodeURIComponent(domain)}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{...baseButtonStyle, backgroundColor: '#3b82f6'}}
+                                  title="View only this site"
+                                >
+                                  IN
+                                </a>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                       
@@ -3765,7 +4017,12 @@ export default function DriggsmanTable({
                                 </button>
 
                                 {/* Platform Table */}
-                                {callPlatforms.length > 0 ? (
+                                {platformsLoading ? (
+                                  <div className="text-center py-4 text-gray-500">
+                                    <div className="animate-spin inline-block w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full mb-2"></div>
+                                    <div>Loading platforms...</div>
+                                  </div>
+                                ) : callPlatforms.length > 0 ? (
                                   <div className="border border-gray-200 rounded">
                                     <div className="max-h-64 overflow-y-auto">
                                       <table className="w-full text-xs">
@@ -4009,7 +4266,12 @@ export default function DriggsmanTable({
                                 </button>
 
                                 {/* Address Species Table */}
-                                {addressSpecies.length > 0 ? (
+                                {addressSpeciesLoading ? (
+                                  <div className="text-center py-4 text-gray-500">
+                                    <div className="animate-spin inline-block w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full mb-2"></div>
+                                    <div>Loading address species...</div>
+                                  </div>
+                                ) : addressSpecies.length > 0 ? (
                                   <div className="border border-gray-200 rounded">
                                     <div className="max-h-64 overflow-y-auto">
                                       <table className="w-full text-xs">
@@ -4366,7 +4628,12 @@ export default function DriggsmanTable({
                                 </button>
 
                                 {/* Citation Gigs Table */}
-                                {citationGigs.length > 0 ? (
+                                {citationGigsLoading ? (
+                                  <div className="text-center py-4 text-gray-500">
+                                    <div className="animate-spin inline-block w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full mb-2"></div>
+                                    <div>Loading citation gigs...</div>
+                                  </div>
+                                ) : citationGigs.length > 0 ? (
                                   <div className="border border-gray-200 rounded">
                                     <div className="max-h-64 overflow-y-auto">
                                       <table className="w-full text-xs">
