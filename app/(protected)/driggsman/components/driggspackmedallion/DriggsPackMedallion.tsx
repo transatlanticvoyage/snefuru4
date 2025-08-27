@@ -18,7 +18,7 @@ const DriggsPackMedallion: React.FC<DriggsPackMedallionProps> = ({
   onBottomClick
 }) => {
   // Define the content for each row based on the driggspack number
-  const getZzText = () => `zz${driggspackNumber}`;
+  const getZzText = () => `zz${driggspackNumber}_medal`;
   
   const getMiddleText = () => {
     switch (driggspackNumber) {

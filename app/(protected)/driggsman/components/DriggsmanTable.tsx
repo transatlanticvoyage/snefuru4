@@ -11,6 +11,7 @@ import VacuumMedallion from './vacuummedallion/VacuumMedallion';
 import ZarpoMedallion from './zarpomedallion/ZarpoMedallion';
 import Chatdori from '@/app/components/Chatdori';
 import DriggsActionsFeedback from '@/app/components/DriggsActionsFeedback';
+import { SitesglubFetcher } from './SitesglubFetchingFunctions';
 
 const DrenjariButtonBarDriggsmanLinks = dynamic(
   () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
@@ -96,6 +97,21 @@ interface CallPlatform {
   updated_at: string;
 }
 
+interface Sitesglub {
+  sitesglub_id: number;
+  sitesglub_base: string;
+  ns_full: string | null;
+  ip_address: string | null;
+  mj_tf: number | null;
+  mj_cf: number | null;
+  mj_rd: number | null;
+  mj_refips: number | null;
+  mj_refsubnets: number | null;
+  mj_bl: number | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
 interface AddressSpecies {
   aspecies_id: number;
   aspecies_name: string | null;
@@ -172,6 +188,8 @@ interface DriggsmanTableProps {
   showVerificationColumn?: boolean;
   showCompetitorSites?: boolean;
   onSitesCountChange?: (count: number) => void;
+  onShowVerificationColumnChange?: (show: boolean) => void;
+  onShowCompetitorSitesChange?: (show: boolean) => void;
 }
 
 // Helper component for vacuum/zarpscrape cell display
@@ -313,7 +331,9 @@ export default function DriggsmanTable({
   onControlsRender,
   showVerificationColumn = false,
   showCompetitorSites = false,
-  onSitesCountChange
+  onSitesCountChange,
+  onShowVerificationColumnChange,
+  onShowCompetitorSitesChange
 }: DriggsmanTableProps) {
   const searchParams = useSearchParams();
   const [sites, setSites] = useState<SitesprenSite[]>([]);
@@ -326,7 +346,7 @@ export default function DriggsmanTable({
   
   // Column pagination for sites
   const [currentColumnPage, setCurrentColumnPage] = useState(1);
-  const [columnsPerPage, setColumnsPerPage] = useState(10);
+  const [columnsPerPage, setColumnsPerPage] = useState(1);
   
   // Inline editing states
   const [editingCell, setEditingCell] = useState<{ field: string; siteId: string } | null>(null);
@@ -425,6 +445,12 @@ export default function DriggsmanTable({
   // Exclude from WP and Frontend states
   const [excludeFromWpData, setExcludeFromWpData] = useState<Map<string, ExcludeFromWpData>>(new Map());
   const [excludeFromFeData, setExcludeFromFeData] = useState<Map<string, ExcludeFromFeData>>(new Map());
+  const [sitesglubData, setSitesglubData] = useState<Map<string, Sitesglub>>(new Map());
+  const [sitesglubLoading, setSitesglubLoading] = useState<Map<string, Set<string>>>(new Map()); // Map<domain, Set<fieldNames>>
+  
+  // Domain registrar popup state
+  const [registrarPopupOpen, setRegistrarPopupOpen] = useState<string | null>(null);
+  const [allHostAccounts, setAllHostAccounts] = useState<any[]>([]);
   
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -614,6 +640,7 @@ export default function DriggsmanTable({
     fetchZarpscrapesData();
     fetchExcludeFromWpData();
     fetchExcludeFromFeData();
+    fetchSitesglubData();
     // Removed: fetchCallPlatforms(), fetchCitationGigs(), fetchAddressSpecies()
     // These will be loaded lazily when dropdown is first opened
   }, []);
@@ -984,6 +1011,164 @@ export default function DriggsmanTable({
       setExcludeFromFeData(exclusionsMap);
     } catch (err) {
       console.error('Error in fetchExcludeFromFeData:', err);
+    }
+  };
+
+  // Function to fetch sitesglub data for all sites
+  const fetchSitesglubData = async () => {
+    try {
+      // Get all sitesglub data - this is a global table
+      const { data: sitesglubRecords, error } = await supabase
+        .from('sitesglub')
+        .select('*');
+      
+      if (error) {
+        console.error('Error fetching sitesglub data:', error);
+        return;
+      }
+      
+      // Store sitesglub data in a Map for quick lookup by domain
+      const sitesglubMap = new Map<string, Sitesglub>();
+      sitesglubRecords?.forEach(record => {
+        sitesglubMap.set(record.sitesglub_base, record);
+      });
+      setSitesglubData(sitesglubMap);
+    } catch (err) {
+      console.error('Error in fetchSitesglubData:', err);
+    }
+  };
+
+  // Function to fetch a specific sitesglub metric for a domain
+  const fetchSitesglubMetric = async (domain: string, metric: string) => {
+    if (!domain) return;
+
+    // Set loading state for this specific domain and metric
+    setSitesglubLoading(prev => {
+      const newLoading = new Map(prev);
+      const domainLoadings = newLoading.get(domain) || new Set();
+      domainLoadings.add(metric);
+      newLoading.set(domain, domainLoadings);
+      return newLoading;
+    });
+
+    try {
+      // Use the SitesglubFetcher to get the metric data
+      const result = await SitesglubFetcher.fetchMetric(domain, metric);
+
+      if (result.success) {
+        // Update the sitesglubData with the new value
+        setSitesglubData(prev => {
+          const newData = new Map(prev);
+          const existingRecord = newData.get(domain);
+          const updatedRecord = {
+            ...existingRecord,
+            sitesglub_base: domain,
+            [metric]: result.data,
+            updated_at: new Date().toISOString(),
+            // Fill in default values for fields that might not exist
+            sitesglub_id: existingRecord?.sitesglub_id || 0,
+            mj_tf: existingRecord?.mj_tf || null,
+            mj_cf: existingRecord?.mj_cf || null,
+            mj_rd: existingRecord?.mj_rd || null,
+            mj_refips: existingRecord?.mj_refips || null,
+            mj_refsubnets: existingRecord?.mj_refsubnets || null,
+            mj_bl: existingRecord?.mj_bl || null,
+            ns_full: metric === 'ns_full' ? result.data : existingRecord?.ns_full || null,
+            ip_address: metric === 'ip_address' ? result.data : existingRecord?.ip_address || null,
+            created_at: existingRecord?.created_at || new Date().toISOString()
+          } as Sitesglub;
+          
+          newData.set(domain, updatedRecord);
+          return newData;
+        });
+
+        console.log(`Successfully fetched ${metric} for ${domain}:`, result.data);
+      } else {
+        console.error(`Failed to fetch ${metric} for ${domain}:`, result.error);
+      }
+    } catch (error) {
+      console.error(`Error fetching ${metric} for ${domain}:`, error);
+    } finally {
+      // Clear loading state for this domain and metric
+      setSitesglubLoading(prev => {
+        const newLoading = new Map(prev);
+        const domainLoadings = newLoading.get(domain) || new Set();
+        domainLoadings.delete(metric);
+        
+        if (domainLoadings.size === 0) {
+          newLoading.delete(domain);
+        } else {
+          newLoading.set(domain, domainLoadings);
+        }
+        
+        return newLoading;
+      });
+    }
+  };
+
+  // Fetch host accounts for the registrar popup
+  const fetchHostAccountsForPopup = async () => {
+    if (!userInternalId || allHostAccounts.length > 0) return;
+
+    try {
+      const params = new URLSearchParams({
+        user_internal_id: userInternalId
+      });
+
+      const response = await fetch(`/api/get_domain_registrar_info?${params}`);
+      const result = await response.json();
+
+      if (result.success && result.data.all_host_accounts) {
+        setAllHostAccounts(result.data.all_host_accounts);
+      }
+    } catch (error) {
+      console.error('Error fetching host accounts:', error);
+    }
+  };
+
+  // Update domain registrar
+  const updateDomainRegistrar = async (siteId: string, newHostAccountId: string | null) => {
+    if (!userInternalId) return;
+
+    try {
+      const response = await fetch('/api/update_domain_registrar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sitespren_id: siteId,
+          fk_domreg_hostaccount: newHostAccountId,
+          user_internal_id: userInternalId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Find the new registrar info from allHostAccounts
+        const newRegistrarInfo = newHostAccountId 
+          ? allHostAccounts.find(acc => acc.host_account_id === newHostAccountId)
+          : null;
+
+        // Update the sites data with the new fk_domreg_hostaccount
+        setSites(prevSites => 
+          prevSites.map(site => 
+            site.id === siteId 
+              ? { 
+                  ...site, 
+                  fk_domreg_hostaccount: newHostAccountId,
+                }
+              : site
+          )
+        );
+
+        setRegistrarPopupOpen(null);
+      } else {
+        console.error('Failed to update domain registrar:', result.error);
+      }
+    } catch (error) {
+      console.error('Error updating domain registrar:', error);
     }
   };
 
@@ -2243,7 +2428,7 @@ export default function DriggsmanTable({
       <div className="flex items-center">
         <span className="text-sm text-gray-600 mr-2">Sites per view:</span>
         <div className="inline-flex" role="group">
-          {[5, 10, 15, 20].map((value, index) => (
+          {[1, 2, 5, 10, 15, 20].map((value, index) => (
             <button
               key={value}
               onClick={() => {
@@ -2254,7 +2439,7 @@ export default function DriggsmanTable({
                 px-3 py-2 text-sm font-medium border border-gray-300
                 ${columnsPerPage === value ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 hover:bg-gray-100'}
                 ${index === 0 ? 'rounded-l-md' : ''}
-                ${index === 3 ? 'rounded-r-md' : ''}
+                ${index === 5 ? 'rounded-r-md' : ''}
                 ${index > 0 ? 'border-l-0' : ''}
                 transition-colors duration-150
               `}
@@ -2703,7 +2888,7 @@ export default function DriggsmanTable({
                   borderRightColor: '#d5d5d5'
                 }}
               >
-                tab {tabNumber}
+{tabNumber === 5 ? 'nav stuff' : `tab ${tabNumber}`}
               </button>
             ))}
           </div>
@@ -3091,6 +3276,44 @@ export default function DriggsmanTable({
         </div>
       )}
 
+      {/* Nav Stuff Chamber - Tab 5 */}
+      {activeTab === 5 && showChamberBoxes && (
+        <div className="nav-stuff-chamber border border-gray-700 rounded-lg">
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center mb-3">
+              <div className="font-bold text-sm text-gray-800">nav_stuff_chamber</div>
+            </div>
+            
+            {/* Drenjari Navigation Links */}
+            <div className="mt-4">
+              <DrenjariButtonBarDriggsmanLinks />
+            </div>
+            
+            {/* Verification and Competitor Buttons */}
+            <div className="mt-4">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => onShowVerificationColumnChange?.(!showVerificationColumn)}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    showVerificationColumn ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  show verification column
+                </button>
+                <button
+                  onClick={() => onShowCompetitorSitesChange?.(!showCompetitorSites)}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    showCompetitorSites ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  show competitor sites
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Matrix Table */}
       <div className="border border-gray-300 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
@@ -3182,13 +3405,144 @@ export default function DriggsmanTable({
                               </tr>
                               <tr>
                                 <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>2a</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>glub.ns</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>2c</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>sitesglub.ns_full</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>
+                                  {(() => {
+                                    if (!site.sitespren_base) return 'NULL';
+                                    
+                                    const isLoading = sitesglubLoading.get(site.sitespren_base)?.has('ns_full');
+                                    const value = sitesglubData.get(site.sitespren_base)?.ns_full;
+                                    
+                                    if (isLoading) {
+                                      return (
+                                        <div className="flex items-center justify-center">
+                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                        </div>
+                                      );
+                                    }
+                                    
+                                    return (
+                                      <button
+                                        className="hover:bg-gray-100 cursor-pointer min-w-0 text-center bg-transparent border-0 p-0 m-0"
+                                        onClick={() => fetchSitesglubMetric(site.sitespren_base!, 'ns_full')}
+                                        title="Click to refresh ns_full data"
+                                      >
+                                        {value || 'NULL'}
+                                      </button>
+                                    );
+                                  })()}
+                                </td>
                               </tr>
                               <tr>
                                 <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3a</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3b</td>
-                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>3c</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>sitesglub.ip_address</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>
+                                  {(() => {
+                                    if (!site.sitespren_base) return 'NULL';
+                                    
+                                    const isLoading = sitesglubLoading.get(site.sitespren_base)?.has('ip_address');
+                                    const value = sitesglubData.get(site.sitespren_base)?.ip_address;
+                                    
+                                    if (isLoading) {
+                                      return (
+                                        <div className="flex items-center justify-center">
+                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                        </div>
+                                      );
+                                    }
+                                    
+                                    return (
+                                      <button
+                                        className="hover:bg-gray-100 cursor-pointer min-w-0 text-center bg-transparent border-0 p-0 m-0"
+                                        onClick={() => fetchSitesglubMetric(site.sitespren_base!, 'ip_address')}
+                                        title="Click to refresh ip_address data"
+                                      >
+                                        {value || 'NULL'}
+                                      </button>
+                                    );
+                                  })()}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>4a</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center' }}>dom reg acct</td>
+                                <td style={{ border: '1px solid #d1d5db', padding: '4px', textAlign: 'center', fontSize: '10px' }}>
+                                  {(() => {
+                                    if (!site.fk_domreg_hostaccount) {
+                                      return (
+                                        <div className="flex items-center justify-center gap-1">
+                                          <span className="text-gray-400">No registrar set</span>
+                                          <button
+                                            onClick={() => {
+                                              setRegistrarPopupOpen(site.id);
+                                              fetchHostAccountsForPopup();
+                                            }}
+                                            className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+                                            title="Set host account"
+                                          >
+                                            ⚙️
+                                          </button>
+                                        </div>
+                                      );
+                                    }
+
+                                    // Find the registrar info from allHostAccounts
+                                    const registrarInfo = allHostAccounts.find(acc => acc.host_account_id === site.fk_domreg_hostaccount);
+                                    
+                                    if (registrarInfo) {
+                                      return (
+                                        <div className="flex flex-col items-center gap-1">
+                                          <div className="text-xs font-medium text-gray-900">
+                                            {registrarInfo.company_name}
+                                          </div>
+                                          <div className="text-xs text-gray-500">
+                                            {registrarInfo.username}
+                                          </div>
+                                          <div className="flex gap-1">
+                                            {registrarInfo.portal_url && (
+                                              <a
+                                                href={registrarInfo.portal_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-xs px-1 py-0.5 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                title="Open portal"
+                                              >
+                                                🔗
+                                              </a>
+                                            )}
+                                            <button
+                                              onClick={() => {
+                                                setRegistrarPopupOpen(site.id);
+                                                fetchHostAccountsForPopup();
+                                              }}
+                                              className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+                                              title="Change host account"
+                                            >
+                                              ⚙️
+                                            </button>
+                                          </div>
+                                        </div>
+                                      );
+                                    }
+
+                                    // Fallback if registrar ID exists but not found in allHostAccounts
+                                    return (
+                                      <div className="flex items-center justify-center gap-1">
+                                        <span className="text-xs text-gray-400">Unknown registrar</span>
+                                        <button
+                                          onClick={() => {
+                                            setRegistrarPopupOpen(site.id);
+                                            fetchHostAccountsForPopup();
+                                          }}
+                                          className="text-xs px-1 py-0.5 bg-green-600 text-white rounded hover:bg-green-700"
+                                          title="Change host account"
+                                        >
+                                          ⚙️
+                                        </button>
+                                      </div>
+                                    );
+                                  })()}
+                                </td>
                               </tr>
                             </tbody>
                           </table>
@@ -3610,7 +3964,20 @@ export default function DriggsmanTable({
                       key={`${site.id}-vacuum`}
                       className="px-1 py-3 text-center text-xs font-bold text-gray-900 border-r border-gray-300"
                     >
-                      <div>**vacuum**</div>
+                      <div className="flex flex-col items-center justify-center">
+                        {/* Vacuum Icon */}
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="#4B5563"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="mb-1"
+                        >
+                          <path d="M23 15v4c0 1.1-.9 2-2 2h-1v-6h3zm-4 0v6h-4v-6h4zm-5 0v6h-4v-6h4zm-5 0v6H8c-1.1 0-2-.9-2-2v-4h3zm-6-2c-.55 0-1-.45-1-1s.45-1 1-1h2.03c.25-1.67 1.67-2.96 3.4-2.96.56 0 1.08.14 1.54.38l5.12-5.12c.37-.38.88-.59 1.41-.59.78 0 1.5.63 1.5 1.41 0 .53-.21 1.04-.59 1.41L11.29 10.63c.24.46.38.98.38 1.54 0 1.73-1.29 3.15-2.96 3.4V13H3zm8.43-7.41c.2-.2.51-.2.71 0s.2.51 0 .71l-3.54 3.54c-.2.2-.51.2-.71 0s-.2-.51 0-.71l3.54-3.54z"/>
+                        </svg>
+                        <div>**vacuum**</div>
+                      </div>
                     </th>
                     {/* Scraper column */}
                     <th
@@ -3618,7 +3985,20 @@ export default function DriggsmanTable({
                       className="px-1 py-3 text-center text-xs font-bold text-gray-900"
                       style={{ borderRight: '3px solid black' }}
                     >
-                      <div>**scraper**</div>
+                      <div className="flex flex-col items-center justify-center">
+                        {/* Scraper Icon */}
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="#4B5563"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="mb-1"
+                        >
+                          <path d="M1 12l3-3v2h13.5c.5 0 1-.2 1.3-.6l5.5-6.4c.1-.1.2-.3.2-.5 0-.4-.3-.7-.7-.7-.2 0-.3.1-.4.2L18.2 9H4v2H1v1zm6.5 1L2 19.4c-.1.1-.2.3-.2.5 0 .4.3.7.7.7.2 0 .3-.1.4-.2L8.2 14H22v-2H7.5c-.2 0-.5.1-.7.3-.3.2-.4.5-.3.7z"/>
+                        </svg>
+                        <div>**scraper**</div>
+                      </div>
                     </th>
                   </>
                 ))}
@@ -5206,6 +5586,132 @@ export default function DriggsmanTable({
                 </Link>
               </div>
               
+              {/* krexport-main-box */}
+              <div className="krexport-main-box" style={{ border: '1px solid black' }}>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', padding: '8px' }}>
+                  krexport-main-box
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', paddingLeft: '8px', paddingRight: '8px' }}>
+                  krexport_ui_table
+                </div>
+                
+                <table style={{ 
+                  borderCollapse: 'collapse',
+                  border: '1px solid gray',
+                  width: '100%',
+                  margin: '8px'
+                }}>
+                  <thead>
+                    <tr style={{ backgroundColor: 'gray' }}>
+                      <th style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="th-inner-wrapper-div">1</div>
+                      </th>
+                      <th style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="th-inner-wrapper-div">2</div>
+                      </th>
+                      <th style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="th-inner-wrapper-div">3</div>
+                      </th>
+                      <th style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="th-inner-wrapper-div">4</div>
+                      </th>
+                      <th style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="th-inner-wrapper-div">5</div>
+                      </th>
+                      <th style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="th-inner-wrapper-div">6</div>
+                      </th>
+                      <th style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="th-inner-wrapper-div">7</div>
+                      </th>
+                      <th style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="th-inner-wrapper-div">8</div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">A</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">B</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">C</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                      <td style={{ border: '1px solid gray', padding: '3px' }}>
+                        <div className="td-inner-wrapper-div">-</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
               {/* Additional content will be added here later */}
             </div>
         </div>
@@ -5226,6 +5732,95 @@ export default function DriggsmanTable({
         message={copyFeedbackMessage}
         onComplete={handleCopyFeedbackComplete}
       />
+
+      {/* Domain Registrar Popup */}
+      {registrarPopupOpen && (
+        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl relative">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Select Domain Registrar Host Account
+              </h3>
+              <button
+                onClick={() => setRegistrarPopupOpen(null)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 max-h-96 overflow-y-auto">
+              {allHostAccounts.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No host accounts found.</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Create host accounts first to assign them to domains.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {/* None/Clear option */}
+                  <div
+                    className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => updateDomainRegistrar(registrarPopupOpen, null)}
+                  >
+                    <div className="flex items-center flex-1">
+                      <div className="w-3 bg-gray-300"></div>
+                      <div className="flex-1 px-3">
+                        <span className="text-sm font-medium text-gray-500">No Registrar</span>
+                        <div className="text-xs text-gray-400">Clear current assignment</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Host account options */}
+                  {allHostAccounts.map((account) => (
+                    <div
+                      key={account.host_account_id}
+                      className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                      onClick={() => updateDomainRegistrar(registrarPopupOpen, account.host_account_id)}
+                    >
+                      <div className="flex items-center flex-1">
+                        {/* Company name */}
+                        <div className="w-24 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                          {account.company_name}
+                        </div>
+                        
+                        {/* Black vertical separator */}
+                        <div className="w-px h-8 bg-black mx-3"></div>
+                        
+                        {/* Username */}
+                        <div className="flex-1 px-3">
+                          <span className="text-sm font-medium text-gray-900">{account.username}</span>
+                          {account.portal_url && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              Portal: {account.portal_url}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end p-4 border-t border-gray-200 space-x-3">
+              <button
+                onClick={() => setRegistrarPopupOpen(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -7,10 +7,6 @@ import DriggsmanTable from './components/DriggsmanTable';
 import dynamic from 'next/dynamic';
 
 
-const DrenjariButtonBarDriggsmanLinks = dynamic(
-  () => import('@/app/components/DrenjariButtonBarDriggsmanLinks'),
-  { ssr: false }
-);
 
 export default function DriggsmanClient() {
   const { user } = useAuth();
@@ -77,31 +73,7 @@ export default function DriggsmanClient() {
         >
           {isHeaderVisible ? 'Hide Page Header' : 'Show Page Header'}
         </button>
-        
-        {/* Drenjari Navigation Links */}
-        <div>
-          <DrenjariButtonBarDriggsmanLinks />
-        </div>
 
-        {/* Verification and Competitor Buttons */}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setShowVerificationColumn(!showVerificationColumn)}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              showVerificationColumn ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            show verification column
-          </button>
-          <button
-            onClick={() => setShowCompetitorSites(!showCompetitorSites)}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              showCompetitorSites ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            show competitor sites
-          </button>
-        </div>
       </div>
       {/* Pagination and Search Controls */}
       {paginationControls && (
@@ -127,6 +99,8 @@ export default function DriggsmanClient() {
           showVerificationColumn={showVerificationColumn}
           showCompetitorSites={showCompetitorSites}
           onSitesCountChange={setSitesCount}
+          onShowVerificationColumnChange={setShowVerificationColumn}
+          onShowCompetitorSitesChange={setShowCompetitorSites}
         />
       </div>
     </div>
