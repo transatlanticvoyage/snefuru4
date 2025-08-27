@@ -482,7 +482,7 @@ export default function DriggsPacksTable() {
                 <th
                   key={field}
                   onClick={() => handleSort(field as keyof DriggsPacksRecord)}
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-900 lowercase tracking-wider cursor-pointer hover:bg-gray-100"
                   style={{ border: '1px solid gray' }}
                 >
                   <div className="flex items-center space-x-1">

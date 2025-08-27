@@ -67,14 +67,66 @@ export default function DriggsmanClient() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Pagination and Search Controls */}
       {paginationControls && (
-        <div className="px-6 py-1 bg-white border-b">
-          <div className="flex items-center space-x-6">
+        <div className="px-6 py-1 border-b">
+          <div 
+            className="flex items-center space-x-4"
+            style={{
+              backgroundColor: '#000000',
+              backgroundImage: `
+                radial-gradient(1px 1px at 50px 25px, #722F37, transparent),
+                radial-gradient(2px 2px at 120px 15px, #808080, transparent),
+                radial-gradient(1px 1px at 200px 35px, #FFD700, transparent),
+                radial-gradient(2px 2px at 80px 40px, #ADD8E6, transparent),
+                radial-gradient(1px 1px at 300px 20px, #722F37, transparent),
+                radial-gradient(3px 3px at 180px 10px, #808080, transparent),
+                radial-gradient(1px 1px at 400px 45px, #FFD700, transparent),
+                radial-gradient(2px 2px at 250px 30px, #ADD8E6, transparent),
+                radial-gradient(1px 1px at 500px 15px, #722F37, transparent),
+                radial-gradient(2px 2px at 350px 40px, #808080, transparent),
+                radial-gradient(4px 4px at 450px 25px, #FFD700, transparent),
+                radial-gradient(1px 1px at 600px 35px, #ADD8E6, transparent),
+                radial-gradient(2px 2px at 550px 10px, #722F37, transparent),
+                radial-gradient(1px 1px at 700px 20px, #808080, transparent),
+                radial-gradient(3px 3px at 650px 45px, #FFD700, transparent),
+                radial-gradient(1px 1px at 750px 30px, #ADD8E6, transparent),
+                radial-gradient(2px 2px at 800px 15px, #722F37, transparent),
+                radial-gradient(1px 1px at 900px 40px, #808080, transparent),
+                radial-gradient(2px 2px at 850px 25px, #FFD700, transparent),
+                radial-gradient(1px 1px at 950px 35px, #ADD8E6, transparent),
+                radial-gradient(3px 3px at 1000px 10px, #722F37, transparent),
+                radial-gradient(1px 1px at 1100px 45px, #808080, transparent),
+                radial-gradient(2px 2px at 1050px 20px, #FFD700, transparent),
+                radial-gradient(1px 1px at 1150px 30px, #ADD8E6, transparent),
+                radial-gradient(2px 2px at 1200px 15px, #722F37, transparent),
+                radial-gradient(1px 1px at 1250px 40px, #808080, transparent),
+                radial-gradient(3px 3px at 1300px 25px, #FFD700, transparent),
+                radial-gradient(1px 1px at 1350px 35px, #ADD8E6, transparent),
+                radial-gradient(2px 2px at 1400px 10px, #722F37, transparent),
+                radial-gradient(1px 1px at 30px 10px, #808080, transparent),
+                radial-gradient(2px 2px at 150px 50px, #FFD700, transparent),
+                radial-gradient(1px 1px at 270px 5px, #ADD8E6, transparent),
+                radial-gradient(3px 3px at 380px 15px, #722F37, transparent),
+                radial-gradient(1px 1px at 480px 35px, #808080, transparent),
+                radial-gradient(2px 2px at 580px 45px, #FFD700, transparent),
+                radial-gradient(1px 1px at 680px 5px, #ADD8E6, transparent),
+                radial-gradient(2px 2px at 780px 35px, #722F37, transparent),
+                radial-gradient(1px 1px at 880px 15px, #808080, transparent),
+                radial-gradient(3px 3px at 980px 45px, #FFD700, transparent),
+                radial-gradient(1px 1px at 1080px 25px, #ADD8E6, transparent),
+                radial-gradient(2px 2px at 1180px 5px, #722F37, transparent)
+              `,
+              backgroundSize: '100% 100%',
+              padding: '8px',
+              borderRadius: '4px'
+            }}
+          >
             {/* Andromeda Logo */}
             <div 
-              className="text-white font-bold text-xl bg-black rounded flex items-center justify-center"
+              className="bg-black rounded flex items-center"
               style={{
-                width: '200px',
+                width: '280px',
                 height: '50px',
+                border: '1px solid red',
                 backgroundImage: `
                   radial-gradient(1px 1px at 25px 12px, #722F37, transparent),
                   radial-gradient(2px 2px at 65px 8px, #808080, transparent),
@@ -93,14 +145,49 @@ export default function DriggsmanClient() {
                   radial-gradient(3px 3px at 155px 8px, #FFD700, transparent),
                   radial-gradient(1px 1px at 115px 28px, #ADD8E6, transparent),
                   radial-gradient(2px 2px at 175px 42px, #722F37, transparent),
-                  radial-gradient(1px 1px at 5px 25px, #808080, transparent)
+                  radial-gradient(1px 1px at 5px 25px, #808080, transparent),
+                  radial-gradient(2px 2px at 220px 10px, #808080, transparent),
+                  radial-gradient(1px 1px at 250px 30px, #FFD700, transparent),
+                  radial-gradient(2px 2px at 270px 40px, #ADD8E6, transparent)
                 `,
-                backgroundSize: '200px 50px',
-                fontSize: '20px',
-                lineHeight: '1'
+                backgroundSize: '280px 50px'
               }}
             >
-              Andromeda
+              {/* Logo wrapper with minimal padding and left margin */}
+              <div 
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  padding: '2px',
+                  marginLeft: '5px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <img 
+                  src="/images/driggsman/andromeda-logo-transparent-trimmed-2.png"
+                  alt="Andromeda Logo"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    objectFit: 'contain'
+                  }}
+                />
+              </div>
+              
+              {/* Text wrapper moved closer to logo */}
+              <div 
+                className="text-white font-bold text-xl flex items-center justify-center"
+                style={{
+                  flex: '1',
+                  fontSize: '20px',
+                  lineHeight: '1',
+                  marginLeft: '-20px'
+                }}
+              >
+                Andromeda Editor
+              </div>
             </div>
             {/* Show Page Header Button - moved here as requested */}
             <button

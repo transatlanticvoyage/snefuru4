@@ -1521,3 +1521,28 @@ In this current conversation, I only worked on:
 
 You might be thinking of a different conversation/session where you were working on the zz3 popup implementation. The chatdori component appears to be intact and properly placed within the zz3 popup structure at `DriggsmanTable.tsx:5532-5536`.
 
+---
+
+_**User**_
+
+
+
+
+Andromeda
+
+
+please create a div that contains the text
+Andromeda
+
+text is white bold 20 px
+
+bg color of div is black
+
+place this on /driggsman to the left of the "show page header" button. note: this should not cause the elements in this row to expand the screen vertically in any way to accomodate this new piece. they can be shifted horizontally and resized in their horizontal spacing, etc. but the ui row itself should not expand vertically or cause any elements to move to another line in the flex system. 
+
+so so this new logo piece should be cleanly integrated with this in mind
+
+then please create a star speckled background behind the text in the div with stars composed of 1 px - 4 px stars that have dark maroon, gray, yellow, etc. star like (and light blue too) appearance dotted across the background at a natural looking interval of randomness across the whole div (to simulate the look of the sky - not a repeating pattern that can be seen in multiple instances to the user's eyeball where they're viewing this)
+
+
+

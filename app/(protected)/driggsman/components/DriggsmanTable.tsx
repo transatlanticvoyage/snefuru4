@@ -5596,6 +5596,21 @@ export default function DriggsmanTable({
                 </Link>
               </div>
               
+              {/* driggs-pack-main-tub */}
+              <div className="driggs-pack-main-tub mt-6" style={{ border: '1px solid black' }}>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', padding: '8px' }}>
+                  driggs-pack-main-tub
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', paddingLeft: '8px', paddingRight: '8px' }}>
+                  driggs_packs_ui_table
+                </div>
+                
+                {/* DriggsPacksTable Component */}
+                <div style={{ padding: '8px' }}>
+                  <DriggsPacksTable />
+                </div>
+              </div>
+              
               {/* krexport-main-box */}
               <div className="krexport-main-box" style={{ border: '1px solid black' }}>
                 <div style={{ fontSize: '16px', fontWeight: 'bold', padding: '8px' }}>
@@ -5720,21 +5735,6 @@ export default function DriggsmanTable({
                     </tr>
                   </tbody>
                 </table>
-              </div>
-              
-              {/* driggs-pack-main-tub */}
-              <div className="driggs-pack-main-tub mt-6" style={{ border: '1px solid black' }}>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', padding: '8px' }}>
-                  driggs-pack-main-tub
-                </div>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', paddingLeft: '8px', paddingRight: '8px' }}>
-                  driggs_packs_ui_table
-                </div>
-                
-                {/* DriggsPacksTable Component */}
-                <div style={{ padding: '8px' }}>
-                  <DriggsPacksTable />
-                </div>
               </div>
               
               {/* Additional content will be added here later */}
