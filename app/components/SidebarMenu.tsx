@@ -400,8 +400,8 @@ export default function SidebarMenu({ isOpen, onToggle, showToggleButton = true 
       {showToggleButton && (
         <button
           onClick={onToggle}
-          className="fixed z-40 p-2 bg-gray-800 rounded-md shadow-lg border border-gray-600 hover:bg-gray-700 transition-colors"
-          style={{ top: '1px', left: '1px' }}
+          className="fixed z-40 p-2 rounded-md shadow-lg border border-gray-600 hover:bg-gray-700 transition-colors"
+          style={{ top: '1px', left: '1px', backgroundColor: '#cecece' }}
           title="Toggle Navigation Menu"
         >
           <svg className="h-5 w-5 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">

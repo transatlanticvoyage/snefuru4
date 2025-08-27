@@ -18,6 +18,11 @@ const DrenjariButtonBarDriggsmanLinks = dynamic(
   { ssr: false }
 );
 
+const DriggsPacksTable = dynamic(
+  () => import('@/app/(protected)/dpackjar/components/DriggsPacksTable'),
+  { ssr: false }
+);
+
 interface SitesprenSite {
   id: string;
   created_at: string;
@@ -5496,7 +5501,7 @@ export default function DriggsmanTable({
             style={{
               top: 0,
               left: driggspackPopup.position.left + 10, // 10px gap for the triangle
-              width: '840px',
+              width: `calc(100vw - ${driggspackPopup.position.left + 10}px)`,
               height: '100vh'
             }}
           >
@@ -5715,6 +5720,21 @@ export default function DriggsmanTable({
                     </tr>
                   </tbody>
                 </table>
+              </div>
+              
+              {/* driggs-pack-main-tub */}
+              <div className="driggs-pack-main-tub mt-6" style={{ border: '1px solid black' }}>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', padding: '8px' }}>
+                  driggs-pack-main-tub
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', paddingLeft: '8px', paddingRight: '8px' }}>
+                  driggs_packs_ui_table
+                </div>
+                
+                {/* DriggsPacksTable Component */}
+                <div style={{ padding: '8px' }}>
+                  <DriggsPacksTable />
+                </div>
               </div>
               
               {/* Additional content will be added here later */}
