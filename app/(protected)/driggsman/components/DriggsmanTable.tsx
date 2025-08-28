@@ -441,6 +441,7 @@ export default function DriggsmanTable({
   // Horizontal tabs state
   const [activeTab, setActiveTab] = useState(1);
   const [showChamberBoxes, setShowChamberBoxes] = useState(true); // Visibility toggle for chamber boxes
+  const [showTundraChamber, setShowTundraChamber] = useState(false); // Tundra Chamber checkbox state
   const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
   
   // Vacuum and Zarpscrapes states
@@ -2893,7 +2894,19 @@ export default function DriggsmanTable({
                   borderRightColor: '#d5d5d5'
                 }}
               >
-{tabNumber === 5 ? 'nav stuff' : `tab ${tabNumber}`}
+                {tabNumber === 5 ? 'nav stuff' : 
+                 tabNumber === 6 ? (
+                   <div className="flex items-center space-x-2">
+                     <input
+                       type="checkbox"
+                       checked={showTundraChamber}
+                       onChange={(e) => setShowTundraChamber(e.target.checked)}
+                       onClick={(e) => e.stopPropagation()}
+                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                     />
+                     <span>Show Tundra Chamber</span>
+                   </div>
+                 ) : `tab ${tabNumber}`}
               </button>
             ))}
           </div>

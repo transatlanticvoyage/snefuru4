@@ -26,6 +26,7 @@ export default function PlanchjarClient() {
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
   const [showNozzlePopup, setShowNozzlePopup] = useState(false);
   const [nozzleContent, setNozzleContent] = useState<string>('');
+  const [copySuccess, setCopySuccess] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Generate sharkintax format output
@@ -115,6 +116,18 @@ export default function PlanchjarClient() {
       setShowNozzlePopup(true);
     } catch (err) {
       console.error('Error generating walrustax output:', err);
+    }
+  };
+
+  // Copy content to clipboard
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(nozzleContent);
+      setCopySuccess(true);
+      // Reset success message after 2 seconds
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
     }
   };
 
@@ -385,12 +398,31 @@ export default function PlanchjarClient() {
             </div>
           </div>
           
-          {/* Large Codebox Area */}
-          <div className="flex-1 px-6 pb-6">
+          {/* Copy Button and Large Codebox Area */}
+          <div className="flex-1 px-6 pb-6 flex flex-col">
+            {/* Copy Button */}
+            <div className="mb-3 flex justify-between items-center">
+              <button
+                onClick={copyToClipboard}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded text-sm transition-colors flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy to Clipboard
+              </button>
+              {copySuccess && (
+                <span className="text-green-600 text-sm font-medium">
+                  Copied successfully!
+                </span>
+              )}
+            </div>
+            
+            {/* Textarea */}
             <textarea
               value={nozzleContent}
               onChange={(e) => setNozzleContent(e.target.value)}
-              className="w-full h-full p-4 bg-gray-900 text-green-400 font-mono text-sm border border-gray-600 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 p-4 bg-gray-900 text-green-400 font-mono text-sm border border-gray-600 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter code here..."
               spellCheck="false"
             />

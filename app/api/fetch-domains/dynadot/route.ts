@@ -63,26 +63,26 @@ export async function POST(request: NextRequest) {
 
     const dynadotData = await response.json();
     
-    if (dynadotData.status !== 'success') {
+    // Check if the response has the expected structure
+    if (!dynadotData.ListDomainInfoResponse || dynadotData.ListDomainInfoResponse.Status !== 'success') {
       console.error('Dynadot API returned error:', dynadotData);
       return NextResponse.json(
-        { success: false, error: dynadotData.error || 'Dynadot API error' },
+        { success: false, error: 'Dynadot API error - invalid response structure' },
         { status: 400 }
       );
     }
 
-    // Extract domains from response
-    const domains = dynadotData.domain_list || [];
+    // Extract domains from response - Dynadot uses ListDomainInfoResponse.MainDomains structure
+    const domains = dynadotData.ListDomainInfoResponse.MainDomains || [];
     const domainsText = domains.map((domain: any) => {
-      return `${domain.name} | Expires: ${domain.expiration} | Status: ${domain.status}`;
+      return `${domain.Name} | Expires: ${domain.Expiration} | Status: ${domain.Status || 'Active'}`;
     }).join('\n');
 
     // Update the domains_glacier field in the host_account
     const { error: updateError } = await supabase
       .from('host_account')
       .update({ 
-        domains_glacier: domainsText,
-        updated_at: new Date().toISOString()
+        domains_glacier: domainsText
       })
       .eq('id', host_account_id);
 

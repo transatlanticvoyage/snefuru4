@@ -98,8 +98,7 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabase
       .from('host_account')
       .update({ 
-        domains_glacier: domainsText,
-        updated_at: new Date().toISOString()
+        domains_glacier: domainsText
       })
       .eq('id', host_account_id);
 
