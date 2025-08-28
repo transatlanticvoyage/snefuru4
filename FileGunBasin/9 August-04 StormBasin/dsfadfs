@@ -1,0 +1,28 @@
+under this content:
+———————————————————————
+tundra_chamber
+Independent Chamber
+Shows Data For The 1 sitespren_base Whose Column Set Is Farthest Left In The Viewing Screen
+———————————————————————
+
+please create a system of horizontal tabs that say:
+
+ntab1
+ntab2
+ntab3
+ntab4
+ntab5
+ntab6
+ntab7
+
+leave the area below them blank of any rael content right now
+
+just put
+
+ntab1 chamber
+ntab2 chamber
+etc
+
+in bold text in 16 px inside each of them for content now
+
+so this is a horizontal tab system inside the tundra chamber itself

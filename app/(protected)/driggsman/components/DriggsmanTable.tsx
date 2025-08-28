@@ -195,6 +195,8 @@ interface DriggsmanTableProps {
   onSitesCountChange?: (count: number) => void;
   onShowVerificationColumnChange?: (show: boolean) => void;
   onShowCompetitorSitesChange?: (show: boolean) => void;
+  showTundraChamber?: boolean;
+  onShowTundraChamberChange?: (show: boolean) => void;
 }
 
 // Helper component for vacuum/zarpscrape cell display
@@ -338,7 +340,9 @@ export default function DriggsmanTable({
   showCompetitorSites = false,
   onSitesCountChange,
   onShowVerificationColumnChange,
-  onShowCompetitorSitesChange
+  onShowCompetitorSitesChange,
+  showTundraChamber = false,
+  onShowTundraChamberChange
 }: DriggsmanTableProps) {
   const searchParams = useSearchParams();
   const [sites, setSites] = useState<SitesprenSite[]>([]);
@@ -441,7 +445,6 @@ export default function DriggsmanTable({
   // Horizontal tabs state
   const [activeTab, setActiveTab] = useState(1);
   const [showChamberBoxes, setShowChamberBoxes] = useState(true); // Visibility toggle for chamber boxes
-  const [showTundraChamber, setShowTundraChamber] = useState(false); // Tundra Chamber checkbox state
   const [storedManualSites, setStoredManualSites] = useState<string[]>([]); // Store manual sites permanently
   
   // Vacuum and Zarpscrapes states
@@ -2900,7 +2903,7 @@ export default function DriggsmanTable({
                      <input
                        type="checkbox"
                        checked={showTundraChamber}
-                       onChange={(e) => setShowTundraChamber(e.target.checked)}
+                       onChange={(e) => onShowTundraChamberChange?.(e.target.checked)}
                        onClick={(e) => e.stopPropagation()}
                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                      />
@@ -3340,6 +3343,96 @@ export default function DriggsmanTable({
               </Link>
             </div>
             
+          </div>
+        </div>
+      )}
+
+      {/* Tundra Chamber - Independent chamber controlled by checkbox */}
+      {showTundraChamber && (
+        <div className="tundra-chamber border border-gray-700 rounded-lg mb-4">
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center mb-3">
+              <div className="font-bold text-sm text-gray-800">tundra_chamber</div>
+              <div className="ml-4 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-md">
+                Independent Chamber
+              </div>
+              {paginatedSites[0] && (
+                <div className="ml-4 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-md font-medium">
+                  {paginatedSites[0].sitespren_base || `site ${paginatedSites[0].id.slice(0, 8)}`}
+                </div>
+              )}
+              <div className="ml-4 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md">
+                Shows Data For The 1 sitespren_base Whose Column Set Is Farthest Left In The Viewing Screen
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="text-sm text-gray-600">
+                This chamber operates independently from the tab system above. 
+                It can be visible simultaneously with any of the other chambers.
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border border-gray-200 rounded p-3 bg-white">
+                  <div className="text-xs font-medium text-gray-700 mb-2">Tundra Settings</div>
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm text-gray-600">
+                      <input type="checkbox" className="mr-2 w-4 h-4" />
+                      Enable Tundra Mode
+                    </label>
+                    <label className="flex items-center text-sm text-gray-600">
+                      <input type="checkbox" className="mr-2 w-4 h-4" />
+                      Show Frozen Assets
+                    </label>
+                  </div>
+                </div>
+                
+                <div className="border border-gray-200 rounded p-3 bg-white">
+                  <div className="text-xs font-medium text-gray-700 mb-2">Chamber Status</div>
+                  <div className="text-sm text-green-600">
+                    ✓ Chamber Active
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Independent of tabs 1-5
+                  </div>
+                </div>
+              </div>
+              
+              {/* Horizontal Tab System inside Tundra Chamber */}
+              <div className="mt-6 border-t border-gray-300 pt-4">
+                {/* Tab Headers */}
+                <div className="flex border-b border-gray-200">
+                  <button className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 bg-blue-50">
+                    ntab1
+                  </button>
+                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    ntab2
+                  </button>
+                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    ntab3
+                  </button>
+                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    ntab4
+                  </button>
+                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    ntab5
+                  </button>
+                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    ntab6
+                  </button>
+                  <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    ntab7
+                  </button>
+                </div>
+                
+                {/* Tab Content */}
+                <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                  <div className="text-base font-bold" style={{ fontSize: '16px' }}>
+                    ntab1 chamber
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -3911,7 +4004,7 @@ export default function DriggsmanTable({
                                 
                                 {/* DG - Driggsman link */}
                                 <a
-                                  href={`/driggsman?sitesentered=${encodeURIComponent(domain)}&activefilterchamber=daylight&showmainchamberboxes=no`}
+                                  href={`/driggsman?sitesentered=${encodeURIComponent(domain)}&activefilterchamber=daylight&showmainchamberboxes=no&showtundrachamber=yes`}
                                   onClick={(e) => e.stopPropagation()}
                                   style={{...baseButtonStyle, backgroundColor: '#8b5cf6'}}
                                   title="Open Driggsman"

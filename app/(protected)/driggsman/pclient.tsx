@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DriggsmanTable from './components/DriggsmanTable';
 import dynamic from 'next/dynamic';
 
@@ -11,11 +11,23 @@ import dynamic from 'next/dynamic';
 export default function DriggsmanClient() {
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(() => {
     // Initialize from localStorage with default as false (hidden)
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('driggsman-header-visible');
       return saved === null ? false : saved === 'true';
+    }
+    return false;
+  });
+
+  // State for tundra chamber visibility
+  const [showTundraChamber, setShowTundraChamber] = useState<boolean>(() => {
+    // Initialize from URL parameter
+    if (typeof window !== 'undefined') {
+      const urlParam = new URLSearchParams(window.location.search).get('showtundrachamber');
+      return urlParam === 'yes';
     }
     return false;
   });
@@ -37,6 +49,29 @@ export default function DriggsmanClient() {
       return;
     }
   }, [user, router]);
+
+  // Ensure URL parameter is always present and sync with state
+  useEffect(() => {
+    const currentParams = new URLSearchParams(window.location.search);
+    const currentParam = currentParams.get('showtundrachamber');
+    
+    // If parameter doesn't exist or state doesn't match URL, update URL
+    if (currentParam !== (showTundraChamber ? 'yes' : 'no')) {
+      currentParams.set('showtundrachamber', showTundraChamber ? 'yes' : 'no');
+      const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, [showTundraChamber]);
+
+  // Initialize URL parameter on first load if missing
+  useEffect(() => {
+    const currentParams = new URLSearchParams(window.location.search);
+    if (!currentParams.has('showtundrachamber')) {
+      currentParams.set('showtundrachamber', 'no');
+      const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, []);
 
   // Save header visibility state to localStorage and update body class
   useEffect(() => {
@@ -231,6 +266,8 @@ export default function DriggsmanClient() {
           onSitesCountChange={setSitesCount}
           onShowVerificationColumnChange={setShowVerificationColumn}
           onShowCompetitorSitesChange={setShowCompetitorSites}
+          showTundraChamber={showTundraChamber}
+          onShowTundraChamberChange={setShowTundraChamber}
         />
       </div>
     </div>
