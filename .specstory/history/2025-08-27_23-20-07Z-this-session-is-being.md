@@ -559,3 +559,9 @@ Both navigation components now display actual profile pictures instead of letter
 
 The implementation is complete and both sidebar and header areas that appear on almost every page now include the avatar pictures as requested.
 
+---
+
+_**User**_
+
+pleae study the /haccjar2 page and use supabase connection to study the related db schema for the page. this shouldnt take a long time. just store it in your memory for now 
+

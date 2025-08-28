@@ -24,6 +24,7 @@ export default function PlanchjarClient() {
   const [filteredSites, setFilteredSites] = useState<SitesprenRecord[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [userInternalId, setUserInternalId] = useState<string | null>(null);
+  const [showNozzlePopup, setShowNozzlePopup] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Get internal user ID from users table
@@ -227,6 +228,16 @@ export default function PlanchjarClient() {
               )}
             </div>
           </div>
+          
+          {/* Nozzle Popup Button */}
+          <div className="ml-4">
+            <button
+              onClick={() => setShowNozzlePopup(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded text-sm h-8 transition-colors"
+            >
+              nozzle popup
+            </button>
+          </div>
         </div>
       </div>
 
@@ -260,6 +271,32 @@ export default function PlanchjarClient() {
           {/* Dpackjar Content */}
           <div className="flex-1 overflow-hidden">
             <DriggsPacksTable />
+          </div>
+        </div>
+      )}
+      
+      {/* Nozzle Popup */}
+      {showNozzlePopup && (
+        <div className="fixed top-0 right-0 h-full w-[900px] z-50 bg-white shadow-xl flex flex-col">
+          <div className="p-6 flex-shrink-0">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">nozzle popup</h2>
+              <button
+                onClick={() => setShowNozzlePopup(false)}
+                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          
+          {/* Large Codebox Area */}
+          <div className="flex-1 px-6 pb-6">
+            <textarea
+              className="w-full h-full p-4 bg-gray-900 text-green-400 font-mono text-sm border border-gray-600 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter code here..."
+              spellCheck="false"
+            />
           </div>
         </div>
       )}

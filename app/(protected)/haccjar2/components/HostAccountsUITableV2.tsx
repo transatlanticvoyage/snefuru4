@@ -20,6 +20,7 @@ interface HostAccountRecord {
   fk_user_id: string;
   fk_host_company_id: string | null;
   host_company: HostCompany | null;
+  domains_glacier: string | null;
 }
 
 interface HostAccountsUITableV2Props {
@@ -39,6 +40,8 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [selectedHostAccounts, setSelectedHostAccounts] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -150,6 +153,51 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
     if (!apiKey) return '-';
     if (apiKey.length <= 8) return '••••••••';
     return apiKey.substring(0, 4) + '••••••••' + apiKey.substring(apiKey.length - 4);
+  };
+
+  const handleFetchDomains = async () => {
+    const selectedId = Array.from(selectedHostAccounts)[0];
+    const selectedAccount = data.find(account => account.id === selectedId);
+    
+    if (!selectedAccount) {
+      setFetchError('Selected account not found');
+      return;
+    }
+
+    setIsLoading(true);
+    setFetchError(null);
+
+    try {
+      console.log('Fetching domains for account:', selectedAccount);
+      
+      const response = await fetch('/api/fetch-domains', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          host_account_id: selectedAccount.id
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('Successfully fetched domains:', result);
+        // Refresh the data to show updated domains_glacier
+        if (onDataChange) {
+          onDataChange();
+        }
+      } else {
+        console.error('Error fetching domains:', result.error);
+        setFetchError(result.error);
+      }
+    } catch (error) {
+      console.error('Error calling fetch domains API:', error);
+      setFetchError('Network error occurred while fetching domains');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -377,6 +425,51 @@ export default function HostAccountsUITableV2({ data, onDataChange }: HostAccoun
             Last
           </button>
         </div>
+      </div>
+
+      {/* Action Button */}
+      <div className="mt-4 flex flex-col items-center space-y-2">
+        <button
+          className="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400"
+          onClick={handleFetchDomains}
+          disabled={selectedHostAccounts.size !== 1 || isLoading}
+        >
+          {isLoading ? 'Fetching domains...' : 'fetch domains_glacier'}
+        </button>
+        
+        {fetchError && (
+          <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-md">
+            Error: {fetchError}
+          </div>
+        )}
+      </div>
+
+      {/* Domains Glacier Text Box */}
+      <div className="mt-6">
+        <div className="mb-2">
+          <span className="text-sm font-bold text-gray-700">
+            host_account.domains_glacier {selectedHostAccounts.size === 1 && (() => {
+              const selectedId = Array.from(selectedHostAccounts)[0];
+              const selectedAccount = data.find(account => account.id === selectedId);
+              const companyName = selectedAccount?.host_company?.name || 'unknown';
+              const username = selectedAccount?.username || 'unknown';
+              return `(${companyName} - ${username})`;
+            })()}
+          </span>
+        </div>
+        <textarea
+          className="w-full h-64 px-4 py-3 border border-gray-300 rounded-md text-sm font-mono resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder={selectedHostAccounts.size === 1 ? "Domain data will appear here after fetching..." : "Select exactly one host account to view domains_glacier data"}
+          value={(() => {
+            if (selectedHostAccounts.size === 1) {
+              const selectedId = Array.from(selectedHostAccounts)[0];
+              const selectedAccount = data.find(account => account.id === selectedId);
+              return selectedAccount?.domains_glacier || '';
+            }
+            return '';
+          })()}
+          readOnly
+        />
       </div>
     </div>
   );

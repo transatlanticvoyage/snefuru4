@@ -851,7 +851,7 @@ export default function DriggsPacksTable() {
                 <td className="px-2 py-4 text-sm text-gray-900" style={{ border: '1px solid gray' }}>
                   <div className="flex flex-col gap-1">
                     <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
-                      equal signs and hyphens
+                      sharkintax - equal signs and hyphens
                     </button>
                     <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded border text-gray-700 transition-colors">
                       vertical transposed csv paste
